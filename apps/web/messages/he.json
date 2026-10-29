@@ -12270,5 +12270,84 @@
       "undo_incomplete": "חלק מהשורות לא בוטלו. נסו שוב.",
       "business_not_activated": "ה-Box שלכם עדיין הדגמה: הפעילו אותו כדי לייבא אנשים."
     }
+  },
+  "SetupRecipes": {
+    "loading": "טוען…",
+    "welcome": "ברוך הבא ל-Palee",
+    "title": "איזה סוג box יש לך?",
+    "intro": "נגדיר חבילות מנוי, סוגי שיעורים וכללי הזמנה. הכול אפשר לשנות אחר כך.",
+    "fromScratch": "אף אחד מאלה: להתחיל מאפס",
+    "continue": "המשך",
+    "backToKinds": "סוג ה-box",
+    "previewTitle": "{name}: מה יוגדר",
+    "previewIntro": "שנה כאן מחירים אם תרצה. את השאר משנים בהגדרות.",
+    "packages": "חבילות מנוי",
+    "packagesInPlace": "חבילות המנוי כבר קיימות.",
+    "perMonth": "/חודש",
+    "perYear": "/שנה",
+    "priceInvalid": "הזן סכום, למשל 75 או 75.50.",
+    "typesAndRules": "סוגי שיעורים וכללים",
+    "noClassTypes": "ללא שיעורים",
+    "advancedCount": "{count, plural, one {ועוד הגדרה אחת עם ברירת מחדל טובה תחת „מתקדם“} other {ועוד # הגדרות עם ברירת מחדל טובה תחת „מתקדם“}}",
+    "nothingToChange": "כל זה כבר קיים ב-box שלך.",
+    "ownerOnly": "רק הבעלים מחיל מתכון.",
+    "apply": "החל",
+    "appliedTitle": "ה-box שלך הוגדר כ-{name}",
+    "appliedCounts": "{packages, plural, one {חבילת מנוי אחת} other {# חבילות מנוי}} · {types, plural, one {סוג שיעור אחד} other {# סוגי שיעורים}} · {rules, plural, one {כלל אחד} other {# כללים}}",
+    "otherRecipe": "מתכון אחר",
+    "start": "התחל",
+    "next": {
+      "title": "הצעדים הבאים",
+      "billing": "פרטי חיוב",
+      "billingHint": "לקבלות חוקיות",
+      "payments": "תשלומים אונליין",
+      "paymentsHint": "כפתור אחד, עם Viva",
+      "import": "הבא את החברים שלך",
+      "importHint": "ייבוא מ-Wodify, PushPress, Excel…"
+    },
+    "errors": {
+      "recipe_owner_only": "רק הבעלים מחיל מתכון.",
+      "recipe_step_failed": "שלב במתכון נכשל. נסה שוב.",
+      "invalid_recipe_prices": "אחד המחירים אינו תקין. הזן סכום, למשל 75 או 75.50."
+    },
+    "rules": {
+      "providerGym": "מוצג כ-box",
+      "providerCoach": "מוצג כמאמן עצמאי",
+      "autoApproveOn": "הזמנות מאושרות אוטומטית",
+      "autoApproveOff": "הזמנות באישור מאמן",
+      "bookingWindow": "ההזמנות נפתחות {days, plural, one {יום אחד} other {# ימים}} מראש",
+      "bookingWindowNone": "ההזמנות נפתחות ללא הגבלה",
+      "cutoffHours": "ביטול מאוחר: {hours, plural, one {שעה אחת} other {# שעות}}",
+      "cutoffMinutes": "ביטול מאוחר: {minutes} דקות",
+      "cutoffNone": "ללא מועד אחרון לביטול",
+      "capacity": "מקומות בכל שיעור: {count}",
+      "leaderboardOn": "לוח מובילים פעיל",
+      "leaderboardOff": "ללא לוח מובילים",
+      "trialsOn": "שיעורי ניסיון מהדף הציבורי",
+      "trialsOff": "ללא שיעורי ניסיון",
+      "trialSeats": "מקומות לניסיון בכל שיעור: {count}"
+    }
+  },
+  "AdvancedSettings": {
+    "title": "מתקדם",
+    "hint": "הגדרות עם ברירת מחדל טובה. רק לעיתים רחוקות משנים אותן.",
+    "hintCount": "{count, plural, one {הגדרה אחת עם ברירת מחדל טובה. רק לעיתים רחוקות משנים אותה.} other {# הגדרות עם ברירת מחדל טובה. רק לעיתים רחוקות משנים אותן.}}",
+    "search": "חיפוש הגדרה",
+    "noMatch": "אין הגדרה מתאימה.",
+    "groups": {
+      "bookings": "הזמנות",
+      "payments": "תשלומים ומסמכים",
+      "motivation": "מוטיבציה",
+      "training": "אימון",
+      "community": "קהילה"
+    },
+    "keywords": {
+      "bookings": "הזמנה הזמנות אישור המתנה ביטול מקומות צ'ק-אין כניסה",
+      "payments": "תשלום תשלומים תזכורת חסד תפוגה מנוי מסמכים",
+      "motivation": "מגן מגינים רצף לוח מובילים רמות קושי",
+      "training": "WOD יעדים עוזר AI התאמה",
+      "community": "קהילה דיון הודעות",
+      "access": "תפקידים גישה הרשאות"
+    }
   }
 }

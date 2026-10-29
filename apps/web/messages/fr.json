@@ -12270,5 +12270,84 @@
       "undo_incomplete": "Certaines lignes n’ont pas pu être annulées. Réessaie.",
       "business_not_activated": "Ta box est encore une démo : active-la pour importer des personnes."
     }
+  },
+  "SetupRecipes": {
+    "loading": "Chargement…",
+    "welcome": "Bienvenue sur Palee",
+    "title": "Quel type de box as-tu ?",
+    "intro": "Nous créons les forfaits d'abonnement, les types de cours et les règles de réservation. Tout se modifie plus tard.",
+    "fromScratch": "Aucun de ceux-ci : partir de zéro",
+    "continue": "Continuer",
+    "backToKinds": "Type de box",
+    "previewTitle": "{name} : ce qui sera mis en place",
+    "previewIntro": "Modifie les prix ici si tu veux. Le reste se modifie dans les Réglages.",
+    "packages": "Forfaits d'abonnement",
+    "packagesInPlace": "Les forfaits d'abonnement existent déjà.",
+    "perMonth": "/mois",
+    "perYear": "/an",
+    "priceInvalid": "Saisis un montant, p. ex. 75 ou 75,50.",
+    "typesAndRules": "Types de cours et règles",
+    "noClassTypes": "Sans cours",
+    "advancedCount": "{count, plural, one {Et # réglage avec une bonne valeur par défaut dans « Avancé »} other {Et # réglages avec une bonne valeur par défaut dans « Avancé »}}",
+    "nothingToChange": "Ta box a déjà tout cela.",
+    "ownerOnly": "Seul le propriétaire applique une recette.",
+    "apply": "Appliquer",
+    "appliedTitle": "Ta box est configurée comme {name}",
+    "appliedCounts": "{packages, plural, one {# forfait d'abonnement} other {# forfaits d'abonnement}} · {types, plural, one {# type de cours} other {# types de cours}} · {rules, plural, one {# règle} other {# règles}}",
+    "otherRecipe": "Autre recette",
+    "start": "Commencer",
+    "next": {
+      "title": "Étapes suivantes",
+      "billing": "Données de facturation",
+      "billingHint": "Pour des reçus valables",
+      "payments": "Paiements en ligne",
+      "paymentsHint": "Un bouton, avec Viva",
+      "import": "Fais venir tes membres",
+      "importHint": "Import depuis Wodify, PushPress, Excel…"
+    },
+    "errors": {
+      "recipe_owner_only": "Seul le propriétaire applique une recette.",
+      "recipe_step_failed": "Une étape de la recette a échoué. Réessaie.",
+      "invalid_recipe_prices": "Un prix n'est pas valide. Saisis un montant, p. ex. 75 ou 75,50."
+    },
+    "rules": {
+      "providerGym": "Affiché comme box",
+      "providerCoach": "Affiché comme coach indépendant",
+      "autoApproveOn": "Réservations confirmées automatiquement",
+      "autoApproveOff": "Réservations validées par le coach",
+      "bookingWindow": "Réservations ouvertes {days, plural, one {# jour} other {# jours}} avant",
+      "bookingWindowNone": "Réservations ouvertes sans limite",
+      "cutoffHours": "Annulation tardive : {hours, plural, one {# heure} other {# heures}}",
+      "cutoffMinutes": "Annulation tardive : {minutes} minutes",
+      "cutoffNone": "Pas de délai d'annulation",
+      "capacity": "Places par cours : {count}",
+      "leaderboardOn": "Leaderboard activé",
+      "leaderboardOff": "Pas de leaderboard",
+      "trialsOn": "Essais depuis la page publique",
+      "trialsOff": "Pas d'essais",
+      "trialSeats": "Places d'essai par cours : {count}"
+    }
+  },
+  "AdvancedSettings": {
+    "title": "Avancé",
+    "hint": "Réglages avec une bonne valeur par défaut. On les change rarement.",
+    "hintCount": "{count, plural, one {# réglage avec une bonne valeur par défaut. On le change rarement.} other {# réglages avec une bonne valeur par défaut. On les change rarement.}}",
+    "search": "Rechercher un réglage",
+    "noMatch": "Aucun réglage ne correspond.",
+    "groups": {
+      "bookings": "Réservations",
+      "payments": "Paiements et documents",
+      "motivation": "Motivation",
+      "training": "Entraînement",
+      "community": "Communauté"
+    },
+    "keywords": {
+      "bookings": "réservation réservations validation attente annulation places check-in entrée",
+      "payments": "paiement paiements rappel grâce échéance abonnement documents",
+      "motivation": "bouclier boucliers série leaderboard niveaux difficulté",
+      "training": "WOD objectifs assistant IA AI adaptation",
+      "community": "communauté discussion messages",
+      "access": "rôles accès droits"
+    }
   }
 }

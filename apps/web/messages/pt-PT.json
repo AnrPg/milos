@@ -12270,5 +12270,84 @@
       "undo_incomplete": "Algumas linhas não puderam ser anuladas. Tenta outra vez.",
       "business_not_activated": "A tua box ainda é uma demonstração: ativa-a para importar pessoas."
     }
+  },
+  "SetupRecipes": {
+    "loading": "A carregar…",
+    "welcome": "Bem-vindo ao Palee",
+    "title": "Que tipo de box tens?",
+    "intro": "Configuramos pacotes de subscrição, tipos de aula e regras de reserva. Tudo se muda mais tarde.",
+    "fromScratch": "Nenhum destes: começar do zero",
+    "continue": "Continuar",
+    "backToKinds": "Tipo de box",
+    "previewTitle": "{name}: o que vai ser configurado",
+    "previewIntro": "Muda os preços aqui se quiseres. O resto muda-se nas Definições.",
+    "packages": "Pacotes de subscrição",
+    "packagesInPlace": "Os pacotes de subscrição já existem.",
+    "perMonth": "/mês",
+    "perYear": "/ano",
+    "priceInvalid": "Escreve um valor, p. ex. 75 ou 75,50.",
+    "typesAndRules": "Tipos de aula e regras",
+    "noClassTypes": "Sem aulas",
+    "advancedCount": "{count, plural, one {E # definição com um bom valor predefinido em «Avançadas»} other {E # definições com um bom valor predefinido em «Avançadas»}}",
+    "nothingToChange": "A tua box já tem tudo isto.",
+    "ownerOnly": "Só o proprietário aplica uma receita.",
+    "apply": "Aplicar",
+    "appliedTitle": "A tua box foi configurada como {name}",
+    "appliedCounts": "{packages, plural, one {# pacote de subscrição} other {# pacotes de subscrição}} · {types, plural, one {# tipo de aula} other {# tipos de aula}} · {rules, plural, one {# regra} other {# regras}}",
+    "otherRecipe": "Outra receita",
+    "start": "Começar",
+    "next": {
+      "title": "Próximos passos",
+      "billing": "Dados de faturação",
+      "billingHint": "Para recibos válidos",
+      "payments": "Pagamentos online",
+      "paymentsHint": "Um botão, com Viva",
+      "import": "Traz os teus membros",
+      "importHint": "Importar de Wodify, PushPress, Excel…"
+    },
+    "errors": {
+      "recipe_owner_only": "Só o proprietário aplica uma receita.",
+      "recipe_step_failed": "Um passo da receita falhou. Tenta novamente.",
+      "invalid_recipe_prices": "Um preço não é válido. Escreve um valor, p. ex. 75 ou 75,50."
+    },
+    "rules": {
+      "providerGym": "Mostrado como box",
+      "providerCoach": "Mostrado como coach independente",
+      "autoApproveOn": "Reservas confirmadas automaticamente",
+      "autoApproveOff": "Reservas aprovadas pelo coach",
+      "bookingWindow": "Reservas abrem {days, plural, one {# dia} other {# dias}} antes",
+      "bookingWindowNone": "Reservas abrem sem limite",
+      "cutoffHours": "Cancelamento tardio: {hours, plural, one {# hora} other {# horas}}",
+      "cutoffMinutes": "Cancelamento tardio: {minutes} minutos",
+      "cutoffNone": "Sem prazo de cancelamento",
+      "capacity": "Lugares por aula: {count}",
+      "leaderboardOn": "Leaderboard ativo",
+      "leaderboardOff": "Sem leaderboard",
+      "trialsOn": "Experiências a partir da página pública",
+      "trialsOff": "Sem experiências",
+      "trialSeats": "Lugares de experiência por aula: {count}"
+    }
+  },
+  "AdvancedSettings": {
+    "title": "Avançadas",
+    "hint": "Definições com um bom valor predefinido. Raramente alguém as muda.",
+    "hintCount": "{count, plural, one {# definição com um bom valor predefinido. Raramente alguém a muda.} other {# definições com um bom valor predefinido. Raramente alguém as muda.}}",
+    "search": "Procurar uma definição",
+    "noMatch": "Nenhuma definição corresponde.",
+    "groups": {
+      "bookings": "Reservas",
+      "payments": "Pagamentos e documentos",
+      "motivation": "Motivação",
+      "training": "Treino",
+      "community": "Comunidade"
+    },
+    "keywords": {
+      "bookings": "reserva reservas aprovação espera cancelamento lugares check-in entrada",
+      "payments": "pagamento pagamentos lembrete tolerância expiração subscrição documentos",
+      "motivation": "escudo escudos sequência leaderboard níveis dificuldade",
+      "training": "WOD objetivos assistente IA AI escalonamento",
+      "community": "comunidade discussão mensagens",
+      "access": "funções acesso permissões"
+    }
   }
 }

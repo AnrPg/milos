@@ -12270,5 +12270,84 @@
       "undo_incomplete": "Some rows could not be undone and kept their changes. Try again.",
       "business_not_activated": "Your box is still a demo: activate it to import people."
     }
+  },
+  "SetupRecipes": {
+    "loading": "Loading…",
+    "welcome": "Welcome to Palee",
+    "title": "What kind of box do you run?",
+    "intro": "We set up subscription packages, class types and booking rules. You can change everything later.",
+    "fromScratch": "None of these: start from scratch",
+    "continue": "Continue",
+    "backToKinds": "Kind of box",
+    "previewTitle": "{name}: what will be set up",
+    "previewIntro": "Change prices here if you like. Everything else changes in Settings.",
+    "packages": "Subscription packages",
+    "packagesInPlace": "The subscription packages are already in place.",
+    "perMonth": "/month",
+    "perYear": "/year",
+    "priceInvalid": "Enter an amount, e.g. 75 or 75.50.",
+    "typesAndRules": "Class types and rules",
+    "noClassTypes": "No classes",
+    "advancedCount": "{count, plural, one {Plus # setting with a good default under “Advanced”} other {Plus # settings with a good default under “Advanced”}}",
+    "nothingToChange": "Your box already has all of this.",
+    "ownerOnly": "Only the owner applies a recipe.",
+    "apply": "Apply",
+    "appliedTitle": "Your box is set up as {name}",
+    "appliedCounts": "{packages, plural, one {# subscription package} other {# subscription packages}} · {types, plural, one {# class type} other {# class types}} · {rules, plural, one {# rule} other {# rules}}",
+    "otherRecipe": "Another recipe",
+    "start": "Start",
+    "next": {
+      "title": "Next steps",
+      "billing": "Billing details",
+      "billingHint": "For valid receipts",
+      "payments": "Online payments",
+      "paymentsHint": "One button, with Viva",
+      "import": "Bring your members",
+      "importHint": "Import from Wodify, PushPress, Excel…"
+    },
+    "errors": {
+      "recipe_owner_only": "Only the owner applies a recipe.",
+      "recipe_step_failed": "A step of the recipe failed. Try again.",
+      "invalid_recipe_prices": "A price is not valid. Enter an amount, e.g. 75 or 75.50."
+    },
+    "rules": {
+      "providerGym": "Shown as a box",
+      "providerCoach": "Shown as an independent coach",
+      "autoApproveOn": "Bookings confirmed automatically",
+      "autoApproveOff": "Bookings approved by a coach",
+      "bookingWindow": "Bookings open {days, plural, one {# day} other {# days}} ahead",
+      "bookingWindowNone": "Bookings open with no limit",
+      "cutoffHours": "Late cancellation: {hours, plural, one {# hour} other {# hours}}",
+      "cutoffMinutes": "Late cancellation: {minutes} minutes",
+      "cutoffNone": "No cancellation cutoff",
+      "capacity": "Places per class: {count}",
+      "leaderboardOn": "Leaderboard on",
+      "leaderboardOff": "No leaderboard",
+      "trialsOn": "Trials from the public page",
+      "trialsOff": "No trials",
+      "trialSeats": "Trial places per class: {count}"
+    }
+  },
+  "AdvancedSettings": {
+    "title": "Advanced",
+    "hint": "Settings with a good default. People rarely change them.",
+    "hintCount": "{count, plural, one {# setting with a good default. People rarely change it.} other {# settings with a good default. People rarely change them.}}",
+    "search": "Search settings",
+    "noMatch": "No setting matches.",
+    "groups": {
+      "bookings": "Bookings",
+      "payments": "Payments and documents",
+      "motivation": "Motivation",
+      "training": "Training",
+      "community": "Community"
+    },
+    "keywords": {
+      "bookings": "booking bookings approval waitlist cancellation places check-in entry",
+      "payments": "payment payments reminder grace expiry subscription documents",
+      "motivation": "shield shields streak leaderboard levels difficulty",
+      "training": "WOD goals assistant AI scaling",
+      "community": "community discussion messages",
+      "access": "roles access permissions"
+    }
   }
 }

@@ -12270,5 +12270,84 @@
       "undo_incomplete": "Sommige rijen konden niet ongedaan worden gemaakt. Probeer het opnieuw.",
       "business_not_activated": "Je box is nog een demo: activeer hem om personen te importeren."
     }
+  },
+  "SetupRecipes": {
+    "loading": "Laden…",
+    "welcome": "Welkom bij Palee",
+    "title": "Wat voor box heb je?",
+    "intro": "We zetten abonnementspakketten, lestypes en boekingsregels klaar. Alles is later aan te passen.",
+    "fromScratch": "Geen van deze: begin bij nul",
+    "continue": "Doorgaan",
+    "backToKinds": "Soort box",
+    "previewTitle": "{name}: wat er wordt ingesteld",
+    "previewIntro": "Pas hier de prijzen aan als je wilt. De rest wijzig je in Instellingen.",
+    "packages": "Abonnementspakketten",
+    "packagesInPlace": "De abonnementspakketten bestaan al.",
+    "perMonth": "/maand",
+    "perYear": "/jaar",
+    "priceInvalid": "Vul een bedrag in, bijv. 75 of 75,50.",
+    "typesAndRules": "Lestypes en regels",
+    "noClassTypes": "Geen lessen",
+    "advancedCount": "{count, plural, one {Plus # instelling met een goede standaard onder ‘Geavanceerd’} other {Plus # instellingen met een goede standaard onder ‘Geavanceerd’}}",
+    "nothingToChange": "Je box heeft dit allemaal al.",
+    "ownerOnly": "Alleen de eigenaar past een recept toe.",
+    "apply": "Toepassen",
+    "appliedTitle": "Je box is ingesteld als {name}",
+    "appliedCounts": "{packages, plural, one {# abonnementspakket} other {# abonnementspakketten}} · {types, plural, one {# lestype} other {# lestypes}} · {rules, plural, one {# regel} other {# regels}}",
+    "otherRecipe": "Ander recept",
+    "start": "Beginnen",
+    "next": {
+      "title": "Volgende stappen",
+      "billing": "Factuurgegevens",
+      "billingHint": "Voor geldige bonnen",
+      "payments": "Online betalingen",
+      "paymentsHint": "Eén knop, met Viva",
+      "import": "Haal je leden binnen",
+      "importHint": "Importeren uit Wodify, PushPress, Excel…"
+    },
+    "errors": {
+      "recipe_owner_only": "Alleen de eigenaar past een recept toe.",
+      "recipe_step_failed": "Een stap van het recept is mislukt. Probeer het opnieuw.",
+      "invalid_recipe_prices": "Een prijs klopt niet. Vul een bedrag in, bijv. 75 of 75,50."
+    },
+    "rules": {
+      "providerGym": "Getoond als box",
+      "providerCoach": "Getoond als zelfstandige coach",
+      "autoApproveOn": "Boekingen automatisch bevestigd",
+      "autoApproveOff": "Boekingen met goedkeuring van de coach",
+      "bookingWindow": "Boekingen openen {days, plural, one {# dag} other {# dagen}} vooraf",
+      "bookingWindowNone": "Boekingen openen zonder limiet",
+      "cutoffHours": "Late annulering: {hours, plural, one {# uur} other {# uur}}",
+      "cutoffMinutes": "Late annulering: {minutes} minuten",
+      "cutoffNone": "Geen annuleringstermijn",
+      "capacity": "Plaatsen per les: {count}",
+      "leaderboardOn": "Leaderboard aan",
+      "leaderboardOff": "Geen leaderboard",
+      "trialsOn": "Proeflessen via de openbare pagina",
+      "trialsOff": "Geen proeflessen",
+      "trialSeats": "Proefplaatsen per les: {count}"
+    }
+  },
+  "AdvancedSettings": {
+    "title": "Geavanceerd",
+    "hint": "Instellingen met een goede standaard. Zelden past iemand ze aan.",
+    "hintCount": "{count, plural, one {# instelling met een goede standaard. Zelden past iemand die aan.} other {# instellingen met een goede standaard. Zelden past iemand ze aan.}}",
+    "search": "Instelling zoeken",
+    "noMatch": "Geen instelling gevonden.",
+    "groups": {
+      "bookings": "Boekingen",
+      "payments": "Betalingen en documenten",
+      "motivation": "Motivatie",
+      "training": "Training",
+      "community": "Community"
+    },
+    "keywords": {
+      "bookings": "boeking boekingen goedkeuring wachtlijst annulering plaatsen check-in toegang",
+      "payments": "betaling betalingen herinnering coulance verloop abonnement documenten",
+      "motivation": "schild schilden reeks leaderboard niveaus moeilijkheid",
+      "training": "WOD doelen assistent AI schaling",
+      "community": "community discussie berichten",
+      "access": "rollen toegang rechten"
+    }
   }
 }

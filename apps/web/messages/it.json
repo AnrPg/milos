@@ -12270,5 +12270,84 @@
       "undo_incomplete": "Alcune righe non sono state annullate. Riprova.",
       "business_not_activated": "Il tuo box è ancora una demo: attivalo per importare persone."
     }
+  },
+  "SetupRecipes": {
+    "loading": "Caricamento…",
+    "welcome": "Benvenuto in Palee",
+    "title": "Che tipo di box hai?",
+    "intro": "Impostiamo pacchetti di abbonamento, tipi di lezione e regole di prenotazione. Tutto si può cambiare dopo.",
+    "fromScratch": "Nessuno di questi: parti da zero",
+    "continue": "Continua",
+    "backToKinds": "Tipo di box",
+    "previewTitle": "{name}: cosa verrà impostato",
+    "previewIntro": "Cambia i prezzi qui se vuoi. Il resto si cambia nelle Impostazioni.",
+    "packages": "Pacchetti di abbonamento",
+    "packagesInPlace": "I pacchetti di abbonamento esistono già.",
+    "perMonth": "/mese",
+    "perYear": "/anno",
+    "priceInvalid": "Inserisci un importo, ad es. 75 o 75,50.",
+    "typesAndRules": "Tipi di lezione e regole",
+    "noClassTypes": "Senza lezioni",
+    "advancedCount": "{count, plural, one {E # impostazione con un buon valore predefinito in «Avanzate»} other {E # impostazioni con un buon valore predefinito in «Avanzate»}}",
+    "nothingToChange": "Il tuo box ha già tutto questo.",
+    "ownerOnly": "Solo il proprietario applica una ricetta.",
+    "apply": "Applica",
+    "appliedTitle": "Il tuo box è impostato come {name}",
+    "appliedCounts": "{packages, plural, one {# pacchetto di abbonamento} other {# pacchetti di abbonamento}} · {types, plural, one {# tipo di lezione} other {# tipi di lezione}} · {rules, plural, one {# regola} other {# regole}}",
+    "otherRecipe": "Un'altra ricetta",
+    "start": "Inizia",
+    "next": {
+      "title": "Prossimi passi",
+      "billing": "Dati di fatturazione",
+      "billingHint": "Per ricevute valide",
+      "payments": "Pagamenti online",
+      "paymentsHint": "Un pulsante, con Viva",
+      "import": "Porta i tuoi membri",
+      "importHint": "Importa da Wodify, PushPress, Excel…"
+    },
+    "errors": {
+      "recipe_owner_only": "Solo il proprietario applica una ricetta.",
+      "recipe_step_failed": "Un passo della ricetta non è riuscito. Riprova.",
+      "invalid_recipe_prices": "Un prezzo non è valido. Inserisci un importo, ad es. 75 o 75,50."
+    },
+    "rules": {
+      "providerGym": "Mostrato come box",
+      "providerCoach": "Mostrato come coach indipendente",
+      "autoApproveOn": "Prenotazioni confermate automaticamente",
+      "autoApproveOff": "Prenotazioni approvate dal coach",
+      "bookingWindow": "Prenotazioni aperte {days, plural, one {# giorno} other {# giorni}} prima",
+      "bookingWindowNone": "Prenotazioni aperte senza limite",
+      "cutoffHours": "Cancellazione tardiva: {hours, plural, one {# ora} other {# ore}}",
+      "cutoffMinutes": "Cancellazione tardiva: {minutes} minuti",
+      "cutoffNone": "Nessun termine di cancellazione",
+      "capacity": "Posti per lezione: {count}",
+      "leaderboardOn": "Leaderboard attiva",
+      "leaderboardOff": "Nessuna leaderboard",
+      "trialsOn": "Prove dalla pagina pubblica",
+      "trialsOff": "Nessuna prova",
+      "trialSeats": "Posti di prova per lezione: {count}"
+    }
+  },
+  "AdvancedSettings": {
+    "title": "Avanzate",
+    "hint": "Impostazioni con un buon valore predefinito. Raramente qualcuno le cambia.",
+    "hintCount": "{count, plural, one {# impostazione con un buon valore predefinito. Raramente qualcuno la cambia.} other {# impostazioni con un buon valore predefinito. Raramente qualcuno le cambia.}}",
+    "search": "Cerca un'impostazione",
+    "noMatch": "Nessuna impostazione corrisponde.",
+    "groups": {
+      "bookings": "Prenotazioni",
+      "payments": "Pagamenti e documenti",
+      "motivation": "Motivazione",
+      "training": "Allenamento",
+      "community": "Community"
+    },
+    "keywords": {
+      "bookings": "prenotazione prenotazioni approvazione attesa cancellazione posti check-in ingresso",
+      "payments": "pagamento pagamenti promemoria tolleranza scadenza abbonamento documenti",
+      "motivation": "scudo scudi serie leaderboard livelli difficoltà",
+      "training": "WOD obiettivi assistente IA AI scalatura",
+      "community": "community discussione messaggi",
+      "access": "ruoli accesso permessi"
+    }
   }
 }

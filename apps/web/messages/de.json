@@ -12270,5 +12270,84 @@
       "undo_incomplete": "Einige Zeilen ließen sich nicht rückgängig machen. Versuch es noch einmal.",
       "business_not_activated": "Deine Box ist noch eine Demo: aktiviere sie, um Personen zu importieren."
     }
+  },
+  "SetupRecipes": {
+    "loading": "Wird geladen…",
+    "welcome": "Willkommen bei Palee",
+    "title": "Was für eine Box hast du?",
+    "intro": "Wir richten Abo-Pakete, Kurstypen und Buchungsregeln ein. Alles lässt sich später ändern.",
+    "fromScratch": "Nichts davon: bei null anfangen",
+    "continue": "Weiter",
+    "backToKinds": "Art der Box",
+    "previewTitle": "{name}: was eingerichtet wird",
+    "previewIntro": "Ändere hier die Preise, wenn du willst. Alles andere änderst du in den Einstellungen.",
+    "packages": "Abo-Pakete",
+    "packagesInPlace": "Die Abo-Pakete gibt es schon.",
+    "perMonth": "/Monat",
+    "perYear": "/Jahr",
+    "priceInvalid": "Gib einen Betrag ein, z. B. 75 oder 75,50.",
+    "typesAndRules": "Kurstypen und Regeln",
+    "noClassTypes": "Keine Kurse",
+    "advancedCount": "{count, plural, one {Dazu # Einstellung mit gutem Standard unter „Erweitert“} other {Dazu # Einstellungen mit gutem Standard unter „Erweitert“}}",
+    "nothingToChange": "Deine Box hat das alles schon.",
+    "ownerOnly": "Nur der Inhaber wendet ein Rezept an.",
+    "apply": "Anwenden",
+    "appliedTitle": "Deine Box ist als {name} eingerichtet",
+    "appliedCounts": "{packages, plural, one {# Abo-Paket} other {# Abo-Pakete}} · {types, plural, one {# Kurstyp} other {# Kurstypen}} · {rules, plural, one {# Regel} other {# Regeln}}",
+    "otherRecipe": "Anderes Rezept",
+    "start": "Loslegen",
+    "next": {
+      "title": "Nächste Schritte",
+      "billing": "Rechnungsdaten",
+      "billingHint": "Für gültige Belege",
+      "payments": "Online-Zahlungen",
+      "paymentsHint": "Ein Knopf, mit Viva",
+      "import": "Hol deine Mitglieder",
+      "importHint": "Import aus Wodify, PushPress, Excel…"
+    },
+    "errors": {
+      "recipe_owner_only": "Nur der Inhaber wendet ein Rezept an.",
+      "recipe_step_failed": "Ein Schritt des Rezepts ist fehlgeschlagen. Versuch es noch einmal.",
+      "invalid_recipe_prices": "Ein Preis ist ungültig. Gib einen Betrag ein, z. B. 75 oder 75,50."
+    },
+    "rules": {
+      "providerGym": "Erscheint als Box",
+      "providerCoach": "Erscheint als unabhängiger Coach",
+      "autoApproveOn": "Buchungen automatisch bestätigt",
+      "autoApproveOff": "Buchungen mit Freigabe durch den Coach",
+      "bookingWindow": "Buchungen öffnen {days, plural, one {# Tag} other {# Tage}} vorher",
+      "bookingWindowNone": "Buchungen ohne Vorlaufgrenze",
+      "cutoffHours": "Späte Stornierung: {hours, plural, one {# Stunde} other {# Stunden}}",
+      "cutoffMinutes": "Späte Stornierung: {minutes} Minuten",
+      "cutoffNone": "Keine Stornofrist",
+      "capacity": "Plätze pro Kurs: {count}",
+      "leaderboardOn": "Leaderboard an",
+      "leaderboardOff": "Kein Leaderboard",
+      "trialsOn": "Probetrainings über die öffentliche Seite",
+      "trialsOff": "Keine Probetrainings",
+      "trialSeats": "Probeplätze pro Kurs: {count}"
+    }
+  },
+  "AdvancedSettings": {
+    "title": "Erweitert",
+    "hint": "Einstellungen mit gutem Standard. Kaum jemand ändert sie.",
+    "hintCount": "{count, plural, one {# Einstellung mit gutem Standard. Kaum jemand ändert sie.} other {# Einstellungen mit gutem Standard. Kaum jemand ändert sie.}}",
+    "search": "Einstellung suchen",
+    "noMatch": "Keine Einstellung passt.",
+    "groups": {
+      "bookings": "Buchungen",
+      "payments": "Zahlungen und Belege",
+      "motivation": "Motivation",
+      "training": "Training",
+      "community": "Community"
+    },
+    "keywords": {
+      "bookings": "Buchung Buchungen Freigabe Warteliste Stornierung Plätze Check-in Zutritt",
+      "payments": "Zahlung Zahlungen Erinnerung Kulanz Ablauf Abo Belege",
+      "motivation": "Schild Schilde Serie Leaderboard Stufen Schwierigkeit",
+      "training": "WOD Ziele Assistent KI AI Skalierung",
+      "community": "Community Diskussion Nachrichten",
+      "access": "Rollen Zugriff Rechte"
+    }
   }
 }

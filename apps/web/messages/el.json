@@ -12270,5 +12270,84 @@
       "undo_incomplete": "Κάποιες γραμμές δεν αναιρέθηκαν και κράτησαν τις αλλαγές τους. Δοκίμασε ξανά.",
       "business_not_activated": "Το box σου είναι ακόμη demo: ενεργοποίησέ το για να εισάγεις άτομα."
     }
+  },
+  "SetupRecipes": {
+    "loading": "Φόρτωση…",
+    "welcome": "Καλώς ήρθες στο Palee",
+    "title": "Τι είδους box έχεις;",
+    "intro": "Στήνουμε πακέτα συνδρομής, τύπους τμημάτων και κανόνες κράτησης. Όλα αλλάζουν αργότερα.",
+    "fromScratch": "Κανένα από αυτά: ξεκίνα από το μηδέν",
+    "continue": "Συνέχεια",
+    "backToKinds": "Είδος box",
+    "previewTitle": "{name}: τι θα στηθεί",
+    "previewIntro": "Άλλαξε τιμές εδώ αν θες. Τα υπόλοιπα αλλάζουν από τις Ρυθμίσεις.",
+    "packages": "Πακέτα συνδρομής",
+    "packagesInPlace": "Τα πακέτα συνδρομής υπάρχουν ήδη.",
+    "perMonth": "/μήνα",
+    "perYear": "/έτος",
+    "priceInvalid": "Γράψε ένα ποσό, π.χ. 75 ή 75,50.",
+    "typesAndRules": "Τύποι τμημάτων και κανόνες",
+    "noClassTypes": "Χωρίς τμήματα",
+    "advancedCount": "{count, plural, one {Και # ρύθμιση με καλή προεπιλογή στα «Προχωρημένα»} other {Και # ρυθμίσεις με καλή προεπιλογή στα «Προχωρημένα»}}",
+    "nothingToChange": "Όλα αυτά υπάρχουν ήδη στο box σου.",
+    "ownerOnly": "Τη συνταγή την εφαρμόζει μόνο ο ιδιοκτήτης.",
+    "apply": "Εφαρμογή",
+    "appliedTitle": "Το box σου στήθηκε ως {name}",
+    "appliedCounts": "{packages, plural, one {# πακέτο συνδρομής} other {# πακέτα συνδρομής}} · {types, plural, one {# τύπος τμήματος} other {# τύποι τμημάτων}} · {rules, plural, one {# κανόνας} other {# κανόνες}}",
+    "otherRecipe": "Άλλη συνταγή",
+    "start": "Ξεκίνα",
+    "next": {
+      "title": "Επόμενα βήματα",
+      "billing": "Στοιχεία τιμολόγησης",
+      "billingHint": "Για νόμιμες αποδείξεις",
+      "payments": "Online πληρωμές",
+      "paymentsHint": "Ένα κουμπί, με Viva",
+      "import": "Φέρε τα μέλη σου",
+      "importHint": "Εισαγωγή από Wodify, PushPress, Excel…"
+    },
+    "errors": {
+      "recipe_owner_only": "Τη συνταγή την εφαρμόζει μόνο ο ιδιοκτήτης.",
+      "recipe_step_failed": "Ένα βήμα της συνταγής απέτυχε. Δοκίμασε ξανά.",
+      "invalid_recipe_prices": "Μια τιμή δεν είναι σωστή. Γράψε ένα ποσό, π.χ. 75 ή 75,50."
+    },
+    "rules": {
+      "providerGym": "Εμφάνιση ως box",
+      "providerCoach": "Εμφάνιση ως ανεξάρτητος coach",
+      "autoApproveOn": "Αυτόματη επιβεβαίωση κρατήσεων",
+      "autoApproveOff": "Κρατήσεις με έγκριση coach",
+      "bookingWindow": "Άνοιγμα κρατήσεων: {days, plural, one {# ημέρα} other {# ημέρες}} πριν",
+      "bookingWindowNone": "Άνοιγμα κρατήσεων: χωρίς όριο",
+      "cutoffHours": "Καθυστερημένη ακύρωση: {hours, plural, one {# ώρα} other {# ώρες}}",
+      "cutoffMinutes": "Καθυστερημένη ακύρωση: {minutes} λεπτά",
+      "cutoffNone": "Χωρίς όριο ακύρωσης",
+      "capacity": "Θέσεις ανά τμήμα: {count}",
+      "leaderboardOn": "Leaderboard ενεργό",
+      "leaderboardOff": "Χωρίς leaderboard",
+      "trialsOn": "Δοκιμαστικά από τη δημόσια σελίδα",
+      "trialsOff": "Χωρίς δοκιμαστικά",
+      "trialSeats": "Θέσεις για δοκιμαστικό ανά τμήμα: {count}"
+    }
+  },
+  "AdvancedSettings": {
+    "title": "Προχωρημένα",
+    "hint": "Ρυθμίσεις με καλή προεπιλογή. Τις αλλάζει σπάνια κανείς.",
+    "hintCount": "{count, plural, one {# ρύθμιση με καλή προεπιλογή. Την αλλάζει σπάνια κανείς.} other {# ρυθμίσεις με καλή προεπιλογή. Τις αλλάζει σπάνια κανείς.}}",
+    "search": "Αναζήτηση ρύθμισης",
+    "noMatch": "Καμία ρύθμιση δεν ταιριάζει.",
+    "groups": {
+      "bookings": "Κρατήσεις",
+      "payments": "Πληρωμές και παραστατικά",
+      "motivation": "Κίνητρα",
+      "training": "Προπόνηση",
+      "community": "Κοινότητα"
+    },
+    "keywords": {
+      "bookings": "κράτηση κρατήσεις έγκριση αναμονή ακύρωση θέσεις check-in είσοδος",
+      "payments": "πληρωμή πληρωμές υπενθύμιση χάριτος λήξη συνδρομή παραστατικά",
+      "motivation": "ασπίδα ασπίδες σερί leaderboard επίπεδα δυσκολίας",
+      "training": "WOD στόχοι βοηθός AI κλιμάκωση",
+      "community": "κοινότητα συζήτηση μηνύματα",
+      "access": "ρόλοι πρόσβαση δικαιώματα"
+    }
   }
 }

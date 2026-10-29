@@ -12270,5 +12270,84 @@
       "undo_incomplete": "تعذر التراجع عن بعض الأسطر. حاول مجددًا.",
       "business_not_activated": "الـBox الخاص بك ما زال تجريبيًا: فعّله لاستيراد الأشخاص."
     }
+  },
+  "SetupRecipes": {
+    "loading": "جارٍ التحميل…",
+    "welcome": "مرحبًا بك في Palee",
+    "title": "ما نوع الـ box لديك؟",
+    "intro": "نُعدّ باقات الاشتراك وأنواع الحصص وقواعد الحجز. يمكنك تغيير كل شيء لاحقًا.",
+    "fromScratch": "لا شيء مما سبق: ابدأ من الصفر",
+    "continue": "متابعة",
+    "backToKinds": "نوع الـ box",
+    "previewTitle": "{name}: ما الذي سيُعدّ",
+    "previewIntro": "غيّر الأسعار هنا إن شئت. يتغيّر الباقي من الإعدادات.",
+    "packages": "باقات الاشتراك",
+    "packagesInPlace": "باقات الاشتراك موجودة بالفعل.",
+    "perMonth": "/شهر",
+    "perYear": "/سنة",
+    "priceInvalid": "اكتب مبلغًا، مثل 75 أو 75.50.",
+    "typesAndRules": "أنواع الحصص والقواعد",
+    "noClassTypes": "بلا حصص",
+    "advancedCount": "{count, plural, one {وإعداد واحد بقيمة افتراضية جيدة ضمن «متقدّم»} other {و# إعدادات بقيمة افتراضية جيدة ضمن «متقدّم»}}",
+    "nothingToChange": "كل هذا موجود بالفعل في الـ box لديك.",
+    "ownerOnly": "المالك وحده يطبّق الوصفة.",
+    "apply": "تطبيق",
+    "appliedTitle": "أُعدّ الـ box لديك كـ {name}",
+    "appliedCounts": "{packages, plural, one {باقة اشتراك واحدة} other {# باقات اشتراك}} · {types, plural, one {نوع حصة واحد} other {# أنواع حصص}} · {rules, plural, one {قاعدة واحدة} other {# قواعد}}",
+    "otherRecipe": "وصفة أخرى",
+    "start": "ابدأ",
+    "next": {
+      "title": "الخطوات التالية",
+      "billing": "بيانات الفوترة",
+      "billingHint": "لإيصالات نظامية",
+      "payments": "الدفع عبر الإنترنت",
+      "paymentsHint": "زر واحد، مع Viva",
+      "import": "أحضر أعضاءك",
+      "importHint": "استيراد من Wodify وPushPress وExcel…"
+    },
+    "errors": {
+      "recipe_owner_only": "المالك وحده يطبّق الوصفة.",
+      "recipe_step_failed": "فشلت خطوة من الوصفة. حاول مرة أخرى.",
+      "invalid_recipe_prices": "أحد الأسعار غير صحيح. اكتب مبلغًا، مثل 75 أو 75.50."
+    },
+    "rules": {
+      "providerGym": "الظهور كـ box",
+      "providerCoach": "الظهور كمدرّب مستقل",
+      "autoApproveOn": "تأكيد الحجوزات تلقائيًا",
+      "autoApproveOff": "الحجوزات بموافقة المدرّب",
+      "bookingWindow": "يُفتح الحجز قبل {days, plural, one {يوم واحد} other {# أيام}}",
+      "bookingWindowNone": "يُفتح الحجز بلا حدّ",
+      "cutoffHours": "الإلغاء المتأخر: {hours, plural, one {ساعة واحدة} other {# ساعات}}",
+      "cutoffMinutes": "الإلغاء المتأخر: {minutes} دقيقة",
+      "cutoffNone": "بلا مهلة للإلغاء",
+      "capacity": "الأماكن في كل حصة: {count}",
+      "leaderboardOn": "لوحة المتصدرين مفعّلة",
+      "leaderboardOff": "بلا لوحة متصدرين",
+      "trialsOn": "حصص تجريبية من الصفحة العامة",
+      "trialsOff": "بلا حصص تجريبية",
+      "trialSeats": "أماكن التجربة في كل حصة: {count}"
+    }
+  },
+  "AdvancedSettings": {
+    "title": "متقدّم",
+    "hint": "إعدادات بقيمة افتراضية جيدة. نادرًا ما يغيّرها أحد.",
+    "hintCount": "{count, plural, one {إعداد واحد بقيمة افتراضية جيدة. نادرًا ما يغيّره أحد.} other {# إعدادات بقيمة افتراضية جيدة. نادرًا ما يغيّرها أحد.}}",
+    "search": "ابحث عن إعداد",
+    "noMatch": "لا يوجد إعداد مطابق.",
+    "groups": {
+      "bookings": "الحجوزات",
+      "payments": "المدفوعات والمستندات",
+      "motivation": "التحفيز",
+      "training": "التدريب",
+      "community": "المجتمع"
+    },
+    "keywords": {
+      "bookings": "حجز حجوزات موافقة انتظار إلغاء أماكن تسجيل دخول",
+      "payments": "دفع مدفوعات تذكير مهلة انتهاء اشتراك مستندات",
+      "motivation": "درع دروع سلسلة متصدرين مستويات صعوبة",
+      "training": "WOD أهداف مساعد AI تدرّج",
+      "community": "مجتمع نقاش رسائل",
+      "access": "أدوار وصول صلاحيات"
+    }
   }
 }
