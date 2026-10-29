@@ -12772,7 +12772,16 @@
       "too_many_rows": "At most 60 exercises",
       "too_many_cells": "At most 30 sets",
       "too_long": "At most 200 characters",
-      "note_too_long": "At most 2000 characters"
+      "note_too_long": "At most 2000 characters",
+      "wrong_unit": "Not a load unit: write kg or %",
+      "no_base": "Nothing before it to change: write a number first",
+      "bad_shape": "This value has the wrong form"
+    },
+    "ambiguous": {
+      "rangeOrList": "range {range}, the athlete picks · for {count} sets write {write}",
+      "listOrLadder": "{list}, then the last one repeats · to keep climbing write {write}",
+      "windows": "{count} AMRAP windows: {list} · for one AMRAP write {write}",
+      "clock": "read as {reading} · for the other unit write {write}"
     }
   },
   "PlanRun": {
@@ -12815,7 +12824,7 @@
     "load": "Load",
     "logTitle": "What you actually did (optional)",
     "logReps": "Reps done",
-    "logLoad": "Load used",
+    "logLoad": "Load used (kg)",
     "cap": "Cap {time}",
     "clock": "Section clock",
     "done": "Section done",
@@ -12863,6 +12872,7 @@
       "within": "in",
       "from": "from",
       "zone": "zone"
-    }
+    },
+    "pctOfMax": "≈ {kg} kg of your 1RM"
   }
 }

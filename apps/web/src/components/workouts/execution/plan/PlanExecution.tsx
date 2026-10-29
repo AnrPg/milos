@@ -20,20 +20,37 @@ import { formatClock, PHASE_COLORS, type TimerPhase } from "../TimerDisplay";
 import {
   currentStep,
   initialRunState,
+  logKeyOf,
   phaseRemainingMs,
   type RunAction,
   runReducer,
   type RunState,
   upcomingStep,
 } from "./runner";
-import { planActuals, type PlanSetActual } from "./actuals";
+import { type OneRepMaxLookup, planActuals, prescribedKg, type PlanSetActual } from "./actuals";
 import { measuredScore, type RunLogs, scoreSegment, type StepLog } from "./score";
 import { buildSequence, type RunRest, type RunSequence, type RunStep, type RunWork } from "./sequence";
 
 const TICK_MS = 250;
 
 /** One value the athlete logged that differs from the target. */
-export type PlanRunLog = { step: RunWork; field: "reps" | "load"; actual: string; canonical: string };
+export type PlanRunLog = {
+  step: RunWork;
+  field: "reps" | "load";
+  actual: string;
+  canonical: string;
+  /** Which interruption an interrupt row was done at (1-based); 0 for the main work. */
+  occurrence: number;
+};
+
+/** Where a section's run stands, to resume it after a reload. */
+export type PlanRunSnapshot = {
+  state: RunState;
+  logs: RunLogs;
+  /** Clock time carried over, and the wall time it was last started at while running. */
+  carriedMs: number;
+  startedAt: number | null;
+};
 
 export type PlanRunResult = { score: SectionScore | null; elapsedMs: number; actuals: PlanSetActual[] };
 
@@ -46,7 +63,18 @@ type Props = {
   onComplete: (result: PlanRunResult) => void;
   /** Called when the athlete moves past a step with logged values that differ from the target. */
   onLog?: (log: PlanRunLog) => void;
+  /** The athlete's 1RM in kg per exercise, to turn % loads into kg. */
+  oneRepMaxKg?: OneRepMaxLookup;
+  /** Resume from this snapshot (after a reload). */
+  initial?: PlanRunSnapshot | null;
+  /** Called whenever the run moves (not on every clock tick), to persist it. */
+  onProgress?: (snapshot: PlanRunSnapshot) => void;
 };
+
+/** Running time a snapshot stands at now: the clock kept running while the page was away. */
+function restoredElapsed(snapshot: PlanRunSnapshot, now: number): number {
+  return snapshot.carriedMs + (snapshot.state.status === "running" && snapshot.startedAt != null ? Math.max(0, now - snapshot.startedAt) : 0);
+}
 
 type Translate = ReturnType<typeof useTranslations>;
 
@@ -104,7 +132,17 @@ function restText(t: Translate, rest: RunRest): string {
   return rest.text ? t("restFor", { time: rest.text }) : t("rest");
 }
 
-export function PlanExecution({ section, sectionId, sectionName, existingScore, onComplete, onLog }: Props) {
+export function PlanExecution({
+  section,
+  sectionId,
+  sectionName,
+  existingScore,
+  onComplete,
+  onLog,
+  oneRepMaxKg,
+  initial = null,
+  onProgress,
+}: Props) {
   const t = useTranslations("PlanRun");
   const words = useMemo(
     () => ({ perSide: t("show.perSide"), within: t("show.within"), from: t("show.from"), zone: t("show.zone") }),
@@ -112,13 +150,19 @@ export function PlanExecution({ section, sectionId, sectionName, existingScore, 
   );
   const seq = useMemo(() => buildSequence(section, words), [section, words]);
   const reducer = useCallback((s: RunState, a: RunAction) => runReducer(seq, s, a), [seq]);
-  const [state, dispatch] = useReducer(reducer, undefined, initialRunState);
-  const [logs, setLogs] = useState<RunLogs>({});
+  const [restoredAt] = useState(() => Date.now());
+  const [state, dispatch] = useReducer(reducer, undefined, () =>
+    initial ? { ...initialRunState(), ...initial.state, elapsedMs: restoredElapsed(initial, restoredAt) } : initialRunState(),
+  );
+  const [logs, setLogs] = useState<RunLogs>(() => initial?.logs ?? {});
   const [scoreOpen, setScoreOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
   // The clock: running time is what was carried over plus the time since the last start / resume.
-  const clockRef = useRef<{ startedAt: number | null; carriedMs: number }>({ startedAt: null, carriedMs: 0 });
+  const clockRef = useRef<{ startedAt: number | null; carriedMs: number }>({
+    startedAt: null,
+    carriedMs: initial ? restoredElapsed(initial, restoredAt) : 0,
+  });
   const running = state.status === "running";
   useEffect(() => {
     if (!running) return;
@@ -134,6 +178,17 @@ export function PlanExecution({ section, sectionId, sectionName, existingScore, 
       if (startedAt != null) clockRef.current = { startedAt: null, carriedMs: carriedMs + Date.now() - startedAt };
     };
   }, [running]);
+
+  // Persist the run whenever it moves; the clock itself is kept as carried time + start time.
+  const moveKey = JSON.stringify({ ...state, elapsedMs: 0 });
+  const progressRef = useRef(onProgress);
+  useEffect(() => {
+    progressRef.current = onProgress;
+  });
+  useEffect(() => {
+    const { startedAt, carriedMs } = clockRef.current;
+    progressRef.current?.({ state: JSON.parse(moveKey) as RunState, logs, carriedMs, startedAt });
+  }, [moveKey, logs]);
 
   const step = currentStep(seq, state);
   const upcoming = upcomingStep(seq, state);
@@ -160,7 +215,8 @@ export function PlanExecution({ section, sectionId, sectionName, existingScore, 
   const flushLog = useCallback(
     (leaving: RunStep | null) => {
       if (!onLog || leaving?.kind !== "work") return;
-      const log = logs[leaving.key];
+      const fire = leaving.interrupt ? state.interruptsFired : 0;
+      const log = logs[logKeyOf(leaving, fire)];
       if (!log) return;
       const pairs: Array<["reps" | "load", string | undefined, string]> = [
         ["reps", log.reps, leaving.values.dose],
@@ -168,10 +224,10 @@ export function PlanExecution({ section, sectionId, sectionName, existingScore, 
       ];
       for (const [field, actual, canonical] of pairs) {
         const value = actual?.trim();
-        if (value && value !== canonical.trim()) onLog({ step: leaving, field, actual: value, canonical });
+        if (value && value !== canonical.trim()) onLog({ step: leaving, field, actual: value, canonical, occurrence: fire });
       }
     },
-    [logs, onLog],
+    [logs, onLog, state.interruptsFired],
   );
 
   const next = useCallback(() => {
@@ -208,7 +264,7 @@ export function PlanExecution({ section, sectionId, sectionName, existingScore, 
 
   function complete(score: SectionScore | null) {
     setScoreOpen(false);
-    onComplete({ score, elapsedMs: state.finishedAtMs ?? state.elapsedMs, actuals: planActuals(seq, state, logs, sectionId) });
+    onComplete({ score, elapsedMs: state.finishedAtMs ?? state.elapsedMs, actuals: planActuals(seq, state, logs, sectionId, { oneRepMaxKg }) });
   }
 
   // ── clock ──────────────────────────────────────────────────────────────
@@ -321,7 +377,14 @@ export function PlanExecution({ section, sectionId, sectionName, existingScore, 
             ) : null}
           </div>
         ) : step?.kind === "work" ? (
-          <WorkView t={t} step={step} seq={seq} log={logs[step.key]} onLog={(change) => setLog(step.key, change)} />
+          <WorkView
+            t={t}
+            step={step}
+            seq={seq}
+            loadKg={prescribedKg(step, oneRepMaxKg)}
+            log={logs[logKeyOf(step, state.interruptsFired)]}
+            onLog={(change) => setLog(logKeyOf(step, state.interruptsFired), change)}
+          />
         ) : null}
       </section>
 
@@ -405,12 +468,14 @@ function WorkView({
   t,
   step,
   seq,
+  loadKg,
   log,
   onLog,
 }: {
   t: Translate;
   step: RunWork;
   seq: RunSequence;
+  loadKg: ReturnType<typeof prescribedKg>;
   log: StepLog | undefined;
   onLog: (change: StepLog) => void;
 }) {
@@ -444,7 +509,14 @@ function WorkView({
       </div>
       <dl className="flex flex-wrap gap-x-6 gap-y-2">
         {values.dose ? <Value label={t("reps")} value={values.dose} big /> : null}
-        {values.load ? <Value label={t("load")} value={values.load} big /> : null}
+        {values.load ? (
+          <Value
+            label={t("load")}
+            value={values.load}
+            big
+            hint={loadKg.pct != null && loadKg.kg != null ? t("pctOfMax", { kg: loadKg.kg }) : undefined}
+          />
+        ) : null}
         {tempo ? <Value label={t("measure.tempo")} value={tempo} /> : null}
         {MEASURE_KEYS.map((k) => (values.measures[k] ? <Value key={k} label={t(`measure.${k}`)} value={values.measures[k]!} /> : null))}
       </dl>
@@ -459,20 +531,25 @@ function WorkView({
         </legend>
         <LogField label={t("logReps")} value={log?.reps ?? ""} placeholder={values.dose} inputMode="numeric" onChange={(reps) => onLog({ reps })} />
         {values.load ? (
-          <LogField label={t("logLoad")} value={log?.load ?? ""} placeholder={values.load} inputMode="decimal" onChange={(load) => onLog({ load })} />
+          <LogField label={t("logLoad")} value={log?.load ?? ""} placeholder={loadKg.kg != null ? String(loadKg.kg) : ""} inputMode="decimal" onChange={(load) => onLog({ load })} />
         ) : null}
       </fieldset>
     </div>
   );
 }
 
-function Value({ label, value, big = false }: { label: string; value: string; big?: boolean }) {
+function Value({ label, value, big = false, hint }: { label: string; value: string; big?: boolean; hint?: string }) {
   return (
     <div className="flex flex-col">
       <dt className="text-xs" style={{ color: "var(--dim)" }}>
         {label}
       </dt>
       <dd className={big ? "text-3xl font-bold tabular-nums" : "text-lg font-semibold tabular-nums"}>{value}</dd>
+      {hint ? (
+        <dd className="text-xs tabular-nums" style={{ color: "var(--muted)" }}>
+          {hint}
+        </dd>
+      ) : null}
     </div>
   );
 }

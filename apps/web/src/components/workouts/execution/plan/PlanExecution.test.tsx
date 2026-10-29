@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { PlanRow, PlanSection } from "@/lib/structured-plan/types";
 
 import en from "../../../../../messages/en.json";
-import { PlanExecution, type PlanRunLog, type PlanRunResult } from "./PlanExecution";
+import { PlanExecution, type PlanRunLog, type PlanRunResult, type PlanRunSnapshot } from "./PlanExecution";
 
 let uid = 0;
 const ex = (name: string, dose: string, more: Partial<PlanRow> = {}): PlanRow => ({ id: `r${uid++}`, kind: "ex", name, dose, load: "", cells: [], ...more });
@@ -18,13 +18,18 @@ const section = (flow: PlanSection["flow"], params: PlanSection["params"], block
   ...more,
 });
 
-function renderRun(plan: PlanSection, onComplete = vi.fn<(r: PlanRunResult) => void>(), onLog = vi.fn<(l: PlanRunLog) => void>()) {
-  render(
+function renderRun(
+  plan: PlanSection,
+  onComplete = vi.fn<(r: PlanRunResult) => void>(),
+  onLog = vi.fn<(l: PlanRunLog) => void>(),
+  more: Partial<React.ComponentProps<typeof PlanExecution>> = {},
+) {
+  const view = render(
     <NextIntlClientProvider locale="en" messages={en}>
-      <PlanExecution section={plan} sectionId="sec-1" sectionName="A" onComplete={onComplete} onLog={onLog} />
+      <PlanExecution section={plan} sectionId="sec-1" sectionName="A" onComplete={onComplete} onLog={onLog} {...more} />
     </NextIntlClientProvider>,
   );
-  return { onComplete, onLog };
+  return { onComplete, onLog, unmount: view.unmount };
 }
 
 const advance = (ms: number) => act(() => vi.advanceTimersByTime(ms));
@@ -140,5 +145,31 @@ describe("PlanExecution", () => {
         expect.objectContaining({ exercise_name: "Pull-up", prescribed_reps: 21, actual_reps: 21, logged: false }),
       ],
     });
+  });
+
+  it("resumes from a snapshot with the clock still running while the page was away", () => {
+    const plan = section("emom", { every: "1:00", times: "3" }, [[ex("Wall Ball", "20")], [ex("Burpee", "12")]]);
+    let saved: PlanRunSnapshot | null = null;
+    const first = renderRun(plan, undefined, undefined, { onProgress: (s) => (saved = s) });
+    key("Enter");
+    advance(30_000);
+    key(" ");
+    expect(saved!.state.status).toBe("running");
+    first.unmount();
+    advance(40_000);
+    renderRun(plan, undefined, undefined, { initial: saved });
+    advance(250);
+    expect(heading()).toBe("Burpee");
+    expect(timer()).toBe("0:50");
+  });
+
+  it("labels the logged load in kg and shows a % load in kg from the 1RM", () => {
+    renderRun(section("sets", { sets: "1" }, [[ex("Back Squat", "", { cells: [{ d: "5", l: "70%" }] })]]), undefined, undefined, {
+      oneRepMaxKg: () => 150,
+    });
+    key("Enter");
+    expect(screen.getByText("70%")).toBeInTheDocument();
+    expect(screen.getByText("≈ 105 kg of your 1RM")).toBeInTheDocument();
+    expect(screen.getByLabelText("Load used (kg)")).toHaveAttribute("placeholder", "105");
   });
 });

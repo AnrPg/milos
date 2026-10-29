@@ -12327,7 +12327,16 @@
       "too_many_rows": "60 exercices au maximum",
       "too_many_cells": "30 séries au maximum",
       "too_long": "200 caractères au maximum",
-      "note_too_long": "2000 caractères au maximum"
+      "note_too_long": "2000 caractères au maximum",
+      "wrong_unit": "Pas une unité de charge : écris kg ou %",
+      "no_base": "Rien avant à modifier : écris d'abord un nombre",
+      "bad_shape": "Cette valeur n'a pas la bonne forme"
+    },
+    "ambiguous": {
+      "rangeOrList": "fourchette {range}, l'athlète choisit · pour {count} séries écris {write}",
+      "listOrLadder": "{list}, puis la dernière valeur se répète · pour continuer à monter écris {write}",
+      "windows": "{count} fenêtres AMRAP : {list} · pour un seul AMRAP écris {write}",
+      "clock": "lu comme {reading} · pour l'autre unité écris {write}"
     }
   },
   "PlanView": {
@@ -12473,7 +12482,7 @@
     "load": "Charge",
     "logTitle": "Ce que tu as vraiment fait (facultatif)",
     "logReps": "Répétitions faites",
-    "logLoad": "Charge utilisée",
+    "logLoad": "Charge utilisée (kg)",
     "cap": "Limite {time}",
     "clock": "Chrono de la partie",
     "done": "Partie terminée",
@@ -12521,6 +12530,343 @@
       "within": "en",
       "from": "à partir de",
       "zone": "zone"
+    },
+    "pctOfMax": "≈ {kg} kg de ton 1RM"
+  },
+  "PlanEditor": {
+    "label": "Éditeur de WOD structuré",
+    "title": "Titre du WOD",
+    "titlePlaceholder": "Titre du WOD",
+    "wodNote": "Note pour tout le WOD (facultatif)",
+    "addSection": "+ Partie",
+    "newSection": "Nouvelle partie",
+    "sectionName": "Nom (facultatif)",
+    "deleteSection": "Supprimer la partie",
+    "noExercises": "Pas encore d’exercice",
+    "presetChip": "Modèle",
+    "steps": "Étapes",
+    "step": {
+      "flow": "Déroulé",
+      "time": "Temps",
+      "exercises": "Exercices",
+      "score": "Score"
+    },
+    "back": "Retour",
+    "next": "Suivant →",
+    "finish": "Terminer la partie",
+    "pickHelp": "Écris pour chercher,",
+    "flowInput": "Déroulé de la partie",
+    "flowPlaceholder": "Comment tourne le chrono ? ex. emom, séries ou un modèle : tabata",
+    "flowsHeading": "Déroulé",
+    "presetsHeading": "Modèles",
+    "presetsSub": "raccourcis : ils choisissent un déroulé et remplissent les valeurs, tout reste modifiable ensuite",
+    "presetIs": "{preset} = {flow}",
+    "noMatch": "Rien sous ce nom. Essaie un autre mot.",
+    "recipe": {
+      "intervals": "{work} / {off} × {rounds}",
+      "intervalsHr": "{work} / pouls × {rounds}",
+      "amrap": "{dur}′",
+      "slots": "{count} intervalles en alternance",
+      "reps": "répétitions {reps}",
+      "interrupt": "interruption toutes les 2:00",
+      "hr": "repos jusqu’à la baisse du pouls"
+    },
+    "example": {
+      "times": "minutes · ex. 12, ou 3-3-3-4 pour des fenêtres",
+      "timeMin": "minutes · ou 1:30, 90s",
+      "timeSmart": "ex. 30s, 1:30, 2′",
+      "range": "ex. 4 ou 3-4",
+      "count": "un nombre entier"
+    },
+    "reading": "= {text}",
+    "readingWindows": "= {count} fenêtres : {list}",
+    "unit": {
+      "rounds": "tours",
+      "times": "fois",
+      "sets": "séries",
+      "hrTarget": "bpm",
+      "min": "minutes",
+      "sec": "s",
+      "clock": "m:ss"
+    },
+    "addMod": "+ {label}",
+    "removeMod": "× {label}",
+    "removeModTitle": "Retirer",
+    "timeline": "Chronologie",
+    "timelineInterrupt": "Interruption toutes les {every}",
+    "timelineSlot": "Intervalle {n}",
+    "timelineWork": "Effort",
+    "timelineRest": "Repos",
+    "score": "Score",
+    "scoreHelp": "Le choix habituel est déjà sélectionné. ← → pour changer.",
+    "sectionNote": "Note pour la partie (facultatif)",
+    "levelNotes": "Notes par niveau",
+    "levelNote": "Note pour {level} (facultatif)",
+    "perRoundOnce": "Ça n’arrive qu’une fois : ajoute des tours à l’étape 2",
+    "deleted": "Supprimé · {undo} pour annuler",
+    "status": {
+      "undone": "Annulé",
+      "redone": "Rétabli"
+    },
+    "hint": {
+      "label": "Clavier",
+      "section": "partie",
+      "open": "ouvrir",
+      "newSection": "nouvelle partie",
+      "all": "tout",
+      "type": "écrire",
+      "search": "chercher",
+      "choose": "choisir",
+      "continue": "continuer",
+      "close": "fermer",
+      "nextField": "champ suivant",
+      "nextStep": "étape suivante",
+      "back": "retour",
+      "newExercise": "nouvel exercice",
+      "actions": "actions",
+      "differentRound": "tour différent",
+      "score": "score"
+    },
+    "sheet": {
+      "title": "Raccourcis",
+      "groupSection": "Partie",
+      "groupExercises": "Exercices",
+      "groupGeneral": "Général",
+      "newSection": "Nouvelle partie",
+      "steps": "Étape suivante / précédente",
+      "jumpStep": "Aller à l’étape",
+      "close": "Réduire la partie à une ligne",
+      "cards": "Sur les parties fermées : choisir et ouvrir",
+      "moveSection": "Déplacer la partie",
+      "newExercise": "Nouvel exercice",
+      "actions": "Actions de ligne (le menu ⋯)",
+      "superset": "Superset avec la ligne du dessus",
+      "structure": "Structure de série : cluster, drop set, complex…",
+      "measure": "Mesure : allure, tempo, RPE, hauteur, par côté…",
+      "perRound": "Valeurs par tour (AMRAP, For Time, EMOM)",
+      "rest": "Repos dans la série",
+      "differentRound": "Tour, série ou intervalle différent (en alternance)",
+      "note": "Note",
+      "emptyCell": "Comme la série précédente",
+      "plus": "Une valeur qui change à chaque série",
+      "spread": "Une valeur répartie jusqu’à la dernière série",
+      "unit": "Une fois par ligne",
+      "deleteRow": "Supprimer",
+      "move": "Passer d’un champ à l’autre",
+      "undo": "Annuler",
+      "redo": "Rétablir",
+      "sheet": "Cette liste",
+      "keyEmptyCell": "case vide",
+      "keyUnit": "kg ou %",
+      "keyDeleteRow": "⌫ sur un nom vide"
+    },
+    "perSide": "par côté"
+  },
+  "PlanGrid": {
+    "head": {
+      "exercise": "Exercice",
+      "amrap": "↻ Tour, encore et encore jusqu’à la fin du temps",
+      "emomEvery": "Toutes les {every}",
+      "emom": "Chaque intervalle",
+      "intervals": "Dans chaque intervalle d’effort ({work})",
+      "rounds": "↻ Tour × {rounds}",
+      "once": "Dans l’ordre, une fois"
+    },
+    "round": {
+      "set": "Série {list}",
+      "round": "Tour {list}",
+      "slot": "Intervalle {list}",
+      "minute": "Minute {list}",
+      "slotAt": "Intervalle {list} · {at}"
+    },
+    "col": {
+      "d": "Rép.",
+      "l": "Charge"
+    },
+    "line": {
+      "d": "Rép.",
+      "rest": "Temps",
+      "l": "Charge",
+      "lUnit": "Charge {unit}"
+    },
+    "measure": {
+      "pace": "Allure",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "Zone cardio",
+      "height": "Hauteur / cible",
+      "dist": "Distance",
+      "hold": "Maintien",
+      "side": "Par côté"
+    },
+    "measureHint": {
+      "pace": "temps intermédiaire · ex. 2:00/500m",
+      "tempo": "descente, pause, montée, pause · ex. 31X1",
+      "rpe": "difficulté, 1–10 · ex. 8",
+      "rir": "répétitions en réserve · ex. 2",
+      "zone": "zone de fréquence cardiaque · ex. 2",
+      "height": "box, cible · ex. 60 cm",
+      "dist": "ex. 400 m",
+      "hold": "maintien isométrique · ex. 3 s",
+      "side": "sans valeur : une étiquette à côté du nom"
+    },
+    "tag": {
+      "side": "par côté"
+    },
+    "unit": {
+      "sec": "s",
+      "min": "min"
+    },
+    "struct": {
+      "single": "Simple",
+      "superset": "Superset",
+      "complex": "Complex",
+      "cluster": "Cluster",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
+    },
+    "structHint": {
+      "single": "un exercice, tel quel",
+      "superset": "tous les exercices, puis la série suivante",
+      "complex": "tous les exercices sans lâcher la barre",
+      "cluster": "la série est coupée en blocs avec une courte pause",
+      "drop": "baisse la charge et continue",
+      "restpause": "jusqu’à l’échec, pause, encore"
+    },
+    "structField": {
+      "clusters": "blocs",
+      "intra": "pause",
+      "drops": "baisses",
+      "dropby": "à chaque fois",
+      "minis": "mini-séries"
+    },
+    "structChip": "Structure de série (Alt+T)",
+    "rest": "Repos",
+    "name": {
+      "placeholder": "Exercice",
+      "inWod": "dans ce WOD",
+      "suggestions": "Suggestions d’exercices"
+    },
+    "note": {
+      "placeholder": "Note pour l’exercice"
+    },
+    "menu": {
+      "button": "Actions de l’exercice",
+      "title": "Actions de l’exercice (Alt+M)",
+      "filter": "Écris pour filtrer",
+      "nothing": "Aucun résultat",
+      "nothingHint": "efface une lettre",
+      "struct": "Structure de série…",
+      "structHint": "ex. cluster, drop set, complex…",
+      "measure": "Mesure…",
+      "measureHint": "allure, tempo, RPE, hauteur…",
+      "perRound": "Valeurs par tour",
+      "sameEachRound": "Mêmes valeurs à chaque tour",
+      "note": "Note",
+      "addNote": "Ajouter une note",
+      "superset": "Superset avec la ligne du dessus",
+      "unsuperset": "Sortir du superset",
+      "restAfter": "Repos après",
+      "remove": "Retirer : {measure}",
+      "delete": "Supprimer",
+      "deleteHint": "⌫ sur un nom vide",
+      "structTitle": "Structure de série",
+      "measureTitle": "Mesure"
+    },
+    "add": {
+      "exercise": "+ Exercice",
+      "exerciseHere": "+ Exercice dans ce bloc",
+      "exerciseSets": "+ Exercice dans ces séries",
+      "exerciseInterrupt": "+ Exercice dans l’interruption",
+      "round": {
+        "set": "+ série différente",
+        "round": "+ tour différent",
+        "slot": "+ intervalle différent"
+      }
+    },
+    "how": {
+      "alternate": "Les blocs alternent : {cycle}, {cycle} …",
+      "own": {
+        "set": "Chaque série a ses propres exercices, dans l’ordre.",
+        "round": "Chaque tour a ses propres exercices, dans l’ordre.",
+        "slot": "Chaque intervalle a ses propres exercices, dans l’ordre."
+      },
+      "emomOne": "Tout ce qui est dans le bloc se fait dans le même intervalle.",
+      "amrapMax": "Pour « autant que possible dans le temps restant », écris max dans les répétitions du dernier exercice.",
+      "optionalSets": "* si possible : il y a {sets} séries."
+    },
+    "optionalSet": "Si possible (il y a {sets} séries)",
+    "interrupt": {
+      "title": "Interruption · toutes les {every}, arrête-toi et fais"
+    },
+    "aria": {
+      "reps": "Répétitions ou quantité",
+      "load": "Charge",
+      "rest": "Repos",
+      "cell": "{column} {n} : {what}"
+    },
+    "error": {
+      "dose": "Illisible : ex. 10, 8-12, 5-10-15…, max, 400 m, 60s",
+      "tempo": "Tempo en 4 signes, ex. 31X1",
+      "number": "Un nombre, +x ou a→b",
+      "numberExample": "Un nombre, ex. {example}",
+      "max": "Au maximum {max}",
+      "loadUnitCompact": "Écris kg ou %, ex. 60kg ou 70%",
+      "loadMissingUnit": "Écris kg ou % dans une série de la ligne ; les autres le reprennent",
+      "loadMixedUnits": "Même unité sur toute la ligne : {unit}"
+    },
+    "mean": {
+      "equals": "= {value}",
+      "max": "autant que possible",
+      "maxCal": "autant de calories que possible",
+      "maxM": "autant de mètres que possible",
+      "sets": "{sets} séries",
+      "ladder": "par {word} : {list}, puis {step} à chaque {word}",
+      "perRound": "par {word} : {list}",
+      "range": "fourchette {range}, l’athlète décide",
+      "rangeSide": "fourchette {range}, l’athlète décide · par côté",
+      "reps": "{value} répétitions",
+      "repsSide": "{value} répétitions · par côté",
+      "amount": "{value}",
+      "amountSide": "{value} · par côté",
+      "bw": "poids du corps",
+      "kg": "{value} kg",
+      "pct": "{value} % du 1RM",
+      "words": "en texte pour l’athlète",
+      "tempo": "↓{down} descente · {bottom} en bas · ↑{up} montée · {top} en haut (secondes, X = explosif)"
+    },
+    "word": {
+      "set": "série",
+      "round": "tour",
+      "slot": "intervalle"
+    },
+    "tip": {
+      "range": "fourchette",
+      "ladder": "monte à chaque tour",
+      "max": "autant que possible",
+      "emptyCode": "vide",
+      "asBefore": "comme le précédent",
+      "kg": "kilos",
+      "pct": "du 1RM",
+      "heavyCode": "lourd",
+      "words": "en mots",
+      "plusEach": "monte à chaque fois",
+      "spread": "jusqu’au dernier",
+      "unitCode": "kg ou %",
+      "unitOnce": "une fois par ligne",
+      "changeEach": "change à chaque fois",
+      "tempo": "secondes de descente · pause en bas · montée (X = explosif) · pause en haut",
+      "seconds": "secondes",
+      "minSec": "minutes:secondes",
+      "minutes": "minutes, jusqu’à 10",
+      "afterLastCode": "après le dernier tour",
+      "afterLast": "même valeur, ou le même changement si tu écris +x"
+    },
+    "colWord": {
+      "set": "Série",
+      "round": "Tour",
+      "slot": "Intervalle"
     }
   }
 }

@@ -12327,7 +12327,16 @@
       "too_many_rows": "Maximaal 60 oefeningen",
       "too_many_cells": "Maximaal 30 sets",
       "too_long": "Maximaal 200 tekens",
-      "note_too_long": "Maximaal 2000 tekens"
+      "note_too_long": "Maximaal 2000 tekens",
+      "wrong_unit": "Geen gewichtseenheid: schrijf kg of %",
+      "no_base": "Er staat niets voor om te veranderen: schrijf eerst een getal",
+      "bad_shape": "Deze waarde heeft de verkeerde vorm"
+    },
+    "ambiguous": {
+      "rangeOrList": "bereik {range}, de atleet kiest · voor {count} sets schrijf {write}",
+      "listOrLadder": "{list}, daarna blijft de laatste · om verder te stijgen schrijf {write}",
+      "windows": "{count} AMRAP-vensters: {list} · voor één AMRAP schrijf {write}",
+      "clock": "gelezen als {reading} · voor de andere eenheid schrijf {write}"
     }
   },
   "PlanView": {
@@ -12473,7 +12482,7 @@
     "load": "Gewicht",
     "logTitle": "Wat je echt hebt gedaan (optioneel)",
     "logReps": "Gedane herhalingen",
-    "logLoad": "Gebruikt gewicht",
+    "logLoad": "Gebruikt gewicht (kg)",
     "cap": "Limiet {time}",
     "clock": "Klok van het onderdeel",
     "done": "Onderdeel klaar",
@@ -12521,6 +12530,343 @@
       "within": "in",
       "from": "vanaf",
       "zone": "zone"
+    },
+    "pctOfMax": "≈ {kg} kg van je 1RM"
+  },
+  "PlanEditor": {
+    "label": "Editor voor gestructureerde WOD’s",
+    "title": "WOD-titel",
+    "titlePlaceholder": "WOD-titel",
+    "wodNote": "Notitie voor de hele WOD (optioneel)",
+    "addSection": "+ Onderdeel",
+    "newSection": "Nieuw onderdeel",
+    "sectionName": "Naam (optioneel)",
+    "deleteSection": "Onderdeel verwijderen",
+    "noExercises": "Nog geen oefeningen",
+    "presetChip": "Sjabloon",
+    "steps": "Stappen",
+    "step": {
+      "flow": "Verloop",
+      "time": "Tijd",
+      "exercises": "Oefeningen",
+      "score": "Score"
+    },
+    "back": "Terug",
+    "next": "Volgende →",
+    "finish": "Onderdeel afronden",
+    "pickHelp": "Typ om te zoeken,",
+    "flowInput": "Verloop van het onderdeel",
+    "flowPlaceholder": "Hoe loopt de klok? bijv. emom, sets of een sjabloon: tabata",
+    "flowsHeading": "Verloop",
+    "presetsHeading": "Sjablonen",
+    "presetsSub": "snelkoppelingen: ze kiezen een verloop en vullen waarden in, daarna kun je alles aanpassen",
+    "presetIs": "{preset} = {flow}",
+    "noMatch": "Niets met die naam. Probeer een ander woord.",
+    "recipe": {
+      "intervals": "{work} / {off} × {rounds}",
+      "intervalsHr": "{work} / hartslag × {rounds}",
+      "amrap": "{dur}′",
+      "slots": "{count} afwisselende intervallen",
+      "reps": "herhalingen {reps}",
+      "interrupt": "onderbreking elke 2:00",
+      "hr": "rust tot je hartslag daalt"
+    },
+    "example": {
+      "times": "minuten · bijv. 12, of 3-3-3-4 voor blokken",
+      "timeMin": "minuten · of 1:30, 90s",
+      "timeSmart": "bijv. 30s, 1:30, 2′",
+      "range": "bijv. 4 of 3-4",
+      "count": "een heel getal"
+    },
+    "reading": "= {text}",
+    "readingWindows": "= {count} blokken: {list}",
+    "unit": {
+      "rounds": "rondes",
+      "times": "keer",
+      "sets": "sets",
+      "hrTarget": "bpm",
+      "min": "minuten",
+      "sec": "sec",
+      "clock": "m:ss"
+    },
+    "addMod": "+ {label}",
+    "removeMod": "× {label}",
+    "removeModTitle": "Verwijderen",
+    "timeline": "Tijdlijn",
+    "timelineInterrupt": "Onderbreking elke {every}",
+    "timelineSlot": "Interval {n}",
+    "timelineWork": "Werk",
+    "timelineRest": "Rust",
+    "score": "Score",
+    "scoreHelp": "Het gebruikelijke is al gekozen. ← → om te wijzigen.",
+    "sectionNote": "Notitie bij het onderdeel (optioneel)",
+    "levelNotes": "Notities per niveau",
+    "levelNote": "Notitie voor {level} (optioneel)",
+    "perRoundOnce": "Dit gebeurt één keer: voeg meer rondes toe in stap 2",
+    "deleted": "Verwijderd · {undo} om ongedaan te maken",
+    "status": {
+      "undone": "Ongedaan gemaakt",
+      "redone": "Opnieuw gedaan"
+    },
+    "hint": {
+      "label": "Toetsenbord",
+      "section": "onderdeel",
+      "open": "openen",
+      "newSection": "nieuw onderdeel",
+      "all": "alles",
+      "type": "typen",
+      "search": "zoeken",
+      "choose": "kiezen",
+      "continue": "verder",
+      "close": "sluiten",
+      "nextField": "volgend veld",
+      "nextStep": "volgende stap",
+      "back": "terug",
+      "newExercise": "nieuwe oefening",
+      "actions": "acties",
+      "differentRound": "andere ronde",
+      "score": "score"
+    },
+    "sheet": {
+      "title": "Sneltoetsen",
+      "groupSection": "Onderdeel",
+      "groupExercises": "Oefeningen",
+      "groupGeneral": "Algemeen",
+      "newSection": "Nieuw onderdeel",
+      "steps": "Volgende / vorige stap",
+      "jumpStep": "Naar stap gaan",
+      "close": "Onderdeel samenvouwen tot één regel",
+      "cards": "Bij gesloten onderdelen: kiezen en openen",
+      "moveSection": "Onderdeel verplaatsen",
+      "newExercise": "Nieuwe oefening",
+      "actions": "Regelacties (het ⋯-menu)",
+      "superset": "Superset met de regel erboven",
+      "structure": "Setstructuur: cluster, dropset, complex…",
+      "measure": "Meting: tempo per afstand, tempo, RPE, hoogte, per kant…",
+      "perRound": "Waarden per ronde (AMRAP, For Time, EMOM)",
+      "rest": "Rust binnen de set",
+      "differentRound": "Andere ronde, set of interval (afwisselend)",
+      "note": "Notitie",
+      "emptyCell": "Zoals de vorige set",
+      "plus": "Een waarde die elke set verandert",
+      "spread": "Een waarde verdeeld tot de laatste set",
+      "unit": "Eén keer per regel",
+      "deleteRow": "Verwijderen",
+      "move": "Tussen velden bewegen",
+      "undo": "Ongedaan maken",
+      "redo": "Opnieuw",
+      "sheet": "Deze lijst",
+      "keyEmptyCell": "leeg veld",
+      "keyUnit": "kg of %",
+      "keyDeleteRow": "⌫ bij een lege naam"
+    },
+    "perSide": "per kant"
+  },
+  "PlanGrid": {
+    "head": {
+      "exercise": "Oefening",
+      "amrap": "↻ Ronde, steeds opnieuw tot de tijd om is",
+      "emomEvery": "Elke {every}",
+      "emom": "Elk interval",
+      "intervals": "In elk werkinterval ({work})",
+      "rounds": "↻ Ronde × {rounds}",
+      "once": "Op volgorde, één keer"
+    },
+    "round": {
+      "set": "Set {list}",
+      "round": "Ronde {list}",
+      "slot": "Interval {list}",
+      "minute": "Minuut {list}",
+      "slotAt": "Interval {list} · {at}"
+    },
+    "col": {
+      "d": "Herh.",
+      "l": "Gewicht"
+    },
+    "line": {
+      "d": "Herh.",
+      "rest": "Tijd",
+      "l": "Gewicht",
+      "lUnit": "Gewicht {unit}"
+    },
+    "measure": {
+      "pace": "Tempo per afstand",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "Hartslagzone",
+      "height": "Hoogte / doel",
+      "dist": "Afstand",
+      "hold": "Vasthouden",
+      "side": "Per kant"
+    },
+    "measureHint": {
+      "pace": "tussentijd · bijv. 2:00/500m",
+      "tempo": "zakken, pauze, omhoog, pauze · bijv. 31X1",
+      "rpe": "hoe zwaar, 1–10 · bijv. 8",
+      "rir": "herhalingen in reserve · bijv. 2",
+      "zone": "hartslagzone · bijv. 2",
+      "height": "box, doel · bijv. 60 cm",
+      "dist": "bijv. 400 m",
+      "hold": "isometrisch vasthouden · bijv. 3 s",
+      "side": "geen waarde: een label naast de naam"
+    },
+    "tag": {
+      "side": "per kant"
+    },
+    "unit": {
+      "sec": "s",
+      "min": "min"
+    },
+    "struct": {
+      "single": "Enkel",
+      "superset": "Superset",
+      "complex": "Complex",
+      "cluster": "Cluster",
+      "drop": "Dropset",
+      "restpause": "Rest-pause"
+    },
+    "structHint": {
+      "single": "één oefening, zoals hij is",
+      "superset": "alle oefeningen, dan de volgende set",
+      "complex": "alle oefeningen zonder de stang neer te leggen",
+      "cluster": "de set wordt in delen opgeknipt met een korte pauze",
+      "drop": "gewicht omlaag en doorgaan",
+      "restpause": "tot falen, pauze, opnieuw"
+    },
+    "structField": {
+      "clusters": "delen",
+      "intra": "pauze",
+      "drops": "keer minder",
+      "dropby": "per keer",
+      "minis": "minisets"
+    },
+    "structChip": "Setstructuur (Alt+T)",
+    "rest": "Rust",
+    "name": {
+      "placeholder": "Oefening",
+      "inWod": "in deze WOD",
+      "suggestions": "Voorgestelde oefeningen"
+    },
+    "note": {
+      "placeholder": "Notitie bij de oefening"
+    },
+    "menu": {
+      "button": "Acties voor oefening",
+      "title": "Acties (Alt+M)",
+      "filter": "Typ om te filteren",
+      "nothing": "Niets gevonden",
+      "nothingHint": "wis een letter",
+      "struct": "Setstructuur…",
+      "structHint": "cluster, dropset, complex…",
+      "measure": "Meting…",
+      "measureHint": "tempo per afstand, tempo, RPE, hoogte…",
+      "perRound": "Waarden per ronde",
+      "sameEachRound": "Dezelfde waarden elke ronde",
+      "note": "Notitie",
+      "addNote": "Notitie toevoegen",
+      "superset": "Superset met de regel erboven",
+      "unsuperset": "Uit de superset halen",
+      "restAfter": "Rust erna",
+      "remove": "Verwijderen: {measure}",
+      "delete": "Verwijderen",
+      "deleteHint": "⌫ bij een lege naam",
+      "structTitle": "Setstructuur",
+      "measureTitle": "Meting"
+    },
+    "add": {
+      "exercise": "+ Oefening",
+      "exerciseHere": "+ Oefening in dit blok",
+      "exerciseSets": "+ Oefening in deze sets",
+      "exerciseInterrupt": "+ Oefening in de onderbreking",
+      "round": {
+        "set": "+ andere set",
+        "round": "+ andere ronde",
+        "slot": "+ ander interval"
+      }
+    },
+    "how": {
+      "alternate": "De blokken wisselen elkaar af: {cycle}, {cycle} …",
+      "own": {
+        "set": "Elke set heeft eigen oefeningen, op volgorde.",
+        "round": "Elke ronde heeft eigen oefeningen, op volgorde.",
+        "slot": "Elk interval heeft eigen oefeningen, op volgorde."
+      },
+      "emomOne": "Alles in het blok gebeurt in hetzelfde interval.",
+      "amrapMax": "Voor ‘zoveel als je haalt in de resterende tijd’ schrijf je max bij de herhalingen van de laatste oefening.",
+      "optionalSets": "* als het lukt: het zijn {sets} sets."
+    },
+    "optionalSet": "Als het lukt (het zijn {sets} sets)",
+    "interrupt": {
+      "title": "Onderbreking · elke {every} stoppen en doen"
+    },
+    "aria": {
+      "reps": "Herhalingen of hoeveelheid",
+      "load": "Gewicht",
+      "rest": "Rust",
+      "cell": "{column} {n}: {what}"
+    },
+    "error": {
+      "dose": "Niet leesbaar: bijv. 10, 8-12, 5-10-15…, max, 400 m, 60s",
+      "tempo": "Tempo in 4 tekens, bijv. 31X1",
+      "number": "Een getal, +x of a→b",
+      "numberExample": "Een getal, bijv. {example}",
+      "max": "Maximaal {max}",
+      "loadUnitCompact": "Schrijf kg of %, bijv. 60kg of 70%",
+      "loadMissingUnit": "Schrijf kg of % in één set van de regel; de rest neemt het over",
+      "loadMixedUnits": "Dezelfde eenheid op de hele regel: {unit}"
+    },
+    "mean": {
+      "equals": "= {value}",
+      "max": "zoveel mogelijk",
+      "maxCal": "zoveel mogelijk calorieën",
+      "maxM": "zoveel mogelijk meters",
+      "sets": "{sets} sets",
+      "ladder": "voor elke {word}: {list}, daarna {step} per {word}",
+      "perRound": "voor elke {word}: {list}",
+      "range": "bereik {range}, de atleet beslist",
+      "rangeSide": "bereik {range}, de atleet beslist · per kant",
+      "reps": "{value} herhalingen",
+      "repsSide": "{value} herhalingen · per kant",
+      "amount": "{value}",
+      "amountSide": "{value} · per kant",
+      "bw": "lichaamsgewicht",
+      "kg": "{value} kg",
+      "pct": "{value}% van de 1RM",
+      "words": "als tekst voor de atleet",
+      "tempo": "↓{down} zakken · {bottom} onderin · ↑{up} omhoog · {top} bovenin (seconden, X = explosief)"
+    },
+    "word": {
+      "set": "set",
+      "round": "ronde",
+      "slot": "interval"
+    },
+    "tip": {
+      "range": "bereik",
+      "ladder": "stijgt elke ronde",
+      "max": "zoveel als het lukt",
+      "emptyCode": "leeg",
+      "asBefore": "zoals de vorige",
+      "kg": "kilo",
+      "pct": "van de 1RM",
+      "heavyCode": "zwaar",
+      "words": "in woorden",
+      "plusEach": "stijgt elke keer",
+      "spread": "tot de laatste",
+      "unitCode": "kg of %",
+      "unitOnce": "één keer per regel",
+      "changeEach": "verandert elke keer",
+      "tempo": "seconden zakken · pauze onderin · omhoog (X = explosief) · pauze bovenin",
+      "seconds": "seconden",
+      "minSec": "minuten:seconden",
+      "minutes": "minuten, tot 10",
+      "afterLastCode": "na de laatste ronde",
+      "afterLast": "dezelfde waarde, of dezelfde verandering als je +x schrijft"
+    },
+    "colWord": {
+      "set": "Set",
+      "round": "Ronde",
+      "slot": "Interval"
     }
   }
 }
