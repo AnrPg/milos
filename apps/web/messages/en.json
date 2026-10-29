@@ -12716,7 +12716,7 @@
     },
     "describe": {
       "emom": "Every {every}, {times} times: {total} in total.",
-      "emomOpen": "Every {every}, until you can no longer keep up.",
+      "emomOpen": "Every {every}, until you can't finish in time.",
       "amrapWindows": "{count} AMRAP windows ({list}).",
       "amrapWindowsRest": "{count} AMRAP windows ({list}), {rest} rest between.",
       "amrap": "As many rounds as you can in {dur}.",
