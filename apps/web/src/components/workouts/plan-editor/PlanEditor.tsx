@@ -65,7 +65,8 @@ export function PlanEditor({ levels }: { levels?: PlanLevel[] }) {
   useEffect(() => {
     const root = rootRef.current;
     if (!pendingFocus || !root) return;
-    const el = [...root.querySelectorAll<HTMLElement>("[data-k]")].find((x) => x.dataset.k === pendingFocus);
+    // The grid marks its fields with `data-key`, the shell with `data-k`; both use the store's focus keys.
+    const el = [...root.querySelectorAll<HTMLElement>("[data-k], [data-key]")].find((x) => (x.dataset.k ?? x.dataset.key) === pendingFocus);
     if (!el) return;
     usePlanEditorStore.getState().consumeFocus(pendingFocus);
     el.focus();
@@ -76,7 +77,7 @@ export function PlanEditor({ levels }: { levels?: PlanLevel[] }) {
     if (e.defaultPrevented || sheet) return;
     const root = rootRef.current;
     const target = e.target as HTMLElement;
-    const k = target.dataset?.k ?? "";
+    const k = target.dataset?.k ?? target.dataset?.key ?? "";
     const inText = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target.isContentEditable;
     const store = usePlanEditorStore.getState();
 

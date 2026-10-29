@@ -12223,7 +12223,7 @@
       "exercises": "Ασκήσεις",
       "score": "Σκορ"
     },
-    "back": "← Πίσω",
+    "back": "Πίσω",
     "next": "Επόμενο →",
     "finish": "Τέλος ενότητας",
     "pickHelp": "Γράψε για αναζήτηση,",
@@ -12430,7 +12430,7 @@
       "nothing": "Τίποτα",
       "nothingHint": "σβήσε ένα γράμμα",
       "struct": "Δομή σετ…",
-      "structHint": "π.χ. cluster, drop set, complex…",
+      "structHint": "cluster, drop set, complex…",
       "measure": "Παράμετρος…",
       "measureHint": "ρυθμός, tempo, RPE, ύψος…",
       "perRound": "Τιμές ανά γύρο",
