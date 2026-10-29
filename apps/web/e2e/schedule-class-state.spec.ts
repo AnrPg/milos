@@ -82,7 +82,7 @@ async function openClass(page: Page) {
   await page.getByRole("button", { name: /CrossFit/ }).first().click();
 }
 
-/** Edit (and Restore) stay in view; the other class actions sit behind ⋯. */
+/** Edit stays in view; the other class actions sit behind ⋯ (restore and resume live in the state notice). */
 async function chooseClassAction(page: Page, name: string) {
   await page.getByTestId("class-more-actions").click();
   await page.getByRole("menu", { name: "More actions for this class" }).getByRole("menuitem", { name, exact: true }).click();
@@ -118,7 +118,7 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
     await openClass(page);
     await chooseClassAction(page, "Pause bookings");
     const dialog = page.getByRole("dialog", { name: "Pause bookings?" });
-    await dialog.getByRole("radio", { name: "All upcoming classes" }).click();
+    await dialog.getByRole("radio", { name: "This and following classes" }).click();
     await chooseOption(page, dialog.getByRole("combobox", { name: "Which of them" }), "2");
     await dialog.getByRole("button", { name: "Pause", exact: true }).click();
 
@@ -157,13 +157,81 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
     await openClass(page);
     await chooseClassAction(page, "Delete");
     const dialog = page.getByRole("dialog", { name: "Delete this class?" });
-    await dialog.getByRole("radio", { name: "All upcoming classes" }).click();
+    await dialog.getByRole("radio", { name: "This and following classes" }).click();
     await dialog.getByRole("button", { name: "Delete", exact: true }).click();
 
     await expect(page.getByText("2 classes have bookings and were kept. Cancel them instead.")).toBeVisible();
     // The class dialog and the confirm on top of it close together; the
     // schedule must scroll again afterwards.
     await expectPageScrolls(page);
+  });
+
+  test("deleting from the class form confirms first and keeps the reach chosen there", async ({ page }) => {
+    await asOwner(page);
+    let sent: Record<string, unknown> | null = null;
+    let plainDeletes = 0;
+    await page.route("**/api/org/box1/admin/schedule/slots/slot-1", (route) => {
+      if (route.request().method() === "DELETE") plainDeletes += 1;
+      return route.fulfill(json({}));
+    });
+    await page.route("**/api/org/box1/admin/schedule/slots/slot-1/state", (route) => {
+      sent = bodyOf(route.request());
+      return route.fulfill(json(result({ action: "delete", changed_count: 3, deleted_ids: ["slot-1", "slot-2", "slot-3"] })));
+    });
+
+    await openClass(page);
+    await page.getByRole("button", { name: "Edit class" }).click();
+    const editor = page.getByRole("dialog", { name: "Edit scheduled class" });
+    await editor.getByRole("radiogroup", { name: "Apply changes to" }).getByRole("radio", { name: "Classes between dates" }).click();
+    await editor.getByTestId("slot-editor-delete").click();
+
+    const dialog = page.getByRole("dialog", { name: "Delete this class?" });
+    await expect(dialog.getByRole("radio", { name: "Classes between dates" })).toHaveAttribute("aria-checked", "true");
+    // The reach can still change before confirming.
+    await dialog.getByRole("radio", { name: "This and following classes" }).click();
+    await dialog.getByRole("button", { name: "Delete", exact: true }).click();
+
+    await expect.poll(() => sent?.action).toBe("delete");
+    expect(sent).toMatchObject({ series_scope: "all" });
+    expect(plainDeletes).toBe(0);
+    await expect(page.getByText("3 classes changed.")).toBeVisible();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+  });
+
+  test("keeping the class closes only the confirmation, not the class form", async ({ page }) => {
+    await asOwner(page);
+    await withClass(page, { ...seriesClass, class_series_id: null });
+
+    await openClass(page);
+    await page.getByRole("button", { name: "Edit class" }).click();
+    const editor = page.getByRole("dialog", { name: "Edit scheduled class" });
+    await editor.getByTestId("slot-editor-delete").click();
+    const dialog = page.getByRole("dialog", { name: "Delete this class?" });
+    // Not in a series: no scope choice.
+    await expect(dialog.getByRole("radiogroup")).toHaveCount(0);
+    await dialog.getByRole("button", { name: "Keep as is" }).click();
+
+    await expect(dialog).toHaveCount(0);
+    await expect(editor).toBeVisible();
+  });
+
+  test("a class shows its coach on the calendar and in its details", async ({ page }) => {
+    await asOwner(page);
+    await page.route("**/api/org/box1/schedule?**", (route) =>
+      route.fulfill(
+        json({
+          class_types: [{ id: "ct", name: "CrossFit", archived_at: null }],
+          locations: [],
+          coaches: [{ id: "owner-1", nickname: "Olga", avatar_url: null }],
+          slots: [{ ...seriesClass, coach_user_id: "owner-1" }],
+        }),
+      ),
+    );
+
+    await page.goto("/admin/schedule");
+    await expect(page.getByRole("button", { name: /CrossFit/ }).first()).toContainText("Olga");
+    await page.getByRole("button", { name: /CrossFit/ }).first().click();
+    await expect(page.getByRole("dialog").getByTestId("slot-coach")).toHaveText("Coach: Olga");
   });
 
   test("a cancelled class shows its reason and offers restore", async ({ page }) => {
@@ -174,13 +242,19 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
     await expect(page.getByTestId("class-state-badge").first()).toHaveText("Cancelled");
     await page.getByRole("button", { name: /CrossFit/ }).first().click();
     await expect(page.getByTestId("class-state-notice")).toHaveText("This class is cancelled: Coach is ill");
+    // The way back sits in the notice, next to what it fixes; nothing to add to a calendar.
+    await expect(page.getByTestId("class-state").getByRole("button", { name: "Restore class" })).toBeVisible();
     const actions = page.getByTestId("class-actions");
-    await expect(actions.getByRole("button", { name: "Restore class" })).toBeVisible();
+    await expect(actions.getByRole("button", { name: "Restore class" })).toHaveCount(0);
     await page.getByTestId("class-more-actions").click();
     const menu = page.getByRole("menu", { name: "More actions for this class" });
     await expect(menu.getByRole("menuitem", { name: "Delete", exact: true })).toBeVisible();
     await expect(menu.getByRole("menuitem", { name: "Pause bookings" })).toHaveCount(0);
     await expect(menu.getByRole("menuitem", { name: "Restore class" })).toHaveCount(0);
+    await expect(menu.getByRole("menuitem", { name: "Add to calendar" })).toHaveCount(0);
+    await page.keyboard.press("Escape");
+    await page.getByTestId("class-state").getByRole("button", { name: "Restore class" }).click();
+    await expect(page.getByRole("dialog", { name: "Restore this class?" })).toBeVisible();
   });
 
   test("a paused class offers resume", async ({ page }) => {
@@ -189,10 +263,39 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
 
     await openClass(page);
     await expect(page.getByTestId("class-state-notice")).toContainText("Booking for this class is paused.");
-    await chooseClassAction(page, "Resume bookings");
+    await page.getByTestId("class-more-actions").click();
+    await expect(page.getByRole("menu").getByRole("menuitem", { name: "Resume bookings" })).toHaveCount(0);
+    await page.keyboard.press("Escape");
+    await page.getByTestId("class-state").getByRole("button", { name: "Resume bookings" }).click();
     // Not in a series: no scope choice.
     const dialog = page.getByRole("dialog", { name: "Resume bookings?" });
     await expect(dialog.getByRole("radiogroup")).toHaveCount(0);
+  });
+
+  test("the class is named by itself and a class without its WOD shows a red card with two ways to add one", async ({ page }) => {
+    await asOwner(page);
+    await withClass(page, { ...seriesClass, class_series_id: null, published: false, workout_status: "missing" });
+
+    await openClass(page);
+    await expect(page.getByRole("dialog").getByRole("heading", { level: 2 })).toHaveText("Morning WOD");
+    const notice = page.getByTestId("class-wod-notice");
+    await expect(notice).toHaveAttribute("role", "alert");
+    await expect(notice).toContainText("Not published: no WOD");
+    await expect(notice).toContainText("Clients can't see or book this class until you add a WOD.");
+    await expect(notice.getByRole("button", { name: "Choose a WOD" })).toBeVisible();
+    await expect(notice.getByRole("button", { name: "+ New WOD" })).toBeVisible();
+  });
+
+  test("a series class without its WOD raises no warning and offers the same two buttons on the WOD card", async ({ page }) => {
+    await asOwner(page);
+    await withClass(page, { ...seriesClass, published: true, workout_status: "awaiting" });
+
+    await openClass(page);
+    await expect(page.getByTestId("class-wod-notice")).toHaveCount(0);
+    await expect(page.getByRole("dialog").getByRole("alert")).toHaveCount(0);
+    const add = page.getByTestId("class-wod-add");
+    await expect(add.getByRole("button", { name: "Choose a WOD" })).toBeVisible();
+    await expect(add.getByRole("button", { name: "+ New WOD" })).toBeVisible();
   });
 
   test("on a phone, the class and workout action rows stay inside the card", async ({ page }) => {

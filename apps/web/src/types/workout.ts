@@ -36,13 +36,9 @@ export type ExerciseFormatContext = {
   intervalMode: IntervalMode;
 };
 
-export type WorkoutType =
-  | "crossfit"
-  | "strength"
-  | "gymnastics"
-  | "aerobics"
-  | "flexibility"
-  | "recovery";
+/** ADR-275: the kinds and their families live in `@/lib/workout-types`. */
+import type { WorkoutType } from "@/lib/workout-types";
+export type { WorkoutType };
 
 export type SectionFormat =
   | "untimed"

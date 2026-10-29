@@ -1,4 +1,5 @@
 import type { FreeTextWorkoutAnalysis } from "@/api/workouts";
+import { isWorkoutType } from "@/lib/workout-types";
 
 export type AnalysisIssue = FreeTextWorkoutAnalysis["issues"][number];
 export type AnalysisSuggestion = FreeTextWorkoutAnalysis["suggestions"][number];
@@ -54,7 +55,6 @@ export type ReviewState = {
 export type BlockingProblem = { path: string; reason: "required" | "too_short" };
 
 const LIST_FIELDS = new Set(["equipment", "tags"]);
-const WORKOUT_TYPES = ["crossfit", "strength", "gymnastics", "aerobics", "flexibility", "recovery"];
 
 export function createReviewState(analysis: FreeTextWorkoutAnalysis, analyzedText: string): ReviewState {
   return {
@@ -209,7 +209,7 @@ export function blockingProblems(title: string, type: string, state: ReviewState
 
   if (!trimmed) problems.push({ path: "title", reason: "required" });
   else if (trimmed.length < 3) problems.push({ path: "title", reason: "too_short" });
-  if (!WORKOUT_TYPES.includes(type)) problems.push({ path: "type", reason: "required" });
+  if (!isWorkoutType(type)) problems.push({ path: "type", reason: "required" });
   if (!state) return problems;
 
   state.workout.sections.forEach((section, sectionIndex) => {
@@ -293,7 +293,7 @@ export function parseFieldInput(path: string, input: string): unknown {
     return Number.isFinite(minutes) && minutes > 0 ? Math.round(minutes * 60) : undefined;
   }
 
-  if (field === "type") return WORKOUT_TYPES.includes(trimmed.toLowerCase()) ? trimmed.toLowerCase() : undefined;
+  if (field === "type") return isWorkoutType(trimmed.toLowerCase()) ? trimmed.toLowerCase() : undefined;
   return trimmed;
 }
 

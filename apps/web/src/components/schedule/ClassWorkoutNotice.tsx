@@ -30,11 +30,17 @@ export function ClassWorkoutNotice({
   accessToken,
   timeZone = null,
   onLinked,
+  calm = false,
 }: {
   slot: ScheduleSlot;
   accessToken: string;
   timeZone?: string | null;
   onLinked?: () => void;
+  /**
+   * Only the two ways to add a WOD, no warning: a series class without its WOD
+   * stays visible and bookable, and staff get reminders, so nothing is wrong yet.
+   */
+  calm?: boolean;
 }) {
   const i18n = useUiTranslations();
   const locale = useLocale();
@@ -44,8 +50,8 @@ export function ClassWorkoutNotice({
   const kind = classWorkoutNoticeKind(slot);
   if (!kind) return null;
 
-  const urgent = kind !== "awaiting";
-  const tone = urgent ? "var(--danger)" : "var(--warning)";
+  // Only a draft is an error to fix: clients can't see it until it has a WOD.
+  const tone = "var(--danger)";
 
   async function link(workoutId: string | null) {
     if (!workoutId || busy) return;
@@ -61,20 +67,10 @@ export function ClassWorkoutNotice({
     }
   }
 
-  return (
-    <div
-      className="mt-6 space-y-3 rounded-[1.4rem] p-4"
-      role={urgent ? "alert" : "status"}
-      aria-busy={busy}
-      style={{ background: `color-mix(in srgb, ${tone} 10%, transparent)`, border: `1px solid color-mix(in srgb, ${tone} 35%, transparent)` }}
-    >
-      <p className="text-sm font-semibold" style={{ color: tone }}>
-        {kind === "draft" ? i18n("classDraftTitle") : kind === "missing" ? i18n("classWodMissingTitle") : i18n("classWodAwaitingTitle")}
-      </p>
-      <p className="text-sm" style={{ color: "var(--text-soft)" }}>
-        {kind === "draft" ? i18n("classDraftBody") : kind === "missing" ? i18n("classWodMissingBody") : i18n("classWodAwaitingBody")}
-      </p>
+  const picker = (
+    <>
       <WodPicker
+        variant="actions"
         label={i18n("classLinkWodLabel")}
         token={accessToken}
         value={null}
@@ -93,6 +89,33 @@ export function ClassWorkoutNotice({
           onClose={() => setCreating(false)}
         />
       ) : null}
+    </>
+  );
+
+  if (calm) {
+    return (
+      <div className="mt-3 space-y-3" aria-busy={busy} data-testid="class-wod-add">
+        {picker}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="mt-4 space-y-3 rounded-[1.4rem] p-4"
+      role="alert"
+      aria-busy={busy}
+      data-testid="class-wod-notice"
+      style={{ background: `color-mix(in srgb, ${tone} 10%, transparent)`, border: `2px solid ${tone}` }}
+    >
+      <p className="text-base font-semibold" style={{ color: tone }}>
+        <span aria-hidden="true">⚠ </span>
+        {i18n("classDraftTitle")}
+      </p>
+      <p className="text-sm" style={{ color: "var(--text-soft)" }}>
+        {i18n("classDraftBody")}
+      </p>
+      {picker}
     </div>
   );
 }

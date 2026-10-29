@@ -246,22 +246,25 @@ export function ClassSheet({
       }
       size="xl"
       headerActions={
-        <button
-          type="button"
-          onClick={() =>
-            downloadIcsEvent({
-              title: slot.name,
-              date: slot.scheduled_at.slice(0, 10),
-              datetime: slot.scheduled_at,
-              durationMinutes: slot.duration_minutes,
-            })
-          }
-          aria-label={i18n("addToCalendar33cead7")}
-          className="grid h-10 w-10 place-items-center rounded-full"
-          style={{ background: "var(--panel-raised)", color: "var(--text-soft)" }}
-        >
-          <span aria-hidden="true">📅</span>
-        </button>
+        // A cancelled class has nothing to add to a calendar.
+        slot.cancelled_at ? undefined : (
+          <button
+            type="button"
+            onClick={() =>
+              downloadIcsEvent({
+                title: slot.name,
+                date: slot.scheduled_at.slice(0, 10),
+                datetime: slot.scheduled_at,
+                durationMinutes: slot.duration_minutes,
+              })
+            }
+            aria-label={i18n("addToCalendar33cead7")}
+            className="grid h-10 w-10 place-items-center rounded-full"
+            style={{ background: "var(--panel-raised)", color: "var(--text-soft)" }}
+          >
+            <span aria-hidden="true">📅</span>
+          </button>
+        )
       }
       footer={
         <div className="flex w-full flex-col gap-2">

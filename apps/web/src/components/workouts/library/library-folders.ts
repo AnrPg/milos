@@ -1,5 +1,5 @@
 import type { WorkoutFolder, WorkoutRecord } from "@/api/workouts";
-import type { WorkoutType } from "@/types/workout";
+import { workoutTypeFamily, type WorkoutTypeFamily } from "@/lib/workout-types";
 
 /** Folders the app maintains are recognised by their `system_key`, never by name. */
 export type FolderKind =
@@ -26,17 +26,22 @@ export const FOLDER_KIND_ICONS: Record<FolderKind, string> = {
   custom: "📁",
 };
 
-const WORKOUT_TYPE_ICONS: Record<WorkoutType, string> = {
-  crossfit: "🔥",
+/** ADR-275: one icon per workout family, so every kind in it has one. */
+const WORKOUT_FAMILY_ICONS: Record<WorkoutTypeFamily, string> = {
+  functional: "🔥",
   strength: "🏋️",
   gymnastics: "🤸",
-  aerobics: "🫀",
-  flexibility: "🧘",
+  endurance: "🫀",
+  mind_body: "🧘",
+  combat: "🥊",
+  dance: "💃",
+  outdoor: "🧗",
   recovery: "💆",
 };
 
 export function workoutIcon(type: string | null | undefined) {
-  return WORKOUT_TYPE_ICONS[type as WorkoutType] ?? "🏋️";
+  const family = workoutTypeFamily(type);
+  return family ? WORKOUT_FAMILY_ICONS[family] : "🏋️";
 }
 
 /**

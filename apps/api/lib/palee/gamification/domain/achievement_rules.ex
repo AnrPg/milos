@@ -1,14 +1,21 @@
 defmodule Palee.Gamification.Domain.AchievementRules do
+  alias Palee.Workouts.Domain.WorkoutType
+
   @attendance_thresholds [1, 10, 25, 50, 100, 200, 365]
   @pr_thresholds [1, 5, 10, 25, 50]
   @streak_thresholds [7, 30, 90]
+  # ADR-275: mastery badges count a workout family, so every kind in it
+  # counts. The first six keys keep the original kinds' badges.
   @type_badges %{
-    "crossfit" => {"type_crossfit_mastery", "CrossFit Devotee"},
+    "functional" => {"type_crossfit_mastery", "CrossFit Devotee"},
     "strength" => {"type_strength_mastery", "Iron Lifter"},
     "gymnastics" => {"type_gymnastics_mastery", "Gymnastics Adept"},
-    "aerobics" => {"type_aerobics_mastery", "Cardio Machine"},
-    "flexibility" => {"type_flexibility_mastery", "Flex Master"},
-    "recovery" => {"type_recovery_mastery", "Recovery Pro"}
+    "endurance" => {"type_aerobics_mastery", "Cardio Machine"},
+    "mind_body" => {"type_flexibility_mastery", "Flex Master"},
+    "recovery" => {"type_recovery_mastery", "Recovery Pro"},
+    "combat" => {"type_combat_mastery", "Fighter"},
+    "dance" => {"type_dance_mastery", "Dancer"},
+    "outdoor" => {"type_outdoor_mastery", "Explorer"}
   }
 
   def milestone_badges(stats, type_counts) do
@@ -29,8 +36,16 @@ defmodule Palee.Gamification.Domain.AchievementRules do
 
     mastery_badges =
       type_counts
-      |> Enum.filter(fn {_type, count} -> count >= 10 end)
-      |> Enum.map(fn {type, _count} -> @type_badges[type] && elem(@type_badges[type], 0) end)
+      |> Enum.reduce(%{}, fn {type, count}, acc ->
+        case WorkoutType.family(type) do
+          nil -> acc
+          family -> Map.update(acc, family, count, &(&1 + count))
+        end
+      end)
+      |> Enum.filter(fn {_family, count} -> count >= 10 end)
+      |> Enum.map(fn {family, _count} ->
+        @type_badges[family] && elem(@type_badges[family], 0)
+      end)
       |> Enum.reject(&is_nil/1)
 
     Enum.uniq(workout_badges ++ pr_badges ++ streak_badges ++ mastery_badges)

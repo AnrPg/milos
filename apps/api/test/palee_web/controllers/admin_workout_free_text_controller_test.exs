@@ -127,6 +127,46 @@ defmodule PaleeWeb.AdminWorkoutFreeTextControllerTest do
                |> json_response(403)
     end
 
+    test "ADR-275: the gym picks the workout kinds its editors offer", %{conn: conn} do
+      {conn, organization} = authenticate(conn, "free_text_workout_types", :owner)
+      base = "/api/org/#{organization.slug}/admin"
+      all = Enum.map(Palee.Workouts.supported_workout_types(), &to_string/1)
+
+      assert %{"workout_types" => ^all} =
+               conn |> get("#{base}/workouts/authoring-settings") |> json_response(200)
+
+      assert "muay_thai" in all and "dance" in all and "aerobics" in all
+
+      patch_types = fn types ->
+        conn
+        |> recycle()
+        |> put_req_header("content-type", "application/json")
+        |> patch("#{base}/settings", Jason.encode!(%{workouts: %{workout_types: types}}))
+      end
+
+      # Stored in catalogue order, whatever order the request used.
+      assert %{"workouts" => %{"workout_types" => ["crossfit", "boxing"]}} =
+               patch_types.(["boxing", "crossfit"]) |> json_response(200)
+
+      assert %{"workout_types" => ["crossfit", "boxing"], "wod_assistant_enabled" => true} =
+               conn
+               |> recycle()
+               |> get("#{base}/workouts/authoring-settings")
+               |> json_response(200)
+
+      assert patch_types.([]) |> json_response(422)
+      assert patch_types.(["karaoke"]) |> json_response(422)
+
+      assert %{"workouts" => %{"workout_types" => nil}} =
+               patch_types.(nil) |> json_response(200)
+
+      assert %{"workout_types" => ^all} =
+               conn
+               |> recycle()
+               |> get("#{base}/workouts/authoring-settings")
+               |> json_response(200)
+    end
+
     test "a member cannot read the authoring settings", %{conn: conn} do
       {conn, organization} = authenticate(conn, "free_text_ai_switch_member", :member)
 

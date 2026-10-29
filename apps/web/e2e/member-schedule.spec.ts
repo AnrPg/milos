@@ -256,9 +256,33 @@ test.describe("member schedule", () => {
     await expect(sheet.getByText("Δύναμη · Πόδια")).toBeVisible();
     await expect(sheet.getByText(/Χωρίς χρέωση έως/)).toBeVisible();
     await expect(sheet.getByRole("button", { name: "Κράτηση" })).toBeVisible();
+    await expect(sheet.getByRole("button", { name: "+ Προσθήκη στο ημερολόγιο" })).toBeVisible();
     await shot(page, "class-sheet");
     await sheet.getByRole("button", { name: "Κλείσιμο" }).first().click();
     await expect(sheet).toHaveCount(0);
+  });
+
+  test("a cancelled class offers nothing to add to a calendar", async ({ page }) => {
+    await page.route("**/api/org/*/schedule?**", (route) =>
+      route.fulfill(
+        json({
+          start_date: localDate(),
+          end_date: localDate(13),
+          days: 14,
+          class_types: [crossfit],
+          coaches: [],
+          slots: [slot("s-9", crossfit, 7, { cancelled_at: at(1), cancel_reason: "Ο coach είναι άρρωστος" })],
+        }),
+      ),
+    );
+    await page.goto("/box/schedule");
+    const sheet = page.getByRole("dialog", { name: "CrossFit" });
+    await expect(async () => {
+      await page.getByRole("main").getByRole("button", { name: /CrossFit/ }).first().click();
+      await expect(sheet).toBeVisible({ timeout: 2_000 });
+    }).toPass({ timeout: 20_000 });
+    await expect(sheet.getByTestId("class-state-notice")).toBeVisible();
+    await expect(sheet.getByRole("button", { name: "+ Προσθήκη στο ημερολόγιο" })).toHaveCount(0);
   });
 
   test("picks a location from the list over the map", async ({ page }) => {

@@ -152,7 +152,7 @@ Token names are camelCase in `theme.ts` and kebab-case as CSS variables
 | Categorical series (providers, wellness, analytics) | `--series-1` … `--series-8`; neutral `--series-neutral`; text on a series fill `--on-series` |
 | Grid lines / axes / tooltips | `--border` / `--dim` / `--panel` with `--text` |
 | Scale levels (Base, Scaled, Rx, Advanced) | `--scale-base`, `--scale-scaled`, `--scale-rx`, `--scale-advanced` |
-| Workout types | `--workout-crossfit`, `--workout-strength`, `--workout-gymnastics`, `--workout-aerobics`, `--workout-flexibility`, `--workout-recovery` |
+| Workout families (ADR-275) | `--workout-crossfit` (functional), `--workout-strength`, `--workout-gymnastics`, `--workout-aerobics` (endurance), `--workout-flexibility` (mind & body), `--workout-recovery`, `--workout-combat`, `--workout-dance`, `--workout-outdoor` |
 | PR scores and history | `--heat` |
 | Anatomy figure: roles, heat map, base and bone | `--anatomy-*` |
 

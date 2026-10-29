@@ -15,6 +15,8 @@ import { resolveWorkoutIcon } from "@/components/workouts/library/library-folder
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { semanticLabel } from "@/i18n/presentation";
+import { useWorkoutTypeLabels, workoutTypeOptionGroups } from "@/components/workouts/WorkoutTypeSelect";
+import { offeredWorkoutTypeGroups } from "@/lib/workout-types";
 import { useUiTranslations } from "@/i18n/ui";
 import { SPARK_CREATE_STYLE } from "@/lib/spark";
 
@@ -35,7 +37,6 @@ import { SPARK_CREATE_STYLE } from "@/lib/spark";
  * A centred dialog on wider screens, a tall bottom sheet on phones.
  */
 
-const WORKOUT_TYPES = ["crossfit", "strength", "gymnastics", "aerobics", "flexibility", "recovery"] as const;
 const SEARCH_DELAY_MS = 250;
 
 export const workoutChoiceKey = (id: string) => ["workout-choice", id] as const;
@@ -71,6 +72,7 @@ export function WodPicker({
   classTypeId,
   classTypeName,
   noneHint,
+  variant = "field",
 }: {
   label: string;
   token: string;
@@ -84,6 +86,11 @@ export function WodPicker({
   classTypeName?: string | null;
   /** What "No WOD yet" means here (a class, or each class of a series). */
   noneHint?: string;
+  /**
+   * "field" is the form input. "actions" is for a class missing its WOD: two
+   * plain calls to action («Choose a WOD», «+ New WOD») instead of a field.
+   */
+  variant?: "field" | "actions";
 }) {
   const t = useTranslations("Schedule");
   const i18n = useUiTranslations();
@@ -115,55 +122,83 @@ export function WodPicker({
   const sameDay = suggestions.data?.same_day ?? [];
   const quick = (sameDay.length ? sameDay : suggestions.data?.recent ?? []).slice(0, 2);
 
+  const actions = variant === "actions";
+
   return (
     <div className="space-y-2 text-sm font-semibold" style={{ color: "var(--muted)" }}>
-      <div className="flex items-center justify-between gap-2">
-        <span id={labelId}>{label}</span>
-        <button type="button" className="rounded-full px-2.5 py-0.5 text-xs font-semibold" style={SPARK_CREATE_STYLE} onClick={onCreateNew}>
-          + {t("wodPickerNew")}
-        </button>
-      </div>
-
-      <div className="relative">
-        <button
-          ref={triggerRef}
-          type="button"
-          aria-haspopup="dialog"
-          aria-expanded={open}
-          aria-labelledby={`${labelId} ${id}-value`}
-          className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-start outline-none"
-          style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)", paddingInlineEnd: value ? "3.25rem" : undefined }}
-          onClick={() => setOpen(true)}
-        >
-          <span aria-hidden="true" className="w-6 shrink-0 text-center text-lg">
-            {selected ? resolveWorkoutIcon(selected) : "○"}
-          </span>
-          <span id={`${id}-value`} className="min-w-0 flex-1">
-            <span className="block truncate font-semibold" style={{ color: value ? "var(--text)" : "var(--muted)" }}>
-              {selected ? selected.title : value ? t("wodPickerChosen") : t("wodPickerNone")}
-            </span>
-            <span className="block truncate text-xs font-normal" style={{ color: "var(--muted)" }}>
-              {selected ? semanticLabel(selected.type, i18n) : value ? "" : t("wodPickerTapToChoose")}
-            </span>
-          </span>
-          {value ? null : (
-            <span aria-hidden="true" className="shrink-0" style={{ color: "var(--muted)" }}>
-              ⌕
-            </span>
-          )}
-        </button>
-        {value ? (
+      {actions ? (
+        <div className="flex flex-wrap gap-2" role="group" aria-label={label}>
+          <button
+            ref={triggerRef}
+            type="button"
+            aria-haspopup="dialog"
+            aria-expanded={open}
+            className="grow whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold sm:grow-0"
+            style={{ background: "var(--text)", color: "var(--bg)" }}
+            onClick={() => setOpen(true)}
+          >
+            {t("wodPickerChoose")}
+          </button>
           <button
             type="button"
-            aria-label={t("wodPickerClear")}
-            className="absolute end-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-base"
-            style={{ color: "var(--muted)" }}
-            onClick={() => choose(null)}
+            className="grow whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold sm:grow-0"
+            style={{ background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border-strong)" }}
+            onClick={onCreateNew}
           >
-            ×
+            + {t("wodPickerNew")}
           </button>
-        ) : null}
-      </div>
+        </div>
+      ) : (
+        <>
+          <div className="flex items-center justify-between gap-2">
+            <span id={labelId}>{label}</span>
+            <button type="button" className="rounded-full px-2.5 py-0.5 text-xs font-semibold" style={SPARK_CREATE_STYLE} onClick={onCreateNew}>
+              + {t("wodPickerNew")}
+            </button>
+          </div>
+
+          <div className="relative">
+            <button
+              ref={triggerRef}
+              type="button"
+              aria-haspopup="dialog"
+              aria-expanded={open}
+              aria-labelledby={`${labelId} ${id}-value`}
+              className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-start outline-none"
+              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)", paddingInlineEnd: value ? "3.25rem" : undefined }}
+              onClick={() => setOpen(true)}
+            >
+              <span aria-hidden="true" className="w-6 shrink-0 text-center text-lg">
+                {selected ? resolveWorkoutIcon(selected) : "○"}
+              </span>
+              <span id={`${id}-value`} className="min-w-0 flex-1">
+                <span className="block truncate font-semibold" style={{ color: value ? "var(--text)" : "var(--muted)" }}>
+                  {selected ? selected.title : value ? t("wodPickerChosen") : t("wodPickerNone")}
+                </span>
+                <span className="block truncate text-xs font-normal" style={{ color: "var(--muted)" }}>
+                  {selected ? semanticLabel(selected.type, i18n) : value ? "" : t("wodPickerTapToChoose")}
+                </span>
+              </span>
+              {value ? null : (
+                <span aria-hidden="true" className="shrink-0" style={{ color: "var(--muted)" }}>
+                  ⌕
+                </span>
+              )}
+            </button>
+            {value ? (
+              <button
+                type="button"
+                aria-label={t("wodPickerClear")}
+                className="absolute end-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-base"
+                style={{ color: "var(--muted)" }}
+                onClick={() => choose(null)}
+              >
+                ×
+              </button>
+            ) : null}
+          </div>
+        </>
+      )}
 
       {!value && quick.length ? (
         <div className="flex flex-wrap items-center gap-2 text-xs font-normal">
@@ -233,6 +268,7 @@ function WodPickerDialog({
 }) {
   const t = useTranslations("Schedule");
   const i18n = useUiTranslations();
+  const typeLabels = useWorkoutTypeLabels();
   const locale = useLocale();
   const listId = useId();
   const [query, setQuery] = useState("");
@@ -335,9 +371,7 @@ function WodPickerDialog({
                 <span>{t("wodPickerType")}</span>
                 <Select className="w-full rounded-xl px-3 py-2 text-sm" value={type} onValueChange={(next) => { setType(next); setActive(0); }}>
                   <option value="">{t("wodPickerAny")}</option>
-                  {WORKOUT_TYPES.map((item) => (
-                    <option key={item} value={item}>{semanticLabel(item, i18n)}</option>
-                  ))}
+                  {workoutTypeOptionGroups(offeredWorkoutTypeGroups(null), typeLabels)}
                 </Select>
               </label>
               <label className="space-y-1 text-xs font-semibold" style={{ color: "var(--muted)" }}>

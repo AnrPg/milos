@@ -45,7 +45,8 @@ import { DraftConflictNotice } from "./DraftConflictNotice";
 import { EditorTabs } from "./EditorTabs";
 import { SectionScoringField } from "./SectionScoringField";
 import { FreeTextTimerFields } from "./FreeTextTimerFields";
-import { Select } from "@/components/ui/Select";
+import { WorkoutTypeSelect } from "@/components/workouts/WorkoutTypeSelect";
+import { isWorkoutType } from "@/lib/workout-types";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 type Props = {
@@ -61,8 +62,6 @@ type Props = {
   /** ADR-270: filled with "save the sections now", so the host can switch editors without losing them. */
   saveHandleRef?: MutableRefObject<(() => Promise<void>) | null>;
 };
-
-const WORKOUT_TYPES: WorkoutType[] = ["crossfit", "strength", "gymnastics", "aerobics", "flexibility", "recovery"];
 
 /**
  * ADR-180: a workout written without the assistant. The coach adds sections
@@ -116,7 +115,7 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
   const applyWorkout = useCallback(
     (workout: WorkoutRecord) => {
       setTitle(workout.title ?? "");
-      setType(WORKOUT_TYPES.includes(workout.type as WorkoutType) ? (workout.type as WorkoutType) : "");
+      setType(isWorkoutType(workout.type) ? workout.type : "");
       metadataRef.current = workout.workout_metadata ?? {};
       // A free-text draft switched to sections keeps its text as section 1
       // and its whole-workout timer as that section's timer.
@@ -311,22 +310,14 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
                 <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                   {i18n("workoutType34a530c")}
                 </span>
-                <Select
+                <WorkoutTypeSelect
                   className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none"
                   style={{ background: "var(--card)", borderColor: showProblems && !type ? "var(--danger)" : "var(--dim)", color: "var(--text)" }}
                   value={type}
-                  onValueChange={(value) => setType(value as WorkoutType)}
-                  aria-invalid={showProblems && !type}
-                >
-                  <option value="" disabled>
-                    {assistantT("chooseType")}
-                  </option>
-                  {WORKOUT_TYPES.map((item) => (
-                    <option key={item} value={item}>
-                      {item.replaceAll("_", " ")}
-                    </option>
-                  ))}
-                </Select>
+                  onChange={setType}
+                  placeholder={assistantT("chooseType")}
+                  invalid={showProblems && !type}
+                />
               </label>
             </div>
           ) : null}
