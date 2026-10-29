@@ -7,17 +7,26 @@ defmodule Palee.Application.Fiscal.FiscalRegistry do
   """
 
   alias Palee.Organizations
+  alias Palee.Application.Fiscal.FiscalConnections
   alias Palee.Fiscal.Registry
 
   @doc "`%{connection: connection | nil}`."
   def connection(context), do: %{connection: Registry.connection(context)}
 
-  def save_connection(context, params, now \\ DateTime.utc_now()) do
-    params = atomize(params, ~w(environment username password)a)
+  @doc """
+  Saves the registry connection, then checks it with a look-up of the
+  business's own ΑΦΜ (ADR-273): `{:ok, %{connection, check}}`.
+  """
+  def save_connection(context, params, now \\ DateTime.utc_now(), opts \\ []) do
+    params =
+      params
+      |> atomize(~w(environment username password)a)
+      |> Map.put(:updated_by_platform, Keyword.get(opts, :platform) == true)
 
-    with {:ok, connection} <-
+    with :ok <- FiscalConnections.guard(context, opts),
+         {:ok, _connection} <-
            Registry.save_connection(context, params, Map.get(context, :user_id), now) do
-      {:ok, %{connection: connection}}
+      {:ok, FiscalConnections.after_save(context, "registry", now)}
     end
   end
 

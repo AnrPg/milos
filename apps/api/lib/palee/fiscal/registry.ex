@@ -17,7 +17,7 @@ defmodule Palee.Fiscal.Registry do
   """
 
   alias Palee.Fiscal
-  alias Palee.Fiscal.{FiscalStore, TransmissionStore}
+  alias Palee.Fiscal.{Connections, FiscalStore, TransmissionStore}
   alias Palee.Fiscal.Domain.TaxId
 
   @authority "gr_registry"
@@ -42,9 +42,33 @@ defmodule Palee.Fiscal.Registry do
 
   defp public_connection(connection) do
     connection
-    |> Map.take([:environment, :user_id, :status, :last_error, :updated_at])
+    |> Map.take([:environment, :status, :updated_at])
+    # ADR-273: the same name the save takes (`username`).
+    |> Map.put(:username, connection.user_id)
+    |> Map.merge(Connections.public_check(connection))
     |> Map.put(:has_password, is_binary(connection.subscription_key))
   end
+
+  @doc false
+  # ADR-273: «Δοκιμή σύνδεσης» looks up the business's own ΑΦΜ (one call
+  # of the business's AADE quota) and answers with the name AADE has.
+  def check_connection(context, connection, %Date{} = as_on) do
+    identity = FiscalStore.get_identity(context)
+
+    with {:ok, afm} <- own_afm(identity),
+         {:ok, business} <- adapter(connection.environment).lookup(connection, afm, as_on) do
+      {:ok, %{tax_id: afm, legal_name: business.legal_name}}
+    end
+  end
+
+  defp own_afm(%{country_code: "GR", tax_id: tax_id}) when is_binary(tax_id) do
+    case valid_afm(tax_id) do
+      {:ok, afm} -> {:ok, afm}
+      {:error, _reason} -> {:error, :tax_id_missing}
+    end
+  end
+
+  defp own_afm(_identity), do: {:error, :tax_id_missing}
 
   @doc """
   Saves the registry connection: `environment` (`sandbox` or
@@ -61,7 +85,12 @@ defmodule Palee.Fiscal.Registry do
                TransmissionStore.save_connection(
                  context,
                  @authority,
-                 Map.merge(attrs, %{status: "active", last_error: nil, updated_by_id: actor_id})
+                 attrs
+                 |> Map.merge(Connections.saved_fields())
+                 |> Map.merge(%{
+                   updated_by_id: actor_id,
+                   updated_by_platform: params[:updated_by_platform] == true
+                 })
                ),
              {:ok, _entry} <-
                Fiscal.append(context, %{
@@ -70,12 +99,14 @@ defmodule Palee.Fiscal.Registry do
                  subject_id: saved.id,
                  actor_id: actor_id,
                  occurred_at: now,
-                 payload: %{
-                   authority: @authority,
-                   environment: saved.environment,
-                   user_id: saved.user_id,
-                   password_changed: Map.has_key?(attrs, :subscription_key)
-                 }
+                 payload:
+                   %{
+                     authority: @authority,
+                     environment: saved.environment,
+                     user_id: saved.user_id,
+                     password_changed: Map.has_key?(attrs, :subscription_key)
+                   }
+                   |> Connections.platform_mark(params)
                }) do
           {:ok, public_connection(saved)}
         end
@@ -124,11 +155,12 @@ defmodule Palee.Fiscal.Registry do
           {:ok, business}
 
         {:error, :credentials_rejected} ->
-          TransmissionStore.set_connection_status(
+          Connections.mark_invalid(
             context,
-            @authority,
-            "invalid",
-            "credentials_rejected"
+            "registry",
+            "credentials_rejected",
+            "credentials_rejected",
+            DateTime.utc_now()
           )
 
           {:error, :registry_credentials_rejected}

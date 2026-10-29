@@ -43,6 +43,7 @@ defmodule Palee.Notifications.Notification do
     :shop_order_placed,
     :payment_failed,
     :payment_needs_attention,
+    :fiscal_connection_failed,
     :shop_order_ready,
     :shop_order_reminder,
     :shop_order_cancelled,

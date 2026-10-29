@@ -746,3 +746,9 @@ msgstr "האישור הרפואי שלך יפוג בקרוב"
 
 msgid "Upload a new health certificate before %{date}."
 msgstr "העלה אישור רפואי חדש לפני %{date}."
+
+msgid "A fiscal connection needs attention"
+msgstr "חיבור פיסקלי דורש תשומת לב"
+
+msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
+msgstr "%{connection} הפסיק לעבוד. פתחו את פרטי החיוב › חיבורים כדי לתקן."

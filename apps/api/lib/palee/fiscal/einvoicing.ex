@@ -19,7 +19,7 @@ defmodule Palee.Fiscal.EInvoicing do
   """
 
   alias Palee.Fiscal
-  alias Palee.Fiscal.{EInvoiceStore, FiscalStore, TillSignatureStore}
+  alias Palee.Fiscal.{Connections, EInvoiceStore, FiscalStore, TillSignatureStore}
   alias Palee.Fiscal.Domain.{CountryProfile, EInvoicePolicy, PeppolId, UblInvoice}
 
   @network "peppol"
@@ -142,11 +142,12 @@ defmodule Palee.Fiscal.EInvoicing do
   defp retired(context, submission, connection, now) do
     if connection.status != "invalid",
       do:
-        EInvoiceStore.set_connection_status(
+        Connections.mark_invalid(
           context,
-          @network,
-          "invalid",
-          "provider_retired: reconnect with #{@default_provider}"
+          "peppol",
+          "provider_retired",
+          "provider_retired: reconnect with #{@default_provider}",
+          now
         )
 
     if submission.status == "sending",
@@ -164,6 +165,15 @@ defmodule Palee.Fiscal.EInvoicing do
   end
 
   defp with_credentials(connection, _context), do: connection
+
+  @doc false
+  # ADR-273: «Δοκιμή σύνδεσης» with the credentials a submission would use.
+  def check_connection(context, connection) do
+    case adapter(connection.provider) do
+      nil -> {:error, :provider_retired}
+      network -> connection |> with_credentials(context) |> network.check()
+    end
+  end
 
   defp till_credentials(context, environment) do
     Enum.find_value(@till_devices, fn device ->
@@ -325,7 +335,14 @@ defmodule Palee.Fiscal.EInvoicing do
   end
 
   defp invalidate(context, {:error, {:unauthorized, _reason}} = result),
-    do: EInvoiceStore.set_connection_status(context, @network, "invalid", error_text(result))
+    do:
+      Connections.mark_invalid(
+        context,
+        "peppol",
+        "credentials_rejected",
+        error_text(result),
+        DateTime.utc_now()
+      )
 
   defp invalidate(_context, _result), do: :ok
 
@@ -443,9 +460,9 @@ defmodule Palee.Fiscal.EInvoicing do
       :environment,
       :legal_entity_id,
       :status,
-      :last_error,
       :updated_at
     ])
+    |> Map.merge(Connections.public_check(connection))
     |> Map.merge(%{
       peppol_id:
         PeppolId.format(%{
@@ -488,7 +505,12 @@ defmodule Palee.Fiscal.EInvoicing do
                EInvoiceStore.save_connection(
                  context,
                  @network,
-                 Map.merge(attrs, %{status: "active", last_error: nil, updated_by_id: actor_id})
+                 attrs
+                 |> Map.merge(Connections.saved_fields())
+                 |> Map.merge(%{
+                   updated_by_id: actor_id,
+                   updated_by_platform: params[:updated_by_platform] == true
+                 })
                ),
              {:ok, _entry} <-
                Fiscal.append(context, %{
@@ -497,15 +519,18 @@ defmodule Palee.Fiscal.EInvoicing do
                  subject_id: saved.id,
                  actor_id: actor_id,
                  occurred_at: now,
-                 payload: %{
-                   network: @network,
-                   provider: saved.provider,
-                   environment: saved.environment,
-                   peppol_id: "#{saved.peppol_scheme}:#{saved.peppol_identifier}",
-                   legal_entity_id: saved.legal_entity_id,
-                   key_changed: Map.has_key?(attrs, :api_key) or Map.has_key?(attrs, :api_secret),
-                   webhook_token_changed: not is_nil(token)
-                 }
+                 payload:
+                   %{
+                     network: @network,
+                     provider: saved.provider,
+                     environment: saved.environment,
+                     peppol_id: "#{saved.peppol_scheme}:#{saved.peppol_identifier}",
+                     legal_entity_id: saved.legal_entity_id,
+                     key_changed:
+                       Map.has_key?(attrs, :api_key) or Map.has_key?(attrs, :api_secret),
+                     webhook_token_changed: not is_nil(token)
+                   }
+                   |> Connections.platform_mark(params)
                }) do
           EInvoiceStore.wake_waiting(context, now)
 

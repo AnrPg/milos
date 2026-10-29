@@ -70,7 +70,12 @@ defmodule PaleeWeb.AdminFiscalReportingControllerTest do
              |> send_json(:put, path, %{"environment" => "production"})
              |> json_response(422)
 
-    assert %{"connection" => connection} =
+    # ADR-273: the save is checked right away (AADE's test system, stubbed).
+    Req.Test.stub(Palee.FiscalHttp, fn conn ->
+      Plug.Conn.send_resp(conn, 200, "<RequestedDoc/>")
+    end)
+
+    assert %{"connection" => connection, "check" => %{"result" => "ok"}} =
              ctx.owner
              |> send_json(:put, path, %{
                "environment" => "test",

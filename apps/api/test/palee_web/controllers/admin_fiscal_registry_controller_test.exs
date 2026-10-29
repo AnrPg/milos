@@ -109,7 +109,19 @@ defmodule PaleeWeb.AdminFiscalRegistryControllerTest do
       })
       |> json_response(200)
 
-    assert %{"connection" => %{"has_password" => true, "user_id" => "BOXUSER"}} = body
+    # ADR-273: checked right away with the business's own ΑΦΜ; without one
+    # the credentials are neither confirmed nor refused.
+    assert %{
+             "connection" => %{
+               "has_password" => true,
+               "username" => "BOXUSER",
+               "status" => "active",
+               "error_code" => "tax_id_missing"
+             },
+             "check" => %{"result" => "unreachable", "error_code" => "tax_id_missing"}
+           } = body
+
+    refute Map.has_key?(body["connection"], "user_id")
     refute Jason.encode!(body) =~ "very-secret-pw"
 
     %{rows: [[stored]]} =

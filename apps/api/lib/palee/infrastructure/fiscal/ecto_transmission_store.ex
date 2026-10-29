@@ -7,6 +7,7 @@ defmodule Palee.Infrastructure.Fiscal.EctoTransmissionStore do
 
   alias Palee.Fiscal.{AuthorityConnection, Transmission, TransmissionAttempt}
   alias Palee.Fiscal.Domain.TransmissionPolicy
+  alias Palee.Infrastructure.Fiscal.ConnectionCheckFields
   alias Palee.Repo
 
   @max_page 200
@@ -43,6 +44,15 @@ defmodule Palee.Infrastructure.Fiscal.EctoTransmissionStore do
     AuthorityConnection
     |> where([c], c.organization_id == ^organization_id and c.authority == ^authority)
     |> Repo.update_all(set: [status: status, last_error: error, updated_at: now()])
+
+    :ok
+  end
+
+  @impl true
+  def update_connection_check(%{organization_id: organization_id}, authority, attrs) do
+    AuthorityConnection
+    |> where([c], c.organization_id == ^organization_id and c.authority == ^authority)
+    |> Repo.update_all(set: ConnectionCheckFields.set(attrs))
 
     :ok
   end

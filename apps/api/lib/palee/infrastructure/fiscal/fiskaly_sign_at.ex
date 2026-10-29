@@ -36,6 +36,30 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignAt do
 
   @base_url "https://rksv.fiskaly.com/api/v1"
 
+  @doc """
+  «Δοκιμή σύνδεσης» (ADR-273): signs in and reads the signature creation
+  unit and the cash register Palee provisioned. Nothing is signed.
+  """
+  @impl true
+  def check(connection) do
+    steps = fn token ->
+      with {:ok, _unit} <-
+             found(request(token, :get, "/signature-creation-unit/" <> connection.unit_id, nil)),
+           {:ok, register} <-
+             found(request(token, :get, "/cash-register/" <> connection.register_id, nil)) do
+        if register["state"] in ["INITIALIZED", nil],
+          do: {:ok, %{}},
+          else: {:error, :unit_not_ready}
+      end
+    end
+
+    {result, _wire} = with_token(connection, steps, nil)
+    result
+  end
+
+  defp found({:error, {:not_found, _body}}), do: {:error, :unit_not_found}
+  defp found(result), do: result
+
   @impl true
   def provision(connection, context) do
     scu = "/signature-creation-unit/" <> connection.unit_id

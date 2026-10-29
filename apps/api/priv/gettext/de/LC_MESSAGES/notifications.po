@@ -746,3 +746,9 @@ msgstr "Deine ärztliche Bescheinigung läuft bald ab"
 
 msgid "Upload a new health certificate before %{date}."
 msgstr "Lade vor dem %{date} eine neue ärztliche Bescheinigung hoch."
+
+msgid "A fiscal connection needs attention"
+msgstr "Eine Steuerverbindung braucht Aufmerksamkeit"
+
+msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
+msgstr "%{connection} funktioniert nicht mehr. Öffne Rechnungsdaten › Verbindungen, um es zu beheben."

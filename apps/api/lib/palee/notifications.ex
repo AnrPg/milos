@@ -887,6 +887,17 @@ defmodule Palee.Notifications do
   def process_event("payment_needs_attention", payload),
     do: enqueue_payment_notice(:payment_needs_attention, payload)
 
+  # ADR-273: a fiscal connection stopped working; to the staff who manage
+  # billing, once a day at most per connection (the dedupe key has the date).
+  def process_event("fiscal_connection_failed", payload),
+    do:
+      enqueue_simple(:fiscal_connection_failed, payload, %{
+        connection: field(payload, :connection),
+        error_code: field(payload, :error_code),
+        dedupe_key: field(payload, :dedupe_key),
+        url: field(payload, :url)
+      })
+
   def process_event("shop_order_ready", payload),
     do:
       enqueue_simple(:shop_order_ready, payload, %{

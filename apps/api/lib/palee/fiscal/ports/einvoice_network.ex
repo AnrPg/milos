@@ -64,4 +64,12 @@ defmodule Palee.Fiscal.Ports.EInvoiceNetwork do
 
   @callback status(connection(), submission_id :: String.t()) ::
               {{:ok, :delivered | :in_progress | {:failed, list()}} | {:error, term()}, wire()}
+
+  @doc """
+  «Δοκιμή σύνδεσης» (ADR-273): signs in with the connection's credentials
+  and reads the business's e-invoicing System (nothing is sent).
+  `{:ok, %{}}`, `{:error, {:unauthorized, _}}`, `{:error,
+  :system_not_found}` or anything else (transient).
+  """
+  @callback check(connection()) :: {:ok, map()} | {:error, term()}
 end

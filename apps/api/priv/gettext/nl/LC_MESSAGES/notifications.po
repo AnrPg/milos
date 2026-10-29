@@ -746,3 +746,9 @@ msgstr "Je medische verklaring verloopt binnenkort"
 
 msgid "Upload a new health certificate before %{date}."
 msgstr "Upload vóór %{date} een nieuwe medische verklaring."
+
+msgid "A fiscal connection needs attention"
+msgstr "Een fiscale koppeling vraagt aandacht"
+
+msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
+msgstr "%{connection} werkt niet meer. Open Factuurgegevens › Koppelingen om het op te lossen."

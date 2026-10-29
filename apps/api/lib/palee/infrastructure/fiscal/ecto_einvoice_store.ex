@@ -7,6 +7,7 @@ defmodule Palee.Infrastructure.Fiscal.EctoEInvoiceStore do
 
   alias Palee.Fiscal.{EInvoiceAttempt, EInvoiceSubmission, NetworkConnection}
   alias Palee.Fiscal.Domain.EInvoicePolicy
+  alias Palee.Infrastructure.Fiscal.ConnectionCheckFields
   alias Palee.Repo
 
   @max_page 200
@@ -43,6 +44,15 @@ defmodule Palee.Infrastructure.Fiscal.EctoEInvoiceStore do
     NetworkConnection
     |> where([c], c.organization_id == ^organization_id and c.network == ^network)
     |> Repo.update_all(set: [status: status, last_error: error, updated_at: DateTime.utc_now()])
+
+    :ok
+  end
+
+  @impl true
+  def update_connection_check(%{organization_id: organization_id}, network, attrs) do
+    NetworkConnection
+    |> where([c], c.organization_id == ^organization_id and c.network == ^network)
+    |> Repo.update_all(set: ConnectionCheckFields.set(attrs))
 
     :ok
   end

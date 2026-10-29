@@ -13,6 +13,7 @@ defmodule PaleeWeb.AdminFiscalTillSigningController do
   alias Palee.Application.Fiscal.FiscalTillSigning
   alias PaleeWeb.Schemas.Fiscal, as: F
   alias PaleeWeb.Schemas.FiscalCompliance, as: C
+  alias PaleeWeb.Schemas.FiscalConnections, as: FC
 
   action_fallback PaleeWeb.FallbackController
 
@@ -41,23 +42,26 @@ defmodule PaleeWeb.AdminFiscalTillSigningController do
   operation(:save_connection,
     summary: "Connect the till to a TSE (DE), RKSV unit (AT) or SIGN FR (FR): sandbox or fiskaly",
     description:
-      "`test` and `production` use fiskaly SIGN DE / SIGN AT and need the API key and secret; " <>
-        "saved ones are kept when none are sent. A new connection (or `reprovision`) creates and " <>
-        "initialises the TSS and client, or the signature unit and cash register. Receipts " <>
-        "waiting for a connection are signed right after.",
+      "`test` and `production` use fiskaly SIGN DE / SIGN AT / SIGN FR and need the API key " <>
+        "and secret; saved ones are kept when none are sent. A new connection (or " <>
+        "`reprovision`) creates and initialises the TSS and client (DE), the signature unit and " <>
+        "cash register (AT), or the taxpayer, location and System (FR; needs the business's " <>
+        "SIREN, else `siren_missing`). The connection is then checked (ADR-273, `check`). " <>
+        "Receipts waiting for a connection are signed right after. Refused with " <>
+        "`fiscal_connections_managed_by_palee` while the Palee team manages the connections.",
     parameters: [@device],
     request_body: F.body(C.till_connection_body()),
-    responses: [ok: {"Connection", "application/json", F.one(:connection, C.till_connection())}]
+    responses: [ok: {"Connection", "application/json", FC.result(C.till_connection())}]
   )
 
   def save_connection(conn, %{device: device}) do
-    with {:ok, connection} <-
+    with {:ok, result} <-
            FiscalTillSigning.save_connection(
              conn.assigns.tenant_context,
              device,
              conn.body_params
            ) do
-      json(conn, %{connection: connection})
+      json(conn, result)
     end
   end
 

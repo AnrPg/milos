@@ -29,6 +29,31 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignDe do
 
   @base_url "https://kassensichv-middleware.fiskaly.com/api/v2"
 
+  # ── Check (ADR-273) ─────────────────────────────────────────────────────
+
+  @doc """
+  «Δοκιμή σύνδεσης»: signs in and reads the TSS (`GET /tss/{id}`) and the
+  client Palee provisioned. Nothing is signed.
+  """
+  @impl true
+  def check(connection) do
+    tss = "/tss/" <> connection.unit_id
+
+    steps = fn token ->
+      with {:ok, unit} <- found(call(token, :get, tss, nil)),
+           {:ok, _client} <-
+             found(call(token, :get, tss <> "/client/" <> connection.register_id, nil)) do
+        if unit["state"] == "INITIALIZED", do: {:ok, %{}}, else: {:error, :unit_not_ready}
+      end
+    end
+
+    {result, _wire} = with_token(connection, steps, nil)
+    result
+  end
+
+  defp found({:error, {:not_found, _body}}), do: {:error, :unit_not_found}
+  defp found(result), do: result
+
   # ── Provisioning ────────────────────────────────────────────────────────
 
   @impl true

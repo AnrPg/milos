@@ -249,7 +249,16 @@ defmodule PaleeWeb.FallbackController do
     till_not_connected: {:conflict, "Connect the till's security device (RKSV) first"},
     till_credentials_refused: {:conflict, "fiskaly refused the business's API key or secret"},
     till_provisioning_failed:
-      {:bad_gateway, "The security device could not be set up; see the connection's last error"}
+      {:bad_gateway, "The security device could not be set up; see the connection's error code"},
+    # ADR-273: fiscal connection checks and who manages the connections.
+    siren_missing:
+      {:unprocessable_entity, "Add the business's SIREN in the billing details, then save again"},
+    connection_not_found: {:not_found, "This connection has not been saved yet"},
+    unknown_connection: {:not_found, "No such fiscal connection"},
+    check_too_soon:
+      {:too_many_requests, "The connection was checked a moment ago; try again in a few minutes"},
+    fiscal_connections_managed_by_palee:
+      {:forbidden, "The Palee team manages this box's fiscal connections"}
   }
 
   # ADR-254: CSV imports.

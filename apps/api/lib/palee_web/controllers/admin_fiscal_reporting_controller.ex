@@ -10,6 +10,7 @@ defmodule PaleeWeb.AdminFiscalReportingController do
   alias OpenApiSpex.{Parameter, Schema}
   alias Palee.Application.Fiscal.FiscalReporting
   alias PaleeWeb.Schemas.Fiscal, as: F
+  alias PaleeWeb.Schemas.FiscalConnections, as: FC
 
   action_fallback PaleeWeb.FallbackController
 
@@ -31,15 +32,17 @@ defmodule PaleeWeb.AdminFiscalReportingController do
       "Connect to myDATA: sandbox, AADE test or production with the business's credentials",
     description:
       "`test` and `production` need the business's myDATA user and subscription key; a saved " <>
-        "key is kept when none is sent. Documents waiting for a connection are sent right after.",
+        "key is kept when none is sent. The connection is then checked with AADE (ADR-273, " <>
+        "`check`). Documents waiting for a connection are sent right after. Refused with " <>
+        "`fiscal_connections_managed_by_palee` while the Palee team manages the connections.",
     request_body: F.body(F.connection_body()),
-    responses: [ok: {"Connection", "application/json", F.one(:connection, F.connection())}]
+    responses: [ok: {"Connection", "application/json", FC.result(F.connection())}]
   )
 
   def save_connection(conn, _params) do
-    with {:ok, connection} <-
+    with {:ok, result} <-
            FiscalReporting.save_connection(conn.assigns.tenant_context, conn.body_params) do
-      json(conn, %{connection: connection})
+      json(conn, result)
     end
   end
 

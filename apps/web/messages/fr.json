@@ -12297,32 +12297,6 @@
       "qr_iban_country": "Le QR-IBAN n'existe qu'en Suisse et au Liechtenstein.",
       "not_a_qr_iban": "C'est un IBAN habituel, pas un QR-IBAN. Ta banque te fournit le QR-IBAN séparément."
     },
-    "next": {
-      "noneTitle": "Aucune autre étape nécessaire",
-      "noneHint": "{country} n'exige pas de transmission à une administration fiscale.",
-      "mydataTitle": "Connexion à myDATA",
-      "mydataActive": "Active ({environment}). Chaque document est transmis à l'AADE.",
-      "mydataInvalid": "L'AADE n'a pas accepté les identifiants de connexion. Les documents attendent et seront transmis dès que ce sera corrigé.",
-      "mydataNone": "Pas encore connecté. Les documents sont émis normalement et transmis à l'AADE dès la connexion.",
-      "connected": "Connecté",
-      "needsCheck": "À vérifier",
-      "notConnected": "Non connecté",
-      "later": "Étape suivante, plus tard : {step}",
-      "soon": "Bientôt",
-      "tseTitle": "Dispositif de sécurité de caisse (TSE)",
-      "tseHint": "Nécessaire seulement pour les paiements en caisse. Nous le connectons avec fiskaly lors d'une étape ultérieure.",
-      "rksvTitle": "Dispositif de sécurité de caisse (RKSV)",
-      "rksvHint": "Nécessaire seulement pour les paiements en caisse. Nous le connectons lors d'une étape ultérieure.",
-      "signFrTitle": "Dispositif de sécurité de caisse (fiskaly SIGN FR)",
-      "signFrHint": "Nécessaire seulement pour les paiements en caisse. Nous le connectons avec fiskaly lors d'une étape ultérieure. Le registre inaltérable est déjà actif.",
-      "nf525Title": "Attestation NF525",
-      "nf525Hint": "Le registre inaltérable est déjà actif. Palee fournit l'attestation de l'éditeur."
-    },
-    "environment": {
-      "sandbox": "bac à sable",
-      "test": "test",
-      "production": "production"
-    },
     "registry": {
       "lookup": "Remplir à partir du numéro fiscal (ΑΦΜ)",
       "looking": "Recherche auprès de l'AADE…",
@@ -12337,6 +12311,133 @@
         "registry_limit_reached": "Trop de recherches. Réessaie dans un moment.",
         "registry_unavailable": "L'AADE ne répond pas pour le moment. Réessaie plus tard ou remplis les champs toi-même."
       }
+    }
+  },
+  "FiscalConnections": {
+    "title": "Connexions",
+    "intro": "Ce que la loi exige en {country}. Les documents sont émis normalement et attendent que vous soyez connecté.",
+    "noneTitle": "Aucune connexion nécessaire",
+    "noneHint": "{country} n’exige ni transmission à une administration fiscale ni dispositif de sécurité de caisse.",
+    "managedByPalee": "Cette connexion est gérée par l’équipe Palee",
+    "managedByPaleeHint": "Vous voyez son état et pouvez lancer « Test de connexion ». Pour la modifier, écrivez à l’équipe Palee.",
+    "loadFailed": "Les connexions ne se sont pas chargées. Réessayez dans un instant.",
+    "registryName": "Registre de l’AADE",
+    "description": {
+      "mydata": "Chaque document est transmis à l’AADE",
+      "registry": "Pour « Remplir depuis le numéro fiscal » · facultatif",
+      "tse": "Dispositif de sécurité de caisse (TSE)",
+      "rksv": "Dispositif de sécurité de caisse (RKSV)",
+      "sign_fr": "Signe et archive chaque ticket de caisse",
+      "peppol": "Factures électroniques via Peppol"
+    },
+    "status": {
+      "active": "Connecté",
+      "invalid": "À vérifier",
+      "provisioning": "En préparation",
+      "none": "Non connecté"
+    },
+    "updated": "Mis à jour {date} · {name}",
+    "updatedAt": "Mis à jour {date}",
+    "updatedByPalee": "Mis à jour {date} · équipe Palee",
+    "checkedAt": "Dernière vérification {date}",
+    "help": {
+      "mydata": "Vous les obtenez dans TAXISnet : myDATA › Inscription à l’API REST myDATA. Ce n’est pas votre mot de passe TAXISnet.",
+      "registry": "Les « identifiants spéciaux » que l’AADE délivre pour son service de consultation du registre (RgWsPublic2). Ni votre mot de passe TAXISnet, ni la clé myDATA.",
+      "fiskaly": "Un seul compte fiskaly pour toute la box. La clé se crée dans le fiskaly HUB, dans l’UNIT de la box.",
+      "peppol": "Un seul compte fiskaly pour toute la box. L’E-INVOICE System et l’inscription Peppol se configurent une fois dans le fiskaly HUB."
+    },
+    "field": {
+      "user_id": "Nom d’utilisateur myDATA",
+      "username": "Nom d’utilisateur",
+      "subscription_key": "Clé d’abonnement (subscription key)",
+      "password": "Mot de passe",
+      "api_key": "Clé API",
+      "api_secret": "Secret API",
+      "legal_entity_id": "ID de l’E-INVOICE System",
+      "peppol_id": "Adresse Peppol",
+      "environment": "Environnement"
+    },
+    "placeholder": {
+      "user_id": "p. ex. kypseli_box",
+      "username": "Nom d’utilisateur spécial",
+      "legal_entity_id": "Depuis le fiskaly HUB"
+    },
+    "fieldHint": {
+      "api_key": "Une clé d’UNIT. Elle n’est plus affichée après l’enregistrement.",
+      "peppol_id": "D’après le numéro d’entreprise (BCE/KBO). Ne la changez que si votre comptable vous le demande."
+    },
+    "secret": {
+      "saved": "Enregistré",
+      "replace": "Remplacer",
+      "cancelReplace": "Annuler",
+      "savedHint": "Il n’est plus affiché. Pour le changer, appuyez sur « Remplacer ».",
+      "newHint": "Il n’est plus affiché après l’enregistrement.",
+      "paste": "Collez-le ici",
+      "newValue": "Nouvelle valeur"
+    },
+    "advanced": "Avancé",
+    "environment": {
+      "production": "Production",
+      "test": "Essai",
+      "testAade": "Essai AADE",
+      "testHint": "« Essai » sert à tester avant de commencer : rien de ce qui y est envoyé ne compte."
+    },
+    "device": {
+      "unit": "Dispositif {device}",
+      "taxpayer": "Contribuable (fiskaly)",
+      "register": "Caisse",
+      "since": "En service depuis"
+    },
+    "reprovision": {
+      "title": "Nouveau dispositif {device}",
+      "hint": "Seulement si le support vous le demande. Les prochains tickets sont signés par un nouveau dispositif.",
+      "action": "Nouveau dispositif",
+      "confirm": "Appuyez encore pour confirmer"
+    },
+    "check": {
+      "action": "Test de connexion",
+      "running": "Test en cours…",
+      "needsSave": "Enregistrez d’abord la connexion.",
+      "registryHint": "Recherche votre propre numéro fiscal · compte dans la limite de l’AADE",
+      "ok": "La connexion fonctionne.",
+      "okRegistry": "L’AADE a trouvé {taxId} : {name}",
+      "unreachable": "Le test n’a pas pu avoir lieu et la connexion n’a pas changé. Nous réessaierons bientôt."
+    },
+    "saved": "Enregistré. Les secrets ne sont plus affichés.",
+    "savedUnchecked": "Enregistré. Les secrets ne sont plus affichés. Le test n’a pas pu avoir lieu ; nous réessaierons bientôt.",
+    "waiting": "Les documents attendent et partent dès que c’est corrigé.",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "error": {
+      "credentials_rejected_aade": "L’AADE n’a pas accepté la clé. Copiez-la à nouveau depuis la page d’inscription myDATA.",
+      "credentials_rejected_registry": "L’AADE n’a pas accepté les identifiants spéciaux. Vérifiez le nom d’utilisateur et le mot de passe.",
+      "credentials_rejected_fiskaly": "fiskaly n’a pas accepté cette clé. Vérifiez que c’est une clé d’UNIT du bon environnement.",
+      "credentials_missing": "Les données de connexion manquent. Remplissez-les et appuyez sur « Enregistrer ».",
+      "unit_not_found": "fiskaly ne trouve pas le dispositif de la box. Écrivez au support ou créez un nouveau dispositif sous Avancé.",
+      "unit_not_ready": "Le dispositif chez fiskaly n’est pas encore prêt. Réessayez dans quelques minutes.",
+      "system_not_found": "fiskaly ne trouve pas cet E-INVOICE System. Vérifiez-le dans le fiskaly HUB.",
+      "tax_id_missing": "Le numéro fiscal de l’entreprise manque, le test n’a donc pas eu lieu. Ajoutez-le dans les données de facturation.",
+      "tax_id_not_found": "L’AADE ne trouve pas le numéro fiscal de l’entreprise. Vérifiez-le dans les données de facturation.",
+      "siren_missing": "Le SIREN de l’entreprise manque. Ajoutez-le dans les données de facturation et appuyez à nouveau sur « Enregistrer ».",
+      "limit_reached": "L’AADE n’accepte plus de recherches pour le moment. Réessayez plus tard.",
+      "unreachable": "Le prestataire n’a pas répondu. Nous réessaierons bientôt.",
+      "provisioning_failed": "Le dispositif n’a pas pu être préparé chez fiskaly. Appuyez à nouveau sur « Enregistrer » ou écrivez au support.",
+      "provider_retired": "Ce prestataire n’est plus pris en charge. Remplissez les données fiskaly et appuyez sur « Enregistrer ».",
+      "invalid_peppol_id": "Ce n’est pas une adresse Peppol valide. Écrivez-la sous la forme schéma:numéro, p. ex. 0208:0123456749.",
+      "managed_by_palee": "Cette connexion est gérée par l’équipe Palee. Pour la modifier, écrivez à l’équipe Palee.",
+      "check_too_soon": "La connexion vient d’être vérifiée. Réessayez dans quelques minutes.",
+      "generic": "La connexion est à vérifier."
+    },
+    "platform": {
+      "open": "Connexions fiscales",
+      "title": "Connexions fiscales · {name}",
+      "managedBy": "Qui les gère",
+      "owner": "Le propriétaire",
+      "palee": "L’équipe Palee",
+      "managedHint": "Quand l’équipe Palee les gère, le propriétaire les voit mais ne peut pas les modifier. Chaque changement est consigné, sans les secrets.",
+      "empty": "Le pays de la box n’exige aucune connexion, ou aucun pays n’est encore choisi."
     }
   },
   "FiscalDocuments": {

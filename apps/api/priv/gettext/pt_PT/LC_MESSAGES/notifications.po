@@ -746,3 +746,9 @@ msgstr "O teu atestado médico expira em breve"
 
 msgid "Upload a new health certificate before %{date}."
 msgstr "Carrega um novo atestado médico antes de %{date}."
+
+msgid "A fiscal connection needs attention"
+msgstr "Uma ligação fiscal precisa de atenção"
+
+msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
+msgstr "%{connection} deixou de funcionar. Abra Dados de faturação › Ligações para corrigir."

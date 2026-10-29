@@ -39,4 +39,12 @@ defmodule Palee.Fiscal.Ports.AuthorityGateway do
 
   @callback submit(connection(), invoice :: list()) ::
               {{:ok, receipt()} | {:error, term()}, wire()}
+
+  @doc """
+  «Δοκιμή σύνδεσης» (ADR-273): asks the authority something harmless with
+  the connection's credentials (nothing is reported). `{:ok, %{}}`, or the
+  same errors as `submit/2` (`{:unauthorized, _}` for refused
+  credentials, anything else transient).
+  """
+  @callback check(connection()) :: {:ok, map()} | {:error, term()}
 end

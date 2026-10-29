@@ -46,6 +46,33 @@ defmodule Palee.Infrastructure.Fiscal.FiskalyEInvoiceNetwork do
 
   alias Palee.Infrastructure.Fiscal.{FiskalyUnified, Http}
 
+  @doc """
+  «Δοκιμή σύνδεσης» (ADR-273): a token for the key, then the business's
+  E-INVOICE System (`GET /systems/{legal_entity_id}`). Nothing is sent.
+  """
+  @impl true
+  def check(connection) do
+    FiskalyUnified.reset()
+
+    result =
+      with :ok <- FiskalyUnified.credentials(connection),
+           {:ok, system_id} <- check_system_id(connection),
+           {:ok, token} <- FiskalyUnified.token(connection),
+           {:ok, _vat} <- FiskalyUnified.vat_table(connection, token, system_id) do
+        {:ok, %{}}
+      end
+
+    FiskalyUnified.reset()
+
+    case result do
+      {:error, {:rejected, [%{code: "system_not_found"} | _]}} -> {:error, :system_not_found}
+      other -> other
+    end
+  end
+
+  defp check_system_id(%{legal_entity_id: id}) when is_binary(id) and id != "", do: {:ok, id}
+  defp check_system_id(_connection), do: {:error, :system_not_found}
+
   @impl true
   def submit(connection, submission) do
     FiskalyUnified.reset()

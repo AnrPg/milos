@@ -745,3 +745,9 @@ msgstr ""
 
 msgid "Upload a new health certificate before %{date}."
 msgstr ""
+
+msgid "A fiscal connection needs attention"
+msgstr ""
+
+msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
+msgstr ""

@@ -7180,7 +7180,7 @@ export interface paths {
         get: operations["PaleeWeb.AdminFiscalReportingController.connection"];
         /**
          * Connect to myDATA: sandbox, AADE test or production with the business's credentials
-         * @description `test` and `production` need the business's myDATA user and subscription key; a saved key is kept when none is sent. Documents waiting for a connection are sent right after.
+         * @description `test` and `production` need the business's myDATA user and subscription key; a saved key is kept when none is sent. The connection is then checked with AADE (ADR-273, `check`). Documents waiting for a connection are sent right after. Refused with `fiscal_connections_managed_by_palee` while the Palee team manages the connections.
          */
         put: operations["PaleeWeb.AdminFiscalReportingController.save_connection"];
         post?: never;
@@ -7201,6 +7201,43 @@ export interface paths {
         get: operations["PaleeWeb.AdminFiscalController.closings"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/connections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's fiscal connections: only those its country asks for (never a credential) */
+        get: operations["PaleeWeb.AdminFiscalConnectionsController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/connections/{kind}/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * «Δοκιμή σύνδεσης»: ask the provider whether the saved connection works
+         * @description Nothing is sent or signed. myDATA: a harmless request with the business's user and key; AADE registry: a look-up of the business's own ΑΦΜ (one call of its quota, at most every 10 minutes); fiskaly: sign in and read the unit or System Palee uses. A refusal marks the connection invalid (`check.result = invalid`, with `error_code`); a provider that cannot be reached changes nothing (`unreachable`). Errors: `unknown_connection`, `connection_not_found`, `check_too_soon` (429).
+         */
+        post: operations["PaleeWeb.AdminFiscalConnectionsController.check"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7509,7 +7546,7 @@ export interface paths {
         get: operations["PaleeWeb.AdminFiscalEInvoicingController.connection"];
         /**
          * Connect to Peppol: sandbox, or fiskaly E-INVOICE (test or production)
-         * @description `test` and `production` send through fiskaly E-INVOICE and need the business's fiskaly E-INVOICE System id (`legal_entity_id`) and an API key and secret; saved ones are kept when none are sent, and without any the business's fiskaly till connection's key and secret are used (one fiskaly account per business). The Peppol id defaults to the `0208` enterprise number of the business. The webhook URL is shown once, when a new token is made. Documents waiting for a connection are sent right after.
+         * @description `test` and `production` send through fiskaly E-INVOICE and need the business's fiskaly E-INVOICE System id (`legal_entity_id`) and an API key and secret; saved ones are kept when none are sent, and without any the business's fiskaly till connection's key and secret are used (one fiskaly account per business). The Peppol id defaults to the `0208` enterprise number of the business. The connection is then checked (ADR-273, `check`). Documents waiting for a connection are sent right after. Refused with `fiscal_connections_managed_by_palee` while the Palee team manages the connections.
          */
         put: operations["PaleeWeb.AdminFiscalEInvoicingController.save_connection"];
         post?: never;
@@ -7530,7 +7567,7 @@ export interface paths {
         get: operations["PaleeWeb.AdminFiscalRegistryController.connection"];
         /**
          * Connect AADE's registry service (RgWsPublic2) with the business's credentials
-         * @description `production` needs the special credentials AADE issued to the business for this service; a saved password is kept when none is sent. `sandbox` answers with made-up details and needs none.
+         * @description `production` needs the special credentials AADE issued to the business for this service; a saved password is kept when none is sent. `sandbox` answers with made-up details and needs none. The connection is then checked by looking up the business's own ΑΦΜ (one call of its AADE quota; ADR-273, `check`). Refused with `fiscal_connections_managed_by_palee` while the Palee team manages the connections.
          */
         put: operations["PaleeWeb.AdminFiscalRegistryController.save_connection"];
         post?: never;
@@ -7609,7 +7646,7 @@ export interface paths {
         get: operations["PaleeWeb.AdminFiscalTillSigningController.connection"];
         /**
          * Connect the till to a TSE (DE), RKSV unit (AT) or SIGN FR (FR): sandbox or fiskaly
-         * @description `test` and `production` use fiskaly SIGN DE / SIGN AT and need the API key and secret; saved ones are kept when none are sent. A new connection (or `reprovision`) creates and initialises the TSS and client, or the signature unit and cash register. Receipts waiting for a connection are signed right after.
+         * @description `test` and `production` use fiskaly SIGN DE / SIGN AT / SIGN FR and need the API key and secret; saved ones are kept when none are sent. A new connection (or `reprovision`) creates and initialises the TSS and client (DE), the signature unit and cash register (AT), or the taxpayer, location and System (FR; needs the business's SIREN, else `siren_missing`). The connection is then checked (ADR-273, `check`). Receipts waiting for a connection are signed right after. Refused with `fiscal_connections_managed_by_palee` while the Palee team manages the connections.
          */
         put: operations["PaleeWeb.AdminFiscalTillSigningController.save_connection"];
         post?: never;
@@ -14790,6 +14827,77 @@ export interface paths {
         put?: never;
         /** Create a constrained presigned upload for an organization logo */
         post: operations["PaleeWeb.PlatformOrganizationBrandingController.logo_upload_url"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/organizations/{id}/fiscal-connections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A box's fiscal connections and who manages them (never a credential) */
+        get: operations["PaleeWeb.PlatformFiscalConnectionsController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/organizations/{id}/fiscal-connections/managed-by": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Choose who manages a box's fiscal connections: its owner or the Palee team */
+        put: operations["PaleeWeb.PlatformFiscalConnectionsController.managed_by"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/organizations/{id}/fiscal-connections/{kind}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Fill or replace one of a box's fiscal connections (Palee team)
+         * @description Takes the same fields as the box's own save for that connection; saved secrets are kept when none are sent. The connection is then checked. Audited without any secret.
+         */
+        put: operations["PaleeWeb.PlatformFiscalConnectionsController.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/organizations/{id}/fiscal-connections/{kind}/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** «Δοκιμή σύνδεσης» of one of a box's fiscal connections (Palee team) */
+        post: operations["PaleeWeb.PlatformFiscalConnectionsController.check"];
         delete?: never;
         options?: never;
         head?: never;
@@ -77433,18 +77541,30 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The myDATA connection; the subscription key is never returned. */
+                        /** @description The myDATA connection; the subscription key is never returned. `error_code` says why it needs a check (ADR-273). */
                         connection: {
                             /** @enum {string} */
                             authority: "mydata";
+                            /** Format: date-time */
+                            checked_at?: string | null;
                             /** @enum {string} */
                             environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
                             has_subscription_key: boolean;
-                            last_error?: string | null;
                             /** @enum {string} */
                             status: "active" | "invalid";
                             /** Format: date-time */
                             updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
                             user_id?: string | null;
                         } | null;
                         environments: ("sandbox" | "test" | "production")[];
@@ -77479,20 +77599,51 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The myDATA connection; the subscription key is never returned. */
+                        /** @description The result of «Δοκιμή σύνδεσης». */
+                        check: {
+                            detail: {
+                                /** @description Registry: the name AADE has for it. */
+                                legal_name?: string | null;
+                                /** @description Registry: the ΑΦΜ looked up. */
+                                tax_id?: string;
+                            };
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            /**
+                             * @description `invalid`: refused (the connection is marked invalid); `unreachable`: it could not be checked (provider down, AADE quota, or the business's own ΑΦΜ missing or unknown to the registry; see `error_code`), nothing changed and it is checked again soon.
+                             * @enum {string}
+                             */
+                            result: "ok" | "invalid" | "unreachable";
+                        } | null;
+                        /** @description The myDATA connection; the subscription key is never returned. `error_code` says why it needs a check (ADR-273). */
                         connection: {
                             /** @enum {string} */
                             authority: "mydata";
+                            /** Format: date-time */
+                            checked_at?: string | null;
                             /** @enum {string} */
                             environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
                             has_subscription_key: boolean;
-                            last_error?: string | null;
                             /** @enum {string} */
                             status: "active" | "invalid";
                             /** Format: date-time */
                             updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
                             user_id?: string | null;
-                        };
+                        } | null;
                     };
                 };
             };
@@ -77535,6 +77686,396 @@ export interface operations {
                                 [key: string]: unknown;
                             };
                         }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalConnectionsController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Connections */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        connections: {
+                            /** @description The myDATA connection; the subscription key is never returned. `error_code` says why it needs a check (ADR-273). */
+                            mydata?: {
+                                /** @enum {string} */
+                                authority: "mydata";
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_subscription_key: boolean;
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                                user_id?: string | null;
+                            } | null;
+                            /** @description The Peppol connection; the API key, secret and webhook token are never returned. `storecove` is a retired provider of old connections: they show as invalid (`provider_retired`) until reconnected. */
+                            peppol?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /**
+                                 * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
+                                 * @enum {string}
+                                 */
+                                credentials_source: "own" | "till_connection" | "none";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                has_webhook_token: boolean;
+                                /** @description fiskaly: the business's E-INVOICE System id. */
+                                legal_entity_id?: string | null;
+                                /** @enum {string} */
+                                network: "peppol";
+                                /** @example 0208:0123456749 */
+                                peppol_id: string;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly" | "storecove";
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The AADE registry connection; the password is never returned. `username` is the same field the save takes (ADR-273). */
+                            registry?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                environment: "sandbox" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_password: boolean;
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                                username?: string | null;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            rksv?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            sign_fr?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            tse?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                        };
+                        country: string | null;
+                        kinds: ("mydata" | "registry" | "tse" | "rksv" | "sign_fr" | "peppol")[];
+                        /**
+                         * @description `palee`: the Palee team manages them; staff see them but cannot save.
+                         * @enum {string}
+                         */
+                        managed_by: "owner" | "palee";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalConnectionsController.check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Which connection */
+                kind: "mydata" | "registry" | "tse" | "rksv" | "sign_fr" | "peppol";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Check */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The result of «Δοκιμή σύνδεσης». */
+                        check: {
+                            detail: {
+                                /** @description Registry: the name AADE has for it. */
+                                legal_name?: string | null;
+                                /** @description Registry: the ΑΦΜ looked up. */
+                                tax_id?: string;
+                            };
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            /**
+                             * @description `invalid`: refused (the connection is marked invalid); `unreachable`: it could not be checked (provider down, AADE quota, or the business's own ΑΦΜ missing or unknown to the registry; see `error_code`), nothing changed and it is checked again soon.
+                             * @enum {string}
+                             */
+                            result: "ok" | "invalid" | "unreachable";
+                        } | null;
+                        connection: ({
+                            /** @enum {string} */
+                            authority: "mydata";
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_subscription_key: boolean;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            user_id?: string | null;
+                        } | ({
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            environment: "sandbox" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_password: boolean;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            username?: string | null;
+                        } | null) | {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            device: "tse" | "rksv" | "sign_fr";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly";
+                            /** Format: date-time */
+                            provisioned_at?: string | null;
+                            public_key?: string | null;
+                            /** Format: uuid */
+                            register_id: string;
+                            register_serial?: string | null;
+                            /** @enum {string} */
+                            status: "provisioning" | "active" | "invalid";
+                            /** Format: uuid */
+                            unit_id: string;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        } | {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /**
+                             * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
+                             * @enum {string}
+                             */
+                            credentials_source: "own" | "till_connection" | "none";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            has_webhook_token: boolean;
+                            /** @description fiskaly: the business's E-INVOICE System id. */
+                            legal_entity_id?: string | null;
+                            /** @enum {string} */
+                            network: "peppol";
+                            /** @example 0208:0123456749 */
+                            peppol_id: string;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly" | "storecove";
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        }) | null;
                     };
                 };
             };
@@ -79189,8 +79730,10 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The Peppol connection; the API key, secret and webhook token are never returned (`webhook_url` appears once, when a new token is made). `storecove` is a retired provider of old connections: they show as invalid until reconnected. */
+                        /** @description The Peppol connection; the API key, secret and webhook token are never returned. `storecove` is a retired provider of old connections: they show as invalid (`provider_retired`) until reconnected. */
                         connection: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
                             /**
                              * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
                              * @enum {string}
@@ -79198,10 +79741,14 @@ export interface operations {
                             credentials_source: "own" | "till_connection" | "none";
                             /** @enum {string} */
                             environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
                             has_api_key: boolean;
                             has_api_secret: boolean;
                             has_webhook_token: boolean;
-                            last_error?: string | null;
                             /** @description fiskaly: the business's E-INVOICE System id. */
                             legal_entity_id?: string | null;
                             /** @enum {string} */
@@ -79214,7 +79761,12 @@ export interface operations {
                             status: "active" | "invalid";
                             /** Format: date-time */
                             updated_at?: string;
-                            webhook_url?: string | null;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
                         } | null;
                         environments: ("sandbox" | "test" | "production")[];
                     };
@@ -79259,8 +79811,29 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The Peppol connection; the API key, secret and webhook token are never returned (`webhook_url` appears once, when a new token is made). `storecove` is a retired provider of old connections: they show as invalid until reconnected. */
+                        /** @description The result of «Δοκιμή σύνδεσης». */
+                        check: {
+                            detail: {
+                                /** @description Registry: the name AADE has for it. */
+                                legal_name?: string | null;
+                                /** @description Registry: the ΑΦΜ looked up. */
+                                tax_id?: string;
+                            };
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            /**
+                             * @description `invalid`: refused (the connection is marked invalid); `unreachable`: it could not be checked (provider down, AADE quota, or the business's own ΑΦΜ missing or unknown to the registry; see `error_code`), nothing changed and it is checked again soon.
+                             * @enum {string}
+                             */
+                            result: "ok" | "invalid" | "unreachable";
+                        } | null;
+                        /** @description The Peppol connection; the API key, secret and webhook token are never returned. `storecove` is a retired provider of old connections: they show as invalid (`provider_retired`) until reconnected. */
                         connection: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
                             /**
                              * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
                              * @enum {string}
@@ -79268,10 +79841,14 @@ export interface operations {
                             credentials_source: "own" | "till_connection" | "none";
                             /** @enum {string} */
                             environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
                             has_api_key: boolean;
                             has_api_secret: boolean;
                             has_webhook_token: boolean;
-                            last_error?: string | null;
                             /** @description fiskaly: the business's E-INVOICE System id. */
                             legal_entity_id?: string | null;
                             /** @enum {string} */
@@ -79284,8 +79861,13 @@ export interface operations {
                             status: "active" | "invalid";
                             /** Format: date-time */
                             updated_at?: string;
-                            webhook_url?: string | null;
-                        };
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        } | null;
                     };
                 };
             };
@@ -79307,17 +79889,29 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The AADE registry connection; the password is never returned. */
+                        /** @description The AADE registry connection; the password is never returned. `username` is the same field the save takes (ADR-273). */
                         connection: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
                             /** @enum {string} */
                             environment: "sandbox" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
                             has_password: boolean;
-                            last_error?: string | null;
                             /** @enum {string} */
                             status: "active" | "invalid";
                             /** Format: date-time */
                             updated_at?: string;
-                            user_id?: string | null;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            username?: string | null;
                         } | null;
                     };
                 };
@@ -79350,17 +79944,48 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The AADE registry connection; the password is never returned. */
+                        /** @description The result of «Δοκιμή σύνδεσης». */
+                        check: {
+                            detail: {
+                                /** @description Registry: the name AADE has for it. */
+                                legal_name?: string | null;
+                                /** @description Registry: the ΑΦΜ looked up. */
+                                tax_id?: string;
+                            };
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            /**
+                             * @description `invalid`: refused (the connection is marked invalid); `unreachable`: it could not be checked (provider down, AADE quota, or the business's own ΑΦΜ missing or unknown to the registry; see `error_code`), nothing changed and it is checked again soon.
+                             * @enum {string}
+                             */
+                            result: "ok" | "invalid" | "unreachable";
+                        } | null;
+                        /** @description The AADE registry connection; the password is never returned. `username` is the same field the save takes (ADR-273). */
                         connection: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
                             /** @enum {string} */
                             environment: "sandbox" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
                             has_password: boolean;
-                            last_error?: string | null;
                             /** @enum {string} */
                             status: "active" | "invalid";
                             /** Format: date-time */
                             updated_at?: string;
-                            user_id?: string | null;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            username?: string | null;
                         } | null;
                     };
                 };
@@ -79532,15 +80157,21 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The TSE, RKSV or SIGN FR connection; key, secret and admin PIN are never returned. */
+                        /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
                         connection: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
                             /** @enum {string} */
                             device: "tse" | "rksv" | "sign_fr";
                             /** @enum {string} */
                             environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
                             has_api_key: boolean;
                             has_api_secret: boolean;
-                            last_error?: string | null;
                             /** @enum {string} */
                             provider: "sandbox" | "fiskaly";
                             /** Format: date-time */
@@ -79556,6 +80187,12 @@ export interface operations {
                             unit_serial?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
                         } | null;
                         environments: ("sandbox" | "test" | "production")[];
                     };
@@ -79579,7 +80216,7 @@ export interface operations {
                     api_secret?: string | null;
                     /** @enum {string} */
                     environment: "sandbox" | "test" | "production";
-                    /** @description Create a new TSS/client (DE) or signature unit/cash register (AT). */
+                    /** @description Create a new TSS/client (DE), signature unit/cash register (AT) or taxpayer/location/System (SIGN FR). */
                     reprovision?: boolean;
                 };
             };
@@ -79592,15 +80229,40 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The TSE, RKSV or SIGN FR connection; key, secret and admin PIN are never returned. */
+                        /** @description The result of «Δοκιμή σύνδεσης». */
+                        check: {
+                            detail: {
+                                /** @description Registry: the name AADE has for it. */
+                                legal_name?: string | null;
+                                /** @description Registry: the ΑΦΜ looked up. */
+                                tax_id?: string;
+                            };
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            /**
+                             * @description `invalid`: refused (the connection is marked invalid); `unreachable`: it could not be checked (provider down, AADE quota, or the business's own ΑΦΜ missing or unknown to the registry; see `error_code`), nothing changed and it is checked again soon.
+                             * @enum {string}
+                             */
+                            result: "ok" | "invalid" | "unreachable";
+                        } | null;
+                        /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
                         connection: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
                             /** @enum {string} */
                             device: "tse" | "rksv" | "sign_fr";
                             /** @enum {string} */
                             environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
                             has_api_key: boolean;
                             has_api_secret: boolean;
-                            last_error?: string | null;
                             /** @enum {string} */
                             provider: "sandbox" | "fiskaly";
                             /** Format: date-time */
@@ -79616,7 +80278,13 @@ export interface operations {
                             unit_serial?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
-                        };
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        } | null;
                     };
                 };
             };
@@ -116441,6 +117109,814 @@ export interface operations {
                             [key: string]: string;
                         };
                         upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformFiscalConnectionsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Connections */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        connections: {
+                            /** @description The myDATA connection; the subscription key is never returned. `error_code` says why it needs a check (ADR-273). */
+                            mydata?: {
+                                /** @enum {string} */
+                                authority: "mydata";
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_subscription_key: boolean;
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                                user_id?: string | null;
+                            } | null;
+                            /** @description The Peppol connection; the API key, secret and webhook token are never returned. `storecove` is a retired provider of old connections: they show as invalid (`provider_retired`) until reconnected. */
+                            peppol?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /**
+                                 * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
+                                 * @enum {string}
+                                 */
+                                credentials_source: "own" | "till_connection" | "none";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                has_webhook_token: boolean;
+                                /** @description fiskaly: the business's E-INVOICE System id. */
+                                legal_entity_id?: string | null;
+                                /** @enum {string} */
+                                network: "peppol";
+                                /** @example 0208:0123456749 */
+                                peppol_id: string;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly" | "storecove";
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The AADE registry connection; the password is never returned. `username` is the same field the save takes (ADR-273). */
+                            registry?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                environment: "sandbox" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_password: boolean;
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                                username?: string | null;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            rksv?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            sign_fr?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            tse?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                        };
+                        country: string | null;
+                        kinds: ("mydata" | "registry" | "tse" | "rksv" | "sign_fr" | "peppol")[];
+                        /**
+                         * @description `palee`: the Palee team manages them; staff see them but cannot save.
+                         * @enum {string}
+                         */
+                        managed_by: "owner" | "palee";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformFiscalConnectionsController.managed_by": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    managed_by: "owner" | "palee";
+                };
+            };
+        };
+        responses: {
+            /** @description Connections */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        connections: {
+                            /** @description The myDATA connection; the subscription key is never returned. `error_code` says why it needs a check (ADR-273). */
+                            mydata?: {
+                                /** @enum {string} */
+                                authority: "mydata";
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_subscription_key: boolean;
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                                user_id?: string | null;
+                            } | null;
+                            /** @description The Peppol connection; the API key, secret and webhook token are never returned. `storecove` is a retired provider of old connections: they show as invalid (`provider_retired`) until reconnected. */
+                            peppol?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /**
+                                 * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
+                                 * @enum {string}
+                                 */
+                                credentials_source: "own" | "till_connection" | "none";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                has_webhook_token: boolean;
+                                /** @description fiskaly: the business's E-INVOICE System id. */
+                                legal_entity_id?: string | null;
+                                /** @enum {string} */
+                                network: "peppol";
+                                /** @example 0208:0123456749 */
+                                peppol_id: string;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly" | "storecove";
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The AADE registry connection; the password is never returned. `username` is the same field the save takes (ADR-273). */
+                            registry?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                environment: "sandbox" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_password: boolean;
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                                username?: string | null;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            rksv?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            sign_fr?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            tse?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                        };
+                        country: string | null;
+                        kinds: ("mydata" | "registry" | "tse" | "rksv" | "sign_fr" | "peppol")[];
+                        /**
+                         * @description `palee`: the Palee team manages them; staff see them but cannot save.
+                         * @enum {string}
+                         */
+                        managed_by: "owner" | "palee";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformFiscalConnectionsController.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                kind: "mydata" | "registry" | "tse" | "rksv" | "sign_fr" | "peppol";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    api_key?: string | null;
+                    api_secret?: string | null;
+                    /** @enum {string} */
+                    environment: "sandbox" | "test" | "production";
+                    legal_entity_id?: string | null;
+                    /** Format: password */
+                    password?: string;
+                    peppol_id?: string | null;
+                    reprovision?: boolean;
+                    subscription_key?: string | null;
+                    user_id?: string | null;
+                    username?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The result of «Δοκιμή σύνδεσης». */
+                        check: {
+                            detail: {
+                                /** @description Registry: the name AADE has for it. */
+                                legal_name?: string | null;
+                                /** @description Registry: the ΑΦΜ looked up. */
+                                tax_id?: string;
+                            };
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            /**
+                             * @description `invalid`: refused (the connection is marked invalid); `unreachable`: it could not be checked (provider down, AADE quota, or the business's own ΑΦΜ missing or unknown to the registry; see `error_code`), nothing changed and it is checked again soon.
+                             * @enum {string}
+                             */
+                            result: "ok" | "invalid" | "unreachable";
+                        } | null;
+                        connection: ({
+                            /** @enum {string} */
+                            authority: "mydata";
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_subscription_key: boolean;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            user_id?: string | null;
+                        } | ({
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            environment: "sandbox" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_password: boolean;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            username?: string | null;
+                        } | null) | {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            device: "tse" | "rksv" | "sign_fr";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly";
+                            /** Format: date-time */
+                            provisioned_at?: string | null;
+                            public_key?: string | null;
+                            /** Format: uuid */
+                            register_id: string;
+                            register_serial?: string | null;
+                            /** @enum {string} */
+                            status: "provisioning" | "active" | "invalid";
+                            /** Format: uuid */
+                            unit_id: string;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        } | {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /**
+                             * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
+                             * @enum {string}
+                             */
+                            credentials_source: "own" | "till_connection" | "none";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            has_webhook_token: boolean;
+                            /** @description fiskaly: the business's E-INVOICE System id. */
+                            legal_entity_id?: string | null;
+                            /** @enum {string} */
+                            network: "peppol";
+                            /** @example 0208:0123456749 */
+                            peppol_id: string;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly" | "storecove";
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        }) | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformFiscalConnectionsController.check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                kind: "mydata" | "registry" | "tse" | "rksv" | "sign_fr" | "peppol";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Check */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The result of «Δοκιμή σύνδεσης». */
+                        check: {
+                            detail: {
+                                /** @description Registry: the name AADE has for it. */
+                                legal_name?: string | null;
+                                /** @description Registry: the ΑΦΜ looked up. */
+                                tax_id?: string;
+                            };
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            /**
+                             * @description `invalid`: refused (the connection is marked invalid); `unreachable`: it could not be checked (provider down, AADE quota, or the business's own ΑΦΜ missing or unknown to the registry; see `error_code`), nothing changed and it is checked again soon.
+                             * @enum {string}
+                             */
+                            result: "ok" | "invalid" | "unreachable";
+                        } | null;
+                        connection: ({
+                            /** @enum {string} */
+                            authority: "mydata";
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_subscription_key: boolean;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            user_id?: string | null;
+                        } | ({
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            environment: "sandbox" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_password: boolean;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            username?: string | null;
+                        } | null) | {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            device: "tse" | "rksv" | "sign_fr";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly";
+                            /** Format: date-time */
+                            provisioned_at?: string | null;
+                            public_key?: string | null;
+                            /** Format: uuid */
+                            register_id: string;
+                            register_serial?: string | null;
+                            /** @enum {string} */
+                            status: "provisioning" | "active" | "invalid";
+                            /** Format: uuid */
+                            unit_id: string;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        } | {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /**
+                             * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
+                             * @enum {string}
+                             */
+                            credentials_source: "own" | "till_connection" | "none";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            has_webhook_token: boolean;
+                            /** @description fiskaly: the business's E-INVOICE System id. */
+                            legal_entity_id?: string | null;
+                            /** @enum {string} */
+                            network: "peppol";
+                            /** @example 0208:0123456749 */
+                            peppol_id: string;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly" | "storecove";
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        }) | null;
                     };
                 };
             };

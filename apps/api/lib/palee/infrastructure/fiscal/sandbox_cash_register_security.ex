@@ -15,6 +15,10 @@ defmodule Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity do
 
   alias Palee.Fiscal.Domain.RksvReceipt
 
+  @doc "ADR-273: the sandbox device is always there and needs no credentials."
+  @impl true
+  def check(_connection), do: {:ok, %{}}
+
   @impl true
   def provision(connection, _context) do
     start =

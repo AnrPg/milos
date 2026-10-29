@@ -12,6 +12,7 @@ defmodule PaleeWeb.AdminFiscalEInvoicingController do
   alias Palee.Application.Fiscal.FiscalEInvoicing
   alias PaleeWeb.Schemas.Fiscal, as: F
   alias PaleeWeb.Schemas.FiscalCompliance, as: C
+  alias PaleeWeb.Schemas.FiscalConnections, as: FC
 
   action_fallback PaleeWeb.FallbackController
 
@@ -35,16 +36,17 @@ defmodule PaleeWeb.AdminFiscalEInvoicingController do
         "E-INVOICE System id (`legal_entity_id`) and an API key and secret; saved ones are " <>
         "kept when none are sent, and without any the business's fiskaly till connection's " <>
         "key and secret are used (one fiskaly account per business). The Peppol id defaults to the " <>
-        "`0208` enterprise number of the business. The webhook URL is shown once, when a new " <>
-        "token is made. Documents waiting for a connection are sent right after.",
+        "`0208` enterprise number of the business. The connection is then checked (ADR-273, " <>
+        "`check`). Documents waiting for a connection are sent right after. Refused with " <>
+        "`fiscal_connections_managed_by_palee` while the Palee team manages the connections.",
     request_body: F.body(C.peppol_connection_body()),
-    responses: [ok: {"Connection", "application/json", F.one(:connection, C.peppol_connection())}]
+    responses: [ok: {"Connection", "application/json", FC.result(C.peppol_connection())}]
   )
 
   def save_connection(conn, _params) do
-    with {:ok, connection} <-
+    with {:ok, result} <-
            FiscalEInvoicing.save_connection(conn.assigns.tenant_context, conn.body_params) do
-      json(conn, %{connection: connection})
+      json(conn, result)
     end
   end
 

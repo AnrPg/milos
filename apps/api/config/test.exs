@@ -119,3 +119,5 @@ config :palee, :stripe_connect, %{
 config :palee, :payments_http, req_options: [plug: {Req.Test, Palee.PaymentsHttp}]
 # ADR-250/251/266: fiskaly calls go to a test plug.
 config :palee, :fiscal_http, req_options: [plug: {Req.Test, Palee.FiscalHttp}]
+# ADR-273: myDATA (saving a test or production connection checks it) too.
+config :palee, :mydata, req_options: [plug: {Req.Test, Palee.FiscalHttp}, retry: false]

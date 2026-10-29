@@ -19,6 +19,12 @@ defmodule Palee.Fiscal.FiscalStore do
   def save_identity(context, attrs), do: tenant_call(context, :save_identity, [attrs])
 
   @impl true
+  def get_connection_setting(context), do: tenant_call(context, :get_connection_setting, [])
+  @impl true
+  def save_connection_setting(context, attrs),
+    do: tenant_call(context, :save_connection_setting, [attrs])
+
+  @impl true
   def lock_journal_head(context), do: tenant_call(context, :lock_journal_head, [])
   @impl true
   def insert_journal_entry(context, entry),

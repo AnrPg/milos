@@ -12,7 +12,8 @@ defmodule Palee.Fiscal.AuthorityConnection do
 
   @primary_key {:id, :binary_id, autogenerate: true}
 
-  @fields ~w(authority environment user_id subscription_key status last_error updated_by_id)a
+  @fields ~w(authority environment user_id subscription_key status last_error updated_by_id
+             error_code checked_at next_check_at check_failures updated_by_platform)a
 
   schema "fiscal_authority_connections" do
     field :organization_id, :binary_id, read_after_writes: true
@@ -23,6 +24,12 @@ defmodule Palee.Fiscal.AuthorityConnection do
     field :status, :string, default: "active"
     field :last_error, :string
     field :updated_by_id, :binary_id
+    # ADR-273: the last «Δοκιμή σύνδεσης».
+    field :error_code, :string
+    field :checked_at, :utc_datetime_usec
+    field :next_check_at, :utc_datetime_usec
+    field :check_failures, :integer, default: 0
+    field :updated_by_platform, :boolean, default: false
 
     timestamps(type: :utc_datetime_usec)
   end

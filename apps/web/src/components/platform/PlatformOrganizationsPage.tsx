@@ -32,6 +32,7 @@ import { platformLogoApi } from "@/api/organization-branding";
 import { TenantLogoUploader } from "@/components/branding/TenantLogoUploader";
 import { OrganizationPurgeDialog } from "@/components/platform/OrganizationPurgeDialog";
 import { OrganizationSlugRenameDialog } from "@/components/platform/OrganizationSlugRenameDialog";
+import { PlatformFiscalConnectionsDialog } from "@/components/platform/PlatformFiscalConnectionsDialog";
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { platformOrganizationPurgeCopy } from "@/i18n/platform-organization-purge";
@@ -105,6 +106,9 @@ export function PlatformOrganizationsPage() {
   const [emailDelivery, setEmailDelivery] = useState<OwnerInvitationDelivery | null>(null);
   const [editing, setEditing] = useState<PlatformOrganization | null>(null);
   const [managingAccess, setManagingAccess] = useState<PlatformOrganization | null>(null);
+  // ADR-273: a box's fiscal connections, managed by its owner or the Palee team.
+  const [fiscalFor, setFiscalFor] = useState<PlatformOrganization | null>(null);
+  const tFiscal = useTranslations("FiscalConnections");
   const [provisioningOpen, setProvisioningOpen] = useState(false);
   const [confirmingArchive, setConfirmingArchive] = useState<PlatformOrganization | null>(null);
   const [reviewingPurge, setReviewingPurge] = useState<PlatformOrganization | null>(null);
@@ -514,6 +518,14 @@ export function PlatformOrganizationsPage() {
                     <button type="button" onClick={() => setManagingAccess(entry)} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">
                       {copy.manageAccess}
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => setFiscalFor(entry)}
+                      className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold"
+                      data-testid={`platform-fiscal-open-${entry.organization.slug}`}
+                    >
+                      {tFiscal("platform.open")}
+                    </button>
                     {entry.organization.status === "active" ? (
                       <button
                         type="button"
@@ -582,6 +594,14 @@ export function PlatformOrganizationsPage() {
           }}
           onLogoChanged={() => void organizationsQuery.refetch()}
           onSave={saveSettings}
+        />
+      ) : null}
+      {fiscalFor ? (
+        <PlatformFiscalConnectionsDialog
+          token={accessToken ?? ""}
+          organizationId={fiscalFor.organization.id}
+          organizationName={fiscalFor.settings?.brand_name ?? fiscalFor.organization.name}
+          onClose={() => setFiscalFor(null)}
         />
       ) : null}
       {managingAccess ? (

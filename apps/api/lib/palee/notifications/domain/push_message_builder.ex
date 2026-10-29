@@ -1268,6 +1268,20 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-273: `connection` is a brand or service name (myDATA, fiskaly SIGN
+  # DE …) and stays as is in every language.
+  def build("fiscal_connection_failed", payload, localize) do
+    %{
+      title: localize.("A fiscal connection needs attention", %{}),
+      body:
+        localize.(
+          "%{connection} stopped working. Open Billing details › Connections to fix it.",
+          %{connection: payload["connection"] || ""}
+        ),
+      url: payload["url"] || "/admin/settings/billing"
+    }
+  end
+
   def build("shop_order_placed", payload, localize) do
     %{
       title: localize.("New shop order", %{}),

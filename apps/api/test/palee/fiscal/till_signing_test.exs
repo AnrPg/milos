@@ -394,8 +394,11 @@ defmodule Palee.Fiscal.TillSigningTest do
       assert {:error, :till_credentials_refused} =
                connect(context, owner, "tse", "test", %{api_key: "bad", api_secret: "bad"})
 
-      assert %{status: "provisioning", last_error: error} = TillSigning.connection(context, "tse")
-      assert is_binary(error)
+      # ADR-273: a stable code, never the provider's text.
+      assert %{status: "provisioning", error_code: "credentials_rejected"} =
+               connection = TillSigning.connection(context, "tse")
+
+      refute Map.has_key?(connection, :last_error)
     end
   end
 

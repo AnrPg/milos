@@ -12297,32 +12297,6 @@
       "qr_iban_country": "يُستخدم QR-IBAN في سويسرا وليختنشتاين فقط.",
       "not_a_qr_iban": "هذا IBAN عادي وليس QR-IBAN. يعطيك المصرف رقم QR-IBAN على حدة."
     },
-    "next": {
-      "noneTitle": "لا حاجة إلى خطوة أخرى",
-      "noneHint": "لا يطلب البلد «{country}» إرسال المستندات إلى سلطة ضريبية.",
-      "mydataTitle": "الاتصال بـ myDATA",
-      "mydataActive": "نشط ({environment}). يُرسل كل مستند إلى AADE.",
-      "mydataInvalid": "لم تقبل AADE بيانات الاتصال. تنتظر المستندات وتُرسل فور إصلاح ذلك.",
-      "mydataNone": "غير متصل بعد. تصدر المستندات كالمعتاد وتُرسل إلى AADE فور الاتصال.",
-      "connected": "متصل",
-      "needsCheck": "يحتاج إلى مراجعة",
-      "notConnected": "غير متصل",
-      "later": "الخطوة التالية، لاحقًا: {step}",
-      "soon": "قريبًا",
-      "tseTitle": "جهاز أمان الصندوق (TSE)",
-      "tseHint": "مطلوب فقط للدفع عند الصندوق. نربطه عبر fiskaly في خطوة لاحقة.",
-      "rksvTitle": "جهاز أمان الصندوق (RKSV)",
-      "rksvHint": "مطلوب فقط للدفع عند الصندوق. نربطه في خطوة لاحقة.",
-      "signFrTitle": "جهاز أمان الصندوق (fiskaly SIGN FR)",
-      "signFrHint": "مطلوب فقط للدفع عند الصندوق. نربطه عبر fiskaly في خطوة لاحقة. السجل غير القابل للتعديل نشط بالفعل.",
-      "nf525Title": "شهادة NF525",
-      "nf525Hint": "السجل غير القابل للتعديل نشط بالفعل. توفر Palee شهادة الناشر."
-    },
-    "environment": {
-      "sandbox": "بيئة تجريبية",
-      "test": "اختبار",
-      "production": "بيئة الإنتاج"
-    },
     "registry": {
       "lookup": "التعبئة من الرقم الضريبي (ΑΦΜ)",
       "looking": "جارٍ البحث لدى AADE…",
@@ -12337,6 +12311,133 @@
         "registry_limit_reached": "عمليات بحث كثيرة جدًا. حاول بعد قليل.",
         "registry_unavailable": "لا تستجيب AADE الآن. حاول لاحقًا أو املأ الحقول بنفسك."
       }
+    }
+  },
+  "FiscalConnections": {
+    "title": "الاتصالات",
+    "intro": "ما يطلبه القانون في «{country}». تصدر المستندات كالمعتاد وتنتظر حتى تتصل.",
+    "noneTitle": "لا حاجة إلى اتصال",
+    "noneHint": "لا يطلب البلد «{country}» إرسالاً إلى سلطة ضريبية ولا جهاز أمان للصندوق.",
+    "managedByPalee": "يدير فريق Palee هذا الاتصال",
+    "managedByPaleeHint": "ترى حالته ويمكنك الضغط على «اختبار الاتصال». للتغيير، راسل فريق Palee.",
+    "loadFailed": "لم يتم تحميل الاتصالات. حاول مرة أخرى بعد قليل.",
+    "registryName": "سجل AADE",
+    "description": {
+      "mydata": "يُرسل كل مستند إلى AADE",
+      "registry": "لـ «التعبئة من الرقم الضريبي» · اختياري",
+      "tse": "جهاز أمان الصندوق (TSE)",
+      "rksv": "جهاز أمان الصندوق (RKSV)",
+      "sign_fr": "يوقّع كل إيصال صندوق ويؤرشفه",
+      "peppol": "فواتير إلكترونية عبر Peppol"
+    },
+    "status": {
+      "active": "متصل",
+      "invalid": "يحتاج إلى فحص",
+      "provisioning": "قيد الإعداد",
+      "none": "غير متصل"
+    },
+    "updated": "حُدّث {date} · {name}",
+    "updatedAt": "حُدّث {date}",
+    "updatedByPalee": "حُدّث {date} · فريق Palee",
+    "checkedAt": "آخر فحص {date}",
+    "help": {
+      "mydata": "تحصل عليها من TAXISnet: myDATA › التسجيل في myDATA REST API. ليست كلمة مرورك في TAXISnet.",
+      "registry": "«بيانات الدخول الخاصة» التي تمنحها AADE لخدمة البحث في السجل (RgWsPublic2). ليست كلمة مرور TAXISnet ولا مفتاح myDATA.",
+      "fiskaly": "حساب fiskaly واحد للـ box كله. تنشئ المفتاح في fiskaly HUB، في الـ UNIT الخاصة بالـ box.",
+      "peppol": "حساب fiskaly واحد للـ box كله. يُعدّ E-INVOICE System والتسجيل في Peppol مرة واحدة في fiskaly HUB."
+    },
+    "field": {
+      "user_id": "اسم مستخدم myDATA",
+      "username": "اسم المستخدم",
+      "subscription_key": "مفتاح الاشتراك (subscription key)",
+      "password": "كلمة المرور",
+      "api_key": "مفتاح API",
+      "api_secret": "سر API",
+      "legal_entity_id": "معرّف E-INVOICE System",
+      "peppol_id": "عنوان Peppol",
+      "environment": "البيئة"
+    },
+    "placeholder": {
+      "user_id": "مثلاً kypseli_box",
+      "username": "اسم المستخدم الخاص",
+      "legal_entity_id": "من fiskaly HUB"
+    },
+    "fieldHint": {
+      "api_key": "مفتاح UNIT. لا يظهر مرة أخرى بعد الحفظ.",
+      "peppol_id": "من رقم المنشأة (KBO). غيّره فقط إذا طلب منك المحاسب."
+    },
+    "secret": {
+      "saved": "محفوظ",
+      "replace": "استبدال",
+      "cancelReplace": "إلغاء",
+      "savedHint": "لا يظهر مرة أخرى. لتغييره، اضغط «استبدال».",
+      "newHint": "لا يظهر مرة أخرى بعد الحفظ.",
+      "paste": "الصقه هنا",
+      "newValue": "قيمة جديدة"
+    },
+    "advanced": "متقدم",
+    "environment": {
+      "production": "الإنتاج",
+      "test": "تجربة",
+      "testAade": "تجربة AADE",
+      "testHint": "«تجربة» للاختبار قبل البدء: ما يُرسل إليها لا يُحتسب."
+    },
+    "device": {
+      "unit": "جهاز {device}",
+      "taxpayer": "المكلّف (fiskaly)",
+      "register": "الصندوق",
+      "since": "قيد الاستخدام منذ"
+    },
+    "reprovision": {
+      "title": "جهاز {device} جديد",
+      "hint": "فقط إذا طلب الدعم ذلك. توقّع الإيصالات التالية بجهاز جديد.",
+      "action": "جهاز جديد",
+      "confirm": "اضغط مرة أخرى للتأكيد"
+    },
+    "check": {
+      "action": "اختبار الاتصال",
+      "running": "جارٍ الاختبار…",
+      "needsSave": "احفظ الاتصال أولاً.",
+      "registryHint": "يبحث عن رقمك الضريبي · يُحتسب من حد AADE",
+      "ok": "الاتصال يعمل.",
+      "okRegistry": "وجدت AADE الرقم {taxId}: {name}",
+      "unreachable": "تعذّر الاختبار الآن ولم يتغير الاتصال. سنحاول مجدداً قريباً."
+    },
+    "saved": "تم الحفظ. لا تظهر الأسرار مرة أخرى.",
+    "savedUnchecked": "تم الحفظ. لا تظهر الأسرار مرة أخرى. تعذّر الاختبار الآن؛ سنحاول مجدداً قريباً.",
+    "waiting": "تنتظر المستندات وتُرسل فور الإصلاح.",
+    "save": "حفظ",
+    "saving": "جارٍ الحفظ…",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "error": {
+      "credentials_rejected_aade": "لم تقبل AADE المفتاح. انسخه مجدداً من صفحة التسجيل في myDATA.",
+      "credentials_rejected_registry": "لم تقبل AADE بيانات الدخول الخاصة. تحقق من اسم المستخدم وكلمة المرور.",
+      "credentials_rejected_fiskaly": "لم يقبل fiskaly هذا المفتاح. تحقق من أنه مفتاح UNIT للبيئة الصحيحة.",
+      "credentials_missing": "بيانات الاتصال ناقصة. املأها واضغط «حفظ».",
+      "unit_not_found": "لا يجد fiskaly جهاز الـ box. راسل الدعم أو أنشئ جهازاً جديداً من متقدم.",
+      "unit_not_ready": "الجهاز في fiskaly ليس جاهزاً بعد. حاول مجدداً بعد بضع دقائق.",
+      "system_not_found": "لا يجد fiskaly هذا الـ E-INVOICE System. تحقق منه في fiskaly HUB.",
+      "tax_id_missing": "الرقم الضريبي للشركة ناقص، لذا لم يجرِ الاختبار. أضفه في بيانات الفوترة.",
+      "tax_id_not_found": "لا تجد AADE الرقم الضريبي للشركة. تحقق منه في بيانات الفوترة.",
+      "siren_missing": "رقم SIREN للشركة ناقص. أضفه في بيانات الفوترة واضغط «حفظ» مجدداً.",
+      "limit_reached": "لا تقبل AADE مزيداً من عمليات البحث حالياً. حاول لاحقاً.",
+      "unreachable": "لم يردّ المزوّد. سنحاول مجدداً قريباً.",
+      "provisioning_failed": "تعذّر إعداد الجهاز في fiskaly. اضغط «حفظ» مجدداً أو راسل الدعم.",
+      "provider_retired": "هذا المزوّد لم يعد مدعوماً. املأ بيانات fiskaly واضغط «حفظ».",
+      "invalid_peppol_id": "هذا ليس عنوان Peppol صالحاً. اكتبه بصيغة مخطط:رقم، مثلاً 0208:0123456749.",
+      "managed_by_palee": "يدير فريق Palee هذا الاتصال. للتغيير، راسل فريق Palee.",
+      "check_too_soon": "فُحص الاتصال للتو. حاول مجدداً بعد بضع دقائق.",
+      "generic": "الاتصال يحتاج إلى فحص."
+    },
+    "platform": {
+      "open": "الاتصالات الضريبية",
+      "title": "الاتصالات الضريبية · {name}",
+      "managedBy": "من يديرها",
+      "owner": "المالك",
+      "palee": "فريق Palee",
+      "managedHint": "عندما يديرها فريق Palee، يراها المالك لكنه لا يستطيع تغييرها. يُسجَّل كل تغيير دون الأسرار.",
+      "empty": "بلد الـ box لا يطلب اتصالات، أو لم يُختر بعد."
     }
   },
   "FiscalDocuments": {

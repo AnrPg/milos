@@ -49,4 +49,13 @@ defmodule Palee.Fiscal.Ports.CashRegisterSecurity do
               {{:ok, map()} | {:error, term()}, wire()}
   @callback lookup(connection :: map(), request :: map()) ::
               {{:ok, map()} | {:error, term()}, wire()}
+
+  @doc """
+  «Δοκιμή σύνδεσης» (ADR-273): signs in with the connection's credentials
+  and reads the unit and register Palee provisioned, without signing
+  anything. `{:ok, %{}}`, `{:error, {:unauthorized, _}}` (credentials
+  refused), `{:error, :unit_not_found}`, `{:error, :unit_not_ready}` or
+  anything else (transient).
+  """
+  @callback check(connection :: map()) :: {:ok, map()} | {:error, term()}
 end

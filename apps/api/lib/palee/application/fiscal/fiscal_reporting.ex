@@ -5,6 +5,7 @@ defmodule Palee.Application.Fiscal.FiscalReporting do
   and sending what is due (right after an issue and every few minutes).
   """
 
+  alias Palee.Application.Fiscal.FiscalConnections
   alias Palee.Fiscal.Reporting
   alias Palee.Workers.TransmitFiscalDocumentsJob
 
@@ -12,17 +13,25 @@ defmodule Palee.Application.Fiscal.FiscalReporting do
   def connection(context),
     do: %{connection: Reporting.connection(context), environments: Reporting.environments()}
 
-  def save_connection(context, params, now \\ DateTime.utc_now()) do
+  @doc """
+  Saves the myDATA connection, then checks it (ADR-273): `{:ok,
+  %{connection, check}}`. Refused while the Palee team manages the box's
+  connections, unless `opts[:platform]` (the vendor console).
+  """
+  def save_connection(context, params, now \\ DateTime.utc_now(), opts \\ []) do
     params = %{
       environment: param(params, :environment),
       user_id: param(params, :user_id),
-      subscription_key: param(params, :subscription_key)
+      subscription_key: param(params, :subscription_key),
+      updated_by_platform: Keyword.get(opts, :platform) == true
     }
 
-    with {:ok, connection} <-
+    with :ok <- FiscalConnections.guard(context, opts),
+         {:ok, _connection} <-
            Reporting.save_connection(context, params, Map.get(context, :user_id), now) do
+      result = FiscalConnections.after_save(context, "mydata", now)
       schedule(context)
-      {:ok, connection}
+      {:ok, result}
     end
   end
 

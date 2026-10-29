@@ -21,6 +21,10 @@ defmodule Palee.Fiscal.TransmissionStore do
     do: tenant_call(context, :set_connection_status, [authority, status, error])
 
   @impl true
+  def update_connection_check(context, authority, attrs),
+    do: tenant_call(context, :update_connection_check, [authority, attrs])
+
+  @impl true
   def insert_transmission(context, attrs), do: tenant_call(context, :insert_transmission, [attrs])
   @impl true
   def get_transmission(context, id), do: tenant_call(context, :get_transmission, [id])

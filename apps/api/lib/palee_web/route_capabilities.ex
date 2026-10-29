@@ -250,6 +250,9 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminFiscalRegistryController, :connection} => [:view_finance_reports],
     {W.AdminFiscalRegistryController, :save_connection} => [:manage_billing],
     {W.AdminFiscalRegistryController, :lookup} => [:manage_billing],
+    # ADR-273: the box's fiscal connections as one set and «Δοκιμή σύνδεσης».
+    {W.AdminFiscalConnectionsController, :index} => [:view_finance_reports],
+    {W.AdminFiscalConnectionsController, :check} => [:manage_billing],
     {W.AdminFiscalTaxController, :export_formats} => [:view_finance_reports],
     {W.AdminFiscalTaxController, :save_export_settings} => [:manage_billing],
     {W.AdminFiscalTaxController, :export} => [:view_finance_reports],

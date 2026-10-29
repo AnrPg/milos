@@ -6,7 +6,7 @@ defmodule Palee.Application.Fiscal.FiscalEInvoicing do
   issue and every few minutes).
   """
 
-  alias Palee.Application.PublicURL
+  alias Palee.Application.Fiscal.FiscalConnections
   alias Palee.Fiscal.EInvoicing
   alias Palee.Workers.SendEInvoicesJob
 
@@ -15,10 +15,11 @@ defmodule Palee.Application.Fiscal.FiscalEInvoicing do
     do: %{connection: EInvoicing.connection(context), environments: EInvoicing.environments()}
 
   @doc """
-  Saves the connection. The answer carries `webhook_url` only when a new
-  webhook token was made (first save or rotation): it is shown once.
+  Saves the connection, then checks it (ADR-273): `{:ok, %{connection,
+  check}}`. fiskaly sends no webhooks, so the webhook URL is no longer
+  handed out (the endpoint stays as a harmless hint, ADR-250 update).
   """
-  def save_connection(context, params, now \\ DateTime.utc_now()) do
+  def save_connection(context, params, now \\ DateTime.utc_now(), opts \\ []) do
     params = %{
       environment: param(params, :environment),
       peppol_id: param(params, :peppol_id),
@@ -26,26 +27,17 @@ defmodule Palee.Application.Fiscal.FiscalEInvoicing do
       provider: param(params, :provider),
       api_key: param(params, :api_key),
       api_secret: param(params, :api_secret),
-      rotate_webhook_token: param(params, :rotate_webhook_token) == true
+      rotate_webhook_token: param(params, :rotate_webhook_token) == true,
+      updated_by_platform: Keyword.get(opts, :platform) == true
     }
 
-    with {:ok, connection} <-
+    with :ok <- FiscalConnections.guard(context, opts),
+         {:ok, _connection} <-
            EInvoicing.save_connection(context, params, Map.get(context, :user_id), now) do
+      result = FiscalConnections.after_save(context, "peppol", now)
       schedule(context)
-      {token, connection} = Map.pop(connection, :webhook_token)
-
-      {:ok,
-       Map.put(
-         connection,
-         :webhook_url,
-         token && webhook_url(context.organization_id, token)
-       )}
+      {:ok, result}
     end
-  end
-
-  defp webhook_url(organization_id, token) do
-    (PublicURL.base_url() |> String.trim_trailing("/")) <>
-      "/api/webhooks/peppol/#{organization_id}/#{token}"
   end
 
   @statuses ~w(pending sending submitted delivered rejected failed uncertain)

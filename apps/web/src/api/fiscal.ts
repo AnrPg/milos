@@ -18,7 +18,69 @@ export type IdentityChanges = NonNullable<
   operations["PaleeWeb.AdminFiscalController.save_identity"]["requestBody"]
 >["content"]["application/json"];
 export type CountriesResponse = Json<"PaleeWeb.AdminFiscalController.countries">;
-export type AuthorityConnectionResponse = Json<"PaleeWeb.AdminFiscalReportingController.connection">;
+
+// ADR-273: the «Συνδέσεις» card, «Δοκιμή σύνδεσης» and the vendor console.
+export type ConnectionsOverview = Json<"PaleeWeb.AdminFiscalConnectionsController.index">;
+export type ConnectionKind = ConnectionsOverview["kinds"][number];
+export type ConnectionResult = Json<"PaleeWeb.AdminFiscalConnectionsController.check">;
+export type ConnectionCheck = NonNullable<ConnectionResult["check"]>;
+export type AuthorityConnection = NonNullable<ConnectionsOverview["connections"]["mydata"]>;
+export type RegistryConnection = NonNullable<ConnectionsOverview["connections"]["registry"]>;
+export type TillConnection = NonNullable<ConnectionsOverview["connections"]["tse"]>;
+export type PeppolConnection = NonNullable<ConnectionsOverview["connections"]["peppol"]>;
+export type FiscalConnection = AuthorityConnection | RegistryConnection | TillConnection | PeppolConnection;
+export type ConnectionsManager = ConnectionsOverview["managed_by"];
+
+/** Where each connection is saved by the box's own staff. */
+const SAVE_PATHS: Record<ConnectionKind, string> = {
+  mydata: "/admin/fiscal/authority-connection",
+  registry: "/admin/fiscal/registry-connection",
+  tse: "/admin/fiscal/till-connections/tse",
+  rksv: "/admin/fiscal/till-connections/rksv",
+  sign_fr: "/admin/fiscal/till-connections/sign_fr",
+  peppol: "/admin/fiscal/peppol-connection",
+};
+
+export function fetchFiscalConnections(token: string) {
+  return apiRequest<ConnectionsOverview>("/admin/fiscal/connections", { token });
+}
+
+/** Saves one connection; it is then checked right away (`check`). Secrets are sent only when typed. */
+export function saveFiscalConnection(token: string, kind: ConnectionKind, body: Record<string, unknown>) {
+  return apiRequest<ConnectionResult>(SAVE_PATHS[kind], { token, method: "PUT", body });
+}
+
+/** «Δοκιμή σύνδεσης». */
+export function checkFiscalConnection(token: string, kind: ConnectionKind) {
+  return apiRequest<ConnectionResult>(`/admin/fiscal/connections/${kind}/check`, { token, method: "POST" });
+}
+
+export function fetchPlatformFiscalConnections(token: string, organizationId: string) {
+  return apiRequest<ConnectionsOverview>(`/platform/organizations/${organizationId}/fiscal-connections`, { token });
+}
+
+export function setPlatformConnectionsManager(token: string, organizationId: string, managedBy: ConnectionsManager) {
+  return apiRequest<ConnectionsOverview>(`/platform/organizations/${organizationId}/fiscal-connections/managed-by`, {
+    token,
+    method: "PUT",
+    body: { managed_by: managedBy },
+  });
+}
+
+export function savePlatformFiscalConnection(token: string, organizationId: string, kind: ConnectionKind, body: Record<string, unknown>) {
+  return apiRequest<ConnectionResult>(`/platform/organizations/${organizationId}/fiscal-connections/${kind}`, {
+    token,
+    method: "PUT",
+    body,
+  });
+}
+
+export function checkPlatformFiscalConnection(token: string, organizationId: string, kind: ConnectionKind) {
+  return apiRequest<ConnectionResult>(`/platform/organizations/${organizationId}/fiscal-connections/${kind}/check`, {
+    token,
+    method: "POST",
+  });
+}
 
 export type DocumentPage = Json<"PaleeWeb.AdminFiscalController.documents">;
 export type FiscalDocument = DocumentPage["documents"][number];
@@ -59,10 +121,6 @@ export function fetchFiscalIdentity(token: string) {
 
 export function saveFiscalIdentity(token: string, changes: IdentityChanges) {
   return apiRequest<IdentityStatus>("/admin/fiscal/identity", { token, method: "PUT", body: changes });
-}
-
-export function fetchAuthorityConnection(token: string) {
-  return apiRequest<AuthorityConnectionResponse>("/admin/fiscal/authority-connection", { token });
 }
 
 export type DocumentFilters = {
