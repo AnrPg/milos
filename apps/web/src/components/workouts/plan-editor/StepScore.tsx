@@ -57,7 +57,7 @@ export function StepScore({ section, levels = [] }: { section: PlanEditorSection
                 data-k={on ? focusKey.score(section.id) : undefined}
                 tabIndex={on ? 0 : -1}
                 onClick={() => setScore(section.id, o)}
-                className="rounded-full border px-3 py-1 text-sm"
+                className="rounded-full border px-3 py-1 text-sm max-sm:min-h-10"
                 style={on ? { background: "var(--primary)", borderColor: "var(--primary)", color: "var(--primary-contrast)" } : { background: "var(--card)", borderColor: "var(--border)", color: "var(--text)" }}
               >
                 {k(scoreLabelKey(o))}

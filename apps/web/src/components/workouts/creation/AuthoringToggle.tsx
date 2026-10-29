@@ -33,7 +33,7 @@ export function AuthoringToggle({ value, disabled = false, busy = false, failed 
         onClick={() => {
           if (!active) onChange(kind);
         }}
-        className="min-h-8 rounded-lg px-3 text-xs font-bold transition-colors disabled:opacity-50"
+        className="min-h-8 rounded-lg px-3 text-xs font-bold max-sm:min-h-10 transition-colors disabled:opacity-50"
         style={active ? { background: "var(--card)", color: "var(--text)", boxShadow: "inset 0 0 0 1px var(--border)" } : { color: "var(--muted)" }}
         data-testid={`authoring-toggle-${kind}`}
       >

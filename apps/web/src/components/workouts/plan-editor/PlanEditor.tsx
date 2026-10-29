@@ -248,7 +248,7 @@ export function PlanEditor({ levels }: { levels?: PlanLevel[] }) {
           data-testid="plan-add-section"
           onClick={() => addSection(openId ?? sections.at(-1)?.id ?? null)}
           title={keyLabel("Shift+Enter", mac)}
-          className="rounded-full border border-dashed px-4 py-1.5 text-sm font-semibold"
+          className="rounded-full border border-dashed px-4 py-1.5 text-sm font-semibold max-sm:min-h-10"
           style={{ borderColor: "var(--border-strong)", color: "var(--text-soft)" }}
         >
           {t("addSection")}

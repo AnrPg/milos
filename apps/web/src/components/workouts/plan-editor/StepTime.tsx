@@ -116,7 +116,7 @@ export function StepTime({ section }: { section: PlanEditorSection }) {
                 data-testid={`plan-mod-remove-${m}`}
                 title={t("removeModTitle")}
                 onClick={() => toggleMod(section.id, m)}
-                className="mt-6 rounded-full border border-dashed px-3 py-1 text-sm"
+                className="mt-6 rounded-full border border-dashed px-3 py-1 text-sm max-sm:min-h-10"
                 style={{ borderColor: "var(--border-strong)", color: "var(--muted)" }}
               >
                 {t("removeMod", { label: k(MODS[m].labelKey) })}
@@ -133,7 +133,7 @@ export function StepTime({ section }: { section: PlanEditorSection }) {
               data-testid={`plan-mod-add-${m}`}
               title={k(MODS[m].hintKey)}
               onClick={() => toggleMod(section.id, m)}
-              className="rounded-full border border-dashed px-3 py-1 text-sm"
+              className="rounded-full border border-dashed px-3 py-1 text-sm max-sm:min-h-10"
               style={{ borderColor: "var(--border-strong)", color: "var(--text-soft)" }}
             >
               {t("addMod", { label: k(MODS[m].labelKey) })}

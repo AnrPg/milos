@@ -43,11 +43,16 @@ export function SectionCard({ section, index }: { section: PlanEditorSection; in
           {k(presetKey)}
         </span>
       ) : null}
-      {section.name ? <b className="text-sm">{section.name}</b> : null}
-      <span className="min-w-0 flex-1 break-words text-sm" style={{ color: "var(--text-soft)" }}>
+      {section.name ? <b className="min-w-0 break-words text-sm">{section.name}</b> : null}
+      {/* One line on wide screens (cut with … , the full list in the tooltip); its own wrapping line on phones. */}
+      <span
+        className="min-w-0 flex-1 truncate text-sm max-sm:order-last max-sm:basis-full max-sm:whitespace-normal max-sm:break-words"
+        title={what || undefined}
+        style={{ color: "var(--text-soft)" }}
+      >
         {what || t("noExercises")}
       </span>
-      {params ? <span className="text-xs" style={{ color: "var(--muted)" }}>{params}</span> : null}
+      {params ? <span className="ms-auto whitespace-nowrap text-xs tabular-nums" style={{ color: "var(--muted)" }}>{params}</span> : null}
     </button>
   );
 }
