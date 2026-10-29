@@ -4,14 +4,13 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
-import { fetchFinancePackages } from "@/api/finance";
 import { listAdminClassTypes } from "@/api/schedule";
 import { fetchTrialPolicy, TRIAL_POLICY_KEY, updateTrialPolicy, type TrialPolicy } from "@/api/trials";
 import { useSession } from "@/components/session-provider";
 import { trialErrorKey } from "@/components/trials/trial-ui";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
-import { Select } from "@/components/ui/Select";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { AdvancedDisclosure } from "@/components/settings/AdvancedSettings";
 import { BackLink } from "@/components/ui/BackLink";
 
 type Draft = {
@@ -74,9 +73,7 @@ function Form({ token, initial, thisWeek }: { token: string; initial: Draft; thi
   };
 
   const classTypes = useQuery({ queryKey: ["admin", "class-types"], queryFn: () => listAdminClassTypes(token) });
-  const packages = useQuery({ queryKey: ["admin", "finance", "packages"], queryFn: () => fetchFinancePackages(token) });
   const activeTypes = (classTypes.data ?? []).filter((type) => !type.archived_at);
-  const activePackages = (packages.data?.packages ?? []).filter((pkg) => pkg.active !== false) as Array<{ id: string; name: string }>;
 
   const save = useMutation({
     mutationFn: () => updateTrialPolicy(token, { ...draft, bring_note: draft.bring_note?.trim() || null } as TrialPolicy),
@@ -108,50 +105,8 @@ function Form({ token, initial, thisWeek }: { token: string; initial: Draft; thi
         <Toggle label={t("enabledLabel")} hint={t("enabledHint")} checked={draft.enabled} onChange={(value) => set("enabled", value)} />
 
         <fieldset disabled={disabled} className="flex flex-col gap-5 disabled:opacity-55">
-          <Section title={t("approvalTitle")}>
-            {(["auto", "manual"] as const).map((value) => (
-              <label key={value} className="flex items-start gap-3 rounded-2xl px-4 py-3" style={{ background: "var(--panel)", border: `1px solid ${draft.approval === value ? "var(--primary)" : "var(--border)"}` }}>
-                <input type="radio" name="approval" checked={draft.approval === value} onChange={() => set("approval", value)} className="mt-1" />
-                <span className="flex flex-col">
-                  <span className="text-sm font-bold" style={{ color: "var(--text)" }}>{t(`approval_${value}`)}</span>
-                  <span className="text-sm" style={{ color: "var(--text-soft)" }}>{t(`approvalHint_${value}`)}</span>
-                </span>
-              </label>
-            ))}
-          </Section>
-
           <Section title={t("limitsTitle")}>
             <NumberRow label={t("seatsPerClass")} value={draft.seats_per_class} min={1} max={50} onChange={(value) => set("seats_per_class", value ?? 1)} className={input} style={field} />
-            <NumberRow label={t("weeklyLimit")} hint={t("weeklyLimitHint", { count: thisWeek })} value={draft.weekly_limit} min={1} max={500} onChange={(value) => set("weekly_limit", value)} className={input} style={field} />
-            <NumberRow label={t("perPersonLimit")} value={draft.per_person_limit} min={1} max={10} onChange={(value) => set("per_person_limit", value ?? 1)} className={input} style={field} />
-            <NumberRow label={t("horizonDays")} hint={t("horizonHint")} value={draft.horizon_days} min={1} max={90} onChange={(value) => set("horizon_days", value)} className={input} style={field} />
-          </Section>
-
-          <Section title={t("classTypesTitle")} hint={t("classTypesHint")}>
-            <div className="flex flex-wrap gap-2">
-              {activeTypes.map((type) => {
-                const on = (draft.class_type_ids ?? []).includes(type.id);
-                return (
-                  <button
-                    key={type.id}
-                    type="button"
-                    aria-pressed={on}
-                    onClick={() =>
-                      set("class_type_ids", on ? (draft.class_type_ids ?? []).filter((id) => id !== type.id) : [...(draft.class_type_ids ?? []), type.id])
-                    }
-                    className="min-h-10 rounded-full px-4 text-sm font-semibold"
-                    style={on ? { background: "var(--text)", color: "var(--bg)" } : { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
-                  >
-                    {type.name}
-                  </button>
-                );
-              })}
-            </div>
-          </Section>
-
-          <Section title={t("whoTitle")}>
-            <Toggle label={t("firstTimersOnly")} hint={t("firstTimersHint")} checked={draft.first_timers_only} onChange={(value) => set("first_timers_only", value)} />
-            <Toggle label={t("noShowConsumes")} hint={t("noShowHint")} checked={draft.no_show_consumes} onChange={(value) => set("no_show_consumes", value)} />
           </Section>
 
           <Section title={t("bringTitle")} hint={t("bringHint")}>
@@ -166,19 +121,52 @@ function Form({ token, initial, thisWeek }: { token: string; initial: Draft; thi
             />
           </Section>
 
-          <Section title={t("conversionTitle")} hint={t("conversionHint")}>
-            <Select
-              value={draft.conversion_package_id ?? ""}
-              onValueChange={(value) => set("conversion_package_id", value || null)}
-              className="min-h-11 rounded-2xl px-3 text-sm"
-              style={field}
-            >
-              <option value="">{t("conversionNone")}</option>
-              {activePackages.map((pkg) => (
-                <option key={pkg.id} value={pkg.id}>{pkg.name}</option>
+          {/* ADR-255: settings with a good default sit under «Προχωρημένα», closed. */}
+          <AdvancedDisclosure count={7} testId="trial-advanced">
+            <Section title={t("approvalTitle")}>
+              {(["auto", "manual"] as const).map((value) => (
+                <label key={value} className="flex items-start gap-3 rounded-2xl px-4 py-3" style={{ background: "var(--panel)", border: `1px solid ${draft.approval === value ? "var(--primary)" : "var(--border)"}` }}>
+                  <input type="radio" name="approval" checked={draft.approval === value} onChange={() => set("approval", value)} className="mt-1" />
+                  <span className="flex flex-col">
+                    <span className="text-sm font-bold" style={{ color: "var(--text)" }}>{t(`approval_${value}`)}</span>
+                    <span className="text-sm" style={{ color: "var(--text-soft)" }}>{t(`approvalHint_${value}`)}</span>
+                  </span>
+                </label>
               ))}
-            </Select>
-          </Section>
+            </Section>
+
+            <Section title={t("limitsTitle")}>
+              <NumberRow label={t("weeklyLimit")} hint={t("weeklyLimitHint", { count: thisWeek })} value={draft.weekly_limit} min={1} max={500} onChange={(value) => set("weekly_limit", value)} className={input} style={field} />
+              <NumberRow label={t("perPersonLimit")} value={draft.per_person_limit} min={1} max={10} onChange={(value) => set("per_person_limit", value ?? 1)} className={input} style={field} />
+              <NumberRow label={t("horizonDays")} hint={t("horizonHint")} value={draft.horizon_days} min={1} max={90} onChange={(value) => set("horizon_days", value)} className={input} style={field} />
+            </Section>
+            <Section title={t("classTypesTitle")} hint={t("classTypesHint")}>
+              <div className="flex flex-wrap gap-2">
+                {activeTypes.map((type) => {
+                  const on = (draft.class_type_ids ?? []).includes(type.id);
+                  return (
+                    <button
+                      key={type.id}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() =>
+                        set("class_type_ids", on ? (draft.class_type_ids ?? []).filter((id) => id !== type.id) : [...(draft.class_type_ids ?? []), type.id])
+                      }
+                      className="min-h-10 rounded-full px-4 text-sm font-semibold"
+                      style={on ? { background: "var(--text)", color: "var(--bg)" } : { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+                    >
+                      {type.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </Section>
+
+            <Section title={t("whoTitle")}>
+              <Toggle label={t("firstTimersOnly")} hint={t("firstTimersHint")} checked={draft.first_timers_only} onChange={(value) => set("first_timers_only", value)} />
+              <Toggle label={t("noShowConsumes")} hint={t("noShowHint")} checked={draft.no_show_consumes} onChange={(value) => set("no_show_consumes", value)} />
+            </Section>
+          </AdvancedDisclosure>
         </fieldset>
 
         <div className="sticky bottom-4 flex flex-col gap-2 rounded-2xl p-3" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>

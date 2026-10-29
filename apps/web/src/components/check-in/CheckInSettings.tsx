@@ -9,7 +9,7 @@ import { CHECK_IN_RULES_KEY, fetchCheckInRules, updateCheckInRules, type MemberC
 import { useSession } from "@/components/session-provider";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
-import { DEFAULT_RULES, modeChangeNeedsConfirm, ROTATION_CHOICES, validateRules, type RulesDraft } from "./check-in";
+import { DEFAULT_RULES, modeChangeNeedsConfirm, validateRules, type RulesDraft } from "./check-in";
 import { checkInErrorKey } from "./errors";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { BackLink } from "@/components/ui/BackLink";
@@ -20,6 +20,8 @@ import { BackLink } from "@/components/ui/BackLink";
  * the door code turns, and whether personal codes rotate or stay the same
  * (only a code that stays the same can go in a Wallet). Going back to
  * rotating codes revokes every fixed code and card, so it asks first.
+ * ADR-255: the door code's turn is no setting any more ("remove") and open
+ * gym's package rule follows the packages ("derive"), so neither is an input.
  */
 export function CheckInSettings() {
   const t = useTranslations("CheckIn");
@@ -104,31 +106,9 @@ function Form({ token, initial }: { token: string; initial: RulesDraft }) {
         </Section>
 
         <Section title={t("rulesTitle")}>
-          <Toggle label={t("openGymRequiresPackage")} hint={t("openGymRequiresPackageHint")} checked={draft.open_gym_requires_package} onChange={(value) => set("open_gym_requires_package", value)} />
           <Toggle label={t("visitorTrialOffer")} hint={t("visitorTrialOfferHint")} checked={draft.visitor_trial_offer} onChange={(value) => set("visitor_trial_offer", value)} />
           <Toggle label={t("deskOverride")} hint={t("deskOverrideHint")} checked={draft.desk_override} onChange={(value) => set("desk_override", value)} />
           <Toggle label={t("geofenceReminder")} hint={t("geofenceReminderHint")} checked={draft.geofence_reminder} onChange={(value) => set("geofence_reminder", value)} />
-        </Section>
-
-        <Section title={t("rotationTitle")} hint={t("rotationHint")}>
-          <div role="radiogroup" aria-label={t("rotationTitle")} className="flex flex-wrap gap-2">
-            {ROTATION_CHOICES.map((seconds) => (
-              <label
-                key={seconds}
-                className="flex min-h-11 cursor-pointer items-center gap-2 rounded-full px-4 text-sm font-semibold"
-                style={draft.door_rotation_seconds === seconds ? { background: "var(--text)", color: "var(--bg)" } : { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
-              >
-                <input
-                  type="radio"
-                  name="door_rotation_seconds"
-                  className="sr-only"
-                  checked={draft.door_rotation_seconds === seconds}
-                  onChange={() => set("door_rotation_seconds", seconds)}
-                />
-                {t("seconds", { count: seconds })}
-              </label>
-            ))}
-          </div>
         </Section>
 
         <Section title={t("codeModeTitle")} hint={t("codeModeHint")}>
