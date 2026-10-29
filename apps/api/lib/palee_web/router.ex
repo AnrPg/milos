@@ -387,6 +387,13 @@ defmodule PaleeWeb.Router do
     get("/callback", PaymentConnectController, :callback)
   end
 
+  # ADR-250: the Peppol access point's webhook (one secret URL per business).
+  scope "/api/webhooks/peppol", PaleeWeb do
+    pipe_through([:payment_provider_webhook])
+
+    post("/:organization_id/:token", PeppolWebhookController, :create)
+  end
+
   scope "/api/email/unsubscribe", PaleeWeb do
     pipe_through([:email_unsubscribe])
 
@@ -1296,6 +1303,26 @@ defmodule PaleeWeb.Router do
       AdminTerminalPaymentsController,
       :sandbox_complete
     )
+
+    # ADR-250: Peppol e-invoicing.
+    get("/fiscal/peppol-connection", AdminFiscalEInvoicingController, :connection)
+    put("/fiscal/peppol-connection", AdminFiscalEInvoicingController, :save_connection)
+    get("/fiscal/einvoices", AdminFiscalEInvoicingController, :index)
+    get("/fiscal/einvoices/:id", AdminFiscalEInvoicingController, :show)
+    post("/fiscal/documents/:id/einvoice/retry", AdminFiscalEInvoicingController, :retry)
+    # ADR-251: TSE (DE) and RKSV (AT) receipt signing.
+    get("/fiscal/till-connections/:device", AdminFiscalTillSigningController, :connection)
+    put("/fiscal/till-connections/:device", AdminFiscalTillSigningController, :save_connection)
+    get("/fiscal/till-signatures", AdminFiscalTillSigningController, :index)
+
+    post(
+      "/fiscal/till-signatures/null-receipts",
+      AdminFiscalTillSigningController,
+      :null_receipt
+    )
+
+    get("/fiscal/till-signatures/:id", AdminFiscalTillSigningController, :show)
+    post("/fiscal/till-signatures/:id/retry", AdminFiscalTillSigningController, :retry)
 
     # ADR-246/247: online payments through the business's provider account.
     get("/payments/account", AdminPaymentsController, :account)

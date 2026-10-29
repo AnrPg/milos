@@ -69,6 +69,9 @@ config :palee, Oban,
        {"20 * * * *", Palee.Workers.CloseFiscalPeriodsJob},
        # ADR-243: retries and deferred reports to the tax authority.
        {"*/5 * * * *", Palee.Workers.TransmitFiscalDocumentsJob},
+       # ADR-250/251: Peppol sends and delivery polls; TSE/RKSV signatures.
+       {"*/5 * * * *", Palee.Workers.SendEInvoicesJob},
+       {"*/2 * * * *", Palee.Workers.SignTillReceiptsJob},
        # ADR-246/247: settle online payments; hourly autopay of due invoices.
        {"*/3 * * * *", Palee.Workers.ProcessPaymentsJob},
        {"11 * * * *", Palee.Workers.ProcessPaymentsJob, args: %{"autopay" => true}},
@@ -199,6 +202,24 @@ config :palee, :fiscal_accounting_export_formats, [
   Palee.Infrastructure.Fiscal.Exports.GenericCsv,
   Palee.Infrastructure.Fiscal.Exports.GenericJson
 ]
+
+# ADR-250: Peppol e-invoicing, the access point per connection provider.
+config :palee, :fiscal_einvoice_store, Palee.Infrastructure.Fiscal.EctoEInvoiceStore
+
+config :palee, :fiscal_einvoice_networks, %{
+  "sandbox" => Palee.Infrastructure.Fiscal.SandboxEInvoiceNetwork,
+  "storecove" => Palee.Infrastructure.Fiscal.StorecoveNetwork
+}
+
+# ADR-251: TSE (DE) and RKSV (AT) signing, the provider per connection.
+config :palee, :fiscal_till_store, Palee.Infrastructure.Fiscal.EctoTillSignatureStore
+
+config :palee, :fiscal_cash_register_security, %{
+  {"tse", "sandbox"} => Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity,
+  {"rksv", "sandbox"} => Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity,
+  {"tse", "fiskaly"} => Palee.Infrastructure.Fiscal.FiskalySignDe,
+  {"rksv", "fiskaly"} => Palee.Infrastructure.Fiscal.FiskalySignAt
+}
 
 # ADR-246/247: online payments through the business's own provider account.
 config :palee, :payment_store, Palee.Infrastructure.Payments.EctoPaymentStore

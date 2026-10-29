@@ -11,7 +11,7 @@ defmodule Palee.Fiscal.Domain.FiscalDocumentPolicy do
         issue_date: ~D[...],            # the gym-local business date
         currency: "EUR",                # default: the country's currency
         prices_include_tax: true,       # default true (retail prices)
-        buyer: %{name, tax_id, vat_number, street, building_number,
+        buyer: %{name, tax_id, vat_number, street, building_number, peppol_id, reference,
                  postal_code, city, region, country_code, email} | nil,
         payment_method: "cash" | "card" | "bank_transfer" | "online" | "other" | nil,
         lines: [%{description, quantity, unit_price_cents, discount_cents,
@@ -24,7 +24,7 @@ defmodule Palee.Fiscal.Domain.FiscalDocumentPolicy do
   `credit_note/4`.
   """
 
-  alias Palee.Fiscal.Domain.{CountryProfile, TaxCalculation, VatRates}
+  alias Palee.Fiscal.Domain.{CountryProfile, PeppolId, TaxCalculation, VatRates}
 
   @kinds ~w(receipt invoice)
   @currencies ~w(EUR CHF GBP USD)
@@ -142,12 +142,25 @@ defmodule Palee.Fiscal.Domain.FiscalDocumentPolicy do
     buyer =
       buyer
       |> Map.take(
-        ~w(name tax_id vat_number street building_number postal_code city region country_code email)a
+        ~w(name tax_id vat_number street building_number postal_code city region country_code email
+           peppol_id reference)a
       )
       |> Map.new(fn {key, value} -> {key, clean(value)} end)
       |> Map.reject(fn {_key, value} -> is_nil(value) end)
+      |> Map.update(:peppol_id, nil, fn id ->
+        case PeppolId.parse(id) do
+          {:ok, parsed} -> PeppolId.format(parsed)
+          _invalid -> id
+        end
+      end)
+      |> Map.reject(fn {_key, value} -> is_nil(value) end)
 
     cond do
+      # ADR-250: the buyer's Peppol address, normalised ("0208:0123456789").
+      Map.has_key?(buyer, :peppol_id) and
+          match?({:error, _}, PeppolId.parse(buyer.peppol_id)) ->
+        {:error, :invalid_peppol_id}
+
       Enum.any?(buyer, fn {_key, value} -> String.length(value) > @max_text end) ->
         {:error, :buyer_field_too_long}
 

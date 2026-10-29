@@ -235,6 +235,8 @@ must have an ADR. See `template.md` for the format.
 | ADR-247 | Saved cards, recurring charges within the payer's consent, autopay and dunning | Accepted |
 | ADR-248 | Selling packages and shop orders online, booking after payment, 14-day withdrawal | Accepted |
 | ADR-249 | Tap to Pay at the desk through the Viva.com Terminal app: signed app-to-app request, result confirmed with Viva, `card_terminal` money with its document | Accepted |
+| ADR-250 | Peppol e-invoicing: UBL 2.1 / BIS Billing 3.0, outbox with uncertain never resent, access point port (sandbox, Storecove) | Accepted |
+| ADR-251 | Till security devices: cloud TSE (DE) and RKSV (AT) through fiskaly, signatures on a side table, outages recorded | Accepted |
 | ADR-252 | Documents and simple electronic signatures (evidence, PDF certificate), health certificates, booking gate | Accepted |
 | ADR-253 | Box screen: TV paired with a code, display token, today's classes/WODs/leaderboards, automatic focus and staff override | Accepted |
 | ADR-254 | Importing clients from a CSV file: Imports context, dry run, idempotent apply, held profiles, undo | Accepted |

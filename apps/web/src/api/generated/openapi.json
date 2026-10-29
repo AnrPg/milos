@@ -176171,6 +176171,99 @@
                           "currency": {
                             "type": "string"
                           },
+                          "einvoice": {
+                            "description": "The document's Peppol submission (ADR-250).",
+                            "nullable": true,
+                            "properties": {
+                              "attempts": {
+                                "type": "integer"
+                              },
+                              "delivered_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "document_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "environment": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "inserted_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "last_error_code": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "last_error_message": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "network": {
+                                "enum": [
+                                  "peppol"
+                                ],
+                                "type": "string"
+                              },
+                              "next_attempt_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "polls": {
+                                "type": "integer"
+                              },
+                              "provider_submission_id": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "recipient_identifier": {
+                                "type": "string"
+                              },
+                              "recipient_scheme": {
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "pending",
+                                  "sending",
+                                  "submitted",
+                                  "delivered",
+                                  "rejected",
+                                  "failed",
+                                  "uncertain"
+                                ],
+                                "type": "string"
+                              },
+                              "submitted_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "attempts",
+                              "document_id",
+                              "id",
+                              "network",
+                              "recipient_identifier",
+                              "recipient_scheme",
+                              "status"
+                            ],
+                            "type": "object"
+                          },
                           "gross_cents": {
                             "type": "integer"
                           },
@@ -176326,6 +176419,167 @@
                           },
                           "tax_cents": {
                             "type": "integer"
+                          },
+                          "till_signature": {
+                            "description": "A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints.",
+                            "nullable": true,
+                            "properties": {
+                              "attempts": {
+                                "type": "integer"
+                              },
+                              "device": {
+                                "enum": [
+                                  "tse",
+                                  "rksv"
+                                ],
+                                "type": "string"
+                              },
+                              "document_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "environment": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "failed_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "finished_at_device": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "inserted_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "kind": {
+                                "enum": [
+                                  "receipt",
+                                  "start",
+                                  "null",
+                                  "monthly",
+                                  "yearly",
+                                  "closing"
+                                ],
+                                "type": "string"
+                              },
+                              "last_error_code": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "last_error_message": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "next_attempt_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "period": {
+                                "format": "date",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "print": {
+                                "items": {
+                                  "properties": {
+                                    "label": {
+                                      "type": "string"
+                                    },
+                                    "value": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "label"
+                                  ],
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "qr_code_data": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "receipt_number": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "register_serial": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "signature_algorithm": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "signature_counter": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "signature_value": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "signed_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "started_at_device": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "pending",
+                                  "sending",
+                                  "signed",
+                                  "uncertain",
+                                  "device_failed",
+                                  "rejected",
+                                  "failed"
+                                ],
+                                "type": "string"
+                              },
+                              "time_format": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "transaction_number": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "unit_serial": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "attempts",
+                              "device",
+                              "id",
+                              "kind",
+                              "print",
+                              "status"
+                            ],
+                            "type": "object"
                           },
                           "transmission": {
                             "description": "The document's report to the tax authority (ADR-243).",
@@ -176526,6 +176780,99 @@
                               "currency": {
                                 "type": "string"
                               },
+                              "einvoice": {
+                                "description": "The document's Peppol submission (ADR-250).",
+                                "nullable": true,
+                                "properties": {
+                                  "attempts": {
+                                    "type": "integer"
+                                  },
+                                  "delivered_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "document_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "environment": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "inserted_at": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                  },
+                                  "last_error_code": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "last_error_message": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "network": {
+                                    "enum": [
+                                      "peppol"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "next_attempt_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "polls": {
+                                    "type": "integer"
+                                  },
+                                  "provider_submission_id": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "recipient_identifier": {
+                                    "type": "string"
+                                  },
+                                  "recipient_scheme": {
+                                    "type": "string"
+                                  },
+                                  "status": {
+                                    "enum": [
+                                      "pending",
+                                      "sending",
+                                      "submitted",
+                                      "delivered",
+                                      "rejected",
+                                      "failed",
+                                      "uncertain"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "submitted_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "updated_at": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "attempts",
+                                  "document_id",
+                                  "id",
+                                  "network",
+                                  "recipient_identifier",
+                                  "recipient_scheme",
+                                  "status"
+                                ],
+                                "type": "object"
+                              },
                               "gross_cents": {
                                 "type": "integer"
                               },
@@ -176682,6 +177029,167 @@
                               "tax_cents": {
                                 "type": "integer"
                               },
+                              "till_signature": {
+                                "description": "A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints.",
+                                "nullable": true,
+                                "properties": {
+                                  "attempts": {
+                                    "type": "integer"
+                                  },
+                                  "device": {
+                                    "enum": [
+                                      "tse",
+                                      "rksv"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "document_id": {
+                                    "format": "uuid",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "environment": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "failed_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "finished_at_device": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "inserted_at": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                  },
+                                  "kind": {
+                                    "enum": [
+                                      "receipt",
+                                      "start",
+                                      "null",
+                                      "monthly",
+                                      "yearly",
+                                      "closing"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "last_error_code": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "last_error_message": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "next_attempt_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "period": {
+                                    "format": "date",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "print": {
+                                    "items": {
+                                      "properties": {
+                                        "label": {
+                                          "type": "string"
+                                        },
+                                        "value": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "label"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "qr_code_data": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "receipt_number": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "register_serial": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "signature_algorithm": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "signature_counter": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "signature_value": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "signed_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "started_at_device": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "status": {
+                                    "enum": [
+                                      "pending",
+                                      "sending",
+                                      "signed",
+                                      "uncertain",
+                                      "device_failed",
+                                      "rejected",
+                                      "failed"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "time_format": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "transaction_number": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "unit_serial": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "updated_at": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "attempts",
+                                  "device",
+                                  "id",
+                                  "kind",
+                                  "print",
+                                  "status"
+                                ],
+                                "type": "object"
+                              },
                               "transmission": {
                                 "description": "The document's report to the tax authority (ADR-243).",
                                 "nullable": true,
@@ -176796,6 +177304,99 @@
                         },
                         "currency": {
                           "type": "string"
+                        },
+                        "einvoice": {
+                          "description": "The document's Peppol submission (ADR-250).",
+                          "nullable": true,
+                          "properties": {
+                            "attempts": {
+                              "type": "integer"
+                            },
+                            "delivered_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "document_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "environment": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "inserted_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "last_error_code": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "last_error_message": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "network": {
+                              "enum": [
+                                "peppol"
+                              ],
+                              "type": "string"
+                            },
+                            "next_attempt_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "polls": {
+                              "type": "integer"
+                            },
+                            "provider_submission_id": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "recipient_identifier": {
+                              "type": "string"
+                            },
+                            "recipient_scheme": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "sending",
+                                "submitted",
+                                "delivered",
+                                "rejected",
+                                "failed",
+                                "uncertain"
+                              ],
+                              "type": "string"
+                            },
+                            "submitted_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "attempts",
+                            "document_id",
+                            "id",
+                            "network",
+                            "recipient_identifier",
+                            "recipient_scheme",
+                            "status"
+                          ],
+                          "type": "object"
                         },
                         "gross_cents": {
                           "type": "integer"
@@ -176952,6 +177553,167 @@
                         },
                         "tax_cents": {
                           "type": "integer"
+                        },
+                        "till_signature": {
+                          "description": "A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints.",
+                          "nullable": true,
+                          "properties": {
+                            "attempts": {
+                              "type": "integer"
+                            },
+                            "device": {
+                              "enum": [
+                                "tse",
+                                "rksv"
+                              ],
+                              "type": "string"
+                            },
+                            "document_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "environment": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "failed_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "finished_at_device": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "inserted_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "kind": {
+                              "enum": [
+                                "receipt",
+                                "start",
+                                "null",
+                                "monthly",
+                                "yearly",
+                                "closing"
+                              ],
+                              "type": "string"
+                            },
+                            "last_error_code": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "last_error_message": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "next_attempt_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "period": {
+                              "format": "date",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "print": {
+                              "items": {
+                                "properties": {
+                                  "label": {
+                                    "type": "string"
+                                  },
+                                  "value": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "label"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "qr_code_data": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "receipt_number": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "register_serial": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "signature_algorithm": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "signature_counter": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "signature_value": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "signed_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "started_at_device": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "sending",
+                                "signed",
+                                "uncertain",
+                                "device_failed",
+                                "rejected",
+                                "failed"
+                              ],
+                              "type": "string"
+                            },
+                            "time_format": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "transaction_number": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "unit_serial": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "attempts",
+                            "device",
+                            "id",
+                            "kind",
+                            "print",
+                            "status"
+                          ],
+                          "type": "object"
                         },
                         "transmission": {
                           "description": "The document's report to the tax authority (ADR-243).",
@@ -177170,6 +177932,99 @@
                         "currency": {
                           "type": "string"
                         },
+                        "einvoice": {
+                          "description": "The document's Peppol submission (ADR-250).",
+                          "nullable": true,
+                          "properties": {
+                            "attempts": {
+                              "type": "integer"
+                            },
+                            "delivered_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "document_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "environment": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "inserted_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "last_error_code": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "last_error_message": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "network": {
+                              "enum": [
+                                "peppol"
+                              ],
+                              "type": "string"
+                            },
+                            "next_attempt_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "polls": {
+                              "type": "integer"
+                            },
+                            "provider_submission_id": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "recipient_identifier": {
+                              "type": "string"
+                            },
+                            "recipient_scheme": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "sending",
+                                "submitted",
+                                "delivered",
+                                "rejected",
+                                "failed",
+                                "uncertain"
+                              ],
+                              "type": "string"
+                            },
+                            "submitted_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "attempts",
+                            "document_id",
+                            "id",
+                            "network",
+                            "recipient_identifier",
+                            "recipient_scheme",
+                            "status"
+                          ],
+                          "type": "object"
+                        },
                         "gross_cents": {
                           "type": "integer"
                         },
@@ -177325,6 +178180,167 @@
                         },
                         "tax_cents": {
                           "type": "integer"
+                        },
+                        "till_signature": {
+                          "description": "A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints.",
+                          "nullable": true,
+                          "properties": {
+                            "attempts": {
+                              "type": "integer"
+                            },
+                            "device": {
+                              "enum": [
+                                "tse",
+                                "rksv"
+                              ],
+                              "type": "string"
+                            },
+                            "document_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "environment": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "failed_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "finished_at_device": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "inserted_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "kind": {
+                              "enum": [
+                                "receipt",
+                                "start",
+                                "null",
+                                "monthly",
+                                "yearly",
+                                "closing"
+                              ],
+                              "type": "string"
+                            },
+                            "last_error_code": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "last_error_message": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "next_attempt_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "period": {
+                              "format": "date",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "print": {
+                              "items": {
+                                "properties": {
+                                  "label": {
+                                    "type": "string"
+                                  },
+                                  "value": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "label"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "qr_code_data": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "receipt_number": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "register_serial": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "signature_algorithm": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "signature_counter": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "signature_value": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "signed_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "started_at_device": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "sending",
+                                "signed",
+                                "uncertain",
+                                "device_failed",
+                                "rejected",
+                                "failed"
+                              ],
+                              "type": "string"
+                            },
+                            "time_format": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "transaction_number": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "unit_serial": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "attempts",
+                            "device",
+                            "id",
+                            "kind",
+                            "print",
+                            "status"
+                          ],
+                          "type": "object"
                         },
                         "transmission": {
                           "description": "The document's report to the tax authority (ADR-243).",
@@ -177472,6 +178488,99 @@
                         "currency": {
                           "type": "string"
                         },
+                        "einvoice": {
+                          "description": "The document's Peppol submission (ADR-250).",
+                          "nullable": true,
+                          "properties": {
+                            "attempts": {
+                              "type": "integer"
+                            },
+                            "delivered_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "document_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "environment": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "inserted_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "last_error_code": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "last_error_message": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "network": {
+                              "enum": [
+                                "peppol"
+                              ],
+                              "type": "string"
+                            },
+                            "next_attempt_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "polls": {
+                              "type": "integer"
+                            },
+                            "provider_submission_id": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "recipient_identifier": {
+                              "type": "string"
+                            },
+                            "recipient_scheme": {
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "sending",
+                                "submitted",
+                                "delivered",
+                                "rejected",
+                                "failed",
+                                "uncertain"
+                              ],
+                              "type": "string"
+                            },
+                            "submitted_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "attempts",
+                            "document_id",
+                            "id",
+                            "network",
+                            "recipient_identifier",
+                            "recipient_scheme",
+                            "status"
+                          ],
+                          "type": "object"
+                        },
                         "gross_cents": {
                           "type": "integer"
                         },
@@ -177628,6 +178737,167 @@
                         "tax_cents": {
                           "type": "integer"
                         },
+                        "till_signature": {
+                          "description": "A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints.",
+                          "nullable": true,
+                          "properties": {
+                            "attempts": {
+                              "type": "integer"
+                            },
+                            "device": {
+                              "enum": [
+                                "tse",
+                                "rksv"
+                              ],
+                              "type": "string"
+                            },
+                            "document_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "environment": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "failed_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "finished_at_device": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "inserted_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "kind": {
+                              "enum": [
+                                "receipt",
+                                "start",
+                                "null",
+                                "monthly",
+                                "yearly",
+                                "closing"
+                              ],
+                              "type": "string"
+                            },
+                            "last_error_code": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "last_error_message": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "next_attempt_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "period": {
+                              "format": "date",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "print": {
+                              "items": {
+                                "properties": {
+                                  "label": {
+                                    "type": "string"
+                                  },
+                                  "value": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "label"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "qr_code_data": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "receipt_number": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "register_serial": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "signature_algorithm": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "signature_counter": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "signature_value": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "signed_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "started_at_device": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "sending",
+                                "signed",
+                                "uncertain",
+                                "device_failed",
+                                "rejected",
+                                "failed"
+                              ],
+                              "type": "string"
+                            },
+                            "time_format": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "transaction_number": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "unit_serial": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "attempts",
+                            "device",
+                            "id",
+                            "kind",
+                            "print",
+                            "status"
+                          ],
+                          "type": "object"
+                        },
                         "transmission": {
                           "description": "The document's report to the tax authority (ADR-243).",
                           "nullable": true,
@@ -177755,6 +179025,142 @@
           }
         ],
         "summary": "Issue a credit note for a document (all that is left, or chosen quantities)",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/einvoice/retry": {
+      "post": {
+        "callbacks": {},
+        "description": "An uncertain submission may already have reached the access point: check its portal first. It is sent with the same idempotency GUID, so a copy is refused, not delivered.",
+        "operationId": "PaleeWeb.AdminFiscalEInvoicingController.retry",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "submission": {
+                      "description": "The document's Peppol submission (ADR-250).",
+                      "properties": {
+                        "attempts": {
+                          "type": "integer"
+                        },
+                        "delivered_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "document_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "environment": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "last_error_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "last_error_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "network": {
+                          "enum": [
+                            "peppol"
+                          ],
+                          "type": "string"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "polls": {
+                          "type": "integer"
+                        },
+                        "provider_submission_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "recipient_identifier": {
+                          "type": "string"
+                        },
+                        "recipient_scheme": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "sending",
+                            "submitted",
+                            "delivered",
+                            "rejected",
+                            "failed",
+                            "uncertain"
+                          ],
+                          "type": "string"
+                        },
+                        "submitted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "attempts",
+                        "document_id",
+                        "id",
+                        "network",
+                        "recipient_identifier",
+                        "recipient_scheme",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "submission"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Submission"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Send a refused, failed or uncertain document over Peppol again",
         "tags": [
           "Fiscal"
         ]
@@ -177997,6 +179403,366 @@
           }
         ],
         "summary": "Send a refused or failed document to the tax authority again",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/einvoices": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalEInvoicingController.index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "enum": [
+                "pending",
+                "sending",
+                "submitted",
+                "delivered",
+                "rejected",
+                "failed",
+                "uncertain"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 200,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "counts": {
+                      "additionalProperties": {
+                        "type": "integer"
+                      },
+                      "type": "object"
+                    },
+                    "submissions": {
+                      "items": {
+                        "description": "The document's Peppol submission (ADR-250).",
+                        "properties": {
+                          "attempts": {
+                            "type": "integer"
+                          },
+                          "delivered_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "document_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "environment": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "last_error_code": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "last_error_message": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "network": {
+                            "enum": [
+                              "peppol"
+                            ],
+                            "type": "string"
+                          },
+                          "next_attempt_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "polls": {
+                            "type": "integer"
+                          },
+                          "provider_submission_id": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "recipient_identifier": {
+                            "type": "string"
+                          },
+                          "recipient_scheme": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "sending",
+                              "submitted",
+                              "delivered",
+                              "rejected",
+                              "failed",
+                              "uncertain"
+                            ],
+                            "type": "string"
+                          },
+                          "submitted_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "attempts",
+                          "document_id",
+                          "id",
+                          "network",
+                          "recipient_identifier",
+                          "recipient_scheme",
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "counts",
+                    "submissions",
+                    "total"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Submissions"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Peppol submissions, newest first, with counts per status",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/einvoices/{id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalEInvoicingController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "submission": {
+                      "description": "The document's Peppol submission (ADR-250).",
+                      "properties": {
+                        "attempts": {
+                          "type": "integer"
+                        },
+                        "attempts_log": {
+                          "items": {
+                            "properties": {
+                              "attempt": {
+                                "type": "integer"
+                              },
+                              "duration_ms": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "environment": {
+                                "type": "string"
+                              },
+                              "error": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "operation": {
+                                "type": "string"
+                              },
+                              "outcome": {
+                                "type": "string"
+                              },
+                              "response_status": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "started_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "attempt",
+                              "environment",
+                              "id",
+                              "operation",
+                              "outcome",
+                              "started_at"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "delivered_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "document_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "environment": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "last_error_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "last_error_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "network": {
+                          "enum": [
+                            "peppol"
+                          ],
+                          "type": "string"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "polls": {
+                          "type": "integer"
+                        },
+                        "provider_submission_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "recipient_identifier": {
+                          "type": "string"
+                        },
+                        "recipient_scheme": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "sending",
+                            "submitted",
+                            "delivered",
+                            "rejected",
+                            "failed",
+                            "uncertain"
+                          ],
+                          "type": "string"
+                        },
+                        "submitted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "attempts",
+                        "attempts_log",
+                        "document_id",
+                        "id",
+                        "network",
+                        "recipient_identifier",
+                        "recipient_scheme",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "submission"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Submission"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A Peppol submission with its attempts",
         "tags": [
           "Fiscal"
         ]
@@ -178989,6 +180755,266 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/fiscal/peppol-connection": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalEInvoicingController.connection",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "connection": {
+                      "description": "The Peppol connection; the API key and the webhook token are never returned (`webhook_url` appears once, when a new token is made).",
+                      "nullable": true,
+                      "properties": {
+                        "environment": {
+                          "enum": [
+                            "sandbox",
+                            "test",
+                            "production"
+                          ],
+                          "type": "string"
+                        },
+                        "has_api_key": {
+                          "type": "boolean"
+                        },
+                        "has_webhook_token": {
+                          "type": "boolean"
+                        },
+                        "last_error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "legal_entity_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "network": {
+                          "enum": [
+                            "peppol"
+                          ],
+                          "type": "string"
+                        },
+                        "peppol_id": {
+                          "example": "0208:0123456749",
+                          "type": "string"
+                        },
+                        "provider": {
+                          "enum": [
+                            "sandbox",
+                            "storecove"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "invalid"
+                          ],
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "webhook_url": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "environment",
+                        "has_api_key",
+                        "has_webhook_token",
+                        "network",
+                        "peppol_id",
+                        "provider",
+                        "status"
+                      ],
+                      "type": "object"
+                    },
+                    "environments": {
+                      "items": {
+                        "enum": [
+                          "sandbox",
+                          "test",
+                          "production"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "connection",
+                    "environments"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Connection"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The Peppol connection (access point, environment, Peppol id; never the key)",
+        "tags": [
+          "Fiscal"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "description": "`test` and `production` send through Storecove and need the business's legal entity id and API key; a saved key is kept when none is sent. The Peppol id defaults to the `0208` enterprise number of the business. The webhook URL is shown once, when a new token is made. Documents waiting for a connection are sent right after.",
+        "operationId": "PaleeWeb.AdminFiscalEInvoicingController.save_connection",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "api_key": {
+                    "description": "Leave out to keep the saved key.",
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "environment": {
+                    "enum": [
+                      "sandbox",
+                      "test",
+                      "production"
+                    ],
+                    "type": "string"
+                  },
+                  "legal_entity_id": {
+                    "maxLength": 40,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "peppol_id": {
+                    "description": "`scheme:identifier`; defaults to `0208:` + the enterprise number.",
+                    "maxLength": 60,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "rotate_webhook_token": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "environment"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "connection": {
+                      "description": "The Peppol connection; the API key and the webhook token are never returned (`webhook_url` appears once, when a new token is made).",
+                      "properties": {
+                        "environment": {
+                          "enum": [
+                            "sandbox",
+                            "test",
+                            "production"
+                          ],
+                          "type": "string"
+                        },
+                        "has_api_key": {
+                          "type": "boolean"
+                        },
+                        "has_webhook_token": {
+                          "type": "boolean"
+                        },
+                        "last_error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "legal_entity_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "network": {
+                          "enum": [
+                            "peppol"
+                          ],
+                          "type": "string"
+                        },
+                        "peppol_id": {
+                          "example": "0208:0123456749",
+                          "type": "string"
+                        },
+                        "provider": {
+                          "enum": [
+                            "sandbox",
+                            "storecove"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "invalid"
+                          ],
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "webhook_url": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "environment",
+                        "has_api_key",
+                        "has_webhook_token",
+                        "network",
+                        "peppol_id",
+                        "provider",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "connection"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Connection"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Connect to Peppol: sandbox, or Storecove (test or production)",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/fiscal/sales-tax-rates": {
       "get": {
         "callbacks": {},
@@ -179254,6 +181280,1223 @@
           }
         ],
         "summary": "Tax categories the gym may give packages and products, and the default one",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/till-connections/{device}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalTillSigningController.connection",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "device",
+            "required": true,
+            "schema": {
+              "enum": [
+                "tse",
+                "rksv"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "connection": {
+                      "description": "The TSE or RKSV connection; key, secret and admin PIN are never returned.",
+                      "nullable": true,
+                      "properties": {
+                        "device": {
+                          "enum": [
+                            "tse",
+                            "rksv"
+                          ],
+                          "type": "string"
+                        },
+                        "environment": {
+                          "enum": [
+                            "sandbox",
+                            "test",
+                            "production"
+                          ],
+                          "type": "string"
+                        },
+                        "has_api_key": {
+                          "type": "boolean"
+                        },
+                        "has_api_secret": {
+                          "type": "boolean"
+                        },
+                        "last_error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "enum": [
+                            "sandbox",
+                            "fiskaly"
+                          ],
+                          "type": "string"
+                        },
+                        "provisioned_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "public_key": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "register_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "register_serial": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "provisioning",
+                            "active",
+                            "invalid"
+                          ],
+                          "type": "string"
+                        },
+                        "unit_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "unit_serial": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "device",
+                        "environment",
+                        "has_api_key",
+                        "has_api_secret",
+                        "provider",
+                        "register_id",
+                        "status",
+                        "unit_id"
+                      ],
+                      "type": "object"
+                    },
+                    "environments": {
+                      "items": {
+                        "enum": [
+                          "sandbox",
+                          "test",
+                          "production"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "connection",
+                    "environments"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Connection"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The TSE or RKSV connection (provider, environment, unit; never the credentials)",
+        "tags": [
+          "Fiscal"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "description": "`test` and `production` use fiskaly SIGN DE / SIGN AT and need the API key and secret; saved ones are kept when none are sent. A new connection (or `reprovision`) creates and initialises the TSS and client, or the signature unit and cash register. Receipts waiting for a connection are signed right after.",
+        "operationId": "PaleeWeb.AdminFiscalTillSigningController.save_connection",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "device",
+            "required": true,
+            "schema": {
+              "enum": [
+                "tse",
+                "rksv"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "api_key": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "api_secret": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "environment": {
+                    "enum": [
+                      "sandbox",
+                      "test",
+                      "production"
+                    ],
+                    "type": "string"
+                  },
+                  "reprovision": {
+                    "description": "Create a new TSS/client (DE) or signature unit/cash register (AT).",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "environment"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "connection": {
+                      "description": "The TSE or RKSV connection; key, secret and admin PIN are never returned.",
+                      "properties": {
+                        "device": {
+                          "enum": [
+                            "tse",
+                            "rksv"
+                          ],
+                          "type": "string"
+                        },
+                        "environment": {
+                          "enum": [
+                            "sandbox",
+                            "test",
+                            "production"
+                          ],
+                          "type": "string"
+                        },
+                        "has_api_key": {
+                          "type": "boolean"
+                        },
+                        "has_api_secret": {
+                          "type": "boolean"
+                        },
+                        "last_error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "enum": [
+                            "sandbox",
+                            "fiskaly"
+                          ],
+                          "type": "string"
+                        },
+                        "provisioned_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "public_key": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "register_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "register_serial": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "provisioning",
+                            "active",
+                            "invalid"
+                          ],
+                          "type": "string"
+                        },
+                        "unit_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "unit_serial": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "device",
+                        "environment",
+                        "has_api_key",
+                        "has_api_secret",
+                        "provider",
+                        "register_id",
+                        "status",
+                        "unit_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "connection"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Connection"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Connect the till to a TSE (DE) or RKSV unit (AT): sandbox or fiskaly",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/till-signatures": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalTillSigningController.index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "enum": [
+                "pending",
+                "sending",
+                "signed",
+                "uncertain",
+                "device_failed",
+                "rejected",
+                "failed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "device",
+            "required": false,
+            "schema": {
+              "enum": [
+                "tse",
+                "rksv"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 200,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "counts": {
+                      "additionalProperties": {
+                        "type": "integer"
+                      },
+                      "type": "object"
+                    },
+                    "signatures": {
+                      "items": {
+                        "description": "A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints.",
+                        "properties": {
+                          "attempts": {
+                            "type": "integer"
+                          },
+                          "device": {
+                            "enum": [
+                              "tse",
+                              "rksv"
+                            ],
+                            "type": "string"
+                          },
+                          "document_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "environment": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "failed_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "finished_at_device": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "receipt",
+                              "start",
+                              "null",
+                              "monthly",
+                              "yearly",
+                              "closing"
+                            ],
+                            "type": "string"
+                          },
+                          "last_error_code": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "last_error_message": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "next_attempt_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "period": {
+                            "format": "date",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "print": {
+                            "items": {
+                              "properties": {
+                                "label": {
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "label"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "qr_code_data": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "receipt_number": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "register_serial": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "signature_algorithm": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "signature_counter": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "signature_value": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "signed_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "started_at_device": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "sending",
+                              "signed",
+                              "uncertain",
+                              "device_failed",
+                              "rejected",
+                              "failed"
+                            ],
+                            "type": "string"
+                          },
+                          "time_format": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "transaction_number": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "unit_serial": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "attempts",
+                          "device",
+                          "id",
+                          "kind",
+                          "print",
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "counts",
+                    "signatures",
+                    "total"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Signatures"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Receipt signatures, newest first, with counts per status",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/till-signatures/null-receipts": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalTillSigningController.null_receipt",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "signature": {
+                      "description": "A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints.",
+                      "properties": {
+                        "attempts": {
+                          "type": "integer"
+                        },
+                        "device": {
+                          "enum": [
+                            "tse",
+                            "rksv"
+                          ],
+                          "type": "string"
+                        },
+                        "document_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "environment": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finished_at_device": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "receipt",
+                            "start",
+                            "null",
+                            "monthly",
+                            "yearly",
+                            "closing"
+                          ],
+                          "type": "string"
+                        },
+                        "last_error_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "last_error_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "period": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "print": {
+                          "items": {
+                            "properties": {
+                              "label": {
+                                "type": "string"
+                              },
+                              "value": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "label"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "qr_code_data": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "receipt_number": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "register_serial": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "signature_algorithm": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "signature_counter": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "signature_value": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "signed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "started_at_device": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "sending",
+                            "signed",
+                            "uncertain",
+                            "device_failed",
+                            "rejected",
+                            "failed"
+                          ],
+                          "type": "string"
+                        },
+                        "time_format": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "transaction_number": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "unit_serial": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "attempts",
+                        "device",
+                        "id",
+                        "kind",
+                        "print",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "signature"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Signature"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Sign an RKSV null receipt (Nullbeleg)",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/till-signatures/{id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalTillSigningController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "signature": {
+                      "description": "A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints.",
+                      "properties": {
+                        "attempts": {
+                          "type": "integer"
+                        },
+                        "attempts_log": {
+                          "items": {
+                            "properties": {
+                              "attempt": {
+                                "type": "integer"
+                              },
+                              "duration_ms": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "environment": {
+                                "type": "string"
+                              },
+                              "error": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "operation": {
+                                "type": "string"
+                              },
+                              "outcome": {
+                                "type": "string"
+                              },
+                              "response_status": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "started_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "attempt",
+                              "environment",
+                              "id",
+                              "operation",
+                              "outcome",
+                              "started_at"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "device": {
+                          "enum": [
+                            "tse",
+                            "rksv"
+                          ],
+                          "type": "string"
+                        },
+                        "document_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "environment": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finished_at_device": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "receipt",
+                            "start",
+                            "null",
+                            "monthly",
+                            "yearly",
+                            "closing"
+                          ],
+                          "type": "string"
+                        },
+                        "last_error_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "last_error_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "period": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "print": {
+                          "items": {
+                            "properties": {
+                              "label": {
+                                "type": "string"
+                              },
+                              "value": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "label"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "qr_code_data": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "receipt_number": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "register_serial": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "signature_algorithm": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "signature_counter": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "signature_value": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "signed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "started_at_device": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "sending",
+                            "signed",
+                            "uncertain",
+                            "device_failed",
+                            "rejected",
+                            "failed"
+                          ],
+                          "type": "string"
+                        },
+                        "time_format": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "transaction_number": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "unit_serial": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "attempts",
+                        "attempts_log",
+                        "device",
+                        "id",
+                        "kind",
+                        "print",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "signature"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Signature"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A receipt signature with what it prints and its attempts",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/till-signatures/{id}/retry": {
+      "post": {
+        "callbacks": {},
+        "description": "An uncertain signature is read back from the device first. A German receipt recorded as a TSE failure stays so.",
+        "operationId": "PaleeWeb.AdminFiscalTillSigningController.retry",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "signature": {
+                      "description": "A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints.",
+                      "properties": {
+                        "attempts": {
+                          "type": "integer"
+                        },
+                        "device": {
+                          "enum": [
+                            "tse",
+                            "rksv"
+                          ],
+                          "type": "string"
+                        },
+                        "document_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "environment": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finished_at_device": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "receipt",
+                            "start",
+                            "null",
+                            "monthly",
+                            "yearly",
+                            "closing"
+                          ],
+                          "type": "string"
+                        },
+                        "last_error_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "last_error_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "period": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "print": {
+                          "items": {
+                            "properties": {
+                              "label": {
+                                "type": "string"
+                              },
+                              "value": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "label"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "qr_code_data": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "receipt_number": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "register_serial": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "signature_algorithm": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "signature_counter": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "signature_value": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "signed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "started_at_device": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "sending",
+                            "signed",
+                            "uncertain",
+                            "device_failed",
+                            "rejected",
+                            "failed"
+                          ],
+                          "type": "string"
+                        },
+                        "time_format": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "transaction_number": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "unit_serial": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "attempts",
+                        "device",
+                        "id",
+                        "kind",
+                        "print",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "signature"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Signature"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Sign a refused, failed or uncertain receipt again",
         "tags": [
           "Fiscal"
         ]

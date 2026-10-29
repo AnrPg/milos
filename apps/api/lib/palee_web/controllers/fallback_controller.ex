@@ -227,7 +227,14 @@ defmodule PaleeWeb.FallbackController do
       {:conflict, "Sales tax rates apply only to a business in the United States"},
     sales_tax_rate_missing:
       {:unprocessable_entity, "Add a sales tax rate for this state or ZIP code first"},
-    unknown_export_format: {:not_found, "No such accounting export format"}
+    unknown_export_format: {:not_found, "No such accounting export format"},
+    # ADR-250/251: Peppol and the till's security device.
+    invalid_peppol_id:
+      {:unprocessable_entity, "This is not a valid Peppol address (scheme:identifier)"},
+    till_not_connected: {:conflict, "Connect the till's security device (RKSV) first"},
+    till_credentials_refused: {:conflict, "fiskaly refused the business's API key or secret"},
+    till_provisioning_failed:
+      {:bad_gateway, "The security device could not be set up; see the connection's last error"}
   }
 
   # ADR-254: CSV imports.

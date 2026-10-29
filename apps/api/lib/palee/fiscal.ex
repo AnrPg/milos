@@ -24,7 +24,7 @@ defmodule Palee.Fiscal do
     VatRates
   }
 
-  alias Palee.Fiscal.{FiscalStore, Reporting}
+  alias Palee.Fiscal.{EInvoicing, FiscalStore, Reporting, TillSigning}
 
   @verify_batch 1_000
 
@@ -254,7 +254,9 @@ defmodule Palee.Fiscal do
                Map.merge(document, %{content_hash: content_hash, journal_position: entry.position}),
                lines
              ),
-           :ok <- Reporting.enqueue(context, saved, issued_at) do
+           :ok <- Reporting.enqueue(context, saved, issued_at),
+           :ok <- EInvoicing.enqueue(context, saved, issued_at),
+           :ok <- TillSigning.enqueue(context, saved, issued_at) do
         {:ok, saved}
       end
     end

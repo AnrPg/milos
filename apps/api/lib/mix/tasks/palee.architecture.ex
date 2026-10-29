@@ -120,6 +120,8 @@ defmodule Mix.Tasks.Palee.Architecture do
     fiscal/fiscal_store
     fiscal/transmission_store
     fiscal/tax_store
+    fiscal/einvoice_store
+    fiscal/till_signature_store
     payments/payment_store
     box_screens/box_screen_store
     documents/document_store

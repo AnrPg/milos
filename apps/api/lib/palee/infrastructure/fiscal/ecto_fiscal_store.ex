@@ -391,6 +391,12 @@ defmodule Palee.Infrastructure.Fiscal.EctoFiscalStore do
         [
           {"fiscal_export_settings", ExportSetting},
           {"fiscal_sales_tax_rates", SalesTaxRate},
+          {"fiscal_till_signature_attempts", Palee.Fiscal.TillSignatureAttempt},
+          {"fiscal_till_signatures", Palee.Fiscal.TillSignature},
+          {"fiscal_till_connections", Palee.Fiscal.TillConnection},
+          {"fiscal_einvoice_attempts", Palee.Fiscal.EInvoiceAttempt},
+          {"fiscal_einvoice_submissions", Palee.Fiscal.EInvoiceSubmission},
+          {"fiscal_network_connections", Palee.Fiscal.NetworkConnection},
           {"fiscal_transmission_attempts", TransmissionAttempt},
           {"fiscal_transmissions", Transmission},
           {"fiscal_authority_connections", AuthorityConnection},
