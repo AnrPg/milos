@@ -64,8 +64,9 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Notation do
   end
 
   @doc "Several times (\"3-3-3-4\", \"90-120″\"): `%{range: bool, secs: [..]}`, `nil` or `:bad`."
-  @spec parse_times(String.t()) :: %{range: boolean(), secs: [pos_integer()]} | nil | :bad
-  def parse_times(text) when is_binary(text) do
+  @spec parse_times(String.t(), :min | :smart) ::
+          %{range: boolean(), secs: [pos_integer()]} | nil | :bad
+  def parse_times(text, default \\ :min) when is_binary(text) do
     value = text |> String.trim() |> String.downcase()
 
     if value == "" do
@@ -82,7 +83,7 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Notation do
         |> String.split(~r/\s*[-–,]\s*/u)
         |> Enum.map(fn part ->
           part = if unit && Regex.match?(~r/^\d+$/, part), do: part <> unit, else: part
-          parse_clock(part, :min)
+          parse_clock(part, default)
         end)
 
       if Enum.all?(secs, &(is_integer(&1) and &1 > 0)) do
@@ -281,7 +282,7 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Notation do
 
   @doc """
   The load unit of a row, written once (kg or %), and the columns whose load
-  breaks the rule: `%{unit: "kg" | "%" | nil, issues: %{index => :missing_unit | :mixed_units}}`.
+  breaks the rule: `%{unit: "kg" | "%" | nil, issues: %{index => :missing_unit | :mixed_unit}}`.
   Empty columns and words never have an issue.
   """
   @spec row_load_issues([String.t() | nil]) :: %{unit: String.t() | nil, issues: map()}
@@ -309,12 +310,10 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Notation do
 
   defp load_issue(match, unit, index, acc) do
     stated = stated_unit(match)
-    units = match |> Enum.drop(1) |> Enum.filter(&(&1 in ["kg", "%"])) |> Enum.uniq()
 
     cond do
       is_nil(unit) -> Map.put(acc, index, :missing_unit)
-      length(units) > 1 -> Map.put(acc, index, :mixed_units)
-      stated && stated != unit -> Map.put(acc, index, :mixed_units)
+      stated && stated != unit -> Map.put(acc, index, :mixed_unit)
       true -> acc
     end
   end
