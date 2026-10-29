@@ -11,6 +11,8 @@
  * touches React or the network.
  */
 
+import { withClock } from "@/lib/clock";
+
 export type ZonedFormat = "time" | "date-time" | "day" | "weekday-time" | "day-time";
 
 const FORMATS: Record<ZonedFormat, Intl.DateTimeFormatOptions> = {
@@ -202,9 +204,9 @@ export function formatInZone(
   const options = typeof format === "string" ? FORMATS[format] : format;
   const timeZone = isValidTimeZone(zone) ? zone : undefined;
   try {
-    return new Intl.DateTimeFormat(locale, { ...options, timeZone }).format(toDate(at));
+    return new Intl.DateTimeFormat(locale, withClock(locale, { ...options, timeZone })).format(toDate(at));
   } catch {
-    return new Intl.DateTimeFormat(undefined, { ...options, timeZone }).format(toDate(at));
+    return new Intl.DateTimeFormat(undefined, withClock(locale, { ...options, timeZone })).format(toDate(at));
   }
 }
 
