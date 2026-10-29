@@ -45,6 +45,8 @@ defmodule Palee.Organizations.OrganizationStore do
 
   @impl true
   def slug_taken?(slug), do: impl().slug_taken?(slug)
+  @impl true
+  def add_guest(organization_id, user_id), do: impl().add_guest(organization_id, user_id)
 
   @impl true
   def count_seats(organization_id, now), do: impl().count_seats(organization_id, now)

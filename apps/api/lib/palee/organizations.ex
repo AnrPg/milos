@@ -1185,6 +1185,16 @@ defmodule Palee.Organizations do
   end
 
   @doc """
+  ADR-272: makes `user_id` a guest of the context's box, as the acting
+  staff member (owner, admin, coach or front desk). Someone with an active
+  membership keeps it as it is. `{:ok, membership_id}`.
+  """
+  def add_guest(%{organization_id: organization_id} = context, user_id)
+      when is_binary(organization_id) and is_binary(user_id) do
+    RepoContext.run(context, fn -> OrganizationStore.add_guest(organization_id, user_id) end)
+  end
+
+  @doc """
   ADR-254: the membership of a person an import brought in. Like
   `add_demo_membership/2` it announces nothing: `:membership_activated`
   starts the welcome, referral, trial and event reactions, and an import

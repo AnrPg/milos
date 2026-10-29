@@ -292,6 +292,21 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
     |> Repo.aggregate(:count)
   end
 
+  # ADR-272: memberships are written by owners and admins only (RLS); the
+  # SQL function lets front desk and coaches write a guest membership and
+  # nothing else, checking the acting person itself.
+  @impl true
+  def add_guest(organization_id, user_id) do
+    case Repo.query("SELECT palee_add_box_guest($1, $2)", [
+           Ecto.UUID.dump!(organization_id),
+           Ecto.UUID.dump!(user_id)
+         ]) do
+      {:ok, %{rows: [[id]]}} -> {:ok, Ecto.UUID.cast!(id)}
+      {:error, %Postgrex.Error{postgres: %{code: :insufficient_privilege}}} -> {:error, :forbidden}
+      {:error, error} -> {:error, error}
+    end
+  end
+
   @impl true
   def slug_taken?(slug) do
     %{rows: [[taken]]} = Repo.query!("SELECT palee_organization_slug_taken($1)", [slug])

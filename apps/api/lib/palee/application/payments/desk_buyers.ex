@@ -236,15 +236,7 @@ defmodule Palee.Application.Payments.DeskBuyers do
           {:error, :guest_is_staff}
 
         true ->
-          with {:ok, _membership} <-
-                 Organizations.add_imported_membership(context, %{
-                   user_id: account.id,
-                   role: :guest,
-                   roles: [:guest],
-                   status: :active,
-                   joined_at: DateTime.utc_now(),
-                   invited_by_user_id: context.user_id
-                 }),
+          with {:ok, _membership_id} <- Organizations.add_guest(context, account.id),
                {:ok, _profile} <-
                  UpdateFinanceMember.call(context, account.id, %{
                    "status" => "active",

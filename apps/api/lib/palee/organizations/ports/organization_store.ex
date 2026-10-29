@@ -33,6 +33,8 @@ defmodule Palee.Organizations.Ports.OrganizationStore do
   @callback list_slug_aliases(Ecto.UUID.t()) :: [OrganizationSlugAlias.t()]
   @callback count_pending_invitations(Ecto.UUID.t(), DateTime.t()) :: non_neg_integer()
   @callback slug_taken?(String.t()) :: boolean()
+  @doc "ADR-272: makes `user_id` a guest of the box as the acting staff member; the membership id."
+  @callback add_guest(binary(), binary()) :: {:ok, binary()} | {:error, term()}
   @callback count_seats(Ecto.UUID.t(), DateTime.t()) :: %{
               staff: non_neg_integer(),
               clients: non_neg_integer(),
