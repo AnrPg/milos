@@ -87,9 +87,9 @@ const ISSUE_CODES = new Set([
 const card: CSSProperties = { background: "var(--panel)", border: "1px solid var(--border)" };
 const highlighted: CSSProperties = { background: "var(--panel)", border: "1px solid var(--primary)", boxShadow: "inset 0 0 0 1px var(--primary)" };
 const quiet: CSSProperties = { color: "var(--muted)" };
-const ghostButton = "inline-flex min-h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold disabled:opacity-50";
+const ghostButton = ["inline-flex", "min-h-10 items-center gap-2 rounded-full px-4 text-sm font-semibold disabled:opacity-50"].join(" ");
 const ghostStyle: CSSProperties = { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" };
-const primaryButton = "inline-flex min-h-10 items-center gap-2 rounded-full px-5 text-sm font-semibold disabled:opacity-50";
+const primaryButton = ["inline-flex", "min-h-10 items-center gap-2 rounded-full px-5 text-sm font-semibold disabled:opacity-50"].join(" ");
 const primaryStyle: CSSProperties = { background: "var(--primary)", color: "var(--primary-contrast)" };
 
 type T = ReturnType<typeof useTranslations>;

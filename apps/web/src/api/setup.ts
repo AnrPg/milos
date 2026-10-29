@@ -29,11 +29,17 @@ export function previewSetupRecipe(token: string, key: string) {
   return apiRequest<RecipePlan>(`/admin/setup/recipes/${encodeURIComponent(key)}/preview`, { token, method: "POST", body: {} });
 }
 
-/** Owner only. `prices`: the owner's prices for the recipe's packages, by code, in cents. */
-export function applySetupRecipe(token: string, key: string, prices: Record<string, number> = {}) {
+/** How a recipe treats settings the owner already changed (product decision 2026-10-29). */
+export type RecipeMode = "all" | "defaults_only";
+
+/**
+ * Owner only. `prices`: the owner's prices for the recipe's packages, by code, in cents.
+ * `mode`: "all" changes every setting; "defaults_only" keeps the ones the owner changed.
+ */
+export function applySetupRecipe(token: string, key: string, prices: Record<string, number> = {}, mode: RecipeMode = "all") {
   return apiRequest<AppliedRecipe>(`/admin/setup/recipes/${encodeURIComponent(key)}/apply`, {
     token,
     method: "POST",
-    body: { prices },
+    body: { prices, mode },
   });
 }

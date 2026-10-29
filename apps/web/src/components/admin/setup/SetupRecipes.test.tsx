@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import en from "../../../../messages/en.json";
 import { ApiError } from "@/api/client";
 
-import { applied, plan, recipesPayload } from "./fixtures";
+import { applied, ownedPlan, plan, recipesPayload } from "./fixtures";
 import { SetupRecipeCard } from "./SetupRecipeCard";
 import { SetupRecipes } from "./SetupRecipes";
 
@@ -63,10 +63,32 @@ describe("SetupRecipes (s10 A)", () => {
     fireEvent.change(screen.getByLabelText("Unlimited"), { target: { value: "80" } });
     fireEvent.click(screen.getByTestId("recipe-apply"));
 
-    await waitFor(() => expect(api.applySetupRecipe).toHaveBeenCalledWith("token", "crossfit_box", { setup_unlimited: 8000 }));
+    await waitFor(() => expect(api.applySetupRecipe).toHaveBeenCalledWith("token", "crossfit_box", { setup_unlimited: 8000 }, "all"));
     expect(await screen.findByTestId("recipe-applied")).toHaveTextContent("Your box is set up as CrossFit box");
     expect(screen.getByTestId("recipe-applied")).toHaveTextContent("2 subscription packages · 2 class types · 4 rules");
     expect(screen.getByRole("link", { name: /Bring your members/ })).toHaveAttribute("href", "/admin/users/import");
+  });
+
+  it("asks what happens to the settings the owner already changed (2026-10-29)", async () => {
+    api.previewSetupRecipe.mockResolvedValue(ownedPlan);
+    api.applySetupRecipe.mockResolvedValue({ ...applied, plan: { ...applied.plan, kept: ["scheduling.default_capacity"] } });
+    await openPreview();
+
+    const owned = screen.getByTestId("recipe-owner-values");
+    expect(owned).toHaveTextContent("1 setting you already changed");
+    const row = screen.getByTestId("owner-value-scheduling.default_capacity");
+    expect(row).toHaveTextContent("Places per class");
+    expect(row).toHaveTextContent("20");
+    expect(row).toHaveTextContent("16");
+
+    fireEvent.click(screen.getByTestId("recipe-apply"));
+    expect(await screen.findByText("Choose what happens to the settings you changed.")).toBeInTheDocument();
+    expect(api.applySetupRecipe).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("radio", { name: /Keep mine/ }));
+    fireEvent.click(screen.getByTestId("recipe-apply"));
+    await waitFor(() => expect(api.applySetupRecipe).toHaveBeenCalledWith("token", "crossfit_box", {}, "defaults_only"));
+    expect(await screen.findByTestId("recipe-kept")).toHaveTextContent("1 setting kept as you set it");
   });
 
   it("keeps a wrong price in the form and sends nothing", async () => {

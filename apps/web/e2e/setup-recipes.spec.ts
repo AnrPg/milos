@@ -61,6 +61,7 @@ const change = (area: string, key: string, to: unknown, name: string | null = nu
   to,
   name,
   advanced: false,
+  owner_changed: false,
 });
 
 const plan = {
@@ -74,10 +75,13 @@ const plan = {
     change("setting", "scheduling.default_auto_approve", true),
     change("setting", "scheduling.default_cancellation_cutoff_minutes", 120),
     change("setting", "gamification.streak_shields", 2),
+    // The owner already set 20 places per class: applying asks (product decision 2026-10-29).
+    { ...change("setting", "scheduling.default_capacity", 16), from: 20, owner_changed: true },
   ],
   manual: [],
   unchanged: [],
-  change_count: 6,
+  kept: [] as string[],
+  change_count: 7,
 };
 
 const catalog = {
@@ -118,9 +122,12 @@ async function stub(page: Page, writes: Write[]) {
     }
     if (path === "/api/admin/setup/recipes/crossfit_box/preview") return json(route, plan);
     if (path === "/api/admin/setup/recipes/crossfit_box/apply") {
-      const application = { id: "app-1", recipe_key: "crossfit_box", recipe_version: 1, applied_by_id: owner.id, applied_at: "2026-10-29T10:00:00Z", changes: plan.changes, manual: [], change_count: 6 };
+      const keep = (request.postDataJSON() as { mode?: string }).mode === "defaults_only";
+      const changes = plan.changes.filter((entry) => !(keep && entry.owner_changed));
+      const kept = keep ? plan.changes.filter((entry) => entry.owner_changed).map((entry) => entry.key) : [];
+      const application = { id: "app-1", recipe_key: "crossfit_box", recipe_version: 1, applied_by_id: owner.id, applied_at: "2026-10-29T10:00:00Z", changes, manual: [], change_count: changes.length };
       applications = [application];
-      return json(route, { plan, application });
+      return json(route, { plan: { ...plan, changes, kept, change_count: changes.length }, application });
     }
     if (path === "/api/admin/setup/settings") return json(route, catalog);
     if (path === "/api/admin/settings") {
@@ -155,12 +162,21 @@ test("the owner picks a kind of box, changes a price and applies the recipe", as
   await expect(page.getByText("Late cancellation: 2 hours")).toBeVisible();
   await expect(page.getByText(/Plus 1 setting with a good default/)).toBeVisible();
 
+  const owned = page.getByTestId("recipe-owner-values");
+  await expect(owned).toContainText("1 setting you already changed");
+  await expect(page.getByTestId("owner-value-scheduling.default_capacity")).toContainText("Places per class");
+
   await page.getByLabel("Unlimited").fill("80");
+  await page.getByTestId("recipe-apply").click();
+  await expect(owned.getByText("Choose what happens to the settings you changed.")).toBeVisible();
+  expect(writes.some((write) => write.path.endsWith("/apply"))).toBe(false);
+  await owned.getByRole("radio", { name: /Keep mine/ }).check();
   await page.getByTestId("recipe-apply").click();
 
   await expect(page.getByTestId("recipe-applied")).toContainText("Your box is set up as CrossFit box");
   await expect(page.getByTestId("recipe-applied")).toContainText("2 subscription packages · 1 class type · 3 rules");
-  expect(writes.find((write) => write.path.endsWith("/apply"))?.body).toEqual({ prices: { setup_unlimited: 8000 } });
+  await expect(page.getByTestId("recipe-kept")).toContainText("1 setting kept as you set it");
+  expect(writes.find((write) => write.path.endsWith("/apply"))?.body).toEqual({ prices: { setup_unlimited: 8000 }, mode: "defaults_only" });
   await expect(page.getByRole("link", { name: /Bring your members/ })).toHaveAttribute("href", /\/admin\/users\/import$/);
 });
 

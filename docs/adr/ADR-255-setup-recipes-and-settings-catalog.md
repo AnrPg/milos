@@ -56,6 +56,13 @@ which ones an owner actually needs.
    that is not one of the recipe's packages, or a price that is not whole cents from 0 to
    10,000,000, is refused (`invalid_recipe_prices`, 422). `GET /setup/recipes` says the `currency`
    of the suggested prices.
+10. **The owner's own settings** (product decision 2026-10-29). Applying asks. A setting (or the
+   provider kind) whose current value is not its catalog default is the owner's choice: the plan
+   marks the change `owner_changed`. `POST …/apply` takes `mode`: `all` (default) changes every
+   setting, `defaults_only` keeps the owner's values (`RecipePlan.for_mode/2` moves them to
+   `kept`). A value the snapshot does not know is not the owner's. The web lists the owner's
+   settings with their value now and the recipe's value, and the owner picks «Εφαρμογή σε όλες» or
+   «Κράτα τις δικές μου» before applying.
 
 Endpoints (`/api/org/:slug/admin`): `GET /setup/settings`, `GET /setup/recipes`,
 `POST /setup/recipes/:key/preview`, `POST /setup/recipes/:key/apply`.

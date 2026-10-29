@@ -58,6 +58,17 @@ export function previewOf(plan: RecipePlan, recipe: SetupRecipe | undefined): Pr
   return { packages, classTypes, rules, advanced: settings.length - rules.length };
 }
 
+/**
+ * Settings the recipe would change although the owner already changed them
+ * (product decision 2026-10-29): the owner chooses to apply or keep them.
+ */
+export function ownerChanges(plan: RecipePlan): RecipeChange[] {
+  return plan.changes.filter((change) => change.owner_changed === true && (change.area === "setting" || change.area === "provider"));
+}
+
+/** The catalog key as a message key: "scheduling.default_capacity" → "scheduling_default_capacity". */
+export const labelKey = (key: string) => key.replace(/\./g, "_");
+
 /** "75", "75,50" or "75.5" in major units → cents; null when it is not a price. */
 export function parsePrice(text: string): number | null {
   const clean = text.trim().replace(/\s/g, "").replace(",", ".");

@@ -11,6 +11,8 @@ import {
   fetchSetupRecipes,
   previewSetupRecipe,
   type AppliedRecipe,
+  type RecipeChange,
+  type RecipeMode,
   type SetupRecipe,
 } from "@/api/setup";
 import { LineIcon } from "@/components/admin/imports/ImportIcons";
@@ -29,6 +31,8 @@ import {
   appliedCounts,
   changedPrices,
   formatPrice,
+  labelKey,
+  ownerChanges,
   previewOf,
   type PreviewRule,
 } from "./recipe-model";
@@ -41,7 +45,7 @@ export const RECIPES_KEY = ["admin", "setup", "recipes"] as const;
 
 const card: CSSProperties = { background: "var(--panel)", border: "1px solid var(--border)" };
 const quiet: CSSProperties = { color: "var(--muted)" };
-const button = "inline-flex min-h-10 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold disabled:opacity-50";
+const button = ["inline-flex", "min-h-10 items-center justify-center gap-2 rounded-full px-5 text-sm font-semibold disabled:opacity-50"].join(" ");
 
 type Step = "pick" | "preview" | "done";
 
@@ -57,6 +61,9 @@ export function SetupRecipes() {
   const [step, setStep] = useState<Step>("pick");
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [invalid, setInvalid] = useState<string[]>([]);
+  // Product decision 2026-10-29: applying asks what happens to the settings the owner changed.
+  const [mode, setMode] = useState<RecipeMode | null>(null);
+  const [modeMissing, setModeMissing] = useState(false);
   const [applied, setApplied] = useState<AppliedRecipe | null>(null);
 
   const recipes = useQuery({
@@ -73,9 +80,11 @@ export function SetupRecipes() {
     staleTime: 0,
   });
   const preview = plan.data ? previewOf(plan.data, recipe) : null;
+  const owned = plan.data ? ownerChanges(plan.data) : [];
 
   const apply = useMutation({
-    mutationFn: (prices: Record<string, number>) => applySetupRecipe(token!, selected!, prices),
+    mutationFn: ({ prices, mode }: { prices: Record<string, number>; mode: RecipeMode }) =>
+      applySetupRecipe(token!, selected!, prices, mode),
     onSuccess: (result) => {
       setApplied(result);
       setStep("done");
@@ -122,6 +131,21 @@ export function SetupRecipes() {
     }
   };
 
+  // A setting's value in words for the «already changed» list.
+  const valueText = (change: RecipeChange, value: unknown): string => {
+    if (value === null || value === undefined) return t("ownerValues.none");
+    if (typeof value === "boolean") return value ? t("ownerValues.on") : t("ownerValues.off");
+    if (change.key === "provider.kind") return t(`ownerValues.kind_${String(value)}`);
+    if (change.key === "community.member_groups") return t(`ownerValues.groups_${String(value)}`);
+    if (change.key === "trials.approval") return t(`ownerValues.approval_${String(value)}`);
+    if (Array.isArray(value)) return value.map((module) => i18n(`pkgModule_${String(module)}`)).join(", ");
+    if (typeof value === "number") {
+      if (change.key.endsWith("_minutes")) return t("ownerValues.minutes", { count: value });
+      if (change.key.endsWith("_days")) return t("ownerValues.days", { count: value });
+    }
+    return String(value);
+  };
+
   const onApply = () => {
     if (!preview) return;
     const result = changedPrices(preview.packages, drafts);
@@ -130,7 +154,11 @@ export function SetupRecipes() {
       return;
     }
     setInvalid([]);
-    apply.mutate(result.prices ?? {});
+    if (owned.length > 0 && !mode) {
+      setModeMissing(true);
+      return;
+    }
+    apply.mutate({ prices: result.prices ?? {}, mode: owned.length > 0 && mode ? mode : "all" });
   };
 
   let body;
@@ -183,6 +211,8 @@ export function SetupRecipes() {
             onClick={() => {
               setDrafts({});
               setInvalid([]);
+              setMode(null);
+              setModeMissing(false);
               setStep("preview");
             }}
           >
@@ -223,7 +253,7 @@ export function SetupRecipes() {
                             id={`price-${pkg.code}`}
                             inputMode="decimal"
                             aria-invalid={wrong || undefined}
-                            aria-describedby={wrong ? `price-${pkg.code}-error` : undefined}
+                            aria-describedby={wrong ? ["price", pkg.code, "error"].join("-") : undefined}
                             className="w-20 rounded-lg px-2 py-1.5 text-end font-mono text-sm"
                             style={{ background: "var(--panel-muted)", border: `1px solid ${wrong ? "var(--danger)" : "var(--border)"}`, color: "var(--text)" }}
                             value={drafts[pkg.code] ?? formatPrice(pkg.cents)}
@@ -234,7 +264,7 @@ export function SetupRecipes() {
                         </span>
                       </div>
                       {wrong ? (
-                        <ErrorNotice variant="field" id={`price-${pkg.code}-error`}>{t("priceInvalid")}</ErrorNotice>
+                        <ErrorNotice variant="field" id={["price", pkg.code, "error"].join("-")}>{t("priceInvalid")}</ErrorNotice>
                       ) : null}
                     </div>
                   );
@@ -265,6 +295,64 @@ export function SetupRecipes() {
                 </ul>
               </section>
             </div>
+            {owned.length > 0 ? (
+              <section
+                className="space-y-3 rounded-2xl p-4"
+                style={{ ...card, borderColor: modeMissing ? "var(--danger)" : "var(--border)" }}
+                aria-labelledby="recipe-owner-values"
+                data-testid="recipe-owner-values"
+              >
+                <div>
+                  <h2 id="recipe-owner-values" className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+                    {t("ownerValues.title", { count: owned.length })}
+                  </h2>
+                  <p className="text-xs" style={quiet}>{t("ownerValues.intro")}</p>
+                </div>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-start text-xs" style={quiet}>
+                      <th className="py-1 text-start font-semibold">{t("ownerValues.setting")}</th>
+                      <th className="py-1 text-start font-semibold">{t("ownerValues.current")}</th>
+                      <th className="py-1 text-start font-semibold">{t("ownerValues.proposed")}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {owned.map((change) => (
+                      <tr key={change.key} style={{ borderTop: "1px solid var(--border)" }} data-testid={`owner-value-${change.key}`}>
+                        <td className="py-1.5 pe-3" style={{ color: "var(--text)" }}>{t(`ownerValues.labels.${labelKey(change.key)}`)}</td>
+                        <td className="py-1.5 pe-3 font-semibold" style={{ color: "var(--text)" }}>{valueText(change, change.from)}</td>
+                        <td className="py-1.5" style={{ color: "var(--text-soft)" }}>{valueText(change, change.to)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <div role="radiogroup" aria-labelledby="recipe-owner-values" className="grid gap-2 sm:grid-cols-2">
+                  {(["all", "defaults_only"] as const).map((value) => (
+                    <label
+                      key={value}
+                      className="flex cursor-pointer items-start gap-3 rounded-xl px-3 py-2.5"
+                      style={{ background: "var(--panel-muted)", border: `1px solid ${mode === value ? "var(--primary)" : "var(--border)"}` }}
+                    >
+                      <input
+                        type="radio"
+                        name="recipe-mode"
+                        className="mt-1"
+                        checked={mode === value}
+                        onChange={() => {
+                          setMode(value);
+                          setModeMissing(false);
+                        }}
+                      />
+                      <span>
+                        <b className="block text-sm" style={{ color: "var(--text)" }}>{t(`ownerValues.${value}`)}</b>
+                        <span className="block text-xs" style={quiet}>{t(`ownerValues.${value}Hint`)}</span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+                {modeMissing ? <ErrorNotice variant="field">{t("ownerValues.choose")}</ErrorNotice> : null}
+              </section>
+            ) : null}
             {plan.data && plan.data.change_count === 0 ? <p className="text-sm" style={quiet}>{t("nothingToChange")}</p> : null}
             {!canApply ? <p className="text-sm" style={quiet}>{t("ownerOnly")}</p> : null}
             {apply.error ? <ErrorNotice>{errorText(apply.error)}</ErrorNotice> : null}
@@ -303,6 +391,9 @@ export function SetupRecipes() {
               <p className="text-xs" style={quiet}>
                 {t("appliedCounts", { packages: counts.packages, types: counts.classTypes, rules: counts.rules })}
               </p>
+              {applied.plan.kept.length > 0 ? (
+                <p className="text-xs" style={quiet} data-testid="recipe-kept">{t("ownerValues.kept", { count: applied.plan.kept.length })}</p>
+              ) : null}
             </div>
             <button
               type="button"

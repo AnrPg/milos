@@ -33,7 +33,7 @@ export function recipesPayload(overrides: Partial<SetupRecipes> = {}): SetupReci
 }
 
 const change = (area: RecipeChange["area"], key: string, to: unknown, name: string | null = null, advanced = false) =>
-  ({ area, key, action: area === "setting" || area === "provider" ? "set" : "create", from: null, to, name, advanced }) as RecipeChange;
+  ({ area, key, action: area === "setting" || area === "provider" ? "set" : "create", from: null, to, name, advanced, owner_changed: false }) as RecipeChange;
 
 export const plan = {
   recipe: "crossfit_box",
@@ -51,7 +51,18 @@ export const plan = {
   ],
   manual: [],
   unchanged: [],
+  kept: [],
   change_count: 8,
+} as unknown as RecipePlan;
+
+/** The same plan where the owner already set 20 places per class (product decision 2026-10-29). */
+export const ownedPlan = {
+  ...plan,
+  changes: [
+    ...plan.changes,
+    { area: "setting", key: "scheduling.default_capacity", action: "set", from: 20, to: 16, name: null, advanced: false, owner_changed: true },
+  ],
+  change_count: 9,
 } as unknown as RecipePlan;
 
 export const applied = {
