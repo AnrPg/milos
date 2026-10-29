@@ -95,4 +95,4 @@ export function PersonRow({ name, detail, action }: { name: string; detail?: Rea
   );
 }
 
-export const linkButtonClass = "text-sm font-semibold underline-offset-4 hover:underline disabled:opacity-50";
+export const linkButtonClass = "text-sm font-semibold disabled:opacity-50";
