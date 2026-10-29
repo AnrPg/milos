@@ -107,6 +107,7 @@ defmodule Palee.Application.FileWorkoutCopy do
   defp unpublishable_problem(:no_sections), do: "no_content"
   defp unpublishable_problem(:no_free_text_body), do: "no_content"
   defp unpublishable_problem({:invalid_text_sections, _problems}), do: "incomplete_sections"
+  defp unpublishable_problem({:invalid_plan_sections, _problems}), do: "incomplete_sections"
   defp unpublishable_problem(%Ecto.Changeset{}), do: "invalid_details"
   defp unpublishable_problem(_reason), do: nil
 end

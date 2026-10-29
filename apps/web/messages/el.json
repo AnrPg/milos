@@ -12757,5 +12757,108 @@
       "from": "από",
       "zone": "ζώνη"
     }
+  },
+  "PlanView": {
+    "label": "Δομημένη προπόνηση",
+    "untitledSection": "Ενότητα {letter}",
+    "empty": "Δεν έχει γραφτεί τίποτα ακόμα.",
+    "flow": {
+      "sets": "Σετ",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Intervals",
+      "rest": "Ξεκούραση"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "hrr": "Ανάκαμψη παλμών (HRR)",
+      "death_by": "Death by",
+      "even_odd": "Εναλλάξ (μονά / ζυγά)",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "ladder": "Σκάλα / πυραμίδα",
+      "calorie_target": "Στόχος θερμίδων",
+      "to_failure": "Μέχρι αποτυχία",
+      "superset": "Superset / γιγάντιο σετ",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "interrupt": "Με διακοπή"
+    },
+    "params": {
+      "sets": "{sets} σετ",
+      "rest": "{time} ξεκούραση",
+      "rounds": "{rounds} γύροι",
+      "cap": "όριο {time}",
+      "windows": "{count} παράθυρα: {times}",
+      "restBetween": "{time} ξεκούραση ανάμεσα",
+      "every": "κάθε {time}",
+      "times": "× {count}",
+      "untilFailure": "μέχρι να μην προλαβαίνεις",
+      "intervals": "{rounds} × {work} δουλειά / {off} ξεκούραση",
+      "intervalsHr": "{rounds} × {work} δουλειά, ξεκούραση μέχρι οι παλμοί να πέσουν στους {bpm}"
+    },
+    "roundWord": {
+      "set": "Σετ {numbers}",
+      "round": "Γύρος {numbers}",
+      "interval": "Διάστημα {numbers}",
+      "minute": "Λεπτό {numbers}"
+    },
+    "struct": {
+      "superset": "Superset",
+      "complex": "Complex",
+      "cluster": "Cluster · {clusters} κομμάτια · {intra} παύση",
+      "drop": "Drop set · {drops} μειώσεις, {dropby} κάθε φορά",
+      "restpause": "Rest-pause · {minis} μίνι σετ · {intra} παύση"
+    },
+    "perSide": "ανά πλευρά",
+    "rest": "Ξεκούραση",
+    "measure": {
+      "pace": "Ρυθμός {value}",
+      "tempo": "Tempo {value}",
+      "rpe": "RPE {value}",
+      "rir": "RIR {value}",
+      "zone": "Ζώνη παλμών {value}",
+      "height": "Ύψος {value}",
+      "dist": "Απόσταση {value}",
+      "hold": "Κράτημα {value}"
+    },
+    "interruptEvery": "Κάθε {time} σταματάς για",
+    "scoreLine": "Σκορ: {score}",
+    "score": {
+      "best_load": "Φορτίο (καλύτερο σετ)",
+      "reps": "Επαναλήψεις",
+      "time": "Χρόνος",
+      "rounds_reps": "Γύροι + επαναλήψεις",
+      "done": "Ολοκληρώθηκε",
+      "total_reps": "Επαναλήψεις (σύνολο)",
+      "lowest_round": "Χαμηλότερος γύρος",
+      "distance": "Απόσταση"
+    },
+    "levelNotes": "Σημειώσεις ανά επίπεδο",
+    "sectionNote": "Σημείωση ενότητας",
+    "exerciseCount": "{count, plural, one {# άσκηση} other {# ασκήσεις}}",
+    "authoring": {
+      "label": "Πώς γράφεται η προπόνηση",
+      "freeText": "Ελεύθερο κείμενο",
+      "structured": "Δομημένο",
+      "toStructuredTitle": "Αλλαγή σε δομημένο;",
+      "toStructuredBody": "Το δομημένο πρόγραμμα ξεκινά άδειο. Το κείμενό σου μένει ως σημείωση της πρώτης ενότητας, ώστε να μη χαθεί τίποτα.",
+      "toTextTitle": "Αλλαγή σε ελεύθερο κείμενο;",
+      "toTextBody": "Το πρόγραμμα γίνεται κείμενο που μπορείς να συνεχίσεις να γράφεις. Ροές, τιμές ανά σετ και δομές γράφονται ως κείμενο και δεν μένουν δομημένα.",
+      "confirm": "Αλλαγή",
+      "cancel": "Άκυρο",
+      "switchFailed": "Η προπόνηση δεν αποθηκεύτηκε πριν την αλλαγή. Δοκίμασε ξανά.",
+      "switching": "Αποθήκευση…"
+    },
+    "editor": {
+      "planEmpty": "Πρόσθεσε τουλάχιστον μία άσκηση ή μία ξεκούραση πριν τη δημοσίευση.",
+      "fixProblems": "Κάποιες τιμές δεν διαβάζονται: διόρθωσε τις γραμμές με κόκκινο.",
+      "sectionCount": "{count, plural, one {# ενότητα} other {# ενότητες}}"
+    }
   }
 }

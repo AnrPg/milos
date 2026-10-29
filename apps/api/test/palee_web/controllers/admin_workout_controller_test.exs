@@ -375,6 +375,115 @@ defmodule PaleeWeb.AdminWorkoutControllerTest do
       refute Map.has_key?(hd(listed["body"]["sections"]), "document")
     end
 
+    test "ADR-270: publishes a structured plan workout, one plan per section", %{conn: conn} do
+      {admin_conn, organization} = authenticate_as_admin(conn, "structured_plan_author")
+      base = "/api/org/#{organization.slug}/admin/workouts"
+      [strength, superset | _rest] = Palee.StructuredPlanFixtures.program()
+
+      draft_id =
+        admin_conn |> post(base) |> json_response(201) |> get_in(["draft", "id"])
+
+      unreadable =
+        put_in(strength, ["blocks", Access.at(0), Access.at(0), "cells"], [
+          %{"d" => "5", "l" => "60kg"},
+          %{"d" => "5", "l" => "70%"}
+        ])
+
+      draft_payload = %{
+        title: "Structured Monday",
+        type: "crossfit",
+        authoring_mode: "structured_plan",
+        expected_source_revision: 0,
+        sections: [
+          %{name: "Strength", order: 1, exercises: [], plan: unreadable},
+          %{name: "Accessory", order: 2, exercises: [], plan: superset}
+        ]
+      }
+
+      admin_conn
+      |> recycle()
+      |> put_req_header("content-type", "application/json")
+      |> patch("#{base}/#{draft_id}/draft", Jason.encode!(draft_payload))
+      |> json_response(200)
+
+      rejected =
+        admin_conn
+        |> recycle()
+        |> put_req_header("content-type", "application/json")
+        |> post("#{base}/#{draft_id}/publish", Jason.encode!(%{expected_source_revision: 1}))
+        |> json_response(422)
+
+      assert rejected["code"] == "invalid_plan_sections"
+
+      assert rejected["details"]["sections"] == [
+               %{"section" => 1, "path" => "blocks.0.0.cells.1.l", "code" => "mixed_units"}
+             ]
+
+      fixed = put_in(draft_payload, [:sections, Access.at(0), :plan], strength)
+
+      workout =
+        admin_conn
+        |> recycle()
+        |> put_req_header("content-type", "application/json")
+        |> post(
+          "#{base}/#{draft_id}/publish",
+          Jason.encode!(%{expected_source_revision: 1, sections: fixed.sections})
+        )
+        |> json_response(200)
+        |> Map.fetch!("workout")
+
+      assert workout["authoring_mode"] == "structured_plan"
+
+      assert [
+               %{"name" => "Strength", "plan" => %{"v" => 1, "flow" => "sets"}, "exercises" => [squat]},
+               %{"name" => "Accessory", "plan" => %{"flow" => "sets"}, "exercises" => [_, _, _]}
+             ] = workout["sections"]
+
+      assert %{"name" => "Back Squat", "prescription_value" => 12, "load_mode" => "pct_1rm"} = squat
+
+      assert %{
+               "kind" => "plan",
+               "sections" => [
+                 %{"name" => "Strength", "plan" => ^strength},
+                 %{"name" => "Accessory", "plan" => ^superset}
+               ]
+             } = workout["body"]
+
+      listed =
+        admin_conn
+        |> recycle()
+        |> get(base)
+        |> json_response(200)
+        |> Map.fetch!("workouts")
+        |> Enum.find(&(&1["id"] == draft_id))
+
+      assert listed["body"] == %{
+               "kind" => "plan",
+               "sections" => [
+                 %{"name" => "Strength", "flow" => "sets", "exercise_count" => 1},
+                 %{"name" => "Accessory", "flow" => "sets", "exercise_count" => 3}
+               ]
+             }
+
+      copy_id =
+        admin_conn
+        |> recycle()
+        |> post("#{base}/#{draft_id}/duplicate")
+        |> json_response(201)
+        |> get_in(["draft", "id"])
+
+      copy =
+        admin_conn
+        |> recycle()
+        |> put_req_header("content-type", "application/json")
+        |> post("#{base}/#{copy_id}/publish", Jason.encode!(%{expected_source_revision: 0}))
+        |> json_response(200)
+        |> Map.fetch!("workout")
+
+      assert Enum.map(copy["sections"], & &1["plan"]) == [strength, superset]
+      assert copy["body"]["kind"] == "plan"
+    end
+
     test "publishes a free-text workout with assistant-derived canonical sections", %{conn: conn} do
       {admin_conn, organization} = authenticate_as_admin(conn, "free_text_ai_publisher")
 

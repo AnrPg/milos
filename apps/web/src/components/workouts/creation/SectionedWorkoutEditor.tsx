@@ -5,7 +5,7 @@ import Underline from "@tiptap/extension-underline";
 import { EditorContent, useEditor, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
 
 import { ApiError } from "@/api/client";
 import {
@@ -58,6 +58,8 @@ type Props = {
   assistantAvailable: boolean;
   /** Switch this workout to the assistant's free-text editor (the draft is saved first). */
   onUseAssistant: () => void;
+  /** ADR-270: filled with "save the sections now", so the host can switch editors without losing them. */
+  saveHandleRef?: MutableRefObject<(() => Promise<void>) | null>;
 };
 
 const WORKOUT_TYPES: WorkoutType[] = ["crossfit", "strength", "gymnastics", "aerobics", "flexibility", "recovery"];
@@ -67,7 +69,7 @@ const WORKOUT_TYPES: WorkoutType[] = ["crossfit", "strength", "gymnastics", "aer
  * («+ Προσθήκη ενότητας»), writes each one's text and picks its own timer;
  * athletes run those timers one section at a time. Nothing is parsed.
  */
-export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady, onPublished, assistantAvailable, onUseAssistant }: Props) {
+export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady, onPublished, assistantAvailable, onUseAssistant, saveHandleRef }: Props) {
   const i18n = useUiTranslations();
   const assistantT = useTranslations("WorkoutAssistant");
   const goalsT = useTranslations("WodGoals");
@@ -146,6 +148,16 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
     if (!loaded) return;
     saver.schedule(buildPayload());
   }, [buildPayload, loaded, saver]);
+
+  useEffect(() => {
+    if (!saveHandleRef) return;
+    saveHandleRef.current = async () => {
+      if (saver.started) await saver.saveNow(buildPayload());
+    };
+    return () => {
+      saveHandleRef.current = null;
+    };
+  }, [buildPayload, saveHandleRef, saver]);
 
   async function keepMyVersion() {
     if (!accessToken || !draftId) return;
