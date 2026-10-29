@@ -735,3 +735,14 @@ msgstr "Плащане с карта изисква внимание"
 
 msgid "%{amount} for %{what} failed after every retry."
 msgstr "Плащането от %{amount} за %{what} е неуспешно след всички опити."
+msgid "A document to sign"
+msgstr "Документ за подпис"
+
+msgid "%{business} asks you to read and sign «%{title}»."
+msgstr "%{business} те моли да прочетеш и подпишеш „%{title}“."
+
+msgid "Your health certificate expires soon"
+msgstr "Медицинската ти бележка изтича скоро"
+
+msgid "Upload a new health certificate before %{date}."
+msgstr "Качи нова медицинска бележка преди %{date}."

@@ -735,3 +735,14 @@ msgstr "Un pago con tarjeta necesita atención"
 
 msgid "%{amount} for %{what} failed after every retry."
 msgstr "El cargo de %{amount} por %{what} falló tras todos los reintentos."
+msgid "A document to sign"
+msgstr "Un documento para firmar"
+
+msgid "%{business} asks you to read and sign «%{title}»."
+msgstr "%{business} te pide que leas y firmes «%{title}»."
+
+msgid "Your health certificate expires soon"
+msgstr "Tu certificado médico caduca pronto"
+
+msgid "Upload a new health certificate before %{date}."
+msgstr "Sube un nuevo certificado médico antes del %{date}."

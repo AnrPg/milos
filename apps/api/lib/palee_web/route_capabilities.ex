@@ -13,6 +13,9 @@ defmodule PaleeWeb.RouteCapabilities do
 
   @controller_defaults %{
     W.AdminWorkoutController => [:manage_workouts],
+    # ADR-252: templates, versions, requirement, settings and audit.
+    W.AdminDocumentsController => [:manage_settings],
+    W.AdminHealthCertificatesController => [:manage_health_certificates],
     # The class form's WOD picker: whoever schedules classes picks WODs.
     W.AdminWorkoutChoiceController => [:manage_schedule, :manage_workouts],
     # ADR-230: the day's WOD, like linking a WOD to one class.
@@ -249,6 +252,25 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminPaymentsController, :retry_charge} => [:manage_billing],
     {W.AdminPaymentsController, :dismiss_charge} => [:manage_billing, :take_payments],
     {W.AdminPaymentsController, :card_link} => [:manage_billing, :take_payments],
+    # ADR-252: documents are box rules (manage_settings: which are
+    # mandatory, their text, the booking gate); asking clients to sign and
+    # reading who signed is membership work too.
+    {W.AdminDocumentsController, :index} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :show} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :version} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :request} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :requests} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :cancel_request} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :signatures} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :evidence} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :member} => [:manage_settings, :manage_memberships],
+    # ADR-252: health certificates are health data (GDPR art. 9): dates and
+    # files need manage_health_certificates; view_health (coaches, own
+    # clients) sees only valid / expired / missing in the list.
+    {W.AdminHealthCertificatesController, :index} => [
+      :manage_health_certificates,
+      :view_health
+    ],
     # ADR-192: shop reports read like the business statistics; the
     # reconciliation is also a finance check; targets are a setting.
     {W.AdminShopReportController, :reconciliation} => [

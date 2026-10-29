@@ -4625,6 +4625,7 @@
     "groupProgrammingRemovePerson": "Remover {nickname}",
     "groupProgrammingNoMatches": "Ninguém corresponde.",
     "roleAccessSpaces": "Espaços e plantas",
+    "roleAccessHealthCertificates": "Atestados médicos",
     "apiErrorSpaceUnavailable": "O espaço está indisponível nessa altura. Escolha outro espaço ou outra hora.",
     "apiErrorSpaceArchived": "Esse espaço está arquivado.",
     "apiErrorSpaceWrongBranch": "Esse espaço pertence a outra filial.",

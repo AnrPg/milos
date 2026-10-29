@@ -120,8 +120,14 @@ defmodule Palee.TenantData.Domain.RetentionReviewTest do
     assert "credentials" in by_context["payments"].excluded_columns
     assert "token" in by_context["payments"].excluded_columns
 
+    # ADR-252: signatures and their certificates are evidence (5 years);
+    # health certificates and settings are not kept.
+    assert by_context["documents"].disposition == :retain
+    assert by_context["documents"].retain_years == 5
+    refute "health_certificates" in by_context["documents"].retained_tables
+
     assert by_context
-           |> Map.drop(["finance", "shop", "fiscal", "payments", "analytics"])
+           |> Map.drop(["finance", "shop", "fiscal", "payments", "documents", "analytics"])
            |> Map.values()
            |> Enum.all?(&(&1.disposition == :purge))
   end

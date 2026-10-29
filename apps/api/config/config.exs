@@ -71,7 +71,9 @@ config :palee, Oban,
        {"*/5 * * * *", Palee.Workers.TransmitFiscalDocumentsJob},
        # ADR-246/247: settle online payments; hourly autopay of due invoices.
        {"*/3 * * * *", Palee.Workers.ProcessPaymentsJob},
-       {"11 * * * *", Palee.Workers.ProcessPaymentsJob, args: %{"autopay" => true}}
+       {"11 * * * *", Palee.Workers.ProcessPaymentsJob, args: %{"autopay" => true}},
+       # ADR-252: reminders before a client's health certificate expires.
+       {"45 8 * * *", Palee.Workers.HealthCertificateRemindersJob}
      ]}
   ],
   queues: [
@@ -180,6 +182,17 @@ config :palee, :payment_gateways, %{
   "viva" => Palee.Infrastructure.Payments.VivaGateway,
   "stripe" => Palee.Infrastructure.Payments.StripeGateway
 }
+# ADR-252: documents and signatures. The evidence store is where an advanced
+# e-signature provider plugs in later.
+config :palee, :documents_store, Palee.Infrastructure.Documents.EctoDocumentStore
+
+config :palee,
+       :documents_evidence_store,
+       Palee.Infrastructure.Documents.StorageSignatureEvidenceStore
+
+config :palee,
+       :documents_certificate_renderer,
+       Palee.Infrastructure.Documents.PdfCertificateRenderer
 
 # ADR-190: the e-shop and Finance's revenue streams.
 config :palee, :shop_store, Palee.Infrastructure.Shop.EctoShopStore

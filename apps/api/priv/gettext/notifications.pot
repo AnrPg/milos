@@ -734,4 +734,14 @@ msgid "A card payment needs attention"
 msgstr ""
 
 msgid "%{amount} for %{what} failed after every retry."
+msgid "A document to sign"
+msgstr ""
+
+msgid "%{business} asks you to read and sign «%{title}»."
+msgstr ""
+
+msgid "Your health certificate expires soon"
+msgstr ""
+
+msgid "Upload a new health certificate before %{date}."
 msgstr ""

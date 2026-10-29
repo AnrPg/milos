@@ -735,3 +735,14 @@ msgstr "دفعة بالبطاقة تحتاج إلى متابعة"
 
 msgid "%{amount} for %{what} failed after every retry."
 msgstr "فشل دفع %{amount} مقابل %{what} بعد كل المحاولات."
+msgid "A document to sign"
+msgstr "مستند للتوقيع"
+
+msgid "%{business} asks you to read and sign «%{title}»."
+msgstr "يطلب منك %{business} قراءة «%{title}» وتوقيعه."
+
+msgid "Your health certificate expires soon"
+msgstr "تنتهي شهادتك الصحية قريبًا"
+
+msgid "Upload a new health certificate before %{date}."
+msgstr "ارفع شهادة صحية جديدة قبل %{date}."

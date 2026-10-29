@@ -234,3 +234,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-248 | Selling packages and shop orders online, booking after payment, 14-day withdrawal | Accepted |
 | ADR-253 | Box screen: TV paired with a code, display token, today's classes/WODs/leaderboards, automatic focus and staff override | Accepted |
 | ADR-260 | What members pay online (per-purpose switches), failed saved-card charges: member and staff notices, Ουρές queue | Accepted |
+| ADR-252 | Documents and simple electronic signatures (evidence, PDF certificate), health certificates, booking gate | Accepted |

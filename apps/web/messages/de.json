@@ -4625,6 +4625,7 @@
     "groupProgrammingRemovePerson": "{nickname} entfernen",
     "groupProgrammingNoMatches": "Niemand gefunden.",
     "roleAccessSpaces": "Räume und Grundrisse",
+    "roleAccessHealthCertificates": "Ärztliche Bescheinigungen",
     "apiErrorSpaceUnavailable": "Der Raum ist zu dieser Zeit gesperrt. Wähle einen anderen Raum oder eine andere Zeit.",
     "apiErrorSpaceArchived": "Dieser Raum ist archiviert.",
     "apiErrorSpaceWrongBranch": "Dieser Raum gehört zu einem anderen Standort.",

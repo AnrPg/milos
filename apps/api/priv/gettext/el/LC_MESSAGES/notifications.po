@@ -735,3 +735,14 @@ msgstr "Μια πληρωμή με κάρτα θέλει προσοχή"
 
 msgid "%{amount} for %{what} failed after every retry."
 msgstr "Η χρέωση %{amount} για %{what} απέτυχε μετά από όλες τις νέες προσπάθειες."
+msgid "A document to sign"
+msgstr "Έγγραφο για υπογραφή"
+
+msgid "%{business} asks you to read and sign «%{title}»."
+msgstr "%{business}: διάβασε και υπόγραψε το «%{title}»."
+
+msgid "Your health certificate expires soon"
+msgstr "Η βεβαίωση υγείας σου λήγει σύντομα"
+
+msgid "Upload a new health certificate before %{date}."
+msgstr "Ανέβασε νέα βεβαίωση υγείας πριν από τις %{date}."

@@ -656,6 +656,27 @@ defmodule Palee.Notifications do
         url: "/box/schedule"
       })
 
+  # ADR-252: staff asked the member to sign a document.
+  def process_event("document_signature_requested", payload),
+    do:
+      enqueue_simple(:document_signature_requested, payload, %{
+        template_id: field(payload, :template_id),
+        title: field(payload, :title),
+        business_name: field(payload, :business_name),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/documents"
+      })
+
+  # ADR-252: the member's health certificate expires soon (once per expiry).
+  def process_event("health_certificate_expiring", payload),
+    do:
+      enqueue_simple(:health_certificate_expiring, payload, %{
+        expires_on: field(payload, :expires_on),
+        business_name: field(payload, :business_name),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/documents"
+      })
+
   def process_event("package_expiring", payload),
     do:
       enqueue_simple(:package_expiring, payload, %{

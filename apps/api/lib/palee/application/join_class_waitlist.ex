@@ -11,6 +11,8 @@ defmodule Palee.Application.JoinClassWaitlist do
     ScheduleRealtime
   }
 
+  alias Palee.Application.Documents.BookingGate
+
   alias Palee.Scheduling
   alias Palee.Scheduling.Domain.BookingPolicy
 
@@ -19,6 +21,8 @@ defmodule Palee.Application.JoinClassWaitlist do
 
     with %{} = slot <- Scheduling.get_slot(context, slot_id) || {:error, :not_found},
          :ok <- BookingPolicy.can_join_waitlist?(slot, user_id: user_id, now: now),
+         # ADR-252: unsigned mandatory documents block the waitlist too.
+         :ok <- BookingGate.check(context, user_id, now),
          terms = BookingTerms.for_slot(context, user_id, slot),
          :ok <-
            BookingPolicy.booking_window_open?(slot.scheduled_at, now, terms.booking_window_days),

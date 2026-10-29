@@ -264,6 +264,24 @@ defmodule PaleeWeb.FallbackController do
 
   def call(conn, {:error, reason}) when is_map_key(@payment_errors, reason) do
     {status, message} = Map.fetch!(@payment_errors, reason)
+  end
+
+  # ADR-252: documents, signatures and health certificates.
+  @documents_errors %{
+    document_archived: {:conflict, "This document is archived"},
+    document_not_published: {:conflict, "This document has no published version yet"},
+    document_version_outdated:
+      {:conflict, "The document changed while you were reading it; read it again and sign"},
+    document_request_closed: {:conflict, "This request is already signed or cancelled"},
+    health_certificate_file_invalid:
+      {:unprocessable_entity, "Upload a PDF or a photo (JPEG, PNG, WebP) of up to 10 MB"},
+    health_certificate_file_missing: {:unprocessable_entity, "Upload the file first"},
+    document_key_forbidden: {:forbidden, "This file does not belong to this upload"},
+    storage_unavailable: {:service_unavailable, "Storage is unavailable; try again."}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@documents_errors, reason) do
+    {status, message} = Map.fetch!(@documents_errors, reason)
 
     conn
     |> put_status(status)
@@ -289,6 +307,27 @@ defmodule PaleeWeb.FallbackController do
     conn
     |> put_status(status)
     |> json(%{code: to_string(reason), error: message})
+  end
+
+  def call(conn, {:error, {reason, _detail}})
+      when reason in [:certificate_render_failed, :evidence_storage_failed] do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{
+      code: "signature_evidence_unavailable",
+      error: "The signature could not be recorded; nothing was signed. Try again."
+    })
+  end
+
+  # The booking gate: which documents block the booking.
+  def call(conn, {:error, :documents_required, details}) do
+    package_contract_error(
+      conn,
+      :conflict,
+      "documents_required",
+      "Sign the box's mandatory documents before you book",
+      details
+    )
   end
 
   # ADR-214: field errors stay in the form, one code per field.

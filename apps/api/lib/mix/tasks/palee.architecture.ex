@@ -121,6 +121,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     fiscal/transmission_store
     payments/payment_store
     box_screens/box_screen_store
+    documents/document_store
   )
 
   defp tenant_scope_violations do

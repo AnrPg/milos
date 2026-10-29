@@ -735,3 +735,14 @@ msgstr "Een kaartbetaling vraagt aandacht"
 
 msgid "%{amount} for %{what} failed after every retry."
 msgstr "De betaling van %{amount} voor %{what} is na alle nieuwe pogingen mislukt."
+msgid "A document to sign"
+msgstr "Een document om te ondertekenen"
+
+msgid "%{business} asks you to read and sign «%{title}»."
+msgstr "%{business} vraagt je „%{title}” te lezen en te ondertekenen."
+
+msgid "Your health certificate expires soon"
+msgstr "Je medische verklaring verloopt binnenkort"
+
+msgid "Upload a new health certificate before %{date}."
+msgstr "Upload vóór %{date} een nieuwe medische verklaring."

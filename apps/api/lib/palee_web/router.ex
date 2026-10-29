@@ -532,6 +532,28 @@ defmodule PaleeWeb.Router do
     post("/packages/:id/buy", MyPaymentsController, :buy_package)
     post("/payments/:id/withdraw", MyPaymentsController, :withdraw)
     post("/shop/orders/:id/pay-online", MyPaymentsController, :pay_shop_order)
+    # ADR-252: Box › Documents (sign, certificates, health certificate).
+    get("/documents", MyDocumentsController, :index)
+    get("/documents/signatures", MyDocumentsController, :signatures)
+    get("/documents/signatures/:id/evidence", MyDocumentsController, :evidence)
+
+    post(
+      "/documents/health-certificate/uploads",
+      MyDocumentsController,
+      :request_health_upload
+    )
+
+    post("/documents/health-certificate", MyDocumentsController, :create_health_certificate)
+    get("/documents/health-certificate/:id/file", MyDocumentsController, :health_file)
+
+    delete(
+      "/documents/health-certificate/:id",
+      MyDocumentsController,
+      :delete_health_certificate
+    )
+
+    get("/documents/:id", MyDocumentsController, :show)
+    post("/documents/:id/sign", MyDocumentsController, :sign)
     # ADR-220: the member's renewal choice and leaving the box.
     put(
       "/membership/subscriptions/:id/auto-renew",
@@ -1249,6 +1271,41 @@ defmodule PaleeWeb.Router do
     post("/payments/:id/retry-charge", AdminPaymentsController, :retry_charge)
     post("/payments/:id/dismiss", AdminPaymentsController, :dismiss_charge)
     post("/payments/:id/card-link", AdminPaymentsController, :card_link)
+    # ADR-252: documents, signatures and health certificates.
+    get("/documents/templates", AdminDocumentsController, :index)
+    post("/documents/templates", AdminDocumentsController, :create)
+    get("/documents/starters", AdminDocumentsController, :starters)
+    get("/documents/templates/:id", AdminDocumentsController, :show)
+    get("/documents/templates/:id/versions/:version_id", AdminDocumentsController, :version)
+    post("/documents/templates/:id/versions", AdminDocumentsController, :publish)
+    put("/documents/templates/:id/requirement", AdminDocumentsController, :set_requirement)
+    post("/documents/templates/:id/archive", AdminDocumentsController, :archive)
+    post("/documents/templates/:id/requests", AdminDocumentsController, :request)
+    get("/documents/requests", AdminDocumentsController, :requests)
+    post("/documents/requests/:id/cancel", AdminDocumentsController, :cancel_request)
+    get("/documents/signatures", AdminDocumentsController, :signatures)
+    get("/documents/signatures/:id/evidence", AdminDocumentsController, :evidence)
+    get("/documents/members/:user_id", AdminDocumentsController, :member)
+    get("/documents/settings", AdminDocumentsController, :settings)
+    put("/documents/settings", AdminDocumentsController, :save_settings)
+    get("/documents/audit", AdminDocumentsController, :audit)
+    get("/documents/health-certificates", AdminHealthCertificatesController, :index)
+
+    get(
+      "/documents/health-certificates/members/:user_id",
+      AdminHealthCertificatesController,
+      :client
+    )
+
+    post(
+      "/documents/health-certificates/uploads",
+      AdminHealthCertificatesController,
+      :request_upload
+    )
+
+    post("/documents/health-certificates", AdminHealthCertificatesController, :create)
+    get("/documents/health-certificates/:id/file", AdminHealthCertificatesController, :file)
+    delete("/documents/health-certificates/:id", AdminHealthCertificatesController, :delete)
 
     # ADR-192: shop reports, pricing indicators and revenue reconciliation.
     get("/shop/reports/overview", AdminShopReportController, :overview)

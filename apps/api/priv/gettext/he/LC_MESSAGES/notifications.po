@@ -735,3 +735,14 @@ msgstr "תשלום בכרטיס דורש טיפול"
 
 msgid "%{amount} for %{what} failed after every retry."
 msgstr "החיוב של %{amount} עבור %{what} נכשל אחרי כל הניסיונות החוזרים."
+msgid "A document to sign"
+msgstr "מסמך לחתימה"
+
+msgid "%{business} asks you to read and sign «%{title}»."
+msgstr "%{business} מבקש ממך לקרוא ולחתום על „%{title}”."
+
+msgid "Your health certificate expires soon"
+msgstr "האישור הרפואי שלך יפוג בקרוב"
+
+msgid "Upload a new health certificate before %{date}."
+msgstr "העלה אישור רפואי חדש לפני %{date}."
