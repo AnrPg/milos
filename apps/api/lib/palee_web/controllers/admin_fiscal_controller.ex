@@ -102,23 +102,24 @@ defmodule PaleeWeb.AdminFiscalController do
   operation(:credit,
     summary: "Issue a credit note for a document (all that is left, or chosen quantities)",
     description:
-      "Documents are never changed: a credit note corrects them. Idempotent by `idempotency_key`.",
+      "Documents are never changed: a credit note corrects them, with its reason (ADR-265). " <>
+        "With `refund: true` the money goes back to the card the document was paid with and " <>
+        "that refund issues the note (`document` is null when the refund could not issue it " <>
+        "yet). Idempotent by `idempotency_key`.",
     parameters: [@id],
     request_body: F.body(F.credit_body()),
     responses: [
-      created: {"Credit note", "application/json", F.one(:document, F.document())},
-      ok:
-        {"The credit note of an earlier identical request", "application/json",
-         F.one(:document, F.document())}
+      created: {"Credit note", "application/json", F.credit_result()},
+      ok: {"The credit note of an earlier identical request", "application/json", F.credit_result()}
     ]
   )
 
   def credit(conn, %{id: id}) do
-    with {:ok, document, mode} <-
+    with {:ok, result, mode} <-
            FiscalAdmin.credit(conn.assigns.tenant_context, id, conn.body_params) do
       conn
       |> put_status(if(mode == :replayed, do: :ok, else: :created))
-      |> json(%{document: document})
+      |> json(result)
     end
   end
 

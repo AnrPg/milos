@@ -7,7 +7,7 @@ defmodule Palee.Payments.Refund do
   @primary_key {:id, :binary_id, autogenerate: true}
 
   @fields ~w(intent_id amount_cents currency status reason idempotency_key provider_ref
-             failure_message finance_reversal_id created_by_id completed_at)a
+             failure_message finance_reversal_id fiscal_credit created_by_id completed_at)a
 
   schema "payment_refunds" do
     field :organization_id, :binary_id, read_after_writes: true
@@ -20,6 +20,8 @@ defmodule Palee.Payments.Refund do
     field :provider_ref, :string
     field :failure_message, :string
     field :finance_reversal_id, :binary_id
+    # ADR-265: what the credit note this refund issues must hold (reason, lines).
+    field :fiscal_credit, :map
     field :created_by_id, :binary_id
     field :completed_at, :utc_datetime_usec
 
