@@ -84,7 +84,7 @@ function isUtilityClassToken(token) {
     .replace(/^(?:sm|md|lg|xl|2xl|hover|focus|focus-visible|active|disabled|group-hover|group-focus-visible|dark|rtl|ltr|motion-safe|motion-reduce):/, "")
     .replace(/^\[[^\]]+\]:/, "");
 
-  return /^(?:-)?(?:flex|grid|block|inline|hidden|contents|relative|absolute|fixed|sticky|static|isolate|overflow|truncate|sr-only|not-sr-only|container|border)$/.test(normalized)
+  return /^(?:-)?(?:flex|grid|block|inline|inline-flex|inline-block|inline-grid|hidden|contents|relative|absolute|fixed|sticky|static|isolate|overflow|truncate|sr-only|not-sr-only|container|border)$/.test(normalized)
     || /^(?:min-|max-)?(?:h|w|size)-[\w./[\]()%,-]+$/.test(normalized)
     || /^(?:m|mx|my|ms|me|mt|mr|mb|ml|p|px|py|ps|pe|pt|pr|pb|pl|gap|space-[xy])-[-\w./[\]()%,]+$/.test(normalized)
     || /^(?:items|content|justify|place|self)-[\w-]+$/.test(normalized)
