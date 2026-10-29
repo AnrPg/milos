@@ -197,6 +197,26 @@ defmodule PaleeWeb.Schemas.Setup do
     }
   end
 
+  def apply_body do
+    %OpenApiSpex.RequestBody{
+      required: false,
+      content: %{
+        "application/json" => %OpenApiSpex.MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{
+              prices: %Schema{
+                type: :object,
+                description: "The owner's prices for the recipe's packages: package code => cents",
+                additionalProperties: %Schema{type: :integer, minimum: 0, maximum: 10_000_000}
+              }
+            }
+          }
+        }
+      }
+    }
+  end
+
   def applied do
     %Schema{
       type: :object,

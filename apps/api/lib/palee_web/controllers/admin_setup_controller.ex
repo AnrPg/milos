@@ -82,19 +82,28 @@ defmodule PaleeWeb.AdminSetupController do
     description:
       "Creates the recipe's subscription packages and class types that are missing and sets its " <>
         "settings through the same services as the settings screens, in one transaction, then " <>
-        "records which recipe was applied, when and by whom. Documents are listed in `manual`.",
+        "records which recipe was applied, when and by whom. Documents are listed in `manual`. " <>
+        "`prices` (optional) are the owner's own prices for the recipe's packages, by code.",
     parameters: [@key],
+    request_body: S.apply_body(),
     responses: [
       ok: {"Applied", "application/json", S.applied()},
       forbidden: {"Not the owner", "application/json", @error},
       not_found: {"No such recipe", "application/json", @error},
-      unprocessable_entity: {"A step failed; nothing changed", "application/json", @error}
+      unprocessable_entity:
+        {"A step failed or a price is not valid; nothing changed", "application/json", @error}
     ]
   )
 
   def apply_recipe(conn, %{key: key}) do
-    with {:ok, result} <- SetupRecipes.apply_recipe(conn.assigns.tenant_context, key) do
+    prices = conn.body_params |> body_field(:prices)
+
+    with {:ok, result} <-
+           SetupRecipes.apply_recipe_with_prices(conn.assigns.tenant_context, key, prices) do
       json(conn, result)
     end
   end
+
+  defp body_field(%{} = body, key), do: Map.get(body, key, Map.get(body, Atom.to_string(key)))
+  defp body_field(_body, _key), do: nil
 end

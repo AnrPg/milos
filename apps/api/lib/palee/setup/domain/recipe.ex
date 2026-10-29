@@ -40,6 +40,43 @@ defmodule Palee.Setup.Domain.Recipe do
 
   @type t :: %__MODULE__{}
 
+  # A price above 100,000.00 is a typo, not a subscription package.
+  @max_price_cents 10_000_000
+
+  @doc """
+  The recipe with the owner's own prices for its packages: `prices` is
+  `%{package code => cents}` from the preview (mockup s10 A, «Άλλαξε τιμές
+  εδώ»). `{:ok, recipe}` or `{:error, :invalid_recipe_prices}` for a code
+  the recipe does not have or a price that is not a whole, non-negative
+  number of cents.
+  """
+  def with_prices(%__MODULE__{} = recipe, nil), do: {:ok, recipe}
+
+  def with_prices(%__MODULE__{} = recipe, prices) when is_map(prices) do
+    codes = MapSet.new(recipe.packages, & &1.code)
+
+    valid? =
+      Enum.all?(prices, fn {code, cents} ->
+        MapSet.member?(codes, to_string(code)) and is_integer(cents) and cents >= 0 and
+          cents <= @max_price_cents
+      end)
+
+    if valid? do
+      prices = Map.new(prices, fn {code, cents} -> {to_string(code), cents} end)
+
+      packages =
+        Enum.map(recipe.packages, fn package ->
+          %{package | base_price_cents: Map.get(prices, package.code, package.base_price_cents)}
+        end)
+
+      {:ok, %{recipe | packages: packages}}
+    else
+      {:error, :invalid_recipe_prices}
+    end
+  end
+
+  def with_prices(%__MODULE__{}, _prices), do: {:error, :invalid_recipe_prices}
+
   @doc "The name in `locale` (\"el\" or English for anything else)."
   def localized(%{} = names, locale) do
     if locale_language(locale) == "el",

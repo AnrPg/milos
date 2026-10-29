@@ -57,10 +57,18 @@ defmodule Palee.Application.Setup.SetupRecipes do
   Applies recipe `key`: `%{plan, application}` where `plan` lists what was
   changed. Owner only (the provider kind and role grants are the owner's).
   """
-  def apply_recipe(context, key, now \\ DateTime.utc_now()) do
+  def apply_recipe(context, key, now \\ DateTime.utc_now()),
+    do: apply_recipe_with_prices(context, key, nil, now)
+
+  @doc """
+  Like `apply_recipe/3`, with the owner's own prices for the recipe's
+  packages (`%{code => cents}`), as changed in the preview.
+  """
+  def apply_recipe_with_prices(context, key, prices, now \\ DateTime.utc_now()) do
     with :ok <- Organizations.authorize_capability(context, :manage_settings),
          :ok <- owner(context),
          {:ok, recipe} <- Setup.fetch_recipe(key),
+         {:ok, recipe} <- Recipe.with_prices(recipe, prices),
          {:ok, result} <- Setup.transaction(context, fn -> apply_plan(context, recipe, now) end) do
       Setup.configurator().after_apply(context)
       {:ok, result}

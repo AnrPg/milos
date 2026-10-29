@@ -83,6 +83,29 @@ defmodule PaleeWeb.AdminSetupControllerTest do
     assert [%{"change_count" => 0}, %{"recipe_key" => "open_gym"}] = history["applications"]
   end
 
+  test "apply takes the owner's prices from the preview", %{owner: owner, base: base} do
+    body = Jason.encode!(%{prices: %{"setup_unlimited" => 7_500}})
+
+    applied =
+      owner
+      |> recycle()
+      |> put_req_header("content-type", "application/json")
+      |> post(base <> "/setup/recipes/crossfit_box/apply", body)
+      |> json_response(200)
+
+    unlimited = Enum.find(applied["plan"]["changes"], &(&1["key"] == "package.setup_unlimited"))
+    assert unlimited["to"] == 7_500
+
+    bad = Jason.encode!(%{prices: %{"setup_bowling" => 100}})
+
+    assert %{"code" => "invalid_recipe_prices"} =
+             owner
+             |> recycle()
+             |> put_req_header("content-type", "application/json")
+             |> post(base <> "/setup/recipes/functional_hyrox/apply", bad)
+             |> json_response(422)
+  end
+
   test "only the owner applies; a coach cannot see recipes", %{
     admin: admin,
     coach: coach,
