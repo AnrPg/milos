@@ -7758,7 +7758,11 @@ export interface paths {
          */
         put: operations["PaleeWeb.AdminPaymentsController.save_account"];
         post?: never;
-        delete?: never;
+        /**
+         * Stop online payments: saved cards are no longer charged
+         * @description A one-button connection also loses Palee's access at the provider.
+         */
+        delete: operations["PaleeWeb.AdminPaymentsController.disconnect"];
         options?: never;
         head?: never;
         patch?: never;
@@ -7798,6 +7802,26 @@ export interface paths {
         get: operations["PaleeWeb.AdminPaymentsController.attention"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start connecting the business's Stripe or Viva account with one button
+         * @description Answers the provider page to send the owner to. There they sign in or open a merchant account and allow Palee; the provider sends them back to `/api/payments/connect/callback`, which opens the settings page with `connect=ok` or `connect=<error code>`.
+         */
+        post: operations["PaleeWeb.AdminPaymentsController.connect"];
         delete?: never;
         options?: never;
         head?: never;
@@ -79107,6 +79131,8 @@ export interface operations {
                         account: {
                             /** Format: date-time */
                             checked_at?: string | null;
+                            /** @enum {string} */
+                            connection: "keys" | "platform";
                             credentials_set: string[];
                             /** @enum {string} */
                             environment: "test" | "live";
@@ -79134,6 +79160,10 @@ export interface operations {
                             updated_at?: string | null;
                             webhook_url: string;
                         } | null;
+                        /** @description Providers that connect with one button, per environment (ADR-261) */
+                        connect_providers: {
+                            [key: string]: string[];
+                        };
                         environments: string[];
                         providers: string[];
                     };
@@ -79180,6 +79210,8 @@ export interface operations {
                         account: {
                             /** Format: date-time */
                             checked_at?: string | null;
+                            /** @enum {string} */
+                            connection: "keys" | "platform";
                             credentials_set: string[];
                             /** @enum {string} */
                             environment: "test" | "live";
@@ -79207,6 +79239,69 @@ export interface operations {
                             updated_at?: string | null;
                             webhook_url: string;
                         } | null;
+                        /** @description Providers that connect with one button, per environment (ADR-261) */
+                        connect_providers: {
+                            [key: string]: string[];
+                        };
+                        environments: string[];
+                        providers: string[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.disconnect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Account */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        account: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            connection: "keys" | "platform";
+                            credentials_set: string[];
+                            /** @enum {string} */
+                            environment: "test" | "live";
+                            /** Format: uuid */
+                            id: string;
+                            last_error?: string | null;
+                            options: {
+                                notify_member: boolean;
+                                notify_staff: boolean;
+                                purposes: {
+                                    autopay: boolean;
+                                    drop_in: boolean;
+                                    packages: boolean;
+                                    personal_training: boolean;
+                                    shop: boolean;
+                                };
+                            };
+                            /** @enum {string} */
+                            provider: "sandbox" | "viva" | "stripe";
+                            settings: {
+                                [key: string]: string;
+                            };
+                            status: string;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            webhook_url: string;
+                        } | null;
+                        /** @description Providers that connect with one button, per environment (ADR-261) */
+                        connect_providers: {
+                            [key: string]: string[];
+                        };
                         environments: string[];
                         providers: string[];
                     };
@@ -79247,6 +79342,8 @@ export interface operations {
                         account: {
                             /** Format: date-time */
                             checked_at?: string | null;
+                            /** @enum {string} */
+                            connection: "keys" | "platform";
                             credentials_set: string[];
                             /** @enum {string} */
                             environment: "test" | "live";
@@ -79274,6 +79371,10 @@ export interface operations {
                             updated_at?: string | null;
                             webhook_url: string;
                         } | null;
+                        /** @description Providers that connect with one button, per environment (ADR-261) */
+                        connect_providers: {
+                            [key: string]: string[];
+                        };
                         environments: string[];
                         providers: string[];
                     };
@@ -79341,6 +79442,40 @@ export interface operations {
                             user_id?: string | null;
                         }[];
                         total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @default live
+                     * @enum {string}
+                     */
+                    environment?: "test" | "live";
+                    /** @enum {string} */
+                    provider: "viva" | "stripe";
+                };
+            };
+        };
+        responses: {
+            /** @description Provider page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        url: string;
                     };
                 };
             };
