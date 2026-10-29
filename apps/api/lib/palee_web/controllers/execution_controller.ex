@@ -14,6 +14,7 @@ defmodule PaleeWeb.ExecutionController do
   }
 
   alias OpenApiSpex.{Parameter, Schema}
+  alias PaleeWeb.Schemas.StructuredPlan, as: StructuredPlanSchemas
 
   action_fallback(PaleeWeb.FallbackController)
 
@@ -91,7 +92,7 @@ defmodule PaleeWeb.ExecutionController do
     summary: "Get an execution by id",
     parameters: [@id_param],
     responses: [
-      ok: {"Execution", "application/json", %Schema{type: :object}},
+      ok: {"Execution", "application/json", StructuredPlanSchemas.execution_response_schema()},
       not_found: {"Error", "application/json", %Schema{type: :object}}
     ]
   )
@@ -164,11 +165,19 @@ defmodule PaleeWeb.ExecutionController do
              additionalProperties: %Schema{type: :integer, minimum: 0}
            },
            kpi_counters: @kpi_counters_schema,
-           duration_adjustments: @duration_adjustments_schema
+           duration_adjustments: @duration_adjustments_schema,
+           plan_actuals: %Schema{
+             type: :array,
+             maxItems: 2_000,
+             description:
+               "ADR-270: structured_plan workouts: one record per set / round done, " <>
+                 "prescribed next to actual",
+             items: StructuredPlanSchemas.plan_actual_schema()
+           }
          }
        }},
     responses: [
-      ok: {"Execution", "application/json", %Schema{type: :object}},
+      ok: {"Execution", "application/json", StructuredPlanSchemas.execution_response_schema()},
       not_found: {"Error", "application/json", %Schema{type: :object}},
       forbidden: {"Error", "application/json", %Schema{type: :object}}
     ]

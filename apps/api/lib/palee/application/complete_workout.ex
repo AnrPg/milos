@@ -22,12 +22,16 @@ defmodule Palee.Application.CompleteWorkout do
     with {:ok, current_execution} <- fetch_execution(execution_id, user_id),
          {:ok, segments, workout} <- timer_sequence_for_execution(current_execution),
          {:ok, text_scores} <- text_section_scores(workout, params),
+         {:ok, plan_sets} <- plan_actuals(workout, params),
          {:ok, execution} <-
            Execution.complete_execution(
              execution_id,
              user_id,
              Map.put(params, :segments, segments),
-             [{:text_section_scores, text_scores} | completion_options(execution_id)]
+             [
+               {:text_section_scores, text_scores},
+               {:plan_sets, plan_sets} | completion_options(execution_id)
+             ]
            ),
          :ok <- process_inline_if_needed(execution) do
       broadcast_completion(execution)
@@ -218,6 +222,18 @@ defmodule Palee.Application.CompleteWorkout do
       )
 
   defp text_section_scores(_workout, _params), do: {:ok, []}
+
+  # ADR-270: what the athlete did in each set / round of a structured plan,
+  # checked against the plan rows of the workout's sections. Other workouts
+  # keep no plan actuals.
+  defp plan_actuals(%{authoring_mode: "structured_plan", sections: sections}, params),
+    do:
+      Execution.normalize_plan_actuals(
+        params[:plan_actuals] || params["plan_actuals"],
+        Workouts.plan_rows_by_section(sections || [])
+      )
+
+  defp plan_actuals(_workout, _params), do: {:ok, []}
 
   defp resolve_workout(context, workout_id, slug) when slug in [nil, ""],
     do: Workouts.get_workout(context, workout_id)

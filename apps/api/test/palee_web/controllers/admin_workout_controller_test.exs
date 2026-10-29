@@ -435,11 +435,27 @@ defmodule PaleeWeb.AdminWorkoutControllerTest do
       assert workout["authoring_mode"] == "structured_plan"
 
       assert [
-               %{"name" => "Strength", "plan" => %{"v" => 1, "flow" => "sets"}, "exercises" => [squat]},
+               %{
+                 "name" => "Strength",
+                 "plan" => %{"v" => 1, "flow" => "sets"},
+                 "exercises" => [squat]
+               },
                %{"name" => "Accessory", "plan" => %{"flow" => "sets"}, "exercises" => [_, _, _]}
              ] = workout["sections"]
 
-      assert %{"name" => "Back Squat", "prescription_value" => 12, "load_mode" => "pct_1rm"} = squat
+      assert %{"name" => "Back Squat", "prescription_value" => 12, "load_mode" => "pct_1rm"} =
+               squat
+
+      # The canonical read model rides along with the plan.
+      assert %{
+               "clock" => %{"flow" => "sets", "total_rounds" => 4, "open_ended" => false},
+               "rows" => [
+                 %{
+                   "row_id" => "r1",
+                   "sets" => [%{"load" => %{"kind" => "pct_1rm", "value" => 60}} | _]
+                 }
+               ]
+             } = hd(workout["sections"])["prescription"]
 
       assert %{
                "kind" => "plan",

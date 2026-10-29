@@ -19,15 +19,17 @@ defmodule Palee.Workouts.Domain.WorkoutBody do
     Text): ordered `sections` with `name`, `timer` and `exercises`, each
     exercise keeping its full prescription.
   * `plan` — written in the structured WOD editor (ADR-270, authoring mode
-    `structured_plan`): ordered `sections` with `id`, `name` and the `plan`
-    (`StructuredPlan`), the source of truth; its materialised exercises are
-    left out.
+    `structured_plan`): ordered `sections` with `id`, `name`, the `plan`
+    (`StructuredPlan`, the source of truth) and its `prescription`
+    (`StructuredPlan.Prescription`, the canonical read model); the
+    materialised exercises are left out.
 
   `summary/1` is the same union for lists: text is cut to an excerpt, the
   rich documents and exercise details are left out, and counts stay.
   """
 
   alias Palee.Workouts.Domain.StructuredPlan
+  alias Palee.Workouts.Domain.StructuredPlan.Prescription
 
   @excerpt_length 280
   @free_text_timer_key "free_text_timer"
@@ -130,10 +132,13 @@ defmodule Palee.Workouts.Domain.WorkoutBody do
   end
 
   defp plan_section(section) do
+    plan = map_value(section, :plan)
+
     %{
       id: value(section, :id),
       name: value(section, :name),
-      plan: map_value(section, :plan)
+      plan: plan,
+      prescription: plan |> Prescription.build() |> Prescription.to_json()
     }
   end
 

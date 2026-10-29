@@ -14,18 +14,24 @@ defmodule Palee.Workouts.Domain.StructuredPlanWorkout do
   * rows of one group (a superset or complex of 2+ exercises) share a
     `superset_group_id`, a UUID derived from the group id, so it is the same
     on every save;
-  * the first column's reps and load where they are whole numbers
-    (`prescription_value`/`prescription_unit`, `load_value`/`load_mode`),
-    the sets of a `sets` flow (or of a dose like "4×10"), the tempo, the
-    `exercise_ref` and the note.
+  * built from `StructuredPlan.Prescription`: `set_prescriptions` per set
+    (a `sets` flow: one per round; other flows: one per distinct
+    prescription), whole-number reps and loads in the integer columns
+    (`prescription_value`/`prescription_unit`, `load_value`/`load_mode`,
+    the first set's on the exercise), and in `metadata` what those columns
+    cannot hold: decimal loads (`load_decimal`), rep ranges, max effort,
+    words (`load_text`), the canonical measures and the rounds a set
+    applies to (`plan_rounds`);
+  * `prescription_metadata` keeps the plan row it came from
+    (`plan_row_id`, `plan_block_index`, `plan_interrupt`), so actuals and
+    analytics can join back to the plan; the tempo, `exercise_ref` and note.
   """
 
   alias Palee.Workouts.Domain.StructuredPlan
-  alias Palee.Workouts.Domain.StructuredPlan.Notation
+  alias Palee.Workouts.Domain.StructuredPlan.Prescription
 
   @mode "structured_plan"
   @group_namespace "palee:structured-plan:group:"
-  @dose_units %{reps: "reps", secs: "secs", kcal: "kcal", m: "meters"}
 
   def mode, do: @mode
 
@@ -109,101 +115,168 @@ defmodule Palee.Workouts.Domain.StructuredPlanWorkout do
   @doc "The legacy exercise rows of a (valid) plan, as `workout_exercises` params."
   @spec exercises(map()) :: [map()]
   def exercises(%{} = plan) do
-    blocks = plan |> Map.get("blocks", []) |> List.wrap()
-    interrupt = plan |> Map.get("interrupt") |> List.wrap()
-    flow = Map.get(plan, "flow")
-    sets = if flow == "sets", do: Notation.max_count(get_in(plan, ["params", "sets"]))
+    case Prescription.build(plan) do
+      nil -> []
+      %{clock: clock, rows: rows} -> materialise(clock, rows)
+    end
+  end
 
-    (blocks ++ [interrupt])
-    |> Enum.flat_map(&StructuredPlan.units/1)
-    |> Enum.flat_map(fn unit ->
-      rows = Enum.filter(unit.rows, &exercise_row?/1)
-      group = if length(rows) > 1, do: group_uuid(unit.group)
-      Enum.map(rows, &exercise(&1, flow, sets, group))
+  defp materialise(clock, rows) do
+    named = Enum.filter(rows, &(&1.kind == "exercise" and &1.name))
+
+    # A superset id only for a group with 2+ exercises (rest rows do not count).
+    sizes =
+      named
+      |> Enum.reject(&is_nil(&1.group_id))
+      |> Enum.frequencies_by(&{&1.block_index, &1.group_id})
+
+    Enum.map(named, fn row ->
+      grouped? = row.group_id && Map.get(sizes, {row.block_index, row.group_id}, 0) > 1
+      exercise(row, clock, if(grouped?, do: group_uuid(row.group_id)))
     end)
   end
 
-  defp exercise_row?(row),
-    do: Map.get(row, "kind") == "ex" and String.trim(Map.get(row, "name") || "") != ""
-
-  defp exercise(row, flow, sets, group) do
-    first = first_cell(row, flow)
-    dose = Notation.parse_dose(first_value(first, row, "d", "dose"))
-    load = first_load(row, first)
+  defp exercise(row, clock, group) do
+    sets = legacy_sets(row, clock)
+    first = List.first(sets)
 
     %{
       "item_type" => "exercise",
-      "name" => String.trim(row["name"]),
-      "exercise_ref" => blank_to_nil(row["exerciseRef"]),
-      "note" => blank_to_nil(row["note"]),
-      "tempo" =>
-        blank_to_nil(first_value(first, row, "tempo", nil) || get_in(row, ["x", "tempo"])),
+      "name" => row.name,
+      "exercise_ref" => row.exercise_ref,
+      "note" => row.note,
+      "tempo" => first && tempo_text(first.measures.tempo),
       "superset_group_id" => group,
-      "sets" => sets || dose_sets(dose)
+      "sets" => max(length(sets), 1),
+      "set_prescriptions" => sets |> Enum.with_index(1) |> Enum.map(&set_prescription/1),
+      "prescription_metadata" => exercise_metadata(row, first)
     }
-    |> Map.merge(prescription(dose))
-    |> Map.merge(load)
+    |> Map.merge(if(first, do: columns(first), else: %{}))
   end
 
-  # Per set (flow `sets`) or per round, the first column holds the values;
-  # otherwise the row's same-every-time values do.
-  defp first_cell(row, flow) do
-    if flow == "sets" or row["perRound"] == true do
-      case row["cells"] do
-        [%{} = cell | _rest] -> cell
-        _none -> %{}
+  # The sets flow: one legacy set per round. Other flows: one per distinct
+  # prescription (a same-every-time row is one set however many rounds).
+  defp legacy_sets(row, %{flow: "sets"}) do
+    Enum.flat_map(row.sets, fn set ->
+      Enum.map(List.wrap(set.rounds), fn round -> %{set | rounds: [round]} end)
+    end)
+  end
+
+  # "4×3" in a same-every-time row is four sets.
+  defp legacy_sets(%{sets: [%{reps: %{sets: %{max: count}}} = set]}, _clock),
+    do: List.duplicate(set, count)
+
+  defp legacy_sets(row, _clock), do: row.sets
+
+  defp set_prescription({set, index}) do
+    set
+    |> columns()
+    |> Map.merge(%{"set_index" => index, "note" => nil, "metadata" => set_metadata(set)})
+  end
+
+  # Whole numbers go to the integer columns; the rest stays in metadata.
+  defp columns(set) do
+    reps =
+      case set.reps do
+        %{min: same, max: same, max_effort: false, unit: unit} ->
+          case whole(same) do
+            number when is_integer(number) and number >= 1 ->
+              %{"prescription_value" => number, "prescription_unit" => unit}
+
+            _other ->
+              %{"prescription_unit" => unit}
+          end
+
+        %{unit: unit} ->
+          %{"prescription_unit" => unit}
+
+        nil ->
+          %{}
       end
-    end
+
+    Map.merge(reps, load_columns(set.load))
   end
 
-  defp first_value(nil, row, _cell_key, row_key) when is_binary(row_key), do: row[row_key]
-  defp first_value(nil, _row, _cell_key, nil), do: nil
+  defp load_columns(%{kind: "bodyweight"}), do: %{"load_mode" => "bw"}
 
-  defp first_value(cell, row, cell_key, row_key) do
-    case cell[cell_key] do
-      value when is_binary(value) and value != "" -> value
-      _empty -> if row_key, do: row[row_key]
-    end
+  defp load_columns(%{kind: kind, value: %Decimal{} = value}) when kind in ["kg", "pct_1rm"] do
+    mode = if kind == "kg", do: "absolute", else: "pct_1rm"
+
+    if Decimal.integer?(value),
+      do: %{"load_value" => Decimal.to_integer(value), "load_mode" => mode},
+      else: %{"load_mode" => mode}
   end
 
-  defp prescription(%{max: nil, entries: [%{min: same, max: same}], unit: unit}) do
-    case whole(same) do
-      nil -> %{}
-      number -> %{"prescription_value" => number, "prescription_unit" => @dose_units[unit]}
-    end
+  defp load_columns(_load), do: %{}
+
+  defp set_metadata(set) do
+    reps = set.reps || %{}
+    load = set.load || %{}
+    measures = set.measures
+
+    %{
+      "load_unit" => load_unit(load[:kind]),
+      "load_decimal" => decimal_number(load[:value]),
+      "load_text" => load[:text],
+      "reps_min" => if(reps[:min] != reps[:max], do: reps[:min]),
+      "reps_max" => if(reps[:min] != reps[:max], do: reps[:max]),
+      "max_effort" => if(reps[:max_effort], do: true),
+      "within_seconds" => reps[:within_secs],
+      "tempo" => tempo_text(measures.tempo),
+      "target_rpe" => in_range(measures.rpe, 0, 10),
+      "target_rir" => whole(measures.rir),
+      "distance_meters" => positive(measures.distance_m),
+      "hold_seconds" => measures.hold_secs,
+      "pace_seconds_per_500m" => positive(measures.pace_secs_per_500m),
+      "hr_zone" => in_range(measures.hr_zone, 1, 5),
+      "height_cm" => positive(measures.height_cm),
+      "rest_after_seconds" => set.rest_secs,
+      "plan_rounds" => if(set.rounds != [], do: Enum.take(set.rounds, 500))
+    }
+    |> Enum.reject(fn {_key, value} -> is_nil(value) or value == "" end)
+    |> Map.new()
   end
 
-  defp prescription(_dose), do: %{}
+  defp exercise_metadata(row, first) do
+    measures = if first, do: first.measures, else: %{}
 
-  defp dose_sets(%{sets: %{max: max}}), do: max
-  defp dose_sets(_dose), do: nil
-
-  defp first_load(row, first) do
-    loads =
-      if first,
-        do: Enum.map(List.wrap(row["cells"]), &cell_load/1),
-        else: [row["load"]]
-
-    %{unit: unit} = Notation.row_load_issues(loads)
-    text = first_value(first, row, "l", "load")
-
-    case Notation.first_load(text, unit) do
-      %{mode: :bw} ->
-        %{"load_mode" => "bw"}
-
-      %{value: number, mode: mode} ->
-        case whole(number) do
-          nil -> %{}
-          number -> %{"load_value" => number, "load_mode" => Atom.to_string(mode)}
-        end
-
-      nil ->
-        %{}
-    end
+    %{
+      "plan_row_id" => row.row_id,
+      "plan_block_index" => row.block_index,
+      "plan_interrupt" => row.interrupt,
+      "side" => if(row.per_side, do: "each"),
+      "target_rpe" => in_range(measures[:rpe], 0, 10),
+      "target_rir" => whole(measures[:rir]),
+      "distance_meters" => positive(measures[:distance_m]),
+      "height_cm" => positive(measures[:height_cm]),
+      "hold_seconds" => measures[:hold_secs],
+      "pace_seconds_per_500m" => positive(measures[:pace_secs_per_500m]),
+      "hr_zone" => in_range(measures[:hr_zone], 1, 5)
+    }
+    |> Enum.reject(fn {_key, value} -> is_nil(value) end)
+    |> Map.new()
   end
 
-  defp cell_load(%{"l" => load}), do: load
-  defp cell_load(_cell), do: nil
+  defp load_unit("kg"), do: "kg"
+  defp load_unit("pct_1rm"), do: "pct_1rm"
+  defp load_unit("bodyweight"), do: "bodyweight"
+  defp load_unit(_kind), do: nil
+
+  defp tempo_text(%{down: down, bottom: bottom, up: up, top: top}),
+    do: Enum.map_join([down, bottom, up, top], "", &to_string/1)
+
+  defp tempo_text(_tempo), do: nil
+
+  defp decimal_number(%Decimal{} = value), do: Decimal.to_float(value)
+  defp decimal_number(_value), do: nil
+
+  defp in_range(value, min, max) when is_number(value) and value >= min and value <= max,
+    do: value
+
+  defp in_range(_value, _min, _max), do: nil
+
+  defp positive(value) when is_number(value) and value > 0, do: value
+  defp positive(_value), do: nil
 
   defp whole(number) when is_integer(number) and number >= 0, do: number
 
@@ -227,11 +300,6 @@ defmodule Palee.Workouts.Domain.StructuredPlanWorkout do
       Enum.join([p1, p2, p3, p4, p5], "-")
     end)
   end
-
-  defp blank_to_nil(value) when is_binary(value),
-    do: if(String.trim(value) == "", do: nil, else: String.trim(value))
-
-  defp blank_to_nil(_value), do: nil
 
   defp value(map, key), do: Map.get(map, key, Map.get(map, Atom.to_string(key)))
 end

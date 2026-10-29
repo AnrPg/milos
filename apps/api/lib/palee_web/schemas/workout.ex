@@ -167,6 +167,7 @@ defmodule PaleeWeb.Schemas.Workout do
         free_text_document: %Schema{type: :object, additionalProperties: true, nullable: true},
         timer_preset: section_timer_preset_schema(),
         plan: plan_section_schema(),
+        prescription: PaleeWeb.Schemas.StructuredPlan.prescription_schema(),
         exercises: %Schema{type: :array, items: workout_item_schema()},
         sections: %Schema{type: :array, items: child_schema}
       },
@@ -175,50 +176,8 @@ defmodule PaleeWeb.Schemas.Workout do
     }
   end
 
-  @doc """
-  ADR-270: one section of a structured WOD plan (the web contract
-  `PlanSection` in `apps/web/src/lib/structured-plan/types.ts`), validated by
-  `Palee.Workouts.Domain.StructuredPlan`. Null outside `structured_plan` workouts.
-  """
-  def plan_section_schema do
-    %Schema{
-      title: "PlanSection",
-      type: :object,
-      nullable: true,
-      description:
-        "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
-      properties: %{
-        v: %Schema{type: :integer, enum: [1]},
-        flow: %Schema{type: :string, enum: Palee.Workouts.Domain.StructuredPlan.flows()},
-        preset: @nullable_string,
-        params: %Schema{type: :object, additionalProperties: %Schema{type: :string}},
-        mods: %Schema{type: :object, additionalProperties: %Schema{type: :boolean}},
-        blocks: %Schema{
-          type: :array,
-          maxItems: 12,
-          items: %Schema{
-            type: :array,
-            maxItems: 60,
-            items: %Schema{type: :object, additionalProperties: true}
-          }
-        },
-        interrupt: %Schema{
-          type: :array,
-          maxItems: 60,
-          items: %Schema{type: :object, additionalProperties: true}
-        },
-        structs: %Schema{
-          type: :object,
-          additionalProperties: %Schema{type: :object, additionalProperties: true}
-        },
-        score: %Schema{type: :string},
-        note: %Schema{type: :string, maxLength: 2000},
-        levelNotes: %Schema{type: :object, additionalProperties: %Schema{type: :string}}
-      },
-      required: [:blocks, :flow, :params, :score, :v],
-      additionalProperties: true
-    }
-  end
+  @doc "ADR-270: one section of a structured WOD plan (see `PaleeWeb.Schemas.StructuredPlan`)."
+  def plan_section_schema, do: PaleeWeb.Schemas.StructuredPlan.plan_section_schema()
 
   @doc "ADR-180: the timer a coach picked for one text section (the free-text preset shape)."
   def section_timer_preset_schema do
@@ -459,9 +418,10 @@ defmodule PaleeWeb.Schemas.Workout do
             properties: %{
               id: @nullable_uuid,
               name: %Schema{type: :string},
-              plan: plan_section_schema()
+              plan: plan_section_schema(),
+              prescription: PaleeWeb.Schemas.StructuredPlan.prescription_schema()
             },
-            required: [:id, :name, :plan],
+            required: [:id, :name, :plan, :prescription],
             additionalProperties: false
           }
         }
