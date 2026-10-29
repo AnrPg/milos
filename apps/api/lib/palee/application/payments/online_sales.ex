@@ -210,7 +210,7 @@ defmodule Palee.Application.Payments.OnlineSales do
              "provider_transaction_id" => intent.provider_transaction_id
            }) do
       unless received.replayed, do: book_after_purchase(context, intent)
-      {:ok, %{finance_payment_id: received.payment.id}}
+      {:ok, Palee.Application.Payments.FinanceFulfilment.fulfilled(received)}
     end
   end
 

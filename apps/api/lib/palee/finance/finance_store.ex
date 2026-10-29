@@ -63,6 +63,8 @@ defmodule Palee.Finance.FinanceStore do
   @impl true
   def get_invoice(invoice_id), do: adapter().get_invoice(invoice_id)
   @impl true
+  def invoice_lines(invoice_id), do: adapter().invoice_lines(invoice_id)
+  @impl true
   def update_invoice_params(invoice_id, params),
     do: adapter().update_invoice_params(invoice_id, params)
 

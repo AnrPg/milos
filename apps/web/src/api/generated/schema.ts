@@ -7223,6 +7223,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/einvoice/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a refused, failed or uncertain document over Peppol again
+         * @description An uncertain submission may already have reached the access point: check its portal first. It is sent with the same idempotency GUID, so a copy is refused, not delivered.
+         */
+        post: operations["PaleeWeb.AdminFiscalEInvoicingController.retry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/fiscal/documents/{id}/html": {
         parameters: {
             query?: never;
@@ -7268,6 +7288,40 @@ export interface paths {
         put?: never;
         /** Send a refused or failed document to the tax authority again */
         post: operations["PaleeWeb.AdminFiscalReportingController.retry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/einvoices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Peppol submissions, newest first, with counts per status */
+        get: operations["PaleeWeb.AdminFiscalEInvoicingController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/einvoices/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A Peppol submission with its attempts */
+        get: operations["PaleeWeb.AdminFiscalEInvoicingController.show"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -7369,6 +7423,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/fiscal/peppol-connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Peppol connection (access point, environment, Peppol id; never the key) */
+        get: operations["PaleeWeb.AdminFiscalEInvoicingController.connection"];
+        /**
+         * Connect to Peppol: sandbox, or Storecove (test or production)
+         * @description `test` and `production` send through Storecove and need the business's legal entity id and API key; a saved key is kept when none is sent. The Peppol id defaults to the `0208` enterprise number of the business. The webhook URL is shown once, when a new token is made. Documents waiting for a connection are sent right after.
+         */
+        put: operations["PaleeWeb.AdminFiscalEInvoicingController.save_connection"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/fiscal/sales-tax-rates": {
         parameters: {
             query?: never;
@@ -7401,6 +7476,98 @@ export interface paths {
         get: operations["PaleeWeb.AdminFiscalTaxController.tax_categories"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/till-connections/{device}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The TSE or RKSV connection (provider, environment, unit; never the credentials) */
+        get: operations["PaleeWeb.AdminFiscalTillSigningController.connection"];
+        /**
+         * Connect the till to a TSE (DE) or RKSV unit (AT): sandbox or fiskaly
+         * @description `test` and `production` use fiskaly SIGN DE / SIGN AT and need the API key and secret; saved ones are kept when none are sent. A new connection (or `reprovision`) creates and initialises the TSS and client, or the signature unit and cash register. Receipts waiting for a connection are signed right after.
+         */
+        put: operations["PaleeWeb.AdminFiscalTillSigningController.save_connection"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/till-signatures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Receipt signatures, newest first, with counts per status */
+        get: operations["PaleeWeb.AdminFiscalTillSigningController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/till-signatures/null-receipts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sign an RKSV null receipt (Nullbeleg) */
+        post: operations["PaleeWeb.AdminFiscalTillSigningController.null_receipt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/till-signatures/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A receipt signature with what it prints and its attempts */
+        get: operations["PaleeWeb.AdminFiscalTillSigningController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/till-signatures/{id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sign a refused, failed or uncertain receipt again
+         * @description An uncertain signature is read back from the device first. A German receipt recorded as a TSE failure stays so.
+         */
+        post: operations["PaleeWeb.AdminFiscalTillSigningController.retry"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7822,6 +7989,114 @@ export interface paths {
          * @description Answers the provider page to send the owner to. There they sign in or open a merchant account and allow Palee; the provider sends them back to `/api/payments/connect/callback`, which opens the settings page with `connect=ok` or `connect=<error code>`.
          */
         post: operations["PaleeWeb.AdminPaymentsController.connect"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Open a Tap to Pay payment at the desk
+         * @description Answers the payment and the request the phone hands to the provider's terminal app. A retry with the same idempotency key answers the first payment.
+         */
+        post: operations["PaleeWeb.AdminTerminalPaymentsController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Whether the business can take Tap to Pay now */
+        get: operations["PaleeWeb.AdminTerminalPaymentsController.availability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal/result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * What the terminal app returned (confirmed with the provider)
+         * @description The phone posts the callback it received. Money is recorded only after the provider confirms the transaction; a duplicate callback answers the payment as it stands.
+         */
+        post: operations["PaleeWeb.AdminTerminalPaymentsController.result"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One Tap to Pay payment */
+        get: operations["PaleeWeb.AdminTerminalPaymentsController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Give up on a Tap to Pay payment that has no card transaction */
+        post: operations["PaleeWeb.AdminTerminalPaymentsController.cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal/{id}/sandbox-complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dev/test only: the sandbox terminal app takes or refuses the card */
+        post: operations["PaleeWeb.AdminTerminalPaymentsController.sandbox_complete"];
         delete?: never;
         options?: never;
         head?: never;
@@ -76733,6 +77008,35 @@ export interface operations {
                             corrects_document_id?: string | null;
                             country_code: string;
                             currency: string;
+                            /** @description The document's Peppol submission (ADR-250). */
+                            einvoice?: {
+                                attempts: number;
+                                /** Format: date-time */
+                                delivered_at?: string | null;
+                                /** Format: uuid */
+                                document_id: string;
+                                environment?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                /** @enum {string} */
+                                network: "peppol";
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                polls?: number;
+                                provider_submission_id?: string | null;
+                                recipient_identifier: string;
+                                recipient_scheme: string;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                                /** Format: date-time */
+                                submitted_at?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
                             gross_cents: number;
                             /** Format: uuid */
                             id: string;
@@ -76779,6 +77083,52 @@ export interface operations {
                                 tax_cents: number;
                             }[];
                             tax_cents: number;
+                            /** @description A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints. */
+                            till_signature?: {
+                                attempts: number;
+                                /** @enum {string} */
+                                device: "tse" | "rksv";
+                                /** Format: uuid */
+                                document_id?: string | null;
+                                environment?: string | null;
+                                /** Format: date-time */
+                                failed_at?: string | null;
+                                /** Format: date-time */
+                                finished_at_device?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                /** @enum {string} */
+                                kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                /** Format: date */
+                                period?: string | null;
+                                print: {
+                                    label: string;
+                                    value?: string | null;
+                                }[];
+                                qr_code_data?: string | null;
+                                receipt_number?: string | null;
+                                register_serial?: string | null;
+                                signature_algorithm?: string | null;
+                                signature_counter?: number | null;
+                                signature_value?: string | null;
+                                /** Format: date-time */
+                                signed_at?: string | null;
+                                /** Format: date-time */
+                                started_at_device?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                                time_format?: string | null;
+                                transaction_number?: number | null;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
                             /** @description The document's report to the tax authority (ADR-243). */
                             transmission?: {
                                 /** Format: date-time */
@@ -76848,6 +77198,35 @@ export interface operations {
                                 corrects_document_id?: string | null;
                                 country_code: string;
                                 currency: string;
+                                /** @description The document's Peppol submission (ADR-250). */
+                                einvoice?: {
+                                    attempts: number;
+                                    /** Format: date-time */
+                                    delivered_at?: string | null;
+                                    /** Format: uuid */
+                                    document_id: string;
+                                    environment?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    /** Format: date-time */
+                                    inserted_at?: string;
+                                    last_error_code?: string | null;
+                                    last_error_message?: string | null;
+                                    /** @enum {string} */
+                                    network: "peppol";
+                                    /** Format: date-time */
+                                    next_attempt_at?: string | null;
+                                    polls?: number;
+                                    provider_submission_id?: string | null;
+                                    recipient_identifier: string;
+                                    recipient_scheme: string;
+                                    /** @enum {string} */
+                                    status: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                                    /** Format: date-time */
+                                    submitted_at?: string | null;
+                                    /** Format: date-time */
+                                    updated_at?: string;
+                                } | null;
                                 gross_cents: number;
                                 /** Format: uuid */
                                 id: string;
@@ -76894,6 +77273,52 @@ export interface operations {
                                     tax_cents: number;
                                 }[];
                                 tax_cents: number;
+                                /** @description A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints. */
+                                till_signature?: {
+                                    attempts: number;
+                                    /** @enum {string} */
+                                    device: "tse" | "rksv";
+                                    /** Format: uuid */
+                                    document_id?: string | null;
+                                    environment?: string | null;
+                                    /** Format: date-time */
+                                    failed_at?: string | null;
+                                    /** Format: date-time */
+                                    finished_at_device?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    /** Format: date-time */
+                                    inserted_at?: string;
+                                    /** @enum {string} */
+                                    kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                                    last_error_code?: string | null;
+                                    last_error_message?: string | null;
+                                    /** Format: date-time */
+                                    next_attempt_at?: string | null;
+                                    /** Format: date */
+                                    period?: string | null;
+                                    print: {
+                                        label: string;
+                                        value?: string | null;
+                                    }[];
+                                    qr_code_data?: string | null;
+                                    receipt_number?: string | null;
+                                    register_serial?: string | null;
+                                    signature_algorithm?: string | null;
+                                    signature_counter?: number | null;
+                                    signature_value?: string | null;
+                                    /** Format: date-time */
+                                    signed_at?: string | null;
+                                    /** Format: date-time */
+                                    started_at_device?: string | null;
+                                    /** @enum {string} */
+                                    status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                                    time_format?: string | null;
+                                    transaction_number?: number | null;
+                                    unit_serial?: string | null;
+                                    /** Format: date-time */
+                                    updated_at?: string;
+                                } | null;
                                 /** @description The document's report to the tax authority (ADR-243). */
                                 transmission?: {
                                     /** Format: date-time */
@@ -76923,6 +77348,35 @@ export interface operations {
                                 } | null;
                             }[];
                             currency: string;
+                            /** @description The document's Peppol submission (ADR-250). */
+                            einvoice?: {
+                                attempts: number;
+                                /** Format: date-time */
+                                delivered_at?: string | null;
+                                /** Format: uuid */
+                                document_id: string;
+                                environment?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                /** @enum {string} */
+                                network: "peppol";
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                polls?: number;
+                                provider_submission_id?: string | null;
+                                recipient_identifier: string;
+                                recipient_scheme: string;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                                /** Format: date-time */
+                                submitted_at?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
                             gross_cents: number;
                             /** Format: uuid */
                             id: string;
@@ -76969,6 +77423,52 @@ export interface operations {
                                 tax_cents: number;
                             }[];
                             tax_cents: number;
+                            /** @description A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints. */
+                            till_signature?: {
+                                attempts: number;
+                                /** @enum {string} */
+                                device: "tse" | "rksv";
+                                /** Format: uuid */
+                                document_id?: string | null;
+                                environment?: string | null;
+                                /** Format: date-time */
+                                failed_at?: string | null;
+                                /** Format: date-time */
+                                finished_at_device?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                /** @enum {string} */
+                                kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                /** Format: date */
+                                period?: string | null;
+                                print: {
+                                    label: string;
+                                    value?: string | null;
+                                }[];
+                                qr_code_data?: string | null;
+                                receipt_number?: string | null;
+                                register_serial?: string | null;
+                                signature_algorithm?: string | null;
+                                signature_counter?: number | null;
+                                signature_value?: string | null;
+                                /** Format: date-time */
+                                signed_at?: string | null;
+                                /** Format: date-time */
+                                started_at_device?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                                time_format?: string | null;
+                                transaction_number?: number | null;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
                             /** @description The document's report to the tax authority (ADR-243). */
                             transmission?: {
                                 /** Format: date-time */
@@ -77039,6 +77539,35 @@ export interface operations {
                             corrects_document_id?: string | null;
                             country_code: string;
                             currency: string;
+                            /** @description The document's Peppol submission (ADR-250). */
+                            einvoice?: {
+                                attempts: number;
+                                /** Format: date-time */
+                                delivered_at?: string | null;
+                                /** Format: uuid */
+                                document_id: string;
+                                environment?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                /** @enum {string} */
+                                network: "peppol";
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                polls?: number;
+                                provider_submission_id?: string | null;
+                                recipient_identifier: string;
+                                recipient_scheme: string;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                                /** Format: date-time */
+                                submitted_at?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
                             gross_cents: number;
                             /** Format: uuid */
                             id: string;
@@ -77085,6 +77614,52 @@ export interface operations {
                                 tax_cents: number;
                             }[];
                             tax_cents: number;
+                            /** @description A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints. */
+                            till_signature?: {
+                                attempts: number;
+                                /** @enum {string} */
+                                device: "tse" | "rksv";
+                                /** Format: uuid */
+                                document_id?: string | null;
+                                environment?: string | null;
+                                /** Format: date-time */
+                                failed_at?: string | null;
+                                /** Format: date-time */
+                                finished_at_device?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                /** @enum {string} */
+                                kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                /** Format: date */
+                                period?: string | null;
+                                print: {
+                                    label: string;
+                                    value?: string | null;
+                                }[];
+                                qr_code_data?: string | null;
+                                receipt_number?: string | null;
+                                register_serial?: string | null;
+                                signature_algorithm?: string | null;
+                                signature_counter?: number | null;
+                                signature_value?: string | null;
+                                /** Format: date-time */
+                                signed_at?: string | null;
+                                /** Format: date-time */
+                                started_at_device?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                                time_format?: string | null;
+                                transaction_number?: number | null;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
                             /** @description The document's report to the tax authority (ADR-243). */
                             transmission?: {
                                 /** Format: date-time */
@@ -77132,6 +77707,35 @@ export interface operations {
                             corrects_document_id?: string | null;
                             country_code: string;
                             currency: string;
+                            /** @description The document's Peppol submission (ADR-250). */
+                            einvoice?: {
+                                attempts: number;
+                                /** Format: date-time */
+                                delivered_at?: string | null;
+                                /** Format: uuid */
+                                document_id: string;
+                                environment?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                /** @enum {string} */
+                                network: "peppol";
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                polls?: number;
+                                provider_submission_id?: string | null;
+                                recipient_identifier: string;
+                                recipient_scheme: string;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                                /** Format: date-time */
+                                submitted_at?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
                             gross_cents: number;
                             /** Format: uuid */
                             id: string;
@@ -77178,6 +77782,52 @@ export interface operations {
                                 tax_cents: number;
                             }[];
                             tax_cents: number;
+                            /** @description A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints. */
+                            till_signature?: {
+                                attempts: number;
+                                /** @enum {string} */
+                                device: "tse" | "rksv";
+                                /** Format: uuid */
+                                document_id?: string | null;
+                                environment?: string | null;
+                                /** Format: date-time */
+                                failed_at?: string | null;
+                                /** Format: date-time */
+                                finished_at_device?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                /** @enum {string} */
+                                kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                /** Format: date */
+                                period?: string | null;
+                                print: {
+                                    label: string;
+                                    value?: string | null;
+                                }[];
+                                qr_code_data?: string | null;
+                                receipt_number?: string | null;
+                                register_serial?: string | null;
+                                signature_algorithm?: string | null;
+                                signature_counter?: number | null;
+                                signature_value?: string | null;
+                                /** Format: date-time */
+                                signed_at?: string | null;
+                                /** Format: date-time */
+                                started_at_device?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                                time_format?: string | null;
+                                transaction_number?: number | null;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
                             /** @description The document's report to the tax authority (ADR-243). */
                             transmission?: {
                                 /** Format: date-time */
@@ -77205,6 +77855,58 @@ export interface operations {
                                 /** Format: date-time */
                                 updated_at?: string;
                             } | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalEInvoicingController.retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Submission */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The document's Peppol submission (ADR-250). */
+                        submission: {
+                            attempts: number;
+                            /** Format: date-time */
+                            delivered_at?: string | null;
+                            /** Format: uuid */
+                            document_id: string;
+                            environment?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            /** @enum {string} */
+                            network: "peppol";
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            polls?: number;
+                            provider_submission_id?: string | null;
+                            recipient_identifier: string;
+                            recipient_scheme: string;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                            /** Format: date-time */
+                            submitted_at?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
                         };
                     };
                 };
@@ -77303,6 +78005,128 @@ export interface operations {
                             /** @enum {string} */
                             status: "pending" | "sending" | "accepted" | "rejected" | "failed";
                             uid?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalEInvoicingController.index": {
+        parameters: {
+            query?: {
+                status?: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Submissions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        counts: {
+                            [key: string]: number;
+                        };
+                        submissions: {
+                            attempts: number;
+                            /** Format: date-time */
+                            delivered_at?: string | null;
+                            /** Format: uuid */
+                            document_id: string;
+                            environment?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            /** @enum {string} */
+                            network: "peppol";
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            polls?: number;
+                            provider_submission_id?: string | null;
+                            recipient_identifier: string;
+                            recipient_scheme: string;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                            /** Format: date-time */
+                            submitted_at?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalEInvoicingController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Submission */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The document's Peppol submission (ADR-250). */
+                        submission: {
+                            attempts: number;
+                            attempts_log: {
+                                attempt: number;
+                                duration_ms?: number | null;
+                                environment: string;
+                                error?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                operation: string;
+                                outcome: string;
+                                response_status?: number | null;
+                                /** Format: date-time */
+                                started_at: string;
+                            }[];
+                            /** Format: date-time */
+                            delivered_at?: string | null;
+                            /** Format: uuid */
+                            document_id: string;
+                            environment?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            /** @enum {string} */
+                            network: "peppol";
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            polls?: number;
+                            provider_submission_id?: string | null;
+                            recipient_identifier: string;
+                            recipient_scheme: string;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                            /** Format: date-time */
+                            submitted_at?: string | null;
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -77619,6 +78443,102 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminFiscalEInvoicingController.connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The Peppol connection; the API key and the webhook token are never returned (`webhook_url` appears once, when a new token is made). */
+                        connection: {
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            has_api_key: boolean;
+                            has_webhook_token: boolean;
+                            last_error?: string | null;
+                            legal_entity_id?: string | null;
+                            /** @enum {string} */
+                            network: "peppol";
+                            /** @example 0208:0123456749 */
+                            peppol_id: string;
+                            /** @enum {string} */
+                            provider: "sandbox" | "storecove";
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            webhook_url?: string | null;
+                        } | null;
+                        environments: ("sandbox" | "test" | "production")[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalEInvoicingController.save_connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Leave out to keep the saved key. */
+                    api_key?: string | null;
+                    /** @enum {string} */
+                    environment: "sandbox" | "test" | "production";
+                    legal_entity_id?: string | null;
+                    /** @description `scheme:identifier`; defaults to `0208:` + the enterprise number. */
+                    peppol_id?: string | null;
+                    rotate_webhook_token?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The Peppol connection; the API key and the webhook token are never returned (`webhook_url` appears once, when a new token is made). */
+                        connection: {
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            has_api_key: boolean;
+                            has_webhook_token: boolean;
+                            last_error?: string | null;
+                            legal_entity_id?: string | null;
+                            /** @enum {string} */
+                            network: "peppol";
+                            /** @example 0208:0123456749 */
+                            peppol_id: string;
+                            /** @enum {string} */
+                            provider: "sandbox" | "storecove";
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            webhook_url?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminFiscalTaxController.sales_tax_rates": {
         parameters: {
             query?: never;
@@ -77716,6 +78636,407 @@ export interface operations {
                         country: string | null;
                         default: string;
                         max_exemption_reason: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTillSigningController.connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device: "tse" | "rksv";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The TSE or RKSV connection; key, secret and admin PIN are never returned. */
+                        connection: {
+                            /** @enum {string} */
+                            device: "tse" | "rksv";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            last_error?: string | null;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly";
+                            /** Format: date-time */
+                            provisioned_at?: string | null;
+                            public_key?: string | null;
+                            /** Format: uuid */
+                            register_id: string;
+                            register_serial?: string | null;
+                            /** @enum {string} */
+                            status: "provisioning" | "active" | "invalid";
+                            /** Format: uuid */
+                            unit_id: string;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        } | null;
+                        environments: ("sandbox" | "test" | "production")[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTillSigningController.save_connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device: "tse" | "rksv";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    api_key?: string | null;
+                    api_secret?: string | null;
+                    /** @enum {string} */
+                    environment: "sandbox" | "test" | "production";
+                    /** @description Create a new TSS/client (DE) or signature unit/cash register (AT). */
+                    reprovision?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The TSE or RKSV connection; key, secret and admin PIN are never returned. */
+                        connection: {
+                            /** @enum {string} */
+                            device: "tse" | "rksv";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            last_error?: string | null;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly";
+                            /** Format: date-time */
+                            provisioned_at?: string | null;
+                            public_key?: string | null;
+                            /** Format: uuid */
+                            register_id: string;
+                            register_serial?: string | null;
+                            /** @enum {string} */
+                            status: "provisioning" | "active" | "invalid";
+                            /** Format: uuid */
+                            unit_id: string;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTillSigningController.index": {
+        parameters: {
+            query?: {
+                status?: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                device?: "tse" | "rksv";
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signatures */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        counts: {
+                            [key: string]: number;
+                        };
+                        signatures: {
+                            attempts: number;
+                            /** @enum {string} */
+                            device: "tse" | "rksv";
+                            /** Format: uuid */
+                            document_id?: string | null;
+                            environment?: string | null;
+                            /** Format: date-time */
+                            failed_at?: string | null;
+                            /** Format: date-time */
+                            finished_at_device?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @enum {string} */
+                            kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            /** Format: date */
+                            period?: string | null;
+                            print: {
+                                label: string;
+                                value?: string | null;
+                            }[];
+                            qr_code_data?: string | null;
+                            receipt_number?: string | null;
+                            register_serial?: string | null;
+                            signature_algorithm?: string | null;
+                            signature_counter?: number | null;
+                            signature_value?: string | null;
+                            /** Format: date-time */
+                            signed_at?: string | null;
+                            /** Format: date-time */
+                            started_at_device?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                            time_format?: string | null;
+                            transaction_number?: number | null;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTillSigningController.null_receipt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signature */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints. */
+                        signature: {
+                            attempts: number;
+                            /** @enum {string} */
+                            device: "tse" | "rksv";
+                            /** Format: uuid */
+                            document_id?: string | null;
+                            environment?: string | null;
+                            /** Format: date-time */
+                            failed_at?: string | null;
+                            /** Format: date-time */
+                            finished_at_device?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @enum {string} */
+                            kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            /** Format: date */
+                            period?: string | null;
+                            print: {
+                                label: string;
+                                value?: string | null;
+                            }[];
+                            qr_code_data?: string | null;
+                            receipt_number?: string | null;
+                            register_serial?: string | null;
+                            signature_algorithm?: string | null;
+                            signature_counter?: number | null;
+                            signature_value?: string | null;
+                            /** Format: date-time */
+                            signed_at?: string | null;
+                            /** Format: date-time */
+                            started_at_device?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                            time_format?: string | null;
+                            transaction_number?: number | null;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTillSigningController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signature */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints. */
+                        signature: {
+                            attempts: number;
+                            attempts_log: {
+                                attempt: number;
+                                duration_ms?: number | null;
+                                environment: string;
+                                error?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                operation: string;
+                                outcome: string;
+                                response_status?: number | null;
+                                /** Format: date-time */
+                                started_at: string;
+                            }[];
+                            /** @enum {string} */
+                            device: "tse" | "rksv";
+                            /** Format: uuid */
+                            document_id?: string | null;
+                            environment?: string | null;
+                            /** Format: date-time */
+                            failed_at?: string | null;
+                            /** Format: date-time */
+                            finished_at_device?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @enum {string} */
+                            kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            /** Format: date */
+                            period?: string | null;
+                            print: {
+                                label: string;
+                                value?: string | null;
+                            }[];
+                            qr_code_data?: string | null;
+                            receipt_number?: string | null;
+                            register_serial?: string | null;
+                            signature_algorithm?: string | null;
+                            signature_counter?: number | null;
+                            signature_value?: string | null;
+                            /** Format: date-time */
+                            signed_at?: string | null;
+                            /** Format: date-time */
+                            started_at_device?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                            time_format?: string | null;
+                            transaction_number?: number | null;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTillSigningController.retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signature */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints. */
+                        signature: {
+                            attempts: number;
+                            /** @enum {string} */
+                            device: "tse" | "rksv";
+                            /** Format: uuid */
+                            document_id?: string | null;
+                            environment?: string | null;
+                            /** Format: date-time */
+                            failed_at?: string | null;
+                            /** Format: date-time */
+                            finished_at_device?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @enum {string} */
+                            kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            /** Format: date */
+                            period?: string | null;
+                            print: {
+                                label: string;
+                                value?: string | null;
+                            }[];
+                            qr_code_data?: string | null;
+                            receipt_number?: string | null;
+                            register_serial?: string | null;
+                            signature_algorithm?: string | null;
+                            signature_counter?: number | null;
+                            signature_value?: string | null;
+                            /** Format: date-time */
+                            signed_at?: string | null;
+                            /** Format: date-time */
+                            started_at_device?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                            time_format?: string | null;
+                            transaction_number?: number | null;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
                     };
                 };
             };
@@ -79083,7 +80404,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -79418,7 +80739,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -79481,6 +80802,441 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminTerminalPaymentsController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    amount_cents: number;
+                    /** @enum {string|null} */
+                    charge_category?: "product" | "personal_training" | "event" | "other" | null;
+                    description?: string | null;
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    purpose: "finance_invoice" | "membership_package" | "shop_order" | "free_sale";
+                    /** Format: uuid */
+                    purpose_id?: string | null;
+                    /** Format: uuid */
+                    user_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            /** @description What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched. */
+                            app_request?: {
+                                params: {
+                                    [key: string]: string;
+                                };
+                                scheme: string;
+                                url: string;
+                            } | null;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            /** @description The signed reference the terminal app keeps (clientTransactionId). */
+                            reference: string;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Availability */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        available: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    message?: string | null;
+                    reference: string;
+                    status: string;
+                    transaction_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            /** @description What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched. */
+                            app_request?: {
+                                params: {
+                                    [key: string]: string;
+                                };
+                                scheme: string;
+                                url: string;
+                            } | null;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            /** @description The signed reference the terminal app keeps (clientTransactionId). */
+                            reference: string;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            /** @description What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched. */
+                            app_request?: {
+                                params: {
+                                    [key: string]: string;
+                                };
+                                scheme: string;
+                                url: string;
+                            } | null;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            /** @description The signed reference the terminal app keeps (clientTransactionId). */
+                            reference: string;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            /** @description What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched. */
+                            app_request?: {
+                                params: {
+                                    [key: string]: string;
+                                };
+                                scheme: string;
+                                url: string;
+                            } | null;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            /** @description The signed reference the terminal app keeps (clientTransactionId). */
+                            reference: string;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.sandbox_complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    outcome: "succeeded" | "failed" | "cancelled";
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            /** @description What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched. */
+                            app_request?: {
+                                params: {
+                                    [key: string]: string;
+                                };
+                                scheme: string;
+                                url: string;
+                            } | null;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            /** @description The signed reference the terminal app keeps (clientTransactionId). */
+                            reference: string;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminPaymentsController.show": {
         parameters: {
             query?: never;
@@ -79519,7 +81275,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -79600,7 +81356,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -79666,7 +81422,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -79777,7 +81533,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -79843,7 +81599,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -97614,7 +99370,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -97916,7 +99672,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -98161,7 +99917,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -98234,7 +99990,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -98300,7 +100056,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -99921,7 +101677,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {

@@ -173,6 +173,46 @@ defmodule Palee.Fiscal.Domain.FiscalDocumentPolicyTest do
                )
     end
 
+    test "a part refund credits an amount over what is left, in proportion",
+         %{original: original} do
+      assert {:ok, part} =
+               FiscalDocumentPolicy.credit_note(
+                 original,
+                 %{},
+                 %{amount_cents: 700},
+                 ~D[2027-02-02]
+               )
+
+      assert part.gross_cents == 700
+
+      assert Enum.map(part.lines, &{&1.corrects_position, &1.quantity, &1.amount_cents}) ==
+               [{1, 1, 600}, {2, 1, 100}]
+
+      credited = %{1 => %{quantity: 1, amount_cents: 600}, 2 => %{quantity: 1, amount_cents: 100}}
+
+      assert {:error, :credit_exceeds_document} =
+               FiscalDocumentPolicy.credit_note(
+                 original,
+                 credited,
+                 %{amount_cents: 2_801},
+                 ~D[2027-02-02]
+               )
+
+      assert {:error, :invalid_credit_amount} =
+               FiscalDocumentPolicy.credit_note(original, %{}, %{amount_cents: 0}, ~D[2027-02-02])
+
+      # What is left is credited in full, whatever the quantities say.
+      assert {:ok, rest} =
+               FiscalDocumentPolicy.credit_note(original, credited, :all, ~D[2027-02-02])
+
+      assert rest.gross_cents == 2_800
+
+      assert Enum.map(rest.lines, &{&1.corrects_position, &1.amount_cents}) == [
+               {1, 2400},
+               {2, 400}
+             ]
+    end
+
     test "a credit note cannot be credited", %{original: original} do
       {:ok, note} = FiscalDocumentPolicy.credit_note(original, %{}, :all, ~D[2027-02-02])
 

@@ -227,7 +227,14 @@ defmodule PaleeWeb.FallbackController do
       {:conflict, "Sales tax rates apply only to a business in the United States"},
     sales_tax_rate_missing:
       {:unprocessable_entity, "Add a sales tax rate for this state or ZIP code first"},
-    unknown_export_format: {:not_found, "No such accounting export format"}
+    unknown_export_format: {:not_found, "No such accounting export format"},
+    # ADR-250/251: Peppol and the till's security device.
+    invalid_peppol_id:
+      {:unprocessable_entity, "This is not a valid Peppol address (scheme:identifier)"},
+    till_not_connected: {:conflict, "Connect the till's security device (RKSV) first"},
+    till_credentials_refused: {:conflict, "fiskaly refused the business's API key or secret"},
+    till_provisioning_failed:
+      {:bad_gateway, "The security device could not be set up; see the connection's last error"}
   }
 
   # ADR-254: CSV imports.
@@ -344,6 +351,27 @@ defmodule PaleeWeb.FallbackController do
 
   def call(conn, {:error, reason}) when is_map_key(@payment_errors, reason) do
     {status, message} = Map.fetch!(@payment_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
+  # ADR-249: Tap to Pay at the desk.
+  @terminal_payment_errors %{
+    terminal_payments_unavailable:
+      {:conflict, "Tap to Pay is not set up for this business (connect a Viva account)"},
+    terminal_member_required: {:unprocessable_entity, "Choose the member who pays"},
+    terminal_request_used:
+      {:conflict, "This payment request was already used for another card payment"},
+    terminal_transaction_used:
+      {:conflict, "This card payment is already recorded for another request"},
+    payment_not_cancellable: {:conflict, "This payment can no longer be cancelled"},
+    package_inactive: {:conflict, "This package is no longer offered"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@terminal_payment_errors, reason) do
+    {status, message} = Map.fetch!(@terminal_payment_errors, reason)
 
     conn
     |> put_status(status)

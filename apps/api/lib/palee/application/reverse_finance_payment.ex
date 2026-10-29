@@ -1,4 +1,5 @@
 defmodule Palee.Application.ReverseFinancePayment do
+  alias Palee.Application.Fiscal.PaymentDocuments
   alias Palee.Application.RecordAnalyticsEvent
   alias Palee.{Finance, Identity}
 
@@ -33,18 +34,26 @@ defmodule Palee.Application.ReverseFinancePayment do
             }
           })
 
-          {:ok,
-           Map.put(
-             reversal,
-             :refund_receipt,
-             Finance.get_refund_receipt_for_reversal(reversal.id)
-           )}
+          reversal =
+            Map.put(
+              reversal,
+              :refund_receipt,
+              Finance.get_refund_receipt_for_reversal(reversal.id)
+            )
+
+          # ADR-262: the money given back credits the payment's fiscal document.
+          {:ok, fiscal_credit(context, payment_id, reversal, admin_id)}
         end
     end
   end
 
   def call(user_id, payment_id, admin_id, params),
     do: call(nil, user_id, payment_id, admin_id, params)
+
+  defp fiscal_credit(nil, _payment_id, reversal, _admin_id), do: reversal
+
+  defp fiscal_credit(context, payment_id, reversal, admin_id),
+    do: PaymentDocuments.attach_credit(context, payment_id, reversal, admin_id)
 
   defp receipt_party(context, user_id) do
     %{

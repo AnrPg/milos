@@ -14,6 +14,8 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(PaleeWidgetsPlugin.class);
         registerPlugin(PaleeGeofencePlugin.class);
         registerPlugin(PaleeNfcPlugin.class);
+        // ADR-249: Tap to Pay through the Viva.com Terminal app.
+        registerPlugin(PaleeVivaTerminalPlugin.class);
         super.onCreate(savedInstanceState);
         createPushChannel();
     }

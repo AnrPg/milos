@@ -1,5 +1,6 @@
 defmodule Palee.Application.CreateFinanceReceipt do
   alias Palee.Application.{GoLive, RecordAnalyticsEvent, RecordFinancePayment}
+  alias Palee.Application.Fiscal.PaymentDocuments
   alias Palee.Finance
 
   @doc """
@@ -7,7 +8,11 @@ defmodule Palee.Application.CreateFinanceReceipt do
   in demo mode would take money from anyone but one of its mock people.
   """
   def call(context, user_id, admin_id, params) do
-    with :ok <- GoLive.check_payment(context, user_id), do: call(user_id, admin_id, params)
+    with :ok <- GoLive.check_payment(context, user_id),
+         {:ok, receipt} <- call(user_id, admin_id, params) do
+      # ADR-262: the legal document of the money received.
+      {:ok, PaymentDocuments.attach(context, receipt, admin_id)}
+    end
   end
 
   def call(user_id, admin_id, params) do

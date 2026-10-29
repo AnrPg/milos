@@ -11,7 +11,7 @@ defmodule Palee.Fiscal.Domain.FiscalDocumentPolicy do
         issue_date: ~D[...],            # the gym-local business date
         currency: "EUR",                # default: the country's currency
         prices_include_tax: true,       # default true (retail prices)
-        buyer: %{name, tax_id, vat_number, street, building_number,
+        buyer: %{name, tax_id, vat_number, street, building_number, peppol_id, reference,
                  postal_code, city, region, country_code, email} | nil,
         payment_method: "cash" | "card" | "bank_transfer" | "online" | "other" | nil,
         lines: [%{description, quantity, unit_price_cents, discount_cents,
@@ -24,7 +24,7 @@ defmodule Palee.Fiscal.Domain.FiscalDocumentPolicy do
   `credit_note/4`.
   """
 
-  alias Palee.Fiscal.Domain.{CountryProfile, TaxCalculation, VatRates}
+  alias Palee.Fiscal.Domain.{CountryProfile, PeppolId, TaxCalculation, VatRates}
 
   @kinds ~w(receipt invoice)
   @currencies ~w(EUR CHF GBP USD)
@@ -77,7 +77,9 @@ defmodule Palee.Fiscal.Domain.FiscalDocumentPolicy do
 
   @doc """
   A credit note correcting `original` (with `lines`) by `requested`:
-  `:all` (cancels what is left) or `[%{position, quantity}]`.
+  `:all` (cancels what is left), `[%{position, quantity}]`, or
+  `%{amount_cents: n}` (a part refund, split over what is left of each
+  line in proportion, ADR-262).
   `credited` maps an original line position to `%{quantity, amount_cents}`
   already credited by earlier credit notes. The quantities and amounts of
   all credit notes never exceed the original's.
@@ -140,12 +142,25 @@ defmodule Palee.Fiscal.Domain.FiscalDocumentPolicy do
     buyer =
       buyer
       |> Map.take(
-        ~w(name tax_id vat_number street building_number postal_code city region country_code email)a
+        ~w(name tax_id vat_number street building_number postal_code city region country_code email
+           peppol_id reference)a
       )
       |> Map.new(fn {key, value} -> {key, clean(value)} end)
       |> Map.reject(fn {_key, value} -> is_nil(value) end)
+      |> Map.update(:peppol_id, nil, fn id ->
+        case PeppolId.parse(id) do
+          {:ok, parsed} -> PeppolId.format(parsed)
+          _invalid -> id
+        end
+      end)
+      |> Map.reject(fn {_key, value} -> is_nil(value) end)
 
     cond do
+      # ADR-250: the buyer's Peppol address, normalised ("0208:0123456789").
+      Map.has_key?(buyer, :peppol_id) and
+          match?({:error, _}, PeppolId.parse(buyer.peppol_id)) ->
+        {:error, :invalid_peppol_id}
+
       Enum.any?(buyer, fn {_key, value} -> String.length(value) > @max_text end) ->
         {:error, :buyer_field_too_long}
 
@@ -236,15 +251,35 @@ defmodule Palee.Fiscal.Domain.FiscalDocumentPolicy do
   defp creditable(%{kind: kind}) when kind in @kinds, do: :ok
   defp creditable(_original), do: {:error, :not_creditable}
 
+  # Each wanted credit is `{position, quantity, amount_cents}`. What is
+  # left of a line is its amount minus what earlier credit notes took, so
+  # credits by quantity and by amount (ADR-262) can follow one another.
   defp wanted_quantities(lines, credited, :all) do
     wanted =
       lines
       |> Enum.map(fn line ->
-        {line.position, line.quantity - credited_quantity(credited, line)}
+        {line.position, open_quantity(credited, line), remaining_amount(credited, line)}
       end)
-      |> Enum.reject(fn {_position, quantity} -> quantity <= 0 end)
+      |> Enum.reject(fn {_position, _quantity, amount} -> amount <= 0 end)
 
     if wanted == [], do: {:error, :already_credited}, else: {:ok, wanted}
+  end
+
+  defp wanted_quantities(lines, credited, %{amount_cents: amount}) do
+    open =
+      lines
+      |> Enum.map(&{&1, remaining_amount(credited, &1)})
+      |> Enum.reject(fn {_line, left} -> left <= 0 end)
+
+    total = Enum.sum(Enum.map(open, &elem(&1, 1)))
+
+    cond do
+      not (is_integer(amount) and amount > 0) -> {:error, :invalid_credit_amount}
+      total == 0 -> {:error, :already_credited}
+      amount > total -> {:error, :credit_exceeds_document}
+      amount == total -> wanted_quantities(lines, credited, :all)
+      true -> {:ok, amount_shares(open, amount, total, credited)}
+    end
   end
 
   defp wanted_quantities(lines, credited, requested)
@@ -272,32 +307,83 @@ defmodule Palee.Fiscal.Domain.FiscalDocumentPolicy do
       end
     end)
     |> case do
-      {:ok, wanted} -> {:ok, Enum.sort(wanted)}
+      {:ok, wanted} -> by_quantity(wanted, by_position, credited)
       error -> error
     end
   end
 
   defp wanted_quantities(_lines, _credited, _requested), do: {:error, :invalid_credit_request}
 
-  defp credit_lines(lines, credited, wanted) do
+  defp by_quantity(wanted, by_position, credited) do
+    wanted
+    |> Enum.sort()
+    |> Enum.reduce_while({:ok, []}, fn {position, quantity}, {:ok, acc} ->
+      line = Map.fetch!(by_position, position)
+      done = credited_quantity(credited, line)
+      left = remaining_amount(credited, line)
+
+      amount =
+        if done + quantity == line.quantity,
+          do: left,
+          else: div(line_amount(line) * quantity, line.quantity)
+
+      if amount > left or amount <= 0,
+        do: {:halt, {:error, :credit_exceeds_document}},
+        else: {:cont, {:ok, [{position, quantity, amount} | acc]}}
+    end)
+    |> case do
+      {:ok, wanted} -> {:ok, Enum.reverse(wanted)}
+      error -> error
+    end
+  end
+
+  # Part of what is left, in proportion per line, rounded by largest
+  # remainder so the shares add up to the cent.
+  defp amount_shares(open, amount, total, credited) do
+    shares =
+      Enum.map(open, fn {line, left} ->
+        exact = amount * left
+        {line, left, div(exact, total), rem(exact, total)}
+      end)
+
+    extra = amount - Enum.sum(Enum.map(shares, &elem(&1, 2)))
+
+    bonus =
+      shares
+      |> Enum.with_index()
+      |> Enum.sort_by(fn {{_line, _left, _base, remainder}, index} -> {-remainder, index} end)
+      |> Enum.take(extra)
+      |> MapSet.new(fn {_share, index} -> index end)
+
+    shares
+    |> Enum.with_index()
+    |> Enum.map(fn {{line, left, base, _remainder}, index} ->
+      share = base + if(MapSet.member?(bonus, index), do: 1, else: 0)
+      quantity = if share == left, do: open_quantity(credited, line), else: 1
+      {line.position, quantity, share}
+    end)
+    |> Enum.reject(fn {_position, _quantity, share} -> share == 0 end)
+  end
+
+  defp credit_lines(lines, _credited, wanted) do
     by_position = Map.new(lines, &{&1.position, &1})
 
     {:ok,
-     Enum.map(wanted, fn {position, quantity} ->
+     Enum.map(wanted, fn {position, quantity, amount} ->
        line = Map.fetch!(by_position, position)
-       done = Map.get(credited, position, %{quantity: 0, amount_cents: 0})
-       original_amount = line.quantity * line.unit_price_cents - line.discount_cents
 
-       amount =
-         if done.quantity + quantity == line.quantity,
-           do: original_amount - done.amount_cents,
-           else: div(original_amount * quantity, line.quantity)
+       # A credit smaller than one unit's price keeps the unit price and
+       # shows the rest as discount; a larger one is a single line.
+       {quantity, unit_price} =
+         if quantity * line.unit_price_cents >= amount,
+           do: {quantity, line.unit_price_cents},
+           else: {1, amount}
 
        %{
          description: line.description,
          quantity: quantity,
-         unit_price_cents: line.unit_price_cents,
-         discount_cents: max(quantity * line.unit_price_cents - amount, 0),
+         unit_price_cents: unit_price,
+         discount_cents: quantity * unit_price - amount,
          tax_category: line.tax_category,
          rate_bp: line.rate_bp,
          exemption_reason: line.exemption_reason,
@@ -307,6 +393,16 @@ defmodule Palee.Fiscal.Domain.FiscalDocumentPolicy do
        }
      end)}
   end
+
+  defp line_amount(line), do: line.quantity * line.unit_price_cents - line.discount_cents
+
+  defp remaining_amount(credited, line) do
+    done = Map.get(credited, line.position, %{amount_cents: 0})
+    line_amount(line) - done.amount_cents
+  end
+
+  defp open_quantity(credited, line),
+    do: max(line.quantity - credited_quantity(credited, line), 1)
 
   defp credited_quantity(credited, line),
     do: credited |> Map.get(line.position, %{quantity: 0}) |> Map.fetch!(:quantity)

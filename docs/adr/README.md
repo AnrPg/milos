@@ -234,6 +234,9 @@ must have an ADR. See `template.md` for the format.
 | ADR-246 | Online payments through the business's own provider account (Viva, Stripe, sandbox), webhooks as hints | Accepted |
 | ADR-247 | Saved cards, recurring charges within the payer's consent, autopay and dunning | Accepted |
 | ADR-248 | Selling packages and shop orders online, booking after payment, 14-day withdrawal | Accepted |
+| ADR-249 | Tap to Pay at the desk through the Viva.com Terminal app: signed app-to-app request, result confirmed with Viva, `card_terminal` money with its document | Accepted |
+| ADR-250 | Peppol e-invoicing: UBL 2.1 / BIS Billing 3.0, outbox with uncertain never resent, access point port (sandbox, Storecove) | Accepted |
+| ADR-251 | Till security devices: cloud TSE (DE) and RKSV (AT) through fiskaly, signatures on a side table, outages recorded | Accepted |
 | ADR-252 | Documents and simple electronic signatures (evidence, PDF certificate), health certificates, booking gate | Accepted |
 | ADR-253 | Box screen: TV paired with a code, display token, today's classes/WODs/leaderboards, automatic focus and staff override | Accepted |
 | ADR-254 | Importing clients from a CSV file: Imports context, dry run, idempotent apply, held profiles, undo | Accepted |
@@ -241,3 +244,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-256 | Store apps: physical services paid through the box's provider in the in-app browser, digital-only packages and Plan (Palee) not sold in the apps, /pay/return app link | Accepted |
 | ADR-260 | What members pay online (per-purpose switches), failed saved-card charges: member and staff notices, Ουρές queue | Accepted |
 | ADR-261 | One-button connection of the business's Stripe (Connect OAuth) or Viva (ISV) account; platform credentials, signed state, disconnect | Accepted |
+| ADR-262 | Every recorded payment (desk or online) issues its fiscal receipt once the fiscal identity is complete; part payments split per tax group; idempotent per payment | Accepted |

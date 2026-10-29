@@ -12,9 +12,10 @@ defmodule Palee.Finance.Domain.ReceivedPayment do
   """
 
   @methods ["cash", "card_manual", "bank_transfer", "other"]
-  # ADR-246: recorded by Palee after the provider confirmed a payment;
-  # never offered at the desk.
-  @online_methods ["online"]
+  # ADR-246/249: recorded by Palee after the provider confirmed a payment
+  # (online, or a card tapped on the Viva.com Terminal app); never offered
+  # at the desk.
+  @online_methods ["online", "card_terminal"]
   @document_modes ["invoice", "receipt"]
 
   @type document :: :settle_invoice | :receipt | :invoice

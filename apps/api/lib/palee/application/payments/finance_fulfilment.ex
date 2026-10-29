@@ -5,18 +5,24 @@ defmodule Palee.Application.Payments.FinanceFulfilment do
   a package bought online is assigned with its document; a shop order is
   settled. A refund is a Finance reversal (idempotent per refund).
 
-  The fiscal document for online payments follows in the fiscal bridge
-  (sale lines from V3-M3); `fiscal_document_id` stays empty until then.
+  ADR-262: recording the money issues its fiscal document;
+  `fiscal_document_id` is empty only while the business has no complete
+  fiscal identity.
   """
 
   @behaviour Palee.Payments.Ports.Fulfilment
 
-  alias Palee.Application.Payments.OnlineSales
+  alias Palee.Application.Fiscal.PaymentDocuments
+  alias Palee.Application.Payments.{OnlineSales, TerminalFulfilment}
   alias Palee.Application.ReceiveFinancePayment
   alias Palee.Finance
   alias Palee.Organizations
 
   @impl true
+  # ADR-249: a card tapped at the desk (method card_terminal).
+  def fulfil(context, %{initiation: "terminal"} = intent),
+    do: TerminalFulfilment.fulfil(context, intent)
+
   def fulfil(context, %{purpose_type: "finance_invoice"} = intent) do
     with {:ok, invoice} <- Finance.get_invoice(context, intent.purpose_id),
          {:ok, received} <-
@@ -33,7 +39,7 @@ defmodule Palee.Application.Payments.FinanceFulfilment do
              "provider" => intent.provider,
              "provider_transaction_id" => intent.provider_transaction_id
            }) do
-      {:ok, %{finance_payment_id: received.payment.id}}
+      {:ok, fulfilled(received)}
     end
   end
 
@@ -46,8 +52,19 @@ defmodule Palee.Application.Payments.FinanceFulfilment do
 
   def fulfil(_context, intent), do: {:error, {:purpose_not_supported, intent.purpose_type}}
 
+  @doc false
+  def fulfilled(received) do
+    %{
+      finance_payment_id: received.payment.id,
+      fiscal_document_id: received[:fiscal_document] && received.fiscal_document.id
+    }
+  end
+
   @impl true
   def reverse(_context, %{finance_payment_id: nil}, _refund), do: {:ok, %{}}
+
+  def reverse(context, %{initiation: "terminal"} = intent, refund),
+    do: TerminalFulfilment.reverse(context, intent, refund)
 
   def reverse(context, %{purpose_type: "finance_invoice"} = intent, refund) do
     with {:ok, invoice} <- Finance.get_invoice(context, intent.purpose_id) do
@@ -72,8 +89,21 @@ defmodule Palee.Application.Payments.FinanceFulfilment do
              "request_id" => refund.id,
              "reason" => refund.reason || "online refund",
              "created_by_id" => refund.created_by_id
-           }) do
-      {:ok, %{finance_reversal_id: reversal_id(reversal)}}
+           }),
+         # ADR-262: a failed credit note fails the refund step, so it retries.
+         {:ok, note} <-
+           PaymentDocuments.credit(
+             context,
+             intent.finance_payment_id,
+             %{id: reversal_id(reversal), amount_cents: refund.amount_cents},
+             refund.created_by_id,
+             DateTime.utc_now()
+           ) do
+      {:ok,
+       %{
+         finance_reversal_id: reversal_id(reversal),
+         fiscal_document_id: if(is_map(note), do: note.id)
+       }}
     end
   end
 

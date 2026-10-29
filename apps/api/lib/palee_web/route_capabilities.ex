@@ -252,6 +252,17 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminFiscalReportingController, :save_connection} => [:manage_billing],
     {W.AdminFiscalReportingController, :transmissions} => [:view_finance_reports],
     {W.AdminFiscalReportingController, :retry} => [:manage_billing],
+    {W.AdminFiscalEInvoicingController, :connection} => [:view_finance_reports],
+    {W.AdminFiscalEInvoicingController, :save_connection} => [:manage_billing],
+    {W.AdminFiscalEInvoicingController, :index} => [:view_finance_reports],
+    {W.AdminFiscalEInvoicingController, :show} => [:view_finance_reports],
+    {W.AdminFiscalEInvoicingController, :retry} => [:manage_billing],
+    {W.AdminFiscalTillSigningController, :connection} => [:view_finance_reports],
+    {W.AdminFiscalTillSigningController, :save_connection} => [:manage_billing],
+    {W.AdminFiscalTillSigningController, :index} => [:view_finance_reports],
+    {W.AdminFiscalTillSigningController, :show} => [:view_finance_reports],
+    {W.AdminFiscalTillSigningController, :retry} => [:manage_billing],
+    {W.AdminFiscalTillSigningController, :null_receipt} => [:manage_billing],
     # ADR-246/247: online payments.
     {W.AdminPaymentsController, :account} => [:view_finance_reports, :manage_billing],
     {W.AdminPaymentsController, :save_account} => [:manage_billing],
@@ -266,6 +277,13 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminPaymentsController, :retry_charge} => [:manage_billing],
     {W.AdminPaymentsController, :dismiss_charge} => [:manage_billing, :take_payments],
     {W.AdminPaymentsController, :card_link} => [:manage_billing, :take_payments],
+    # ADR-249: Tap to Pay is taking money at the desk, like ADR-222.
+    {W.AdminTerminalPaymentsController, :availability} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :create} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :result} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :show} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :cancel} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :sandbox_complete} => [:take_payments],
     # ADR-252: documents are box rules (manage_settings: which are
     # mandatory, their text, the booking gate); asking clients to sign and
     # reading who signed is membership work too.
