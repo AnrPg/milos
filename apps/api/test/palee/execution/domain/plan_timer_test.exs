@@ -4,7 +4,7 @@ defmodule Palee.Execution.Domain.PlanTimerTest do
   import Palee.StructuredPlanFixtures
 
   alias Palee.Execution
-  alias Palee.Execution.Domain.{ClassTimerMachine, PlanTimer, ProgressSnapshotter}
+  alias Palee.Execution.Domain.{ClassTimerMachine, PlanTimer, ProgressSnapshotter, ScoreRanking}
 
   defp sections(indexes) do
     indexes
@@ -91,5 +91,13 @@ defmodule Palee.Execution.Domain.PlanTimerTest do
   test "sections without a plan are skipped" do
     assert PlanTimer.build([%{id: "x", plan: nil}, %{"id" => "y"}]) == []
     assert PlanTimer.build(nil) == []
+  end
+
+  test "a plan's rounds + reps score ranks like rounds+reps" do
+    assert ScoreRanking.sort_value(%{"value" => "5+3"}, "rounds_reps") ==
+             ScoreRanking.sort_value(%{"value" => "5+3"}, "rounds+reps")
+
+    assert ScoreRanking.sort_value(%{"value" => "5+3"}, "rounds_reps") >
+             ScoreRanking.sort_value(%{"value" => "4+20"}, "rounds_reps")
   end
 end

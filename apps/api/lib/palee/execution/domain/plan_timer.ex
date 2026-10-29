@@ -12,27 +12,18 @@ defmodule Palee.Execution.Domain.PlanTimer do
   `structured_plan` keeps the score type the section's own.
   """
 
+  alias Palee.Workouts.Domain.StructuredPlan
   alias Palee.Workouts.Domain.StructuredPlan.Prescription
-
-  # The score types of the web `scoreConfig` (plan/score.ts); nil: not scored.
-  @score_types %{
-    "time" => %{type: "time"},
-    "rounds_reps" => %{type: "rounds_reps"},
-    "reps" => %{type: "reps"},
-    "total_reps" => %{type: "reps"},
-    "lowest_round" => %{type: "reps"},
-    "best_load" => %{type: "load", unit: "kg"},
-    "done" => %{type: "pass_fail"},
-    "distance" => %{type: "reps", unit: "m"}
-  }
 
   @doc "The segments of a workout's plan sections, in order; sections without a plan are skipped."
   def build(sections) when is_list(sections) do
     sections
     |> Enum.sort_by(&(value(&1, :order) || 0))
     |> Enum.flat_map(fn section ->
-      case Prescription.build(value(section, :plan)) do
-        %{clock: clock} -> [segment(section, clock)]
+      plan = value(section, :plan)
+
+      case Prescription.build(plan) do
+        %{clock: clock} -> [segment(section, plan, clock)]
         nil -> []
       end
     end)
@@ -40,18 +31,22 @@ defmodule Palee.Execution.Domain.PlanTimer do
 
   def build(_sections), do: []
 
-  @doc "The score config of a plan score key, as the web sends it; nil when not scored."
-  def score_config(score, label) do
-    case Map.get(@score_types, score) do
-      nil -> nil
-      config -> Map.put(config, :label, label)
+  @doc "The score config of a plan, as the web runner's segment carries it; nil when not scored."
+  def score_config(plan, label) do
+    case StructuredPlan.score_config(plan) do
+      nil ->
+        nil
+
+      config ->
+        %{type: config["type"], label: label}
+        |> then(&if(config["unit"], do: Map.put(&1, :unit, config["unit"]), else: &1))
     end
   end
 
-  defp segment(section, clock) do
+  defp segment(section, plan, clock) do
     id = to_string(value(section, :id))
     name = value(section, :name) || ""
-    score = score_config(clock.score, name)
+    score = score_config(plan, name)
 
     Map.merge(
       %{

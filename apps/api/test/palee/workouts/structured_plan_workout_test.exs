@@ -44,6 +44,9 @@ defmodule Palee.Workouts.StructuredPlanWorkoutStoreTest do
     assert accessory.exercises |> Enum.map(& &1.superset_group_id) |> Enum.uniq() |> length() == 1
     assert Enum.map(engine.exercises, & &1.name) == ["Row", "Burpee", "Run", "Wall Ball"]
 
+    # The plan's score is the section's, for leaderboards and PR detection.
+    assert %{scoreable: true, score_config: %{"type" => "time", "plan_score" => "time"}} = engine
+
     assert %{kind: "plan", sections: [%{name: "Strength", plan: %{"flow" => "sets"}} | _]} =
              workout.body
 

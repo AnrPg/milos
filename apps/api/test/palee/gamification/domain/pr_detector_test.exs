@@ -37,4 +37,13 @@ defmodule Palee.Gamification.Domain.PRDetectorTest do
 
     assert PRDetector.is_pr?(new_score, history)
   end
+
+  test "a stored section config's string type compares like its atom (a plan's for-time score)" do
+    history = [%{section_id: "s1", value: 300, score_type: "time"}]
+    assert PRDetector.is_pr?(%{section_id: "s1", value: 250, score_type: "time"}, history)
+    refute PRDetector.is_pr?(%{section_id: "s1", value: 350, score_type: "time"}, history)
+
+    rounds = [%{section_id: "s1", value: "4+3", score_type: "rounds_reps"}]
+    assert PRDetector.is_pr?(%{section_id: "s1", value: "5+0", score_type: "rounds_reps"}, rounds)
+  end
 end
