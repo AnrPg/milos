@@ -36,17 +36,48 @@ defmodule Palee.Application.SubmitBooking do
     end
   end
 
-  defp submit(context, %{id: user_id} = actor, slot_id, operation_id, documents_gate?) do
+  defp submit(context, actor, slot_id, operation_id, documents_gate?) do
     now = DateTime.utc_now()
+
+    case write(context, actor, slot_id,
+           client_operation_id: operation_id,
+           now: now,
+           documents_gate: documents_gate?
+         ) do
+      {:ok, slot, booking} ->
+        announce(context, slot, booking, now)
+        {:ok, booking, :created}
+
+      {:replayed, booking} ->
+        {:ok, booking, :replayed}
+
+      error ->
+        error
+    end
+  end
+
+  @doc """
+  The checks and writes of a booking without its announcements, so a caller
+  can run them inside its own transaction and announce after it commits
+  (`announce/4`). `PlaceMemberInClass` books for staff with `approved: true`
+  (no approval step), `booking_window: false` (staff may place a member
+  before the member's own booking window opens) and `documents_gate: false`
+  (ADR-252: staff decide); capacity, timing and the
+  member's package still apply.
+
+  Returns `{:ok, slot, booking}`, `{:replayed, booking}` for a replayed
+  `client_operation_id`, or an error.
+  """
+  def write(context, %{id: user_id} = actor, slot_id, opts \\ []) do
+    now = Keyword.get(opts, :now) || DateTime.utc_now()
+    operation_id = Keyword.get(opts, :client_operation_id)
 
     with {:ok, slot} <- fetch_slot(context, slot_id),
          # ADR-184: a business in demo mode takes no bookings from real people.
          :ok <- GoLive.check_booking(context, user_id),
          :ok <- BookingPolicy.can_book?(slot, user_id: user_id, now: now),
-         :ok <- documents_gate(documents_gate?, context, user_id, now),
-         terms = BookingTerms.for_slot(context, user_id, slot),
-         :ok <-
-           BookingPolicy.booking_window_open?(slot.scheduled_at, now, terms.booking_window_days),
+         :ok <- documents_gate(Keyword.get(opts, :documents_gate, true), context, user_id, now),
+         :ok <- check_booking_window(context, user_id, slot, now, opts),
          request = BookingPolicy.entitlement_request(slot),
          {:ok, reservation} <- reserve_visit(context, actor, slot, request) do
       attrs = %{
@@ -54,38 +85,54 @@ defmodule Palee.Application.SubmitBooking do
         client_operation_id: operation_id
       }
 
+      slot =
+        if Keyword.get(opts, :approved, false), do: Map.put(slot, :auto_approve, true), else: slot
+
       case create_booking(context, slot, user_id, attrs) do
         {:ok, booking} ->
-          dispatch_booking_notification(slot, booking)
-          broadcast_booking_event(slot, booking)
-          broadcast_entitlement_change(user_id)
-
-          Palee.DomainEvents.publish(:booking_made, %{
-            organization_id: slot.organization_id,
-            scheduled_class_id: slot.id,
-            booking_id: booking.id,
-            user_id: user_id,
-            at: now
-          })
-
-          TrackAnalyticsEvent.call("class_booking_requested", context, booking, %{
-            user_id: user_id,
-            metadata: %{auto_approved: slot.auto_approve == true}
-          })
-
-          {:ok, booking, :created}
+          {:ok, slot, booking}
 
         {:error, reason} ->
           release_failed_reservation(context, reservation)
           # A concurrent delivery of the same operation may have won the race.
           case find_replay(context, user_id, operation_id, slot_id) do
             :none -> {:error, reason}
-            replay_or_conflict -> replay_or_conflict
+            {:ok, booking, :replayed} -> {:replayed, booking}
+            conflict -> conflict
           end
       end
+    end
+  end
+
+  @doc "Tells staff, the schedule and analytics about a booking `write/4` made."
+  def announce(context, slot, booking, now) do
+    user_id = booking.user_id
+    dispatch_booking_notification(slot, booking)
+    broadcast_booking_event(slot, booking)
+    broadcast_entitlement_change(user_id)
+
+    Palee.DomainEvents.publish(:booking_made, %{
+      organization_id: slot.organization_id,
+      scheduled_class_id: slot.id,
+      booking_id: booking.id,
+      user_id: user_id,
+      at: now
+    })
+
+    TrackAnalyticsEvent.call("class_booking_requested", context, booking, %{
+      user_id: user_id,
+      metadata: %{auto_approved: slot.auto_approve == true}
+    })
+
+    :ok
+  end
+
+  defp check_booking_window(context, user_id, slot, now, opts) do
+    if Keyword.get(opts, :booking_window, true) do
+      terms = BookingTerms.for_slot(context, user_id, slot)
+      BookingPolicy.booking_window_open?(slot.scheduled_at, now, terms.booking_window_days)
     else
-      {:error, reason} -> {:error, reason}
-      {:error, reason, details} -> {:error, reason, details}
+      :ok
     end
   end
 

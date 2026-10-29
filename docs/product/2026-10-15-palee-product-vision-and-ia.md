@@ -136,7 +136,7 @@ Researched Oct 2026. Many figures come from interested parties (vendors, Strava,
 | **Box** | "Where and with whom do I train?" | Today's workout card (**Καταγραφή / Έναρξη ▶**), next booking (+ QR check-in), actions (Πρόγραμμα · Ραντεβού · Βίντεο · Coach), membership, announcements. |
 | **Journal** | "How am I doing?" | `Νέα καταχώρηση` button, device sync card, segments **Ροή · Vault · Σώμα · Ευεξία · Πρόοδος**. |
 | 🔔 **Ειδοποιήσεις** | "What needs me?" | Not a tab: opens the inbox over the current screen; unread badge. |
-| **Εγώ** (Me, the avatar) | "How others see me + my settings" | Public profile (Αναρτήσεις · PRs · Clubs) + a list: Φέρε φίλο, Φιλαράκι στήριξης (Check-in buddy), Τα box και τα clubs μου, Κοινοποίηση & ορατότητα, Συνδεδεμένες συσκευές, Πληρωμές, Ρυθμίσεις, Βοήθεια (+ staff entry to admin). |
+| **Εγώ** (Me, the avatar) | "How others see me + my settings" | Public profile (Αναρτήσεις · Πολυμέσα · PRs · Clubs) + a list: Φέρε φίλο, Φιλαράκι στήριξης (Check-in buddy), Τα box και τα clubs μου, Κοινοποίηση & ορατότητα, Συνδεδεμένες συσκευές, Πληρωμές, Ρυθμίσεις, Βοήθεια (+ staff entry to admin). |
 
 Messages live top-right in the Feed. `Box › Coach` opens the same inbox filtered to the coach. Alternatives considered: 3 tabs with an avatar; 5 tabs with Clubs; 5 tabs with Messages. Revisit **5 tabs with Clubs** only if the average member is in ≥3 clubs and events become a core use.
 
@@ -167,7 +167,7 @@ Box   (title ▾ switches provider: gym or independent coach)
 └─ Πρόοδος (time range; Pantheon; consistency heatmap; strength; muscle coverage; qualities radar; load; insights; export)
 
 Εγώ
-├─ Profile tabs: Αναρτήσεις · PRs (shared) · Clubs
+├─ Profile tabs: Αναρτήσεις · Πολυμέσα · PRs (shared) · Clubs
 ├─ Φέρε φίλο · Φιλαράκι στήριξης · Τα box και τα clubs μου
 ├─ Κοινοποίηση & ορατότητα · Συνδεδεμένες συσκευές (+ Wallet, ICS)
 └─ Πληρωμές & αποδείξεις · Ρυθμίσεις · Βοήθεια & ξενάγηση · (staff) Διαχείριση → web console
@@ -346,7 +346,10 @@ Today the backend has admin-only referral programs, referral events and rewards 
 *Decision (ADR-198, 2026-10-24) [PARTIAL]:* `Πελάτες μου` is a Box extension shown only to someone with the coach role at the selected provider (a solo coach is owner and coach). It has four parts, each hidden when empty, and the whole section is hidden when all are empty. **Περιμένουν απάντηση**: each row opens the thread. **Αξιολόγηση τεχνικής**: a sheet with the video and the console's own feedback form. **Check-in σήμερα**: today's classes and sessions the coach leads, with «Ήρθε / Δεν ήρθε» per person. The staff roster now carries each booking's attendance. **Πελάτες**: chips that open the client's console profile, which stays the client's one home. Programming, coach notes, nutrition and the class timer stay in the console for now.
 
 ### 7.11 Εγώ [EXISTS + NEW]
-Profile tabs (Αναρτήσεις grid · shared PRs · Clubs) and a fixed list:
+Profile tabs (Αναρτήσεις grid · Πολυμέσα · shared PRs · Clubs) and a fixed list:
+
+*Decision (ANR 2026-10-29, ADR-231):* every profile (a person's and Εγώ) has a **Πολυμέσα** tab after Αναρτήσεις, Instagram-like: a three-wide grid of square thumbnails of the person's posts with photos or a video, newest first, with a corner mark for a video (and its length) or several photos. A square opens the whole post over the grid. It follows the posts' audience exactly (public posts for everyone, followers posts once you follow; a private account's stay locked with the same note).
+
 - **Φέρε φίλο**
 - **Φιλαράκι στήριξης** (Check-in buddy, §7.8)
 - **Τα box και τα clubs μου:** providers, per-club notification level, join by code/link.

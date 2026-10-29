@@ -69914,6 +69914,10 @@
           "following_count": {
             "type": "integer"
           },
+          "media_count": {
+            "description": "ADR-231: your posts with photos or a video",
+            "type": "integer"
+          },
           "member_visibility": {
             "description": "Whether you keep out of your clubs' «Μέλη» lists",
             "properties": {
@@ -69957,6 +69961,7 @@
           "follow_groups",
           "followers_count",
           "following_count",
+          "media_count",
           "member_visibility",
           "posts_count",
           "privacy",
@@ -134231,6 +134236,10 @@
                     "following_count": {
                       "type": "integer"
                     },
+                    "media_count": {
+                      "description": "ADR-231: your posts with photos or a video",
+                      "type": "integer"
+                    },
                     "member_visibility": {
                       "description": "Whether you keep out of your clubs' «Μέλη» lists",
                       "properties": {
@@ -134274,6 +134283,7 @@
                     "follow_groups",
                     "followers_count",
                     "following_count",
+                    "media_count",
                     "member_visibility",
                     "posts_count",
                     "privacy",
@@ -209209,7 +209219,7 @@
       },
       "get": {
         "callbacks": {},
-        "description": "`programming` (clients only, else null): `{allowed, grant, reason}` says whether a WOD can be assigned to the person: their subscription package needs online programming (`online_programming`) or personal training (`personal_training`), ADR-225.",
+        "description": "`programming` (clients only, else null): `{allowed, grant, reason}` says whether a WOD can be assigned to the person: their subscription package needs online programming (`online_programming`) or personal training (`personal_training`), ADR-232.",
         "operationId": "PaleeWeb.AdminUserController.show",
         "parameters": [
           {
@@ -209470,6 +209480,141 @@
       }
     },
     "/api/org/{organization_slug}/admin/users/{id}/class-placement": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminUserController.class_placement_options",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "bookings": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "booking_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "slot_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "approved"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "booking_id",
+                          "name",
+                          "scheduled_at",
+                          "slot_id",
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "classes": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "blocked_reason": {
+                            "description": "Why the class cannot take the member now, as the booking error code (slot_full, class_paused, class_not_published, already_booked, finance_*), or null.",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "capacity": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "duration_minutes": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "slot_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "spots_remaining": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "blocked_reason",
+                          "capacity",
+                          "duration_minutes",
+                          "name",
+                          "scheduled_at",
+                          "slot_id",
+                          "spots_remaining"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "lookahead_days": {
+                      "type": "integer"
+                    },
+                    "timezone": {
+                      "description": "The box's IANA time zone (ADR-179).",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "bookings",
+                    "classes",
+                    "lookahead_days",
+                    "timezone"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Class placement options"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "What staff can choose when booking a member into a class or moving them (ADR-232)",
+        "tags": [
+          "Admin Users"
+        ]
+      },
       "post": {
         "callbacks": {},
         "operationId": "PaleeWeb.AdminUserController.place_in_class",
@@ -209531,7 +209676,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Book a member into a class, optionally moving them out of an existing booking",
+        "summary": "Book a member into a class, optionally moving them out of an upcoming booking in one transaction (ADR-232)",
         "tags": [
           "Admin Users"
         ]
@@ -210867,7 +211012,7 @@
     "/api/org/{organization_slug}/admin/users/{id}/programming": {
       "post": {
         "callbacks": {},
-        "description": "Athletes receive a personal assignment. Members follow `mode` (ADR-125). Without folder_id, copies are filed automatically (ADR-136): athletes in their folder, class workouts in the class-day folder, member variations in the member's variations folder. Athletes, and members in the personal and class_variant modes, need a package with online programming or personal training (ADR-225); otherwise 403 `programming_not_in_package`.",
+        "description": "Athletes receive a personal assignment. Members follow `mode` (ADR-125). Without folder_id, copies are filed automatically (ADR-136): athletes in their folder, class workouts in the class-day folder, member variations in the member's variations folder. Athletes, and members in the personal and class_variant modes, need a package with online programming or personal training (ADR-232); otherwise 403 `programming_not_in_package`.",
         "operationId": "PaleeWeb.AdminUserController.program_workout",
         "parameters": [
           {
@@ -280408,6 +280553,906 @@
           }
         ],
         "summary": "A person: name, avatar, counts and both follow relationships",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
+    "/api/people/{id}/media": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PeopleController.media",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "posts": {
+                      "items": {
+                        "description": "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
+                        "properties": {
+                          "attachment": {
+                            "additionalProperties": true,
+                            "description": "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on",
+                            "nullable": true,
+                            "type": "object"
+                          },
+                          "attachment_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "attachment_type": {
+                            "enum": [
+                              "training_log_entry",
+                              "workout_execution",
+                              "pr",
+                              "event",
+                              "product"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "audience": {
+                            "enum": [
+                              "club_channel",
+                              "followers",
+                              "public"
+                            ],
+                            "type": "string"
+                          },
+                          "author": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "CommunityAuthor",
+                            "type": "object"
+                          },
+                          "body": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "can_delete": {
+                            "type": "boolean"
+                          },
+                          "can_moderate": {
+                            "type": "boolean"
+                          },
+                          "can_pin": {
+                            "type": "boolean"
+                          },
+                          "can_report": {
+                            "type": "boolean"
+                          },
+                          "channel": {
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "kind": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "type": "object"
+                          },
+                          "club": {
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "kind": {
+                                "type": "string"
+                              },
+                              "logo_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "organization_slug": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "primary_color": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name"
+                            ],
+                            "type": "object"
+                          },
+                          "comment_count": {
+                            "type": "integer"
+                          },
+                          "event": {
+                            "description": "The event as you see it now, when the post is an event card (attachment_type event)",
+                            "nullable": true,
+                            "properties": {
+                              "audience": {
+                                "description": "ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone",
+                                "enum": [
+                                  "group",
+                                  "club",
+                                  "open"
+                                ],
+                                "type": "string"
+                              },
+                              "box": {
+                                "properties": {
+                                  "logo_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "slug": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "title": "CommunityEventBox",
+                                "type": "object"
+                              },
+                              "can_manage": {
+                                "description": "You run events at this box",
+                                "type": "boolean"
+                              },
+                              "can_rsvp": {
+                                "type": "boolean"
+                              },
+                              "cancel_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "cancelled": {
+                                "type": "boolean"
+                              },
+                              "cancelled_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "capacity": {
+                                "description": "Null: no limit",
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "channel_id": {
+                                "description": "The member group this event belongs to; null for a club event",
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "club": {
+                                "properties": {
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "kind": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id"
+                                ],
+                                "title": "CommunityEventClub",
+                                "type": "object"
+                              },
+                              "club_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "cohosts": {
+                                "description": "ADR-185: boxes that co-host it (accepted)",
+                                "items": {
+                                  "properties": {
+                                    "logo_url": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "name": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "organization_id": {
+                                      "format": "uuid",
+                                      "type": "string"
+                                    },
+                                    "slug": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "organization_id"
+                                  ],
+                                  "title": "CommunityEventCohost",
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "cover_media_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "cover_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "currency": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "ends_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "goers": {
+                                "description": "Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count",
+                                "items": {
+                                  "properties": {
+                                    "avatar_url": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "id": {
+                                      "format": "uuid",
+                                      "type": "string"
+                                    },
+                                    "nickname": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "id"
+                                  ],
+                                  "title": "CommunityAuthor",
+                                  "type": "object"
+                                },
+                                "nullable": true,
+                                "type": "array"
+                              },
+                              "going_count": {
+                                "type": "integer"
+                              },
+                              "good_for_friends": {
+                                "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                                "type": "boolean"
+                              },
+                              "group": {
+                                "description": "The member group of a group event (free, for its members only)",
+                                "nullable": true,
+                                "properties": {
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id"
+                                ],
+                                "title": "CommunityEventGroup",
+                                "type": "object"
+                              },
+                              "guest_pass_allowed": {
+                                "type": "boolean"
+                              },
+                              "guests_left": {
+                                "description": "Event page: guests you can still bring (going, guest passes on)",
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "guests_per_member": {
+                                "type": "integer"
+                              },
+                              "host": {
+                                "properties": {
+                                  "kind": {
+                                    "enum": [
+                                      "person",
+                                      "business"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "logo_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "organization_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "person": {
+                                    "description": "The person hosting their own event",
+                                    "nullable": true,
+                                    "properties": {
+                                      "avatar_url": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "type": "string"
+                                      },
+                                      "nickname": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "id"
+                                    ],
+                                    "title": "CommunityAuthor",
+                                    "type": "object"
+                                  },
+                                  "slug": {
+                                    "description": "The business's box page; null for a person",
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "organization_id"
+                                ],
+                                "title": "CommunityEventHost",
+                                "type": "object"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "invitation": {
+                                "description": "Event page opened with an invitation link",
+                                "nullable": true,
+                                "properties": {
+                                  "host": {
+                                    "description": "ADR-185: the host's own invitation",
+                                    "type": "boolean"
+                                  },
+                                  "inviter": {
+                                    "properties": {
+                                      "avatar_url": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "type": "string"
+                                      },
+                                      "nickname": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "id"
+                                    ],
+                                    "title": "CommunityAuthor",
+                                    "type": "object"
+                                  },
+                                  "reason": {
+                                    "enum": [
+                                      "guests_not_allowed",
+                                      "inviter_not_going",
+                                      "guest_limit_reached",
+                                      "event_cancelled",
+                                      "event_started"
+                                    ],
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "usable": {
+                                    "type": "boolean"
+                                  }
+                                },
+                                "required": [
+                                  "inviter",
+                                  "usable"
+                                ],
+                                "type": "object"
+                              },
+                              "my": {
+                                "description": "Where you stand; null if not on it",
+                                "nullable": true,
+                                "properties": {
+                                  "invited_by_id": {
+                                    "format": "uuid",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "late_cancel": {
+                                    "type": "boolean"
+                                  },
+                                  "paid": {
+                                    "type": "boolean"
+                                  },
+                                  "source": {
+                                    "enum": [
+                                      "member",
+                                      "open",
+                                      "guest"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "status": {
+                                    "enum": [
+                                      "going",
+                                      "waitlisted",
+                                      "cancelled"
+                                    ],
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "status",
+                                  "source",
+                                  "paid",
+                                  "late_cancel"
+                                ],
+                                "title": "CommunityEventMine",
+                                "type": "object"
+                              },
+                              "open_to_non_members": {
+                                "type": "boolean"
+                              },
+                              "organization_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "place": {
+                                "properties": {
+                                  "address": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "city": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "latitude": {
+                                    "nullable": true,
+                                    "type": "number"
+                                  },
+                                  "location_id": {
+                                    "description": "One of the box's locations, or null",
+                                    "format": "uuid",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "longitude": {
+                                    "nullable": true,
+                                    "type": "number"
+                                  },
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "neighbourhood": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "location_id",
+                                  "name",
+                                  "address",
+                                  "latitude",
+                                  "longitude"
+                                ],
+                                "title": "CommunityEventPlace",
+                                "type": "object"
+                              },
+                              "post_id": {
+                                "description": "Its card in the club feed",
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "price_cents": {
+                                "description": "0: free; otherwise paid at the box",
+                                "type": "integer"
+                              },
+                              "series_id": {
+                                "description": "Shared by every week of a weekly event",
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "spots_left": {
+                                "description": "Null: no limit",
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "starts_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "time_zone": {
+                                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                "type": "string"
+                              },
+                              "time_zone_confirmed": {
+                                "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                                "type": "boolean"
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "waitlist_count": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "organization_id",
+                              "club_id",
+                              "title",
+                              "starts_at",
+                              "ends_at",
+                              "place",
+                              "time_zone",
+                              "going_count",
+                              "waitlist_count",
+                              "price_cents",
+                              "currency",
+                              "open_to_non_members",
+                              "guest_pass_allowed",
+                              "guests_per_member",
+                              "good_for_friends",
+                              "cancelled",
+                              "club",
+                              "box",
+                              "audience",
+                              "host",
+                              "cohosts",
+                              "can_rsvp",
+                              "can_manage"
+                            ],
+                            "title": "CommunityPostEvent",
+                            "type": "object"
+                          },
+                          "hidden": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "kudos_by_me": {
+                            "type": "boolean"
+                          },
+                          "kudos_count": {
+                            "type": "integer"
+                          },
+                          "media": {
+                            "description": "Up to ten photos or one video, in order (ADR-157)",
+                            "items": {
+                              "description": "Renditions are WebP (thumb ~320, feed ~1080, full ~2048 px on the long side); for a video they are its poster and video_url is an H.264/AAC MP4. URLs are short-lived.",
+                              "properties": {
+                                "alt_text": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "duration_ms": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "feed_url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "full_url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "height": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "image",
+                                    "video"
+                                  ],
+                                  "type": "string"
+                                },
+                                "placeholder": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "enum": [
+                                    "pending",
+                                    "processing",
+                                    "ready",
+                                    "rejected",
+                                    "missing"
+                                  ],
+                                  "type": "string"
+                                },
+                                "thumb_url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "video_url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "width": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "kind",
+                                "status"
+                              ],
+                              "title": "PostMedia",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "media_status": {
+                            "description": "ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed",
+                            "enum": [
+                              "ready",
+                              "processing",
+                              "failed"
+                            ],
+                            "type": "string"
+                          },
+                          "origin": {
+                            "enum": [
+                              "club",
+                              "profile"
+                            ],
+                            "type": "string"
+                          },
+                          "pinned": {
+                            "type": "boolean"
+                          },
+                          "product": {
+                            "description": "The promoted product as the reader can buy it now (attachment_type product, ADR-190)",
+                            "nullable": true,
+                            "properties": {
+                              "availability": {
+                                "enum": [
+                                  "in_stock",
+                                  "low"
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "buy_link": {
+                                "description": "The in-app product route; an order placed from it sends these params as its attribution",
+                                "nullable": true,
+                                "properties": {
+                                  "params": {
+                                    "properties": {
+                                      "promotion_code": {
+                                        "type": "string"
+                                      },
+                                      "source": {
+                                        "type": "string"
+                                      },
+                                      "source_ref_id": {
+                                        "format": "uuid",
+                                        "type": "string"
+                                      }
+                                    },
+                                    "type": "object"
+                                  },
+                                  "path": {
+                                    "type": "string"
+                                  },
+                                  "product_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "url": {
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              },
+                              "currency": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "max_price_cents": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "media_ids": {
+                                "items": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              },
+                              "price_cents": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "product_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "promotion": {
+                                "nullable": true,
+                                "properties": {
+                                  "code": {
+                                    "type": "string"
+                                  },
+                                  "discount_cents": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "discount_percent": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "ends_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              },
+                              "promotion_price_cents": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "status": {
+                                "enum": [
+                                  "available",
+                                  "sold_out",
+                                  "members_only",
+                                  "unavailable"
+                                ],
+                                "type": "string"
+                              },
+                              "title": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "product_id",
+                              "status"
+                            ],
+                            "title": "ShopProductCard",
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "origin",
+                          "audience",
+                          "club",
+                          "channel",
+                          "author",
+                          "media",
+                          "media_status",
+                          "pinned",
+                          "hidden",
+                          "kudos_count",
+                          "comment_count",
+                          "kudos_by_me",
+                          "can_delete",
+                          "can_moderate",
+                          "can_pin",
+                          "inserted_at"
+                        ],
+                        "title": "CommunityPost",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "posts"
+                  ],
+                  "title": "PersonPostsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Posts"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "ADR-231: the «Πολυμέσα» grid, a person's posts with photos or a video you may read",
         "tags": [
           "Follows"
         ]

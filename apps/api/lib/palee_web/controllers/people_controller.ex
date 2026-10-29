@@ -1,5 +1,5 @@
 defmodule PaleeWeb.PeopleController do
-  @moduledoc "Another person's profile and the posts you may read (ADR-142, P2-M2)."
+  @moduledoc "Another person's profile, the posts you may read and its media grid (ADR-142, ADR-231)."
 
   use PaleeWeb, :controller
   use OpenApiSpex.ControllerSpecs
@@ -58,6 +58,20 @@ defmodule PaleeWeb.PeopleController do
 
   def posts(conn, %{id: id} = params) do
     with {:ok, page} <- SocialProfile.posts(conn.assigns.user_context, id, params),
+         do: json(conn, page)
+  end
+
+  operation(:media,
+    summary: "ADR-231: the «Πολυμέσα» grid, a person's posts with photos or a video you may read",
+    parameters: [
+      @id,
+      %Parameter{name: :cursor, in: :query, required: false, schema: %Schema{type: :string}}
+    ],
+    responses: [ok: {"Posts", "application/json", S.person_posts_response()}]
+  )
+
+  def media(conn, %{id: id} = params) do
+    with {:ok, page} <- SocialProfile.media(conn.assigns.user_context, id, params),
          do: json(conn, page)
   end
 end

@@ -256,6 +256,7 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 | Coaching | Coaching | `coaching_relationships` | A coach and a client at one business. Decides what the coach sees and who can join their PT squad. | Follow. |
 | My clients | Οι πελάτες μου | coach view | The coach's list of active coaching clients (Box › Πελάτες μου). | Members of the box. |
 | PR sharing | Κοινοποίηση PR | `pr_sharing_grants` | A person lets a specific person see all their PRs. | Follow. |
+| Media (profile tab) | Πολυμέσα | `GET /api/people/:id/media` | The profile tab with a person's photos and videos: a grid of their profile posts that carry media, under the same audience as the posts. There are no separate «reels»: a video is a post with a video. (ADR-231) | Αναρτήσεις (every post, text included). |
 
 ### 4.6 Conversations (Μηνύματα)
 

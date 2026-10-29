@@ -225,6 +225,8 @@ must have an ADR. See `template.md` for the format.
 | ADR-226 | Class booking rules explained; approval wait may have no limit; late-cancellation cutoff in minutes (hours + minutes input) | Accepted |
 | ADR-229 | The weekly workout goal is personal (the person, their coach, full-scope staff set it); the box sets only streak shields and their renewal | Accepted |
 | ADR-230 | Day WODs: one WOD for a whole day, inherited by its classes (all or chosen class types), overridable per class | Accepted |
+| ADR-231 | The profile's «Πολυμέσα» grid: photos and videos from posts, same visibility as posts | Accepted |
+| ADR-232 | Staff book or move a member into a class: one transaction, no late charge, server-listed choices | Accepted |
 | ADR-240 | Fiscal context, business legal identity and country profiles (GR, CY, DE, AT, CH, LI, LU, FR, BE, MC, GB, US) | Accepted |
 | ADR-241 | Immutable fiscal documents, gapless series, VAT by rate group, credit notes only | Accepted |
 | ADR-242 | Inalterable fiscal journal: hash chain, Ed25519 signatures, period closings, audit archive | Accepted |
@@ -250,3 +252,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-265 | Credit note reason (immutable, hashed, printed, UBL note) and refund to the card that issues the note; «Αποστολή με email» of a document PDF through the outbox (attachments); «Συμπλήρωση από το ΑΦΜ» from AADE RgWsPublic2 with the business's own encrypted credentials | Accepted |
 | ADR-266 | French till receipts signed through fiskaly SIGN FR next to Palee's own journal (ADR-241/242); fiskaly must confirm certification coverage in writing; Monaco not covered | Accepted |
 | ADR-267 | Draft `/privacy` and `/terms` pages (12 locales, sub-processors from the code); minimum age 16 as an explicit confirmation enforced in the API (no date of birth); «Λήψη των δεδομένων μου»: one ZIP of the person's own data across contexts, built by a job in the person's own sessions, short-lived links, email notice, one a day | Accepted |
+| ADR-300 | Operation registry: one spec per use case generates REST, MCP and LLM tools; previewable commands, problem details, idempotency keys, ETags (v4) | Proposed |
+| ADR-301 | AI agents as delegated principals: rights intersected on every call, durable runs, Rule-of-Two policy, approvals, one LLM provider port, multi-agent via delegation (v4) | Proposed |

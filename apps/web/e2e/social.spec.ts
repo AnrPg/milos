@@ -27,6 +27,29 @@ const json = (body: unknown, status = 200) => ({ status, contentType: "applicati
 const since = new Date().toISOString();
 const nikos = { id: "person-2", nickname: "Nikos", avatar_url: null };
 
+// ADR-231: the «Media» grid holds only posts with photos or a video.
+const mediaPost = (id: string, body: string, media: Record<string, unknown>[]) => ({
+  id,
+  origin: "profile",
+  audience: "public",
+  author: nikos,
+  body,
+  media: media.map((item, index) => ({ id: `${id}-m${index}`, status: "ready", thumb_url: "/icon.svg", feed_url: "/icon.svg", width: 1080, height: 1080, ...item })),
+  media_status: "ready",
+  kudos_count: 2,
+  comment_count: 0,
+  kudos_by_me: false,
+  can_delete: false,
+  inserted_at: since,
+});
+const nikosMedia = [
+  mediaPost("post-video", "Muscle-ups at last", [{ kind: "video", duration_ms: 42_000, video_url: "/video.mp4", alt_text: null }]),
+  mediaPost("post-album", "Open gym Saturday", [
+    { kind: "image", alt_text: "Rings" },
+    { kind: "image", alt_text: "Rower" },
+  ]),
+];
+
 async function stub(page: Page) {
   const state = { followers: 0, requests: 1, sharing: { enabled: false, offered: false }, puts: [] as unknown[] };
   await page.context().addCookies([{ name: "palee_locale", value: "en", url: "http://127.0.0.1" }]);
@@ -81,6 +104,7 @@ async function stub(page: Page) {
     route.fulfill(json({ ...nikos, is_me: false, followers_count: 10, following_count: 4, my_status: "none", follows_me: true })),
   );
   await page.route("**/api/people/person-2/posts**", (route) => route.fulfill(json({ posts: [], next_cursor: null })));
+  await page.route("**/api/people/person-2/media**", (route) => route.fulfill(json({ posts: nikosMedia, next_cursor: null })));
   await page.route("**/api/pr-sharing/shared-with-me", (route) => route.fulfill(json({ shared: [] })));
   await page.route("**/api/me/follows/user/person-2", (route) => route.fulfill(json({ status: "none" })));
   return state;
@@ -140,6 +164,30 @@ test.describe("social", () => {
     await expect(page.getByText("Follow to also see followers-only posts.")).toBeVisible();
     await page.getByRole("tab", { name: "PRs" }).click();
     await expect(page.getByText("They don't share their PRs with you.")).toBeVisible();
+  });
+
+  test("a person's Media tab is an Instagram-like grid that opens each post", async ({ page }) => {
+    await stub(page);
+    await page.goto("/people/person-2");
+    await page.getByRole("tab", { name: "Media" }).click();
+    await expect(page).toHaveURL(/tab=media/);
+    const grid = page.getByTestId("media-grid");
+    await expect(grid.getByRole("button")).toHaveCount(2);
+    await expect(grid.getByRole("button", { name: "Video 0:42" })).toBeVisible();
+    await expect(grid.getByRole("button", { name: "2 photos: Rings" })).toBeVisible();
+    // Not following yet: the grid says what stays hidden, like the posts.
+    await expect(page.getByText("Follow to also see followers-only posts.")).toBeVisible();
+    await page.screenshot({ path: "test-results/social/person-media.png", fullPage: true });
+
+    await grid.getByRole("button", { name: "2 photos: Rings" }).click();
+    const dialog = page.getByRole("dialog", { name: "Nikos's post" });
+    await expect(dialog.getByText("Open gym Saturday")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(dialog).toHaveCount(0);
+
+    // A deep link opens the tab directly.
+    await page.goto("/people/person-2?tab=media");
+    await expect(page.getByRole("tab", { name: "Media" })).toHaveAttribute("aria-selected", "true");
   });
 
   test("the selected profile tab is a rounded Spark pill with room around its label", async ({ page }) => {

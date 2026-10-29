@@ -10,38 +10,59 @@ defmodule Palee.Application.WithdrawBooking do
   alias Palee.Scheduling.Domain.BookingPolicy
 
   def call(context, user_id, booking_id) do
+    with {:ok, booking, withdrawn_booking, late?} <- write(context, user_id, booking_id) do
+      announce(context, booking, withdrawn_booking, late?, :member)
+    end
+  end
+
+  @doc """
+  Withdraws the booking and settles its visit (returned, or consumed when the
+  withdrawal is late), without the announcements, so a caller can run it
+  inside its own transaction and `announce/5` after it commits.
+
+  `late_cancellation: false` is for staff moving a member to another class
+  (`PlaceMemberInClass`): the member did not cancel, so the visit always
+  goes back.
+  """
+  def write(context, user_id, booking_id, opts \\ []) do
     with booking when not is_nil(booking) <- Scheduling.get_booking(context, booking_id),
          :ok <- verify_ownership(booking, user_id),
-         late? = late_cancellation?(context, booking),
+         late? =
+           Keyword.get(opts, :late_cancellation, true) and late_cancellation?(context, booking),
          {:ok, withdrawn_booking} <-
            Scheduling.withdraw_booking(context, booking_id, reconciliation(booking, late?)) do
       reconcile_now(context, booking, late?)
-      PromoteClassWaitlist.call(context, booking.scheduled_class_id)
-
-      Palee.DomainEvents.publish(:booking_cancelled, %{
-        organization_id: booking.organization_id,
-        scheduled_class_id: booking.scheduled_class_id,
-        booking_id: booking.id,
-        user_id: booking.user_id,
-        kind: Map.get(booking, :kind, "member"),
-        by: :member,
-        at: DateTime.utc_now()
-      })
-
-      TrackAnalyticsEvent.call("class_booking_cancelled", context, withdrawn_booking, %{
-        metadata: %{
-          cancelled_by: "member",
-          previous_status: booking.status,
-          late_cancellation: late?
-        }
-      })
-
-      {:ok, Map.put(withdrawn_booking, :late_cancellation, late?)}
+      {:ok, booking, withdrawn_booking, late?}
     else
       nil -> {:error, :not_found}
       {:error, :not_owner} -> {:error, :forbidden}
       {:error, reason} -> {:error, reason}
     end
+  end
+
+  @doc "Frees the place for the waitlist and tells the rest of the app; `by` is `:member` or `:staff`."
+  def announce(context, booking, withdrawn_booking, late?, by) do
+    PromoteClassWaitlist.call(context, booking.scheduled_class_id)
+
+    Palee.DomainEvents.publish(:booking_cancelled, %{
+      organization_id: booking.organization_id,
+      scheduled_class_id: booking.scheduled_class_id,
+      booking_id: booking.id,
+      user_id: booking.user_id,
+      kind: Map.get(booking, :kind, "member"),
+      by: by,
+      at: DateTime.utc_now()
+    })
+
+    TrackAnalyticsEvent.call("class_booking_cancelled", context, withdrawn_booking, %{
+      metadata: %{
+        cancelled_by: Atom.to_string(by),
+        previous_status: booking.status,
+        late_cancellation: late?
+      }
+    })
+
+    {:ok, Map.put(withdrawn_booking, :late_cancellation, late?)}
   end
 
   defp verify_ownership(%{user_id: uid}, user_id) when uid == user_id, do: :ok
