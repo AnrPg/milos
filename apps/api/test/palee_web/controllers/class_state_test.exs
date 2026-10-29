@@ -163,6 +163,44 @@ defmodule PaleeWeb.ClassStateTest do
     assert remaining.id == second.id
   end
 
+  test "deleting from a later class reaches it and the ones after it, not the earlier ones",
+       %{context: context} = ctx do
+    [first, second, third | _] = classes(context, ctx.series_id)
+
+    assert %{"changed_count" => 4, "deleted_ids" => ids} =
+             ctx
+             |> change(third, %{action: "delete", series_scope: "all"})
+             |> json_response(200)
+
+    assert third.id in ids
+    assert Enum.map(classes(context, ctx.series_id), & &1.id) == [first.id, second.id]
+    # Nothing comes after the deleted classes any more.
+    assert Scheduling.get_class_series(context, ctx.series_id).status == "ended"
+  end
+
+  test "deleting in a date range reaches only the classes on those dates",
+       %{context: context} = ctx do
+    [first, second, third, fourth | rest] = classes(context, ctx.series_id)
+    day = fn slot -> slot.scheduled_at |> DateTime.to_date() |> Date.to_iso8601() end
+
+    assert %{"changed_count" => 2, "deleted_ids" => ids} =
+             ctx
+             |> change(second, %{
+               action: "delete",
+               series_scope: "range",
+               range_from: day.(third),
+               range_to: day.(fourth)
+             })
+             |> json_response(200)
+
+    assert Enum.sort(ids) == Enum.sort([third.id, fourth.id])
+
+    assert Enum.map(classes(context, ctx.series_id), & &1.id) ==
+             [first.id, second.id | Enum.map(rest, & &1.id)]
+
+    assert Scheduling.get_class_series(context, ctx.series_id).status == "active"
+  end
+
   test "deleting one booked class is refused with the reason", %{context: context} = ctx do
     [first | _] = classes(context, ctx.series_id)
     member_booking(context, first)

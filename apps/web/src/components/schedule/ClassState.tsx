@@ -74,7 +74,7 @@ export function useClassActionSummary() {
 
   return (result: ClassStateResult) =>
     [
-      result.changed_count > 1 || result.skipped_count > 0 ? t("classActionDone", { count: result.changed_count }) : null,
+      result.changed_count !== 1 || result.skipped_count > 0 ? t("classActionDone", { count: result.changed_count }) : null,
       result.released_count > 0 ? t("classActionReleased", { count: result.released_count }) : null,
       result.skipped_with_bookings > 0 ? t("classActionSkippedBookings", { count: result.skipped_with_bookings }) : null,
       result.skipped_count > result.skipped_with_bookings
@@ -94,6 +94,7 @@ export function ClassActionDialog({
   token,
   slot,
   action,
+  initialScope,
   classDate,
   onClose,
   onDone,
@@ -101,6 +102,8 @@ export function ClassActionDialog({
   token: string;
   slot: ScheduleSlot;
   action: ClassAction;
+  /** The reach already chosen elsewhere (the class form's «Apply changes to»). */
+  initialScope?: SeriesEditScope;
   /** The class's date on the gym's clock (YYYY-MM-DD). */
   classDate: string;
   onClose: () => void;
@@ -109,7 +112,7 @@ export function ClassActionDialog({
   const t = useTranslations("Schedule");
   const common = useTranslations("Common");
   const i18n = useUiTranslations();
-  const [scope, setScope] = useState<SeriesEditScope>({ scope: "this" });
+  const [scope, setScope] = useState<SeriesEditScope>(initialScope ?? { scope: "this" });
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

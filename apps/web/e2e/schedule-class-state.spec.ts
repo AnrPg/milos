@@ -117,7 +117,7 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
     await openClass(page);
     await chooseClassAction(page, "Pause bookings");
     const dialog = page.getByRole("dialog", { name: "Pause bookings?" });
-    await dialog.getByRole("radio", { name: "All upcoming classes" }).click();
+    await dialog.getByRole("radio", { name: "This and following classes" }).click();
     await chooseOption(page, dialog.getByRole("combobox", { name: "Which of them" }), "2");
     await dialog.getByRole("button", { name: "Pause", exact: true }).click();
 
@@ -156,11 +156,60 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
     await openClass(page);
     await chooseClassAction(page, "Delete");
     const dialog = page.getByRole("dialog", { name: "Delete this class?" });
-    await dialog.getByRole("radio", { name: "All upcoming classes" }).click();
+    await dialog.getByRole("radio", { name: "This and following classes" }).click();
     await dialog.getByRole("button", { name: "Delete", exact: true }).click();
 
     await expect(page.getByText("2 classes have bookings and were kept. Cancel them instead.")).toBeVisible();
     await expect(page.getByRole("dialog")).toHaveCount(0);
+  });
+
+  test("deleting from the class form confirms first and keeps the reach chosen there", async ({ page }) => {
+    await asOwner(page);
+    let sent: Record<string, unknown> | null = null;
+    let plainDeletes = 0;
+    await page.route("**/api/org/box1/admin/schedule/slots/slot-1", (route) => {
+      if (route.request().method() === "DELETE") plainDeletes += 1;
+      return route.fulfill(json({}));
+    });
+    await page.route("**/api/org/box1/admin/schedule/slots/slot-1/state", (route) => {
+      sent = bodyOf(route.request());
+      return route.fulfill(json(result({ action: "delete", changed_count: 3, deleted_ids: ["slot-1", "slot-2", "slot-3"] })));
+    });
+
+    await openClass(page);
+    await page.getByRole("button", { name: "Edit class" }).click();
+    const editor = page.getByRole("dialog", { name: "Edit scheduled class" });
+    await editor.getByRole("radiogroup", { name: "Apply changes to" }).getByRole("radio", { name: "Classes between dates" }).click();
+    await editor.getByTestId("slot-editor-delete").click();
+
+    const dialog = page.getByRole("dialog", { name: "Delete this class?" });
+    await expect(dialog.getByRole("radio", { name: "Classes between dates" })).toHaveAttribute("aria-checked", "true");
+    // The reach can still change before confirming.
+    await dialog.getByRole("radio", { name: "This and following classes" }).click();
+    await dialog.getByRole("button", { name: "Delete", exact: true }).click();
+
+    await expect.poll(() => sent?.action).toBe("delete");
+    expect(sent).toMatchObject({ series_scope: "all" });
+    expect(plainDeletes).toBe(0);
+    await expect(page.getByText("3 classes changed.")).toBeVisible();
+    await expect(page.getByRole("dialog")).toHaveCount(0);
+  });
+
+  test("keeping the class closes only the confirmation, not the class form", async ({ page }) => {
+    await asOwner(page);
+    await withClass(page, { ...seriesClass, class_series_id: null });
+
+    await openClass(page);
+    await page.getByRole("button", { name: "Edit class" }).click();
+    const editor = page.getByRole("dialog", { name: "Edit scheduled class" });
+    await editor.getByTestId("slot-editor-delete").click();
+    const dialog = page.getByRole("dialog", { name: "Delete this class?" });
+    // Not in a series: no scope choice.
+    await expect(dialog.getByRole("radiogroup")).toHaveCount(0);
+    await dialog.getByRole("button", { name: "Keep as is" }).click();
+
+    await expect(dialog).toHaveCount(0);
+    await expect(editor).toBeVisible();
   });
 
   test("a cancelled class shows its reason and offers restore", async ({ page }) => {

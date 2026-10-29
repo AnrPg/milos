@@ -100,12 +100,12 @@ defmodule PaleeWeb.SeriesEditScopeTest do
     assert Scheduling.get_slot(context, first.id).capacity == 10
   end
 
-  test "all classes take the edit, a new time on their own dates, and so does the series",
+  test "this class and the following ones take the edit, a new time on their own dates, and so does the series",
        %{context: context} = ctx do
-    [_first, second | _] = all = classes(context, ctx.series_id)
+    [first, second | _] = all = classes(context, ctx.series_id)
     new_start = at(DateTime.to_date(second.scheduled_at), ~T[18:30:00])
 
-    assert %{"updated_count" => 6} =
+    assert %{"updated_count" => 5} =
              ctx
              |> edit(second, %{
                name: "Evening WOD",
@@ -115,13 +115,19 @@ defmodule PaleeWeb.SeriesEditScopeTest do
              })
              |> json_response(200)
 
-    after_edit = classes(context, ctx.series_id)
-    assert Enum.all?(after_edit, &(&1.name == "Evening WOD" and &1.capacity == 14))
+    [first_after | following] = after_edit = classes(context, ctx.series_id)
+
+    # The upcoming class before the edited one stays as it was.
+    assert first_after.id == first.id
+    assert first_after.name == first.name and first_after.capacity == first.capacity
+    assert first_after.scheduled_at == first.scheduled_at
+
+    assert Enum.all?(following, &(&1.name == "Evening WOD" and &1.capacity == 14))
 
     assert Enum.map(after_edit, &DateTime.to_date(&1.scheduled_at)) ==
              Enum.map(all, &DateTime.to_date(&1.scheduled_at))
 
-    assert Enum.all?(after_edit, &(DateTime.to_time(&1.scheduled_at) == ~T[18:30:00]))
+    assert Enum.all?(following, &(DateTime.to_time(&1.scheduled_at) == ~T[18:30:00]))
 
     series = Scheduling.get_class_series(context, ctx.series_id)
     assert series.name == "Evening WOD"
