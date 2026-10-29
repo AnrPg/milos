@@ -147,6 +147,14 @@ export type PlanEditorState = {
   /** Per scale level note (typing); empty text removes it. */
   setLevelNote: (sectionId: string, level: string, text: string) => void;
 
+  /**
+   * Replaces a section's plan with `recipe(plan)` (the recipe gets a deep
+   * copy it may mutate or replace). `typing: true` coalesces it with other
+   * typing into one undo step; otherwise it is its own step. `focus` sets
+   * `pendingFocus`. For callers with their own pure plan mutations.
+   */
+  updatePlan: (sectionId: string, recipe: (plan: PlanSection) => PlanSection | void, opts?: { typing?: boolean; focus?: string | null }) => void;
+
   // ── rows (grid) ─────────────────────────────────────────────────────────
   /** Finds a row anywhere in the WOD. */
   findRow: (rowId: string) => PlanRowLocation | null;
@@ -480,6 +488,16 @@ export const usePlanEditorStore = create<PlanEditorState>((set, get) => {
       sec.plan.levelNotes = notes;
     }),
 
+    updatePlan: (sectionId, recipe, opts = {}) => {
+      if (!get().sections.some((s) => s.id === sectionId)) return;
+      const apply = (draft: Snapshot) => {
+        const sec = section(draft, sectionId)!;
+        sec.plan = recipe(sec.plan) ?? sec.plan;
+      };
+      if (opts.typing) typing(apply);
+      else commit(apply);
+      if (opts.focus !== undefined) set({ pendingFocus: opts.focus });
+    },
     findRow: (rowId) => locate(get().sections, rowId),
     addRow: (after, kind = "ex") => {
       const slot: PlanRowSlot | null = typeof after === "string"

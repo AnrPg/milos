@@ -66,12 +66,12 @@ export const PRESETS: PresetDef[] = [
   { key: "chipper", flow: "for_time" },
   { key: "21_15_9", flow: "for_time", reps: "21-15-9" },
   { key: "ladder", flow: "for_time", reps: "2-4-6…" },
-  { key: "kcal_target", flow: "for_time", reps: "100 cal" },
+  { key: "calorie_target", flow: "for_time", reps: "100 cal" },
   { key: "to_failure", flow: "sets", reps: "max" },
   { key: "superset", flow: "sets", struct: "superset" },
   { key: "cluster", flow: "sets", struct: "cluster" },
-  { key: "drop", flow: "sets", struct: "drop" },
-  { key: "restpause", flow: "sets", struct: "restpause" },
+  { key: "drop_set", flow: "sets", struct: "drop" },
+  { key: "rest_pause", flow: "sets", struct: "restpause" },
   { key: "interrupt", flow: "for_time", mods: { interrupt: true } },
 ];
 

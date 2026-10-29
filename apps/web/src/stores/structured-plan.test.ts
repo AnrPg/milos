@@ -283,6 +283,19 @@ describe("rows", () => {
     expect(store().togglePerRound("c")).toBe(false);
   });
 
+  it("replaces a plan through a recipe, as typing or as its own step", () => {
+    store().updatePlan("s1", (p) => { p.note = "a"; }, { typing: true });
+    now += 10;
+    store().updatePlan("s1", (p) => ({ ...p, note: "ab" }), { typing: true, focus: "x" });
+    expect(section("s1").plan.note).toBe("ab");
+    expect(store().pendingFocus).toBe("x");
+    store().updatePlan("s1", (p) => { p.score = "reps"; });
+    store().undo();
+    expect(section("s1").plan.score).toBe("none");
+    store().undo();
+    expect(section("s1").plan.note).toBeUndefined();
+  });
+
   it("adds blocks and raises the rounds when needed", () => {
     store().setParam("s2", "rounds", "1");
     const id = store().addBlock("s2");
