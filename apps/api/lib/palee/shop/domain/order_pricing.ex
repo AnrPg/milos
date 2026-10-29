@@ -151,7 +151,10 @@ defmodule Palee.Shop.Domain.OrderPricing do
       quantity: quantity,
       unit_price_cents: variant.price_cents,
       cost_price_cents: variant.cost_price_cents,
-      tax_class: variant.tax_class,
+      # ADR-244: the category that applies when sold (variant, else product).
+      tax_class:
+        Map.get(variant, :tax_category) || Map.get(variant, :tax_class) ||
+          Map.get(product, :tax_category),
       currency: variant.currency,
       discount_cents: discount,
       total_cents: gross - discount

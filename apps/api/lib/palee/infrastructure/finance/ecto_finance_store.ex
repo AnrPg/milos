@@ -5833,6 +5833,8 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
           PackageContract.fields_from_params(package.params || %{})
         ),
       active: package.active,
+      tax_category: package.tax_category,
+      exemption_reason: package.exemption_reason,
       inserted_at: package.inserted_at,
       updated_at: package.updated_at
     }

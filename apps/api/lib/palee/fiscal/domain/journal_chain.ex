@@ -15,6 +15,7 @@ defmodule Palee.Fiscal.Domain.JournalChain do
   @event_types ~w(
     identity_saved document_issued period_closed archive_exported
     journal_verified authority_connection_saved document_reported
+    sales_tax_rates_saved
   )
 
   @hashed_fields ~w(position organization_id event_type subject_type subject_id actor_id occurred_at payload)a

@@ -169,7 +169,21 @@ defmodule PaleeWeb.AdminFinanceController do
     currency: %Schema{type: :string},
     tags: %Schema{type: :array, items: %Schema{type: :string}},
     fields: @package_fields_schema,
-    active: %Schema{type: :boolean}
+    active: %Schema{type: :boolean},
+    tax_category: %Schema{
+      type: :string,
+      nullable: true,
+      enum: Palee.Fiscal.Taxes.all_categories(),
+      description:
+        "ADR-244: the tax category printed on fiscal documents; one the business's country " <>
+          "offers (`/admin/fiscal/countries`). Empty means `standard` (`sales_tax` in the US)."
+    },
+    exemption_reason: %Schema{
+      type: :string,
+      nullable: true,
+      maxLength: 300,
+      description: "Required with `exempt`: the article of the VAT law printed on the document."
+    }
   }
   @create_package_request_body %RequestBody{
     required: true,
