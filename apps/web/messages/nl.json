@@ -12247,7 +12247,8 @@
       "branchCode": "Alleen wijzigen als je een vestiging hebt die bij de AADE is aangemeld.",
       "optional": "Optioneel.",
       "iban": "Optioneel. Staat op facturen die per overschrijving worden betaald.",
-      "qrIban": "Optioneel. Voor QR-facturen met een QR-referentie."
+      "qrIban": "Optioneel. Voor QR-facturen met een QR-referentie.",
+      "checkDigitsOk": "Controlecijfers: juist."
     },
     "reason": {
       "blank": "Vul dit in.",
@@ -12284,6 +12285,21 @@
       "sandbox": "sandbox",
       "test": "test",
       "production": "productie"
+    },
+    "registry": {
+      "lookup": "Invullen vanuit het fiscaal nummer (ΑΦΜ)",
+      "looking": "Opzoeken bij de AADE…",
+      "orByHand": "Of vul de velden zelf in.",
+      "found": "Gevonden in het register van de AADE. Controleer ze.",
+      "foundLater": "De AADE gaf ook het adres en de activiteitscode (ΚΑΔ): je vindt ze ingevuld in de volgende stappen.",
+      "error": {
+        "invalid_tax_id": "Dit fiscaal nummer klopt niet. Controleer de cijfers.",
+        "registry_not_connected": "De inloggegevens voor het AADE-register ontbreken. Vul de velden zelf in.",
+        "registry_credentials_rejected": "De AADE heeft de inloggegevens niet geaccepteerd. Vul de velden zelf in.",
+        "registry_not_found": "De AADE heeft dit fiscaal nummer niet gevonden.",
+        "registry_limit_reached": "Te veel zoekopdrachten. Probeer het zo meteen opnieuw.",
+        "registry_unavailable": "De AADE antwoordt nu niet. Probeer het later of vul de velden zelf in."
+      }
     }
   },
   "FiscalDocuments": {
@@ -12406,7 +12422,33 @@
     "mapPlaceholder": "categorie=waarde, één per regel",
     "auditOk": "OK",
     "pdf": "PDF",
-    "txAccepted": "myDATA"
+    "txAccepted": "myDATA",
+    "sendEmail": "Per e-mail versturen",
+    "reason": "Reden",
+    "reasons": {
+      "product_return": "Product retour",
+      "billing_error": "Verkeerd gefactureerd",
+      "subscription_cancelled": "Abonnement opgezegd",
+      "other": "Anders"
+    },
+    "pickReason": "Kies een reden.",
+    "refundToCard": "Terugbetalen op de kaart {card}",
+    "refundToCardHint": "Via {provider}, samen met de creditnota. Zet het uit als je het geld op een andere manier hebt teruggegeven.",
+    "refundingToCard": "Het geld gaat terug naar de kaart {card} (2–5 werkdagen).",
+    "noRefund": "Zonder terugbetaling.",
+    "emailTitle": "{number} per e-mail versturen",
+    "emailTo": "E-mail van de ontvanger",
+    "emailHint": "We sturen de pdf in de taal van het document.",
+    "emailSend": "Versturen",
+    "emailSending": "Versturen…",
+    "emailSent": "Verstuurd naar {to}.",
+    "emailError": {
+      "invalid_address": "Dit e-mailadres lijkt niet te kloppen. Controleer het.",
+      "no_recipient": "Vul het e-mailadres in waarnaar het moet.",
+      "throttled": "Het is net naar dit adres verstuurd. Probeer het later opnieuw.",
+      "suppressed": "Dit adres accepteert onze berichten niet. Probeer een ander.",
+      "business_not_activated": "E-mails aan klanten starten zodra je box is geactiveerd."
+    }
   },
   "BoxScreens": {
     "eyebrow": "Instellingen",

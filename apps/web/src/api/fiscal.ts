@@ -32,6 +32,9 @@ export type ExportFormats = Json<"PaleeWeb.AdminFiscalTaxController.export_forma
 export type ExportFormat = ExportFormats["formats"][number];
 export type ExportSetting = ExportFormats["settings"][number];
 export type CreditLine = { position: number; quantity: number };
+type CreditNoteRequest = NonNullable<
+  operations["PaleeWeb.AdminFiscalController.credit"]["requestBody"]
+>["content"]["application/json"];
 
 /** The languages a document can be rendered in (ADR-245). */
 export const DOCUMENT_LANGUAGES = ["el", "en", "de", "fr", "it", "nl", "es"] as const;
@@ -79,12 +82,50 @@ export function fetchFiscalDocument(token: string, id: string) {
   return apiRequest<{ document: FiscalDocumentDetail }>(`/admin/fiscal/documents/${id}`, { token });
 }
 
-/** Issues a credit note: every line when `lines` is left out (ADR-241). */
-export function issueCreditNote(token: string, id: string, idempotencyKey: string, lines?: CreditLine[]) {
-  return apiRequest<{ document: FiscalDocument }>(`/admin/fiscal/documents/${id}/credit-notes`, {
+export type CreditReason = NonNullable<CreditNoteRequest["reason"]>;
+export const CREDIT_REASONS: readonly CreditReason[] = ["product_return", "billing_error", "subscription_cancelled", "other"];
+export type CreditResult = Json<"PaleeWeb.AdminFiscalController.credit", 201>;
+export type RefundOption = NonNullable<FiscalDocumentDetail["refund_option"]>;
+
+/**
+ * Issues a credit note with its reason: every line when `lines` is left out
+ * (ADR-241, ADR-265). With `refund` the money goes back to the card the
+ * document was paid with and that refund issues the note.
+ */
+export function issueCreditNote(
+  token: string,
+  id: string,
+  request: { idempotencyKey: string; reason: CreditReason; lines?: CreditLine[]; refund?: boolean },
+) {
+  return apiRequest<CreditResult>(`/admin/fiscal/documents/${id}/credit-notes`, {
     token,
     method: "POST",
-    body: { idempotency_key: idempotencyKey, ...(lines ? { lines } : {}) },
+    body: {
+      idempotency_key: request.idempotencyKey,
+      reason: request.reason,
+      ...(request.lines ? { lines: request.lines } : {}),
+      ...(request.refund ? { refund: true } : {}),
+    },
+  });
+}
+
+export type DocumentEmail = Json<"PaleeWeb.AdminFiscalTaxController.email_document", 202>["email"];
+
+/** «Αποστολή με email» (ADR-265): the PDF to `to`, or to the buyer printed on it. */
+export function emailFiscalDocument(token: string, id: string, idempotencyKey: string, to?: string) {
+  return apiRequest<{ email: DocumentEmail }>(`/admin/fiscal/documents/${id}/email`, {
+    token,
+    method: "POST",
+    body: { idempotency_key: idempotencyKey, ...(to ? { to } : {}) },
+  });
+}
+
+export type RegistryBusiness = Json<"PaleeWeb.AdminFiscalRegistryController.lookup">["business"];
+
+/** «Συμπλήρωση από το ΑΦΜ» (ADR-265): a Greek business from AADE's registry. */
+export function lookupRegistryBusiness(token: string, taxId: string) {
+  return apiRequest<{ business: RegistryBusiness }>(`/admin/fiscal/registry/businesses/${encodeURIComponent(taxId)}`, {
+    token,
   });
 }
 

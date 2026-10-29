@@ -170,3 +170,54 @@ const LOCAL_TERMS: Partial<Record<string, Partial<Record<FieldKey, string>>>> = 
 export function localTerm(country: string, field: FieldKey): string | null {
   return LOCAL_TERMS[country]?.[field] ?? null;
 }
+
+/**
+ * The Greek ΑΦΜ's check digit (ADR-265): nine digits, the first eight
+ * weighted by 2⁸…2¹, the sum mod 11 mod 10 is the ninth. The look-up is
+ * offered only for a number that passes, so a typo never reaches AADE.
+ */
+export function isValidAfm(value: string): boolean {
+  const afm = value.trim();
+  if (!/^\d{9}$/.test(afm) || afm === "000000000") return false;
+  let sum = 0;
+  for (let index = 0; index < 8; index += 1) sum += Number(afm[index]) * 2 ** (8 - index);
+  return (sum % 11) % 10 === Number(afm[8]);
+}
+
+/** What AADE's registry answers (only the fields the details use). */
+export type RegistryDetails = {
+  legal_name?: string | null;
+  trade_name?: string | null;
+  tax_office?: string | null;
+  street?: string | null;
+  building_number?: string | null;
+  postal_code?: string | null;
+  city?: string | null;
+  activity_code?: string | null;
+};
+
+/**
+ * «Συμπλήρωση από το ΑΦΜ»: `shown` fills the business row's own fields (staff
+ * check them before saving); `later` holds the address and ΚΑΔ, saved with
+ * the row only where the details have nothing yet, so typed values stay.
+ */
+export type RegistryLater = Partial<Record<"street" | "postal_code" | "city" | "activity_code", string>>;
+
+export function fromRegistry(business: RegistryDetails, current: Draft): { shown: Draft; later: RegistryLater } {
+  const text = (value: string | null | undefined) => (typeof value === "string" ? value.trim() : "");
+  const shown: Draft = {};
+  for (const key of ["legal_name", "trade_name", "tax_office"] as const) {
+    if (text(business[key])) shown[key] = text(business[key]);
+  }
+  const found: Required<RegistryLater> = {
+    street: [text(business.street), text(business.building_number)].filter(Boolean).join(" "),
+    postal_code: text(business.postal_code),
+    city: text(business.city),
+    activity_code: text(business.activity_code),
+  };
+  const later: RegistryLater = {};
+  for (const [key, value] of Object.entries(found) as Array<[keyof RegistryLater, string]>) {
+    if (value && !(current[key] ?? "").trim()) later[key] = value;
+  }
+  return { shown, later };
+}

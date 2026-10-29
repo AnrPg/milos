@@ -12247,7 +12247,8 @@
       "branchCode": "À changer seulement si tu as un établissement déclaré auprès de l'AADE.",
       "optional": "Facultatif.",
       "iban": "Facultatif. Imprimé sur les factures à régler par virement.",
-      "qrIban": "Facultatif. Pour les QR-factures avec référence QR."
+      "qrIban": "Facultatif. Pour les QR-factures avec référence QR.",
+      "checkDigitsOk": "Chiffres de contrôle : corrects."
     },
     "reason": {
       "blank": "Complète ce champ.",
@@ -12284,6 +12285,21 @@
       "sandbox": "bac à sable",
       "test": "test",
       "production": "production"
+    },
+    "registry": {
+      "lookup": "Remplir à partir du numéro fiscal (ΑΦΜ)",
+      "looking": "Recherche auprès de l'AADE…",
+      "orByHand": "Ou remplis les champs toi-même.",
+      "found": "Trouvé dans le registre de l'AADE. Vérifie les informations.",
+      "foundLater": "L'AADE a aussi donné l'adresse et le code d'activité (ΚΑΔ) : tu les trouveras remplis aux étapes suivantes.",
+      "error": {
+        "invalid_tax_id": "Ce numéro fiscal n'est pas correct. Vérifie les chiffres.",
+        "registry_not_connected": "Les identifiants du registre AADE manquent. Remplis les champs toi-même.",
+        "registry_credentials_rejected": "L'AADE n'a pas accepté les identifiants. Remplis les champs toi-même.",
+        "registry_not_found": "L'AADE n'a pas trouvé ce numéro fiscal.",
+        "registry_limit_reached": "Trop de recherches. Réessaie dans un moment.",
+        "registry_unavailable": "L'AADE ne répond pas pour le moment. Réessaie plus tard ou remplis les champs toi-même."
+      }
     }
   },
   "FiscalDocuments": {
@@ -12406,7 +12422,33 @@
     "mapPlaceholder": "catégorie=valeur, une par ligne",
     "auditOk": "OK",
     "pdf": "PDF",
-    "txAccepted": "myDATA"
+    "txAccepted": "myDATA",
+    "sendEmail": "Envoyer par e-mail",
+    "reason": "Motif",
+    "reasons": {
+      "product_return": "Retour de produit",
+      "billing_error": "Erreur de facturation",
+      "subscription_cancelled": "Abonnement résilié",
+      "other": "Autre"
+    },
+    "pickReason": "Choisis un motif.",
+    "refundToCard": "Rembourser sur la carte {card}",
+    "refundToCardHint": "Via {provider}, avec l'avoir. Désactive-le si tu as rendu l'argent autrement.",
+    "refundingToCard": "L'argent est remboursé sur la carte {card} (2 à 5 jours ouvrés).",
+    "noRefund": "Sans remboursement.",
+    "emailTitle": "Envoyer {number} par e-mail",
+    "emailTo": "E-mail du destinataire",
+    "emailHint": "Nous envoyons le PDF dans la langue du document.",
+    "emailSend": "Envoyer",
+    "emailSending": "Envoi…",
+    "emailSent": "Envoyé à {to}.",
+    "emailError": {
+      "invalid_address": "Cet e-mail ne semble pas correct. Vérifie-le.",
+      "no_recipient": "Indique l'e-mail auquel l'envoyer.",
+      "throttled": "Il vient d'être envoyé à cet e-mail. Réessaie plus tard.",
+      "suppressed": "Cet e-mail n'accepte pas nos messages. Essaie une autre adresse.",
+      "business_not_activated": "Les e-mails aux clients commencent dès que ta box est activée."
+    }
   },
   "BoxScreens": {
     "eyebrow": "Réglages",

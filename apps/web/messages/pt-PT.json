@@ -12247,7 +12247,8 @@
       "branchCode": "Altera apenas se tiveres um estabelecimento registado na AADE.",
       "optional": "Opcional.",
       "iban": "Opcional. Impresso nas faturas a pagar por transferência.",
-      "qrIban": "Opcional. Para faturas QR com referência QR."
+      "qrIban": "Opcional. Para faturas QR com referência QR.",
+      "checkDigitsOk": "Dígitos de controlo: corretos."
     },
     "reason": {
       "blank": "Preenche este campo.",
@@ -12284,6 +12285,21 @@
       "sandbox": "ambiente de testes",
       "test": "teste",
       "production": "produção"
+    },
+    "registry": {
+      "lookup": "Preencher a partir do NIF (ΑΦΜ)",
+      "looking": "A consultar a AADE…",
+      "orByHand": "Ou preenche os campos tu mesmo.",
+      "found": "Encontrados no registo da AADE. Verifica-os.",
+      "foundLater": "A AADE também deu a morada e o código de atividade (ΚΑΔ): vais encontrá-los preenchidos nos passos seguintes.",
+      "error": {
+        "invalid_tax_id": "Este NIF não está correto. Verifica os dígitos.",
+        "registry_not_connected": "Faltam as credenciais do registo da AADE. Preenche os campos tu mesmo.",
+        "registry_credentials_rejected": "A AADE não aceitou as credenciais. Preenche os campos tu mesmo.",
+        "registry_not_found": "A AADE não encontrou este NIF.",
+        "registry_limit_reached": "Demasiadas consultas. Tenta novamente daqui a pouco.",
+        "registry_unavailable": "A AADE não está a responder. Tenta mais tarde ou preenche os campos tu mesmo."
+      }
     }
   },
   "FiscalDocuments": {
@@ -12406,7 +12422,33 @@
     "mapPlaceholder": "categoria=valor, um por linha",
     "auditOk": "OK",
     "pdf": "PDF",
-    "txAccepted": "myDATA"
+    "txAccepted": "myDATA",
+    "sendEmail": "Enviar por email",
+    "reason": "Motivo",
+    "reasons": {
+      "product_return": "Devolução de produto",
+      "billing_error": "Erro de cobrança",
+      "subscription_cancelled": "Subscrição cancelada",
+      "other": "Outro"
+    },
+    "pickReason": "Escolhe um motivo.",
+    "refundToCard": "Reembolso no cartão {card}",
+    "refundToCardHint": "Através de {provider}, junto com a nota de crédito. Desliga se devolveste o dinheiro de outra forma.",
+    "refundingToCard": "O dinheiro volta ao cartão {card} (2–5 dias úteis).",
+    "noRefund": "Sem reembolso.",
+    "emailTitle": "Enviar {number} por email",
+    "emailTo": "Email do destinatário",
+    "emailHint": "Enviamos o PDF na língua do documento.",
+    "emailSend": "Enviar",
+    "emailSending": "A enviar…",
+    "emailSent": "Enviado para {to}.",
+    "emailError": {
+      "invalid_address": "Este email não parece correto. Verifica-o.",
+      "no_recipient": "Escreve o email para onde enviar.",
+      "throttled": "Acabou de ser enviado para este email. Tenta mais tarde.",
+      "suppressed": "Este email não aceita as nossas mensagens. Tenta outro.",
+      "business_not_activated": "Os emails para clientes começam assim que a tua box for ativada."
+    }
   },
   "BoxScreens": {
     "eyebrow": "Definições",

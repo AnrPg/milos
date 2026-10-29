@@ -12247,7 +12247,8 @@
       "branchCode": "Da cambiare solo se hai una sede secondaria registrata presso l'AADE.",
       "optional": "Facoltativo.",
       "iban": "Facoltativo. Stampato sulle fatture da pagare con bonifico.",
-      "qrIban": "Facoltativo. Per le QR-fatture con riferimento QR."
+      "qrIban": "Facoltativo. Per le QR-fatture con riferimento QR.",
+      "checkDigitsOk": "Cifre di controllo: corrette."
     },
     "reason": {
       "blank": "Compila questo campo.",
@@ -12284,6 +12285,21 @@
       "sandbox": "sandbox",
       "test": "test",
       "production": "produzione"
+    },
+    "registry": {
+      "lookup": "Compila dal codice fiscale (ΑΦΜ)",
+      "looking": "Ricerca presso l'AADE…",
+      "orByHand": "Oppure compila i campi da solo.",
+      "found": "Trovati nel registro dell'AADE. Controllali.",
+      "foundLater": "L'AADE ha fornito anche indirizzo e codice attività (ΚΑΔ): li troverai compilati nei passaggi successivi.",
+      "error": {
+        "invalid_tax_id": "Questo codice fiscale non è corretto. Controlla le cifre.",
+        "registry_not_connected": "Mancano le credenziali del registro AADE. Compila i campi da solo.",
+        "registry_credentials_rejected": "L'AADE non ha accettato le credenziali. Compila i campi da solo.",
+        "registry_not_found": "L'AADE non ha trovato questo codice fiscale.",
+        "registry_limit_reached": "Troppe ricerche. Riprova tra poco.",
+        "registry_unavailable": "L'AADE non risponde ora. Riprova più tardi o compila i campi da solo."
+      }
     }
   },
   "FiscalDocuments": {
@@ -12406,7 +12422,33 @@
     "mapPlaceholder": "categoria=valore, uno per riga",
     "auditOk": "OK",
     "pdf": "PDF",
-    "txAccepted": "myDATA"
+    "txAccepted": "myDATA",
+    "sendEmail": "Invia via email",
+    "reason": "Motivo",
+    "reasons": {
+      "product_return": "Reso del prodotto",
+      "billing_error": "Errore di addebito",
+      "subscription_cancelled": "Abbonamento annullato",
+      "other": "Altro"
+    },
+    "pickReason": "Scegli un motivo.",
+    "refundToCard": "Rimborso sulla carta {card}",
+    "refundToCardHint": "Tramite {provider}, insieme alla nota di credito. Disattivalo se hai restituito i soldi in un altro modo.",
+    "refundingToCard": "I soldi tornano sulla carta {card} (2–5 giorni lavorativi).",
+    "noRefund": "Senza rimborso.",
+    "emailTitle": "Invia {number} via email",
+    "emailTo": "Email del destinatario",
+    "emailHint": "Inviamo il PDF nella lingua del documento.",
+    "emailSend": "Invia",
+    "emailSending": "Invio…",
+    "emailSent": "Inviato a {to}.",
+    "emailError": {
+      "invalid_address": "Questa email non sembra corretta. Controllala.",
+      "no_recipient": "Scrivi l'email a cui inviarlo.",
+      "throttled": "È appena stato inviato a questa email. Riprova più tardi.",
+      "suppressed": "Questa email non accetta i nostri messaggi. Provane un'altra.",
+      "business_not_activated": "Le email ai clienti partono appena il tuo box è attivato."
+    }
   },
   "BoxScreens": {
     "eyebrow": "Impostazioni",
