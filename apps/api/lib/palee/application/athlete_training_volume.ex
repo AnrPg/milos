@@ -163,7 +163,11 @@ defmodule Palee.Application.AthleteTrainingVolume do
   # ADR-270: a structured plan workout counts what was done in each set (its
   # actuals; without them its prescription and scored rounds), not one set
   # per materialised exercise.
-  defp plan_workload(%{organization_id: org_id, master_workout_id: workout_id} = execution, workouts, plan_sets)
+  defp plan_workload(
+         %{organization_id: org_id, master_workout_id: workout_id} = execution,
+         workouts,
+         plan_sets
+       )
        when is_binary(org_id) and is_binary(workout_id) do
     with %{} = workout <- Map.get(workouts, {org_id, workout_id}),
          true <- PlanPrescriptions.plan_workout?(workout) do

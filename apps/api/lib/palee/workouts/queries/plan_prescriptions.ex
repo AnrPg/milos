@@ -99,7 +99,11 @@ defmodule Palee.Workouts.Queries.PlanPrescriptions do
               elapsed_secs: elapsed_secs(elapsed, id)
             ]
 
-            case PlanWorkload.section(field(section, :plan), Map.get(by_section, id, []), section_opts) do
+            case PlanWorkload.section(
+                   field(section, :plan),
+                   Map.get(by_section, id, []),
+                   section_opts
+                 ) do
               nil -> nil
               workload -> Map.merge(%{section_id: id, name: field(section, :name)}, workload)
             end

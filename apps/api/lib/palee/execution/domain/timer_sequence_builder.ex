@@ -341,7 +341,18 @@ defmodule Palee.Execution.Domain.TimerSequenceBuilder do
 
   defp plan_segments("emom", section, exercises, get) do
     every = positive(get.(:every_secs)) || 60
-    [segment(section, :interval_cycle, every, nil, positive(get.(:times)), exercises, text("emom"))]
+
+    [
+      segment(
+        section,
+        :interval_cycle,
+        every,
+        nil,
+        positive(get.(:times)),
+        exercises,
+        text("emom")
+      )
+    ]
   end
 
   defp plan_segments("intervals", section, exercises, get) do

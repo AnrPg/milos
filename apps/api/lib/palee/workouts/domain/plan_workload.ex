@@ -342,7 +342,11 @@ defmodule Palee.Workouts.Domain.PlanWorkload do
   end
 
   defp step_set(set, %{rule: "step"} = rule, n) do
-    %{set | reps: step_reps(set.reps, rule.reps_step, n), load: step_load(set.load, rule.load_step, n)}
+    %{
+      set
+      | reps: step_reps(set.reps, rule.reps_step, n),
+        load: step_load(set.load, rule.load_step, n)
+    }
   end
 
   defp step_set(set, _rule, _n), do: set
@@ -591,8 +595,11 @@ defmodule Palee.Workouts.Domain.PlanWorkload do
 
   defp record_kg(%{prescribed_load_pct: %Decimal{} = pct} = record, set, one_rep_max) do
     case record.one_rep_max_kg || one_rep_max do
-      %Decimal{} = orm -> {pct |> Decimal.mult(orm) |> Decimal.div(@hundred) |> Decimal.round(2), false}
-      nil -> if set, do: load_kg(set.load, nil), else: {nil, true}
+      %Decimal{} = orm ->
+        {pct |> Decimal.mult(orm) |> Decimal.div(@hundred) |> Decimal.round(2), false}
+
+      nil ->
+        if set, do: load_kg(set.load, nil), else: {nil, true}
     end
   end
 
@@ -674,9 +681,10 @@ defmodule Palee.Workouts.Domain.PlanWorkload do
   defp top_set(%{top_set: nil} = acc, kg, reps), do: %{acc | top_set: %{load_kg: kg, reps: reps}}
 
   defp top_set(%{top_set: top} = acc, kg, reps) do
-    if Decimal.gt?(kg, top.load_kg) or (Decimal.equal?(kg, top.load_kg) and Decimal.gt?(reps, top.reps)),
-      do: %{acc | top_set: %{load_kg: kg, reps: reps}},
-      else: acc
+    if Decimal.gt?(kg, top.load_kg) or
+         (Decimal.equal?(kg, top.load_kg) and Decimal.gt?(reps, top.reps)),
+       do: %{acc | top_set: %{load_kg: kg, reps: reps}},
+       else: acc
   end
 
   defp totals_of(workloads) do
@@ -743,7 +751,10 @@ defmodule Palee.Workouts.Domain.PlanWorkload do
 
   defp to_decimal(%Decimal{} = value), do: value
   defp to_decimal(value) when is_integer(value), do: Decimal.new(value)
-  defp to_decimal(value) when is_float(value), do: value |> Decimal.from_float() |> Decimal.round(2)
+
+  defp to_decimal(value) when is_float(value),
+    do: value |> Decimal.from_float() |> Decimal.round(2)
+
   defp to_decimal(_value), do: nil
 
   defp number(nil), do: nil
