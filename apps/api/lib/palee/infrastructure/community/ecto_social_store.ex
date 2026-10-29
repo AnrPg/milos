@@ -297,6 +297,7 @@ defmodule Palee.Infrastructure.Community.EctoSocialStore do
     ProfilePost
     |> where([p], p.user_id in ^filter.author_ids and is_nil(p.deleted_at))
     |> media_shown_to(filter.viewer_id)
+    |> media_only(Map.get(filter, :media_only, false))
     |> only_ids(Map.get(filter, :ids))
     |> before(Map.get(filter, :before))
     |> order_by([p], desc: p.inserted_at, desc: p.id)
@@ -310,6 +311,10 @@ defmodule Palee.Infrastructure.Community.EctoSocialStore do
     do: where(query, [p], p.media_status == "ready" or p.user_id == ^viewer_id)
 
   defp media_shown_to(query, _viewer_id), do: where(query, [p], p.media_status == "ready")
+
+  # ADR-231: the profile's «Πολυμέσα» grid, posts that carry photos or a video.
+  defp media_only(query, true), do: where(query, [p], fragment("cardinality(?) > 0", p.media))
+  defp media_only(query, _all), do: query
 
   @impl true
   def update_profile_post_media(_context, id, fun) when is_function(fun, 1) do
@@ -357,10 +362,11 @@ defmodule Palee.Infrastructure.Community.EctoSocialStore do
   end
 
   @impl true
-  def count_profile_posts(_context, author_id) do
+  def count_profile_posts(_context, author_id, filter) do
     ProfilePost
     |> where([p], p.user_id == ^author_id and is_nil(p.deleted_at))
     |> where([p], p.media_status == "ready")
+    |> media_only(Map.get(filter, :media_only, false))
     |> Repo.aggregate(:count)
   end
 

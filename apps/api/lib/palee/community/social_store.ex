@@ -93,8 +93,8 @@ defmodule Palee.Community.SocialStore do
     do: call(context, :list_profile_posts, [filter])
 
   @impl true
-  def count_profile_posts(context, author_id),
-    do: call(context, :count_profile_posts, [author_id])
+  def count_profile_posts(context, author_id, filter),
+    do: call(context, :count_profile_posts, [author_id, filter])
 
   @impl true
   def update_profile_post_media(context, id, fun),

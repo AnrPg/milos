@@ -181,6 +181,64 @@ defmodule PaleeWeb.PostMediaControllerTest do
     assert is_binary(url)
   end
 
+  test "the profile's «Πολυμέσα» grid: only posts with media, by the same audience (ADR-231)",
+       ctx do
+    %{as: as, member: member, other: other, coach: stranger} = ctx
+    private_account!(member)
+
+    post! = fn body ->
+      as.(member)
+      |> send_json(:post, "/api/profile-posts", body)
+      |> json_response(201)
+      |> get_in(["post", "id"])
+    end
+
+    _text_only = post!.(%{audience: "public", body: "Words only"})
+    public_photo = post!.(%{audience: "public", media_ids: [photo!(as, member)]})
+
+    followers_photos =
+      post!.(%{audience: "followers", media_ids: [photo!(as, member), photo!(as, member)]})
+
+    {pending, _key} = reserve(as, member, "post_photo", "image/jpeg", jpeg(1200, 900))
+    processing = post!.(%{audience: "public", media_ids: [pending]})
+
+    grid = fn user ->
+      as.(user)
+      |> get("/api/people/#{member.id}/media")
+      |> json_response(200)
+      |> Map.fetch!("posts")
+      |> Enum.map(& &1["id"])
+    end
+
+    # The author sees their own grid, still-processing posts included.
+    assert grid.(member) == [processing, followers_photos, public_photo]
+    # Not a follower of a private account: the public posts with ready media only.
+    assert grid.(stranger) == [public_photo]
+
+    assert %{"status" => "requested"} =
+             as.(other)
+             |> send_json(:post, "/api/me/follows", %{target_type: "user", target_id: member.id})
+             |> json_response(200)
+
+    assert grid.(other) == [public_photo]
+
+    assert %{"entries" => [%{"follow_id" => follow_id}]} =
+             as.(member) |> get("/api/me/follow-requests") |> json_response(200)
+
+    assert as.(member) |> post("/api/me/follow-requests/#{follow_id}/accept") |> response(204)
+    assert grid.(other) == [followers_photos, public_photo]
+
+    assert %{"posts" => [%{"media" => [%{"thumb_url" => thumb}, _second]} | _]} =
+             as.(other) |> get("/api/people/#{member.id}/media") |> json_response(200)
+
+    assert thumb =~ "users/#{member.id}/media/posts/"
+
+    assert %{"posts_count" => 3, "media_count" => 2} =
+             as.(member) |> get("/api/me/social") |> json_response(200)
+
+    assert as.(other) |> get("/api/people/#{Ecto.UUID.generate()}/media") |> response(404)
+  end
+
   test "a photo that cannot be decoded fails the post, for its author only", ctx do
     %{as: as, member: member, other: other} = ctx
 

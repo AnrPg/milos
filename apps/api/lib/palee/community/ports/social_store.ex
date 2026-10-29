@@ -62,7 +62,7 @@ defmodule Palee.Community.Ports.SocialStore do
   @callback create_profile_post(context(), map()) :: {:ok, map()} | {:error, term()}
   @callback get_profile_post(context(), id(), id() | nil) :: map() | nil
   @callback list_profile_posts(context(), map()) :: [map()]
-  @callback count_profile_posts(context(), id()) :: non_neg_integer()
+  @callback count_profile_posts(context(), id(), map()) :: non_neg_integer()
   @doc "ADR-157: as `CommunityStore.update_post_media/3`, for a profile post."
   @callback update_profile_post_media(context(), id(), (map() -> {:ok, map()} | :skip)) ::
               {:ok, map(), map()} | {:error, term()}

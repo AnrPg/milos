@@ -3,18 +3,22 @@ defmodule Palee.Application.SocialProfile do
   ADR-142 (P2-M2): the social side of a person. The member's own counts for
   Εγώ (posts, followers, following, waiting requests), and another person's
   profile as the viewer may see it: name, avatar, counts, both follow
-  relationships and the profile posts the viewer may read.
+  relationships and the profile posts the viewer may read, all of them or
+  only those with photos or a video (ADR-231, the «Πολυμέσα» grid).
   """
 
   alias Palee.Application.PostPresenter
   alias Palee.{Community, Identity, Places}
 
   @page 20
+  # Ten rows of the three-wide grid.
+  @media_page 30
 
   def me(%{user_id: user_id} = context) do
     {:ok,
      %{
        posts_count: Community.count_profile_posts(context, user_id),
+       media_count: Community.count_profile_posts(context, user_id, %{media_only: true}),
        followers_count: Community.count_incoming_follows(context, "user", user_id, "active"),
        following_count:
          Community.count_outgoing_follows(context, user_id, Community.follow_target_types(), [
@@ -140,18 +144,29 @@ defmodule Palee.Application.SocialProfile do
   end
 
   @doc "The person's profile posts the viewer may read, newest first."
-  def posts(%{user_id: viewer_id} = context, person_id, params) do
+  def posts(context, person_id, params), do: page(context, person_id, params, @page, false)
+
+  @doc """
+  ADR-231: the posts behind the profile's «Πολυμέσα» grid, those with photos
+  or a video, newest first. The same audience rules as `posts/3` decide what
+  the viewer reads (RLS), so a private account's grid stays locked too.
+  """
+  def media(context, person_id, params),
+    do: page(context, person_id, params, @media_page, true)
+
+  defp page(%{user_id: viewer_id} = context, person_id, params, size, media_only) do
     with {:ok, person} <- find(person_id, viewer_id),
          {:ok, before} <- Community.decode_feed_cursor(params[:cursor] || params["cursor"]) do
       posts =
         Community.list_profile_posts(context, %{
           author_ids: [person.id],
           viewer_id: viewer_id,
+          media_only: media_only,
           before: before,
-          limit: @page + 1
+          limit: size + 1
         })
 
-      {page, rest} = Enum.split(posts, @page)
+      {page, rest} = Enum.split(posts, size)
 
       {:ok,
        %{
