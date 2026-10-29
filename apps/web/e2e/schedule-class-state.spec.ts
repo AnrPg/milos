@@ -82,7 +82,7 @@ async function openClass(page: Page) {
   await page.getByRole("button", { name: /CrossFit/ }).first().click();
 }
 
-/** Edit (and Restore) stay in view; the other class actions sit behind ⋯. */
+/** Edit stays in view; the other class actions sit behind ⋯ (restore and resume live in the state notice). */
 async function chooseClassAction(page: Page, name: string) {
   await page.getByTestId("class-more-actions").click();
   await page.getByRole("menu", { name: "More actions for this class" }).getByRole("menuitem", { name, exact: true }).click();
@@ -242,13 +242,19 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
     await expect(page.getByTestId("class-state-badge").first()).toHaveText("Cancelled");
     await page.getByRole("button", { name: /CrossFit/ }).first().click();
     await expect(page.getByTestId("class-state-notice")).toHaveText("This class is cancelled: Coach is ill");
+    // The way back sits in the notice, next to what it fixes; nothing to add to a calendar.
+    await expect(page.getByTestId("class-state").getByRole("button", { name: "Restore class" })).toBeVisible();
     const actions = page.getByTestId("class-actions");
-    await expect(actions.getByRole("button", { name: "Restore class" })).toBeVisible();
+    await expect(actions.getByRole("button", { name: "Restore class" })).toHaveCount(0);
     await page.getByTestId("class-more-actions").click();
     const menu = page.getByRole("menu", { name: "More actions for this class" });
     await expect(menu.getByRole("menuitem", { name: "Delete", exact: true })).toBeVisible();
     await expect(menu.getByRole("menuitem", { name: "Pause bookings" })).toHaveCount(0);
     await expect(menu.getByRole("menuitem", { name: "Restore class" })).toHaveCount(0);
+    await expect(menu.getByRole("menuitem", { name: "Add to calendar" })).toHaveCount(0);
+    await page.keyboard.press("Escape");
+    await page.getByTestId("class-state").getByRole("button", { name: "Restore class" }).click();
+    await expect(page.getByRole("dialog", { name: "Restore this class?" })).toBeVisible();
   });
 
   test("a paused class offers resume", async ({ page }) => {
@@ -257,10 +263,39 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
 
     await openClass(page);
     await expect(page.getByTestId("class-state-notice")).toContainText("Booking for this class is paused.");
-    await chooseClassAction(page, "Resume bookings");
+    await page.getByTestId("class-more-actions").click();
+    await expect(page.getByRole("menu").getByRole("menuitem", { name: "Resume bookings" })).toHaveCount(0);
+    await page.keyboard.press("Escape");
+    await page.getByTestId("class-state").getByRole("button", { name: "Resume bookings" }).click();
     // Not in a series: no scope choice.
     const dialog = page.getByRole("dialog", { name: "Resume bookings?" });
     await expect(dialog.getByRole("radiogroup")).toHaveCount(0);
+  });
+
+  test("the class is named by itself and a class without its WOD shows a red card with two ways to add one", async ({ page }) => {
+    await asOwner(page);
+    await withClass(page, { ...seriesClass, class_series_id: null, published: false, workout_status: "missing" });
+
+    await openClass(page);
+    await expect(page.getByRole("dialog").getByRole("heading", { level: 2 })).toHaveText("Morning WOD");
+    const notice = page.getByTestId("class-wod-notice");
+    await expect(notice).toHaveAttribute("role", "alert");
+    await expect(notice).toContainText("Not published: no WOD");
+    await expect(notice).toContainText("Clients can't see or book this class until you add a WOD.");
+    await expect(notice.getByRole("button", { name: "Choose a WOD" })).toBeVisible();
+    await expect(notice.getByRole("button", { name: "+ New WOD" })).toBeVisible();
+  });
+
+  test("a series class without its WOD raises no warning and offers the same two buttons on the WOD card", async ({ page }) => {
+    await asOwner(page);
+    await withClass(page, { ...seriesClass, published: true, workout_status: "awaiting" });
+
+    await openClass(page);
+    await expect(page.getByTestId("class-wod-notice")).toHaveCount(0);
+    await expect(page.getByRole("dialog").getByRole("alert")).toHaveCount(0);
+    const add = page.getByTestId("class-wod-add");
+    await expect(add.getByRole("button", { name: "Choose a WOD" })).toBeVisible();
+    await expect(add.getByRole("button", { name: "+ New WOD" })).toBeVisible();
   });
 
   test("on a phone, the class and workout action rows stay inside the card", async ({ page }) => {

@@ -33,8 +33,21 @@ export function ClassStateBadge({ slot }: { slot: ScheduleSlot }) {
   );
 }
 
-/** The class's state in its detail view, with the reason a cancel gave. */
-export function ClassStateNotice({ slot, className = "" }: { slot: ScheduleSlot; className?: string }) {
+/**
+ * The class's state in its detail view, with the reason a cancel gave. Staff
+ * get the way back inside it (restore a cancelled class, resume bookings), so
+ * the state and its fix read together.
+ */
+export function ClassStateNotice({
+  slot,
+  className = "",
+  onAction,
+}: {
+  slot: ScheduleSlot;
+  className?: string;
+  /** Staff: shows «Restore class» or «Resume bookings» in the notice. */
+  onAction?: (action: ClassAction) => void;
+}) {
   const t = useTranslations("Schedule");
   const state = classStateBadge(slot);
   if (!state) return null;
@@ -45,20 +58,32 @@ export function ClassStateNotice({ slot, className = "" }: { slot: ScheduleSlot;
       : slot.cancel_reason
         ? t("classStateCancelledReason", { reason: slot.cancel_reason })
         : t("classStateCancelledNotice");
+  const action: ClassAction = state === "paused" ? "resume" : "restore";
 
   return (
-    <p
+    <div
       role="status"
-      data-testid="class-state-notice"
-      className={`rounded-2xl px-4 py-3 text-sm font-semibold ${className}`}
+      data-testid="class-state"
+      className={`flex flex-wrap items-center justify-between gap-3 rounded-2xl px-4 py-3 ${className}`}
       style={{
         background: `color-mix(in srgb, ${TONE[state]} 12%, transparent)`,
         border: `1px solid color-mix(in srgb, ${TONE[state]} 30%, transparent)`,
-        color: TONE[state],
       }}
     >
-      {text}
-    </p>
+      <p data-testid="class-state-notice" className="min-w-0 flex-[1_1_12rem] text-sm font-semibold" style={{ color: TONE[state] }}>
+        {text}
+      </p>
+      {onAction ? (
+        <button
+          type="button"
+          className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold"
+          style={{ background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border-strong)" }}
+          onClick={() => onAction(action)}
+        >
+          {t(`classAction_${action}`)}
+        </button>
+      ) : null}
+    </div>
   );
 }
 

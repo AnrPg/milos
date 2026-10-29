@@ -25,7 +25,7 @@ import { WorkoutPreviewDetail, type PreviewSection } from "@/components/workouts
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { ClassStateNotice, classActionsFor } from "@/components/schedule/ClassState";
-import { ClassWorkoutNotice } from "@/components/schedule/ClassWorkoutNotice";
+import { ClassWorkoutNotice, classWorkoutNoticeKind } from "@/components/schedule/ClassWorkoutNotice";
 import { ClassDayWorkoutNote } from "@/components/schedule/ClassDayWorkoutNote";
 import type { DayWorkout } from "@/api/day-workouts";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
@@ -133,6 +133,7 @@ export function SlotPopup({
   const canJoinWaitlist = !isAdmin && memberState.kind === "waitlist_open";
   // ADR-200: pause/resume, cancel/restore and delete apply to upcoming classes only.
   const stateActions = isAdmin && onClassAction && !isPast ? classActionsFor(slot) : [];
+  const workoutNotice = classWorkoutNoticeKind(slot);
   const locationName = slotLocationName(slot, locations);
   const coachName = slotCoachName(slot, coaches);
   const creditCost = slotCreditCost(slot);
@@ -296,6 +297,15 @@ export function SlotPopup({
       </>
     ) : null;
 
+  function addToCalendar() {
+    downloadIcsEvent({
+      title: slot.name || slot.class_type.name,
+      date: slot.scheduled_at.slice(0, 10),
+      datetime: slot.scheduled_at,
+      durationMinutes: slot.duration_minutes,
+    });
+  }
+
   return (
     <>
       <Dialog
@@ -328,36 +338,30 @@ export function SlotPopup({
         </div>
 
         <div className="p-6">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="min-w-0">
-              <h2 className="text-3xl font-semibold" style={{ color: "var(--text)" }}>
-                {slot.workout?.title ?? i18n("scheduledClass571cba0")}
-              </h2>
-              <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
-                {formatDateTime(locale, slot.scheduled_at, timeZone)}
-                <YourTime at={slot.scheduled_at} zone={timeZone} format="day-time" />
-              </p>
-            </div>
+          {/* The class first: its name, when, then its state and actions. The
+              WOD's own title lives on the WOD card below. */}
+          <div className="min-w-0">
+            <h2 className="text-3xl font-semibold" style={{ color: "var(--text)" }}>
+              {slot.name || slot.class_type.name}
+            </h2>
+            <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
+              {formatDateTime(locale, slot.scheduled_at, timeZone)}
+              <YourTime at={slot.scheduled_at} zone={timeZone} format="day-time" />
+            </p>
+          </div>
+
+          {/* Members keep a quiet calendar button; staff find it under ⋯. A
+              cancelled class has nothing to add. */}
+          {!isAdmin && !slot.cancelled_at ? (
             <button
-              className="mt-1 shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-colors"
-              style={{
-                background: "color-mix(in srgb, var(--primary) 18%, transparent)",
-                color: "var(--primary-strong)",
-                border: "1px solid color-mix(in srgb, var(--primary) 45%, transparent)",
-              }}
-              onClick={() =>
-                downloadIcsEvent({
-                  title: slot.workout?.title ?? i18n("scheduledClass571cba0"),
-                  date: slot.scheduled_at.slice(0, 10),
-                  datetime: slot.scheduled_at,
-                  durationMinutes: 60,
-                })
-              }
+              className="mt-3 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold transition-colors"
+              style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
+              onClick={addToCalendar}
               type="button"
             >
               {i18n("addToCalendar33cead7")}
             </button>
-          </div>
+          ) : null}
 
           {isAdmin ? (
             <ClassDayWorkoutNote
@@ -369,11 +373,16 @@ export function SlotPopup({
             />
           ) : null}
 
-          <ClassStateNotice slot={slot} className="mt-4" />
+          {/* The state carries its own way back (restore, resume) for staff. */}
+          <ClassStateNotice
+            slot={slot}
+            className="mt-4"
+            onAction={stateActions.some((action) => action === "restore" || action === "resume") ? onClassAction : undefined}
+          />
 
-          {/* Class actions: Edit (and Restore on a cancelled class) stay in
-              view; the rest sit behind ⋯ so the row never overflows the card
-              on a phone or in a long language. Destructive ones come last. */}
+          {/* Class actions: only Edit stays in view; the rest sit behind ⋯ so
+              the row never overflows on a phone or in a long language.
+              Destructive ones come last. */}
           {isAdmin ? (
             <div className="mt-4 flex flex-wrap items-center gap-2" data-testid="class-actions">
               <button
@@ -384,24 +393,15 @@ export function SlotPopup({
               >
                 {i18n("editSlot4754d1f")}
               </button>
-              {stateActions.includes("restore") ? (
-                <button
-                  className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-                  style={{ background: "var(--card)", color: "var(--text-soft)" }}
-                  onClick={() => onClassAction?.("restore")}
-                  type="button"
-                >
-                  {t("classAction_restore")}
-                </button>
-              ) : null}
               <MoreMenu
                 variant="pill"
                 label={t("classMoreActions")}
                 testId="class-more-actions"
                 items={[
                   ...(onDuplicate ? [{ label: t("duplicateClass"), onSelect: onDuplicate }] : []),
+                  ...(slot.cancelled_at ? [] : [{ label: i18n("addToCalendar4f05cd6"), onSelect: addToCalendar }]),
                   ...stateActions
-                    .filter((action) => action !== "restore" && action !== "delete")
+                    .filter((action) => action !== "restore" && action !== "resume" && action !== "delete")
                     .map((action) => ({
                       label: t(`classAction_${action}`),
                       onSelect: () => onClassAction?.(action),
@@ -421,7 +421,10 @@ export function SlotPopup({
             </div>
           ) : null}
 
-          {isAdmin ? (
+          {/* Only a draft (hidden from clients until it has a WOD) warns; a
+              series class without its WOD offers the same buttons calmly on
+              the WOD card, since it stays bookable and staff get reminders. */}
+          {isAdmin && workoutNotice === "draft" ? (
             <ClassWorkoutNotice slot={slot} accessToken={accessToken} timeZone={timeZone} onLinked={onSlotChanged} />
           ) : null}
 
@@ -710,14 +713,15 @@ export function SlotPopup({
           >
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <h3 className="min-w-0 text-lg font-semibold" style={{ color: "var(--text)" }}>
-                {i18n("workout39463a5")}
+                {slot.workout?.title ? `${i18n("workout39463a5")} · ${slot.workout.title}` : i18n("workout39463a5")}
               </h3>
               {/* Only the workout's own actions here; the class's are at the top. */}
               {isAdmin && (slot.workout || canProgramVariations) ? (
-                <div className="flex flex-wrap gap-2" data-testid="workout-actions">
+                // On a phone the row takes the card's width and each label stays whole.
+                <div className="flex w-full flex-wrap gap-2 sm:w-auto" data-testid="workout-actions">
                   {slot.workout ? (
                     <button
-                      className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                      className="grow whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors sm:grow-0"
                       style={{ background: "var(--card)", color: "var(--text-soft)" }}
                       onClick={() => setEditWorkoutOpen(true)}
                       type="button"
@@ -727,7 +731,7 @@ export function SlotPopup({
                   ) : null}
                   {canProgramVariations ? (
                     <button
-                      className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                      className="grow whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors sm:grow-0"
                       style={{ background: "var(--card)", color: "var(--text-soft)" }}
                       onClick={() => setVariationOpen(true)}
                       type="button"
@@ -783,9 +787,14 @@ export function SlotPopup({
                 freeTextDocument={slot.workout.free_text_document}
               />
             ) : (
-              <p className="text-sm" style={{ color: "var(--dim)" }}>
-                {i18n("noWorkoutAssignedToThisSlotac3ec23")}
-              </p>
+              <>
+                <p className="text-sm" style={{ color: "var(--dim)" }}>
+                  {i18n("noWorkoutAssignedToThisSlotac3ec23")}
+                </p>
+                {isAdmin && workoutNotice && workoutNotice !== "draft" ? (
+                  <ClassWorkoutNotice slot={slot} accessToken={accessToken} timeZone={timeZone} onLinked={onSlotChanged} calm />
+                ) : null}
+              </>
             )}
 
             {!isAdmin && slot.workout && ownBookingActive ? (
