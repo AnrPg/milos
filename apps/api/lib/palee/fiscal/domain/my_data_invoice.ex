@@ -245,18 +245,12 @@ defmodule Palee.Fiscal.Domain.MyDataInvoice do
     ] ++
       if(is_map(pos) and document.payment_method in ["card", "online"],
         do:
-          tip(pos[:tip_cents]) ++
-            optional("transactionId", pos[:transaction_id]) ++
+          optional("transactionId", pos[:transaction_id]) ++
             optional("tid", pos[:tid]) ++
             provider_signature(pos[:providers_signature]),
         else: []
       )
   end
-
-  # ADR-264: a card tip is reported with the payment, never as a line (it is
-  # not part of the sale's amount).
-  defp tip(cents) when is_integer(cents) and cents > 0, do: [{"tipAmount", amount(cents)}]
-  defp tip(_cents), do: []
 
   defp provider_signature(%{signing_author: author, signature: signature}),
     do: [{"ProvidersSignature", [{"SigningAuthor", author}, {"Signature", signature}]}]
