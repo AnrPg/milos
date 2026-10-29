@@ -615,6 +615,77 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/box-screen/classes/{slot_id}/timer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A class's timer, for a class the screen shows */
+        get: operations["PaleeWeb.BoxScreenController.class_timer"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/box-screen/pair": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pair this TV with the code staff got (no sign-in)
+         * @description Case, spaces and dashes do not matter. A code pairs one device once. The display token lasts 90 days and is renewed with `POST /api/box-screen/token`.
+         */
+        post: operations["PaleeWeb.BoxScreenController.pair"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/box-screen/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What the screen shows today: classes, WODs, leaderboards and the focus */
+        get: operations["PaleeWeb.BoxScreenController.today"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/box-screen/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Renew the display token */
+        post: operations["PaleeWeb.BoxScreenController.token"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/box-search": {
         parameters: {
             query?: never;
@@ -4686,6 +4757,86 @@ export interface paths {
          * @description Booking resolution is never replayed blindly (ADR-120): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
          */
         patch: operations["PaleeWeb.AdminScheduleController.reject_booking"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/box-screens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's screens (those of the branches the staff member works at) */
+        get: operations["PaleeWeb.AdminBoxScreenController.index"];
+        put?: never;
+        /**
+         * Add a box screen and get its pairing code
+         * @description The code is shown once and works for 15 minutes; type it on the TV. A box has at most 20 screens. `location_id` null shows the whole box.
+         */
+        post: operations["PaleeWeb.AdminBoxScreenController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/box-screens/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a box screen: its TV stops at once */
+        delete: operations["PaleeWeb.AdminBoxScreenController.delete"];
+        options?: never;
+        head?: never;
+        /** Rename a box screen or move it to another branch */
+        patch: operations["PaleeWeb.AdminBoxScreenController.update"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/box-screens/{id}/override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Choose what a screen shows and pin it
+         * @description `wod`, `timer`, `leaderboard`, `bookings` or one `class` (with `slot_id`, one of today's classes on the screen), optionally until a time. The TV changes at once.
+         */
+        put: operations["PaleeWeb.AdminBoxScreenController.put_override"];
+        post?: never;
+        /** Return the screen to automatic («Επιστροφή στο αυτόματο») */
+        delete: operations["PaleeWeb.AdminBoxScreenController.delete_override"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/box-screens/{id}/pairing-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * A new pairing code for a screen (to pair it with another TV)
+         * @description Replaces any pending code. The paired TV keeps working until another device pairs with the new code.
+         */
+        post: operations["PaleeWeb.AdminBoxScreenController.pairing_code"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/branding": {
@@ -10258,6 +10409,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/packages/{id}/buy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Buy a package on the payment provider's page (and book a class once paid)
+         * @description Where the law gives 14 days to withdraw, `start_now` must be true: the member asks for the package to start at once. `book_slot_id` books that class once the package is paid.
+         */
+        post: operations["PaleeWeb.MyPaymentsController.buy_package"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/packages/{id}/purchase-terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What buying a package online costs, and the texts to agree to */
+        get: operations["PaleeWeb.MyPaymentsController.package_terms"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/payment-methods": {
         parameters: {
             query?: never;
@@ -10354,6 +10542,26 @@ export interface paths {
         get: operations["PaleeWeb.MyPaymentsController.show"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/payments/{id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Withdraw from a package bought online within 14 days
+         * @description Gives back the price less the part already used, and ends the package.
+         */
+        post: operations["PaleeWeb.MyPaymentsController.withdraw"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10648,6 +10856,23 @@ export interface paths {
         put?: never;
         /** Pay an unpaid order online (409 online_payment_unavailable until a provider exists) */
         post: operations["PaleeWeb.MyShopController.pay"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/orders/{id}/pay-online": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pay an unpaid shop order on the payment provider's page */
+        post: operations["PaleeWeb.MyPaymentsController.pay_shop_order"];
         delete?: never;
         options?: never;
         head?: never;
@@ -13738,6 +13963,23 @@ export interface paths {
         };
         /** A published box: who it is, its «Σχετικά» and its locations */
         get: operations["PaleeWeb.PublicBoxController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/boxes/{slug}/packages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The packages a published box sells online (ADR-248) */
+        get: operations["PaleeWeb.PublicBoxController.packages"];
         put?: never;
         post?: never;
         delete?: never;
@@ -19259,6 +19501,353 @@ export interface components {
             /** @description Ready box_photo media of the gallery, in display order. */
             photo_ids?: string[];
             services?: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+        };
+        /** BoxScreen */
+        BoxScreen: {
+            /** @description Who last changed what the screen shows, and when */
+            focus_changed: {
+                /** Format: date-time */
+                at: string;
+                by: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string | null;
+                } | null;
+            } | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at: string;
+            /** Format: date-time */
+            last_seen_at: string | null;
+            /**
+             * Format: uuid
+             * @description The branch; null for the whole box
+             */
+            location_id: string | null;
+            name: string;
+            /**
+             * BoxScreenOverride
+             * @description What staff pinned on the screen; null when it follows the day automatically
+             */
+            override: {
+                /** Format: uuid */
+                slot_id: string | null;
+                /** Format: date-time */
+                until: string | null;
+                /** @enum {string} */
+                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+            } | null;
+            paired: boolean;
+            /** Format: date-time */
+            paired_at: string | null;
+            /**
+             * Format: date-time
+             * @description When the pending pairing code stops working; null without one
+             */
+            pairing_expires_at: string | null;
+        };
+        /** BoxScreenClass */
+        BoxScreenClass: {
+            /** @description First names of booked members who do not hide; hidden people, guests and trials only counted */
+            bookings: {
+                capacity: number;
+                count: number;
+                names: string[];
+                unnamed: number;
+                waitlist: number;
+            };
+            cancelled: boolean;
+            class_type: string | null;
+            coach_name: string | null;
+            duration_minutes: number;
+            /** Format: date-time */
+            ends_at: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            location_id: string | null;
+            name: string | null;
+            /** Format: date-time */
+            scheduled_at: string;
+            /** Format: uuid */
+            workout_id: string | null;
+        };
+        /**
+         * BoxScreenFocus
+         * @description What the screen puts first: automatically (preview, timer, results, idle) or as staff pinned it
+         */
+        BoxScreenFocus: {
+            /** Format: uuid */
+            slot_id: string | null;
+            /** @enum {string} */
+            source: "auto" | "staff";
+            /** Format: date-time */
+            until: string | null;
+            /** @enum {string} */
+            view: "preview" | "timer" | "results" | "idle" | "wod" | "timer" | "leaderboard" | "bookings" | "class";
+        };
+        /**
+         * BoxScreenLeaderboard
+         * @description Only people who opted in to leaderboards; never journal-private results
+         */
+        BoxScreenLeaderboard: {
+            entries: {
+                /** @description First word of the display name */
+                name: string;
+                rank: number;
+                scale_level_slug: string | null;
+                unit: string | null;
+                value: string | null;
+            }[];
+            score: {
+                name?: string | null;
+                score_type?: string | null;
+                unit?: string | null;
+            } | null;
+            /** Format: uuid */
+            workout_id: string;
+        };
+        /**
+         * BoxScreenOverride
+         * @description What staff pinned on the screen; null when it follows the day automatically
+         */
+        BoxScreenOverride: {
+            /** Format: uuid */
+            slot_id: string | null;
+            /** Format: date-time */
+            until: string | null;
+            /** @enum {string} */
+            view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+        } | null;
+        /**
+         * BoxScreenPairingCode
+         * @description Shown once: typed on the TV within 15 minutes
+         */
+        BoxScreenPairingCode: {
+            /** @example ACEF-3467 */
+            code: string;
+            /** Format: date-time */
+            expires_at: string;
+        };
+        /** BoxScreenToday */
+        BoxScreenToday: {
+            box: {
+                name: string | null;
+            };
+            classes: {
+                /** @description First names of booked members who do not hide; hidden people, guests and trials only counted */
+                bookings: {
+                    capacity: number;
+                    count: number;
+                    names: string[];
+                    unnamed: number;
+                    waitlist: number;
+                };
+                cancelled: boolean;
+                class_type: string | null;
+                coach_name: string | null;
+                duration_minutes: number;
+                /** Format: date-time */
+                ends_at: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                location_id: string | null;
+                name: string | null;
+                /** Format: date-time */
+                scheduled_at: string;
+                /** Format: uuid */
+                workout_id: string | null;
+            }[];
+            /**
+             * Format: date
+             * @description Today on the box's clock
+             */
+            date: string;
+            /**
+             * BoxScreenFocus
+             * @description What the screen puts first: automatically (preview, timer, results, idle) or as staff pinned it
+             */
+            focus: {
+                /** Format: uuid */
+                slot_id: string | null;
+                /** @enum {string} */
+                source: "auto" | "staff";
+                /** Format: date-time */
+                until: string | null;
+                /** @enum {string} */
+                view: "preview" | "timer" | "results" | "idle" | "wod" | "timer" | "leaderboard" | "bookings" | "class";
+            };
+            leaderboards: {
+                entries: {
+                    /** @description First word of the display name */
+                    name: string;
+                    rank: number;
+                    scale_level_slug: string | null;
+                    unit: string | null;
+                    value: string | null;
+                }[];
+                score: {
+                    name?: string | null;
+                    score_type?: string | null;
+                    unit?: string | null;
+                } | null;
+                /** Format: uuid */
+                workout_id: string;
+            }[];
+            screen: {
+                branch: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                } | null;
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
+            /** Format: date-time */
+            server_now: string;
+            time_zone: string;
+            workouts: {
+                /** WorkoutBody */
+                body: {
+                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                    document: {
+                        [key: string]: unknown;
+                    } | null;
+                    /** @enum {string} */
+                    kind: "free_text";
+                    /** @description The assistant also derived exercises (see `sections`) */
+                    structured: boolean;
+                    text: string | null;
+                    timer: {
+                        [key: string]: unknown;
+                    } | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "text_sections";
+                    sections: {
+                        /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                        document: {
+                            [key: string]: unknown;
+                        } | null;
+                        /** Format: uuid */
+                        id: string | null;
+                        /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                        scoring: {
+                            [key: string]: unknown;
+                        }[];
+                        text: string;
+                        /** SectionTimerPreset */
+                        timer: {
+                            duration_seconds?: number | null;
+                            /** @enum {string} */
+                            format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                            interval_seconds?: number | null;
+                            rest_seconds?: number | null;
+                            rounds?: number | null;
+                            work_seconds?: number | null;
+                        } | null;
+                        /** @description Null when untitled */
+                        title: string | null;
+                    }[];
+                } | {
+                    /** @enum {string} */
+                    kind: "structured";
+                    sections: {
+                        /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                        exercises: {
+                            [key: string]: unknown;
+                        }[];
+                        /** Format: uuid */
+                        id: string | null;
+                        name: string;
+                        scoreable: boolean;
+                        subtitle?: string | null;
+                        timer: {
+                            [key: string]: unknown;
+                        } | null;
+                    }[];
+                };
+                /** Format: uuid */
+                id: string;
+                title: string | null;
+                type: string | null;
+            }[];
+        };
+        /** BoxScreenToken */
+        BoxScreenToken: {
+            /** Format: date-time */
+            expires_at: string;
+            token: string;
+        };
+        /** BoxScreenWorkout */
+        BoxScreenWorkout: {
+            /** WorkoutBody */
+            body: {
+                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                document: {
+                    [key: string]: unknown;
+                } | null;
+                /** @enum {string} */
+                kind: "free_text";
+                /** @description The assistant also derived exercises (see `sections`) */
+                structured: boolean;
+                text: string | null;
+                timer: {
+                    [key: string]: unknown;
+                } | null;
+            } | {
+                /** @enum {string} */
+                kind: "text_sections";
+                sections: {
+                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                    document: {
+                        [key: string]: unknown;
+                    } | null;
+                    /** Format: uuid */
+                    id: string | null;
+                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                    scoring: {
+                        [key: string]: unknown;
+                    }[];
+                    text: string;
+                    /** SectionTimerPreset */
+                    timer: {
+                        duration_seconds?: number | null;
+                        /** @enum {string} */
+                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                        interval_seconds?: number | null;
+                        rest_seconds?: number | null;
+                        rounds?: number | null;
+                        work_seconds?: number | null;
+                    } | null;
+                    /** @description Null when untitled */
+                    title: string | null;
+                }[];
+            } | {
+                /** @enum {string} */
+                kind: "structured";
+                sections: {
+                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                    exercises: {
+                        [key: string]: unknown;
+                    }[];
+                    /** Format: uuid */
+                    id: string | null;
+                    name: string;
+                    scoreable: boolean;
+                    subtitle?: string | null;
+                    timer: {
+                        [key: string]: unknown;
+                    } | null;
+                }[];
+            };
+            /** Format: uuid */
+            id: string;
+            title: string | null;
+            type: string | null;
         };
         /** BoxSearchResponse */
         BoxSearchResponse: {
@@ -42852,6 +43441,336 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.BoxScreenController.class_timer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Class timer */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class: {
+                            duration_minutes?: number;
+                            /** Format: uuid */
+                            id?: string;
+                            name?: string;
+                            /** Format: date-time */
+                            scheduled_at?: string;
+                        };
+                        segments: {
+                            [key: string]: unknown;
+                        }[];
+                        /** Format: date-time */
+                        server_now: string;
+                        timer: {
+                            current_segment_index: number;
+                            duration_adjustments?: {
+                                [key: string]: unknown;
+                            };
+                            lock_version: number;
+                            paused_elapsed_ms: number;
+                            /** Format: date-time */
+                            segment_started_at_utc?: string | null;
+                            /** @enum {string} */
+                            status: "ready" | "running" | "paused" | "finished";
+                            timer_preset?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                        };
+                        workout?: {
+                            [key: string]: unknown;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Not on this screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.BoxScreenController.pair": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    code: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Display token */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        box: {
+                            name: string;
+                        };
+                        /** Format: date-time */
+                        expires_at: string;
+                        screen: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        token: string;
+                    };
+                };
+            };
+            /** @description Wrong or expired code */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.BoxScreenController.today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Today */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        box: {
+                            name: string | null;
+                        };
+                        classes: {
+                            /** @description First names of booked members who do not hide; hidden people, guests and trials only counted */
+                            bookings: {
+                                capacity: number;
+                                count: number;
+                                names: string[];
+                                unnamed: number;
+                                waitlist: number;
+                            };
+                            cancelled: boolean;
+                            class_type: string | null;
+                            coach_name: string | null;
+                            duration_minutes: number;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id: string | null;
+                            name: string | null;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                            /** Format: uuid */
+                            workout_id: string | null;
+                        }[];
+                        /**
+                         * Format: date
+                         * @description Today on the box's clock
+                         */
+                        date: string;
+                        /**
+                         * BoxScreenFocus
+                         * @description What the screen puts first: automatically (preview, timer, results, idle) or as staff pinned it
+                         */
+                        focus: {
+                            /** Format: uuid */
+                            slot_id: string | null;
+                            /** @enum {string} */
+                            source: "auto" | "staff";
+                            /** Format: date-time */
+                            until: string | null;
+                            /** @enum {string} */
+                            view: "preview" | "timer" | "results" | "idle" | "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                        };
+                        leaderboards: {
+                            entries: {
+                                /** @description First word of the display name */
+                                name: string;
+                                rank: number;
+                                scale_level_slug: string | null;
+                                unit: string | null;
+                                value: string | null;
+                            }[];
+                            score: {
+                                name?: string | null;
+                                score_type?: string | null;
+                                unit?: string | null;
+                            } | null;
+                            /** Format: uuid */
+                            workout_id: string;
+                        }[];
+                        screen: {
+                            branch: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        /** Format: date-time */
+                        server_now: string;
+                        time_zone: string;
+                        workouts: {
+                            /** WorkoutBody */
+                            body: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            title: string | null;
+                            type: string | null;
+                        }[];
+                    };
+                };
+            };
+            /** @description Invalid display token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.BoxScreenController.token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Display token */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        expires_at: string;
+                        token: string;
+                    };
+                };
+            };
+            /** @description Invalid display token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.BoxSearchController.index": {
         parameters: {
             query: {
@@ -62351,6 +63270,592 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminBoxScreenController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Box screens */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        max_screens: number;
+                        override_views: ("wod" | "timer" | "leaderboard" | "bookings" | "class")[];
+                        screens: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Box screen and pairing code */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * BoxScreenPairingCode
+                         * @description Shown once: typed on the TV within 15 minutes
+                         */
+                        pairing_code: {
+                            /** @example ACEF-3467 */
+                            code: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                        };
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Too many screens */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Invalid name or branch */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No such screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Box screen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Invalid name or branch */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.put_override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: uuid
+                     * @description One of today's classes on the screen; required for `class`
+                     */
+                    slot_id?: string | null;
+                    /**
+                     * Format: date-time
+                     * @description When the screen goes back to automatic (within 24 hours); null to keep it
+                     */
+                    until?: string | null;
+                    /** @enum {string} */
+                    view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                };
+            };
+        };
+        responses: {
+            /** @description Box screen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Invalid choice */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.delete_override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Box screen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.pairing_code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Box screen and pairing code */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * BoxScreenPairingCode
+                         * @description Shown once: typed on the TV within 15 minutes
+                         */
+                        pairing_code: {
+                            /** @example ACEF-3467 */
+                            code: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                        };
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminBrandingController.show": {
         parameters: {
             query?: never;
@@ -71204,6 +72709,7 @@ export interface operations {
                     name: string;
                     /** @enum {string} */
                     package_type: "membership" | "class_pack" | "drop_in" | "trial" | "pt_pack" | "add_on" | "shared" | "corporate";
+                    sold_online?: boolean;
                     tags?: string[];
                 };
             };
@@ -71371,6 +72877,7 @@ export interface operations {
                     name?: string;
                     /** @enum {string} */
                     package_type?: "membership" | "class_pack" | "drop_in" | "trial" | "pt_pack" | "add_on" | "shared" | "corporate";
+                    sold_online?: boolean;
                     tags?: string[];
                 };
             };
@@ -74278,6 +75785,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -74441,6 +75951,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -74559,6 +76072,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -91510,6 +93026,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -91750,6 +93269,120 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.MyPaymentsController.buy_package": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    book_slot_id?: string;
+                    consent_accepted?: boolean;
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    language?: "el" | "en";
+                    save_card?: boolean;
+                    start_now?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.package_terms": {
+        parameters: {
+            query?: {
+                language?: "el" | "en";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Terms */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        available: boolean;
+                        consent_text: string;
+                        consent_version: string;
+                        package: {
+                            base_price_cents: number;
+                            billing_period: string;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            package_type: string;
+                        };
+                        start_now_text: string | null;
+                        withdrawal_days: number | null;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.MyPaymentsController.methods": {
         parameters: {
             query?: never;
@@ -91918,6 +93551,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -91983,6 +93619,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -92041,6 +93680,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -92057,6 +93699,33 @@ export interface operations {
                             /** Format: uuid */
                             user_id?: string | null;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Withdrawal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        refund: {
+                            [key: string]: unknown;
+                        };
+                        refunded_cents: number;
                     };
                 };
             };
@@ -93574,6 +95243,75 @@ export interface operations {
                             status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
                             subtotal_cents?: number;
                             total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.pay_shop_order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    language?: "el" | "en";
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
@@ -108781,6 +110519,51 @@ export interface operations {
                         published_at?: string | null;
                         /** @description ADR-179: the gym's IANA zone; its classes show on this clock */
                         time_zone?: string;
+                    };
+                };
+            };
+            /** @description No published box with this slug */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.PublicBoxController.packages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The gym's slug or one of its former slugs */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Packages */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        online_payments: boolean;
+                        packages: {
+                            base_price_cents: number;
+                            billing_period: string;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            package_type: string;
+                        }[];
+                        withdrawal_days: number | null;
                     };
                 };
             };

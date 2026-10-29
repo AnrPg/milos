@@ -17018,6 +17018,1164 @@
         "title": "BoxPublicProfileUpdate",
         "type": "object"
       },
+      "BoxScreen": {
+        "properties": {
+          "focus_changed": {
+            "description": "Who last changed what the screen shows, and when",
+            "nullable": true,
+            "properties": {
+              "at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "by": {
+                "nullable": true,
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "type": "object"
+              }
+            },
+            "required": [
+              "at",
+              "by"
+            ],
+            "type": "object"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "inserted_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "last_seen_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "location_id": {
+            "description": "The branch; null for the whole box",
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "override": {
+            "description": "What staff pinned on the screen; null when it follows the day automatically",
+            "nullable": true,
+            "properties": {
+              "slot_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "until": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "view": {
+                "enum": [
+                  "wod",
+                  "timer",
+                  "leaderboard",
+                  "bookings",
+                  "class"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "slot_id",
+              "until",
+              "view"
+            ],
+            "title": "BoxScreenOverride",
+            "type": "object"
+          },
+          "paired": {
+            "type": "boolean"
+          },
+          "paired_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "pairing_expires_at": {
+            "description": "When the pending pairing code stops working; null without one",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "focus_changed",
+          "id",
+          "inserted_at",
+          "last_seen_at",
+          "location_id",
+          "name",
+          "override",
+          "paired",
+          "paired_at",
+          "pairing_expires_at"
+        ],
+        "title": "BoxScreen",
+        "type": "object"
+      },
+      "BoxScreenClass": {
+        "properties": {
+          "bookings": {
+            "description": "First names of booked members who do not hide; hidden people, guests and trials only counted",
+            "properties": {
+              "capacity": {
+                "type": "integer"
+              },
+              "count": {
+                "type": "integer"
+              },
+              "names": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "unnamed": {
+                "type": "integer"
+              },
+              "waitlist": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "capacity",
+              "count",
+              "names",
+              "unnamed",
+              "waitlist"
+            ],
+            "type": "object"
+          },
+          "cancelled": {
+            "type": "boolean"
+          },
+          "class_type": {
+            "nullable": true,
+            "type": "string"
+          },
+          "coach_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "duration_minutes": {
+            "type": "integer"
+          },
+          "ends_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "scheduled_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "workout_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "bookings",
+          "cancelled",
+          "class_type",
+          "coach_name",
+          "duration_minutes",
+          "ends_at",
+          "id",
+          "location_id",
+          "name",
+          "scheduled_at",
+          "workout_id"
+        ],
+        "title": "BoxScreenClass",
+        "type": "object"
+      },
+      "BoxScreenFocus": {
+        "description": "What the screen puts first: automatically (preview, timer, results, idle) or as staff pinned it",
+        "properties": {
+          "slot_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "source": {
+            "enum": [
+              "auto",
+              "staff"
+            ],
+            "type": "string"
+          },
+          "until": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "view": {
+            "enum": [
+              "preview",
+              "timer",
+              "results",
+              "idle",
+              "wod",
+              "timer",
+              "leaderboard",
+              "bookings",
+              "class"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "slot_id",
+          "source",
+          "until",
+          "view"
+        ],
+        "title": "BoxScreenFocus",
+        "type": "object"
+      },
+      "BoxScreenLeaderboard": {
+        "description": "Only people who opted in to leaderboards; never journal-private results",
+        "properties": {
+          "entries": {
+            "items": {
+              "properties": {
+                "name": {
+                  "description": "First word of the display name",
+                  "type": "string"
+                },
+                "rank": {
+                  "type": "integer"
+                },
+                "scale_level_slug": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "unit": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "value": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "rank",
+                "scale_level_slug",
+                "unit",
+                "value"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "score": {
+            "nullable": true,
+            "properties": {
+              "name": {
+                "nullable": true,
+                "type": "string"
+              },
+              "score_type": {
+                "nullable": true,
+                "type": "string"
+              },
+              "unit": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "workout_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "entries",
+          "score",
+          "workout_id"
+        ],
+        "title": "BoxScreenLeaderboard",
+        "type": "object"
+      },
+      "BoxScreenOverride": {
+        "description": "What staff pinned on the screen; null when it follows the day automatically",
+        "nullable": true,
+        "properties": {
+          "slot_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "until": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "view": {
+            "enum": [
+              "wod",
+              "timer",
+              "leaderboard",
+              "bookings",
+              "class"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "slot_id",
+          "until",
+          "view"
+        ],
+        "title": "BoxScreenOverride",
+        "type": "object"
+      },
+      "BoxScreenPairingCode": {
+        "description": "Shown once: typed on the TV within 15 minutes",
+        "properties": {
+          "code": {
+            "example": "ACEF-3467",
+            "pattern": "^[A-Z0-9]{4}-[A-Z0-9]{4}$",
+            "type": "string"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "expires_at"
+        ],
+        "title": "BoxScreenPairingCode",
+        "type": "object"
+      },
+      "BoxScreenToday": {
+        "properties": {
+          "box": {
+            "properties": {
+              "name": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          },
+          "classes": {
+            "items": {
+              "properties": {
+                "bookings": {
+                  "description": "First names of booked members who do not hide; hidden people, guests and trials only counted",
+                  "properties": {
+                    "capacity": {
+                      "type": "integer"
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "names": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "unnamed": {
+                      "type": "integer"
+                    },
+                    "waitlist": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "capacity",
+                    "count",
+                    "names",
+                    "unnamed",
+                    "waitlist"
+                  ],
+                  "type": "object"
+                },
+                "cancelled": {
+                  "type": "boolean"
+                },
+                "class_type": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "coach_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "duration_minutes": {
+                  "type": "integer"
+                },
+                "ends_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "location_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "scheduled_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "workout_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "bookings",
+                "cancelled",
+                "class_type",
+                "coach_name",
+                "duration_minutes",
+                "ends_at",
+                "id",
+                "location_id",
+                "name",
+                "scheduled_at",
+                "workout_id"
+              ],
+              "title": "BoxScreenClass",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "date": {
+            "description": "Today on the box's clock",
+            "format": "date",
+            "type": "string"
+          },
+          "focus": {
+            "description": "What the screen puts first: automatically (preview, timer, results, idle) or as staff pinned it",
+            "properties": {
+              "slot_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "source": {
+                "enum": [
+                  "auto",
+                  "staff"
+                ],
+                "type": "string"
+              },
+              "until": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "view": {
+                "enum": [
+                  "preview",
+                  "timer",
+                  "results",
+                  "idle",
+                  "wod",
+                  "timer",
+                  "leaderboard",
+                  "bookings",
+                  "class"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "slot_id",
+              "source",
+              "until",
+              "view"
+            ],
+            "title": "BoxScreenFocus",
+            "type": "object"
+          },
+          "leaderboards": {
+            "items": {
+              "description": "Only people who opted in to leaderboards; never journal-private results",
+              "properties": {
+                "entries": {
+                  "items": {
+                    "properties": {
+                      "name": {
+                        "description": "First word of the display name",
+                        "type": "string"
+                      },
+                      "rank": {
+                        "type": "integer"
+                      },
+                      "scale_level_slug": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "unit": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "value": {
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "rank",
+                      "scale_level_slug",
+                      "unit",
+                      "value"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "score": {
+                  "nullable": true,
+                  "properties": {
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "score_type": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "unit": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "workout_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "entries",
+                "score",
+                "workout_id"
+              ],
+              "title": "BoxScreenLeaderboard",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "screen": {
+            "properties": {
+              "branch": {
+                "nullable": true,
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name"
+                ],
+                "type": "object"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "branch",
+              "id",
+              "name"
+            ],
+            "type": "object"
+          },
+          "server_now": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "time_zone": {
+            "type": "string"
+          },
+          "workouts": {
+            "items": {
+              "properties": {
+                "body": {
+                  "discriminator": {
+                    "propertyName": "kind"
+                  },
+                  "oneOf": [
+                    {
+                      "additionalProperties": false,
+                      "description": "One text written with the WOD assistant",
+                      "properties": {
+                        "document": {
+                          "additionalProperties": true,
+                          "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "kind": {
+                          "enum": [
+                            "free_text"
+                          ],
+                          "type": "string"
+                        },
+                        "structured": {
+                          "description": "The assistant also derived exercises (see `sections`)",
+                          "type": "boolean"
+                        },
+                        "text": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timer": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "text",
+                        "document",
+                        "timer",
+                        "structured"
+                      ],
+                      "title": "FreeTextWorkoutBody",
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "description": "ADR-180: text sections written without the assistant, a timer each",
+                      "properties": {
+                        "kind": {
+                          "enum": [
+                            "text_sections"
+                          ],
+                          "type": "string"
+                        },
+                        "sections": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "document": {
+                                "additionalProperties": true,
+                                "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                "nullable": true,
+                                "type": "object"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "scoring": {
+                                "description": "What the section counts (SectionScoring metrics), empty when not scored",
+                                "items": {
+                                  "additionalProperties": true,
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "text": {
+                                "type": "string"
+                              },
+                              "timer": {
+                                "nullable": true,
+                                "properties": {
+                                  "duration_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "format": {
+                                    "enum": [
+                                      "untimed",
+                                      "for_time",
+                                      "amrap",
+                                      "emom",
+                                      "tabata",
+                                      "custom_hiit",
+                                      "death_by"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "interval_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "rest_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "rounds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "work_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  }
+                                },
+                                "required": [
+                                  "format"
+                                ],
+                                "title": "SectionTimerPreset",
+                                "type": "object"
+                              },
+                              "title": {
+                                "description": "Null when untitled",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "title",
+                              "text",
+                              "document",
+                              "timer",
+                              "scoring"
+                            ],
+                            "title": "TextSection",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "sections"
+                      ],
+                      "title": "TextSectionsWorkoutBody",
+                      "type": "object"
+                    },
+                    {
+                      "additionalProperties": false,
+                      "description": "Exercises with every parameter (structured editor, Quick Text)",
+                      "properties": {
+                        "kind": {
+                          "enum": [
+                            "structured"
+                          ],
+                          "type": "string"
+                        },
+                        "sections": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "exercises": {
+                                "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+                                "items": {
+                                  "additionalProperties": true,
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "scoreable": {
+                                "type": "boolean"
+                              },
+                              "subtitle": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "timer": {
+                                "additionalProperties": true,
+                                "nullable": true,
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "timer",
+                              "scoreable",
+                              "exercises"
+                            ],
+                            "title": "StructuredSection",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "sections"
+                      ],
+                      "title": "StructuredWorkoutBody",
+                      "type": "object"
+                    }
+                  ],
+                  "title": "WorkoutBody"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "title": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "type": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "body",
+                "id",
+                "title",
+                "type"
+              ],
+              "title": "BoxScreenWorkout",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "box",
+          "classes",
+          "date",
+          "focus",
+          "leaderboards",
+          "screen",
+          "server_now",
+          "time_zone",
+          "workouts"
+        ],
+        "title": "BoxScreenToday",
+        "type": "object"
+      },
+      "BoxScreenToken": {
+        "properties": {
+          "expires_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "expires_at",
+          "token"
+        ],
+        "title": "BoxScreenToken",
+        "type": "object"
+      },
+      "BoxScreenWorkout": {
+        "properties": {
+          "body": {
+            "discriminator": {
+              "propertyName": "kind"
+            },
+            "oneOf": [
+              {
+                "additionalProperties": false,
+                "description": "One text written with the WOD assistant",
+                "properties": {
+                  "document": {
+                    "additionalProperties": true,
+                    "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                    "nullable": true,
+                    "type": "object"
+                  },
+                  "kind": {
+                    "enum": [
+                      "free_text"
+                    ],
+                    "type": "string"
+                  },
+                  "structured": {
+                    "description": "The assistant also derived exercises (see `sections`)",
+                    "type": "boolean"
+                  },
+                  "text": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "timer": {
+                    "additionalProperties": true,
+                    "nullable": true,
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "text",
+                  "document",
+                  "timer",
+                  "structured"
+                ],
+                "title": "FreeTextWorkoutBody",
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "description": "ADR-180: text sections written without the assistant, a timer each",
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "text_sections"
+                    ],
+                    "type": "string"
+                  },
+                  "sections": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "document": {
+                          "additionalProperties": true,
+                          "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "scoring": {
+                          "description": "What the section counts (SectionScoring metrics), empty when not scored",
+                          "items": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "text": {
+                          "type": "string"
+                        },
+                        "timer": {
+                          "nullable": true,
+                          "properties": {
+                            "duration_seconds": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "format": {
+                              "enum": [
+                                "untimed",
+                                "for_time",
+                                "amrap",
+                                "emom",
+                                "tabata",
+                                "custom_hiit",
+                                "death_by"
+                              ],
+                              "type": "string"
+                            },
+                            "interval_seconds": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "rest_seconds": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "rounds": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "work_seconds": {
+                              "nullable": true,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "format"
+                          ],
+                          "title": "SectionTimerPreset",
+                          "type": "object"
+                        },
+                        "title": {
+                          "description": "Null when untitled",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "text",
+                        "document",
+                        "timer",
+                        "scoring"
+                      ],
+                      "title": "TextSection",
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "sections"
+                ],
+                "title": "TextSectionsWorkoutBody",
+                "type": "object"
+              },
+              {
+                "additionalProperties": false,
+                "description": "Exercises with every parameter (structured editor, Quick Text)",
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "structured"
+                    ],
+                    "type": "string"
+                  },
+                  "sections": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "exercises": {
+                          "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+                          "items": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "scoreable": {
+                          "type": "boolean"
+                        },
+                        "subtitle": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timer": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "timer",
+                        "scoreable",
+                        "exercises"
+                      ],
+                      "title": "StructuredSection",
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "sections"
+                ],
+                "title": "StructuredWorkoutBody",
+                "type": "object"
+              }
+            ],
+            "title": "WorkoutBody"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": {
+            "nullable": true,
+            "type": "string"
+          },
+          "type": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "body",
+          "id",
+          "title",
+          "type"
+        ],
+        "title": "BoxScreenWorkout",
+        "type": "object"
+      },
       "BoxSearchResponse": {
         "properties": {
           "boxes": {
@@ -89916,6 +91074,909 @@
         ]
       }
     },
+    "/api/box-screen/classes/{slot_id}/timer": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.BoxScreenController.class_timer",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slot_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "class": {
+                      "properties": {
+                        "duration_minutes": {
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "scheduled_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "segments": {
+                      "items": {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "server_now": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "timer": {
+                      "properties": {
+                        "current_segment_index": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "duration_adjustments": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "lock_version": {
+                          "type": "integer"
+                        },
+                        "paused_elapsed_ms": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "segment_started_at_utc": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "ready",
+                            "running",
+                            "paused",
+                            "finished"
+                          ],
+                          "type": "string"
+                        },
+                        "timer_preset": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "current_segment_index",
+                        "paused_elapsed_ms",
+                        "lock_version"
+                      ],
+                      "type": "object"
+                    },
+                    "workout": {
+                      "additionalProperties": true,
+                      "nullable": true,
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "class",
+                    "segments",
+                    "timer",
+                    "server_now"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Class timer"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not on this screen"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A class's timer, for a class the screen shows",
+        "tags": [
+          "Box screens"
+        ]
+      }
+    },
+    "/api/box-screen/pair": {
+      "post": {
+        "callbacks": {},
+        "description": "Case, spaces and dashes do not matter. A code pairs one device once. The display token lasts 90 days and is renewed with `POST /api/box-screen/token`.",
+        "operationId": "PaleeWeb.BoxScreenController.pair",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "code": {
+                    "maxLength": 20,
+                    "minLength": 8,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "box": {
+                      "properties": {
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "expires_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "screen": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "token": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "box",
+                    "expires_at",
+                    "screen",
+                    "token"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Display token"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Wrong or expired code"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Pair this TV with the code staff got (no sign-in)",
+        "tags": [
+          "Box screens"
+        ]
+      }
+    },
+    "/api/box-screen/today": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.BoxScreenController.today",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "box": {
+                      "properties": {
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "classes": {
+                      "items": {
+                        "properties": {
+                          "bookings": {
+                            "description": "First names of booked members who do not hide; hidden people, guests and trials only counted",
+                            "properties": {
+                              "capacity": {
+                                "type": "integer"
+                              },
+                              "count": {
+                                "type": "integer"
+                              },
+                              "names": {
+                                "items": {
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              },
+                              "unnamed": {
+                                "type": "integer"
+                              },
+                              "waitlist": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "capacity",
+                              "count",
+                              "names",
+                              "unnamed",
+                              "waitlist"
+                            ],
+                            "type": "object"
+                          },
+                          "cancelled": {
+                            "type": "boolean"
+                          },
+                          "class_type": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "coach_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "duration_minutes": {
+                            "type": "integer"
+                          },
+                          "ends_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "workout_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "bookings",
+                          "cancelled",
+                          "class_type",
+                          "coach_name",
+                          "duration_minutes",
+                          "ends_at",
+                          "id",
+                          "location_id",
+                          "name",
+                          "scheduled_at",
+                          "workout_id"
+                        ],
+                        "title": "BoxScreenClass",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "date": {
+                      "description": "Today on the box's clock",
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "focus": {
+                      "description": "What the screen puts first: automatically (preview, timer, results, idle) or as staff pinned it",
+                      "properties": {
+                        "slot_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "source": {
+                          "enum": [
+                            "auto",
+                            "staff"
+                          ],
+                          "type": "string"
+                        },
+                        "until": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "view": {
+                          "enum": [
+                            "preview",
+                            "timer",
+                            "results",
+                            "idle",
+                            "wod",
+                            "timer",
+                            "leaderboard",
+                            "bookings",
+                            "class"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "slot_id",
+                        "source",
+                        "until",
+                        "view"
+                      ],
+                      "title": "BoxScreenFocus",
+                      "type": "object"
+                    },
+                    "leaderboards": {
+                      "items": {
+                        "description": "Only people who opted in to leaderboards; never journal-private results",
+                        "properties": {
+                          "entries": {
+                            "items": {
+                              "properties": {
+                                "name": {
+                                  "description": "First word of the display name",
+                                  "type": "string"
+                                },
+                                "rank": {
+                                  "type": "integer"
+                                },
+                                "scale_level_slug": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "unit": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "name",
+                                "rank",
+                                "scale_level_slug",
+                                "unit",
+                                "value"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "score": {
+                            "nullable": true,
+                            "properties": {
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "score_type": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "unit": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "workout_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "entries",
+                          "score",
+                          "workout_id"
+                        ],
+                        "title": "BoxScreenLeaderboard",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "screen": {
+                      "properties": {
+                        "branch": {
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name"
+                          ],
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "branch",
+                        "id",
+                        "name"
+                      ],
+                      "type": "object"
+                    },
+                    "server_now": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "time_zone": {
+                      "type": "string"
+                    },
+                    "workouts": {
+                      "items": {
+                        "properties": {
+                          "body": {
+                            "discriminator": {
+                              "propertyName": "kind"
+                            },
+                            "oneOf": [
+                              {
+                                "additionalProperties": false,
+                                "description": "One text written with the WOD assistant",
+                                "properties": {
+                                  "document": {
+                                    "additionalProperties": true,
+                                    "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                    "nullable": true,
+                                    "type": "object"
+                                  },
+                                  "kind": {
+                                    "enum": [
+                                      "free_text"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "structured": {
+                                    "description": "The assistant also derived exercises (see `sections`)",
+                                    "type": "boolean"
+                                  },
+                                  "text": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "timer": {
+                                    "additionalProperties": true,
+                                    "nullable": true,
+                                    "type": "object"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "text",
+                                  "document",
+                                  "timer",
+                                  "structured"
+                                ],
+                                "title": "FreeTextWorkoutBody",
+                                "type": "object"
+                              },
+                              {
+                                "additionalProperties": false,
+                                "description": "ADR-180: text sections written without the assistant, a timer each",
+                                "properties": {
+                                  "kind": {
+                                    "enum": [
+                                      "text_sections"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "sections": {
+                                    "items": {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "document": {
+                                          "additionalProperties": true,
+                                          "description": "The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes",
+                                          "nullable": true,
+                                          "type": "object"
+                                        },
+                                        "id": {
+                                          "format": "uuid",
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "scoring": {
+                                          "description": "What the section counts (SectionScoring metrics), empty when not scored",
+                                          "items": {
+                                            "additionalProperties": true,
+                                            "type": "object"
+                                          },
+                                          "type": "array"
+                                        },
+                                        "text": {
+                                          "type": "string"
+                                        },
+                                        "timer": {
+                                          "nullable": true,
+                                          "properties": {
+                                            "duration_seconds": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            },
+                                            "format": {
+                                              "enum": [
+                                                "untimed",
+                                                "for_time",
+                                                "amrap",
+                                                "emom",
+                                                "tabata",
+                                                "custom_hiit",
+                                                "death_by"
+                                              ],
+                                              "type": "string"
+                                            },
+                                            "interval_seconds": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            },
+                                            "rest_seconds": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            },
+                                            "rounds": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            },
+                                            "work_seconds": {
+                                              "nullable": true,
+                                              "type": "integer"
+                                            }
+                                          },
+                                          "required": [
+                                            "format"
+                                          ],
+                                          "title": "SectionTimerPreset",
+                                          "type": "object"
+                                        },
+                                        "title": {
+                                          "description": "Null when untitled",
+                                          "nullable": true,
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "id",
+                                        "title",
+                                        "text",
+                                        "document",
+                                        "timer",
+                                        "scoring"
+                                      ],
+                                      "title": "TextSection",
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "sections"
+                                ],
+                                "title": "TextSectionsWorkoutBody",
+                                "type": "object"
+                              },
+                              {
+                                "additionalProperties": false,
+                                "description": "Exercises with every parameter (structured editor, Quick Text)",
+                                "properties": {
+                                  "kind": {
+                                    "enum": [
+                                      "structured"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "sections": {
+                                    "items": {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "exercises": {
+                                          "description": "Every exercise with its full prescription (the WorkoutItem shape)",
+                                          "items": {
+                                            "additionalProperties": true,
+                                            "type": "object"
+                                          },
+                                          "type": "array"
+                                        },
+                                        "id": {
+                                          "format": "uuid",
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "scoreable": {
+                                          "type": "boolean"
+                                        },
+                                        "subtitle": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "timer": {
+                                          "additionalProperties": true,
+                                          "nullable": true,
+                                          "type": "object"
+                                        }
+                                      },
+                                      "required": [
+                                        "id",
+                                        "name",
+                                        "timer",
+                                        "scoreable",
+                                        "exercises"
+                                      ],
+                                      "title": "StructuredSection",
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "sections"
+                                ],
+                                "title": "StructuredWorkoutBody",
+                                "type": "object"
+                              }
+                            ],
+                            "title": "WorkoutBody"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "title": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "type": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "body",
+                          "id",
+                          "title",
+                          "type"
+                        ],
+                        "title": "BoxScreenWorkout",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "box",
+                    "classes",
+                    "date",
+                    "focus",
+                    "leaderboards",
+                    "screen",
+                    "server_now",
+                    "time_zone",
+                    "workouts"
+                  ],
+                  "title": "BoxScreenToday",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Today"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid display token"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "What the screen shows today: classes, WODs, leaderboards and the focus",
+        "tags": [
+          "Box screens"
+        ]
+      }
+    },
+    "/api/box-screen/token": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.BoxScreenController.token",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "token": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "expires_at",
+                    "token"
+                  ],
+                  "title": "BoxScreenToken",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Display token"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid display token"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Renew the display token",
+        "tags": [
+          "Box screens"
+        ]
+      }
+    },
     "/api/box-search": {
       "get": {
         "callbacks": {},
@@ -141165,6 +143226,1337 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/box-screens": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminBoxScreenController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "max_screens": {
+                      "type": "integer"
+                    },
+                    "override_views": {
+                      "items": {
+                        "enum": [
+                          "wod",
+                          "timer",
+                          "leaderboard",
+                          "bookings",
+                          "class"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "screens": {
+                      "items": {
+                        "properties": {
+                          "focus_changed": {
+                            "description": "Who last changed what the screen shows, and when",
+                            "nullable": true,
+                            "properties": {
+                              "at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "by": {
+                                "nullable": true,
+                                "properties": {
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "name"
+                                ],
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "at",
+                              "by"
+                            ],
+                            "type": "object"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "last_seen_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "description": "The branch; null for the whole box",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "override": {
+                            "description": "What staff pinned on the screen; null when it follows the day automatically",
+                            "nullable": true,
+                            "properties": {
+                              "slot_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "until": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "view": {
+                                "enum": [
+                                  "wod",
+                                  "timer",
+                                  "leaderboard",
+                                  "bookings",
+                                  "class"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "slot_id",
+                              "until",
+                              "view"
+                            ],
+                            "title": "BoxScreenOverride",
+                            "type": "object"
+                          },
+                          "paired": {
+                            "type": "boolean"
+                          },
+                          "paired_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "pairing_expires_at": {
+                            "description": "When the pending pairing code stops working; null without one",
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "focus_changed",
+                          "id",
+                          "inserted_at",
+                          "last_seen_at",
+                          "location_id",
+                          "name",
+                          "override",
+                          "paired",
+                          "paired_at",
+                          "pairing_expires_at"
+                        ],
+                        "title": "BoxScreen",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "max_screens",
+                    "override_views",
+                    "screens"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Box screens"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The box's screens (those of the branches the staff member works at)",
+        "tags": [
+          "Box screens"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "description": "The code is shown once and works for 15 minutes; type it on the TV. A box has at most 20 screens. `location_id` null shows the whole box.",
+        "operationId": "PaleeWeb.AdminBoxScreenController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 60,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "pairing_code": {
+                      "description": "Shown once: typed on the TV within 15 minutes",
+                      "properties": {
+                        "code": {
+                          "example": "ACEF-3467",
+                          "pattern": "^[A-Z0-9]{4}-[A-Z0-9]{4}$",
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "expires_at"
+                      ],
+                      "title": "BoxScreenPairingCode",
+                      "type": "object"
+                    },
+                    "screen": {
+                      "properties": {
+                        "focus_changed": {
+                          "description": "Who last changed what the screen shows, and when",
+                          "nullable": true,
+                          "properties": {
+                            "at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "by": {
+                              "nullable": true,
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "name"
+                              ],
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "at",
+                            "by"
+                          ],
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "last_seen_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "description": "The branch; null for the whole box",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "override": {
+                          "description": "What staff pinned on the screen; null when it follows the day automatically",
+                          "nullable": true,
+                          "properties": {
+                            "slot_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "until": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "view": {
+                              "enum": [
+                                "wod",
+                                "timer",
+                                "leaderboard",
+                                "bookings",
+                                "class"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "slot_id",
+                            "until",
+                            "view"
+                          ],
+                          "title": "BoxScreenOverride",
+                          "type": "object"
+                        },
+                        "paired": {
+                          "type": "boolean"
+                        },
+                        "paired_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "pairing_expires_at": {
+                          "description": "When the pending pairing code stops working; null without one",
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "focus_changed",
+                        "id",
+                        "inserted_at",
+                        "last_seen_at",
+                        "location_id",
+                        "name",
+                        "override",
+                        "paired",
+                        "paired_at",
+                        "pairing_expires_at"
+                      ],
+                      "title": "BoxScreen",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "pairing_code",
+                    "screen"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Box screen and pairing code"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Too many screens"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid name or branch"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Add a box screen and get its pairing code",
+        "tags": [
+          "Box screens"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/box-screens/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminBoxScreenController.delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removed"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such screen"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove a box screen: its TV stops at once",
+        "tags": [
+          "Box screens"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminBoxScreenController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 60,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "screen": {
+                      "properties": {
+                        "focus_changed": {
+                          "description": "Who last changed what the screen shows, and when",
+                          "nullable": true,
+                          "properties": {
+                            "at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "by": {
+                              "nullable": true,
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "name"
+                              ],
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "at",
+                            "by"
+                          ],
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "last_seen_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "description": "The branch; null for the whole box",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "override": {
+                          "description": "What staff pinned on the screen; null when it follows the day automatically",
+                          "nullable": true,
+                          "properties": {
+                            "slot_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "until": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "view": {
+                              "enum": [
+                                "wod",
+                                "timer",
+                                "leaderboard",
+                                "bookings",
+                                "class"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "slot_id",
+                            "until",
+                            "view"
+                          ],
+                          "title": "BoxScreenOverride",
+                          "type": "object"
+                        },
+                        "paired": {
+                          "type": "boolean"
+                        },
+                        "paired_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "pairing_expires_at": {
+                          "description": "When the pending pairing code stops working; null without one",
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "focus_changed",
+                        "id",
+                        "inserted_at",
+                        "last_seen_at",
+                        "location_id",
+                        "name",
+                        "override",
+                        "paired",
+                        "paired_at",
+                        "pairing_expires_at"
+                      ],
+                      "title": "BoxScreen",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "screen"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Box screen"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such screen"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid name or branch"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Rename a box screen or move it to another branch",
+        "tags": [
+          "Box screens"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/box-screens/{id}/override": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminBoxScreenController.delete_override",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "screen": {
+                      "properties": {
+                        "focus_changed": {
+                          "description": "Who last changed what the screen shows, and when",
+                          "nullable": true,
+                          "properties": {
+                            "at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "by": {
+                              "nullable": true,
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "name"
+                              ],
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "at",
+                            "by"
+                          ],
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "last_seen_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "description": "The branch; null for the whole box",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "override": {
+                          "description": "What staff pinned on the screen; null when it follows the day automatically",
+                          "nullable": true,
+                          "properties": {
+                            "slot_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "until": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "view": {
+                              "enum": [
+                                "wod",
+                                "timer",
+                                "leaderboard",
+                                "bookings",
+                                "class"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "slot_id",
+                            "until",
+                            "view"
+                          ],
+                          "title": "BoxScreenOverride",
+                          "type": "object"
+                        },
+                        "paired": {
+                          "type": "boolean"
+                        },
+                        "paired_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "pairing_expires_at": {
+                          "description": "When the pending pairing code stops working; null without one",
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "focus_changed",
+                        "id",
+                        "inserted_at",
+                        "last_seen_at",
+                        "location_id",
+                        "name",
+                        "override",
+                        "paired",
+                        "paired_at",
+                        "pairing_expires_at"
+                      ],
+                      "title": "BoxScreen",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "screen"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Box screen"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such screen"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Return the screen to automatic («Επιστροφή στο αυτόματο»)",
+        "tags": [
+          "Box screens"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "description": "`wod`, `timer`, `leaderboard`, `bookings` or one `class` (with `slot_id`, one of today's classes on the screen), optionally until a time. The TV changes at once.",
+        "operationId": "PaleeWeb.AdminBoxScreenController.put_override",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "slot_id": {
+                    "description": "One of today's classes on the screen; required for `class`",
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "until": {
+                    "description": "When the screen goes back to automatic (within 24 hours); null to keep it",
+                    "format": "date-time",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "view": {
+                    "enum": [
+                      "wod",
+                      "timer",
+                      "leaderboard",
+                      "bookings",
+                      "class"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "view"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "screen": {
+                      "properties": {
+                        "focus_changed": {
+                          "description": "Who last changed what the screen shows, and when",
+                          "nullable": true,
+                          "properties": {
+                            "at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "by": {
+                              "nullable": true,
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "name"
+                              ],
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "at",
+                            "by"
+                          ],
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "last_seen_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "description": "The branch; null for the whole box",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "override": {
+                          "description": "What staff pinned on the screen; null when it follows the day automatically",
+                          "nullable": true,
+                          "properties": {
+                            "slot_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "until": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "view": {
+                              "enum": [
+                                "wod",
+                                "timer",
+                                "leaderboard",
+                                "bookings",
+                                "class"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "slot_id",
+                            "until",
+                            "view"
+                          ],
+                          "title": "BoxScreenOverride",
+                          "type": "object"
+                        },
+                        "paired": {
+                          "type": "boolean"
+                        },
+                        "paired_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "pairing_expires_at": {
+                          "description": "When the pending pairing code stops working; null without one",
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "focus_changed",
+                        "id",
+                        "inserted_at",
+                        "last_seen_at",
+                        "location_id",
+                        "name",
+                        "override",
+                        "paired",
+                        "paired_at",
+                        "pairing_expires_at"
+                      ],
+                      "title": "BoxScreen",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "screen"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Box screen"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such screen"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid choice"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Choose what a screen shows and pin it",
+        "tags": [
+          "Box screens"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/box-screens/{id}/pairing-code": {
+      "post": {
+        "callbacks": {},
+        "description": "Replaces any pending code. The paired TV keeps working until another device pairs with the new code.",
+        "operationId": "PaleeWeb.AdminBoxScreenController.pairing_code",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "pairing_code": {
+                      "description": "Shown once: typed on the TV within 15 minutes",
+                      "properties": {
+                        "code": {
+                          "example": "ACEF-3467",
+                          "pattern": "^[A-Z0-9]{4}-[A-Z0-9]{4}$",
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "expires_at"
+                      ],
+                      "title": "BoxScreenPairingCode",
+                      "type": "object"
+                    },
+                    "screen": {
+                      "properties": {
+                        "focus_changed": {
+                          "description": "Who last changed what the screen shows, and when",
+                          "nullable": true,
+                          "properties": {
+                            "at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "by": {
+                              "nullable": true,
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "name"
+                              ],
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "at",
+                            "by"
+                          ],
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "last_seen_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "description": "The branch; null for the whole box",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "override": {
+                          "description": "What staff pinned on the screen; null when it follows the day automatically",
+                          "nullable": true,
+                          "properties": {
+                            "slot_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "until": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "view": {
+                              "enum": [
+                                "wod",
+                                "timer",
+                                "leaderboard",
+                                "bookings",
+                                "class"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "slot_id",
+                            "until",
+                            "view"
+                          ],
+                          "title": "BoxScreenOverride",
+                          "type": "object"
+                        },
+                        "paired": {
+                          "type": "boolean"
+                        },
+                        "paired_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "pairing_expires_at": {
+                          "description": "When the pending pairing code stops working; null without one",
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "focus_changed",
+                        "id",
+                        "inserted_at",
+                        "last_seen_at",
+                        "location_id",
+                        "name",
+                        "override",
+                        "paired",
+                        "paired_at",
+                        "pairing_expires_at"
+                      ],
+                      "title": "BoxScreen",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "pairing_code",
+                    "screen"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Box screen and pairing code"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such screen"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A new pairing code for a screen (to pair it with another TV)",
+        "tags": [
+          "Box screens"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/branding": {
       "get": {
         "callbacks": {},
@@ -164714,6 +168106,9 @@
                     ],
                     "type": "string"
                   },
+                  "sold_online": {
+                    "type": "boolean"
+                  },
                   "tags": {
                     "items": {
                       "type": "string"
@@ -165365,6 +168760,9 @@
                       "corporate"
                     ],
                     "type": "string"
+                  },
+                  "sold_online": {
+                    "type": "boolean"
                   },
                   "tags": {
                     "items": {
@@ -173236,6 +176634,10 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "metadata": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
                           "next_attempt_at": {
                             "format": "date-time",
                             "nullable": true,
@@ -173701,6 +177103,10 @@
                               "nullable": true,
                               "type": "string"
                             },
+                            "metadata": {
+                              "additionalProperties": true,
+                              "type": "object"
+                            },
                             "next_attempt_at": {
                               "format": "date-time",
                               "nullable": true,
@@ -174042,6 +177448,10 @@
                           "format": "date-time",
                           "nullable": true,
                           "type": "string"
+                        },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
                         },
                         "next_attempt_at": {
                           "format": "date-time",
@@ -220128,6 +223538,10 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
                         "next_attempt_at": {
                           "format": "date-time",
                           "nullable": true,
@@ -220639,6 +224053,327 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/me/packages/{id}/buy": {
+      "post": {
+        "callbacks": {},
+        "description": "Where the law gives 14 days to withdraw, `start_now` must be true: the member asks for the package to start at once. `book_slot_id` books that class once the package is paid.",
+        "operationId": "PaleeWeb.MyPaymentsController.buy_package",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "book_slot_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "consent_accepted": {
+                    "type": "boolean"
+                  },
+                  "idempotency_key": {
+                    "maxLength": 200,
+                    "minLength": 8,
+                    "type": "string"
+                  },
+                  "language": {
+                    "enum": [
+                      "el",
+                      "en"
+                    ],
+                    "type": "string"
+                  },
+                  "save_card": {
+                    "type": "boolean"
+                  },
+                  "start_now": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "idempotency_key"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "payment": {
+                      "properties": {
+                        "amount_cents": {
+                          "type": "integer"
+                        },
+                        "card_brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_last4": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "environment": {
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finance_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fulfilment_status": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "initiation": {
+                          "enum": [
+                            "payer",
+                            "merchant"
+                          ],
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "provider_transaction_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purpose_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "purpose_type": {
+                          "type": "string"
+                        },
+                        "redirect_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "refunded_cents": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "scheduled",
+                            "awaiting_payer",
+                            "processing",
+                            "succeeded",
+                            "failed",
+                            "cancelled",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "succeeded_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "amount_cents",
+                        "currency",
+                        "description",
+                        "environment",
+                        "fulfilment_status",
+                        "id",
+                        "initiation",
+                        "provider",
+                        "purpose_id",
+                        "purpose_type",
+                        "refunded_cents",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "payment"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Payment"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Buy a package on the payment provider's page (and book a class once paid)",
+        "tags": [
+          "Member Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/packages/{id}/purchase-terms": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyPaymentsController.package_terms",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "enum": [
+                "el",
+                "en"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "consent_text": {
+                      "type": "string"
+                    },
+                    "consent_version": {
+                      "type": "string"
+                    },
+                    "package": {
+                      "properties": {
+                        "base_price_cents": {
+                          "type": "integer"
+                        },
+                        "billing_period": {
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "package_type": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "base_price_cents",
+                        "billing_period",
+                        "currency",
+                        "id",
+                        "name",
+                        "package_type"
+                      ],
+                      "type": "object"
+                    },
+                    "start_now_text": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "withdrawal_days": {
+                      "nullable": true,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "available",
+                    "consent_text",
+                    "consent_version",
+                    "package",
+                    "start_now_text",
+                    "withdrawal_days"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Terms"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "What buying a package online costs, and the texts to agree to",
+        "tags": [
+          "Member Finance"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/me/payment-methods": {
       "get": {
         "callbacks": {},
@@ -221052,6 +224787,10 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
                         "next_attempt_at": {
                           "format": "date-time",
                           "nullable": true,
@@ -221236,6 +224975,10 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
                         "next_attempt_at": {
                           "format": "date-time",
                           "nullable": true,
@@ -221399,6 +225142,10 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
                         "next_attempt_at": {
                           "format": "date-time",
                           "nullable": true,
@@ -221481,6 +225228,58 @@
           }
         ],
         "summary": "One of my online payments",
+        "tags": [
+          "Member Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/payments/{id}/withdraw": {
+      "post": {
+        "callbacks": {},
+        "description": "Gives back the price less the part already used, and ends the package.",
+        "operationId": "PaleeWeb.MyPaymentsController.withdraw",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "refund": {
+                      "additionalProperties": true,
+                      "type": "object"
+                    },
+                    "refunded_cents": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "refund",
+                    "refunded_cents"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Withdrawal"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Withdraw from a package bought online within 14 days",
         "tags": [
           "Member Finance"
         ]
@@ -225728,6 +229527,200 @@
         "summary": "Pay an unpaid order online (409 online_payment_unavailable until a provider exists)",
         "tags": [
           "Shop (member)"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/shop/orders/{id}/pay-online": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyPaymentsController.pay_shop_order",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "idempotency_key": {
+                    "maxLength": 200,
+                    "minLength": 8,
+                    "type": "string"
+                  },
+                  "language": {
+                    "enum": [
+                      "el",
+                      "en"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "idempotency_key"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "payment": {
+                      "properties": {
+                        "amount_cents": {
+                          "type": "integer"
+                        },
+                        "card_brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_last4": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "environment": {
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finance_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fulfilment_status": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "initiation": {
+                          "enum": [
+                            "payer",
+                            "merchant"
+                          ],
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "provider_transaction_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purpose_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "purpose_type": {
+                          "type": "string"
+                        },
+                        "redirect_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "refunded_cents": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "scheduled",
+                            "awaiting_payer",
+                            "processing",
+                            "succeeded",
+                            "failed",
+                            "cancelled",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "succeeded_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "amount_cents",
+                        "currency",
+                        "description",
+                        "environment",
+                        "fulfilment_status",
+                        "id",
+                        "initiation",
+                        "provider",
+                        "purpose_id",
+                        "purpose_type",
+                        "refunded_cents",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "payment"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Payment"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Pay an unpaid shop order on the payment provider's page",
+        "tags": [
+          "Member Finance"
         ]
       }
     },
@@ -268406,6 +272399,103 @@
           }
         },
         "summary": "A published box: who it is, its «Σχετικά» and its locations",
+        "tags": [
+          "Public box page"
+        ]
+      }
+    },
+    "/api/public/boxes/{slug}/packages": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PublicBoxController.packages",
+        "parameters": [
+          {
+            "description": "The gym's slug or one of its former slugs",
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "maxLength": 120,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "online_payments": {
+                      "type": "boolean"
+                    },
+                    "packages": {
+                      "items": {
+                        "properties": {
+                          "base_price_cents": {
+                            "type": "integer"
+                          },
+                          "billing_period": {
+                            "type": "string"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "package_type": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "base_price_cents",
+                          "billing_period",
+                          "currency",
+                          "id",
+                          "name",
+                          "package_type"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "withdrawal_days": {
+                      "nullable": true,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "online_payments",
+                    "packages",
+                    "withdrawal_days"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Packages"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No published box with this slug"
+          }
+        },
+        "summary": "The packages a published box sells online (ADR-248)",
         "tags": [
           "Public box page"
         ]
