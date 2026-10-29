@@ -111,4 +111,9 @@ config :palee, Palee.Infrastructure.Fiscal.Ed25519JournalSigner,
 
 # ADR-246: the sandbox payment provider and stubbed provider HTTP in tests.
 config :palee, :payments_sandbox, true
+
+config :palee, :stripe_connect, %{
+  "test" => %{client_id: "ca_test_platform", secret_key: "sk_test_platform"}
+}
+
 config :palee, :payments_http, req_options: [plug: {Req.Test, Palee.PaymentsHttp}]

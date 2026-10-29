@@ -7,7 +7,10 @@ defmodule Palee.Application.Payments.OnlinePayments do
   """
 
   alias Palee.Application.Payments.Webhooks
-  alias Palee.Application.PublicURL
+  alias Palee.Application.{PublicURL, SignedToken}
+  alias Palee.Identity
+  alias Palee.Organizations
+  alias Palee.Organizations.Domain.TenantAuthorization
   alias Palee.Finance
   alias Palee.Fiscal
   alias Palee.Payments
@@ -25,7 +28,8 @@ defmodule Palee.Application.Payments.OnlinePayments do
         account &&
           Map.put(account, :webhook_url, Webhooks.url(context.organization_id, account.id)),
       providers: providers(),
-      environments: Payments.environments()
+      environments: Payments.environments(),
+      connect_providers: Map.new(Payments.environments(), &{&1, Payments.connect_providers(&1)})
     }
   end
 
@@ -43,6 +47,90 @@ defmodule Palee.Application.Payments.OnlinePayments do
   end
 
   def list(context, filters), do: Payments.list(context, filters)
+
+  # ── One-button connection (ADR-261) ────────────────────────────────────
+
+  @connect_salt "payments-connect"
+  # The owner has half an hour on the provider's page.
+  @connect_max_age 1_800
+  @settings_path "/admin/settings?tab=payments"
+
+  @doc """
+  The provider page where the owner signs in and allows Palee. The signed
+  `state` names the business, the person and the choice, so the callback
+  needs no session.
+  """
+  def connect_start(context, params) do
+    provider = params[:provider] || params["provider"]
+    environment = params[:environment] || params["environment"] || "live"
+
+    state =
+      SignedToken.sign(@connect_salt, %{
+        "o" => context.organization_id,
+        "u" => Map.get(context, :user_id),
+        "p" => provider,
+        "e" => environment
+      })
+
+    email =
+      case Map.get(context, :user_id) && Identity.find_by_id(context.user_id) do
+        %{email: email} when is_binary(email) -> email
+        _none -> nil
+      end
+
+    with {:ok, url} <-
+           Payments.connect_url(provider, environment, %{
+             state: state,
+             redirect_uri: connect_callback_url(),
+             email: email
+           }) do
+      {:ok, %{url: url}}
+    end
+  end
+
+  def connect_callback_url,
+    do: (PublicURL.base_url() |> String.trim_trailing("/")) <> "/api/payments/connect/callback"
+
+  @doc """
+  The provider sent the owner back. Answers the web page to show:
+  `{:ok, path}` either way, with `connect=ok` or `connect=<error code>`.
+  """
+  def connect_callback(params) do
+    result =
+      with {:ok, %{"o" => organization_id, "u" => user_id, "p" => provider, "e" => environment}} <-
+             verify_state(params["state"]),
+           %{} = user <- Identity.find_by_id(user_id) || {:error, :connect_state_invalid},
+           {:ok, context} <- Organizations.resolve_tenant_context_by_id(user, organization_id),
+           true <-
+             TenantAuthorization.can?(context, :manage_billing) || {:error, :forbidden} do
+        Payments.complete_connect(context, provider, environment, params, user.id, now())
+      end
+
+    code =
+      case result do
+        {:ok, _account} -> "ok"
+        {:error, reason} when is_atom(reason) -> Atom.to_string(reason)
+        {:error, {:invalid_fields, _}} -> "rejected"
+        _other -> "failed"
+      end
+
+    {:ok, @settings_path <> "&connect=" <> code}
+  end
+
+  defp verify_state(state) when is_binary(state) do
+    case SignedToken.verify(@connect_salt, state, max_age: @connect_max_age) do
+      {:ok, %{} = payload} -> {:ok, payload}
+      _invalid -> {:error, :connect_state_invalid}
+    end
+  end
+
+  defp verify_state(_state), do: {:error, :connect_state_invalid}
+
+  def disconnect(context) do
+    with {:ok, _account} <- Payments.disconnect(context, Map.get(context, :user_id), now()) do
+      {:ok, account(context)}
+    end
+  end
 
   def get(context, id) do
     with {:ok, payment} <- Payments.get(context, id) do

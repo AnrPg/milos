@@ -174,4 +174,34 @@ defmodule PaleeWeb.AdminPaymentsController do
       json(conn, %{payment: payment})
     end
   end
+
+  operation(:connect,
+    summary: "Start connecting the business's Stripe or Viva account with one button",
+    description:
+      "Answers the provider page to send the owner to. There they sign in or open a " <>
+        "merchant account and allow Palee; the provider sends them back to " <>
+        "`/api/payments/connect/callback`, which opens the settings page with `connect=ok` " <>
+        "or `connect=<error code>`.",
+    request_body: P.body(P.connect_body()),
+    responses: [ok: {"Provider page", "application/json", P.connect_start()}]
+  )
+
+  def connect(conn, _params) do
+    with {:ok, start} <-
+           OnlinePayments.connect_start(conn.assigns.tenant_context, conn.body_params) do
+      json(conn, start)
+    end
+  end
+
+  operation(:disconnect,
+    summary: "Stop online payments: saved cards are no longer charged",
+    description: "A one-button connection also loses Palee's access at the provider.",
+    responses: [ok: {"Account", "application/json", P.account_status()}]
+  )
+
+  def disconnect(conn, _params) do
+    with {:ok, status} <- OnlinePayments.disconnect(conn.assigns.tenant_context) do
+      json(conn, status)
+    end
+  end
 end

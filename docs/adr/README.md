@@ -229,6 +229,8 @@ must have an ADR. See `template.md` for the format.
 | ADR-241 | Immutable fiscal documents, gapless series, VAT by rate group, credit notes only | Accepted |
 | ADR-242 | Inalterable fiscal journal: hash chain, Ed25519 signatures, period closings, audit archive | Accepted |
 | ADR-243 | Reporting fiscal documents to myDATA: outbox, sandbox and AADE gateways, document mapping | Accepted |
+| ADR-244 | Tax categories on packages, products and variants; stable sale lines for `Fiscal.issue`; US sales tax port with a manual rate table | Accepted |
+| ADR-245 | Country document templates (PDF/HTML, Swiss QR-bill, myDATA mentions) and accounting exports (DATEV, Xero, QuickBooks, Sage, bexio, CSV, JSON) | Accepted |
 | ADR-246 | Online payments through the business's own provider account (Viva, Stripe, sandbox), webhooks as hints | Accepted |
 | ADR-247 | Saved cards, recurring charges within the payer's consent, autopay and dunning | Accepted |
 | ADR-248 | Selling packages and shop orders online, booking after payment, 14-day withdrawal | Accepted |
@@ -239,3 +241,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-255 | Setup recipes per box type and the settings catalog («Προχωρημένα») | Accepted |
 | ADR-256 | Store apps: physical services paid through the box's provider in the in-app browser, digital-only packages and Plan (Palee) not sold in the apps, /pay/return app link | Accepted |
 | ADR-260 | What members pay online (per-purpose switches), failed saved-card charges: member and staff notices, Ουρές queue | Accepted |
+| ADR-261 | One-button connection of the business's Stripe (Connect OAuth) or Viva (ISV) account; platform credentials, signed state, disconnect | Accepted |

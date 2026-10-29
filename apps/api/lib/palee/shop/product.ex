@@ -4,6 +4,7 @@ defmodule Palee.Shop.Product do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Palee.Fiscal.TaxCategoryChangeset
   alias Palee.Shop.Domain.ProductPolicy
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -22,7 +23,9 @@ defmodule Palee.Shop.Product do
     :per_person_limit,
     :all_locations,
     :location_ids,
-    :position
+    :position,
+    :tax_category,
+    :exemption_reason
   ]
 
   schema "shop_products" do
@@ -41,6 +44,9 @@ defmodule Palee.Shop.Product do
     field :all_locations, :boolean, default: true
     field :location_ids, {:array, :binary_id}, default: []
     field :position, :integer, default: 0
+    # ADR-244: the tax category of its variants (nil: standard).
+    field :tax_category, :string
+    field :exemption_reason, :string
     field :published_at, :utc_datetime_usec
     field :archived_at, :utc_datetime_usec
     field :created_by_id, :binary_id
@@ -67,6 +73,7 @@ defmodule Palee.Shop.Product do
         {:error, reason} -> [options: Atom.to_string(reason)]
       end
     end)
+    |> TaxCategoryChangeset.validate()
     |> check_constraint(:location_ids, name: :shop_products_location_scope_check)
   end
 end

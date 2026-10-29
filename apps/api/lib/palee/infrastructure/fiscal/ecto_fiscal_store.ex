@@ -10,9 +10,11 @@ defmodule Palee.Infrastructure.Fiscal.EctoFiscalStore do
     BusinessIdentity,
     Document,
     DocumentLine,
+    ExportSetting,
     JournalEntry,
     JournalHead,
     PeriodClosingRecord,
+    SalesTaxRate,
     Sequence,
     Transmission,
     TransmissionAttempt
@@ -387,6 +389,8 @@ defmodule Palee.Infrastructure.Fiscal.EctoFiscalStore do
 
       Map.new(
         [
+          {"fiscal_export_settings", ExportSetting},
+          {"fiscal_sales_tax_rates", SalesTaxRate},
           {"fiscal_transmission_attempts", TransmissionAttempt},
           {"fiscal_transmissions", Transmission},
           {"fiscal_authority_connections", AuthorityConnection},

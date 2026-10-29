@@ -62,7 +62,7 @@ defmodule PaleeWeb.Schemas.Fiscal do
 
   @identity_text ~w(legal_name trade_name tax_id vat_number tax_office registration_number
                     activity_code street building_number postal_code city region email phone
-                    document_language)a
+                    document_language iban qr_iban)a
 
   def identity do
     %Schema{

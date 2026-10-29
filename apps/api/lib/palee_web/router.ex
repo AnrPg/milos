@@ -201,6 +201,11 @@ defmodule PaleeWeb.Router do
     plug(PaleeWeb.Plugs.RateLimit, max: 600, interval: 60_000, bucket: "payment-webhook")
   end
 
+  # ADR-261: the payment provider sends the owner back after connecting.
+  pipeline :payment_connect_callback do
+    plug(PaleeWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "payment-connect")
+  end
+
   pipeline :email_unsubscribe do
     plug(PaleeWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "email-unsubscribe")
   end
@@ -374,6 +379,12 @@ defmodule PaleeWeb.Router do
 
     get("/:organization_id/:account_id", PaymentWebhookController, :show)
     post("/:organization_id/:account_id", PaymentWebhookController, :create)
+  end
+
+  scope "/api/payments/connect", PaleeWeb do
+    pipe_through([:payment_connect_callback])
+
+    get("/callback", PaymentConnectController, :callback)
   end
 
   scope "/api/email/unsubscribe", PaleeWeb do
@@ -1253,6 +1264,15 @@ defmodule PaleeWeb.Router do
     get("/fiscal/journal/verification", AdminFiscalController, :verify_journal)
     get("/fiscal/closings", AdminFiscalController, :closings)
     get("/fiscal/archive", AdminFiscalController, :archive)
+    # ADR-244/245: tax categories, US sales tax, document files, accounting exports.
+    get("/fiscal/tax-categories", AdminFiscalTaxController, :tax_categories)
+    get("/fiscal/sales-tax-rates", AdminFiscalTaxController, :sales_tax_rates)
+    put("/fiscal/sales-tax-rates", AdminFiscalTaxController, :save_sales_tax_rates)
+    get("/fiscal/documents/:id/pdf", AdminFiscalTaxController, :document_pdf)
+    get("/fiscal/documents/:id/html", AdminFiscalTaxController, :document_html)
+    get("/fiscal/exports/formats", AdminFiscalTaxController, :export_formats)
+    put("/fiscal/exports/settings/:format", AdminFiscalTaxController, :save_export_settings)
+    get("/fiscal/exports/:format", AdminFiscalTaxController, :export)
     # ADR-243: reporting to the tax authority (myDATA).
     get("/fiscal/authority-connection", AdminFiscalReportingController, :connection)
     put("/fiscal/authority-connection", AdminFiscalReportingController, :save_connection)
@@ -1281,6 +1301,8 @@ defmodule PaleeWeb.Router do
     get("/payments/account", AdminPaymentsController, :account)
     put("/payments/account", AdminPaymentsController, :save_account)
     put("/payments/account/options", AdminPaymentsController, :save_options)
+    delete("/payments/account", AdminPaymentsController, :disconnect)
+    post("/payments/connect", AdminPaymentsController, :connect)
     get("/payments/attention", AdminPaymentsController, :attention)
     get("/payments", AdminPaymentsController, :index)
     get("/payments/:id", AdminPaymentsController, :show)

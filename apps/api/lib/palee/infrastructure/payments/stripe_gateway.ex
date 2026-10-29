@@ -6,7 +6,9 @@ defmodule Palee.Infrastructure.Payments.StripeGateway do
 
   Credentials (the business's own Stripe account): a secret or restricted
   key (`sk_…`/`rk_…`, whose test/live mode must match the environment)
-  and the endpoint's `webhook_secret` (`whsec_…`). Every write carries an
+  and the endpoint's `webhook_secret` (`whsec_…`). An account connected
+  with one button (ADR-261) holds only `connected_account` (`acct_…`):
+  calls then use Palee's platform key with the `Stripe-Account` header. Every write carries an
   `Idempotency-Key`, so retrying after a timeout never charges twice.
 
   API version pinned in `@api_version`. Sources: docs.stripe.com (Checkout
@@ -15,7 +17,7 @@ defmodule Palee.Infrastructure.Payments.StripeGateway do
 
   @behaviour Palee.Payments.Ports.Gateway
 
-  alias Palee.Infrastructure.Payments.Http
+  alias Palee.Infrastructure.Payments.{Http, StripeConnect}
 
   @base "https://api.stripe.com"
   @api_version "2024-06-20"
@@ -36,6 +38,16 @@ defmodule Palee.Infrastructure.Payments.StripeGateway do
       {:ok, response} -> {:error, error(response)}
       {:error, {:uncertain, reason}} -> {:error, {:transient, reason}}
       {:error, _reason} = error -> error
+    end
+  end
+
+  defp key_mode(%{environment: environment, credentials: %{"connected_account" => "acct_" <> _}}) do
+    case StripeConnect.platform_key(environment) do
+      key when is_binary(key) ->
+        key_mode(%{environment: environment, credentials: %{"secret_key" => key}})
+
+      _missing ->
+        {:error, {:unauthorized, :connect_not_configured}}
     end
   end
 
@@ -323,14 +335,24 @@ defmodule Palee.Infrastructure.Payments.StripeGateway do
   defp call(account, method, path, options) do
     {key, options} = Keyword.pop(options, :key)
 
+    {secret, on_behalf} =
+      case account.credentials do
+        %{"connected_account" => "acct_" <> _ = connected} ->
+          {StripeConnect.platform_key(account.environment), [{"stripe-account", connected}]}
+
+        credentials ->
+          {credentials["secret_key"], []}
+      end
+
     headers =
-      [{"stripe-version", @api_version}] ++ if(key, do: [{"idempotency-key", key}], else: [])
+      [{"stripe-version", @api_version}] ++
+        on_behalf ++ if(key, do: [{"idempotency-key", key}], else: [])
 
     Http.request(
       [
         method: method,
         url: @base <> path,
-        auth: {:bearer, account.credentials["secret_key"] || ""},
+        auth: {:bearer, secret || ""},
         headers: headers
       ] ++ options
     )

@@ -147,4 +147,21 @@ defmodule Palee.Infrastructure.Payments.StripeGatewayTest do
     late = %{request | now: DateTime.add(@now, 301, :second)}
     assert StripeGateway.parse_webhook(@account, late) == {:error, :invalid_signature}
   end
+
+  test "a connected account is charged with the platform key and Stripe-Account (ADR-261)" do
+    connected = %{@account | credentials: %{"connected_account" => "acct_9Box"}}
+
+    Req.Test.stub(Palee.PaymentsHttp, fn conn ->
+      assert conn.request_path == "/v1/checkout/sessions"
+      assert Plug.Conn.get_req_header(conn, "authorization") == ["Bearer sk_test_platform"]
+      assert Plug.Conn.get_req_header(conn, "stripe-account") == ["acct_9Box"]
+      Req.Test.json(conn, %{"id" => "cs_test_1", "url" => "https://checkout.stripe.com/c/1"})
+    end)
+
+    assert {:ok, %{provider_ref: "cs_test_1"}} =
+             StripeGateway.create_checkout(connected, checkout_request())
+
+    assert StripeGateway.check(%{connected | environment: "live"}) ==
+             {:error, {:unauthorized, :connect_not_configured}}
+  end
 end

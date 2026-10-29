@@ -7223,6 +7223,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/html": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A fiscal document as printable HTML */
+        get: operations["PaleeWeb.AdminFiscalTaxController.document_html"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A fiscal document as PDF, with its country's mentions (and the Swiss QR-bill) */
+        get: operations["PaleeWeb.AdminFiscalTaxController.document_pdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/fiscal/documents/{id}/transmission/retry": {
         parameters: {
             query?: never;
@@ -7234,6 +7268,63 @@ export interface paths {
         put?: never;
         /** Send a refused or failed document to the tax authority again */
         post: operations["PaleeWeb.AdminFiscalReportingController.retry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/exports/formats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Accounting export formats and the gym's options for each */
+        get: operations["PaleeWeb.AdminFiscalTaxController.export_formats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/exports/settings/{format}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Save the gym's options of an accounting export format (journaled)
+         * @description Unknown options are dropped and missing ones take their default; invalid ones come back as `validation_failed` with `options.<key>` fields.
+         */
+        put: operations["PaleeWeb.AdminFiscalTaxController.save_export_settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/exports/{format}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download the accounting export of a period (at most 366 days)
+         * @description Fiscal documents issued in the period (credit notes negative) and Finance payments, in the format's file layout, with the gym's saved options. The export is journaled. `x-palee-export-skipped` counts documents or payments the format cannot carry.
+         */
+        get: operations["PaleeWeb.AdminFiscalTaxController.export"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -7270,6 +7361,44 @@ export interface paths {
         };
         /** Recompute the journal's hash chain and signatures */
         get: operations["PaleeWeb.AdminFiscalController.verify_journal"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/sales-tax-rates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The gym's US sales tax rates by state and ZIP code */
+        get: operations["PaleeWeb.AdminFiscalTaxController.sales_tax_rates"];
+        /**
+         * Replace the gym's US sales tax rates (journaled)
+         * @description Only for a business whose legal identity is in the US (`sales_tax_not_applicable` otherwise). A ZIP code rate wins over its state's rate.
+         */
+        put: operations["PaleeWeb.AdminFiscalTaxController.save_sales_tax_rates"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/tax-categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tax categories the gym may give packages and products, and the default one */
+        get: operations["PaleeWeb.AdminFiscalTaxController.tax_categories"];
         put?: never;
         post?: never;
         delete?: never;
@@ -35934,6 +36063,8 @@ export interface components {
             archived_at?: string | null;
             category?: string | null;
             description?: string | null;
+            /** @description Required with exempt: the article of the VAT law printed on the document */
+            exemption_reason?: string | null;
             /** Format: uuid */
             id: string;
             location_ids?: string[];
@@ -35964,6 +36095,11 @@ export interface components {
             sell_in_app?: boolean;
             /** @enum {string} */
             status: "draft" | "published" | "archived";
+            /**
+             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+             * @enum {string|null}
+             */
+            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
             title: string;
             variants: {
                 /** Format: date-time */
@@ -35972,6 +36108,7 @@ export interface components {
                 compare_at_price_cents?: number | null;
                 cost_price_cents?: number | null;
                 currency: string;
+                exemption_reason?: string | null;
                 /** Format: uuid */
                 id: string;
                 low_stock_threshold?: number | null;
@@ -35998,6 +36135,15 @@ export interface components {
                 };
                 /** @enum {string} */
                 stock_status: "ok" | "low" | "critical" | "out";
+                /**
+                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                 * @enum {string|null}
+                 */
+                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                /**
+                 * @deprecated
+                 * @description Use tax_category (ADR-244)
+                 */
                 tax_class?: string | null;
                 title?: string | null;
                 track_inventory?: boolean;
@@ -36010,6 +36156,8 @@ export interface components {
             all_locations?: boolean;
             category?: string | null;
             description?: string | null;
+            /** @description Required with exempt: the article of the VAT law printed on the document */
+            exemption_reason?: string | null;
             location_ids?: string[];
             media_ids?: string[];
             member_discount_applies?: boolean;
@@ -36027,12 +36175,19 @@ export interface components {
              * @enum {string}
              */
             status?: "draft" | "published" | "archived";
+            /**
+             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+             * @enum {string|null}
+             */
+            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
             title: string;
             variants?: {
                 barcode?: string | null;
                 compare_at_price_cents?: number | null;
                 cost_price_cents?: number | null;
                 currency?: string;
+                /** @description Required with exempt: the article of the VAT law printed on the document */
+                exemption_reason?: string | null;
                 initial_quantity?: number;
                 /** Format: uuid */
                 location_id?: string | null;
@@ -36043,7 +36198,16 @@ export interface components {
                 position?: number;
                 price_cents: number;
                 sku?: string | null;
-                /** @enum {string|null} */
+                /**
+                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                 * @enum {string|null}
+                 */
+                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                /**
+                 * @deprecated
+                 * @description Deprecated alias of tax_category (ADR-244)
+                 * @enum {string|null}
+                 */
                 tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
                 title?: string | null;
                 track_inventory?: boolean;
@@ -36105,6 +36269,8 @@ export interface components {
                 archived_at?: string | null;
                 category?: string | null;
                 description?: string | null;
+                /** @description Required with exempt: the article of the VAT law printed on the document */
+                exemption_reason?: string | null;
                 /** Format: uuid */
                 id: string;
                 location_ids?: string[];
@@ -36135,6 +36301,11 @@ export interface components {
                 sell_in_app?: boolean;
                 /** @enum {string} */
                 status: "draft" | "published" | "archived";
+                /**
+                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                 * @enum {string|null}
+                 */
+                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                 title: string;
                 variants: {
                     /** Format: date-time */
@@ -36143,6 +36314,7 @@ export interface components {
                     compare_at_price_cents?: number | null;
                     cost_price_cents?: number | null;
                     currency: string;
+                    exemption_reason?: string | null;
                     /** Format: uuid */
                     id: string;
                     low_stock_threshold?: number | null;
@@ -36169,6 +36341,15 @@ export interface components {
                     };
                     /** @enum {string} */
                     stock_status: "ok" | "low" | "critical" | "out";
+                    /**
+                     * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                     * @enum {string|null}
+                     */
+                    tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                    /**
+                     * @deprecated
+                     * @description Use tax_category (ADR-244)
+                     */
                     tax_class?: string | null;
                     title?: string | null;
                     track_inventory?: boolean;
@@ -36198,6 +36379,8 @@ export interface components {
             all_locations?: boolean;
             category?: string | null;
             description?: string | null;
+            /** @description Required with exempt: the article of the VAT law printed on the document */
+            exemption_reason?: string | null;
             location_ids?: string[];
             media_ids?: string[];
             member_discount_applies?: boolean;
@@ -36211,6 +36394,11 @@ export interface components {
             sell_in_app?: boolean;
             /** @enum {string} */
             status?: "draft" | "published" | "archived";
+            /**
+             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+             * @enum {string|null}
+             */
+            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
             title?: string;
             /** @description The full list of live variants: with id edited, without one added (with optional opening stock), live ones left out archived. Written with the product in one transaction. */
             variants?: {
@@ -36218,6 +36406,8 @@ export interface components {
                 compare_at_price_cents?: number | null;
                 cost_price_cents?: number | null;
                 currency?: string;
+                /** @description Required with exempt: the article of the VAT law printed on the document */
+                exemption_reason?: string | null;
                 /** Format: uuid */
                 id?: string | null;
                 initial_quantity?: number;
@@ -36230,7 +36420,16 @@ export interface components {
                 position?: number;
                 price_cents?: number;
                 sku?: string | null;
-                /** @enum {string|null} */
+                /**
+                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                 * @enum {string|null}
+                 */
+                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                /**
+                 * @deprecated
+                 * @description Deprecated alias of tax_category (ADR-244)
+                 * @enum {string|null}
+                 */
                 tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
                 title?: string | null;
                 track_inventory?: boolean;
@@ -36688,6 +36887,7 @@ export interface components {
             compare_at_price_cents?: number | null;
             cost_price_cents?: number | null;
             currency: string;
+            exemption_reason?: string | null;
             /** Format: uuid */
             id: string;
             low_stock_threshold?: number | null;
@@ -36714,6 +36914,15 @@ export interface components {
             };
             /** @enum {string} */
             stock_status: "ok" | "low" | "critical" | "out";
+            /**
+             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+             * @enum {string|null}
+             */
+            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+            /**
+             * @deprecated
+             * @description Use tax_category (ADR-244)
+             */
             tax_class?: string | null;
             title?: string | null;
             track_inventory?: boolean;
@@ -36724,6 +36933,8 @@ export interface components {
             compare_at_price_cents?: number | null;
             cost_price_cents?: number | null;
             currency?: string;
+            /** @description Required with exempt: the article of the VAT law printed on the document */
+            exemption_reason?: string | null;
             low_stock_threshold?: number | null;
             option_values?: {
                 [key: string]: string;
@@ -36731,7 +36942,16 @@ export interface components {
             position?: number;
             price_cents?: number;
             sku?: string | null;
-            /** @enum {string|null} */
+            /**
+             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+             * @enum {string|null}
+             */
+            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+            /**
+             * @deprecated
+             * @description Deprecated alias of tax_category (ADR-244)
+             * @enum {string|null}
+             */
             tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
             title?: string | null;
             track_inventory?: boolean;
@@ -74771,6 +74991,8 @@ export interface operations {
                     code?: string | null;
                     currency?: string;
                     description?: string | null;
+                    /** @description Required with `exempt`: the article of the VAT law printed on the document. */
+                    exemption_reason?: string | null;
                     /** @description Entitlement catalog v2 field values keyed by catalog field key (ADR-096) */
                     fields?: {
                         "booking.cancellation_cutoff_hours"?: number | null;
@@ -74879,6 +75101,11 @@ export interface operations {
                     package_type: "membership" | "class_pack" | "drop_in" | "trial" | "pt_pack" | "add_on" | "shared" | "corporate";
                     sold_online?: boolean;
                     tags?: string[];
+                    /**
+                     * @description ADR-244: the tax category printed on fiscal documents; one the business's country offers (`/admin/fiscal/countries`). Empty means `standard` (`sales_tax` in the US).
+                     * @enum {string|null}
+                     */
+                    tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                 };
             };
         };
@@ -74939,6 +75166,8 @@ export interface operations {
                     code?: string | null;
                     currency?: string;
                     description?: string | null;
+                    /** @description Required with `exempt`: the article of the VAT law printed on the document. */
+                    exemption_reason?: string | null;
                     /** @description Entitlement catalog v2 field values keyed by catalog field key (ADR-096) */
                     fields?: {
                         "booking.cancellation_cutoff_hours"?: number | null;
@@ -75047,6 +75276,11 @@ export interface operations {
                     package_type?: "membership" | "class_pack" | "drop_in" | "trial" | "pt_pack" | "add_on" | "shared" | "corporate";
                     sold_online?: boolean;
                     tags?: string[];
+                    /**
+                     * @description ADR-244: the tax category printed on fiscal documents; one the business's country offers (`/admin/fiscal/countries`). Empty means `standard` (`sales_tax` in the US).
+                     * @enum {string|null}
+                     */
+                    tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                 };
             };
         };
@@ -77061,6 +77295,56 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminFiscalTaxController.document_html": {
+        parameters: {
+            query?: {
+                /** @description Render in this language instead of the document's own */
+                language?: "el" | "en" | "de" | "fr" | "it" | "nl" | "es";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description HTML */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTaxController.document_pdf": {
+        parameters: {
+            query?: {
+                /** @description Render in this language instead of the document's own */
+                language?: "el" | "en" | "de" | "fr" | "it" | "nl" | "es";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PDF */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminFiscalReportingController.retry": {
         parameters: {
             query?: never;
@@ -77111,6 +77395,119 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminFiscalTaxController.export_formats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Formats */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        formats: {
+                            content_type: string;
+                            description: string;
+                            file_extension: string;
+                            file_prefix: string;
+                            id: string;
+                            name: string;
+                            options: {
+                                default: unknown;
+                                description: string;
+                                key: string;
+                                /** @enum {string} */
+                                type: "string" | "integer" | "boolean" | "enum" | "map";
+                                values?: string[];
+                            }[];
+                        }[];
+                        settings: {
+                            format: string;
+                            name: string;
+                            options: {
+                                [key: string]: unknown;
+                            };
+                            saved: boolean;
+                            /** Format: date-time */
+                            updated_at: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTaxController.save_export_settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                format: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    options: {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Setting */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        setting: {
+                            format: string;
+                            name: string;
+                            options: {
+                                [key: string]: unknown;
+                            };
+                            saved: boolean;
+                            /** Format: date-time */
+                            updated_at: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTaxController.export": {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path: {
+                format: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Export file */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminFiscalController.identity": {
         parameters: {
             query?: never;
@@ -77138,11 +77535,13 @@ export interface operations {
                             document_language?: string | null;
                             email?: string | null;
                             fiscal_year_start_month: number;
+                            iban?: string | null;
                             /** Format: uuid */
                             id: string;
                             legal_name?: string | null;
                             phone?: string | null;
                             postal_code?: string | null;
+                            qr_iban?: string | null;
                             region?: string | null;
                             registration_number?: string | null;
                             street?: string | null;
@@ -77197,9 +77596,11 @@ export interface operations {
                     document_language?: string | null;
                     email?: string | null;
                     fiscal_year_start_month?: number;
+                    iban?: string | null;
                     legal_name?: string | null;
                     phone?: string | null;
                     postal_code?: string | null;
+                    qr_iban?: string | null;
                     region?: string | null;
                     registration_number?: string | null;
                     street?: string | null;
@@ -77231,11 +77632,13 @@ export interface operations {
                             document_language?: string | null;
                             email?: string | null;
                             fiscal_year_start_month: number;
+                            iban?: string | null;
                             /** Format: uuid */
                             id: string;
                             legal_name?: string | null;
                             phone?: string | null;
                             postal_code?: string | null;
+                            qr_iban?: string | null;
                             region?: string | null;
                             registration_number?: string | null;
                             street?: string | null;
@@ -77295,6 +77698,108 @@ export interface operations {
                             reason?: string;
                             valid: boolean;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTaxController.sales_tax_rates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sales tax rates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        applies: boolean;
+                        rates: {
+                            /** Format: uuid */
+                            id?: string;
+                            label: string | null;
+                            rate_bp: number;
+                            state: string;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            zip: string | null;
+                        }[];
+                        states: string[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTaxController.save_sales_tax_rates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    rates: {
+                        label?: string | null;
+                        rate_bp: number;
+                        state: string;
+                        zip?: string | null;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description Sales tax rates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        applies: boolean;
+                        rates: {
+                            /** Format: uuid */
+                            id?: string;
+                            label: string | null;
+                            rate_bp: number;
+                            state: string;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            zip: string | null;
+                        }[];
+                        states: string[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTaxController.tax_categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tax categories */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        categories: string[];
+                        country: string | null;
+                        default: string;
+                        max_exemption_reason: number;
                     };
                 };
             };
@@ -106751,6 +107256,8 @@ export interface operations {
                             archived_at?: string | null;
                             category?: string | null;
                             description?: string | null;
+                            /** @description Required with exempt: the article of the VAT law printed on the document */
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
@@ -106781,6 +107288,11 @@ export interface operations {
                             sell_in_app?: boolean;
                             /** @enum {string} */
                             status: "draft" | "published" | "archived";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                             title: string;
                             variants: {
                                 /** Format: date-time */
@@ -106789,6 +107301,7 @@ export interface operations {
                                 compare_at_price_cents?: number | null;
                                 cost_price_cents?: number | null;
                                 currency: string;
+                                exemption_reason?: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 low_stock_threshold?: number | null;
@@ -106815,6 +107328,15 @@ export interface operations {
                                 };
                                 /** @enum {string} */
                                 stock_status: "ok" | "low" | "critical" | "out";
+                                /**
+                                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                                 * @enum {string|null}
+                                 */
+                                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                                /**
+                                 * @deprecated
+                                 * @description Use tax_category (ADR-244)
+                                 */
                                 tax_class?: string | null;
                                 title?: string | null;
                                 track_inventory?: boolean;
@@ -106840,6 +107362,8 @@ export interface operations {
                     all_locations?: boolean;
                     category?: string | null;
                     description?: string | null;
+                    /** @description Required with exempt: the article of the VAT law printed on the document */
+                    exemption_reason?: string | null;
                     location_ids?: string[];
                     media_ids?: string[];
                     member_discount_applies?: boolean;
@@ -106857,12 +107381,19 @@ export interface operations {
                      * @enum {string}
                      */
                     status?: "draft" | "published" | "archived";
+                    /**
+                     * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                     * @enum {string|null}
+                     */
+                    tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                     title: string;
                     variants?: {
                         barcode?: string | null;
                         compare_at_price_cents?: number | null;
                         cost_price_cents?: number | null;
                         currency?: string;
+                        /** @description Required with exempt: the article of the VAT law printed on the document */
+                        exemption_reason?: string | null;
                         initial_quantity?: number;
                         /** Format: uuid */
                         location_id?: string | null;
@@ -106873,7 +107404,16 @@ export interface operations {
                         position?: number;
                         price_cents: number;
                         sku?: string | null;
-                        /** @enum {string|null} */
+                        /**
+                         * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                         * @enum {string|null}
+                         */
+                        tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                        /**
+                         * @deprecated
+                         * @description Deprecated alias of tax_category (ADR-244)
+                         * @enum {string|null}
+                         */
                         tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
                         title?: string | null;
                         track_inventory?: boolean;
@@ -106898,6 +107438,8 @@ export interface operations {
                             archived_at?: string | null;
                             category?: string | null;
                             description?: string | null;
+                            /** @description Required with exempt: the article of the VAT law printed on the document */
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
@@ -106928,6 +107470,11 @@ export interface operations {
                             sell_in_app?: boolean;
                             /** @enum {string} */
                             status: "draft" | "published" | "archived";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                             title: string;
                             variants: {
                                 /** Format: date-time */
@@ -106936,6 +107483,7 @@ export interface operations {
                                 compare_at_price_cents?: number | null;
                                 cost_price_cents?: number | null;
                                 currency: string;
+                                exemption_reason?: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 low_stock_threshold?: number | null;
@@ -106962,6 +107510,15 @@ export interface operations {
                                 };
                                 /** @enum {string} */
                                 stock_status: "ok" | "low" | "critical" | "out";
+                                /**
+                                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                                 * @enum {string|null}
+                                 */
+                                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                                /**
+                                 * @deprecated
+                                 * @description Use tax_category (ADR-244)
+                                 */
                                 tax_class?: string | null;
                                 title?: string | null;
                                 track_inventory?: boolean;
@@ -106999,6 +107556,8 @@ export interface operations {
                             archived_at?: string | null;
                             category?: string | null;
                             description?: string | null;
+                            /** @description Required with exempt: the article of the VAT law printed on the document */
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
@@ -107029,6 +107588,11 @@ export interface operations {
                             sell_in_app?: boolean;
                             /** @enum {string} */
                             status: "draft" | "published" | "archived";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                             title: string;
                             variants: {
                                 /** Format: date-time */
@@ -107037,6 +107601,7 @@ export interface operations {
                                 compare_at_price_cents?: number | null;
                                 cost_price_cents?: number | null;
                                 currency: string;
+                                exemption_reason?: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 low_stock_threshold?: number | null;
@@ -107063,6 +107628,15 @@ export interface operations {
                                 };
                                 /** @enum {string} */
                                 stock_status: "ok" | "low" | "critical" | "out";
+                                /**
+                                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                                 * @enum {string|null}
+                                 */
+                                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                                /**
+                                 * @deprecated
+                                 * @description Use tax_category (ADR-244)
+                                 */
                                 tax_class?: string | null;
                                 title?: string | null;
                                 track_inventory?: boolean;
@@ -107090,6 +107664,8 @@ export interface operations {
                     all_locations?: boolean;
                     category?: string | null;
                     description?: string | null;
+                    /** @description Required with exempt: the article of the VAT law printed on the document */
+                    exemption_reason?: string | null;
                     location_ids?: string[];
                     media_ids?: string[];
                     member_discount_applies?: boolean;
@@ -107103,6 +107679,11 @@ export interface operations {
                     sell_in_app?: boolean;
                     /** @enum {string} */
                     status?: "draft" | "published" | "archived";
+                    /**
+                     * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                     * @enum {string|null}
+                     */
+                    tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                     title?: string;
                     /** @description The full list of live variants: with id edited, without one added (with optional opening stock), live ones left out archived. Written with the product in one transaction. */
                     variants?: {
@@ -107110,6 +107691,8 @@ export interface operations {
                         compare_at_price_cents?: number | null;
                         cost_price_cents?: number | null;
                         currency?: string;
+                        /** @description Required with exempt: the article of the VAT law printed on the document */
+                        exemption_reason?: string | null;
                         /** Format: uuid */
                         id?: string | null;
                         initial_quantity?: number;
@@ -107122,7 +107705,16 @@ export interface operations {
                         position?: number;
                         price_cents?: number;
                         sku?: string | null;
-                        /** @enum {string|null} */
+                        /**
+                         * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                         * @enum {string|null}
+                         */
+                        tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                        /**
+                         * @deprecated
+                         * @description Deprecated alias of tax_category (ADR-244)
+                         * @enum {string|null}
+                         */
                         tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
                         title?: string | null;
                         track_inventory?: boolean;
@@ -107147,6 +107739,8 @@ export interface operations {
                             archived_at?: string | null;
                             category?: string | null;
                             description?: string | null;
+                            /** @description Required with exempt: the article of the VAT law printed on the document */
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
@@ -107177,6 +107771,11 @@ export interface operations {
                             sell_in_app?: boolean;
                             /** @enum {string} */
                             status: "draft" | "published" | "archived";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                             title: string;
                             variants: {
                                 /** Format: date-time */
@@ -107185,6 +107784,7 @@ export interface operations {
                                 compare_at_price_cents?: number | null;
                                 cost_price_cents?: number | null;
                                 currency: string;
+                                exemption_reason?: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 low_stock_threshold?: number | null;
@@ -107211,6 +107811,15 @@ export interface operations {
                                 };
                                 /** @enum {string} */
                                 stock_status: "ok" | "low" | "critical" | "out";
+                                /**
+                                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                                 * @enum {string|null}
+                                 */
+                                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                                /**
+                                 * @deprecated
+                                 * @description Use tax_category (ADR-244)
+                                 */
                                 tax_class?: string | null;
                                 title?: string | null;
                                 track_inventory?: boolean;
@@ -107624,6 +108233,8 @@ export interface operations {
                             archived_at?: string | null;
                             category?: string | null;
                             description?: string | null;
+                            /** @description Required with exempt: the article of the VAT law printed on the document */
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
@@ -107654,6 +108265,11 @@ export interface operations {
                             sell_in_app?: boolean;
                             /** @enum {string} */
                             status: "draft" | "published" | "archived";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                             title: string;
                             variants: {
                                 /** Format: date-time */
@@ -107662,6 +108278,7 @@ export interface operations {
                                 compare_at_price_cents?: number | null;
                                 cost_price_cents?: number | null;
                                 currency: string;
+                                exemption_reason?: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 low_stock_threshold?: number | null;
@@ -107688,6 +108305,15 @@ export interface operations {
                                 };
                                 /** @enum {string} */
                                 stock_status: "ok" | "low" | "critical" | "out";
+                                /**
+                                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                                 * @enum {string|null}
+                                 */
+                                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                                /**
+                                 * @deprecated
+                                 * @description Use tax_category (ADR-244)
+                                 */
                                 tax_class?: string | null;
                                 title?: string | null;
                                 track_inventory?: boolean;
@@ -107716,6 +108342,8 @@ export interface operations {
                     compare_at_price_cents?: number | null;
                     cost_price_cents?: number | null;
                     currency?: string;
+                    /** @description Required with exempt: the article of the VAT law printed on the document */
+                    exemption_reason?: string | null;
                     low_stock_threshold?: number | null;
                     option_values?: {
                         [key: string]: string;
@@ -107723,7 +108351,16 @@ export interface operations {
                     position?: number;
                     price_cents?: number;
                     sku?: string | null;
-                    /** @enum {string|null} */
+                    /**
+                     * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                     * @enum {string|null}
+                     */
+                    tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                    /**
+                     * @deprecated
+                     * @description Deprecated alias of tax_category (ADR-244)
+                     * @enum {string|null}
+                     */
                     tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
                     title?: string | null;
                     track_inventory?: boolean;
@@ -107746,6 +108383,7 @@ export interface operations {
                             compare_at_price_cents?: number | null;
                             cost_price_cents?: number | null;
                             currency: string;
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             low_stock_threshold?: number | null;
@@ -107772,6 +108410,15 @@ export interface operations {
                             };
                             /** @enum {string} */
                             stock_status: "ok" | "low" | "critical" | "out";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                            /**
+                             * @deprecated
+                             * @description Use tax_category (ADR-244)
+                             */
                             tax_class?: string | null;
                             title?: string | null;
                             track_inventory?: boolean;
@@ -107798,6 +108445,8 @@ export interface operations {
                     compare_at_price_cents?: number | null;
                     cost_price_cents?: number | null;
                     currency?: string;
+                    /** @description Required with exempt: the article of the VAT law printed on the document */
+                    exemption_reason?: string | null;
                     low_stock_threshold?: number | null;
                     option_values?: {
                         [key: string]: string;
@@ -107805,7 +108454,16 @@ export interface operations {
                     position?: number;
                     price_cents?: number;
                     sku?: string | null;
-                    /** @enum {string|null} */
+                    /**
+                     * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                     * @enum {string|null}
+                     */
+                    tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                    /**
+                     * @deprecated
+                     * @description Deprecated alias of tax_category (ADR-244)
+                     * @enum {string|null}
+                     */
                     tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
                     title?: string | null;
                     track_inventory?: boolean;
@@ -107828,6 +108486,7 @@ export interface operations {
                             compare_at_price_cents?: number | null;
                             cost_price_cents?: number | null;
                             currency: string;
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             low_stock_threshold?: number | null;
@@ -107854,6 +108513,15 @@ export interface operations {
                             };
                             /** @enum {string} */
                             stock_status: "ok" | "low" | "critical" | "out";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                            /**
+                             * @deprecated
+                             * @description Use tax_category (ADR-244)
+                             */
                             tax_class?: string | null;
                             title?: string | null;
                             track_inventory?: boolean;
@@ -107890,6 +108558,7 @@ export interface operations {
                             compare_at_price_cents?: number | null;
                             cost_price_cents?: number | null;
                             currency: string;
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             low_stock_threshold?: number | null;
@@ -107916,6 +108585,15 @@ export interface operations {
                             };
                             /** @enum {string} */
                             stock_status: "ok" | "low" | "critical" | "out";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                            /**
+                             * @deprecated
+                             * @description Use tax_category (ADR-244)
+                             */
                             tax_class?: string | null;
                             title?: string | null;
                             track_inventory?: boolean;
@@ -108277,6 +108955,7 @@ export interface operations {
                             compare_at_price_cents?: number | null;
                             cost_price_cents?: number | null;
                             currency: string;
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             low_stock_threshold?: number | null;
@@ -108303,6 +108982,15 @@ export interface operations {
                             };
                             /** @enum {string} */
                             stock_status: "ok" | "low" | "critical" | "out";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                            /**
+                             * @deprecated
+                             * @description Use tax_category (ADR-244)
+                             */
                             tax_class?: string | null;
                             title?: string | null;
                             track_inventory?: boolean;

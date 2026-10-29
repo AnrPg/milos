@@ -219,7 +219,15 @@ defmodule PaleeWeb.FallbackController do
     journal_signing_unavailable:
       {:service_unavailable, "Fiscal documents are paused: the journal signing key is missing"},
     not_retryable:
-      {:conflict, "Only a refused or failed report can be sent again; this one is on its way"}
+      {:conflict, "Only a refused or failed report can be sent again; this one is on its way"},
+    # ADR-244/245: taxes, document files and accounting exports.
+    unsupported_language:
+      {:unprocessable_entity, "Documents can be printed in el, en, de, fr, it, nl or es"},
+    sales_tax_not_applicable:
+      {:conflict, "Sales tax rates apply only to a business in the United States"},
+    sales_tax_rate_missing:
+      {:unprocessable_entity, "Add a sales tax rate for this state or ZIP code first"},
+    unknown_export_format: {:not_found, "No such accounting export format"}
   }
 
   # ADR-254: CSV imports.
@@ -253,6 +261,16 @@ defmodule PaleeWeb.FallbackController do
     conn
     |> put_status(status)
     |> json(%{code: to_string(reason), error: message})
+  end
+
+  def call(conn, {:error, {:invalid_sale_line, index, reason}}) when is_integer(index) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_sale_line",
+      error: "A line of the sale cannot go on a fiscal document",
+      errors: %{"lines.#{index}" => [to_string(reason)]}
+    })
   end
 
   def call(conn, {:error, reason}) when is_map_key(@fiscal_errors, reason) do
@@ -316,7 +334,12 @@ defmodule PaleeWeb.FallbackController do
     withdrawal_not_available: {:conflict, "This payment cannot be withdrawn from"},
     already_withdrawn: {:conflict, "You have already withdrawn from this package"},
     # ADR-260: failed charges in the queue.
-    payment_not_retryable: {:conflict, "This charge can no longer be tried again"}
+    payment_not_retryable: {:conflict, "This charge can no longer be tried again"},
+    # ADR-261: one-button connection.
+    connect_not_available:
+      {:conflict, "This provider cannot be connected with one button yet; use its API keys"},
+    connect_not_configured:
+      {:conflict, "This provider cannot be connected with one button yet; use its API keys"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@payment_errors, reason) do

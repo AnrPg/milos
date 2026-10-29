@@ -1,0 +1,191 @@
+msgid ""
+msgstr ""
+"Language: it\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Receipt"
+msgstr "Ricevuta"
+
+msgid "Invoice"
+msgstr "Fattura"
+
+msgid "Credit note"
+msgstr "Nota di credito"
+
+msgid "Retail sales receipt"
+msgstr "Scontrino di vendita al dettaglio"
+
+msgid "Service receipt"
+msgstr "Ricevuta di prestazione di servizi"
+
+msgid "Retail credit note"
+msgstr "Nota di credito al dettaglio"
+
+msgid "Sales invoice"
+msgstr "Fattura di vendita"
+
+msgid "Service invoice"
+msgstr "Fattura di prestazione di servizi"
+
+msgid "Credit invoice"
+msgstr "Nota di credito"
+
+msgid "Number"
+msgstr "Numero"
+
+msgid "Date of issue"
+msgstr "Data di emissione"
+
+msgid "Seller"
+msgstr "Cedente"
+
+msgid "Customer"
+msgstr "Cliente"
+
+msgid "Payment method"
+msgstr "Metodo di pagamento"
+
+msgid "Cash"
+msgstr "Contanti"
+
+msgid "Card"
+msgstr "Carta"
+
+msgid "Bank transfer"
+msgstr "Bonifico bancario"
+
+msgid "Online payment"
+msgstr "Pagamento online"
+
+msgid "Other"
+msgstr "Altro"
+
+msgid "Corrects document"
+msgstr "Rettifica il documento"
+
+msgid "Description"
+msgstr "Descrizione"
+
+msgid "Qty"
+msgstr "Qtà"
+
+msgid "Unit price"
+msgstr "Prezzo unitario"
+
+msgid "Discount"
+msgstr "Sconto"
+
+msgid "VAT"
+msgstr "IVA"
+
+msgid "Amount"
+msgstr "Importo"
+
+msgid "VAT breakdown"
+msgstr "Riepilogo IVA"
+
+msgid "Rate"
+msgstr "Aliquota"
+
+msgid "Net"
+msgstr "Imponibile"
+
+msgid "Gross"
+msgstr "Totale"
+
+msgid "Total excluding VAT"
+msgstr "Totale imponibile"
+
+msgid "Total VAT"
+msgstr "Totale IVA"
+
+msgid "Total"
+msgstr "Totale"
+
+msgid "Sales tax"
+msgstr "Imposta sulle vendite"
+
+msgid "Total sales tax"
+msgstr "Totale imposta sulle vendite"
+
+msgid "Subtotal"
+msgstr "Subtotale"
+
+msgid "Prices include VAT."
+msgstr "Prezzi IVA inclusa."
+
+msgid "Exempt"
+msgstr "Esente"
+
+msgid "Zero-rated"
+msgstr "Aliquota zero"
+
+msgid "Tax ID (AFM)"
+msgstr "Codice fiscale (AFM)"
+
+msgid "Tax office (DOY)"
+msgstr "Ufficio delle imposte (DOY)"
+
+msgid "Tax number"
+msgstr "Codice fiscale"
+
+msgid "VAT number"
+msgstr "Partita IVA"
+
+msgid "SIREN/SIRET"
+msgstr "SIREN/SIRET"
+
+msgid "Trade register number"
+msgstr "Numero di iscrizione al registro delle imprese"
+
+msgid "EIN"
+msgstr "EIN"
+
+msgid "Enterprise number"
+msgstr "Numero d'impresa"
+
+msgid "UID (myDATA)"
+msgstr "UID (myDATA)"
+
+msgid "UID"
+msgstr "IDI"
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "Phone"
+msgstr "Telefono"
+
+msgid "myDATA (AADE)"
+msgstr "myDATA (AADE)"
+
+msgid "MARK"
+msgstr "MARK"
+
+msgid "Authentication code"
+msgstr "Codice di autenticazione"
+
+msgid "Reporting to myDATA (AADE) is pending."
+msgstr "La trasmissione a myDATA (AADE) è in attesa."
+
+msgid "Bank details"
+msgstr "Coordinate bancarie"
+
+msgid "IBAN"
+msgstr "IBAN"
+
+msgid "Category of operation: provision of services"
+msgstr "Categoria dell'operazione: prestazione di servizi"
+
+msgid "Late payment: penalties at three times the legal interest rate and a fixed recovery fee of 40 euros (Commercial Code, art. L441-10 and D441-5). No discount for early payment."
+msgstr "In caso di ritardo nel pagamento: penali pari a tre volte il tasso di interesse legale e un indennizzo forfettario di 40 euro per le spese di recupero (Code de commerce, art. L441-10 e D441-5). Nessuno sconto per pagamento anticipato."
+
+msgid "This document is recorded in the inalterable fiscal journal of the business."
+msgstr "Questo documento è registrato nel giornale fiscale inalterabile dell'impresa."
+
+msgid "Document fingerprint (SHA-256)"
+msgstr "Impronta del documento (SHA-256)"
+
+msgid "Page"
+msgstr "Pagina"

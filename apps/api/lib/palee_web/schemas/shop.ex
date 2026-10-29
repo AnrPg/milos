@@ -69,6 +69,21 @@ defmodule PaleeWeb.Schemas.Shop do
     }
   end
 
+  @nullable_tax_category %Schema{
+    type: :string,
+    nullable: true,
+    enum: Palee.Fiscal.Taxes.all_categories(),
+    description:
+      "ADR-244: the tax category on fiscal documents (one the business's country offers). " <>
+        "Empty: standard (sales_tax in the US) on a product, the product's on a variant."
+  }
+  @exemption_reason %Schema{
+    type: :string,
+    nullable: true,
+    maxLength: 300,
+    description: "Required with exempt: the article of the VAT law printed on the document"
+  }
+
   def variant do
     %Schema{
       title: "ShopVariant",
@@ -84,7 +99,9 @@ defmodule PaleeWeb.Schemas.Shop do
         currency: @currency,
         compare_at_price_cents: @nullable_cents,
         cost_price_cents: @nullable_cents,
-        tax_class: @text,
+        tax_class: %Schema{@text | deprecated: true, description: "Use tax_category (ADR-244)"},
+        tax_category: @nullable_tax_category,
+        exemption_reason: @text,
         low_stock_threshold: %Schema{type: :integer, nullable: true},
         track_inventory: %Schema{type: :boolean},
         stock_status: %Schema{type: :string, enum: ~w(ok low critical out)},
@@ -108,7 +125,9 @@ defmodule PaleeWeb.Schemas.Shop do
     per_person_limit: %Schema{type: :integer, minimum: 1, nullable: true},
     all_locations: %Schema{type: :boolean},
     location_ids: %Schema{type: :array, items: @uuid, maxItems: 200},
-    position: %Schema{type: :integer}
+    position: %Schema{type: :integer},
+    tax_category: @nullable_tax_category,
+    exemption_reason: @exemption_reason
   }
 
   def product do
@@ -167,8 +186,12 @@ defmodule PaleeWeb.Schemas.Shop do
     tax_class: %Schema{
       type: :string,
       enum: ~w(standard reduced super_reduced zero exempt),
-      nullable: true
+      nullable: true,
+      deprecated: true,
+      description: "Deprecated alias of tax_category (ADR-244)"
     },
+    tax_category: @nullable_tax_category,
+    exemption_reason: @exemption_reason,
     low_stock_threshold: %Schema{type: :integer, minimum: 0, nullable: true},
     track_inventory: %Schema{type: :boolean},
     position: %Schema{type: :integer}

@@ -181,16 +181,40 @@ config :palee, :fiscal_authority_gateways, %{
   "production" => Palee.Infrastructure.Fiscal.MyDataGateway
 }
 
+# ADR-244: tax and export settings, and the sales tax calculator (manual
+# rate table now; Stripe Tax or Avalara later behind the same port).
+config :palee, :fiscal_tax_store, Palee.Infrastructure.Fiscal.EctoTaxStore
+
+config :palee,
+       :fiscal_sales_tax_calculator,
+       Palee.Infrastructure.Fiscal.RateTableSalesTaxCalculator
+
+# ADR-245: accounting export formats, by id (the order is the API's order).
+config :palee, :fiscal_accounting_export_formats, [
+  Palee.Infrastructure.Fiscal.Exports.Datev,
+  Palee.Infrastructure.Fiscal.Exports.Xero,
+  Palee.Infrastructure.Fiscal.Exports.QuickBooks,
+  Palee.Infrastructure.Fiscal.Exports.Sage,
+  Palee.Infrastructure.Fiscal.Exports.Bexio,
+  Palee.Infrastructure.Fiscal.Exports.GenericCsv,
+  Palee.Infrastructure.Fiscal.Exports.GenericJson
+]
+
 # ADR-246/247: online payments through the business's own provider account.
 config :palee, :payment_store, Palee.Infrastructure.Payments.EctoPaymentStore
 config :palee, :payment_fulfilment, Palee.Application.Payments.FinanceFulfilment
 config :palee, :payment_notifier, Palee.Application.Payments.FailureNotices
+
+# ADR-261: one-button connection; platform credentials come from runtime.exs.
+config :palee, :payment_connect, %{"stripe" => Palee.Infrastructure.Payments.StripeConnect}
+config :palee, :stripe_connect, %{}
 
 config :palee, :payment_gateways, %{
   "sandbox" => Palee.Infrastructure.Payments.SandboxGateway,
   "viva" => Palee.Infrastructure.Payments.VivaGateway,
   "stripe" => Palee.Infrastructure.Payments.StripeGateway
 }
+
 # ADR-252: documents and signatures. The evidence store is where an advanced
 # e-signature provider plugs in later.
 config :palee, :documents_store, Palee.Infrastructure.Documents.EctoDocumentStore
@@ -202,6 +226,7 @@ config :palee,
 config :palee,
        :documents_certificate_renderer,
        Palee.Infrastructure.Documents.PdfCertificateRenderer
+
 # ADR-254: CSV imports (upload, dry run, apply, undo).
 config :palee, :import_store, Palee.Infrastructure.Imports.EctoImportStore
 config :palee, :import_clock, Palee.Infrastructure.Imports.SystemClock

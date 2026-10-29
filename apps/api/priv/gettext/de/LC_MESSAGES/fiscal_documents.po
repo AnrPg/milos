@@ -1,0 +1,191 @@
+msgid ""
+msgstr ""
+"Language: de\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Receipt"
+msgstr "Quittung"
+
+msgid "Invoice"
+msgstr "Rechnung"
+
+msgid "Credit note"
+msgstr "Gutschrift"
+
+msgid "Retail sales receipt"
+msgstr "Beleg Einzelhandelsverkauf"
+
+msgid "Service receipt"
+msgstr "Beleg Dienstleistung"
+
+msgid "Retail credit note"
+msgstr "Gutschrift Einzelhandel"
+
+msgid "Sales invoice"
+msgstr "Verkaufsrechnung"
+
+msgid "Service invoice"
+msgstr "Dienstleistungsrechnung"
+
+msgid "Credit invoice"
+msgstr "Gutschrift (Rechnungskorrektur)"
+
+msgid "Number"
+msgstr "Nummer"
+
+msgid "Date of issue"
+msgstr "Ausstellungsdatum"
+
+msgid "Seller"
+msgstr "Leistender Unternehmer"
+
+msgid "Customer"
+msgstr "Kunde"
+
+msgid "Payment method"
+msgstr "Zahlungsart"
+
+msgid "Cash"
+msgstr "Bar"
+
+msgid "Card"
+msgstr "Karte"
+
+msgid "Bank transfer"
+msgstr "Überweisung"
+
+msgid "Online payment"
+msgstr "Online-Zahlung"
+
+msgid "Other"
+msgstr "Sonstige"
+
+msgid "Corrects document"
+msgstr "Berichtigt Beleg"
+
+msgid "Description"
+msgstr "Beschreibung"
+
+msgid "Qty"
+msgstr "Menge"
+
+msgid "Unit price"
+msgstr "Einzelpreis"
+
+msgid "Discount"
+msgstr "Rabatt"
+
+msgid "VAT"
+msgstr "MwSt."
+
+msgid "Amount"
+msgstr "Betrag"
+
+msgid "VAT breakdown"
+msgstr "MwSt.-Aufstellung"
+
+msgid "Rate"
+msgstr "Satz"
+
+msgid "Net"
+msgstr "Netto"
+
+msgid "Gross"
+msgstr "Brutto"
+
+msgid "Total excluding VAT"
+msgstr "Summe netto"
+
+msgid "Total VAT"
+msgstr "Summe MwSt."
+
+msgid "Total"
+msgstr "Gesamtbetrag"
+
+msgid "Sales tax"
+msgstr "Umsatzsteuer (US)"
+
+msgid "Total sales tax"
+msgstr "Summe Umsatzsteuer (US)"
+
+msgid "Subtotal"
+msgstr "Zwischensumme"
+
+msgid "Prices include VAT."
+msgstr "Preise inkl. MwSt."
+
+msgid "Exempt"
+msgstr "Steuerfrei"
+
+msgid "Zero-rated"
+msgstr "Nullsatz"
+
+msgid "Tax ID (AFM)"
+msgstr "Steuer-ID (AFM)"
+
+msgid "Tax office (DOY)"
+msgstr "Finanzamt (DOY)"
+
+msgid "Tax number"
+msgstr "Steuernummer"
+
+msgid "VAT number"
+msgstr "USt-IdNr."
+
+msgid "SIREN/SIRET"
+msgstr "SIREN/SIRET"
+
+msgid "Trade register number"
+msgstr "Handelsregisternummer"
+
+msgid "EIN"
+msgstr "EIN"
+
+msgid "Enterprise number"
+msgstr "Unternehmensnummer"
+
+msgid "UID (myDATA)"
+msgstr "UID (myDATA)"
+
+msgid "UID"
+msgstr "UID"
+
+msgid "Email"
+msgstr "E-Mail"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "myDATA (AADE)"
+msgstr "myDATA (AADE)"
+
+msgid "MARK"
+msgstr "MARK"
+
+msgid "Authentication code"
+msgstr "Authentifizierungscode"
+
+msgid "Reporting to myDATA (AADE) is pending."
+msgstr "Die Übermittlung an myDATA (AADE) steht aus."
+
+msgid "Bank details"
+msgstr "Bankverbindung"
+
+msgid "IBAN"
+msgstr "IBAN"
+
+msgid "Category of operation: provision of services"
+msgstr "Art der Leistung: Dienstleistung"
+
+msgid "Late payment: penalties at three times the legal interest rate and a fixed recovery fee of 40 euros (Commercial Code, art. L441-10 and D441-5). No discount for early payment."
+msgstr "Bei Zahlungsverzug: Verzugszinsen in Höhe des Dreifachen des gesetzlichen Zinssatzes und eine Pauschale von 40 Euro für Beitreibungskosten (Code de commerce, Art. L441-10 und D441-5). Kein Skonto bei vorzeitiger Zahlung."
+
+msgid "This document is recorded in the inalterable fiscal journal of the business."
+msgstr "Dieser Beleg ist im unveränderbaren Fiskaljournal des Unternehmens aufgezeichnet."
+
+msgid "Document fingerprint (SHA-256)"
+msgstr "Fingerabdruck des Belegs (SHA-256)"
+
+msgid "Page"
+msgstr "Seite"
