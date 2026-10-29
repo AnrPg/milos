@@ -19,6 +19,7 @@ import { ProfilesSection } from "@/components/account/ProfilesSection";
 import { MyRolesSection } from "@/components/roles/MyRolesSection";
 import { RecoveryCodesSection } from "@/components/account/RecoveryCodesSection";
 import { DeleteAccountSection } from "@/components/account/DeleteAccountSection";
+import { YourDataSection } from "@/components/account/YourDataSection";
 import { BusinessAccountSettings } from "@/components/business/BusinessAccountSettings";
 import { AvatarEditorModal } from "@/components/profile/AvatarEditorModal";
 import { CollapsibleSection } from "@/components/profile/CollapsibleSection";
@@ -381,6 +382,9 @@ export function ProfilePage() {
             )}
           </div>
         </CollapsibleSection>
+
+        {/* ADR-267: download my data, privacy policy and terms. */}
+        <YourDataSection />
 
         {/* ADR-211: last, and collapsed. */}
         <DeleteAccountSection />
