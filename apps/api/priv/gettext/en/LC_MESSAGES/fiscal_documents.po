@@ -1,0 +1,191 @@
+msgid ""
+msgstr ""
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Receipt"
+msgstr ""
+
+msgid "Invoice"
+msgstr ""
+
+msgid "Credit note"
+msgstr ""
+
+msgid "Retail sales receipt"
+msgstr ""
+
+msgid "Service receipt"
+msgstr ""
+
+msgid "Retail credit note"
+msgstr ""
+
+msgid "Sales invoice"
+msgstr ""
+
+msgid "Service invoice"
+msgstr ""
+
+msgid "Credit invoice"
+msgstr ""
+
+msgid "Number"
+msgstr ""
+
+msgid "Date of issue"
+msgstr ""
+
+msgid "Seller"
+msgstr ""
+
+msgid "Customer"
+msgstr ""
+
+msgid "Payment method"
+msgstr ""
+
+msgid "Cash"
+msgstr ""
+
+msgid "Card"
+msgstr ""
+
+msgid "Bank transfer"
+msgstr ""
+
+msgid "Online payment"
+msgstr ""
+
+msgid "Other"
+msgstr ""
+
+msgid "Corrects document"
+msgstr ""
+
+msgid "Description"
+msgstr ""
+
+msgid "Qty"
+msgstr ""
+
+msgid "Unit price"
+msgstr ""
+
+msgid "Discount"
+msgstr ""
+
+msgid "VAT"
+msgstr ""
+
+msgid "Amount"
+msgstr ""
+
+msgid "VAT breakdown"
+msgstr ""
+
+msgid "Rate"
+msgstr ""
+
+msgid "Net"
+msgstr ""
+
+msgid "Gross"
+msgstr ""
+
+msgid "Total excluding VAT"
+msgstr ""
+
+msgid "Total VAT"
+msgstr ""
+
+msgid "Total"
+msgstr ""
+
+msgid "Sales tax"
+msgstr ""
+
+msgid "Total sales tax"
+msgstr ""
+
+msgid "Subtotal"
+msgstr ""
+
+msgid "Prices include VAT."
+msgstr ""
+
+msgid "Exempt"
+msgstr ""
+
+msgid "Zero-rated"
+msgstr ""
+
+msgid "Tax ID (AFM)"
+msgstr ""
+
+msgid "Tax office (DOY)"
+msgstr ""
+
+msgid "Tax number"
+msgstr ""
+
+msgid "VAT number"
+msgstr ""
+
+msgid "SIREN/SIRET"
+msgstr ""
+
+msgid "Trade register number"
+msgstr ""
+
+msgid "EIN"
+msgstr ""
+
+msgid "Enterprise number"
+msgstr ""
+
+msgid "UID (myDATA)"
+msgstr ""
+
+msgid "UID"
+msgstr ""
+
+msgid "Email"
+msgstr ""
+
+msgid "Phone"
+msgstr ""
+
+msgid "myDATA (AADE)"
+msgstr ""
+
+msgid "MARK"
+msgstr ""
+
+msgid "Authentication code"
+msgstr ""
+
+msgid "Reporting to myDATA (AADE) is pending."
+msgstr ""
+
+msgid "Bank details"
+msgstr ""
+
+msgid "IBAN"
+msgstr ""
+
+msgid "Category of operation: provision of services"
+msgstr ""
+
+msgid "Late payment: penalties at three times the legal interest rate and a fixed recovery fee of 40 euros (Commercial Code, art. L441-10 and D441-5). No discount for early payment."
+msgstr ""
+
+msgid "This document is recorded in the inalterable fiscal journal of the business."
+msgstr ""
+
+msgid "Document fingerprint (SHA-256)"
+msgstr ""
+
+msgid "Page"
+msgstr ""

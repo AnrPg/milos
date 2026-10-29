@@ -2,6 +2,7 @@ defmodule Palee.Finance.MembershipPackage do
   use Ecto.Schema
   import Ecto.Changeset
   alias Palee.Finance.Domain.{EntitlementPlan, PackageCode, PackageType}
+  alias Palee.Fiscal.TaxCategoryChangeset
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -19,6 +20,9 @@ defmodule Palee.Finance.MembershipPackage do
     field :tags, {:array, :string}, default: []
     field :params, :map, default: %{}
     field :active, :boolean, default: true
+    # ADR-244: the tax category printed on fiscal documents (nil: standard).
+    field :tax_category, :string
+    field :exemption_reason, :string
     # ADR-248: members can buy it themselves, online.
     field :sold_online, :boolean, default: false
 
@@ -38,6 +42,8 @@ defmodule Palee.Finance.MembershipPackage do
       :tags,
       :params,
       :active,
+      :tax_category,
+      :exemption_reason,
       :sold_online
     ])
     |> update_change(:code, &PackageCode.normalize/1)
@@ -47,6 +53,7 @@ defmodule Palee.Finance.MembershipPackage do
     |> put_family_from_type()
     |> validate_number(:base_price_cents, greater_than_or_equal_to: 0)
     |> validate_entitlement_plan()
+    |> TaxCategoryChangeset.validate()
     |> unique_constraint([:organization_id, :code],
       name: :membership_packages_organization_code_index
     )

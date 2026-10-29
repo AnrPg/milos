@@ -9,7 +9,8 @@ defmodule Palee.Fiscal.BusinessIdentity do
 
   @fields ~w(legal_name trade_name country_code tax_id vat_number tax_office registration_number
              activity_code vat_scheme street building_number postal_code city region email phone
-             document_language currency branch_code fiscal_year_start_month updated_by_id)a
+             document_language currency branch_code fiscal_year_start_month iban qr_iban
+             updated_by_id)a
 
   schema "fiscal_business_identities" do
     field :organization_id, :binary_id, read_after_writes: true
@@ -33,6 +34,9 @@ defmodule Palee.Fiscal.BusinessIdentity do
     field :currency, :string
     field :branch_code, :integer, default: 0
     field :fiscal_year_start_month, :integer, default: 1
+    # ADR-245: bank details printed on invoices and used by the Swiss QR-bill.
+    field :iban, :string
+    field :qr_iban, :string
     field :updated_by_id, :binary_id
 
     timestamps(type: :utc_datetime_usec)

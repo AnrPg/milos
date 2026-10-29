@@ -7,6 +7,7 @@ defmodule Palee.Shop.Variant do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Palee.Fiscal.TaxCategoryChangeset
   alias Palee.Shop.Domain.StockStatus
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -23,6 +24,8 @@ defmodule Palee.Shop.Variant do
     :compare_at_price_cents,
     :cost_price_cents,
     :tax_class,
+    :tax_category,
+    :exemption_reason,
     :low_stock_threshold,
     :track_inventory,
     :position
@@ -39,7 +42,11 @@ defmodule Palee.Shop.Variant do
     field :currency, :string, default: "EUR"
     field :compare_at_price_cents, :integer
     field :cost_price_cents, :integer
+    # Deprecated name of tax_category (ADR-244), kept in step with it.
     field :tax_class, :string
+    # ADR-244: overrides the product's tax category (nil: as the product).
+    field :tax_category, :string
+    field :exemption_reason, :string
     field :low_stock_threshold, :integer
     field :track_inventory, :boolean, default: true
     field :stock_status, Ecto.Enum, values: StockStatus.statuses(), default: :out
@@ -66,9 +73,26 @@ defmodule Palee.Shop.Variant do
     |> validate_number(:compare_at_price_cents, greater_than_or_equal_to: 0)
     |> validate_number(:cost_price_cents, greater_than_or_equal_to: 0)
     |> validate_number(:low_stock_threshold, greater_than_or_equal_to: 0)
+    |> sync_tax_class()
     |> validate_inclusion(:tax_class, @tax_classes)
+    |> TaxCategoryChangeset.validate()
     |> unique_constraint(:sku, name: :shop_variants_organization_sku_index)
     |> foreign_key_constraint(:product_id, name: :shop_variants_product_fkey)
+  end
+
+  # `tax_class` is the old name of `tax_category`: a client that still sends
+  # it sets the category; a category outside the old five clears it.
+  defp sync_tax_class(changeset) do
+    case {fetch_change(changeset, :tax_category), fetch_change(changeset, :tax_class)} do
+      {{:ok, category}, _class} ->
+        put_change(changeset, :tax_class, if(category in @tax_classes, do: category))
+
+      {:error, {:ok, class}} ->
+        put_change(changeset, :tax_category, class)
+
+      {:error, :error} ->
+        changeset
+    end
   end
 
   defp blank_to_nil(nil), do: nil
