@@ -227,3 +227,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-230 | Day WODs: one WOD for a whole day, inherited by its classes (all or chosen class types), overridable per class | Accepted |
 | ADR-231 | The profile's «Πολυμέσα» grid: photos and videos from posts, same visibility as posts | Accepted |
 | ADR-232 | Staff book or move a member into a class: one transaction, no late charge, server-listed choices | Accepted |
+| ADR-300 | Operation registry: one spec per use case generates REST, MCP and LLM tools; previewable commands, problem details, idempotency keys, ETags (v4) | Proposed |
+| ADR-301 | AI agents as delegated principals: rights intersected on every call, durable runs, Rule-of-Two policy, approvals, one LLM provider port, multi-agent via delegation (v4) | Proposed |
