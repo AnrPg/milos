@@ -132,7 +132,8 @@ defmodule Palee.Pdf do
 
             if text_width(pdf, candidate, opts) <= width,
               do: [candidate | rest],
-              else: Enum.reverse(cut(pdf, word, width, opts)) ++ lines
+              # `cut/4` returns its pieces last first, like `lines`.
+              else: cut(pdf, word, width, opts) ++ lines
         end
       end)
       |> Enum.reverse()
