@@ -9,10 +9,11 @@
  */
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { completeExecution, fetchExecution, type PlanSetActual, type SectionScore } from "@/api/executions";
 import type { JournalComment } from "@/api/journal-comments";
+import { listPRs } from "@/api/gamification";
 import { fetchWorkout } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { BackButton } from "@/components/ui/BackLink";
@@ -21,8 +22,10 @@ import { useScreenWakeLock } from "@/hooks/useScreenWakeLock";
 import { changeDraft, finishWrites, type FinishComments } from "@/lib/journal-comments";
 
 import { FinishWizard } from "../FinishWizard";
-import { PlanExecution, type PlanRunLog, type PlanRunResult } from "./PlanExecution";
-import { decimal } from "./actuals";
+import { PlanExecution, type PlanRunLog, type PlanRunResult, type PlanRunSnapshot } from "./PlanExecution";
+import { decimal, type OneRepMaxLookup } from "./actuals";
+import { oneRepMaxLookup } from "./one-rep-max";
+import { readPlanProgress, storePlanProgress } from "./plan-progress";
 import { planSections, type RunnablePlanSection } from "./plan-workout";
 import { scoreSegment } from "./score";
 
@@ -38,12 +41,32 @@ export function PlanExecutionMode({ executionId }: { executionId: string }) {
   const commentWriter = useJournalCommentWriter();
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [failed, setFailed] = useState(false);
-  const [index, setIndex] = useState(0);
-  const [scores, setScores] = useState<SectionScore[]>([]);
-  const [elapsed, setElapsed] = useState<Record<string, number>>({});
-  const [actuals, setActuals] = useState<Record<string, PlanSetActual[]>>({});
+  // A reload resumes where the athlete was (this device only).
+  const [restored] = useState(() => readPlanProgress(executionId));
+  const [index, setIndex] = useState(restored?.index ?? 0);
+  const [scores, setScores] = useState<SectionScore[]>(restored?.scores ?? []);
+  const [elapsed, setElapsed] = useState<Record<string, number>>(restored?.elapsed ?? {});
+  const [actuals, setActuals] = useState<Record<string, PlanSetActual[]>>(restored?.actuals ?? {});
   const [comments, setComments] = useState<JournalComment[]>([]);
-  const [finishing, setFinishing] = useState(false);
+  const [finishing, setFinishing] = useState(restored?.finishing ?? false);
+  const [oneRepMax, setOneRepMax] = useState<OneRepMaxLookup | undefined>(undefined);
+  const currentRef = useRef<{ index: number; snapshot: PlanRunSnapshot | null }>({
+    index: restored?.index ?? 0,
+    snapshot: restored?.current ?? null,
+  });
+  const [initialSnapshot] = useState(() => restored?.current ?? null);
+  const baseRef = useRef({ index, scores, elapsed, actuals, finishing });
+  useEffect(() => {
+    baseRef.current = { index, scores, elapsed, actuals, finishing };
+    if (currentRef.current.index !== index) currentRef.current = { index, snapshot: null };
+    storePlanProgress(executionId, { ...baseRef.current, current: currentRef.current.snapshot });
+  }, [actuals, elapsed, executionId, finishing, index, scores]);
+
+  function saveSnapshot(sectionIndex: number, snapshot: PlanRunSnapshot) {
+    if (sectionIndex !== baseRef.current.index) return;
+    currentRef.current = { index: sectionIndex, snapshot };
+    storePlanProgress(executionId, { ...baseRef.current, current: snapshot });
+  }
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const accessToken = tokens?.access_token ?? null;
@@ -64,6 +87,12 @@ export function PlanExecutionMode({ executionId }: { executionId: string }) {
         }
         setLoaded({ title: workout.title, sections: planSections(workout) });
         setComments(execution.comments ?? []);
+        // The athlete's 1RMs (their PRs) turn % loads into kg; without them % stays %.
+        listPRs(accessToken)
+          .then((prs) => {
+            if (!cancelled) setOneRepMax(() => oneRepMaxLookup(prs));
+          })
+          .catch(() => undefined);
       } catch {
         if (!cancelled) setFailed(true);
       }
@@ -85,7 +114,7 @@ export function PlanExecutionMode({ executionId }: { executionId: string }) {
   async function log(section: RunnablePlanSection, entry: PlanRunLog) {
     const { step, field, actual, canonical } = entry;
     const draft = changeDraft("execution", executionId, {
-      patch_id: ["plan", section.id, step.rowId, step.block, step.round, step.part?.index ?? 0, field].join(":"),
+      patch_id: ["plan", section.id, step.rowId, step.block, step.round, step.part?.index ?? 0, entry.occurrence, field].join(":"),
       field: field === "reps" ? "reps" : "load",
       type: field === "reps" ? "reps_changed" : "weight_changed",
       section_id: section.id,
@@ -93,7 +122,7 @@ export function PlanExecutionMode({ executionId }: { executionId: string }) {
       exercise_id: step.rowId,
       exercise_name: step.name,
       set_index: step.round,
-      round_index: step.round,
+      round_index: step.interrupt ? entry.occurrence : step.round,
       actual_value: asValue(actual),
       canonical_value: asValue(canonical),
       ...(field === "load" ? { unit: "kg" } : {}),
@@ -131,6 +160,7 @@ export function PlanExecutionMode({ executionId }: { executionId: string }) {
         segment_cycle_counts: {},
         plan_actuals: (loaded?.sections ?? []).flatMap((s) => actuals[s.id] ?? []),
       });
+      storePlanProgress(executionId, null);
       router.push("/");
     } catch {
       setFeedback(t("saveFailed"));
@@ -204,6 +234,9 @@ export function PlanExecutionMode({ executionId }: { executionId: string }) {
           existingScore={scores.find((s) => s.section_id === section.id)}
           onComplete={(result) => completeSection(section, result)}
           onLog={(entry) => void log(section, entry)}
+          oneRepMaxKg={oneRepMax}
+          initial={index === (restored?.index ?? 0) ? initialSnapshot : null}
+          onProgress={(snapshot) => saveSnapshot(index, snapshot)}
         />
       </main>
     </div>

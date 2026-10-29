@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { createContext, useContext, useSyncExternalStore } from "react";
 
 import type { PlanSection } from "@/lib/structured-plan/types";
-import type { ExerciseSuggestion } from "@/components/workouts/structured/editor-context";
+import type { ExerciseSuggestion } from "./exercise-catalog";
 
 import { isMacPlatform, keyLabel } from "../keymap";
 

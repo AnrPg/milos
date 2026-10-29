@@ -192,7 +192,7 @@ export function StructuredPlanWorkoutEditor({ draftId, folderId = null, onDraftR
   const problems = useMemo(() => planProblems(sections), [sections]);
   const empty = useMemo(() => planIsEmpty(sections), [sections]);
   const titleMissing = title.trim().length < 3;
-  const timeDomainSeconds = useMemo(() => planTimeDomain(sections, (plan) => timeline(plan).total), [sections]);
+  const timeDomainSeconds = useMemo(() => planTimeDomain(sections, (plan) => timeline(plan).total ?? 0), [sections]);
 
   async function publish() {
     if (!accessToken || !draftId) return;

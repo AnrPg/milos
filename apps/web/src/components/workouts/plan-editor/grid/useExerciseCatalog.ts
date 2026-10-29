@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { fetchWorkoutDslManual } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
-import { catalogFromManual, type ExerciseSuggestion } from "@/components/workouts/structured/editor-context";
+import { catalogFromManual, type ExerciseSuggestion } from "./exercise-catalog";
 
 const EMPTY: ExerciseSuggestion[] = [];
 
