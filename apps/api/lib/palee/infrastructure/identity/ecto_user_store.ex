@@ -210,6 +210,16 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
     end)
   end
 
+  @impl true
+  def confirm_age(login_id, now) do
+    {_count, _rows} =
+      Login
+      |> where([l], l.id == ^login_id and is_nil(l.age_confirmed_at))
+      |> Repo.update_all(set: [age_confirmed_at: now, updated_at: now])
+
+    :ok
+  end
+
   @doc "ADR-187: sets a new password on a login and revokes every profile's sessions."
   @impl true
   def mark_email_verified(login_id, email, now) do

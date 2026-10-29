@@ -60,6 +60,7 @@ async function fillSignUp(page: Page) {
   await page.getByLabel("Handle", { exact: true }).fill("maria");
   await page.getByLabel("Email address", { exact: true }).fill("maria@example.com");
   await page.getByLabel("Password", { exact: true }).fill("secret-pass");
+  await page.getByLabel("I am 16 or older").check();
   await page.getByRole("button", { name: "Create account" }).click();
 }
 

@@ -68,7 +68,7 @@ Reply with ADR-256's table in plain words and quote:
 
 ## Open items before the first submission
 
-1. Publish `https://palee.app/privacy` and `https://palee.app/terms` (texts need a lawyer; the pages need approved mockups). Both stores require the privacy policy URL; Health Connect's privacy link (`palee_health_privacy_path`, today `/me/devices`) must point to the same policy.
+1. `/privacy` and `/terms` exist as marked drafts (ADR-267) and Health Connect's privacy link (`palee_health_privacy_path`) is `/privacy#health`. Before submission the law consultant fills in the `[…]` placeholders (controller, address, contact, hosting provider, supervisory authority, governing law) and confirms retention and legal bases, then the draft notice comes off.
 2. A public page that explains account deletion without signing in is better for Google than the settings link; it is UI and waits for a mockup.
-3. Owner decisions from the release-prep notes §18: company or individual accounts, background location on Android in the first release, minimum age, DSA trader details.
+3. Owner decisions from the release-prep notes §18: company or individual accounts, background location on Android in the first release, DSA trader details. (Minimum age: 16, confirmed at sign-up, ADR-267.)
 4. The `/pay/return` page and the member purchase screens are UI and wait for approved mockups; until they exist the reviewer cannot pay in the app, so either ship them first or remove the "To see a payment" paragraph.

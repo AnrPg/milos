@@ -72,6 +72,14 @@ describe("registerFailure", () => {
     expect(registerFailure(error, t, fallback, "generic").fieldErrors).toEqual({ handle: ["handleRule"] });
   });
 
+  it("puts the minimum-age refusal under the age box (ADR-267)", () => {
+    const error = new ApiError(422, "", { code: "validation_failed", errors: { age_confirmed: ["minimum_age"] } });
+    expect(registerFailure(error, t, fallback, "generic")).toEqual({
+      fieldErrors: { age_confirmed: ["minimumAgeRule"] },
+      message: null,
+    });
+  });
+
   it("leaves other failures to the fallback", () => {
     expect(registerFailure(new ApiError(401, "", { code: "invalid_credentials" }), t, fallback, "generic")).toEqual({
       fieldErrors: {},

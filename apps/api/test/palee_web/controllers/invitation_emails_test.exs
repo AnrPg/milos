@@ -348,6 +348,7 @@ defmodule PaleeWeb.InvitationEmailsTest do
           display_name: "New Person",
           password: "S3cur3P@ss!42",
           email: "new@example.com",
+          age_confirmed: true,
           invitation_token: token
         })
 

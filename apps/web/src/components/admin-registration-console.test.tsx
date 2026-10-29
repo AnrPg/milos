@@ -36,6 +36,13 @@ vi.mock("@/i18n/ui", () => ({
     values ? `${key} ${Object.values(values).join(" ")}` : key,
 }));
 
+vi.mock("next-intl", () => {
+  const translate = (key: string, values?: Record<string, unknown>) =>
+    values ? `${key}:${JSON.stringify(values)}` : key;
+  translate.rich = (key: string) => key;
+  return { useTranslations: () => translate };
+});
+
 vi.mock("@/i18n/presentation", () => ({
   localizeError: (error: Error) => error.message,
 }));
@@ -78,6 +85,7 @@ describe("AdminRegistrationConsole", () => {
     fireEvent.change(screen.getByLabelText("password8be3c94"), {
       target: { value: "S3cur3P@ss!42" },
     });
+    fireEvent.click(screen.getByLabelText('ageConfirmation:{"age":16}'));
     fireEvent.click(screen.getByRole("button", { name: "createAdminAccount" }));
 
     await waitFor(() => {
@@ -86,6 +94,7 @@ describe("AdminRegistrationConsole", () => {
         email: "client@example.test",
         password: "S3cur3P@ss!42",
         invitation_token: "admin-token-1234567890",
+        age_confirmed: true,
       });
     });
 
@@ -171,6 +180,7 @@ describe("AdminRegistrationConsole", () => {
     fireEvent.change(screen.getByLabelText("nicknamece2bd99"), { target: { value: "test_admin" } });
     fireEvent.change(screen.getByLabelText("emailAddress"), { target: { value: "vendor@example.test" } });
     fireEvent.change(screen.getByLabelText("password8be3c94"), { target: { value: "1234" } });
+    fireEvent.click(screen.getByLabelText('ageConfirmation:{"age":16}'));
     fireEvent.click(screen.getByRole("button", { name: "createAdminAccount" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("adminEmailHasProfiles 1 3");
@@ -198,6 +208,7 @@ describe("AdminRegistrationConsole", () => {
     fireEvent.change(screen.getByLabelText("nicknamece2bd99"), { target: { value: "test_admin" } });
     fireEvent.change(screen.getByLabelText("emailAddress"), { target: { value: "full@example.test" } });
     fireEvent.change(screen.getByLabelText("password8be3c94"), { target: { value: "right-pass" } });
+    fireEvent.click(screen.getByLabelText('ageConfirmation:{"age":16}'));
     fireEvent.click(screen.getByRole("button", { name: "createAdminAccount" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("adminEmailProfileLimit 3");
@@ -221,6 +232,7 @@ describe("AdminRegistrationConsole", () => {
     const submit = screen.getByRole("button", { name: "createAdminAccount" });
     expect(submit).toBeEnabled();
 
+    fireEvent.click(screen.getByLabelText('ageConfirmation:{"age":16}'));
     fireEvent.click(submit);
 
     await waitFor(() => {
@@ -229,6 +241,7 @@ describe("AdminRegistrationConsole", () => {
         email: "client@example.test",
         password: "a b ",
         invitation_token: "admin-token-1234567890",
+        age_confirmed: true,
       });
     });
   });
@@ -248,9 +261,24 @@ describe("AdminRegistrationConsole", () => {
       target: { value: "abc" },
     });
 
+    fireEvent.click(screen.getByLabelText('ageConfirmation:{"age":16}'));
     fireEvent.click(screen.getByRole("button", { name: "createAdminAccount" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent("passwordRules0c63f14");
+    expect(signUpAdmin).not.toHaveBeenCalled();
+  });
+
+  it("asks to confirm the minimum age under the box before signing up (ADR-267)", async () => {
+    render(<AdminRegistrationConsole />);
+
+    await screen.findByText("Palee Method");
+    fireEvent.change(screen.getByLabelText("nicknamece2bd99"), { target: { value: "client_admin" } });
+    fireEvent.change(screen.getByLabelText("emailAddress"), { target: { value: "client@example.test" } });
+    fireEvent.change(screen.getByLabelText("password8be3c94"), { target: { value: "S3cur3P@ss!42" } });
+    fireEvent.click(screen.getByRole("button", { name: "createAdminAccount" }));
+
+    expect(await screen.findByText("minimumAgeRule")).toBeInTheDocument();
+    expect(screen.getByLabelText('ageConfirmation:{"age":16}')).toHaveAttribute("aria-invalid", "true");
     expect(signUpAdmin).not.toHaveBeenCalled();
   });
 
@@ -284,6 +312,7 @@ describe("AdminRegistrationConsole", () => {
     fireEvent.change(screen.getByLabelText("password8be3c94"), {
       target: { value: "S3cur3P@ss!42" },
     });
+    fireEvent.click(screen.getByLabelText('ageConfirmation:{"age":16}'));
     fireEvent.click(screen.getByRole("button", { name: "createAdminAccount" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(

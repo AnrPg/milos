@@ -22,6 +22,8 @@ defmodule Palee.Identity.Login do
     # ADR-207: "this wasn't me" stops new email changes until then.
     field :email_change_locked_until, :utc_datetime_usec
     field :last_used_user_id, :binary_id
+    # ADR-267: when sign-up confirmed the minimum age (never cast from input).
+    field :age_confirmed_at, :utc_datetime_usec
 
     has_many :profiles, Palee.Identity.User
 

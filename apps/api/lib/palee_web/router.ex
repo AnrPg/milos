@@ -51,6 +51,17 @@ defmodule PaleeWeb.Router do
     )
   end
 
+  # ADR-267: asking for "Download my data" is also capped per hour here, on
+  # top of the service's one request in progress and one a day.
+  pipeline :data_export_rate_limited do
+    plug(PaleeWeb.Plugs.RateLimit,
+      max: 5,
+      interval: 3_600_000,
+      bucket: "data-exports",
+      methods: ["POST"]
+    )
+  end
+
   # ADR-157: one upload per picked file, plus its completion.
   pipeline :media_upload_rate_limited do
     plug(PaleeWeb.Plugs.RateLimit,
@@ -468,6 +479,20 @@ defmodule PaleeWeb.Router do
     pipe_through([:api, :authenticated, :auth_rate_limited])
 
     post("/account-deletion", AccountDeletionController, :create)
+  end
+
+  # ADR-267: "Download my data" (GDPR articles 15 and 20).
+  scope "/api", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :data_export_rate_limited
+    ])
+
+    get("/me/data-exports", PersonalDataExportController, :index)
+    post("/me/data-exports", PersonalDataExportController, :create)
   end
 
   # ADR-187: the password reset requests the signed-in person can handle

@@ -27,7 +27,8 @@ defmodule PaleeWeb.PasswordRecoveryControllerTest do
           handle: handle,
           email: email,
           password: "1537",
-          role: "athlete"
+          role: "athlete",
+          age_confirmed: true
         }),
         201
       )

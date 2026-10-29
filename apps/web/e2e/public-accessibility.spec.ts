@@ -5,6 +5,8 @@ const pages = [
   { path: "/about", heading: /palee/i },
   { path: "/register", heading: /create your account/i },
   { path: "/forgot-password", heading: /forgot your password/i },
+  { path: "/privacy", heading: /^privacy policy$/i },
+  { path: "/terms", heading: /^terms of use$/i },
   {
     path: "/box/schedule",
     heading: /^schedule$/i,

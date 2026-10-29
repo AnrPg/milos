@@ -39,7 +39,8 @@ defmodule Palee.Application.ReleasedEmailReservationTest do
       "handle" => "taker#{unique}",
       "password" => "An0ther-P@ss!",
       "role" => "member",
-      "email" => email
+      "email" => email,
+      "age_confirmed" => true
     })
   end
 
@@ -76,7 +77,12 @@ defmodule Palee.Application.ReleasedEmailReservationTest do
 
     # A bad field is still refused, as for any sign-up.
     assert {:error, %Ecto.Changeset{}} =
-             RegisterUser.call(%{"handle" => "x", "password" => "short", "email" => owner.email})
+             RegisterUser.call(%{
+               "handle" => "x",
+               "password" => "short",
+               "email" => owner.email,
+               "age_confirmed" => true
+             })
   end
 
   test "the hold ends after 7 days", %{owner: owner} do

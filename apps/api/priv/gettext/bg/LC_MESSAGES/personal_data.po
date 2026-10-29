@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Language: bg\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Your data is ready to download"
+msgstr "Данните ви са готови за изтегляне"
+
+msgid "The copy of your data you asked for is ready: one ZIP file with your profile, bookings, journal, wellness, devices, the messages you wrote, payments, receipts and signed documents."
+msgstr "Копието на данните ви, което поискахте, е готово: един ZIP файл с профила ви, резервациите, дневника, благосъстоянието, устройствата, съобщенията, които сте написали, плащанията, касовите бележки и подписаните документи."
+
+msgid "Download it from Settings while you are signed in. It is kept for %{days} days."
+msgstr "Изтеглете го от Настройки, след като влезете. Пази се %{days} дни."
+
+msgid "Open Settings"
+msgstr "Отваряне на Настройки"
+
+msgid "If you didn't ask for this, change your password: someone else may know it."
+msgstr "Ако не сте поискали това, сменете паролата си: възможно е някой друг да я знае."

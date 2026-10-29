@@ -19,7 +19,8 @@ defmodule PaleeWeb.AuthControllerTest do
         nickname: "zeus",
         password: "a b c d",
         role: "member",
-        email: "zeus@placeholder.invalid"
+        email: "zeus@placeholder.invalid",
+        age_confirmed: true
       }
 
       conn =
@@ -33,12 +34,57 @@ defmodule PaleeWeb.AuthControllerTest do
       assert conn.resp_cookies["palee_refresh"].same_site == "Strict"
     end
 
+    test "ADR-267: without the minimum-age confirmation nothing is created", %{conn: conn} do
+      params = %{
+        nickname: "minor",
+        password: "a b c d",
+        role: "member",
+        email: "minor@placeholder.invalid"
+      }
+
+      for body <- [params, Map.put(params, :age_confirmed, false)] do
+        response =
+          conn
+          |> recycle()
+          |> put_req_header("content-type", "application/json")
+          |> post("/api/auth/register", Jason.encode!(body))
+          |> json_response(422)
+
+        assert response == %{
+                 "code" => "validation_failed",
+                 "errors" => %{"age_confirmed" => ["minimum_age"]}
+               }
+      end
+
+      assert Identity.find_login_by_email("minor@placeholder.invalid") == nil
+    end
+
+    test "ADR-267: the confirmation is kept on the login", %{conn: conn} do
+      conn
+      |> put_req_header("content-type", "application/json")
+      |> post(
+        "/api/auth/register",
+        Jason.encode!(%{
+          nickname: "adult",
+          password: "a b c d",
+          role: "member",
+          email: "adult@placeholder.invalid",
+          age_confirmed: true
+        })
+      )
+      |> json_response(201)
+
+      login = Palee.Repo.get_by!(Palee.Identity.Login, email: "adult@placeholder.invalid")
+      assert %DateTime{} = login.age_confirmed_at
+    end
+
     test "keeps the language the sign-up page was shown in (ADR-195)", %{conn: conn} do
       params = %{
         handle: "hera",
         password: "a b c d",
         role: "member",
         email: "hera@placeholder.invalid",
+        age_confirmed: true,
         preferred_locale: "el"
       }
 
@@ -59,7 +105,13 @@ defmodule PaleeWeb.AuthControllerTest do
         |> put_req_header("content-type", "application/json")
         |> post(
           "/api/auth/register",
-          Jason.encode!(Map.merge(base, %{handle: "ares", email: "ares@placeholder.invalid"}))
+          Jason.encode!(
+            Map.merge(base, %{
+              handle: "ares",
+              email: "ares@placeholder.invalid",
+              age_confirmed: true
+            })
+          )
         )
 
       assert json_response(created, 201)
@@ -74,6 +126,7 @@ defmodule PaleeWeb.AuthControllerTest do
             Map.merge(base, %{
               handle: "eris",
               email: "eris@placeholder.invalid",
+              age_confirmed: true,
               preferred_locale: "xx"
             })
           )
@@ -87,7 +140,8 @@ defmodule PaleeWeb.AuthControllerTest do
         nickname: "zeus",
         password: "S3cur3P@ss!42",
         role: "member",
-        email: "zeus@placeholder.invalid"
+        email: "zeus@placeholder.invalid",
+        age_confirmed: true
       }
 
       _ =
@@ -128,7 +182,8 @@ defmodule PaleeWeb.AuthControllerTest do
             nickname: "hephaestus",
             password: "S3cur3P@ss!42",
             role: "member",
-            email: "hephaestus@placeholder.invalid"
+            email: "hephaestus@placeholder.invalid",
+            age_confirmed: true
           })
         )
 
@@ -166,7 +221,8 @@ defmodule PaleeWeb.AuthControllerTest do
         nickname: "athena_admin",
         password: "S3cur3P@ss!42",
         invitation_token: token,
-        email: "athena_admin@placeholder.invalid"
+        email: "athena_admin@placeholder.invalid",
+        age_confirmed: true
       }
 
       conn =
@@ -215,7 +271,8 @@ defmodule PaleeWeb.AuthControllerTest do
             nickname: "wrong_person",
             password: "S3cur3P@ss!42",
             invitation_token: bound_token,
-            email: "someone.else@example.com"
+            email: "someone.else@example.com",
+            age_confirmed: true
           })
         )
 
@@ -231,7 +288,8 @@ defmodule PaleeWeb.AuthControllerTest do
             nickname: "right_person",
             password: "S3cur3P@ss!42",
             invitation_token: bound_token,
-            email: "Invited@Example.com"
+            email: "Invited@Example.com",
+            age_confirmed: true
           })
         )
 
@@ -264,7 +322,8 @@ defmodule PaleeWeb.AuthControllerTest do
             nickname: "copied_person",
             password: "S3cur3P@ss!42",
             invitation_token: bound_token,
-            email: "copied@example.com"
+            email: "copied@example.com",
+            age_confirmed: true
           })
         )
 
@@ -295,7 +354,8 @@ defmodule PaleeWeb.AuthControllerTest do
             nickname: "new_owner",
             password: "1234",
             invitation_token: token,
-            email: "vendor@example.test"
+            email: "vendor@example.test",
+            age_confirmed: true
           })
         )
 
@@ -313,7 +373,8 @@ defmodule PaleeWeb.AuthControllerTest do
             nickname: "new_owner",
             password: "vendor-secret",
             invitation_token: token,
-            email: "Vendor@Example.test"
+            email: "Vendor@Example.test",
+            age_confirmed: true
           })
         )
 
@@ -333,7 +394,8 @@ defmodule PaleeWeb.AuthControllerTest do
         nickname: "false_admin",
         password: "S3cur3P@ss!42",
         invitation_token: String.duplicate("x", 43),
-        email: "false_admin@placeholder.invalid"
+        email: "false_admin@placeholder.invalid",
+        age_confirmed: true
       }
 
       conn =
@@ -584,7 +646,8 @@ defmodule PaleeWeb.AuthControllerTest do
             nickname: "apollo",
             password: "S3cur3P@ss!42",
             role: "member",
-            email: "apollo@placeholder.invalid"
+            email: "apollo@placeholder.invalid",
+            age_confirmed: true
           })
         )
 
@@ -623,7 +686,8 @@ defmodule PaleeWeb.AuthControllerTest do
             nickname: "odin",
             password: "S3cur3P@ss!42",
             role: "member",
-            email: "odin@placeholder.invalid"
+            email: "odin@placeholder.invalid",
+            age_confirmed: true
           })
         )
 
@@ -674,7 +738,8 @@ defmodule PaleeWeb.AuthControllerTest do
             nickname: "security_family",
             password: "S3cur3P@ss!42",
             role: "member",
-            email: "security_family@placeholder.invalid"
+            email: "security_family@placeholder.invalid",
+            age_confirmed: true
           })
         )
 

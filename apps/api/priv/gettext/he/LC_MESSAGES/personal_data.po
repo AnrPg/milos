@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Language: he\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Your data is ready to download"
+msgstr "הנתונים שלך מוכנים להורדה"
+
+msgid "The copy of your data you asked for is ready: one ZIP file with your profile, bookings, journal, wellness, devices, the messages you wrote, payments, receipts and signed documents."
+msgstr "העותק של הנתונים שביקשת מוכן: קובץ ZIP אחד עם הפרופיל, ההזמנות, היומן, הרווחה, המכשירים, ההודעות שכתבת, התשלומים, הקבלות והמסמכים שנחתמו."
+
+msgid "Download it from Settings while you are signed in. It is kept for %{days} days."
+msgstr "אפשר להוריד אותו מההגדרות לאחר הכניסה לחשבון. הוא נשמר למשך %{days} ימים."
+
+msgid "Open Settings"
+msgstr "פתיחת ההגדרות"
+
+msgid "If you didn't ask for this, change your password: someone else may know it."
+msgstr "אם לא ביקשת זאת, יש לשנות את הסיסמה: ייתכן שמישהו אחר יודע אותה."

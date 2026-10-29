@@ -127,6 +127,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     account_provider_selections journal_coach_audience_exclusions journal_entry_audiences
     user_insights guide_progress notification_preferences
     training_goals
+    personal_data_exports
   )
 
   def report do

@@ -18,6 +18,7 @@ defmodule Palee.Email.Templates do
     organization_invitation: Palee.Email.Templates.OrganizationInvitation,
     owner_invitation: Palee.Email.Templates.OwnerInvitation,
     password_reset: Palee.Email.Templates.PasswordReset,
+    personal_data_export_ready: Palee.Email.Templates.PersonalDataExportReady,
     security_account_deleted: Palee.Email.Templates.SecurityAccountDeleted,
     security_account_deletion_scheduled: Palee.Email.Templates.SecurityAccountDeletionScheduled,
     security_email_change_requested: Palee.Email.Templates.SecurityEmailChangeRequested,

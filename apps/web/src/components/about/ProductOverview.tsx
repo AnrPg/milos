@@ -10,6 +10,7 @@ import type { FaqEntry, FeatureFacts } from "@/lib/seo/site-info";
 export async function ProductOverview({ faq, features }: { faq: FaqEntry[]; features: FeatureFacts[] }) {
   const i18n = await getUiTranslations();
   const info = await getTranslations("SiteInfo");
+  const legal = await getTranslations("legal");
   return (
     <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-16" style={{ color: "var(--text)" }}>
       <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--primary)" }}>
@@ -65,6 +66,18 @@ export async function ProductOverview({ faq, features }: { faq: FaqEntry[]; feat
           ))}
         </dl>
       </section>
+      <nav
+        aria-label={legal("footerLabel")}
+        className="mt-16 flex flex-wrap gap-x-6 gap-y-2 border-t pt-6 text-sm"
+        style={{ borderColor: "var(--border)" }}
+      >
+        <Link href="/privacy" className="font-semibold" style={{ color: "var(--primary)" }}>
+          {legal("privacyTitle")}
+        </Link>
+        <Link href="/terms" className="font-semibold" style={{ color: "var(--primary)" }}>
+          {legal("termsTitle")}
+        </Link>
+      </nav>
     </div>
   );
 }

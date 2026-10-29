@@ -22,7 +22,7 @@ Shared settings:
 - **Category:** Apple: Health & Fitness (primary), Lifestyle (secondary). Google: Health & Fitness.
 - **Price:** free, no in-app purchases (ADR-256: payments go to the box through its provider).
 - **Support URL / website:** `https://palee.app`, support email `support@palee.app`.
-- **Privacy policy URL:** `https://palee.app/privacy` (page still to be published, see store-review-notes.md, open items).
+- **Privacy policy URL:** `https://palee.app/privacy` (published as a draft, ADR-267; final text after the law consultant, see store-review-notes.md, open items).
 - **Account deletion URL (Google):** `https://palee.app/me/settings#delete-account`.
 - **Copyright (Apple):** `2026 <legal name of the Palee company>`.
 

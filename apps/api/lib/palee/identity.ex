@@ -127,6 +127,15 @@ defmodule Palee.Identity do
   def mark_email_verified(login_id, email, now \\ DateTime.utc_now()),
     do: UserStore.mark_email_verified(login_id, email, now)
 
+  @doc "ADR-267: `:ok` when a sign-up confirms the minimum age, else the field error."
+  defdelegate confirm_minimum_age(params), to: Palee.Identity.Domain.AgePolicy, as: :confirm
+
+  defdelegate minimum_age(), to: Palee.Identity.Domain.AgePolicy
+
+  @doc "ADR-267: keeps when the login confirmed the minimum age (the first time only)."
+  def record_age_confirmation(login_id, now \\ DateTime.utc_now()),
+    do: UserStore.confirm_age(login_id, now)
+
   @doc "Whether the account's login has proved it reads its email."
   def email_verified?(%{email_verified_at: %DateTime{}}), do: true
   def email_verified?(_account), do: false
