@@ -278,6 +278,7 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminDocumentsController, :signatures} => [:manage_settings, :manage_memberships],
     {W.AdminDocumentsController, :evidence} => [:manage_settings, :manage_memberships],
     {W.AdminDocumentsController, :member} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :outstanding} => [:manage_settings, :manage_memberships],
     # ADR-252: health certificates are health data (GDPR art. 9): dates and
     # files need manage_health_certificates; view_health (coaches, own
     # clients) sees only valid / expired / missing in the list.

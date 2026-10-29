@@ -104,6 +104,16 @@ defmodule PaleeWeb.DocumentsControllerTest do
              })
              |> json_response(201)
 
+    assert %{"templates" => [row]} =
+             ctx.owner |> get_json("#{ctx.admin}/outstanding") |> json_response(200)
+
+    assert row["template_id"] == template["id"]
+    assert row["outstanding"] == length(row["clients"])
+    assert row["signed"] == 0
+
+    assert %{"status" => "unsigned"} =
+             Enum.find(row["clients"], &(&1["user_id"] == ctx.client_user.id))
+
     assert %{"starters" => starters} =
              ctx.owner |> get_json("#{ctx.admin}/starters?language=el") |> json_response(200)
 
@@ -119,6 +129,7 @@ defmodule PaleeWeb.DocumentsControllerTest do
              |> json_response(403)
 
       assert staff |> get_json("#{ctx.admin}/settings") |> json_response(403)
+      assert staff |> get_json("#{ctx.admin}/outstanding") |> json_response(403)
     end
 
     assert %{"events" => events} =

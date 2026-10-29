@@ -191,6 +191,36 @@ defmodule PaleeWeb.Schemas.Documents do
     }
   end
 
+  def outstanding do
+    client = %Schema{
+      type: :object,
+      properties: %{
+        user_id: @uuid,
+        display_name: %Schema{type: :string, nullable: true},
+        handle: %Schema{type: :string, nullable: true},
+        status: %Schema{type: :string, enum: ["unsigned", "resign_required"]}
+      },
+      required: [:display_name, :handle, :status, :user_id]
+    }
+
+    row = %Schema{
+      type: :object,
+      properties: %{
+        template_id: @uuid,
+        signed: %Schema{type: :integer, description: "Clients whose signature counts"},
+        outstanding: %Schema{type: :integer},
+        clients: %Schema{type: :array, items: client, description: "Clients who have not signed"}
+      },
+      required: [:clients, :outstanding, :signed, :template_id]
+    }
+
+    %Schema{
+      type: :object,
+      properties: %{templates: %Schema{type: :array, items: row}},
+      required: [:templates]
+    }
+  end
+
   # ── Requests and signatures ─────────────────────────────────────────────
 
   def request do
