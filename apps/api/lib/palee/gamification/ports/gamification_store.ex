@@ -43,4 +43,6 @@ defmodule Palee.Gamification.Ports.GamificationStore do
               {:ok, map()} | {:error, Ecto.Changeset.t()}
 
   @callback leaderboard_opted_in_user_ids([Ecto.UUID.t()]) :: [Ecto.UUID.t()]
+  @callback get_training_goal(user_id :: Ecto.UUID.t(), kind :: String.t()) :: map() | nil
+  @callback put_training_goal(params :: map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
 end

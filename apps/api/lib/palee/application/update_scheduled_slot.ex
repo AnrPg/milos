@@ -110,7 +110,7 @@ defmodule Palee.Application.UpdateScheduledSlot do
     )
   end
 
-  # ADR-224: a class moved to another day or type, or whose own WOD was
+  # ADR-230: a class moved to another day or type, or whose own WOD was
   # removed, takes the WOD of the day that covers it now.
   defp inherit_day_workout(context, slots) do
     with {:ok, changed_ids} <- DayWorkouts.reconcile_classes(context, slots) do

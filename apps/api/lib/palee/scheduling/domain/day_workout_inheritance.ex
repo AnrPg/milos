@@ -1,6 +1,6 @@
 defmodule Palee.Scheduling.Domain.DayWorkoutInheritance do
   @moduledoc """
-  Which WOD a class takes from the day's WODs (ADR-224).
+  Which WOD a class takes from the day's WODs (ADR-230).
 
   A day may hold several rules, each for «all» or one class type, and for
   «all» or one branch. A class follows the most specific rule that covers it:

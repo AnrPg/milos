@@ -99,7 +99,7 @@ defmodule PaleeWeb.ScheduleController do
              day_workouts: %Schema{
                type: :array,
                description:
-                 "ADR-224, staff only (empty for others): the WOD of each day in the window, " <>
+                 "ADR-230, staff only (empty for others): the WOD of each day in the window, " <>
                    "for every class (class_type_id null) or one class type, and every branch " <>
                    "(location_id null) or one.",
                items: %Schema{
@@ -147,14 +147,14 @@ defmodule PaleeWeb.ScheduleController do
                      type: :string,
                      format: :uuid,
                      nullable: true,
-                     description: "ADR-224: the day WOD the class's WOD comes from."
+                     description: "ADR-230: the day WOD the class's WOD comes from."
                    },
                    workout_source: %Schema{
                      type: :string,
                      nullable: true,
                      enum: ["day", "class"],
                      description:
-                       "ADR-224: day = inherited from the day's WOD, class = set on the class."
+                       "ADR-230: day = inherited from the day's WOD, class = set on the class."
                    },
                    space_id: %Schema{type: :string, format: :uuid, nullable: true},
                    space: %Schema{

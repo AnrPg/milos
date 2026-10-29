@@ -2,7 +2,7 @@ import { apiRequest } from "@/api/client";
 import type { ScheduleSlot } from "@/api/schedule";
 
 /**
- * ADR-224: the WOD of a whole day. A rule covers every class of the date
+ * ADR-230: the WOD of a whole day. A rule covers every class of the date
  * (`class_type_id` null; events only by their type) or one class type, and
  * every branch (`location_id` null) or one. Classes inherit it unless they
  * have their own WOD.

@@ -34,6 +34,7 @@ defmodule PaleeWeb.AdminFinanceController do
     ListFinanceReferrals,
     ListFinanceReferralRewards,
     PresignInvoiceUpload,
+    ReceiveFinancePayment,
     RecordFinancePayment,
     PurgeFinanceRecord,
     RedeemFinancePromotion,
@@ -556,6 +557,40 @@ defmodule PaleeWeb.AdminFinanceController do
     }
   }
 
+  # ADR-222: the box's billing setup, not this body, picks the document.
+  @receive_payment_request_body %RequestBody{
+    required: true,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          additionalProperties: false,
+          required: [:amount_cents, :idempotency_key, :payment_method],
+          properties: %{
+            amount_cents: %Schema{type: :integer, minimum: 1},
+            currency: %Schema{type: :string, minLength: 3, maxLength: 3, nullable: true},
+            paid_on: %Schema{type: :string, format: :date, nullable: true},
+            payment_method: %Schema{type: :string, enum: Finance.received_payment_methods()},
+            finance_invoice_id: %Schema{type: :string, format: :uuid, nullable: true},
+            membership_package_subscription_id: %Schema{
+              type: :string,
+              format: :uuid,
+              nullable: true
+            },
+            description: %Schema{type: :string, maxLength: 500, nullable: true},
+            charge_category: %Schema{
+              type: :string,
+              enum: ["product", "personal_training", "event", "other"],
+              nullable: true
+            },
+            notes: %Schema{type: :string, nullable: true},
+            idempotency_key: %Schema{type: :string, minLength: 1, maxLength: 200}
+          }
+        }
+      }
+    }
+  }
+
   @purge_request_body %RequestBody{
     required: true,
     content: %{
@@ -592,6 +627,7 @@ defmodule PaleeWeb.AdminFinanceController do
               :create_manual_credit,
               :create_invoice,
               :create_receipt,
+              :receive_payment,
               :apply_credit_to_payment,
               :apply_credit_to_invoice,
               :reverse_payment,
@@ -950,6 +986,31 @@ defmodule PaleeWeb.AdminFinanceController do
       conn
       |> put_status(:created)
       |> json(%{receipt: receipt})
+    end
+  end
+
+  operation(:receive_payment,
+    summary:
+      "Record money received from a client and issue the document the billing setup calls for",
+    parameters: [@id_parameter],
+    request_body: @receive_payment_request_body,
+    responses: [
+      created: {"Received payment and its document", "application/json", @open_object},
+      ok: {"The same request, already recorded", "application/json", @open_object}
+    ]
+  )
+
+  def receive_payment(conn, params) do
+    with {:ok, received} <-
+           ReceiveFinancePayment.call(
+             conn.assigns.tenant_context,
+             param_id(params),
+             current_user_id(conn),
+             body_params(conn, params)
+           ) do
+      conn
+      |> put_status(if(received.replayed, do: :ok, else: :created))
+      |> json(%{received: received})
     end
   end
 

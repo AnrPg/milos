@@ -1872,6 +1872,16 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: "invalid_payment_amount", error: "Payment amount must be greater than zero"})
   end
 
+  # ADR-222: a new receipt or invoice says what the money was for.
+  def call(conn, {:error, :payment_purpose_required}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "payment_purpose_required",
+      error: "Choose the subscription package or describe what the payment is for"
+    })
+  end
+
   def call(conn, {:error, :duplicate_renewal_invoice}) do
     conn
     |> put_status(:conflict)
@@ -2670,7 +2680,7 @@ defmodule PaleeWeb.FallbackController do
     slot_not_full: {:conflict, "The class still has free spots"},
     # ADR-176: a draft class has no WOD yet.
     class_not_published: {:conflict, "This class isn't open yet"},
-    # ADR-224: day WODs.
+    # ADR-230: day WODs.
     day_in_the_past: {:unprocessable_entity, "A day WOD can be set from today on"},
     no_day_workout: {:conflict, "No day WOD covers this class"},
     day_class_started: {:conflict, "This class has started; its WOD stays as it was"},

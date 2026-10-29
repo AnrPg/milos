@@ -1,6 +1,6 @@
 defmodule Palee.Application.DayWorkouts do
   @moduledoc """
-  A WOD for a whole gym day (ADR-224).
+  A WOD for a whole gym day (ADR-230).
 
   Staff set a WOD on a date, for every class or for chosen class types (and,
   in a gym with branches, for one branch). The day's classes inherit it:

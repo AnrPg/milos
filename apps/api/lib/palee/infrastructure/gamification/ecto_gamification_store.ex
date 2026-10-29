@@ -8,6 +8,7 @@ defmodule Palee.Infrastructure.Gamification.EctoGamificationStore do
     GamificationSetting,
     LeaderboardOptIn,
     SeasonalChallenge,
+    TrainingGoal,
     UserAchievement,
     UserChallengeProgress,
     UserStat
@@ -44,7 +45,7 @@ defmodule Palee.Infrastructure.Gamification.EctoGamificationStore do
     case Repo.one(from settings in scoped_to_tenant(GamificationSetting), limit: 1) do
       nil ->
         %{
-          weekly_workout_target: 2,
+          streak_shields: GamificationSetting.default_streak_shields(),
           streak_shield_reset_day: nil,
           leaderboard_enabled: true
         }
@@ -493,7 +494,7 @@ defmodule Palee.Infrastructure.Gamification.EctoGamificationStore do
   defp normalize_settings(%GamificationSetting{} = settings) do
     %{
       id: settings.id,
-      weekly_workout_target: settings.weekly_workout_target,
+      streak_shields: settings.streak_shields,
       streak_shield_reset_day: settings.streak_shield_reset_day,
       leaderboard_enabled: settings.leaderboard_enabled,
       inserted_at: settings.inserted_at,
@@ -588,6 +589,50 @@ defmodule Palee.Infrastructure.Gamification.EctoGamificationStore do
       {:ok, prefs} -> {:ok, UserGamificationPreferences.present(prefs)}
       {:error, changeset} -> {:error, changeset}
     end
+  end
+
+  @impl true
+  def get_training_goal(user_id, kind) do
+    TrainingGoal
+    |> where([goal], goal.user_id == ^user_id and goal.kind == ^kind)
+    |> Repo.one()
+    |> present_goal()
+  end
+
+  # One row per person and kind, written in one statement so a member and
+  # their coach saving at once both land on it: the conflict keeps the row
+  # (and its inserted_at) and replaces the target and who set it.
+  @impl true
+  def put_training_goal(params) do
+    %TrainingGoal{}
+    |> TrainingGoal.changeset(params)
+    |> Repo.insert(
+      on_conflict:
+        {:replace, [:target, :set_by_id, :set_by_role, :set_in_organization_id, :updated_at]},
+      conflict_target: [:user_id, :kind],
+      returning: true
+    )
+    |> case do
+      {:ok, goal} -> {:ok, present_goal(goal)}
+      {:error, changeset} -> {:error, changeset}
+    end
+  end
+
+  defp present_goal(nil), do: nil
+
+  defp present_goal(%TrainingGoal{} = goal) do
+    goal
+    |> Map.from_struct()
+    |> Map.drop([:__meta__])
+    |> Map.put(:set_by_nickname, nickname(goal.set_by_id))
+  end
+
+  defp nickname(nil), do: nil
+
+  defp nickname(user_id) do
+    Repo.one(
+      from user in "users", where: user.id == type(^user_id, :binary_id), select: user.nickname
+    )
   end
 
   defp user_preferences_params(user_id, params) do

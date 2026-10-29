@@ -1,7 +1,7 @@
 defmodule Palee.Application.GetLandingPage do
   alias Palee.Application.{GetLeaderboardSnippet, ListWorkoutExecutions}
   alias Palee.{Finance, Gamification, Messaging, Organizations, Scheduling}
-  alias Palee.Gamification.Domain.{ChallengeCriteria, ChallengeProgress}
+  alias Palee.Gamification.Domain.{ChallengeCriteria, ChallengeProgress, WeeklyGoal}
   alias Palee.Application.LandingCache
 
   # TD-092: the whole payload is read inside the member's tenant scope. Without
@@ -40,6 +40,7 @@ defmodule Palee.Application.GetLandingPage do
       "admin_metrics" => admin_metrics(context),
       "gamification" => %{
         "settings" => Gamification.get_settings(),
+        "goal" => nil,
         "stats" => empty_stats,
         "preferences" => nil,
         "badges" => [],
@@ -132,6 +133,8 @@ defmodule Palee.Application.GetLandingPage do
       "role" => to_string(context.role),
       "gamification" => %{
         "settings" => Gamification.get_settings(),
+        # ADR-229: the person's own weekly goal (the default until set).
+        "goal" => user.id |> Gamification.get_training_goal() |> WeeklyGoal.present(),
         "stats" => stats,
         "preferences" => preferences,
         "badges" => Gamification.list_visible_achievements(user.id),

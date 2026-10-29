@@ -35,7 +35,7 @@ defmodule Palee.Application.GetScheduleCalendar do
        %{
          start_date: start_date,
          end_date: end_date,
-         # ADR-224: staff see and edit the WOD of each day.
+         # ADR-230: staff see and edit the WOD of each day.
          day_workouts:
            if(admin_role?(context, actor),
              do: DayWorkouts.list(context, start_date, end_date),
@@ -84,7 +84,7 @@ defmodule Palee.Application.GetScheduleCalendar do
       Map.merge(slot, %{
         published: Scheduling.class_published?(slot),
         workout_status: Scheduling.class_workout_status(slot, now, zone),
-        # ADR-224: "day" (inherited from the day's WOD), "class" or nil.
+        # ADR-230: "day" (inherited from the day's WOD), "class" or nil.
         workout_source: Scheduling.class_workout_source(slot)
       })
     end)
@@ -136,7 +136,7 @@ defmodule Palee.Application.GetScheduleCalendar do
       base = %{
         id: slot.id,
         master_workout_id: slot.master_workout_id,
-        # ADR-224: set when the WOD is inherited from the day's WOD.
+        # ADR-230: set when the WOD is inherited from the day's WOD.
         day_workout_id: Map.get(slot, :day_workout_id),
         class_series_id: slot.class_series_id,
         class_series: slot.class_series,

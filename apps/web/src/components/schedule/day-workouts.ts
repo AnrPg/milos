@@ -3,7 +3,7 @@ import type { ClassTypeRecord, ScheduleSlot } from "@/api/schedule";
 import { dateKeyInZone } from "@/lib/zoned-time";
 
 /**
- * ADR-224: reading the day WODs of the schedule. The server decides which
+ * ADR-230: reading the day WODs of the schedule. The server decides which
  * rule a class follows; these helpers mirror its order for display only:
  * a class type beats «all», a branch beats «all branches», and an
  * all-classes rule never covers events.

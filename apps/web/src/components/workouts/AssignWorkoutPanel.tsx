@@ -46,7 +46,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
   const [workout, setWorkout] = useState<WorkoutRecord | null>(null);
   const [athletes, setAthletes] = useState<AthleteOption[]>([]);
   const scheduleT = useTranslations("Schedule");
-  // ADR-224: «Ημέρα» sets the WOD of a whole day (all classes or some types).
+  // ADR-230: «Ημέρα» sets the WOD of a whole day (all classes or some types).
   const [mode, setMode] = useState<"athletes" | "class" | "day">("athletes");
   const gymZone = useOrganizationTimeZone();
   const [dayDate, setDayDate] = useState(() => dateKeyInZone(new Date(), gymZone));

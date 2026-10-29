@@ -25,7 +25,7 @@ import { useUiTranslations } from "@/i18n/ui";
 type Editing = { rule: DayWorkout | null; workoutId: string | null; scope: DayWorkoutScopeValue; replaceOwn: boolean };
 
 /**
- * ADR-224: the WOD of one day, opened from the day's strip in the schedule.
+ * ADR-230: the WOD of one day, opened from the day's strip in the schedule.
  * Lists the day's WODs (each for every class or for some class types) and
  * edits one: the WOD (suggestions, search, «+ Νέο WOD» that comes back
  * filled in), which classes it is for, and a preview of what it changes.

@@ -1,6 +1,6 @@
 defmodule Palee.Scheduling.DayWorkout do
   @moduledoc """
-  A WOD for a whole gym day (ADR-224): every class of that day inherits it,
+  A WOD for a whole gym day (ADR-230): every class of that day inherits it,
   or only the classes of one type and/or one branch. `nil` scope fields mean
   «all». The workout is the copy filed in the day's Classes folder.
   """

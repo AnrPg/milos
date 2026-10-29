@@ -10,7 +10,7 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 
 /**
- * ADR-224, staff: where the class's WOD comes from. An inherited WOD says
+ * ADR-230, staff: where the class's WOD comes from. An inherited WOD says
  * so (it changes with the day's WOD); a class with its own WOD on a day that
  * has one names the day's WOD and offers «Επαναφορά στο WOD ημέρας». Shows
  * nothing when the day has no WOD for this class.

@@ -67,7 +67,7 @@ defmodule Palee.Application.CreateScheduledSlot do
 
   defp create_slot(context, params), do: Scheduling.create_slot(context, params)
 
-  # ADR-224: a class created on a day with a day WOD inherits it.
+  # ADR-230: a class created on a day with a day WOD inherits it.
   defp inherit_day_workout(context, slots) do
     with {:ok, changed_ids} <- DayWorkouts.reconcile_classes(context, slots) do
       {:ok, Enum.map(slots, &refetch_if_changed(context, &1, changed_ids))}

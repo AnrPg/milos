@@ -58,7 +58,7 @@ defmodule Palee.Application.CreateRecurringClassSeries do
     end
   end
 
-  # ADR-224: occurrences on days with a day WOD inherit it.
+  # ADR-230: occurrences on days with a day WOD inherit it.
   defp create_series(context, params) do
     with {:ok, series} <- Scheduling.create_class_series(context, params),
          {:ok, _changed} <-

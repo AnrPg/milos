@@ -10,7 +10,7 @@ import { Select } from "@/components/ui/Select";
 import { formatInZone } from "@/lib/zoned-time";
 
 /**
- * ADR-224: the parts shared by every place a day WOD is set (the schedule's
+ * ADR-230: the parts shared by every place a day WOD is set (the schedule's
  * day dialog, the library's «Ανάθεση → Ημέρα»): which classes it is for,
  * and what it will change before it is saved (count, the classes keeping
  * their own WOD with a «give them the day WOD too» choice, the classes that

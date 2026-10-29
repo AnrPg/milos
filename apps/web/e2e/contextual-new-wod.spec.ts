@@ -184,7 +184,7 @@ test.describe("Schedule › «+ New WOD» comes back to the class", () => {
     );
 
     await page.goto("/admin/schedule");
-    await page.getByRole("button", { name: "+ Slot" }).first().click();
+    await page.getByRole("button", { name: "+ Class" }).first().click();
     const form = page.getByRole("dialog");
     await form.getByLabel("Class name").fill("Friday Barbell");
     await form.getByRole("button", { name: "+ New WOD" }).click();

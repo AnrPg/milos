@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "./support/test";
 
-// ADR-224: a WOD for a whole day. Staff set it from the strip under a day's
+// ADR-230: a WOD for a whole day. Staff set it from the strip under a day's
 // header; every class of the day follows it unless it has its own WOD, and a
 // class's sheet says where its WOD comes from. The API is stubbed; every
 // route not listed answers an empty object.

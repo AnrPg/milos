@@ -24,6 +24,7 @@ defmodule Palee.Finance do
     FinalizeEntitlementSource,
     GrantAllowance,
     IssueInvoice,
+    ReceivePayment,
     RecordPayment,
     ReleaseEntitlement,
     ReleaseEntitlementSource,
@@ -119,6 +120,14 @@ defmodule Palee.Finance do
 
   def create_receipt(context, membership_id, params),
     do: scoped(context, fn -> create_receipt(membership_id, params) end)
+
+  defdelegate receive_payment(membership_id, params), to: ReceivePayment, as: :call
+
+  def receive_payment(context, membership_id, params),
+    do: scoped(context, fn -> receive_payment(membership_id, params) end)
+
+  @doc "ADR-222: how money can reach the box at the desk."
+  defdelegate received_payment_methods(), to: Palee.Finance.Domain.ReceivedPayment, as: :methods
 
   defdelegate create_manual_credit(membership_id, params), to: CreateManualCredit, as: :call
 

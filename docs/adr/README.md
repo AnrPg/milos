@@ -218,4 +218,9 @@ must have an ADR. See `template.md` for the format.
 | ADR-218 | Web Push keys belong to the platform console, not to a gym's settings (moves ADR-049's editor) | Accepted |
 | ADR-219 | Role hierarchy enforced downwards (vendor › owner › admin › staff › clients); self-added roles below one's top role | Accepted |
 | ADR-221 | Find a box or coach by name; publishing the public page is a setup step | Accepted |
-| ADR-224 | Day WODs: one WOD for a whole day, inherited by its classes (all or chosen class types), overridable per class | Accepted |
+| ADR-222 | Record money received at the desk; the billing setup picks the receipt, paid invoice or invoice it settles | Accepted |
+| ADR-223 | A new WOD written in context comes back to its form and is assigned to it; programming copies keep how they were written | Accepted |
+| ADR-224 | A workout's `body` has its own shape per way of writing (free text, text sections, structured) | Accepted |
+| ADR-226 | Class booking rules explained; approval wait may have no limit; late-cancellation cutoff in minutes (hours + minutes input) | Accepted |
+| ADR-229 | The weekly workout goal is personal (the person, their coach, full-scope staff set it); the box sets only streak shields and their renewal | Accepted |
+| ADR-230 | Day WODs: one WOD for a whole day, inherited by its classes (all or chosen class types), overridable per class | Accepted |

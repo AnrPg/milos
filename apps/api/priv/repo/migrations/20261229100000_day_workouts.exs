@@ -1,6 +1,6 @@
 defmodule Palee.Repo.Migrations.DayWorkouts do
   @moduledoc """
-  ADR-224: a WOD for a whole day. `day_workouts` holds one rule per gym day,
+  ADR-230: a WOD for a whole day. `day_workouts` holds one rule per gym day,
   optionally narrowed to a class type and/or a branch; NULL means «all».
   `scheduled_classes.day_workout_id` records which rule gave a class its WOD:
   set = inherited, NULL with a WOD = the class's own WOD (an override).

@@ -53,7 +53,8 @@ const landing = {
   admin_metrics: null,
   quote: { body: "Strength grows in the moments you think you can't go on.", author: "Coach Nikos" },
   gamification: {
-    settings: { weekly_workout_target: 3, streak_shield_reset_day: null, leaderboard_enabled: true },
+    settings: { streak_shields: 1, streak_shield_reset_day: null, leaderboard_enabled: true },
+    goal: { weekly_workout_target: 3, is_default: false, set_by_role: "self", min: 1, max: 14 },
     stats: {
       current_streak: 4,
       longest_streak: 9,
@@ -189,6 +190,8 @@ async function stubMemberApi(page: Page) {
     route.fulfill(json({ level: "none", warnings: [], warning_count: 0 })),
   );
   await page.route(/\/api(?:\/org\/[^/]+)?\/landing$/, (route) => route.fulfill(json(landing)));
+  // ADR-229: the weekly goal is read on its own (also without a gym).
+  await page.route("**/api/gamification/goal", (route) => route.fulfill(json({ goal: landing.gamification.goal })));
   await page.route(/\/api(?:\/org\/[^/]+)?\/prs$/, (route) => route.fulfill(json({ prs: [] })));
   await page.route(/\/api(?:\/org\/[^/]+)?\/executions\/vault$/, (route) =>
     route.fulfill(

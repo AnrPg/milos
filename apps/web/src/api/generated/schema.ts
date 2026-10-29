@@ -1065,6 +1065,24 @@ export interface paths {
         patch: operations["PaleeWeb.ExecutionController.update_progress"];
         trace?: never;
     };
+    "/api/gamification/goal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My weekly workout goal */
+        get: operations["PaleeWeb.TrainingGoalController.show"];
+        /** Set my weekly workout goal */
+        put: operations["PaleeWeb.TrainingGoalController.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/gamification/preferences": {
         parameters: {
             query?: never;
@@ -6055,6 +6073,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/finance/members/{id}/payments/receive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record money received from a client and issue the document the billing setup calls for */
+        post: operations["PaleeWeb.AdminFinanceController.receive_payment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/members/{id}/payments/{payment_id}/credits": {
         parameters: {
             query?: never;
@@ -7252,7 +7287,7 @@ export interface paths {
         get: operations["PaleeWeb.AdminDayWorkoutController.index"];
         /**
          * Set the WOD of a day
-         * @description ADR-224: every class of the date (or of the given class types) inherits the WOD unless it has its own; classes created later that day inherit it too.
+         * @description ADR-230: every class of the date (or of the given class types) inherits the WOD unless it has its own; classes created later that day inherit it too.
          */
         put: operations["PaleeWeb.AdminDayWorkoutController.put"];
         post?: never;
@@ -11022,6 +11057,24 @@ export interface paths {
         /** A client's muscle coverage, qualities radar and training load, from shared entries */
         get: operations["PaleeWeb.TrainingDepthController.client"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/clients/{user_id}/training-goal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A client's weekly workout goal */
+        get: operations["PaleeWeb.TrainingGoalController.client_show"];
+        /** Set a client's weekly workout goal; the client is notified */
+        put: operations["PaleeWeb.TrainingGoalController.client_update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -26470,6 +26523,24 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /**
+         * FreeTextWorkoutBody
+         * @description One text written with the WOD assistant
+         */
+        FreeTextWorkoutBody: {
+            /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+            document: {
+                [key: string]: unknown;
+            } | null;
+            /** @enum {string} */
+            kind: "free_text";
+            /** @description The assistant also derived exercises (see `sections`) */
+            structured: boolean;
+            text: string | null;
+            timer: {
+                [key: string]: unknown;
+            } | null;
+        };
         /** GarminConnectRequest */
         GarminConnectRequest: {
             /**
@@ -36991,6 +37062,43 @@ export interface components {
                 unmatched_exercises: number;
             };
         };
+        /** StructuredSection */
+        StructuredSection: {
+            /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+            exercises: {
+                [key: string]: unknown;
+            }[];
+            /** Format: uuid */
+            id: string | null;
+            name: string;
+            scoreable: boolean;
+            subtitle?: string | null;
+            timer: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /**
+         * StructuredWorkoutBody
+         * @description Exercises with every parameter (structured editor, Quick Text)
+         */
+        StructuredWorkoutBody: {
+            /** @enum {string} */
+            kind: "structured";
+            sections: {
+                /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                exercises: {
+                    [key: string]: unknown;
+                }[];
+                /** Format: uuid */
+                id: string | null;
+                name: string;
+                scoreable: boolean;
+                subtitle?: string | null;
+                timer: {
+                    [key: string]: unknown;
+                } | null;
+            }[];
+        };
         /** SubscriptionBeneficiary */
         SubscriptionBeneficiary: {
             /** Format: uuid */
@@ -37344,6 +37452,80 @@ export interface components {
                 /** Format: date-time */
                 undo_until?: string;
             };
+        };
+        /** TextSection */
+        TextSection: {
+            /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+            document: {
+                [key: string]: unknown;
+            } | null;
+            /** Format: uuid */
+            id: string | null;
+            /** @description What the section counts (SectionScoring metrics), empty when not scored */
+            scoring: {
+                [key: string]: unknown;
+            }[];
+            text: string;
+            /** SectionTimerPreset */
+            timer: {
+                duration_seconds?: number | null;
+                /** @enum {string} */
+                format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                interval_seconds?: number | null;
+                rest_seconds?: number | null;
+                rounds?: number | null;
+                work_seconds?: number | null;
+            } | null;
+            /** @description Null when untitled */
+            title: string | null;
+        };
+        /**
+         * TextSectionsWorkoutBody
+         * @description ADR-180: text sections written without the assistant, a timer each
+         */
+        TextSectionsWorkoutBody: {
+            /** @enum {string} */
+            kind: "text_sections";
+            sections: {
+                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                document: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                id: string | null;
+                /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                scoring: {
+                    [key: string]: unknown;
+                }[];
+                text: string;
+                /** SectionTimerPreset */
+                timer: {
+                    duration_seconds?: number | null;
+                    /** @enum {string} */
+                    format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                    interval_seconds?: number | null;
+                    rest_seconds?: number | null;
+                    rounds?: number | null;
+                    work_seconds?: number | null;
+                } | null;
+                /** @description Null when untitled */
+                title: string | null;
+            }[];
+        };
+        /** TrainingGoal */
+        TrainingGoal: {
+            /** @description No one set a goal yet; the platform default applies */
+            is_default: boolean;
+            max: number;
+            min: number;
+            /** Format: uuid */
+            set_by_id?: string | null;
+            set_by_nickname?: string | null;
+            /** @enum {string|null} */
+            set_by_role?: "self" | "coach" | "staff" | null;
+            /** Format: date-time */
+            updated_at?: string | null;
+            weekly_workout_target: number;
         };
         /** TrainingHistoryPage */
         TrainingHistoryPage: {
@@ -38597,6 +38779,79 @@ export interface components {
         WorkoutAuthoringSettings: {
             /** @description Off: no assistant; workouts are written in text sections with a timer each */
             wod_assistant_enabled: boolean;
+        };
+        /** WorkoutBody */
+        WorkoutBody: {
+            /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+            document: {
+                [key: string]: unknown;
+            } | null;
+            /** @enum {string} */
+            kind: "free_text";
+            /** @description The assistant also derived exercises (see `sections`) */
+            structured: boolean;
+            text: string | null;
+            timer: {
+                [key: string]: unknown;
+            } | null;
+        } | {
+            /** @enum {string} */
+            kind: "text_sections";
+            sections: {
+                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                document: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                id: string | null;
+                /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                scoring: {
+                    [key: string]: unknown;
+                }[];
+                text: string;
+                /** SectionTimerPreset */
+                timer: {
+                    duration_seconds?: number | null;
+                    /** @enum {string} */
+                    format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                    interval_seconds?: number | null;
+                    rest_seconds?: number | null;
+                    rounds?: number | null;
+                    work_seconds?: number | null;
+                } | null;
+                /** @description Null when untitled */
+                title: string | null;
+            }[];
+        } | {
+            /** @enum {string} */
+            kind: "structured";
+            sections: {
+                /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                exercises: {
+                    [key: string]: unknown;
+                }[];
+                /** Format: uuid */
+                id: string | null;
+                name: string;
+                scoreable: boolean;
+                subtitle?: string | null;
+                timer: {
+                    [key: string]: unknown;
+                } | null;
+            }[];
+        };
+        /** WorkoutBodySummary */
+        WorkoutBodySummary: {
+            excerpt?: string | null;
+            /** @enum {string} */
+            kind: "free_text" | "text_sections" | "structured";
+            sections?: {
+                [key: string]: unknown;
+            }[];
+            structured?: boolean;
+            timer?: {
+                [key: string]: unknown;
+            } | null;
         };
         /** WorkoutChoice */
         WorkoutChoice: {
@@ -44250,6 +44505,96 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.TrainingGoalController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Goal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** TrainingGoal */
+                        goal: {
+                            /** @description No one set a goal yet; the platform default applies */
+                            is_default: boolean;
+                            max: number;
+                            min: number;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_nickname?: string | null;
+                            /** @enum {string|null} */
+                            set_by_role?: "self" | "coach" | "staff" | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            weekly_workout_target: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.TrainingGoalController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Goal */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    weekly_workout_target: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Goal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** TrainingGoal */
+                        goal: {
+                            /** @description No one set a goal yet; the platform default applies */
+                            is_default: boolean;
+                            max: number;
+                            min: number;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_nickname?: string | null;
+                            /** @enum {string|null} */
+                            set_by_role?: "self" | "coach" | "staff" | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            weekly_workout_target: number;
+                        };
+                    };
+                };
+            };
+            /** @description Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
@@ -70029,6 +70374,61 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminFinanceController.receive_payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    amount_cents: number;
+                    /** @enum {string|null} */
+                    charge_category?: "product" | "personal_training" | "event" | "other" | null;
+                    currency?: string | null;
+                    description?: string | null;
+                    /** Format: uuid */
+                    finance_invoice_id?: string | null;
+                    idempotency_key: string;
+                    /** Format: uuid */
+                    membership_package_subscription_id?: string | null;
+                    notes?: string | null;
+                    /** Format: date */
+                    paid_on?: string | null;
+                    /** @enum {string} */
+                    payment_method: "cash" | "card_manual" | "bank_transfer" | "other";
+                };
+            };
+        };
+        responses: {
+            /** @description The same request, already recorded */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Received payment and its document */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminFinanceController.apply_credit_to_payment": {
         parameters: {
             query?: never;
@@ -75707,7 +76107,7 @@ export interface operations {
             content: {
                 "application/json": {
                     auto_approve: boolean;
-                    booking_timeout_minutes: number;
+                    booking_timeout_minutes: number | null;
                     capacity: number;
                     /** Format: uuid */
                     class_type_id: string;
@@ -75759,7 +76159,7 @@ export interface operations {
             content: {
                 "application/json": {
                     auto_approve: boolean;
-                    booking_timeout_minutes: number;
+                    booking_timeout_minutes: number | null;
                     capacity: number;
                     /** Format: uuid */
                     class_type_id: string;
@@ -75836,7 +76236,7 @@ export interface operations {
             content: {
                 "application/json": {
                     auto_approve: boolean;
-                    booking_timeout_minutes: number;
+                    booking_timeout_minutes: number | null;
                     capacity: number;
                     /** Format: uuid */
                     class_type_id: string;
@@ -77027,10 +77427,12 @@ export interface operations {
                             /** Format: date-time */
                             inserted_at?: string | null;
                             leaderboard_enabled: boolean;
+                            /** @description Day of the month the shields renew; null renews each member's on their sign-up day */
                             streak_shield_reset_day?: number | null;
+                            /** @description Streak shields each member gets at every renewal (0 turns shields off) */
+                            streak_shields: number;
                             /** Format: date-time */
                             updated_at?: string | null;
-                            weekly_workout_target: number;
                         };
                         /** @description ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it. */
                         provider: {
@@ -77040,9 +77442,11 @@ export interface operations {
                         };
                         scheduling: {
                             default_auto_approve: boolean;
-                            default_booking_timeout_minutes: number;
+                            /** @description Minutes a pending booking request waits for staff approval before it is cancelled; null waits until the class starts */
+                            default_booking_timeout_minutes: number | null;
                             default_booking_window_days?: number | null;
-                            default_cancellation_cutoff_hours?: number | null;
+                            /** @description Minutes before the class after which a withdrawal still uses the visit, when the package sets none; null = no cutoff */
+                            default_cancellation_cutoff_minutes?: number | null;
                             default_capacity: number;
                             /** Format: uuid */
                             id?: string | null;
@@ -77092,8 +77496,10 @@ export interface operations {
                     };
                     gamification?: {
                         leaderboard_enabled?: boolean;
+                        /** @description Day of the month the shields renew; null renews each member's on their sign-up day */
                         streak_shield_reset_day?: number | null;
-                        weekly_workout_target?: number;
+                        /** @description Streak shields each member gets at every renewal (0 turns shields off) */
+                        streak_shields?: number;
                     };
                     provider?: {
                         /** @enum {string} */
@@ -77101,11 +77507,12 @@ export interface operations {
                     };
                     scheduling?: {
                         default_auto_approve?: boolean;
-                        default_booking_timeout_minutes?: number;
+                        /** @description Minutes a pending booking request waits for staff approval before it is cancelled; null waits until the class starts */
+                        default_booking_timeout_minutes?: number | null;
                         /** @description How many days ahead members may book when their package sets no window */
                         default_booking_window_days?: number | null;
-                        /** @description Withdrawals closer to the class than this use the visit */
-                        default_cancellation_cutoff_hours?: number | null;
+                        /** @description Minutes before the class after which a withdrawal still uses the visit, when the package sets none; null = no cutoff */
+                        default_cancellation_cutoff_minutes?: number | null;
                         default_capacity?: number;
                     };
                     workouts?: {
@@ -77147,10 +77554,12 @@ export interface operations {
                             /** Format: date-time */
                             inserted_at?: string | null;
                             leaderboard_enabled: boolean;
+                            /** @description Day of the month the shields renew; null renews each member's on their sign-up day */
                             streak_shield_reset_day?: number | null;
+                            /** @description Streak shields each member gets at every renewal (0 turns shields off) */
+                            streak_shields: number;
                             /** Format: date-time */
                             updated_at?: string | null;
-                            weekly_workout_target: number;
                         };
                         /** @description ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it. */
                         provider: {
@@ -77160,9 +77569,11 @@ export interface operations {
                         };
                         scheduling: {
                             default_auto_approve: boolean;
-                            default_booking_timeout_minutes: number;
+                            /** @description Minutes a pending booking request waits for staff approval before it is cancelled; null waits until the class starts */
+                            default_booking_timeout_minutes: number | null;
                             default_booking_window_days?: number | null;
-                            default_cancellation_cutoff_hours?: number | null;
+                            /** @description Minutes before the class after which a withdrawal still uses the visit, when the package sets none; null = no cutoff */
+                            default_cancellation_cutoff_minutes?: number | null;
                             default_capacity: number;
                             /** Format: uuid */
                             id?: string | null;
@@ -80688,9 +81099,23 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        workouts: {
+                        workouts: ({
+                            /** WorkoutBodySummary */
+                            body?: {
+                                excerpt?: string | null;
+                                /** @enum {string} */
+                                kind: "free_text" | "text_sections" | "structured";
+                                sections?: {
+                                    [key: string]: unknown;
+                                }[];
+                                structured?: boolean;
+                                timer?: {
+                                    [key: string]: unknown;
+                                } | null;
+                            };
+                        } & {
                             [key: string]: unknown;
-                        }[];
+                        })[];
                     };
                 };
             };
@@ -81297,6 +81722,66 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {
@@ -83527,6 +84012,66 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {
@@ -88109,10 +88654,19 @@ export interface operations {
                             thread_id: string;
                         }[];
                         gamification: {
+                            goal?: ({
+                                is_default: boolean;
+                                set_by_nickname?: string | null;
+                                /** @enum {string|null} */
+                                set_by_role?: "self" | "coach" | "staff" | null;
+                                weekly_workout_target: number;
+                            } & {
+                                [key: string]: unknown;
+                            }) | null;
                             settings: {
                                 leaderboard_enabled: boolean;
                                 streak_shield_reset_day?: number | null;
-                                weekly_workout_target: number;
+                                streak_shields: number;
                             };
                         } & {
                             [key: string]: unknown;
@@ -92593,7 +93147,7 @@ export interface operations {
                             id: string;
                             nickname: string;
                         }[];
-                        /** @description ADR-224, staff only (empty for others): the WOD of each day in the window, for every class (class_type_id null) or one class type, and every branch (location_id null) or one. */
+                        /** @description ADR-230, staff only (empty for others): the WOD of each day in the window, for every class (class_type_id null) or one class type, and every branch (location_id null) or one. */
                         day_workouts: ({
                             /** Format: uuid */
                             class_type_id: string | null;
@@ -92653,7 +93207,7 @@ export interface operations {
                             covered_by_package?: boolean;
                             /**
                              * Format: uuid
-                             * @description ADR-224: the day WOD the class's WOD comes from.
+                             * @description ADR-230: the day WOD the class's WOD comes from.
                              */
                             day_workout_id?: string | null;
                             /** @description Members only: people the viewer follows who share their bookings and hold a place in this class (the «Φίλοι» chip). */
@@ -92682,7 +93236,7 @@ export interface operations {
                                 [key: string]: unknown;
                             }) | null;
                             /**
-                             * @description ADR-224: day = inherited from the day's WOD, class = set on the class.
+                             * @description ADR-230: day = inherited from the day's WOD, class = set on the class.
                              * @enum {string|null}
                              */
                             workout_source?: "day" | "class" | null;
@@ -94237,6 +94791,122 @@ export interface operations {
                 content: {
                     "application/json": {
                         error?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.TrainingGoalController.client_show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Goal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** TrainingGoal */
+                        goal: {
+                            /** @description No one set a goal yet; the platform default applies */
+                            is_default: boolean;
+                            max: number;
+                            min: number;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_nickname?: string | null;
+                            /** @enum {string|null} */
+                            set_by_role?: "self" | "coach" | "staff" | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            weekly_workout_target: number;
+                        };
+                    };
+                };
+            };
+            /** @description Not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.TrainingGoalController.client_update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Goal */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    weekly_workout_target: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Goal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** TrainingGoal */
+                        goal: {
+                            /** @description No one set a goal yet; the platform default applies */
+                            is_default: boolean;
+                            max: number;
+                            min: number;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_nickname?: string | null;
+                            /** @enum {string|null} */
+                            set_by_role?: "self" | "coach" | "staff" | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            weekly_workout_target: number;
+                        };
+                    };
+                };
+            };
+            /** @description Not allowed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };
@@ -99760,6 +100430,66 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {
@@ -100395,6 +101125,66 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {
@@ -100942,6 +101732,66 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            /** WorkoutBody */
+                            body?: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            };
                             content?: {
                                 body: string;
                                 document?: {

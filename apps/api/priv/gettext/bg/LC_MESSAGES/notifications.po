@@ -709,6 +709,12 @@ msgstr "SMTP ключът на Palee изтече на %{date}, затова Pal
 msgid "The email key has expired"
 msgstr "Ключът за имейл изтече"
 
+msgid "Your weekly goal changed"
+msgstr "Седмичната ти цел е променена"
+
+msgid "%{person} set your goal to %{target} workouts a week. You can change it."
+msgstr "%{person} зададе целта ти на %{target} тренировки седмично. Можеш да я промениш."
+
 msgid "A box member is leaving"
 msgstr "Член на залата напуска"
 

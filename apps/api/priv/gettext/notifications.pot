@@ -224,6 +224,7 @@ msgid "Running low"
 msgstr ""
 
 msgid "%{item}: %{quantity} left."
+msgstr ""
 
 msgid "Your subscription ends soon"
 msgstr ""
@@ -436,6 +437,7 @@ msgid "Referral to approve"
 msgstr ""
 
 msgid "%{nickname} subscribed, invited by %{referrer}."
+msgstr ""
 
 msgid "New near you"
 msgstr ""
@@ -567,6 +569,7 @@ msgid "Season cancelled"
 msgstr ""
 
 msgid "%{box} cancelled %{season}."
+msgstr ""
 
 msgid "You found a training partner"
 msgstr ""
@@ -575,6 +578,7 @@ msgid "You and %{nickname} both want to train together. Say hi."
 msgstr ""
 
 msgid "Training partner message"
+msgstr ""
 
 msgid "PT squad invitation"
 msgstr ""
@@ -618,6 +622,7 @@ msgid "%{box} declined to co-host «%{event}»."
 msgstr ""
 
 msgid "%{box} no longer co-hosts «%{event}»."
+msgstr ""
 
 # ADR-187: a password reset request (handlers) and the reset itself (the person).
 msgid "Password reset request"
@@ -702,6 +707,12 @@ msgid "Palee's SMTP key expired on %{date}, so Palee can't send email. Create a 
 msgstr ""
 
 msgid "The email key has expired"
+msgstr ""
+
+msgid "Your weekly goal changed"
+msgstr ""
+
+msgid "%{person} set your goal to %{target} workouts a week. You can change it."
 msgstr ""
 
 msgid "A box member is leaving"

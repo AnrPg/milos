@@ -16,7 +16,7 @@ defmodule Palee.Workers.ClassSeriesExtensionJob do
            ResolveJobTenantContext.call(organization_id, __MODULE__ |> Atom.to_string()),
          {:ok, horizon} <- Date.from_iso8601(horizon),
          {:ok, series} <- Scheduling.extend_class_series(context, series_id, horizon),
-         # ADR-224: new occurrences on days with a day WOD inherit it.
+         # ADR-230: new occurrences on days with a day WOD inherit it.
          {:ok, _changed} <-
            DayWorkouts.reconcile_range(context, series.starts_on, series.materialized_through) do
       :ok

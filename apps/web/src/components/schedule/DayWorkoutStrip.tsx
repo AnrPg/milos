@@ -8,7 +8,7 @@ import type { ClassTypeRecord } from "@/api/schedule";
 const MAX_SHOWN = 2;
 
 /**
- * ADR-224: the day's WOD under a day's header, like a calendar's all-day row.
+ * ADR-230: the day's WOD under a day's header, like a calendar's all-day row.
  * A set day WOD shows its title (and class type when it is not for every
  * class); a day without one offers a quiet «+ WOD ημέρας» to staff, only on
  * days that have classes. In the month grid it is one small line that opens

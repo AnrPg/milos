@@ -709,6 +709,12 @@ msgstr "انتهى مفتاح SMTP الخاص بـ Palee في %{date}، لذلك
 msgid "The email key has expired"
 msgstr "انتهت صلاحية مفتاح البريد الإلكتروني"
 
+msgid "Your weekly goal changed"
+msgstr "تغيّر هدفك الأسبوعي"
+
+msgid "%{person} set your goal to %{target} workouts a week. You can change it."
+msgstr "حدّد %{person} هدفك بـ %{target} تمارين في الأسبوع. يمكنك تغييره."
+
 msgid "A box member is leaving"
 msgstr "أحد أعضاء الصالة يغادر"
 

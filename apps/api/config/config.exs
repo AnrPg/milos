@@ -311,7 +311,7 @@ config :palee,
        :scheduling_store,
        Palee.Infrastructure.Scheduling.EctoSchedulingStore
 
-# ADR-224: day WODs and their inheritance by the day's classes.
+# ADR-230: day WODs and their inheritance by the day's classes.
 config :palee, :day_workout_store, Palee.Infrastructure.Scheduling.EctoDayWorkoutStore
 
 config :palee, :pr_store, Palee.Infrastructure.Pantheon.EctoPRStore

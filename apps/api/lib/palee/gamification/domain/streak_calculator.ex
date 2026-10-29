@@ -8,12 +8,14 @@ defmodule Palee.Gamification.Domain.StreakCalculator do
     target = Keyword.get(opts, :target, @default_target)
     anchor_date = Keyword.get(opts, :anchor_date)
     shield_reset_day = Keyword.get(opts, :shield_reset_day)
+    shields = Keyword.get(opts, :shields, @default_shields)
 
     computed =
       calculate(completed_dates, anchor_date,
         current_date: current_date,
         target: target,
-        shield_reset_day: shield_reset_day
+        shield_reset_day: shield_reset_day,
+        shields: shields
       )
 
     %{
@@ -28,11 +30,11 @@ defmodule Palee.Gamification.Domain.StreakCalculator do
     calculate(completed_dates, nil, opts)
   end
 
-  def calculate([], _anchor_date, _opts) do
+  def calculate([], _anchor_date, opts) do
     %{
       current_streak: 0,
       longest_streak: 0,
-      current_streak_shields: @default_shields,
+      current_streak_shields: Keyword.get(opts, :shields, @default_shields),
       consistency_score: 0.0
     }
   end
@@ -49,6 +51,8 @@ defmodule Palee.Gamification.Domain.StreakCalculator do
     current_date = Keyword.fetch!(opts, :current_date)
     target = Keyword.get(opts, :target, @default_target)
     shield_reset_day = Keyword.get(opts, :shield_reset_day)
+    # ADR-229: each box sets how many shields a renewal hands out.
+    shields = Keyword.get(opts, :shields, @default_shields)
     normalized_anchor_date = anchor_date || earliest_date(completed_dates)
     current_week = week_start_for_date(current_date, normalized_anchor_date)
 
@@ -62,7 +66,7 @@ defmodule Palee.Gamification.Domain.StreakCalculator do
     {current_streak, longest_streak, shields_left, _last_reset_date} =
       Enum.reduce(
         week_starts,
-        {0, 0, @default_shields, normalized_anchor_date},
+        {0, 0, shields, normalized_anchor_date},
         fn week_start, {current_streak, longest_streak, shields_left, last_reset_date} ->
           {shields_for_week, next_reset_date} =
             maybe_reset_shields(
@@ -70,7 +74,7 @@ defmodule Palee.Gamification.Domain.StreakCalculator do
               normalized_anchor_date,
               shields_left,
               last_reset_date,
-              shield_reset_day
+              {shield_reset_day, shields}
             )
 
           workouts = Map.get(weekly_map, week_start, 0)
@@ -102,7 +106,7 @@ defmodule Palee.Gamification.Domain.StreakCalculator do
          anchor_date,
          shields_left,
          last_reset_date,
-         shield_reset_day
+         {shield_reset_day, shields} = renewal
        ) do
     week_end = Date.add(week_start, 6)
     next_reset_date = next_monthly_reset(anchor_date, last_reset_date, shield_reset_day)
@@ -111,9 +115,9 @@ defmodule Palee.Gamification.Domain.StreakCalculator do
       maybe_reset_shields(
         week_start,
         anchor_date,
-        @default_shields,
+        shields,
         next_reset_date,
-        shield_reset_day
+        renewal
       )
     else
       {shields_left, last_reset_date}

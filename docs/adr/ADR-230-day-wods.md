@@ -1,4 +1,4 @@
-# ADR-224: Day WODs: one WOD for a whole day, inherited by its classes
+# ADR-230: Day WODs: one WOD for a whole day, inherited by its classes
 Date: 2026-10-28
 Status: Accepted
 

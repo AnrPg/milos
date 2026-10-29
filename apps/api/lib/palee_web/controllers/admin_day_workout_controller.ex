@@ -1,5 +1,5 @@
 defmodule PaleeWeb.AdminDayWorkoutController do
-  @moduledoc "ADR-224: the WOD of a whole day, inherited by its classes."
+  @moduledoc "ADR-230: the WOD of a whole day, inherited by its classes."
 
   use PaleeWeb, :controller
   use OpenApiSpex.ControllerSpecs
@@ -136,7 +136,7 @@ defmodule PaleeWeb.AdminDayWorkoutController do
   operation(:put,
     summary: "Set the WOD of a day",
     description:
-      "ADR-224: every class of the date (or of the given class types) inherits the WOD " <>
+      "ADR-230: every class of the date (or of the given class types) inherits the WOD " <>
         "unless it has its own; classes created later that day inherit it too.",
     request_body: %RequestBody{
       required: true,

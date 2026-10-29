@@ -32,7 +32,7 @@ type CalendarViewProps = {
   onOpenDay?: (isoDate: string) => void;
   /** ADR-179: the gym's zone; days and times are on its clock. */
   timeZone?: string | null;
-  /** ADR-224, staff: the WOD of each day, shown under the day's header. */
+  /** ADR-230, staff: the WOD of each day, shown under the day's header. */
   dayWorkouts?: DayWorkout[];
   classTypes?: ClassTypeRecord[];
   /** Opens the day WOD dialog of a date (today or later). */
@@ -259,7 +259,7 @@ export function CalendarView({
                 date={date}
                 rules={dayWorkoutsOn(dayWorkouts, date, classTypes)}
                 classTypes={classTypes}
-                // ADR-224: offered on days with classes, from today on.
+                // ADR-230: offered on days with classes, from today on.
                 canAdd={canAddOn(date) && daySlots.length > 0}
                 onOpen={onOpenDayWorkout && date >= todayKey ? () => onOpenDayWorkout(date) : undefined}
               />

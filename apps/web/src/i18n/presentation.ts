@@ -237,6 +237,13 @@ const SEMANTIC_KEYS: Record<string, string> = {
 };
 
 const API_ERROR_KEYS: Record<string, string> = {
+  // ADR-222: recording money received at the desk.
+  payment_exceeds_invoice_balance: "apiErrorPaymentExceedsInvoiceBalance",
+  invoice_already_paid: "apiErrorInvoiceAlreadyPaid",
+  invoice_void: "apiErrorInvoiceVoid",
+  payment_purpose_required: "apiErrorPaymentPurposeRequired",
+  invalid_payment_amount: "apiErrorInvalidPaymentAmount",
+  invalid_payment_method: "apiErrorInvalidPaymentMethod",
   // ADR-202: spaces, floor plans, the cleaning schedule and machine placement.
   space_unavailable: "apiErrorSpaceUnavailable",
   space_archived: "apiErrorSpaceArchived",
@@ -395,7 +402,7 @@ const API_ERROR_KEYS: Record<string, string> = {
   slot_not_full: "mbErrSlotNotFull",
   // ADR-176
   class_not_published: "apiErrorClassNotPublished",
-  // ADR-224: day WODs.
+  // ADR-230: day WODs.
   day_in_the_past: "apiErrorDayInThePast",
   no_day_workout: "apiErrorNoDayWorkout",
   day_class_started: "apiErrorDayClassStarted",

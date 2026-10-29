@@ -38,6 +38,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { OutboxSettingsCard } from "@/components/outbox/OutboxSettingsCard";
 import { BackToMe } from "@/components/member-app/me/BackToMe";
 import { RestDaysSettings } from "@/components/member-app/me/RestDaysSettings";
+import { WeeklyGoalSetting } from "@/components/training-goal/WeeklyGoalSetting";
 import { JournalSectionsSetting, UnitsSetting } from "@/components/body/BodyPreferenceSettings";
 import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
 import { ThemeSetting } from "@/components/profile/ThemeSetting";
@@ -73,6 +74,7 @@ export function ProfilePage() {
   const tAccount = useTranslations("accountProfiles");
   const tBody = useTranslations("Body");
   const tFirstRun = useTranslations("FirstRun");
+  const tGoal = useTranslations("TrainingGoal");
   const { tokens, currentUser, signOut } = useSession();
   const selfService = showsTenantSelfServiceSurfaces(currentUser);
   const user = currentUser as CurrentUserWithAvatar | null;
@@ -260,9 +262,13 @@ export function ProfilePage() {
           <CollapsibleSection
             id="training-schedule"
             title={i18n("trainingSchedule80e51e2")}
-            description={i18n("markYourWeeklyRestDaysUpTo5ee5b72a")}
+            description={tGoal("sectionDescription")}
           >
-            <RestDaysSettings />
+            <div className="space-y-6">
+              {/* ADR-229: the weekly goal is mine; my coach may set it too. */}
+              <WeeklyGoalSetting />
+              <RestDaysSettings />
+            </div>
           </CollapsibleSection>
         ) : null}
 

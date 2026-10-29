@@ -116,4 +116,10 @@ defmodule Palee.Gamification.GamificationStore do
   @impl true
   def list_challenge_leaderboard_participants(challenge_id),
     do: adapter().list_challenge_leaderboard_participants(challenge_id)
+
+  @impl true
+  def get_training_goal(user_id, kind), do: adapter().get_training_goal(user_id, kind)
+
+  @impl true
+  def put_training_goal(params), do: adapter().put_training_goal(params)
 end

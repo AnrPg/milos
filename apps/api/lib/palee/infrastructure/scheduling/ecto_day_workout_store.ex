@@ -1,5 +1,5 @@
 defmodule Palee.Infrastructure.Scheduling.EctoDayWorkoutStore do
-  @moduledoc "Postgres storage of day WODs (ADR-224)."
+  @moduledoc "Postgres storage of day WODs (ADR-230)."
 
   @behaviour Palee.Scheduling.Ports.DayWorkoutStore
 

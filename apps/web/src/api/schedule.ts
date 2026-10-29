@@ -152,9 +152,9 @@ export type ScheduleSlot = {
   /** False for a draft: no WOD and not in a series, so members can't see it. */
   published?: boolean;
   workout_status?: ClassWorkoutStatus;
-  /** ADR-224: "day" = inherited from the day's WOD, "class" = set on the class. */
+  /** ADR-230: "day" = inherited from the day's WOD, "class" = set on the class. */
   workout_source?: "day" | "class" | null;
-  /** ADR-224: the day WOD the class's WOD comes from. */
+  /** ADR-230: the day WOD the class's WOD comes from. */
   day_workout_id?: string | null;
   class_series_id?: string | null;
   name: string;
@@ -164,7 +164,8 @@ export type ScheduleSlot = {
   class_type: ClassTypeRecord;
   capacity: number;
   auto_approve: boolean;
-  booking_timeout_minutes: number;
+  /** ADR-226: minutes a pending request waits for staff; null waits until the class starts. */
+  booking_timeout_minutes: number | null;
   approved_booking_count: number;
   spots_remaining: number;
   workout: WorkoutPreview | null;
@@ -224,7 +225,7 @@ export type ScheduleWindow = {
   slots: ScheduleSlot[];
   locations?: ScheduleLocation[];
   coaches?: ScheduleCoach[];
-  /** ADR-224, staff only: the WOD of each day in the window. */
+  /** ADR-230, staff only: the WOD of each day in the window. */
   day_workouts?: DayWorkout[];
 };
 
@@ -237,7 +238,8 @@ export type ScheduleSlotPayload = {
   scheduled_at: string;
   capacity: number;
   auto_approve: boolean;
-  booking_timeout_minutes: number;
+  /** ADR-226: minutes a pending request waits for staff; null waits until the class starts. */
+  booking_timeout_minutes: number | null;
   /** Optional gym location (ADR-097); null for single-site gyms. */
   location_id?: string | null;
   /** Optional space of the branch (ADR-202). */
@@ -405,7 +407,8 @@ export async function createScheduleSeries(
     excluded_dates: string[];
     capacity: number;
     auto_approve: boolean;
-    booking_timeout_minutes: number;
+    /** ADR-226: minutes a pending request waits for staff; null waits until the class starts. */
+  booking_timeout_minutes: number | null;
     location_id?: string | null;
     /** ADR-202: the space every class of the series is held in. */
     space_id?: string | null;

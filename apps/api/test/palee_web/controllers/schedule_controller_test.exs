@@ -27,6 +27,41 @@ defmodule PaleeWeb.ScheduleControllerTest do
     :ok
   end
 
+  test "a class may let requests wait for approval without a limit (ADR-226)", %{conn: conn} do
+    admin = admin_fixture(%{nickname: "sched_nolimit_admin"})
+    {:ok, _} = Organizations.ensure_legacy_membership_for_migration(admin, :owner)
+    workout = workout_fixture(admin, %{title: "No limit WOD"})
+    class_type = class_type_fixture(%{name: "No limit class"})
+    admin_conn = put_bearer_token(conn, admin)
+    path = "/api/org/#{Palee.Organizations.legacy_organization_slug()}/admin/schedule/slots"
+
+    body = %{
+      master_workout_id: workout.id,
+      class_type_id: class_type.id,
+      scheduled_at: DateTime.add(DateTime.utc_now(), 7200, :second) |> DateTime.truncate(:second),
+      capacity: 12,
+      auto_approve: false,
+      booking_timeout_minutes: nil
+    }
+
+    slot =
+      admin_conn
+      |> put_req_header("content-type", "application/json")
+      |> post(path, Jason.encode!(body))
+      |> json_response(201)
+      |> Map.fetch!("slot")
+
+    assert slot["booking_timeout_minutes"] == nil
+
+    for minutes <- [0, 10_081] do
+      assert admin_conn
+             |> recycle()
+             |> put_req_header("content-type", "application/json")
+             |> post(path, Jason.encode!(%{body | booking_timeout_minutes: minutes}))
+             |> json_response(422)
+    end
+  end
+
   test "member can list schedule, book a slot, and admin can approve it", %{conn: conn} do
     Testing.with_testing_mode(:manual, fn ->
       admin = admin_fixture(%{nickname: "sched_admin"})

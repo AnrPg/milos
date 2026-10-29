@@ -65,7 +65,7 @@ describe("CalendarView", () => {
     expect(screen.queryByText("Yoga")).not.toBeInTheDocument();
   });
 
-  describe("day WOD (ADR-224)", () => {
+  describe("day WOD (ADR-230)", () => {
     const rule = {
       id: "r1",
       local_date: "2026-10-14",

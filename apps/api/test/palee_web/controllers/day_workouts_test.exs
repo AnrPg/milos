@@ -1,5 +1,5 @@
 defmodule PaleeWeb.DayWorkoutsTest do
-  @moduledoc "ADR-224: a WOD for a whole day, inherited by its classes."
+  @moduledoc "ADR-230: a WOD for a whole day, inherited by its classes."
 
   use PaleeWeb.ConnCase, async: false
   use Oban.Testing, repo: Palee.Repo

@@ -1,5 +1,5 @@
 defmodule Palee.Scheduling.Ports.DayWorkoutStore do
-  @moduledoc "Storage of day WODs and the class facts their inheritance reads (ADR-224)."
+  @moduledoc "Storage of day WODs and the class facts their inheritance reads (ADR-230)."
 
   alias Palee.Organizations.TenantContext
 

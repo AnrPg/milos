@@ -767,6 +767,9 @@ defmodule PaleeWeb.Router do
 
     get("/members", StaffController, :index)
     get("/clients/:user_id/coach-notes", CoachNotesController, :index)
+    # ADR-229: a client's weekly goal, set by their coach or full-scope staff.
+    get("/clients/:user_id/training-goal", TrainingGoalController, :client_show)
+    put("/clients/:user_id/training-goal", TrainingGoalController, :client_update)
     get("/clients/:user_id/journal", JournalController, :client_journal)
     # ADR-158: shared body snapshots (audited in the client's access log).
     get("/clients/:user_id/body", ClientBodyController, :index)
@@ -1118,7 +1121,7 @@ defmodule PaleeWeb.Router do
     post("/schedule/slots/series", AdminScheduleController, :create_series)
     patch("/schedule/slots/:id", AdminScheduleController, :update_slot)
     put("/schedule/slots/:id/workout", AdminScheduleController, :link_workout)
-    # ADR-224: the WOD of a whole day.
+    # ADR-230: the WOD of a whole day.
     post("/schedule/slots/:id/day-workout", AdminDayWorkoutController, :follow_day)
     get("/schedule/day-workouts", AdminDayWorkoutController, :index)
     post("/schedule/day-workouts/preview", AdminDayWorkoutController, :preview)
@@ -1222,6 +1225,7 @@ defmodule PaleeWeb.Router do
     post("/finance/members/:id/leave", AdminFinanceController, :mark_member_left)
     delete("/finance/members/:id/leave", AdminFinanceController, :undo_member_left)
     post("/finance/members/:id/payments", AdminFinanceController, :record_payment)
+    post("/finance/members/:id/payments/receive", AdminFinanceController, :receive_payment)
     post("/finance/members/:id/receipts", AdminFinanceController, :create_receipt)
     post("/finance/members/:id/invoices", AdminFinanceController, :create_invoice)
 
@@ -1971,6 +1975,9 @@ defmodule PaleeWeb.Router do
 
     get("/preferences", GamificationPreferencesController, :show)
     put("/preferences", GamificationPreferencesController, :update)
+    # ADR-229: the weekly workout goal is the person's own.
+    get("/goal", TrainingGoalController, :show)
+    put("/goal", TrainingGoalController, :update)
   end
 
   scope "/api/prs", PaleeWeb do

@@ -16,6 +16,7 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
     Workouts.Domain.AssignmentAudiencePolicy,
     Workouts.Domain.SectionedText,
     Workouts.Domain.WorkoutAuthoring,
+    Workouts.Domain.WorkoutBody,
     Workouts.Domain.WorkoutContent,
     Workouts.Domain.WorkoutMaterializer,
     Workouts.ExerciseVariation,
@@ -253,9 +254,11 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
     |> Repo.all()
     |> Repo.preload(@workout_preloads)
     |> Enum.map(fn workout ->
-      workout
-      |> normalize_workout(audience: :staff)
+      normalized = normalize_workout(workout, audience: :staff)
+
+      normalized
       |> Map.update!(:sections, &summarize_sections_for_list/1)
+      |> Map.put(:body, WorkoutBody.summary(normalized))
     end)
   end
 
@@ -1194,7 +1197,18 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
       sections: sections
     }
 
-    Map.put(normalized, :available_scale_levels, WorkoutMaterializer.available_scales(normalized))
+    normalized
+    |> Map.put(:available_scale_levels, WorkoutMaterializer.available_scales(normalized))
+    # ADR-224: what the workout says, in the shape of how it was written.
+    |> Map.put(
+      :body,
+      WorkoutBody.build(
+        Map.merge(normalized, %{
+          free_text_body: workout.free_text_body,
+          free_text_document: workout.free_text_document
+        })
+      )
+    )
   end
 
   defp normalize_assignment(%AssignedWorkout{} = assignment) do

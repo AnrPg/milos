@@ -756,6 +756,16 @@ defmodule Palee.Notifications do
         url: "/box/coach"
       })
 
+  # ADR-229: a coach or the box's staff changed the person's weekly goal.
+  def process_event("training_goal_updated", payload),
+    do:
+      enqueue_simple(:training_goal_updated, payload, %{
+        target: field(payload, :target),
+        set_by_role: field(payload, :set_by_role),
+        set_by_nickname: field(payload, :set_by_nickname),
+        url: "/me/settings#training-schedule"
+      })
+
   def process_event("appointment_booked", payload),
     do:
       enqueue_simple(:appointment_booked, payload, %{

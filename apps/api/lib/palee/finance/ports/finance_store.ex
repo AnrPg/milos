@@ -10,6 +10,7 @@ defmodule Palee.Finance.Ports.FinanceStore do
   @callback assign_package(Ecto.UUID.t(), Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback record_payment(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback create_receipt(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
+  @callback receive_payment(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback create_manual_credit(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback apply_credit_to_payment(Ecto.UUID.t(), Ecto.UUID.t(), map()) ::
               {:ok, map()} | {:error, term()}
