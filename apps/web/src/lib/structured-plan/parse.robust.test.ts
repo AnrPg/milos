@@ -235,3 +235,23 @@ describe("measures: bugs fixed", () => {
     expect(parseNums("8 ως 12")).toEqual({ entries: [{ min: 8, max: 12 }], cont: false });
   });
 });
+
+describe("bounds: bugs found by fuzzing", () => {
+  it("refuses numbers past a billion instead of reading 1e+22", () => {
+    expect(parseDose("1000000000")).not.toBe("bad");
+    expect(parseDose("10000000000000000000000")).toBe("bad");
+    expect(parseClock("99999999999", "smart")).toBe("bad");
+    expect(parseLoad("1e22kg")).toMatchObject({ kind: "text" });
+    expect(setLoads(loads("60kg", "99999999999999"), 2)).toEqual({ values: ["60 kg", "99999999999999"], errors: [null, null], unit: "kg" });
+  });
+
+  it("caps counts at 999 so clocks and tables stay finite", () => {
+    expect(parseCountRange("999")).toEqual({ min: 999, max: 999 });
+    expect(parseCountRange("3-1000")).toBeNull();
+    expect(parseDose("1000x10")).toBe("bad");
+  });
+
+  it("writes canonical doses with full precision", () => {
+    expect(showDose(dose("2.522"))).toBe("2.522");
+  });
+});
