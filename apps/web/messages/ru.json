@@ -12101,5 +12101,108 @@
     "rowButton": "+ Оплата",
     "rowButtonLabel": "Записать оплату от {name}",
     "panelButton": "+ Записать оплату"
+  },
+  "PlanView": {
+    "label": "Структурированная тренировка",
+    "untitledSection": "Часть {letter}",
+    "empty": "Пока ничего не написано.",
+    "flow": {
+      "sets": "Подходы",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Интервалы",
+      "rest": "Отдых"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "hrr": "Восстановление пульса (HRR)",
+      "death_by": "Death by",
+      "even_odd": "Чередование (нечётные / чётные)",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "ladder": "Лесенка / пирамида",
+      "kcal_target": "Цель по калориям",
+      "to_failure": "До отказа",
+      "superset": "Суперсет / гигантский сет",
+      "cluster": "Cluster",
+      "drop": "Дроп-сет",
+      "restpause": "Отдых-пауза",
+      "interrupt": "С прерываниями"
+    },
+    "params": {
+      "sets": "подходов: {sets}",
+      "rest": "{time} отдыха",
+      "rounds": "раундов: {rounds}",
+      "cap": "лимит {time}",
+      "windows": "окон: {count} — {times}",
+      "restBetween": "{time} отдыха между ними",
+      "every": "каждые {time}",
+      "times": "× {count}",
+      "untilFailure": "пока успеваешь",
+      "intervals": "{rounds} × {work} работы / {off} отдыха",
+      "intervalsHr": "{rounds} × {work} работы, отдых до снижения пульса до {bpm}"
+    },
+    "roundWord": {
+      "set": "Подход {numbers}",
+      "round": "Раунд {numbers}",
+      "interval": "Интервал {numbers}",
+      "minute": "Минута {numbers}"
+    },
+    "struct": {
+      "superset": "Superset",
+      "complex": "Complex",
+      "cluster": "Кластер · частей: {clusters} · пауза {intra}",
+      "drop": "Дроп-сет · снижений: {drops}, по {dropby}",
+      "restpause": "Отдых-пауза · мини-подходов: {minis} · пауза {intra}"
+    },
+    "perSide": "на каждую сторону",
+    "rest": "Отдых",
+    "measure": {
+      "pace": "Темп {value}",
+      "tempo": "Темп выполнения {value}",
+      "rpe": "RPE {value}",
+      "rir": "RIR {value}",
+      "zone": "Пульсовая зона {value}",
+      "height": "Высота {value}",
+      "dist": "Дистанция {value}",
+      "hold": "Удержание {value}"
+    },
+    "interruptEvery": "Каждые {time} останавливайся на",
+    "scoreLine": "Результат: {score}",
+    "score": {
+      "load": "Вес (лучший подход)",
+      "reps": "Повторения",
+      "time": "Время",
+      "rounds_reps": "Раунды + повторения",
+      "done": "Выполнено",
+      "total_reps": "Повторения (всего)",
+      "lowest_round": "Худший раунд",
+      "distance": "Дистанция"
+    },
+    "levelNotes": "Заметки по уровням",
+    "sectionNote": "Заметка к части",
+    "exerciseCount": "{count, plural, one {# упражнение} few {# упражнения} many {# упражнений} other {# упражнения}}",
+    "authoring": {
+      "label": "Как записана эта тренировка",
+      "freeText": "Свободный текст",
+      "structured": "Структурированно",
+      "toStructuredTitle": "Перейти на структурированный вид?",
+      "toStructuredBody": "Структурированный план начинается пустым. Твой текст останется заметкой к первой части, так что ничего не потеряется.",
+      "toTextTitle": "Перейти на свободный текст?",
+      "toTextBody": "План станет текстом, который можно дальше редактировать. Режимы, значения по подходам и структуры будут записаны текстом и перестанут быть структурированными.",
+      "confirm": "Переключить",
+      "cancel": "Отмена",
+      "switchFailed": "Не удалось сохранить тренировку перед переключением. Попробуй ещё раз.",
+      "switching": "Сохраняем…"
+    },
+    "editor": {
+      "planEmpty": "Перед публикацией добавь хотя бы одно упражнение или отдых.",
+      "fixProblems": "Некоторые значения не читаются: исправь строки, отмеченные красным.",
+      "sectionCount": "{count, plural, one {# часть} few {# части} many {# частей} other {# части}}"
+    }
   }
 }
