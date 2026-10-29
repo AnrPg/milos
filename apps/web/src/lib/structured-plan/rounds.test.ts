@@ -70,6 +70,17 @@ describe("totalRounds and occurrences", () => {
     expect(totalRounds(section("amrap", { dur: "12" }))).toBe(Infinity);
   });
 
+  it("runs an EMOM without times (Death by) open-ended, growing as the coach types", () => {
+    const r = newRow("ex", { perRound: true, cells: [] });
+    const s = section("emom", { every: "1:00", times: "" }, [[r]]);
+    expect(totalRounds(s)).toBe(Infinity);
+    expect(occurrences(s, 0)).toEqual({ list: [1, 2], open: true });
+    r.cells = [{ d: "1" }, { d: "2" }, { d: "3" }];
+    expect(occurrences(s, 0)).toEqual({ list: [1, 2, 3, 4], open: true });
+    expect(canPerRound(s, 0)).toBe(true);
+    expect(blockLabel(s, 0)).toEqual({ key: "PlanCore.block.minute", values: { list: "1, 2, 3, …" } });
+  });
+
   it("alternates blocks: 1, 3, 5 … / 2, 4, 6 …", () => {
     const s = section("emom", { every: "1:00", times: "8" }, [[newRow()], [newRow()]]);
     expect(occurrences(s, 0)).toEqual({ list: [1, 3, 5, 7], open: false });
