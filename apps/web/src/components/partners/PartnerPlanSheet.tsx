@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 
 import { fetchPartnerSessions, partnerSessionsKey, suggestPartnerPlan, type PartnerSession } from "@/api/partners";
 import { ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
@@ -11,6 +11,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { PartnerTag } from "./PartnerBits";
 import { partnerErrorMessage } from "./errors";
 import { usePartnersToken } from "./use-partners";
+import { withClock } from "@/lib/clock";
 
 /**
  * «Κλείστε μαζί» (ADR-169 §8): the gym's next classes that suit you both,
@@ -32,6 +33,7 @@ export function PartnerPlanSheet({
   const t = useTranslations("Partners");
   const tUi = useUiTranslations();
   const format = useFormatter();
+  const locale = useLocale();
   const token = usePartnersToken();
   const [picked, setPicked] = useState<string | null>(null);
   const [note, setNote] = useState("");
@@ -49,14 +51,14 @@ export function PartnerPlanSheet({
   });
   const rows = sessions.data?.sessions ?? [];
   const when = (session: PartnerSession) =>
-    format.dateTime(new Date(session.scheduled_at), {
+    format.dateTime(new Date(session.scheduled_at), withClock(locale, {
       weekday: "short",
       day: "numeric",
       month: "short",
       hour: "2-digit",
       minute: "2-digit",
       timeZone: sessions.data?.timezone ?? undefined,
-    });
+    }));
 
   return (
     <Sheet

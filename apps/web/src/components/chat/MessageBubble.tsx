@@ -5,6 +5,8 @@ import type { ChatMessage, MessageTopic } from "@/api/messaging";
 import { TOPIC_KEYS } from "./message-topics";
 import { OutboxFailureControls } from "@/components/outbox/OutboxFailureControls";
 import type { DisplayChatMessage } from "@/lib/offline-message-outbox";
+import { formatClock } from "@/lib/clock";
+import { useUiLocale } from "@/i18n/use-ui-locale";
 
 interface MessageBubbleProps {
   message: ChatMessage | DisplayChatMessage;
@@ -24,6 +26,7 @@ export function MessageBubble({
   onDiscard,
 }: MessageBubbleProps) {
   const i18n = useUiTranslations();
+  const uiLocale = useUiLocale();
   // ADR-140 §6: a coaching message and a message from the box are marked;
   // chat is not.
   const topic = "topic" in message ? message.topic : null;
@@ -37,7 +40,7 @@ export function MessageBubble({
     "delivery_status" in message && message.delivery_status === "failed"
       ? (message.client_operation_id ?? null)
       : null;
-  const time = new Date(message.inserted_at).toLocaleTimeString([], {
+  const time = formatClock(new Date(message.inserted_at), uiLocale, {
     hour: "2-digit",
     minute: "2-digit",
   });

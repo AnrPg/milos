@@ -30,6 +30,7 @@ import { MemberGroupsSetting, PartnersSetting } from "./CommunitySettings";
 import { EventsTab } from "./EventsTab";
 import { OpenClubsTab } from "./OpenClubsTab";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
+import { clockFormat } from "@/lib/clock";
 
 type Tab = "groups" | "events" | "reports" | "clubs";
 const TABS: Tab[] = ["groups", "events", "reports", "clubs"];
@@ -224,7 +225,7 @@ function ReportItem({ row }: { row: ReportRow }) {
   const reasons = Object.entries(row.reasons)
     .sort((a, b) => b[1] - a[1])
     .map(([reason, count]) => `${tClubs(`reason_${reason}`)} ×${count}`);
-  const when = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(
+  const when = clockFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(
     new Date(row.last_reported_at),
   );
 

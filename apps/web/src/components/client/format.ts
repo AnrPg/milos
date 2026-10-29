@@ -1,4 +1,5 @@
 import { zonedText } from "@/lib/zoned-time";
+import { formatClock } from "@/lib/clock";
 
 /** Long date for a `YYYY-MM-DD` calendar day, independent of the viewer's zone. */
 export function formatDay(day: string, locale: string, options?: Intl.DateTimeFormatOptions): string {
@@ -19,12 +20,12 @@ export function formatTime(iso: string, locale: string, timeZone?: string | null
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "";
   if (timeZone) return zonedText(date, timeZone, locale, "time");
-  return date.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+  return formatClock(date, locale, { hour: "2-digit", minute: "2-digit" });
 }
 
 export function formatDateTime(iso: string | null | undefined, locale: string): string {
   if (!iso) return "";
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "";
-  return date.toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" });
+  return formatClock(date, locale, { dateStyle: "medium", timeStyle: "short" });
 }

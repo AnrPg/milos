@@ -22,6 +22,7 @@ import {
 } from "@/components/staff/staff-ui";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
+import { clockFormat } from "@/lib/clock";
 
 type PlanForm = {
   title: string;
@@ -147,7 +148,7 @@ function PlanEditor({ userId, plan }: { userId: string; plan: NutritionPlan | nu
       {plan?.updated_at ? (
         <StatusText tone="muted">
           {i18n("stfPlanLastUpdated", {
-            time: new Intl.DateTimeFormat(uiLocale, { dateStyle: "medium", timeStyle: "short" }).format(
+            time: clockFormat(uiLocale, { dateStyle: "medium", timeStyle: "short" }).format(
               new Date(plan.updated_at),
             ),
           })}

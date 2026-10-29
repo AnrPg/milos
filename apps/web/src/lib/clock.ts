@@ -40,10 +40,11 @@ function showsHours(options: Intl.DateTimeFormatOptions): boolean {
  * show hours get `hourCycle: "h23"` (and lose a stray `hour12`). Options that
  * show no hours, and every other locale, come back unchanged.
  */
-export function withClock(locale: LocaleArg, options: Intl.DateTimeFormatOptions): Intl.DateTimeFormatOptions {
+export function withClock<Options extends Intl.DateTimeFormatOptions>(locale: LocaleArg, options: Options): Options {
   if (!showsHours(options) || !uses24HourClock(locale)) return options;
-  const { hour12: _hour12, ...rest } = options;
-  return { ...rest, hourCycle: "h23" };
+  const clocked: Intl.DateTimeFormatOptions = { ...options, hourCycle: "h23" };
+  delete clocked.hour12;
+  return clocked as Options;
 }
 
 /** `new Intl.DateTimeFormat` with this locale's clock applied. */

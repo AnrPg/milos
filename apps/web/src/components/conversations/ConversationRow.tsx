@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
 import type { PersonConversation } from "@/api/conversations";
@@ -9,6 +9,7 @@ import { PersonAvatar } from "@/components/social/PersonAvatar";
 
 import { personLabel, previewLine } from "./conversation-model";
 import { conversationHref } from "./use-conversations";
+import { withClock } from "@/lib/clock";
 
 /** «Buddy»: you and they follow each other (ADR-193 §1). */
 export function BuddyBadge() {
@@ -31,12 +32,13 @@ function sameDay(a: Date, b: Date) {
 /** Today's messages by their time, older ones by their day. */
 export function useShortTime() {
   const format = useFormatter();
+  const locale = useLocale();
   return (iso: string | null | undefined) => {
     if (!iso) return "";
     const date = new Date(iso);
     if (Number.isNaN(date.getTime())) return "";
     return sameDay(date, new Date())
-      ? format.dateTime(date, { hour: "2-digit", minute: "2-digit" })
+      ? format.dateTime(date, withClock(locale, { hour: "2-digit", minute: "2-digit" }))
       : format.dateTime(date, { day: "numeric", month: "short" });
   };
 }

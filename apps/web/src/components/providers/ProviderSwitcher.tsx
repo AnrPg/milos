@@ -12,6 +12,7 @@ import { useAdoptAccountProvider, useMyProviders, useSwitchProvider } from "@/co
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
 import { paletteColor, providerColor } from "@/lib/provider-sources";
+import { formatClock } from "@/lib/clock";
 
 /**
  * Box's title (board 17 Q1): «Box Κυψέλη ▾» opens the sheet of everyone who
@@ -132,7 +133,7 @@ function ProviderLine({ provider }: { provider: Provider }) {
   if (provider.next) {
     const at = new Date(provider.next.at);
     const today = new Date();
-    const time = at.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+    const time = formatClock(at, locale, { hour: "2-digit", minute: "2-digit" });
     const when =
       at.toDateString() === today.toDateString()
         ? t("nextToday", { time })

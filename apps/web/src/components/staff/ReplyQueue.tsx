@@ -9,6 +9,7 @@ import { chatThreadHref, replyUrgency, sortReplyQueue, staffErrorMessage } from 
 import { Pill, secondaryButtonClass, secondaryButtonStyle, StaffPanel, StatusText } from "@/components/staff/staff-ui";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
+import { clockFormat } from "@/lib/clock";
 
 export function ReplyQueue() {
   const i18n = useUiTranslations();
@@ -25,7 +26,7 @@ export function ReplyQueue() {
   const items = sortReplyQueue(query.data ?? []);
   const now = new Date();
   const when = (iso: string) =>
-    new Intl.DateTimeFormat(uiLocale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
+    clockFormat(uiLocale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
 
   return (
     <StaffPanel eyebrow={i18n("stfReplyQueueEyebrow")} labelledBy="staff-reply-queue" title={i18n("stfReplyQueueTitle")}>
