@@ -53,3 +53,10 @@ desk only.
 - One-button connect (Stripe Connect OAuth, Viva ISV) is a separate step:
   it needs Palee registered as a Stripe Connect platform and a Viva ISV
   partner first.
+
+## Update (2026-10-29, staff screens)
+- `GET /admin/payments/attention` also answers each charge's `member_name`
+  (the person's display name), so the Ουρές row names the person.
+- The staff notice `payment_needs_attention` opens
+  `/admin/finance?tab=queues&queue=failed_charges`, the «Αποτυχημένες
+  χρεώσεις» group of the Queues tab.
