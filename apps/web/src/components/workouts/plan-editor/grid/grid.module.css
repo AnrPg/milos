@@ -125,6 +125,9 @@
   font-size: 0.92rem;
   color: var(--text);
 }
+.vd b {
+  font-weight: 400;
+}
 .vd small {
   font-size: 0.62rem;
   font-weight: 800;
@@ -298,6 +301,7 @@
   grid-template-columns: minmax(8rem, 1fr) repeat(var(--cols), minmax(5rem, max-content)) 2.2rem;
   column-gap: 4px;
   align-items: stretch;
+  grid-auto-flow: dense;
 }
 .xh,
 .xr,
@@ -532,6 +536,9 @@ td.labs {
   align-items: center;
   gap: 4px;
 }
+.scardHead > :first-child {
+  flex: 1;
+}
 .scard .gridwrap {
   overflow: visible;
 }
@@ -645,9 +652,6 @@ td.labs {
 }
 .root[data-layout="phone"] .xp {
   padding-inline-start: 0;
-}
-.root[data-layout="phone"] .gridwrap.mini {
-  align-self: stretch;
 }
 .root[data-layout="phone"] .slot,
 .root[data-layout="phone"] .lane {
