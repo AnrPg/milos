@@ -101,15 +101,27 @@ defmodule PaleeWeb.Schemas.FiscalCompliance do
     %Schema{
       type: :object,
       description:
-        "The Peppol connection; the API key and the webhook token are never returned " <>
-          "(`webhook_url` appears once, when a new token is made).",
+        "The Peppol connection; the API key, secret and webhook token are never returned " <>
+          "(`webhook_url` appears once, when a new token is made). `storecove` is a " <>
+          "retired provider of old connections: they show as invalid until reconnected.",
       properties: %{
         network: %Schema{type: :string, enum: ["peppol"]},
-        provider: %Schema{type: :string, enum: ["sandbox", "storecove"]},
+        provider: %Schema{type: :string, enum: ["sandbox", "fiskaly", "storecove"]},
         environment: %Schema{type: :string, enum: @environments},
         peppol_id: %Schema{type: :string, example: "0208:0123456749"},
-        legal_entity_id: %Schema{type: :string, nullable: true},
+        legal_entity_id: %Schema{
+          type: :string,
+          nullable: true,
+          description: "fiskaly: the business's E-INVOICE System id."
+        },
         has_api_key: %Schema{type: :boolean},
+        has_api_secret: %Schema{type: :boolean},
+        credentials_source: %Schema{
+          type: :string,
+          enum: ["own", "till_connection", "none"],
+          description:
+            "`till_connection`: no key of its own, the fiskaly till connection's is used."
+        },
         has_webhook_token: %Schema{type: :boolean},
         webhook_url: %Schema{type: :string, nullable: true},
         status: %Schema{type: :string, enum: ["active", "invalid"]},
@@ -117,8 +129,10 @@ defmodule PaleeWeb.Schemas.FiscalCompliance do
         updated_at: @time
       },
       required: [
+        :credentials_source,
         :environment,
         :has_api_key,
+        :has_api_secret,
         :has_webhook_token,
         :network,
         :peppol_id,
@@ -151,12 +165,30 @@ defmodule PaleeWeb.Schemas.FiscalCompliance do
           maxLength: 60,
           description: "`scheme:identifier`; defaults to `0208:` + the enterprise number."
         },
-        legal_entity_id: %Schema{type: :string, nullable: true, maxLength: 40},
+        provider: %Schema{
+          type: :string,
+          enum: ["fiskaly"],
+          description: "Access point outside the sandbox; defaults to `fiskaly`."
+        },
+        legal_entity_id: %Schema{
+          type: :string,
+          nullable: true,
+          maxLength: 40,
+          description: "fiskaly: the business's E-INVOICE System id."
+        },
         api_key: %Schema{
           type: :string,
           nullable: true,
           maxLength: 500,
-          description: "Leave out to keep the saved key."
+          description:
+            "Leave out to keep the saved key, or (fiskaly) to use the fiskaly till " <>
+              "connection's key and secret."
+        },
+        api_secret: %Schema{
+          type: :string,
+          nullable: true,
+          maxLength: 500,
+          description: "Leave out to keep the saved secret."
         },
         rotate_webhook_token: %Schema{type: :boolean}
       },

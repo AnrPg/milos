@@ -203,12 +203,13 @@ config :palee, :fiscal_accounting_export_formats, [
   Palee.Infrastructure.Fiscal.Exports.GenericJson
 ]
 
-# ADR-250: Peppol e-invoicing, the access point per connection provider.
+# ADR-250: Peppol e-invoicing, the access point per connection provider (fiskaly
+# E-INVOICE since 2026-10-29; Storecove retired, old rows show as invalid).
 config :palee, :fiscal_einvoice_store, Palee.Infrastructure.Fiscal.EctoEInvoiceStore
 
 config :palee, :fiscal_einvoice_networks, %{
   "sandbox" => Palee.Infrastructure.Fiscal.SandboxEInvoiceNetwork,
-  "storecove" => Palee.Infrastructure.Fiscal.StorecoveNetwork
+  "fiskaly" => Palee.Infrastructure.Fiscal.FiskalyEInvoiceNetwork
 }
 
 # ADR-251: TSE (DE) and RKSV (AT) signing, the provider per connection.
