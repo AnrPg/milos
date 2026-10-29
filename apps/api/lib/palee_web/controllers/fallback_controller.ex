@@ -321,6 +321,10 @@ defmodule PaleeWeb.FallbackController do
 
   def call(conn, {:error, reason}) when is_map_key(@payment_errors, reason) do
     {status, message} = Map.fetch!(@payment_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
   end
 
   # ADR-252: documents, signatures and health certificates.
