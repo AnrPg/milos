@@ -4,6 +4,7 @@ import { useEffect, useId, useRef, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { Layer } from "@/components/ui/Layer";
 import { BackArrow } from "@/components/ui/BackLink";
+import { lockPageScroll } from "@/lib/scroll-lock";
 
 // «Φίλτρα (n)» opens this full-screen page (plan §5a decision 3): one section
 // per filter, «Καθαρισμός» and «Δείξε N» pinned at the bottom.
@@ -39,11 +40,10 @@ export function FilterPage({
       if (event.key === "Escape") close.current();
     };
     document.addEventListener("keydown", onKey);
-    const overflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const releaseScroll = lockPageScroll();
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = overflow;
+      releaseScroll();
       previous?.focus();
     };
   }, []);
