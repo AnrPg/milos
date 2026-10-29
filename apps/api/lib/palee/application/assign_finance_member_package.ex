@@ -29,9 +29,10 @@ defmodule Palee.Application.AssignFinanceMemberPackage do
   end
 
   # ADR-217: packages are for clients only; staff never get one, not even a
-  # leftover profile from before they became staff.
+  # leftover profile from before they became staff. ADR-272: a guest of the
+  # box may be sold one at the desk.
   defp ensure_client(context, user_id) do
-    if Organizations.client_role(context, user_id), do: :ok, else: {:error, :not_a_client}
+    if Organizations.buyer_role(context, user_id), do: :ok, else: {:error, :not_a_client}
   end
 
   # A new profile starts active: the package, not a placeholder status,

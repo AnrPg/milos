@@ -5,11 +5,15 @@ defmodule Palee.Organizations.Domain.MembershipPolicy do
   role of a set in that order is its primary role.
   """
 
-  @roles [:owner, :admin, :coach, :front_desk, :accountant, :janitor, :member, :athlete]
+  @roles [:owner, :admin, :coach, :front_desk, :accountant, :janitor, :member, :athlete, :guest]
   @statuses [:invited, :active, :suspended, :revoked]
 
   @staff_roles [:coach, :front_desk, :accountant, :janitor]
   @client_roles [:member, :athlete]
+  # ADR-272: a guest of the box (a person with an account who pays at the
+  # desk). The lowest client-type role: it buys like a client but opens no
+  # member-only content.
+  @guest_roles [:guest]
 
   # Roles that run the gym; used where a check predates capabilities.
   @admin_roles [:owner, :admin]
@@ -17,6 +21,7 @@ defmodule Palee.Organizations.Domain.MembershipPolicy do
   def roles, do: @roles
   def staff_roles, do: @staff_roles
   def client_roles, do: @client_roles
+  def guest_roles, do: @guest_roles
   def admin_roles, do: @admin_roles
   def statuses, do: @statuses
   def authorized_status?(status), do: status == :active
@@ -26,6 +31,31 @@ defmodule Palee.Organizations.Domain.MembershipPolicy do
   member or athlete role does; staff roles never imply one.
   """
   def client?(roles), do: Enum.any?(List.wrap(roles), &(parse_role(&1) in @client_roles))
+
+  @doc "ADR-272: whether a role set holds the guest role."
+  def guest?(roles), do: Enum.any?(List.wrap(roles), &(parse_role(&1) in @guest_roles))
+
+  @doc """
+  ADR-272: whether a role set may buy from the box (a finance profile, a
+  πακέτο συνδρομής, a free sale): a client or a guest.
+  """
+  def buyer?(roles), do: client?(roles) or guest?(roles)
+
+  @doc """
+  ADR-272: whether a role set makes someone only a guest of the box (no
+  client or staff role): the box is not one of their gyms, so no member-only
+  content (club, WODs, member app) opens to them.
+  """
+  def guest_only?(roles), do: guest?(roles) and not client?(roles) and not staff?(roles)
+
+  @doc "ADR-272: the role a buyer buys as (`:athlete`, `:member`, then `:guest`), or nil."
+  def buyer_role(roles) do
+    cond do
+      role = client_role(roles) -> role
+      guest?(roles) -> :guest
+      true -> nil
+    end
+  end
 
   @doc "ADR-217: whether a role set holds any staff role (owner and admin included)."
   def staff?(roles),
@@ -52,23 +82,26 @@ defmodule Palee.Organizations.Domain.MembershipPolicy do
 
     cond do
       :owner in issuer_roles -> target_role in @roles
-      :admin in issuer_roles -> target_role in @staff_roles or target_role in @client_roles
-      Enum.any?(issuer_roles, &(&1 in [:coach, :front_desk])) -> target_role in @client_roles
+      :admin in issuer_roles -> target_role in (@staff_roles ++ @client_roles ++ @guest_roles)
+      Enum.any?(issuer_roles, &(&1 in [:coach, :front_desk])) ->
+        target_role in (@client_roles ++ @guest_roles)
+
       true -> false
     end
   end
 
   # The hierarchy (rights-per-account-type §4): owner › admin › staff ›
-  # clients. Roles of one tier are peers.
+  # clients › guests (ADR-272). Roles of one tier are peers.
   @tiers %{
-    owner: 4,
-    admin: 3,
-    coach: 2,
-    front_desk: 2,
-    accountant: 2,
-    janitor: 2,
-    member: 1,
-    athlete: 1
+    owner: 5,
+    admin: 4,
+    coach: 3,
+    front_desk: 3,
+    accountant: 3,
+    janitor: 3,
+    member: 2,
+    athlete: 2,
+    guest: 1
   }
 
   @doc "A role's rank in the hierarchy; higher outranks lower, equal ranks are peers."
@@ -93,8 +126,10 @@ defmodule Palee.Organizations.Domain.MembershipPolicy do
   @doc """
   Whether someone holding `own_roles` may add or drop `role` on themselves:
   only roles ranked below their top role, which therefore never changes (an
-  owner who also coaches stays owner).
+  owner who also coaches stays owner). Nobody makes themselves a guest
+  (ADR-272): staff make a person a guest of the box.
   """
+  def self_assignable_role?(_own_roles, :guest), do: false
   def self_assignable_role?(own_roles, role), do: tier(role) < top_tier(own_roles)
 
   @doc """

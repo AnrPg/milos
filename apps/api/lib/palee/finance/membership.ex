@@ -49,7 +49,7 @@ defmodule Palee.Finance.Membership do
       :last_payment_reminder_sent_at
     ])
     |> validate_required([:user_id, :user_type_snapshot, :status, :signup_source])
-    |> validate_inclusion(:user_type_snapshot, ["member", "athlete"])
+    |> validate_inclusion(:user_type_snapshot, ["member", "athlete", "guest"])
     |> validate_inclusion(:status, [
       "active",
       "expiring",

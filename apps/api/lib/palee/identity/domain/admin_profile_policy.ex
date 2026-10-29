@@ -47,7 +47,7 @@ defmodule Palee.Identity.Domain.AdminProfilePolicy do
     )
   end
 
-  def finance_available?(roles), do: MembershipPolicy.client?(roles)
+  def finance_available?(roles), do: MembershipPolicy.buyer?(roles)
   def coaching_available?(roles), do: :athlete in List.wrap(roles)
 
   defp maybe_put(map, true, key, value), do: Map.put(map, key, value)
