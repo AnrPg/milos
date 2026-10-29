@@ -9,7 +9,8 @@ defmodule Palee.Application.Payments.TerminalPayments do
 
   Purposes: an open invoice of the member (up to its balance), a πακέτο
   συνδρομής sold at the desk, a shop order waiting for payment (its total;
-  may be a walk-in's) and a free sale (a description, for a member).
+  may be a walk-in's) and a free sale (a description, for a member or,
+  ADR-264, a walk-in).
   """
 
   alias Palee.Application.GoLive
@@ -29,7 +30,8 @@ defmodule Palee.Application.Payments.TerminalPayments do
   @doc """
   Opens a terminal payment. `params`: `purpose` (finance_invoice,
   membership_package, shop_order, free_sale), `purpose_id` (not for a free
-  sale), `user_id` (the member; none for a walk-in shop order),
+  sale), `user_id` (the member; none for a walk-in's shop
+  order or free sale),
   `amount_cents`, `description` and `charge_category` (free sale),
   `idempotency_key`.
   """
@@ -120,18 +122,29 @@ defmodule Palee.Application.Payments.TerminalPayments do
         {:error, :invalid_payment_purpose}
 
       true ->
-        with {:ok, user_id} <- member(context, params[:user_id]) do
+        with {:ok, user_id} <- free_sale_payer(context, params[:user_id]) do
           {:ok,
            %{
-             # A free sale is for the member it is charged to.
-             purpose_id: user_id,
+             # A free sale is for the member it is charged to; a walk-in's
+             # (ADR-264) is its own sale.
+             purpose_id: user_id || Ecto.UUID.generate(),
              user_id: user_id,
              currency: business_currency(context),
-             description: description,
-             metadata: if(category, do: %{"charge_category" => category}, else: %{})
+             description: String.trim(description),
+             metadata: free_sale_metadata(user_id, category)
            }}
         end
     end
+  end
+
+  # ADR-264: a walk-in (no member) may pay a free sale too.
+  defp free_sale_payer(_context, nil), do: {:ok, nil}
+  defp free_sale_payer(context, user_id), do: member(context, user_id)
+
+  defp free_sale_metadata(user_id, category) do
+    %{}
+    |> then(&if(category, do: Map.put(&1, "charge_category", category), else: &1))
+    |> then(&if(is_nil(user_id), do: Map.put(&1, "walk_in", true), else: &1))
   end
 
   defp resolve(_context, _purpose, _params), do: {:error, :invalid_payment_purpose}
@@ -210,9 +223,13 @@ defmodule Palee.Application.Payments.TerminalPayments do
 
   def cancel(context, id), do: Terminal.cancel(context, id, now())
 
-  @doc "Dev/test only: the sandbox terminal app takes (or refuses) the card."
-  def sandbox_complete(context, id, outcome) do
-    with {:ok, reference, transaction_id} <- Terminal.sandbox_transaction(context, id, outcome) do
+  @doc """
+  Dev/test only: the sandbox terminal app takes (or refuses) the card;
+  `extras` may add a tip and a card surcharge (ADR-264).
+  """
+  def sandbox_complete(context, id, outcome, extras \\ %{}) do
+    with {:ok, reference, transaction_id} <-
+           Terminal.sandbox_transaction(context, id, outcome, extras) do
       Terminal.record_result(
         context,
         %{

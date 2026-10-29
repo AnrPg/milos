@@ -1,5 +1,5 @@
 defmodule PaleeWeb.Schemas.TerminalPayments do
-  @moduledoc "OpenAPI schemas of Tap to Pay at the desk (ADR-249)."
+  @moduledoc "OpenAPI schemas of Tap to Pay at the desk (ADR-249, ADR-264)."
 
   alias OpenApiSpex.Schema
   alias PaleeWeb.Schemas.Payments, as: P
@@ -24,7 +24,12 @@ defmodule PaleeWeb.Schemas.TerminalPayments do
           enum: ~w(finance_invoice membership_package shop_order free_sale)
         },
         purpose_id: %{P.uuid() | nullable: true},
-        user_id: %{P.uuid() | nullable: true},
+        user_id: %{
+          P.uuid()
+          | nullable: true,
+            description:
+              "The member; none for a walk-in (a shop order or a free sale, ADR-264)."
+        },
         amount_cents: %Schema{type: :integer, minimum: 1, maximum: 10_000_000},
         description: %Schema{type: :string, maxLength: 120, nullable: true},
         charge_category: %Schema{
@@ -66,9 +71,23 @@ defmodule PaleeWeb.Schemas.TerminalPayments do
               description: "The signed reference the terminal app keeps (clientTransactionId)."
             },
             failure_message: @text,
-            app_request: app_request()
+            app_request: app_request(),
+            tip_cents: %Schema{
+              type: :integer,
+              minimum: 0,
+              description:
+                "Tip the provider confirmed on top of the amount (ADR-264): the staff's, " <>
+                  "not revenue of the sale."
+            },
+            surcharge_cents: %Schema{
+              type: :integer,
+              minimum: 0,
+              description:
+                "Card surcharge the provider added on top of the amount (ADR-264): part of " <>
+                  "the sale's price, on its receipt."
+            }
           }),
-        required: Enum.sort([:reference | intent.required])
+        required: Enum.sort([:reference, :surcharge_cents, :tip_cents | intent.required])
     }
   end
 
@@ -90,7 +109,15 @@ defmodule PaleeWeb.Schemas.TerminalPayments do
     %Schema{
       type: :object,
       properties: %{
-        outcome: %Schema{type: :string, enum: ["succeeded", "failed", "cancelled"]}
+        outcome: %Schema{type: :string, enum: ["succeeded", "failed", "cancelled"]},
+        tip_cents: %Schema{type: :integer, minimum: 0, nullable: true},
+        surcharge_cents: %Schema{type: :integer, minimum: 0, nullable: true},
+        amount_cents: %Schema{
+          type: :integer,
+          minimum: 1,
+          nullable: true,
+          description: "What the card paid in all, to try a mismatch (default: amount + extras)."
+        }
       },
       required: [:outcome]
     }
