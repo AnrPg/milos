@@ -364,15 +364,17 @@ export async function apiRequest<T>(
     options.scope === "account" ? null : await resolveOrganizationSlugForRequest(path, token);
   const requestPath = tenantScopedPath(path, organizationSlug);
 
+  // A FormData body (a file upload, ADR-254) goes as multipart: the browser sets its boundary.
+  const multipart = typeof FormData !== "undefined" && options.body instanceof FormData;
   const response = await fetch(`${API_BASE_URL}${requestPath}`, {
     method: options.method ?? "GET",
     headers: {
-      "Content-Type": "application/json",
+      ...(multipart ? {} : { "Content-Type": "application/json" }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(organizationSlug ? { "X-Organization-Slug": organizationSlug } : {}),
       ...options.headers,
     },
-    body: options.body ? JSON.stringify(options.body) : undefined,
+    body: multipart ? (options.body as FormData) : options.body ? JSON.stringify(options.body) : undefined,
     credentials: "same-origin",
     signal: options.signal,
   });
