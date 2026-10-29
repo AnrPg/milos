@@ -89,14 +89,25 @@ defmodule Palee.Infrastructure.Fiscal.EctoEInvoiceStore do
     Repo.transaction(fn ->
       stale = DateTime.add(now, -EInvoicePolicy.claim_timeout_seconds(), :second)
 
+      # A worker that died while sending may have reached the access point:
+      # its row becomes uncertain and is never sent again by itself.
+      EInvoiceSubmission
+      |> where([s], s.organization_id == ^organization_id)
+      |> where([s], s.status == "sending" and s.claimed_at < ^stale)
+      |> Repo.update_all(
+        set: [
+          status: "uncertain",
+          next_attempt_at: nil,
+          last_error_code: "uncertain",
+          last_error_message: "worker_lost",
+          updated_at: now
+        ]
+      )
+
       to_send =
         organization_id
         |> due(which, limit)
-        |> where(
-          [s],
-          (s.status == "pending" and s.next_attempt_at <= ^now) or
-            (s.status == "sending" and s.claimed_at < ^stale)
-        )
+        |> where([s], s.status == "pending" and s.next_attempt_at <= ^now)
 
       {_count, sending} =
         EInvoiceSubmission

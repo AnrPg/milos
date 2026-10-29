@@ -7,7 +7,8 @@ defmodule Palee.Fiscal.Ports.EInvoiceStore do
   and leases due `submitted` rows for a delivery poll, in statements that
   lock with `FOR UPDATE SKIP LOCKED`, so two workers never handle the same
   submission at once; `finish/4` records the attempt and the new state in
-  one transaction.
+  one transaction. A `sending` row whose worker died may have reached the
+  access point: it becomes `uncertain` and is never sent again by itself.
   """
 
   @type context :: map()

@@ -3,10 +3,11 @@ defmodule Palee.Fiscal.Ports.TillSignatureStore do
   Persistence of till connections and the receipt signature outbox
   (ADR-251). Every callback takes the tenant context first.
 
-  Claiming moves due `pending` and `uncertain` rows to `sending` (keeping
-  whether the next call is a sign or a read-back) and spends one attempt,
-  locking with `FOR UPDATE SKIP LOCKED`; `finish/4` records the attempt
-  and the new state in one transaction.
+  Claiming moves due `pending` rows to `sending` (a sign) and leases due
+  `uncertain` rows (a read-back), spending one attempt, locking with
+  `FOR UPDATE SKIP LOCKED`. A `sending` row whose worker died may have
+  reached the device: it becomes `uncertain`, never signed blindly again.
+  `finish/4` records the attempt and the new state in one transaction.
   """
 
   @type context :: map()
@@ -21,7 +22,7 @@ defmodule Palee.Fiscal.Ports.TillSignatureStore do
   @callback insert_signature(context(), map()) :: {:ok, map()} | {:error, term()}
   @callback get_signature(context(), id()) :: map() | nil
   @callback signatures_for_documents(context(), [id()]) :: %{id() => map()}
-  @doc "Claims due rows (or the one with `id`); each keeps `claimed_from` (its status before)."
+  @doc "Claims due rows (or the one with `id`): `sending` ones to sign, `uncertain` ones to read back."
   @callback claim(context(), :due | id(), DateTime.t(), pos_integer()) :: [map()]
   @callback finish(context(), id(), map(), map() | nil) :: {:ok, map()} | {:error, term()}
   @callback update_signature(context(), id(), map()) :: {:ok, map()} | {:error, term()}
