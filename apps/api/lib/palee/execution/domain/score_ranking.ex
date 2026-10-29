@@ -89,7 +89,9 @@ defmodule Palee.Execution.Domain.ScoreRanking do
 
   defp parse(value, type) when type in @lower_is_better and is_binary(value), do: seconds(value)
   defp parse(value, type) when type in @lower_is_better and is_number(value), do: value * 1.0
-  defp parse(value, "rounds+reps") when is_binary(value), do: rounds_reps(value)
+  # ADR-270: a plan section records rounds + reps as `rounds_reps`.
+  defp parse(value, type) when type in ["rounds+reps", "rounds_reps"] and is_binary(value),
+    do: rounds_reps(value)
   defp parse(value, _type) when is_number(value), do: value * 1.0
 
   defp parse(value, _type) when is_binary(value) do

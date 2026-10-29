@@ -9,6 +9,8 @@ defmodule Palee.Application.AthleteTrainingVolume do
 
     * completed executions: the exercises of the workout done (at its scale
       level when one was chosen), each with the coach's set count, else 1;
+      a structured plan execution (ADR-270) counts the sets the athlete
+      recorded (`execution_plan_sets`) instead;
     * logged training-log entries (voided ones never): their performed
       exercises with the sets written, else 1; an entry without performed
       exercises falls back to the exercises of its workout;
@@ -76,7 +78,7 @@ defmodule Palee.Application.AthleteTrainingVolume do
           feedback("execution", executions, user_id) ++
             feedback("training_log", logs, user_id)
 
-        {executions, logs, felt}
+        {attach_plan_sets(executions), logs, felt}
       end)
 
     workouts = workouts(executions ++ Enum.filter(logs, &needs_workout?/1))
@@ -132,8 +134,39 @@ defmodule Palee.Application.AthleteTrainingVolume do
       source: source(execution.organization_id, nil),
       minutes: minutes_from_ms(Map.get(execution, :total_elapsed_ms)),
       rpe: nil,
-      exercises: workout_exercises(execution, workouts)
+      exercises:
+        case plan_exercises(Map.get(execution, :plan_sets, [])) do
+          [] -> workout_exercises(execution, workouts)
+          exercises -> exercises
+        end
     }
+  end
+
+  # ADR-270: a structured plan execution counts what the athlete did, set by
+  # set (`execution_plan_sets`), not the plan's materialised exercises.
+  defp attach_plan_sets([]), do: []
+
+  defp attach_plan_sets(executions) do
+    by_execution =
+      executions
+      |> Enum.map(& &1.id)
+      |> Execution.list_plan_sets()
+      |> Enum.group_by(& &1.execution_id)
+
+    Enum.map(executions, &Map.put(&1, :plan_sets, Map.get(by_execution, &1.id, [])))
+  end
+
+  # One entry per plan row done, in run order; a set is a record of its first
+  # part (cluster / drop parts are one set).
+  defp plan_exercises(sets) do
+    sets
+    |> Enum.filter(&(&1.part_index == 0 and is_binary(&1.exercise_name) and &1.exercise_name != ""))
+    |> Enum.group_by(&{&1.section_id, &1.row_id})
+    |> Enum.sort_by(fn {_row, [first | _rest]} -> {first.inserted_at, first.id} end)
+    |> Enum.map(fn {_row, [first | _rest] = done} ->
+      entry = Workouts.resolve_catalog_exercise(first.exercise_ref, first.exercise_name)
+      %{exercise_ref: entry && entry.id, name: first.exercise_name, sets: length(done)}
+    end)
   end
 
   defp log(entry, workouts) do

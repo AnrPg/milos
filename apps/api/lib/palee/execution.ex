@@ -13,6 +13,7 @@ defmodule Palee.Execution do
     ExecutionKpis,
     ModificationPatchValidator,
     PlanActuals,
+    PlanTimer,
     TextSectionScores,
     TimerPresets,
     TimerSequenceBuilder,
@@ -77,6 +78,11 @@ defmodule Palee.Execution do
   """
   def build_timer_sequence(%{authoring_mode: "sectioned_text"} = workout),
     do: TimerPresets.build_sections(Map.get(workout, :sections) || [])
+
+  # ADR-270: a structured plan runs on the web from its plan; the server's
+  # segments are one per plan section, from its clock, carrying its score.
+  def build_timer_sequence(%{authoring_mode: "structured_plan"} = workout),
+    do: PlanTimer.build(Map.get(workout, :sections) || [])
 
   def build_timer_sequence(workout), do: TimerSequenceBuilder.build(workout)
 

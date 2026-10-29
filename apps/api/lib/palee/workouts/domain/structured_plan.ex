@@ -116,6 +116,30 @@ defmodule Palee.Workouts.Domain.StructuredPlan do
 
   def rows(_plan), do: []
 
+  # The score types of a plan score key, as the web runner records them
+  # (`plan/score.ts` `scoreConfig`); `none` is not scored.
+  @score_types %{
+    "time" => %{"type" => "time"},
+    "rounds_reps" => %{"type" => "rounds_reps"},
+    "reps" => %{"type" => "reps"},
+    "total_reps" => %{"type" => "reps"},
+    "lowest_round" => %{"type" => "reps"},
+    "best_load" => %{"type" => "load", "unit" => "kg"},
+    "done" => %{"type" => "pass_fail"},
+    "distance" => %{"type" => "reps", "unit" => "m"}
+  }
+
+  @doc """
+  The section score of a plan, as a section `score_config`
+  (`%{"type" => type}` plus `"unit"` when it has one, and the plan's own
+  `"plan_score"` key); nil when the plan is not scored.
+  """
+  @spec score_config(term()) :: map() | nil
+  def score_config(%{"score" => score}) when is_map_key(@score_types, score),
+    do: @score_types |> Map.fetch!(score) |> Map.put("plan_score", score)
+
+  def score_config(_plan), do: nil
+
   @doc """
   Row id => the block it is in (0-based), `-1` for an interruption row; what
   the execution checks plan actuals against. Only rows with an id.

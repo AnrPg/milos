@@ -5,7 +5,9 @@ defmodule PaleeWeb.ExecutionPlanActualsTest do
   import Palee.StructuredPlanFixtures
 
   alias Palee.{Execution, Identity, Organizations, Repo}
+  alias Palee.Application.AthleteTrainingVolume
   alias Palee.Execution.ExecutionPlanSet
+  alias Palee.Identity.UserContext
 
   defp create_user!(nickname, role) do
     {:ok, user} =
@@ -121,11 +123,35 @@ defmodule PaleeWeb.ExecutionPlanActualsTest do
       })
     ]
 
+    # What the web plan runner sends: its scores and elapsed time per plan
+    # section, keyed by section id, next to the actuals.
     completed =
       athlete_conn
-      |> json(:patch, path, %{plan_actuals: actuals})
+      |> json(:patch, path, %{
+        timezone: "Europe/Athens",
+        checked_exercise_ids: [],
+        section_scores: [
+          %{
+            section_id: engine["id"],
+            section_name: "Engine",
+            value: 754,
+            score_type: "time",
+            source: "user",
+            kind: "final"
+          }
+        ],
+        total_elapsed_ms: 1_500_000,
+        section_elapsed_ms: %{strength["id"] => 900_000, engine["id"] => 600_000},
+        segment_cycle_counts: %{},
+        plan_actuals: actuals
+      })
       |> json_response(200)
       |> Map.fetch!("execution")
+
+    assert [%{"section_id" => engine_id, "value" => 754, "score_type" => "time"}] =
+             completed["section_scores"]
+
+    assert engine_id == engine["id"]
 
     assert [first, second, burpee] = completed["plan_sets"]
 
@@ -167,6 +193,12 @@ defmodule PaleeWeb.ExecutionPlanActualsTest do
     assert Enum.all?(rows, &(&1.user_id == athlete.id and &1.execution_id == execution_id))
 
     assert [_, _, _] = Execution.list_plan_sets([execution_id])
+
+    # Training volume counts the sets done, not the plan's materialised rows.
+    assert %{performances: [%{kind: "execution", exercises: exercises}]} =
+             AthleteTrainingVolume.load(UserContext.new(athlete), nil)
+
+    assert [%{name: "Back Squat", sets: 2}, %{name: "Burpee", sets: 1}] = exercises
   end
 
   test "a completion without plan actuals stores none", %{conn: conn} do

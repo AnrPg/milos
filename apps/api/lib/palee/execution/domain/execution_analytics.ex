@@ -42,7 +42,40 @@ defmodule Palee.Execution.Domain.ExecutionAnalytics do
       checked_exercise_count: length(value(execution, :checked_exercise_ids) || []),
       primary_format: primary_format(segments)
     }
+    |> Map.merge(plan_facts(value(execution, :plan_sets) || []))
   end
+
+  @doc """
+  ADR-270: what a structured plan execution recorded, set by set: how many
+  sets, how many the athlete typed values for, how many at interruptions,
+  how many plan rows, and the tonnage (actual reps × actual kg, where both
+  are numbers). Nothing for an execution without plan actuals.
+  """
+  def plan_facts([]), do: %{}
+
+  def plan_facts(sets) when is_list(sets) do
+    %{
+      plan_set_count: length(sets),
+      plan_logged_set_count: Enum.count(sets, &(value(&1, :logged) == true)),
+      plan_interrupt_set_count: Enum.count(sets, &(value(&1, :interrupt) == true)),
+      plan_row_count:
+        sets |> Enum.map(&{value(&1, :section_id), value(&1, :row_id)}) |> Enum.uniq() |> length(),
+      plan_tonnage_kg: sets |> Enum.map(&tonnage/1) |> Enum.sum() |> Float.round(2)
+    }
+  end
+
+  def plan_facts(_sets), do: %{}
+
+  defp tonnage(set) do
+    case {number(value(set, :actual_reps)), number(value(set, :actual_load_kg))} do
+      {reps, kg} when is_number(reps) and is_number(kg) -> reps * kg * 1.0
+      _other -> 0.0
+    end
+  end
+
+  defp number(%Decimal{} = value), do: Decimal.to_float(value)
+  defp number(value) when is_number(value), do: value
+  defp number(_value), do: nil
 
   @doc """
   Abandon point for a started, never-completed execution: the segment index,
