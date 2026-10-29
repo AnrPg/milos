@@ -189,3 +189,15 @@ msgstr "Vingerafdruk van het document (SHA-256)"
 
 msgid "Page"
 msgstr "Pagina"
+
+msgid "Reason for the credit note"
+msgstr "Reden van de creditnota"
+
+msgid "Product returned"
+msgstr "Product geretourneerd"
+
+msgid "Billing error"
+msgstr "Factuurfout"
+
+msgid "Subscription cancelled"
+msgstr "Abonnement opgezegd"

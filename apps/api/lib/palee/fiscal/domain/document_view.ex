@@ -110,9 +110,21 @@ defmodule Palee.Fiscal.Domain.DocumentView do
       document.payment_method &&
         {label.(:payment_method), payment_method(document.payment_method, label)},
       document.corrects_document_id &&
-        {label.(:corrects), corrects(original, document.corrects_document_id, format)}
+        {label.(:corrects), corrects(original, document.corrects_document_id, format)},
+      Map.get(document, :credit_reason) &&
+        {label.(:credit_reason), credit_reason(document.credit_reason, label)}
     ]
     |> Enum.reject(&is_nil/1)
+  end
+
+  @doc "ADR-265: the printed text of a credit note's reason, in the document's language."
+  def credit_reason(reason, label) do
+    case reason do
+      "product_return" -> label.(:cr_product_return)
+      "billing_error" -> label.(:cr_billing_error)
+      "subscription_cancelled" -> label.(:cr_subscription_cancelled)
+      _other -> label.(:cr_other)
+    end
   end
 
   defp corrects(nil, id, _format), do: id

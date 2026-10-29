@@ -189,3 +189,15 @@ msgstr "Empreinte du document (SHA-256)"
 
 msgid "Page"
 msgstr "Page"
+
+msgid "Reason for the credit note"
+msgstr "Motif de l'avoir"
+
+msgid "Product returned"
+msgstr "Retour de produit"
+
+msgid "Billing error"
+msgstr "Erreur de facturation"
+
+msgid "Subscription cancelled"
+msgstr "Résiliation de l'abonnement"

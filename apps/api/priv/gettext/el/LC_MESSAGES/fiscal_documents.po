@@ -189,3 +189,15 @@ msgstr "Αποτύπωμα παραστατικού (SHA-256)"
 
 msgid "Page"
 msgstr "Σελίδα"
+
+msgid "Reason for the credit note"
+msgstr "Λόγος πιστωτικού"
+
+msgid "Product returned"
+msgstr "Επιστροφή προϊόντος"
+
+msgid "Billing error"
+msgstr "Λάθος χρέωση"
+
+msgid "Subscription cancelled"
+msgstr "Ακύρωση συνδρομής"
