@@ -187,6 +187,11 @@ describe("setLoads: bugs fixed", () => {
     expect(setLoads(loads("60%", "65-70"), 2)).toEqual({ values: ["60%", "65–70%"], errors: [null, null], unit: "%" });
   });
 
+  it("reads 'start 60% and build up' in a column", () => {
+    expect(setLoads(loads("60%↑", "", ""), 3)).toEqual({ values: ["60%", "↑ 60%", "↑ 60%"], errors: [null, null, null], unit: "%" });
+    expect(setLoads(loads("60%+", "+5"), 2).values).toEqual(["60%", "65%"]);
+  });
+
   it("refuses a change with nothing before it (no_base)", () => {
     expect(setLoads(loads("+5kg", ""), 2).errors).toEqual(["no_base", null]);
     expect(setLoads(loads("βαρύ", "+5kg"), 2).errors).toEqual([null, "no_base"]);

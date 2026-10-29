@@ -713,6 +713,7 @@ type LoadToken =
   | { t: "empty" }
   | { t: "abs"; n: number; unit: LoadUnit | null }
   | { t: "delta"; n: number; unit: LoadUnit | null }
+  | { t: "up"; n: number; unit: LoadUnit | null }
   | { t: "spread"; a: number; b: number; unit: LoadUnit | null }
   | { t: "range"; a: number; b: number; unit: LoadUnit | null }
   | { t: "wrong" }
@@ -729,6 +730,8 @@ function readLoadCell(raw: string): LoadToken {
   if (m) return { t: "delta", n: (m[1] === "-" ? -1 : 1) * +m[2], unit: unitOfLoad(m[3]) };
   m = new RegExp(`^${LN}${LU}$`).exec(v);
   if (m) return { t: "abs", n: +m[1], unit: unitOfLoad(m[2]) };
+  m = new RegExp(`^${LN}${LU}\\s*(?:\\+|↑)$`).exec(v);
+  if (m) return { t: "up", n: +m[1], unit: unitOfLoad(m[2]) };
   m = new RegExp(`^${LN}${LU}\\s*(?:→|ως|εως)\\s*${LN}${LU}$`).exec(v);
   if (m) {
     const a = unitOfLoad(m[2]);
@@ -752,7 +755,9 @@ function readLoadCell(raw: string): LoadToken {
  * → `mixed_unit`; a unit that is not a load ("60 km") → `wrong_unit`; a
  * change ("+5") with nothing before it to change → `no_base`. Empty = as
  * before (or keeps adding the last `+x`, or keeps spreading `a→b` to the
- * last column). "60-70" is a range for the athlete in that column. Words
+ * last column). "60-70" is a range for the athlete in that column; "60%+"
+ * / "60%↑" starts there and builds up (the columns after it show "↑ 60%"
+ * until another value). Words
  * ("βαρύ", "με βάρος") pass through and reset the progression.
  */
 export function setLoads(row: Pick<PlanRow, "cells">, n: number): SetLoads {
@@ -765,6 +770,7 @@ export function setLoads(row: Pick<PlanRow, "cells">, n: number): SetLoads {
   let prev: number | null = null;
   let delta: number | null = null;
   let spread: { a: number; b: number; i: number } | null = null;
+  let rising = false;
   tokens.forEach((tok, i) => {
     errors.push(null);
     const fail = (code: PlanErrorCode) => {
@@ -773,9 +779,15 @@ export function setLoads(row: Pick<PlanRow, "cells">, n: number): SetLoads {
       prev = null;
       delta = null;
       spread = null;
+      rising = false;
     };
+    if (tok.t !== "empty") rising = false;
     switch (tok.t) {
       case "empty":
+        if (rising && prev != null && unit) {
+          values.push(`↑ ${fmt(prev)}`);
+          return;
+        }
         if (spread) prev = spread.a + ((spread.b - spread.a) * (i - spread.i)) / Math.max(1, n - 1 - spread.i);
         else if (delta != null && prev != null) prev += delta;
         values.push(prev != null && unit ? fmt(prev) : values[i - 1] || "");
@@ -802,6 +814,12 @@ export function setLoads(row: Pick<PlanRow, "cells">, n: number): SetLoads {
       prev = tok.a;
       spread = { a: tok.a, b: tok.b, i };
       delta = null;
+      values.push(fmt(prev));
+    } else if (tok.t === "up") {
+      prev = tok.n;
+      delta = null;
+      spread = null;
+      rising = true;
       values.push(fmt(prev));
     } else if (tok.t === "range") {
       prev = null;
