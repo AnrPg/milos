@@ -215,14 +215,16 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
     await expect(notice.getByRole("button", { name: "+ New WOD" })).toBeVisible();
   });
 
-  test("a series class without its WOD stays bookable and asks for the WOD before it starts", async ({ page }) => {
+  test("a series class without its WOD raises no warning and offers the same two buttons on the WOD card", async ({ page }) => {
     await asOwner(page);
     await withClass(page, { ...seriesClass, published: true, workout_status: "awaiting" });
 
     await openClass(page);
-    const notice = page.getByTestId("class-wod-notice");
-    await expect(notice).toHaveAttribute("role", "alert");
-    await expect(notice).toContainText("Clients can see and book this class. Add a WOD before the class starts.");
+    await expect(page.getByTestId("class-wod-notice")).toHaveCount(0);
+    await expect(page.getByRole("dialog").getByRole("alert")).toHaveCount(0);
+    const add = page.getByTestId("class-wod-add");
+    await expect(add.getByRole("button", { name: "Choose a WOD" })).toBeVisible();
+    await expect(add.getByRole("button", { name: "+ New WOD" })).toBeVisible();
   });
 
   test("on a phone, the class and workout action rows stay inside the card", async ({ page }) => {

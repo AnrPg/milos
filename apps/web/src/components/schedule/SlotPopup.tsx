@@ -24,7 +24,7 @@ import { WorkoutPreviewDetail, type PreviewSection } from "@/components/workouts
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { ClassStateNotice, classActionsFor } from "@/components/schedule/ClassState";
-import { ClassWorkoutNotice } from "@/components/schedule/ClassWorkoutNotice";
+import { ClassWorkoutNotice, classWorkoutNoticeKind } from "@/components/schedule/ClassWorkoutNotice";
 import { ClassDayWorkoutNote } from "@/components/schedule/ClassDayWorkoutNote";
 import type { DayWorkout } from "@/api/day-workouts";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
@@ -128,6 +128,7 @@ export function SlotPopup({
   const canJoinWaitlist = !isAdmin && memberState.kind === "waitlist_open";
   // ADR-200: pause/resume, cancel/restore and delete apply to upcoming classes only.
   const stateActions = isAdmin && onClassAction && !isPast ? classActionsFor(slot) : [];
+  const workoutNotice = classWorkoutNoticeKind(slot);
   const locationName = slotLocationName(slot, locations);
   const creditCost = slotCreditCost(slot);
   const [waitlistBusy, setWaitlistBusy] = useState(false);
@@ -414,7 +415,10 @@ export function SlotPopup({
             </div>
           ) : null}
 
-          {isAdmin ? (
+          {/* Only a draft (hidden from clients until it has a WOD) warns; a
+              series class without its WOD offers the same buttons calmly on
+              the WOD card, since it stays bookable and staff get reminders. */}
+          {isAdmin && workoutNotice === "draft" ? (
             <ClassWorkoutNotice slot={slot} accessToken={accessToken} timeZone={timeZone} onLinked={onSlotChanged} />
           ) : null}
 
@@ -757,9 +761,14 @@ export function SlotPopup({
                 freeTextDocument={slot.workout.free_text_document}
               />
             ) : (
-              <p className="text-sm" style={{ color: "var(--dim)" }}>
-                {i18n("noWorkoutAssignedToThisSlotac3ec23")}
-              </p>
+              <>
+                <p className="text-sm" style={{ color: "var(--dim)" }}>
+                  {i18n("noWorkoutAssignedToThisSlotac3ec23")}
+                </p>
+                {isAdmin && workoutNotice && workoutNotice !== "draft" ? (
+                  <ClassWorkoutNotice slot={slot} accessToken={accessToken} timeZone={timeZone} onLinked={onSlotChanged} calm />
+                ) : null}
+              </>
             )}
 
             {!isAdmin && slot.workout && ownBookingActive ? (
