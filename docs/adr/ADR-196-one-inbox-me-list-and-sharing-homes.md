@@ -55,5 +55,5 @@ The vision (§4, §6.3, §7.10, §7.11) gives messages one home (Αρχική �
 
 ## Consequences
 - Nothing posts automatic PR celebration cards yet. `pr_celebrations` is stored now so that the card, when it ships, respects the opt-in from its first day (TD-204).
-- «Αναφορά προβλήματος» shows only when `NEXT_PUBLIC_SUPPORT_EMAIL` is set (TD-204).
+- «Αναφορά προβλήματος» opens a mail draft to the vendor's support inbox, `support@palee.app` by default (`NEXT_PUBLIC_SUPPORT_EMAIL` overrides it at build time; TD-204).
 - Existing PRs start private, so members' profiles show no PRs until they choose some.
