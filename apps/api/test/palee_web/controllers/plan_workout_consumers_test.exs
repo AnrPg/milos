@@ -257,4 +257,61 @@ defmodule PaleeWeb.PlanWorkoutConsumersTest do
 
     assert Enum.all?(sections, &is_map(&1["plan"]))
   end
+
+  test "a legacy editor's draft save never replaces a structured plan", %{conn: conn} do
+    admin = create_user!("plan_draft_guard_admin", :admin)
+    admin_conn = put_bearer_token(conn, admin)
+    workout = plan_workout!(conn, admin)
+    base = org_path("/admin/workouts")
+    legacy_sections = [%{name: "Main", order: 1, exercises: [%{name: "Back squat", order: 1}]}]
+
+    for draft <- [
+          %{authoring_mode: "structured", title: "Legacy", sections: legacy_sections},
+          %{authoring_mode: "quick_text", title: "Quick Text"},
+          %{title: "No mode", sections: legacy_sections}
+        ] do
+      assert %{"code" => "structured_plan_mode_change"} =
+               admin_conn
+               |> json(:patch, "#{base}/#{workout["id"]}/draft", %{
+                 expected_source_revision: workout["dsl_source_revision"],
+                 draft_data: draft
+               })
+               |> json_response(409)
+    end
+
+    # The publish that follows still sees a plan workout: refused, plans intact.
+    assert %{"code" => "structured_plan_mode_change"} =
+             admin_conn
+             |> json(:post, "#{base}/#{workout["id"]}/publish", %{
+               expected_source_revision: workout["dsl_source_revision"],
+               title: "Legacy save",
+               type: "crossfit",
+               sections: legacy_sections
+             })
+             |> json_response(409)
+
+    stored =
+      admin_conn
+      |> recycle()
+      |> get("#{base}/#{workout["id"]}")
+      |> json_response(200)
+      |> Map.fetch!("workout")
+
+    assert stored["authoring_mode"] == "structured_plan"
+    assert length(stored["sections"]) == 3
+    assert Enum.all?(stored["sections"], &is_map(&1["plan"]))
+
+    # The structured WOD editor's own draft save goes through.
+    assert %{"draft" => %{"id" => _}} =
+             admin_conn
+             |> json(:patch, "#{base}/#{workout["id"]}/draft", %{
+               expected_source_revision: workout["dsl_source_revision"],
+               draft_data: %{
+                 authoring_mode: "structured_plan",
+                 title: "Plan consumers",
+                 sections: [%{name: "Strength", order: 1, plan: Enum.at(program(), 0)}]
+               }
+             })
+             |> json_response(200)
+  end
 end

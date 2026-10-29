@@ -44,6 +44,32 @@ defmodule Palee.Workouts.Domain.PlanAuthoringGuard do
 
   def check_save(_current, _params), do: :ok
 
+  @doc """
+  `check_save/2` for a draft save (`PATCH …/draft`): what is saved is the
+  `draft_data` (or the params themselves), whose mode a top-level
+  `authoring_mode` overrides, as the store writes it. Checked before the
+  stored mode and draft data are replaced, so a publish afterwards still
+  sees the plan.
+  """
+  @spec check_draft_save(term(), map()) :: :ok | {:error, :structured_plan_mode_change}
+  def check_draft_save(current, %{} = params) do
+    saved =
+      case field(params, :draft_data) do
+        %{} = draft_data -> draft_data
+        _none -> params
+      end
+
+    saved =
+      case mode(params) do
+        nil -> saved
+        mode -> saved |> Map.delete(:authoring_mode) |> Map.put("authoring_mode", mode)
+      end
+
+    check_save(current, saved)
+  end
+
+  def check_draft_save(_current, _params), do: :ok
+
   @doc "`:ok`, or the error when a Quick Text publish would replace a plan workout."
   @spec check_quick_text(term()) :: :ok | {:error, :structured_plan_mode_change}
   def check_quick_text(current),

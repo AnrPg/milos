@@ -34,6 +34,33 @@ defmodule Palee.Workouts.Domain.PlanAuthoringGuardTest do
              check.(%{"sections" => [%{"name" => "Main", "exercises" => []}]})
   end
 
+  test "a draft save is checked on its draft data and top-level mode" do
+    check = &PlanAuthoringGuard.check_draft_save(@plan_workout, &1)
+    draft = %{authoring_mode: nil, draft_data: %{"authoring_mode" => "structured_plan"}}
+
+    assert :ok = check.(%{draft_data: %{"authoring_mode" => "structured_plan", "sections" => []}})
+    assert :ok = check.(%{"draft_data" => %{"title" => "Renamed"}})
+    assert :ok = check.(%{draft_data: %{"title" => "Text"}, authoring_mode: "free_text"})
+    assert :ok = check.(%{"authoring_mode" => "sectioned_text", "sections" => []})
+
+    assert {:error, :structured_plan_mode_change} =
+             check.(%{draft_data: %{"authoring_mode" => "structured", "sections" => []}})
+
+    assert {:error, :structured_plan_mode_change} =
+             PlanAuthoringGuard.check_draft_save(draft, %{
+               draft_data: %{"authoring_mode" => "structured_plan"},
+               authoring_mode: "quick_text"
+             })
+
+    assert {:error, :structured_plan_mode_change} =
+             check.(%{draft_data: %{"sections" => [%{"name" => "Main", "exercises" => []}]}})
+
+    assert :ok =
+             PlanAuthoringGuard.check_draft_save(%{authoring_mode: "structured"}, %{
+               draft_data: %{"authoring_mode" => "quick_text"}
+             })
+  end
+
   test "other workouts save as before" do
     assert :ok =
              PlanAuthoringGuard.check_save(%{authoring_mode: "structured"}, %{

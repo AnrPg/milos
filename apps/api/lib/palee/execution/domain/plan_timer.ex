@@ -1,8 +1,8 @@
 defmodule Palee.Execution.Domain.PlanTimer do
   @moduledoc """
   ADR-270: the timer segments of a structured plan workout, one per plan
-  section, from the section's canonical clock
-  (`Palee.Workouts.Domain.StructuredPlan.Prescription`).
+  section, from the section's canonical clock, read through the Workouts
+  port for plan workouts (`Palee.Workouts.Queries.PlanPrescriptions`).
 
   The web runner executes a plan section itself (`sections[].plan`), so these
   segments are the server's view of it: keyed `plan:<section id>` like the
@@ -12,18 +12,15 @@ defmodule Palee.Execution.Domain.PlanTimer do
   `structured_plan` keeps the score type the section's own.
   """
 
-  alias Palee.Workouts.Domain.StructuredPlan
-  alias Palee.Workouts.Domain.StructuredPlan.Prescription
+  alias Palee.Workouts.Queries.PlanPrescriptions
 
   @doc "The segments of a workout's plan sections, in order; sections without a plan are skipped."
   def build(sections) when is_list(sections) do
     sections
     |> Enum.sort_by(&(value(&1, :order) || 0))
     |> Enum.flat_map(fn section ->
-      plan = value(section, :plan)
-
-      case Prescription.build(plan) do
-        %{clock: clock} -> [segment(section, plan, clock)]
+      case PlanPrescriptions.clock(section) do
+        %{} = clock -> [segment(section, clock)]
         nil -> []
       end
     end)
@@ -31,9 +28,9 @@ defmodule Palee.Execution.Domain.PlanTimer do
 
   def build(_sections), do: []
 
-  @doc "The score config of a plan, as the web runner's segment carries it; nil when not scored."
-  def score_config(plan, label) do
-    case StructuredPlan.score_config(plan) do
+  # The section's score config, as the web runner's segment carries it; nil when not scored.
+  defp score_config(section, label) do
+    case PlanPrescriptions.score_config(section) do
       nil ->
         nil
 
@@ -43,10 +40,10 @@ defmodule Palee.Execution.Domain.PlanTimer do
     end
   end
 
-  defp segment(section, plan, clock) do
+  defp segment(section, clock) do
     id = to_string(value(section, :id))
     name = value(section, :name) || ""
-    score = score_config(plan, name)
+    score = score_config(section, name)
 
     Map.merge(
       %{
@@ -82,7 +79,9 @@ defmodule Palee.Execution.Domain.PlanTimer do
 
   defp timing(%{flow: "intervals", work_secs: work} = clock) when is_integer(work) do
     pattern = Enum.filter([work, clock.off_secs], &positive/1)
-    windows = clock.rounds && clock.rounds * length(pattern)
+    # The block ends with the last work window, no off after it, like the
+    # web runner and `PlanWorkload`: (work + off) × rounds − off.
+    windows = clock.rounds && clock.rounds * length(pattern) - (length(pattern) - 1)
     timer(:interval_cycle, work, windows, clock, %{interval_pattern_seconds: pattern})
   end
 
