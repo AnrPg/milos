@@ -54,7 +54,7 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
     invoice
   end
 
-  defp path(ctx, rest), do: "/api/org/#{ctx.organization.slug}/admin/payments/terminal#{rest}"
+  defp tpath(ctx, rest), do: "/api/org/#{ctx.organization.slug}/admin/payments/terminal#{rest}"
   defp as(conn, user), do: put_bearer_token(conn, user)
 
   defp connect_viva(ctx) do
@@ -86,13 +86,13 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
   defp start(conn, ctx, body) do
     conn
     |> as(ctx.admin)
-    |> post(path(ctx, ""), Map.put_new(body, :idempotency_key, "tap-" <> Ecto.UUID.generate()))
+    |> post(tpath(ctx, ""), Map.put_new(body, :idempotency_key, "tap-" <> Ecto.UUID.generate()))
   end
 
   defp result(conn, ctx, body) do
     conn
     |> as(ctx.admin)
-    |> post(path(ctx, "/result"), body)
+    |> post(tpath(ctx, "/result"), body)
   end
 
   # Viva answers: a token, and the transaction `id` as `transaction` says.
@@ -143,7 +143,7 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
     invoice = open_invoice(ctx.context, ctx.membership, 4_500)
 
     assert %{"available" => true} =
-             conn |> as(ctx.admin) |> get(path(ctx, "/availability")) |> json_response(200)
+             conn |> as(ctx.admin) |> get(tpath(ctx, "/availability")) |> json_response(200)
 
     %{"payment" => payment} =
       conn
@@ -384,7 +384,7 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
     assert %{"payment" => %{"status" => "cancelled"}} =
              conn
              |> as(ctx.admin)
-             |> post(path(ctx, "/#{another["id"]}/cancel"))
+             |> post(tpath(ctx, "/#{another["id"]}/cancel"))
              |> json_response(200)
 
     assert [%{payment_method: "card_terminal", amount_cents: 1_500}] = payments_of(ctx)
@@ -526,7 +526,7 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
     paid =
       conn
       |> as(ctx.admin)
-      |> post(path(ctx, "/#{payment["id"]}/sandbox-complete"), %{outcome: "succeeded"})
+      |> post(tpath(ctx, "/#{payment["id"]}/sandbox-complete"), %{outcome: "succeeded"})
       |> json_response(200)
       |> Map.fetch!("payment")
 
@@ -534,7 +534,7 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
     assert paid["fulfilment_status"] == "done"
 
     assert %{"payment" => %{"id" => id}} =
-             conn |> as(ctx.admin) |> get(path(ctx, "/#{payment["id"]}")) |> json_response(200)
+             conn |> as(ctx.admin) |> get(tpath(ctx, "/#{payment["id"]}")) |> json_response(200)
 
     assert id == payment["id"]
 
@@ -548,7 +548,7 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
     # A paid request can no longer be cancelled.
     conn
     |> as(ctx.admin)
-    |> post(path(ctx, "/#{payment["id"]}/cancel"))
+    |> post(tpath(ctx, "/#{payment["id"]}/cancel"))
     |> json_response(409)
     |> then(&assert(&1["code"] == "payment_not_cancellable"))
   end
