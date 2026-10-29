@@ -116,6 +116,28 @@ defmodule Palee.Workouts.Domain.StructuredPlan do
 
   def rows(_plan), do: []
 
+  @doc """
+  Row id => the block it is in (0-based), `-1` for an interruption row; what
+  the execution checks plan actuals against. Only rows with an id.
+  """
+  @spec row_blocks(term()) :: %{String.t() => integer()}
+  def row_blocks(%{} = plan) do
+    blocks =
+      plan
+      |> list("blocks")
+      |> Enum.with_index()
+      |> Enum.flat_map(fn {rows, index} -> Enum.map(List.wrap(rows), &{&1, index}) end)
+
+    (blocks ++ Enum.map(list(plan, "interrupt"), &{&1, -1}))
+    |> Enum.flat_map(fn
+      {%{"id" => id}, index} when is_binary(id) and id != "" -> [{id, index}]
+      _other -> []
+    end)
+    |> Map.new()
+  end
+
+  def row_blocks(_plan), do: %{}
+
   @doc "Execution units of a list of rows: one row, or consecutive rows of one group."
   @spec units([map()]) :: [%{group: String.t() | nil, rows: [map()]}]
   def units(rows) do

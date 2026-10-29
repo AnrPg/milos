@@ -30,6 +30,9 @@ defmodule Palee.Execution.ExecutionStore do
   def get_execution(id), do: adapter().get_execution(id)
 
   @impl true
+  def list_plan_sets(execution_ids), do: adapter().list_plan_sets(execution_ids)
+
+  @impl true
   def list_executions_for_user(user_id), do: adapter().list_executions_for_user(user_id)
 
   @impl true

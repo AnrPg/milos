@@ -12,6 +12,7 @@ defmodule Palee.Execution do
     ExecutionAnalytics,
     ExecutionKpis,
     ModificationPatchValidator,
+    PlanActuals,
     TextSectionScores,
     TimerPresets,
     TimerSequenceBuilder,
@@ -85,6 +86,12 @@ defmodule Palee.Execution do
     as: :normalize
 
   defdelegate text_section_metrics(workout), to: TextSectionScores, as: :section_metrics
+
+  @doc "ADR-270: the athlete's plan actuals, checked against the plan rows of each section."
+  defdelegate normalize_plan_actuals(entries, rows_by_section), to: PlanActuals, as: :normalize
+
+  @doc "ADR-270: the plan actuals (decimals) of these executions, for consumers."
+  def list_plan_sets(execution_ids), do: ExecutionStore.list_plan_sets(execution_ids)
 
   defdelegate preview_timer_sequence(workout), to: TimerSequenceBuilder, as: :preview
 

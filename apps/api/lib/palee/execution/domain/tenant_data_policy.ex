@@ -20,6 +20,12 @@ defmodule Palee.Execution.Domain.TenantDataPolicy do
                 parent: {"workout_executions", "execution_id"},
                 rls: :user
               },
+              # ADR-270 plan actuals, owner rows under their execution.
+              %{
+                table: "execution_plan_sets",
+                parent: {"workout_executions", "execution_id"},
+                rls: :user
+              },
               %{table: "workout_executions"},
               # ADR-118 standalone training-log entries; their RLS USING clause
               # admits organization sessions, so purge runs per tenant.
