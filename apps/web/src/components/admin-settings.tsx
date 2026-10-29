@@ -7,7 +7,7 @@
 import {useUiTranslations} from "@/i18n/ui";
 import { useTranslations } from "next-intl";
 import { localizeError } from "@/i18n/presentation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
@@ -52,6 +52,7 @@ import { PlanCard, PlanNotice } from "@/components/solo-coach/PlanCard";
 import { Dialog } from "@/components/ui/Dialog";
 import { Popover } from "@/components/ui/Popover";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { OnlinePaymentsSettings } from "@/components/admin/payments/OnlinePaymentsSettings";
 
 // ── Shared sub-components ────────────────────────────────────────────────────
 
@@ -1112,6 +1113,7 @@ function WorkoutDefaultsSection({ token }: { token: string }) {
 
 export function AdminSettingsHub() {
   const i18n = useUiTranslations();
+  const paymentsT = useTranslations("OnlinePayments");
   const { tokens, currentUser } = useSession();
   const token = tokens?.access_token;
   const { membership, selectedOrganizationSlug } = useSelectedMembershipRole();
@@ -1176,6 +1178,15 @@ export function AdminSettingsHub() {
             >
               <GamificationSection token={token} />
             </CollapsibleSection>
+
+            {/* Mockup s3 B (ADR-246/260/261): the provider sends the owner back to ?tab=payments. */}
+            {can(membership, "manage_billing") ? (
+              <CollapsibleSection id="payments" title={paymentsT("sectionTitle")} description={paymentsT("sectionDescription")}>
+                <Suspense>
+                  <OnlinePaymentsSettings token={token} />
+                </Suspense>
+              </CollapsibleSection>
+            ) : null}
 
             <CollapsibleSection
               id="finance"

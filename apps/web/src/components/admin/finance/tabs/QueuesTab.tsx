@@ -9,12 +9,17 @@ import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { fetchFinanceQueues, type FinanceRecord } from "@/api/finance";
+import { FailedChargesList, useFailedCharges } from "@/components/admin/payments/FailedCharges";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { can } from "@/lib/role-navigation";
 
-type QueueKey = "expiring" | "pending" | "overdue" | "rewards" | "promos";
+type QueueKey = "expiring" | "failed" | "pending" | "overdue" | "rewards" | "promos";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -36,8 +41,13 @@ function dateText(value: unknown) {
 export function QueuesTab({ locationIds }: { locationIds?: string } = {}) {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
+  const paymentsT = useTranslations("OnlinePayments");
+  const { membership } = useSelectedMembershipRole();
+  // ADR-260: saved-card charges that need a person, for whoever handles billing or takes payments.
+  const seesFailedCharges = can(membership, "manage_billing") || can(membership, "take_payments");
   const CHIPS: Array<{ id: QueueKey; label: string }> = [
     { id: "expiring", label: i18n("expiringb98d672") },
+    ...(seesFailedCharges ? [{ id: "failed" as const, label: paymentsT("queueChip") }] : []),
     { id: "pending", label: i18n("pendingPayments9126c11") },
     { id: "overdue", label: i18n("overdueInvoices739b616") },
     { id: "rewards", label: i18n("pendingRewardse6d6885") },
@@ -45,7 +55,10 @@ export function QueuesTab({ locationIds }: { locationIds?: string } = {}) {
   ];
   const { tokens } = useSession();
   const token = tokens?.access_token;
-  const [active, setActive] = useState<QueueKey>("expiring");
+  // The staff notice of a failed charge opens `?tab=queues&queue=failed_charges`.
+  const requested = useSearchParams().get("queue");
+  const [active, setActive] = useState<QueueKey>(requested === "failed_charges" ? "failed" : "expiring");
+  const failedQuery = useFailedCharges(token, seesFailedCharges);
 
   // Same key and params as the page's attention summary, so both share one read.
   const queuesQuery = useQuery({
@@ -59,6 +72,7 @@ export function QueuesTab({ locationIds }: { locationIds?: string } = {}) {
 
   const rowsByKey: Record<QueueKey, FinanceRecord[]> = {
     expiring: queues.expiring_memberships ?? [],
+    failed: (failedQuery.data ?? []) as unknown as FinanceRecord[],
     pending: queues.pending_payments ?? [],
     overdue: queues.overdue_invoices ?? [],
     rewards: queues.pending_referral_rewards ?? [],
@@ -101,7 +115,16 @@ export function QueuesTab({ locationIds }: { locationIds?: string } = {}) {
 
       {/* Queue list */}
       <div className="rounded-[2rem] overflow-hidden" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-        {queuesQuery.isLoading ? (
+        {active === "failed" ? (
+          seesFailedCharges && token ? (
+            <FailedChargesList
+              token={token}
+              charges={failedQuery.data ?? []}
+              loading={failedQuery.isLoading}
+              canRetry={can(membership, "manage_billing")}
+            />
+          ) : null
+        ) : queuesQuery.isLoading ? (
           <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>{i18n("loadingQueuea1e2a39")}</p>
         ) : rows.length === 0 ? (
           <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>{i18n("noItemsInThisQueuec992fc9")}</p>
