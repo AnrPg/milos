@@ -17,7 +17,10 @@ const api = vi.hoisted(() => ({
   fetchSettingsCatalog: vi.fn(),
 }));
 
+const payments = vi.hoisted(() => ({ fetchPaymentAccount: vi.fn() }));
+
 vi.mock("@/api/setup", () => api);
+vi.mock("@/api/online-payments", async (original) => ({ ...(await original<object>()), ...payments }));
 vi.mock("@/components/session-provider", () => ({ useSession: () => ({ tokens: { access_token: "token" } }) }));
 vi.mock("@/lib/organization-slug", () => ({ useOrganizationSlug: () => "kypseli", adminHref: (href: string) => href }));
 vi.mock("@/i18n/ui", () => ({ useUiTranslations: () => (key: string) => key }));
@@ -37,6 +40,8 @@ beforeEach(() => {
   api.fetchSetupRecipes.mockResolvedValue(recipesPayload());
   api.previewSetupRecipe.mockResolvedValue(plan);
   api.applySetupRecipe.mockResolvedValue(applied);
+  payments.fetchPaymentAccount.mockReset();
+  payments.fetchPaymentAccount.mockResolvedValue({ account: null, providers: [], environments: [], connect_providers: {}, online_sales: { sold_online: 0, packages: 2 } });
 });
 
 async function openPreview() {
@@ -67,6 +72,22 @@ describe("SetupRecipes (s10 A)", () => {
     expect(await screen.findByTestId("recipe-applied")).toHaveTextContent("Your box is set up as CrossFit box");
     expect(screen.getByTestId("recipe-applied")).toHaveTextContent("2 subscription packages · 2 class types · 4 rules");
     expect(screen.getByRole("link", { name: /Bring your members/ })).toHaveAttribute("href", "/admin/users/import");
+    // ADR-271: «Τι πωλείται online» before online payments are connected.
+    expect(await screen.findByRole("link", { name: /What is sold online/ })).toHaveAttribute("href", "/admin/finance?tab=packages");
+    expect(screen.getByText("Once online payments are connected, paid subscription packages go on sale online by themselves")).toBeInTheDocument();
+  });
+
+  it("counts the packages sold online once payments are connected (ADR-271)", async () => {
+    payments.fetchPaymentAccount.mockResolvedValue({
+      account: { status: "active" },
+      providers: [],
+      environments: [],
+      connect_providers: {},
+      online_sales: { sold_online: 3, packages: 4 },
+    });
+    await openPreview();
+    fireEvent.click(screen.getByTestId("recipe-apply"));
+    expect(await screen.findByText("Sales page · 3 of 4 subscription packages")).toBeInTheDocument();
   });
 
   it("asks what happens to the settings the owner already changed (2026-10-29)", async () => {
