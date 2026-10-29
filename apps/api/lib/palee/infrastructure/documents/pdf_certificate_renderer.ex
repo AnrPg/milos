@@ -86,13 +86,15 @@ defmodule Palee.Infrastructure.Documents.PdfCertificateRenderer do
     rows =
       [
         {"Υπογράφων · Signed by", signer_name(signer)},
-        {"Λογαριασμός · Account", Enum.join(Enum.reject([signer[:user_id], signer[:email]], &is_nil/1), " · ")},
+        {"Λογαριασμός · Account",
+         Enum.join(Enum.reject([signer[:user_id], signer[:email]], &is_nil/1), " · ")},
         {"Πληκτρολογημένο όνομα · Typed name", evidence.typed_name},
         {"Ημερομηνία (UTC) · Signed at (UTC)", DateTime.to_iso8601(evidence.signed_at)},
         {"Τοπική ώρα · Local time", certificate[:local_signed_at]},
         {"Διεύθυνση IP · IP address", evidence.ip_address},
         {"Συσκευή · Device", evidence.user_agent},
-        {"Έγγραφο · Document", "#{evidence.template_id} · v#{evidence.version_number} (#{evidence.version_id})"},
+        {"Έγγραφο · Document",
+         "#{evidence.template_id} · v#{evidence.version_number} (#{evidence.version_id})"},
         {"SHA-256 κειμένου · Text SHA-256", evidence.content_hash},
         {"Υπογραφή · Signature", evidence.signature_id},
         {"Είδος · Type",
@@ -116,8 +118,8 @@ defmodule Palee.Infrastructure.Documents.PdfCertificateRenderer do
         {:paragraph,
          "Το SHA-256 κειμένου ταυτοποιεί το ακριβές κείμενο που υπογράφηκε και το SHA-256 στοιχείων " <>
            "την παραπάνω εγγραφή, όπως φυλάσσεται στο Palee. · The text SHA-256 identifies the exact " <>
-           "text signed and the evidence SHA-256 the record above, as kept by Palee.", @small_size, 0,
-         12}
+           "text signed and the evidence SHA-256 the record above, as kept by Palee.",
+         @small_size, 0, 12}
       ]
   end
 

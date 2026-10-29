@@ -12,12 +12,16 @@ defmodule Palee.Application.DocumentsBookingGateTest do
   alias Palee.TestFixtures
 
   setup do
-    start_supervised!({Oban, Keyword.put(Application.fetch_env!(:palee, Oban), :testing, :manual)})
+    start_supervised!(
+      {Oban, Keyword.put(Application.fetch_env!(:palee, Oban), :testing, :manual)}
+    )
 
     owner = TestFixtures.admin_fixture()
 
     {:ok, organization} =
-      Organizations.create_organization(%{name: "Documents Gym #{System.unique_integer([:positive])}"})
+      Organizations.create_organization(%{
+        name: "Documents Gym #{System.unique_integer([:positive])}"
+      })
 
     owner_context = join_gym(organization, owner, :owner)
     client = TestFixtures.user_fixture()

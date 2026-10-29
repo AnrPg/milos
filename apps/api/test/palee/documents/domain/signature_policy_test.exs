@@ -6,17 +6,24 @@ defmodule Palee.Documents.Domain.SignaturePolicyTest do
   @version %{id: "11111111-1111-4111-8111-111111111111"}
 
   defp params(extra),
-    do: Map.merge(%{version_id: @version.id, agreed: true, typed_name: "Μαρία Παπαδοπούλου"}, extra)
+    do:
+      Map.merge(%{version_id: @version.id, agreed: true, typed_name: "Μαρία Παπαδοπούλου"}, extra)
 
   describe "what the signer sends" do
     test "a typed name, a drawn signature or both, after agreeing to the text" do
       assert {:ok, %{typed_name: "Μαρία Παπαδοπούλου", drawn_signature: nil}} =
-               SignaturePolicy.validate(params(%{typed_name: "  Μαρία   Παπαδοπούλου "}), @version)
+               SignaturePolicy.validate(
+                 params(%{typed_name: "  Μαρία   Παπαδοπούλου "}),
+                 @version
+               )
 
       drawn = %{"width" => 300, "height" => 100, "strokes" => [[[1.4, 2.6], [10, 20]], [[5, 5]]]}
 
       assert {:ok, %{typed_name: nil, drawn_signature: signature}} =
-               SignaturePolicy.validate(params(%{typed_name: nil, drawn_signature: drawn}), @version)
+               SignaturePolicy.validate(
+                 params(%{typed_name: nil, drawn_signature: drawn}),
+                 @version
+               )
 
       assert signature == %{width: 300, height: 100, strokes: [[[1, 3], [10, 20]], [[5, 5]]]}
     end
@@ -66,7 +73,11 @@ defmodule Palee.Documents.Domain.SignaturePolicyTest do
         signed_at: ~U[2027-02-08 10:00:00Z],
         level: "simple",
         provider: "palee",
-        signer: %{user_id: "66666666-6666-4666-8666-666666666666", display_name: "Μαρία", email: "m@example.com"},
+        signer: %{
+          user_id: "66666666-6666-4666-8666-666666666666",
+          display_name: "Μαρία",
+          email: "m@example.com"
+        },
         typed_name: "Μαρία",
         drawn_signature: nil,
         ip_address: SignaturePolicy.ip_address({203, 0, 113, 7}),
@@ -115,7 +126,10 @@ defmodule Palee.Documents.Domain.SignaturePolicyTest do
         MemberDocuments.items([optional, @template, draft, archived], %{}, ["t2"])
 
       assert Enum.map(items, & &1.template.id) == ["t1", "t2"]
-      assert [%{outstanding: true, status: :unsigned}, %{outstanding: false, requested: true}] = items
+
+      assert [%{outstanding: true, status: :unsigned}, %{outstanding: false, requested: true}] =
+               items
+
       assert [%{template: %{id: "t1"}}] = MemberDocuments.outstanding(items)
     end
 
@@ -141,7 +155,11 @@ defmodule Palee.Documents.Domain.SignaturePolicyTest do
                  "missing"
                )
 
-      health = %{settings | block_booking_on_unsigned: false, block_booking_on_health_certificate: true}
+      health = %{
+        settings
+        | block_booking_on_unsigned: false,
+          block_booking_on_health_certificate: true
+      }
 
       assert {:error, :documents_required, %{documents: [], health_certificate: "expired"}} =
                MemberDocuments.booking_gate(health, items, "expired")

@@ -54,8 +54,11 @@ defmodule Palee.Documents.Domain.HealthCertificatePolicyTest do
   end
 
   test "uploads are PDFs or photos of up to 10 MB, checked by their first bytes" do
-    assert {:ok, %{extension: ".pdf", max_bytes: 10_485_760}} = Policy.validate_upload("application/pdf")
-    assert {:error, {:invalid_fields, %{content_type: "unsupported"}}} = Policy.validate_upload("image/gif")
+    assert {:ok, %{extension: ".pdf", max_bytes: 10_485_760}} =
+             Policy.validate_upload("application/pdf")
+
+    assert {:error, {:invalid_fields, %{content_type: "unsupported"}}} =
+             Policy.validate_upload("image/gif")
 
     assert :ok = Policy.validate_file("application/pdf", "%PDF-1.7\n", 1_000)
     assert :ok = Policy.validate_file("image/jpeg", <<0xFF, 0xD8, 0xFF, 0xE0>>, 1_000)

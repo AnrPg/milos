@@ -110,11 +110,19 @@ defmodule Palee.Documents do
                  Map.put(template_attrs, :created_by_id, actor_id)
                ),
              {:ok, _event} <-
-               audit(context, "template_created", "document_template", template.id, actor_id, now, %{
-                 kind: template.kind,
-                 title: template.title,
-                 requirement: template.requirement
-               }) do
+               audit(
+                 context,
+                 "template_created",
+                 "document_template",
+                 template.id,
+                 actor_id,
+                 now,
+                 %{
+                   kind: template.kind,
+                   title: template.title,
+                   requirement: template.requirement
+                 }
+               ) do
           insert_version(context, template, version_attrs, actor_id, now)
         end
       end)
@@ -208,9 +216,17 @@ defmodule Palee.Documents do
              }),
            cancelled = DocumentStore.cancel_requests_for_template(context, template.id, now),
            {:ok, _event} <-
-             audit(context, "template_archived", "document_template", template.id, actor_id, now, %{
-               cancelled_requests: cancelled
-             }) do
+             audit(
+               context,
+               "template_archived",
+               "document_template",
+               template.id,
+               actor_id,
+               now,
+               %{
+                 cancelled_requests: cancelled
+               }
+             ) do
         {:ok, archived}
       end
     end)
@@ -287,13 +303,21 @@ defmodule Palee.Documents do
 
         with {:ok, inserted} <- DocumentStore.insert_requests(context, rows),
              {:ok, _event} <-
-               audit(context, "signatures_requested", "document_template", template.id, actor_id, now, %{
-                 batch_id: batch_id,
-                 audience: audience,
-                 recipients: length(user_ids),
-                 created: length(inserted),
-                 already_signed: length(already_signed)
-               }) do
+               audit(
+                 context,
+                 "signatures_requested",
+                 "document_template",
+                 template.id,
+                 actor_id,
+                 now,
+                 %{
+                   batch_id: batch_id,
+                   audience: audience,
+                   recipients: length(user_ids),
+                   created: length(inserted),
+                   already_signed: length(already_signed)
+                 }
+               ) do
           {:ok,
            %{
              batch_id: batch_id,
@@ -468,7 +492,8 @@ defmodule Palee.Documents do
   defp record(context, template_id, version_id, evidence, evidence_hash, stored, now) do
     DocumentStore.transaction(context, fn ->
       with {:ok, template} <- active_template(context, template_id, lock: true),
-           true <- template.current_version_id == version_id || {:error, :document_version_outdated},
+           true <-
+             template.current_version_id == version_id || {:error, :document_version_outdated},
            {:ok, signature} <-
              DocumentStore.insert_signature(context, %{
                id: evidence.signature_id,
@@ -518,7 +543,9 @@ defmodule Palee.Documents do
   """
   def health_status(context, user_id, %Date{} = today, settings \\ nil) do
     settings = settings || settings(context)
-    certificate = context |> DocumentStore.current_health_certificates([user_id]) |> Map.get(user_id)
+
+    certificate =
+      context |> DocumentStore.current_health_certificates([user_id]) |> Map.get(user_id)
 
     %{
       status:

@@ -31,7 +31,14 @@ defmodule Palee.DocumentsTest do
   setup do
     {organization, owner, context} = bypass_rls(fn -> organization_fixture() end)
     {client, client_context} = bypass_rls(fn -> member_context(organization, :member) end)
-    %{organization: organization, owner: owner, context: context, client: client, client_context: client_context}
+
+    %{
+      organization: organization,
+      owner: owner,
+      context: context,
+      client: client,
+      client_context: client_context
+    }
   end
 
   defp waiver(context, extra \\ %{}) do
@@ -39,7 +46,12 @@ defmodule Palee.DocumentsTest do
       DocumentsAdmin.create_template(
         context,
         Map.merge(
-          %{kind: "waiver", title: "Απαλλαγή ευθύνης", requirement: "mandatory", body: "Κείμενο v1"},
+          %{
+            kind: "waiver",
+            title: "Απαλλαγή ευθύνης",
+            requirement: "mandatory",
+            body: "Κείμενο v1"
+          },
           extra
         ),
         @now
@@ -85,7 +97,12 @@ defmodule Palee.DocumentsTest do
                )
 
       assert {:ok, %{template: %{requirement: "optional"}}} =
-               DocumentsAdmin.set_requirement(context, template.id, %{requirement: "optional"}, @now)
+               DocumentsAdmin.set_requirement(
+                 context,
+                 template.id,
+                 %{requirement: "optional"},
+                 @now
+               )
 
       actions =
         context
@@ -98,7 +115,10 @@ defmodule Palee.DocumentsTest do
                ~w(requirement_changed template_created version_published version_published)
 
       assert %{actor_id: actor} =
-               context |> Documents.list_audit_events(%{action: "requirement_changed"}) |> Map.fetch!(:events) |> hd()
+               context
+               |> Documents.list_audit_events(%{action: "requirement_changed"})
+               |> Map.fetch!(:events)
+               |> hd()
 
       assert actor == owner.id
 
@@ -116,7 +136,8 @@ defmodule Palee.DocumentsTest do
       end)
     end
 
-    test "an archived document cannot be published, signed or requested", %{context: context} = ctx do
+    test "an archived document cannot be published, signed or requested",
+         %{context: context} = ctx do
       {template, version} = waiver(context)
       assert {:ok, _} = DocumentsAdmin.archive_template(context, template.id, @now)
 
@@ -126,7 +147,12 @@ defmodule Palee.DocumentsTest do
       assert {:error, :document_archived} = sign(ctx.client_context, template.id, version.id)
 
       assert {:error, :document_archived} =
-               DocumentsAdmin.request_signatures(context, template.id, %{audience: "all_clients"}, @now)
+               DocumentsAdmin.request_signatures(
+                 context,
+                 template.id,
+                 %{audience: "all_clients"},
+                 @now
+               )
     end
   end
 
@@ -158,7 +184,12 @@ defmodule Palee.DocumentsTest do
 
       # Bulk: the pending request of the client is not duplicated.
       assert {:ok, %{created: 1, skipped: 1, recipients: 2}} =
-               DocumentsAdmin.request_signatures(context, template.id, %{audience: "all_clients"}, @now)
+               DocumentsAdmin.request_signatures(
+                 context,
+                 template.id,
+                 %{audience: "all_clients"},
+                 @now
+               )
 
       assert [_] = notifications(client.id, :document_signature_requested)
       assert [notification] = notifications(athlete.id, :document_signature_requested)
@@ -176,7 +207,12 @@ defmodule Palee.DocumentsTest do
                )
 
       assert {:error, {:invalid_fields, %{role: "invalid"}}} =
-               DocumentsAdmin.request_signatures(context, other.id, %{audience: "role", role: "coach"}, @now)
+               DocumentsAdmin.request_signatures(
+                 context,
+                 other.id,
+                 %{audience: "role", role: "coach"},
+                 @now
+               )
 
       {:ok, package} =
         Finance.create_package(context, %{name: "Unlimited", package_type: "class_pack"})
@@ -202,7 +238,8 @@ defmodule Palee.DocumentsTest do
       assert user_id == client.id
 
       assert {:ok, %{requests: requests}} =
-               {:ok, Documents.list_requests(context, %{template_id: other.id, status: "pending"})}
+               {:ok,
+                Documents.list_requests(context, %{template_id: other.id, status: "pending"})}
 
       assert length(requests) == 2
     end
@@ -280,14 +317,24 @@ defmodule Palee.DocumentsTest do
       {:ok, _} = sign(client_context, template.id, v1.id)
 
       {:ok, %{version: v2}} =
-        DocumentsAdmin.publish_version(context, template.id, %{body: "v2", change_kind: "minor"}, @now)
+        DocumentsAdmin.publish_version(
+          context,
+          template.id,
+          %{body: "v2", change_kind: "minor"},
+          @now
+        )
 
       assert %{outstanding: 0} = MyDocuments.overview(client_context, @now)
       # The old version can no longer be signed.
       assert {:error, :document_version_outdated} = sign(client_context, template.id, v1.id)
 
       {:ok, %{version: v3}} =
-        DocumentsAdmin.publish_version(context, template.id, %{body: "v3", change_kind: "major"}, @now)
+        DocumentsAdmin.publish_version(
+          context,
+          template.id,
+          %{body: "v3", change_kind: "major"},
+          @now
+        )
 
       assert %{outstanding: 1, documents: [%{status: "resign_required"}]} =
                MyDocuments.overview(client_context, @now)
@@ -308,11 +355,15 @@ defmodule Palee.DocumentsTest do
       assert :ok = Documents.booking_gate(context, client.id, ~D[2027-02-08])
 
       {_mandatory, _version} = waiver(context, %{title: "Όροι", kind: "terms"})
-      assert {:error, :documents_required, _} = Documents.booking_gate(context, client.id, ~D[2027-02-08])
+
+      assert {:error, :documents_required, _} =
+               Documents.booking_gate(context, client.id, ~D[2027-02-08])
 
       {:ok, _} = DocumentsAdmin.save_settings(context, %{block_booking_on_unsigned: false}, @now)
       assert :ok = Documents.booking_gate(context, client.id, ~D[2027-02-08])
-      assert [%{action: "settings_changed"}] = Documents.list_audit_events(context, %{action: "settings_changed"}).events
+
+      assert [%{action: "settings_changed"}] =
+               Documents.list_audit_events(context, %{action: "settings_changed"}).events
     end
   end
 
@@ -355,7 +406,11 @@ defmodule Palee.DocumentsTest do
       assert {:error, :document_key_forbidden} =
                MyDocuments.complete_health_upload(
                  ctx.context,
-                 %{file_key: upload.file_key, content_type: "application/pdf", issued_on: "2027-01-10"},
+                 %{
+                   file_key: upload.file_key,
+                   content_type: "application/pdf",
+                   issued_on: "2027-01-10"
+                 },
                  @now
                )
 
@@ -373,11 +428,18 @@ defmodule Palee.DocumentsTest do
                MyDocuments.delete_health_certificate(client_context, certificate.id, @now)
 
       assert MemoryObjectStore.get(:documents, file_key) == :error
-      assert %{health_certificate: %{status: "missing"}} = MyDocuments.overview(client_context, @now)
+
+      assert %{health_certificate: %{status: "missing"}} =
+               MyDocuments.overview(client_context, @now)
     end
 
     test "staff with the capability see files; coaches see only valid or expired", ctx do
-      %{organization: organization, context: context, client: client, client_context: client_context} =
+      %{
+        organization: organization,
+        context: context,
+        client: client,
+        client_context: client_context
+      } =
         ctx
 
       {:ok, _} = upload(client_context, "2026-02-20")
@@ -396,7 +458,9 @@ defmodule Palee.DocumentsTest do
       assert row.status == "expiring"
       assert row.certificate.expires_on == ~D[2027-02-20]
 
-      assert %{health_certificates: [coach_row]} = HealthCertificatesAdmin.list(coach_context, %{}, @now)
+      assert %{health_certificates: [coach_row]} =
+               HealthCertificatesAdmin.list(coach_context, %{}, @now)
+
       assert coach_row.status == "valid"
       assert coach_row.certificate == nil
     end

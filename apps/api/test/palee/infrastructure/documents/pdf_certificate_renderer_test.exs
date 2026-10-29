@@ -26,7 +26,11 @@ defmodule Palee.Infrastructure.Documents.PdfCertificateRendererTest do
       email: "maria@example.com"
     },
     typed_name: "Μαρία Παπαδοπούλου",
-    drawn_signature: %{width: 300, height: 100, strokes: [[[10, 50], [50, 20], [90, 80]], [[200, 60]]]},
+    drawn_signature: %{
+      width: 300,
+      height: 100,
+      strokes: [[[10, 50], [50, 20], [90, 80]], [[200, 60]]]
+    },
     ip_address: "203.0.113.7",
     user_agent: "Mozilla/5.0 (iPhone)"
   }

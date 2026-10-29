@@ -100,7 +100,8 @@ defmodule PaleeWeb.MyDocumentsController do
     summary: "Record my uploaded health certificate with its dates",
     request_body: D.body(D.upload_complete_body(false)),
     responses: [
-      created: {"Health certificate", "application/json", D.one(:health_certificate, D.certificate())}
+      created:
+        {"Health certificate", "application/json", D.one(:health_certificate, D.certificate())}
     ]
   )
 

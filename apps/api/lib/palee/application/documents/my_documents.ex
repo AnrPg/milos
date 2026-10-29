@@ -123,7 +123,8 @@ defmodule Palee.Application.Documents.MyDocuments do
     do: Files.request_upload(context, context.user_id, Files.param(params, :content_type))
 
   def complete_health_upload(context, params, now \\ DateTime.utc_now()) do
-    with {:ok, certificate} <- Files.complete(context, context.user_id, params, context.user_id, now) do
+    with {:ok, certificate} <-
+           Files.complete(context, context.user_id, params, context.user_id, now) do
       {:ok, %{health_certificate: V.certificate(certificate)}}
     end
   end

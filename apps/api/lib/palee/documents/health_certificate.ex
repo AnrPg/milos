@@ -31,7 +31,14 @@ defmodule Palee.Documents.HealthCertificate do
   def changeset(certificate, attrs) do
     certificate
     |> cast(attrs, @fields)
-    |> validate_required([:user_id, :issued_on, :expires_on, :file_key, :content_type, :byte_size])
+    |> validate_required([
+      :user_id,
+      :issued_on,
+      :expires_on,
+      :file_key,
+      :content_type,
+      :byte_size
+    ])
     |> unique_constraint(:file_key)
     |> check_constraint(:expires_on, name: :health_certificates_check)
   end

@@ -21,11 +21,15 @@ defmodule Palee.Documents.Domain.TemplatePolicyTest do
       assert errors == %{kind: "invalid", title: "required", requirement: "invalid"}
 
       assert {:error, {:invalid_fields, %{title: "too_long"}}} =
-               TemplatePolicy.validate_template(%{kind: "other", title: String.duplicate("α", 201)})
+               TemplatePolicy.validate_template(%{
+                 kind: "other",
+                 title: String.duplicate("α", 201)
+               })
     end
 
     test "the requirement is mandatory or optional" do
       assert {:ok, "mandatory"} = TemplatePolicy.validate_requirement("mandatory")
+
       assert {:error, {:invalid_fields, %{requirement: "invalid"}}} =
                TemplatePolicy.validate_requirement("sometimes")
     end
@@ -54,7 +58,10 @@ defmodule Palee.Documents.Domain.TemplatePolicyTest do
                TemplatePolicy.validate_version(%{title: "T", body: "  "}, 1)
 
       assert {:error, {:invalid_fields, %{body: "too_long"}}} =
-               TemplatePolicy.validate_version(%{title: "T", body: String.duplicate("a", 100_001)}, 1)
+               TemplatePolicy.validate_version(
+                 %{title: "T", body: String.duplicate("a", 100_001)},
+                 1
+               )
 
       assert {:ok, %{body: "a\nb\nc"}} =
                TemplatePolicy.validate_version(%{title: "T", body: "a\r\nb\rc\n"}, 1)
@@ -106,12 +113,16 @@ defmodule Palee.Documents.Domain.TemplatePolicyTest do
     end
 
     test "blocking on health certificates turns on requiring them; values are checked" do
-      assert {:ok, %{block_booking_on_health_certificate: true, health_certificate_required: true}} =
+      assert {:ok,
+              %{block_booking_on_health_certificate: true, health_certificate_required: true}} =
                SettingsPolicy.validate(nil, %{block_booking_on_health_certificate: true})
 
       assert {:error,
               {:invalid_fields,
-               %{health_certificate_validity_months: "invalid", block_booking_on_unsigned: "invalid"}}} =
+               %{
+                 health_certificate_validity_months: "invalid",
+                 block_booking_on_unsigned: "invalid"
+               }}} =
                SettingsPolicy.validate(nil, %{
                  health_certificate_validity_months: 36,
                  block_booking_on_unsigned: "yes"

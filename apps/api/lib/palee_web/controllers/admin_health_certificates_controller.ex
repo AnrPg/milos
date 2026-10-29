@@ -60,7 +60,8 @@ defmodule PaleeWeb.AdminHealthCertificatesController do
     summary: "Record an uploaded health certificate with its dates",
     request_body: D.body(D.upload_complete_body(true)),
     responses: [
-      created: {"Health certificate", "application/json", D.one(:health_certificate, D.certificate())}
+      created:
+        {"Health certificate", "application/json", D.one(:health_certificate, D.certificate())}
     ]
   )
 

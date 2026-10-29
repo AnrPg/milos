@@ -43,5 +43,6 @@ defmodule Palee.Documents.Domain.StarterTemplates do
   def list(language), do: Enum.filter(@starters, &(&1.language == language))
 
   @doc "One starter by kind and language, or nil."
-  def get(kind, language), do: Enum.find(@starters, &(&1.kind == kind and &1.language == language))
+  def get(kind, language),
+    do: Enum.find(@starters, &(&1.kind == kind and &1.language == language))
 end

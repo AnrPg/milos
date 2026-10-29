@@ -32,11 +32,13 @@ defmodule Palee.Infrastructure.Documents.Pdf.TrueType do
   @doc "Parses a TrueType (glyf-outline) font."
   def parse(<<0x00010000::32, num_tables::16, _search::48, rest::binary>> = font) do
     tables =
-      for <<tag::binary-size(4), _checksum::32, offset::32, length::32 <- binary_part(
-              rest,
-              0,
-              num_tables * 16
-            )>>,
+      for <<tag::binary-size(4), _checksum::32, offset::32,
+            length::32 <-
+              binary_part(
+                rest,
+                0,
+                num_tables * 16
+              )>>,
           into: %{} do
         {tag, binary_part(font, offset, length)}
       end
@@ -91,8 +93,11 @@ defmodule Palee.Infrastructure.Documents.Pdf.TrueType do
         Enum.find(records, &match?({3, 1, _}, &1)) || Enum.find(records, &match?({0, _, _}, &1))
 
     case preferred do
-      {_platform, _encoding, offset} -> subtable(binary_part(table, offset, byte_size(table) - offset))
-      nil -> %{}
+      {_platform, _encoding, offset} ->
+        subtable(binary_part(table, offset, byte_size(table) - offset))
+
+      nil ->
+        %{}
     end
   end
 
@@ -103,9 +108,11 @@ defmodule Palee.Infrastructure.Documents.Pdf.TrueType do
         do: {code, glyph + code - start}
   end
 
-  defp subtable(<<4::16, _length::16, _language::16, seg_x2::16, _::binary-size(6), rest::binary>>) do
-    <<ends::binary-size(seg_x2), _pad::16, starts::binary-size(seg_x2), deltas::binary-size(seg_x2),
-      range_area::binary>> = rest
+  defp subtable(
+         <<4::16, _length::16, _language::16, seg_x2::16, _::binary-size(6), rest::binary>>
+       ) do
+    <<ends::binary-size(seg_x2), _pad::16, starts::binary-size(seg_x2),
+      deltas::binary-size(seg_x2), range_area::binary>> = rest
 
     ends = for <<v::16 <- ends>>, do: v
     starts = for <<v::16 <- starts>>, do: v
@@ -280,7 +287,8 @@ defmodule Palee.Infrastructure.Documents.Pdf.TrueType do
   end
 
   defp head_location(font, count) do
-    for <<tag::binary-size(4), _checksum::32, offset::32, length::32 <-
+    for <<tag::binary-size(4), _checksum::32, offset::32,
+          length::32 <-
             binary_part(font, 12, count * 16)>>,
         tag == "head",
         reduce: nil do

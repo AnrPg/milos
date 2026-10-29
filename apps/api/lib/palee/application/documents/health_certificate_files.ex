@@ -50,7 +50,9 @@ defmodule Palee.Application.Documents.HealthCertificateFiles do
     prefix = TenantObjectStorage.tenant_object_prefix(context.organization_id)
 
     with {:ok, _upload} <- Documents.validate_health_upload(content_type),
-         true <- Documents.health_key_of?(file_key, prefix, owner_id) || {:error, :document_key_forbidden},
+         true <-
+           Documents.health_key_of?(file_key, prefix, owner_id) ||
+             {:error, :document_key_forbidden},
          {:ok, probe} <- probe(context, file_key),
          :ok <- Documents.validate_health_file(content_type, probe.head, probe.byte_size) do
       Documents.record_health_certificate(

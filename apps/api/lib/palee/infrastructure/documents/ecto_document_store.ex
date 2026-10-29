@@ -151,8 +151,7 @@ defmodule Palee.Infrastructure.Documents.EctoDocumentStore do
     {_count, inserted} =
       Repo.insert_all(SignatureRequest, entries,
         on_conflict: :nothing,
-        conflict_target:
-          {:unsafe_fragment, "(template_id, user_id) WHERE status = 'pending'"},
+        conflict_target: {:unsafe_fragment, "(template_id, user_id) WHERE status = 'pending'"},
         returning: true
       )
 
@@ -172,7 +171,8 @@ defmodule Palee.Infrastructure.Documents.EctoDocumentStore do
   @impl true
   def update_request(%{organization_id: organization_id}, id, attrs) do
     case Repo.one(
-           from r in SignatureRequest, where: r.organization_id == ^organization_id and r.id == ^id
+           from r in SignatureRequest,
+             where: r.organization_id == ^organization_id and r.id == ^id
          ) do
       nil -> {:error, :not_found}
       request -> request |> SignatureRequest.changeset(attrs) |> Repo.update() |> map_result()
@@ -297,7 +297,9 @@ defmodule Palee.Infrastructure.Documents.EctoDocumentStore do
       desc: s.id
     )
     |> Repo.all()
-    |> Map.new(fn signature -> {{signature.user_id, signature.template_id}, to_map(signature)} end)
+    |> Map.new(fn signature ->
+      {{signature.user_id, signature.template_id}, to_map(signature)}
+    end)
   end
 
   # ── Audit ─────────────────────────────────────────────────────────────────
@@ -446,7 +448,9 @@ defmodule Palee.Infrastructure.Documents.EctoDocumentStore do
   defp uuid?(id), do: is_binary(id) and match?({:ok, _}, Ecto.UUID.cast(id))
 
   defp map_result({:ok, record}), do: {:ok, to_map(record)}
-  defp map_result({:error, %Ecto.Changeset{} = changeset}), do: {:error, changeset_error(changeset)}
+
+  defp map_result({:error, %Ecto.Changeset{} = changeset}),
+    do: {:error, changeset_error(changeset)}
 
   defp changeset_error(changeset) do
     {:invalid_fields,

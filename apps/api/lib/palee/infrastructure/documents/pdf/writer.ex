@@ -251,7 +251,7 @@ defmodule Palee.Infrastructure.Documents.Pdf.Writer do
 
     {chunks, offsets, _size} =
       Enum.reduce(objects, {[header], %{}, byte_size(header)}, fn {id, body},
-                                                                    {chunks, offsets, size} ->
+                                                                  {chunks, offsets, size} ->
         bytes = object(id, body)
         {[bytes | chunks], Map.put(offsets, id, size), size + byte_size(bytes)}
       end)
@@ -276,7 +276,14 @@ defmodule Palee.Infrastructure.Documents.Pdf.Writer do
   end
 
   defp object(id, {:stream, dictionary, data}),
-    do: IO.iodata_to_binary(["#{id} 0 obj\n", dictionary, "\nstream\n", data, "\nendstream\nendobj\n"])
+    do:
+      IO.iodata_to_binary([
+        "#{id} 0 obj\n",
+        dictionary,
+        "\nstream\n",
+        data,
+        "\nendstream\nendobj\n"
+      ])
 
   defp object(id, body), do: "#{id} 0 obj\n#{body}\nendobj\n"
 

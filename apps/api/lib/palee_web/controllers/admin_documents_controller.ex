@@ -217,8 +217,9 @@ defmodule PaleeWeb.AdminDocumentsController do
 
   operation(:audit,
     summary: "The documents audit log, newest first",
-    parameters: [D.query(:subject_id, D.uuid()), D.query(:action, %Schema{type: :string})] ++
-      D.paging(),
+    parameters:
+      [D.query(:subject_id, D.uuid()), D.query(:action, %Schema{type: :string})] ++
+        D.paging(),
     responses: [ok: {"Audit events", "application/json", D.events()}]
   )
 

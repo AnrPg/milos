@@ -40,7 +40,9 @@ defmodule Palee.Application.Documents.DocumentsAdmin do
 
   def get_template(context, id) do
     with {:ok, template} <- Documents.get_template_with_versions(context, id) do
-      current = template.current_version_id && Documents.get_version(context, template.current_version_id)
+      current =
+        template.current_version_id && Documents.get_version(context, template.current_version_id)
+
       {:ok, %{template: V.template(template), current_version: current && V.version(current)}}
     end
   end
@@ -98,7 +100,14 @@ defmodule Palee.Application.Documents.DocumentsAdmin do
 
     with {:ok, user_ids} <- recipients(context, audience, params, now),
          {:ok, result} <-
-           Documents.request_signatures(context, template_id, user_ids, audience, context.user_id, now) do
+           Documents.request_signatures(
+             context,
+             template_id,
+             user_ids,
+             audience,
+             context.user_id,
+             now
+           ) do
       notify(context, result)
 
       {:ok,
@@ -222,7 +231,8 @@ defmodule Palee.Application.Documents.DocumentsAdmin do
 
   @doc "A short-lived link to a signature's PDF certificate (the download is audited)."
   def evidence(context, signature_id, now \\ DateTime.utc_now()) do
-    with %{} = signature <- Documents.get_signature(context, signature_id) || {:error, :not_found},
+    with %{} = signature <-
+           Documents.get_signature(context, signature_id) || {:error, :not_found},
          {:ok, url} <- evidence_url(context, signature),
          {:ok, _event} <-
            Documents.audit(
@@ -235,7 +245,8 @@ defmodule Palee.Application.Documents.DocumentsAdmin do
              %{},
              signature.user_id
            ) do
-      {:ok, %{url: url, sha256: signature.evidence_sha256, byte_size: signature.evidence_byte_size}}
+      {:ok,
+       %{url: url, sha256: signature.evidence_sha256, byte_size: signature.evidence_byte_size}}
     end
   end
 
@@ -261,7 +272,10 @@ defmodule Palee.Application.Documents.DocumentsAdmin do
          documents: Enum.map(items, &V.item/1),
          outstanding: Enum.count(items, & &1.outstanding),
          signatures:
-           Enum.map(Documents.list_signatures(context, %{user_id: user_id}).signatures, &V.signature/1),
+           Enum.map(
+             Documents.list_signatures(context, %{user_id: user_id}).signatures,
+             &V.signature/1
+           ),
          health_certificate_status: health.status
        }}
     else

@@ -17,7 +17,9 @@ defmodule PaleeWeb.DocumentsControllerTest do
   @pdf "%PDF-1.7\n1 0 obj\n<<>>\nendobj\n"
 
   setup %{conn: conn} do
-    start_supervised!({Oban, Keyword.put(Application.fetch_env!(:palee, Oban), :testing, :manual)})
+    start_supervised!(
+      {Oban, Keyword.put(Application.fetch_env!(:palee, Oban), :testing, :manual)}
+    )
 
     {:ok, organization} = Organizations.ensure_legacy_organization_for_migration()
     Repo.query!("SELECT set_config($1, $2, false)", ["app.organization_id", organization.id])
@@ -109,19 +111,30 @@ defmodule PaleeWeb.DocumentsControllerTest do
 
     for staff <- [ctx.desk, ctx.coach] do
       assert staff
-             |> send_json(:post, "#{ctx.admin}/templates", %{"kind" => "other", "title" => "x", "body" => "x"})
+             |> send_json(:post, "#{ctx.admin}/templates", %{
+               "kind" => "other",
+               "title" => "x",
+               "body" => "x"
+             })
              |> json_response(403)
 
       assert staff |> get_json("#{ctx.admin}/settings") |> json_response(403)
     end
 
-    assert %{"events" => events} = ctx.owner |> get_json("#{ctx.admin}/audit") |> json_response(200)
+    assert %{"events" => events} =
+             ctx.owner |> get_json("#{ctx.admin}/audit") |> json_response(200)
+
     assert "requirement_changed" in Enum.map(events, & &1["action"])
   end
 
-  test "a client reads, signs and downloads the certificate; booking waits for the signature", ctx do
+  test "a client reads, signs and downloads the certificate; booking waits for the signature",
+       ctx do
     %{"template" => template, "version" => version} = create_waiver(ctx)
-    slot = slot_fixture(workout_fixture(ctx.owner_user, %{tenant_context: ctx.context}), %{tenant_context: ctx.context})
+
+    slot =
+      slot_fixture(workout_fixture(ctx.owner_user, %{tenant_context: ctx.context}), %{
+        tenant_context: ctx.context
+      })
 
     assert %{"code" => "documents_required", "params" => %{"documents" => [blocking]}} =
              ctx.client
@@ -153,12 +166,18 @@ defmodule PaleeWeb.DocumentsControllerTest do
                "version_id" => version["id"],
                "agreed" => true,
                "typed_name" => "Μαρία Παπαδοπούλου",
-               "drawn_signature" => %{"width" => 200, "height" => 80, "strokes" => [[[1, 1], [20, 30]]]}
+               "drawn_signature" => %{
+                 "width" => 200,
+                 "height" => 80,
+                 "strokes" => [[[1, 1], [20, 30]]]
+               }
              })
              |> json_response(201)
 
     assert %{"url" => url} =
-             ctx.client |> get_json("#{ctx.me}/signatures/#{signature["id"]}/evidence") |> json_response(200)
+             ctx.client
+             |> get_json("#{ctx.me}/signatures/#{signature["id"]}/evidence")
+             |> json_response(200)
 
     assert is_binary(url)
 
@@ -167,7 +186,10 @@ defmodule PaleeWeb.DocumentsControllerTest do
              ctx.owner |> get_json("#{ctx.admin}/signatures") |> json_response(200)
 
     assert user_id == ctx.client_user.id
-    assert ctx.owner |> get_json("#{ctx.admin}/signatures/#{signature["id"]}/evidence") |> json_response(200)
+
+    assert ctx.owner
+           |> get_json("#{ctx.admin}/signatures/#{signature["id"]}/evidence")
+           |> json_response(200)
 
     # Another client cannot download it.
     {_other, other} =
@@ -177,7 +199,9 @@ defmodule PaleeWeb.DocumentsControllerTest do
          {user, put_bearer_token(build_conn(), user)}
        end).()
 
-    assert other |> get_json("#{ctx.me}/signatures/#{signature["id"]}/evidence") |> json_response(404)
+    assert other
+           |> get_json("#{ctx.me}/signatures/#{signature["id"]}/evidence")
+           |> json_response(404)
 
     assert %{"booking" => _} =
              ctx.client
@@ -189,7 +213,9 @@ defmodule PaleeWeb.DocumentsControllerTest do
        ctx do
     assert %{"file_key" => key, "upload_url" => _} =
              ctx.client
-             |> send_json(:post, "#{ctx.me}/health-certificate/uploads", %{"content_type" => "application/pdf"})
+             |> send_json(:post, "#{ctx.me}/health-certificate/uploads", %{
+               "content_type" => "application/pdf"
+             })
              |> json_response(200)
 
     :ok = MemoryObjectStore.put_object(:documents, key, @pdf, "application/pdf")
@@ -210,7 +236,9 @@ defmodule PaleeWeb.DocumentsControllerTest do
     assert row["status"] == "valid" and row["certificate"]["id"] == id
 
     assert %{"url" => _} =
-             ctx.owner |> get_json("#{ctx.admin}/health-certificates/#{id}/file") |> json_response(200)
+             ctx.owner
+             |> get_json("#{ctx.admin}/health-certificates/#{id}/file")
+             |> json_response(200)
 
     # Front desk lacks the capability by default; coaches read statuses only.
     assert ctx.desk |> get_json("#{ctx.admin}/health-certificates") |> json_response(403)
@@ -226,7 +254,10 @@ defmodule PaleeWeb.DocumentsControllerTest do
              ctx.coach |> get_json("#{ctx.admin}/health-certificates") |> json_response(200)
 
     assert coach_row["status"] == "valid" and coach_row["certificate"] == nil
-    assert ctx.coach |> get_json("#{ctx.admin}/health-certificates/#{id}/file") |> json_response(403)
+
+    assert ctx.coach
+           |> get_json("#{ctx.admin}/health-certificates/#{id}/file")
+           |> json_response(403)
 
     assert %{"health_certificate" => %{"id" => ^id}} =
              ctx.client

@@ -23,8 +23,15 @@ defmodule Palee.Application.Documents.HealthCertificatesAdmin do
 
     clients =
       case if(full?, do: :all, else: AuthorizeClientAccess.client_ids(context, :view_health)) do
-        :all -> Organizations.list_client_user_ids(context)
-        ids -> MapSet.intersection(MapSet.new(ids), MapSet.new(Organizations.list_client_user_ids(context))) |> MapSet.to_list()
+        :all ->
+          Organizations.list_client_user_ids(context)
+
+        ids ->
+          MapSet.intersection(
+            MapSet.new(ids),
+            MapSet.new(Organizations.list_client_user_ids(context))
+          )
+          |> MapSet.to_list()
       end
 
     statuses = Documents.health_statuses(context, clients, today)
@@ -102,13 +109,15 @@ defmodule Palee.Application.Documents.HealthCertificatesAdmin do
   end
 
   def download(context, id, now \\ DateTime.utc_now()) do
-    with %{} = certificate <- Documents.get_health_certificate(context, id) || {:error, :not_found} do
+    with %{} = certificate <-
+           Documents.get_health_certificate(context, id) || {:error, :not_found} do
       Files.download(context, certificate, context.user_id, now)
     end
   end
 
   def delete(context, id, now \\ DateTime.utc_now()) do
-    with %{} = certificate <- Documents.get_health_certificate(context, id) || {:error, :not_found},
+    with %{} = certificate <-
+           Documents.get_health_certificate(context, id) || {:error, :not_found},
          {:ok, deleted} <- Files.delete(context, certificate, context.user_id, now) do
       {:ok, %{health_certificate: V.certificate(deleted)}}
     end
