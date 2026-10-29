@@ -73,8 +73,8 @@ defmodule Palee.Execution.Domain.PlanActuals do
   @spec place(record()) :: tuple()
   def place(record),
     do:
-      {record.section_id, record.row_id, record.interrupt, record.block_index,
-       record.round_index, record.part_index, record.phase_index}
+      {record.section_id, record.row_id, record.interrupt, record.block_index, record.round_index,
+       record.part_index, record.phase_index}
 
   @doc """
   The volume of one record in kg × reps: actual reps times actual load, when
