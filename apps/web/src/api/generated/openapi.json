@@ -90500,6 +90500,10 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "age_confirmed": {
+                    "description": "ADR-267: true when the person confirms they are at least 16; without it nothing is created (422, errors.age_confirmed)",
+                    "type": "boolean"
+                  },
                   "display_name": {
                     "description": "Free display name; defaults to the handle",
                     "type": "string"
@@ -90689,6 +90693,10 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "age_confirmed": {
+                    "description": "ADR-267: true when the person confirms they are at least 16; without it nothing is created (422, errors.age_confirmed)",
+                    "type": "boolean"
+                  },
                   "display_name": {
                     "type": "string"
                   },
@@ -90893,6 +90901,10 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "age_confirmed": {
+                    "description": "ADR-267: true when the person confirms they are at least 16; without it nothing is created (422, errors.age_confirmed)",
+                    "type": "boolean"
+                  },
                   "display_name": {
                     "type": "string"
                   },
@@ -116556,6 +116568,252 @@
         "summary": "Πρόοδος: the member's own daily stats from a device (resting heart rate)",
         "tags": [
           "Connected devices"
+        ]
+      }
+    },
+    "/api/me/data-exports": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PersonalDataExportController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "exports": {
+                      "items": {
+                        "properties": {
+                          "completed_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "expires_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "file": {
+                            "description": "The ZIP of JSON files, while it is kept (status ready)",
+                            "nullable": true,
+                            "properties": {
+                              "bytes": {
+                                "type": "integer"
+                              },
+                              "download_url": {
+                                "description": "Short-lived presigned link, made afresh on every request",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "sha256": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "bytes",
+                              "download_url",
+                              "name",
+                              "sha256"
+                            ],
+                            "type": "object"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "record_count": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "requested_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "ready",
+                              "failed",
+                              "expired"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "requested_at",
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "exports"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Exports"
+          }
+        },
+        "summary": "Your data exports, newest first, with short-lived download links",
+        "tags": [
+          "Personal data"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "description": "One request at a time and one a day. The file is built in the background; an email says when it is ready.",
+        "operationId": "PaleeWeb.PersonalDataExportController.create",
+        "parameters": [],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "export": {
+                      "properties": {
+                        "completed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "file": {
+                          "description": "The ZIP of JSON files, while it is kept (status ready)",
+                          "nullable": true,
+                          "properties": {
+                            "bytes": {
+                              "type": "integer"
+                            },
+                            "download_url": {
+                              "description": "Short-lived presigned link, made afresh on every request",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "sha256": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "bytes",
+                            "download_url",
+                            "name",
+                            "sha256"
+                          ],
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "record_count": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "ready",
+                            "failed",
+                            "expired"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "requested_at",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "export"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Requested"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "retry_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "An export is being prepared"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "retry_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Asked less than a day ago"
+          }
+        },
+        "summary": "Ask for a copy of all your data (one ZIP of JSON files)",
+        "tags": [
+          "Personal data"
         ]
       }
     },

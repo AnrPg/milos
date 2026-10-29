@@ -2449,6 +2449,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/data-exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your data exports, newest first, with short-lived download links */
+        get: operations["PaleeWeb.PersonalDataExportController.index"];
+        put?: never;
+        /**
+         * Ask for a copy of all your data (one ZIP of JSON files)
+         * @description One request at a time and one a day. The file is built in the background; an email says when it is ready.
+         */
+        post: operations["PaleeWeb.PersonalDataExportController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/device-imports/{id}/confirm": {
         parameters: {
             query?: never;
@@ -44446,6 +44467,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description ADR-267: true when the person confirms they are at least 16; without it nothing is created (422, errors.age_confirmed) */
+                    age_confirmed?: boolean;
                     /** @description Free display name; defaults to the handle */
                     display_name?: string;
                     /** Format: email */
@@ -44541,6 +44564,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description ADR-267: true when the person confirms they are at least 16; without it nothing is created (422, errors.age_confirmed) */
+                    age_confirmed?: boolean;
                     display_name?: string;
                     /** Format: email */
                     email: string;
@@ -44643,6 +44668,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description ADR-267: true when the person confirms they are at least 16; without it nothing is created (422, errors.age_confirmed) */
+                    age_confirmed?: boolean;
                     display_name?: string;
                     /** Format: email */
                     email: string;
@@ -54222,6 +54249,118 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonalDataExportController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Exports */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        exports: {
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** @description The ZIP of JSON files, while it is kept (status ready) */
+                            file?: {
+                                bytes: number;
+                                /** @description Short-lived presigned link, made afresh on every request */
+                                download_url: string | null;
+                                name: string;
+                                sha256: string;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            record_count?: number | null;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** @enum {string} */
+                            status: "pending" | "ready" | "failed" | "expired";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonalDataExportController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Requested */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        export: {
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** @description The ZIP of JSON files, while it is kept (status ready) */
+                            file?: {
+                                bytes: number;
+                                /** @description Short-lived presigned link, made afresh on every request */
+                                download_url: string | null;
+                                name: string;
+                                sha256: string;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            record_count?: number | null;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** @enum {string} */
+                            status: "pending" | "ready" | "failed" | "expired";
+                        };
+                    };
+                };
+            };
+            /** @description An export is being prepared */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        /** Format: date-time */
+                        retry_at?: string;
+                    };
+                };
+            };
+            /** @description Asked less than a day ago */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        /** Format: date-time */
+                        retry_at?: string;
                     };
                 };
             };
