@@ -12,6 +12,15 @@ defmodule Palee.Repo.Migrations.CreateExecutionPlanSets do
 
   @user "NULLIF(current_setting('app.user_id', true), '')::uuid"
 
+  # The owner's own row, on an execution of its own.
+  @owner_write """
+  user_id = #{@user}
+  AND EXISTS (
+    SELECT 1 FROM workout_executions e
+    WHERE e.id = execution_plan_sets.execution_id AND e.user_id = execution_plan_sets.user_id
+  )
+  """
+
   def up do
     create table(:execution_plan_sets, primary_key: false) do
       add :id, :binary_id, primary_key: true
@@ -80,23 +89,39 @@ defmodule Palee.Repo.Migrations.CreateExecutionPlanSets do
     execute("ALTER TABLE execution_plan_sets FORCE ROW LEVEL SECURITY")
 
     # Read: whoever can read the parent execution (its own policies apply in
-    # the subquery). Write: only the owner, on an execution it can see.
+    # the subquery). Write (insert, update, delete): only the owner, on an
+    # execution of its own. Split per command so a scope that may only read
+    # the parent (staff, a coach it is shared with) cannot delete or change
+    # the actuals: a FOR ALL policy's USING would let it, as WITH CHECK is
+    # never evaluated for DELETE.
     execute("""
-    CREATE POLICY execution_plan_sets_parent_policy ON execution_plan_sets
-      FOR ALL
+    CREATE POLICY execution_plan_sets_read_policy ON execution_plan_sets
+      FOR SELECT
       USING (
         user_id = #{@user}
         OR EXISTS (
           SELECT 1 FROM workout_executions e WHERE e.id = execution_plan_sets.execution_id
         )
       )
-      WITH CHECK (
-        user_id = #{@user}
-        AND EXISTS (
-          SELECT 1 FROM workout_executions e
-          WHERE e.id = execution_plan_sets.execution_id AND e.user_id = execution_plan_sets.user_id
-        )
-      )
+    """)
+
+    execute("""
+    CREATE POLICY execution_plan_sets_owner_insert_policy ON execution_plan_sets
+      FOR INSERT
+      WITH CHECK (#{@owner_write})
+    """)
+
+    execute("""
+    CREATE POLICY execution_plan_sets_owner_update_policy ON execution_plan_sets
+      FOR UPDATE
+      USING (user_id = #{@user})
+      WITH CHECK (#{@owner_write})
+    """)
+
+    execute("""
+    CREATE POLICY execution_plan_sets_owner_delete_policy ON execution_plan_sets
+      FOR DELETE
+      USING (user_id = #{@user})
     """)
   end
 
