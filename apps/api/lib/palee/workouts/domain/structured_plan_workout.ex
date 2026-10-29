@@ -71,20 +71,11 @@ defmodule Palee.Workouts.Domain.StructuredPlanWorkout do
   end
 
   defp prepare_section(%{} = section, index) do
-    section = Map.new(section, fn {key, item} -> {to_string(key), item} end)
-
-    case Map.get(section, "plan") do
+    case value(section, :plan) do
       %{} = plan ->
         case StructuredPlan.normalize(plan) do
-          {:ok, plan} ->
-            {:ok,
-             section
-             |> Map.delete("sections")
-             |> Map.put("plan", plan)
-             |> Map.put("exercises", exercises(plan))}
-
-          {:error, errors} ->
-            {:error, Enum.map(errors, &Map.put(&1, :section, index))}
+          {:ok, plan} -> {:ok, put_plan(section, plan)}
+          {:error, errors} -> {:error, Enum.map(errors, &Map.put(&1, :section, index))}
         end
 
       _none ->
@@ -94,6 +85,25 @@ defmodule Palee.Workouts.Domain.StructuredPlanWorkout do
 
   defp prepare_section(_section, index),
     do: {:error, [%{section: index, path: "", code: "plan_required"}]}
+
+  # The section keeps its own key style (internal callers use atoms, requests
+  # strings), so it still casts; the materialised exercises follow it.
+  defp put_plan(section, plan) do
+    exercises = exercises(plan)
+
+    if Enum.any?(Map.keys(section), &is_atom/1) do
+      section
+      |> Map.drop([:sections, :exercises, :plan])
+      |> Map.merge(%{plan: plan, exercises: Enum.map(exercises, &atom_keys/1)})
+    else
+      section
+      |> Map.drop(["sections", "exercises", "plan"])
+      |> Map.merge(%{"plan" => plan, "exercises" => exercises})
+    end
+  end
+
+  # Only the materialiser's own fixed keys are turned into atoms.
+  defp atom_keys(exercise), do: Map.new(exercise, fn {key, item} -> {String.to_existing_atom(key), item} end)
 
   @doc "The legacy exercise rows of a (valid) plan, as `workout_exercises` params."
   @spec exercises(map()) :: [map()]

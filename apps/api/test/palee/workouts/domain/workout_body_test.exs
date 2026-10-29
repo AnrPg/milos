@@ -65,4 +65,35 @@ defmodule Palee.Workouts.Domain.WorkoutBodyTest do
 
     assert %{sections: [%{scored: true, excerpt: "21-15-9"}]} = WorkoutBody.summary(workout)
   end
+
+  test "ADR-270: a structured plan carries its plans; lists name each section's flow and count" do
+    plan = Palee.StructuredPlanFixtures.program() |> Enum.at(8)
+
+    workout = %{
+      authoring_mode: "structured_plan",
+      sections: [
+        %{id: "s1", name: "Engine", plan: plan, exercises: [%{name: "Row"}]},
+        %{"id" => "s2", "name" => "Rest", "plan" => nil}
+      ]
+    }
+
+    assert WorkoutBody.build(workout) == %{
+             kind: "plan",
+             sections: [
+               %{id: "s1", name: "Engine", plan: plan},
+               %{id: "s2", name: "Rest", plan: nil}
+             ]
+           }
+
+    assert WorkoutBody.summary(workout) == %{
+             kind: "plan",
+             sections: [
+               %{name: "Engine", flow: "for_time", exercise_count: 4},
+               %{name: "Rest", flow: nil, exercise_count: 0}
+             ]
+           }
+
+    assert WorkoutBody.kind("structured_plan") == "plan"
+    assert "plan" in WorkoutBody.kinds()
+  end
 end
