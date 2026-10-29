@@ -6,6 +6,8 @@
 //     the app's host, in AndroidManifest.xml.
 //   - iOS: Associated Domains (applinks:<host>) in App.entitlements and the
 //     app-bound domains (WKAppBoundDomains) in Info.plist.
+//   - ADR-256: the store version and build number (config/release.json,
+//     PALEE_BUILD_NUMBER) in build.gradle and project.pbxproj.
 //
 // Every edit sits between `palee:app-links` markers and is rewritten on each
 // run, so the native projects stay in git and switching environments is a
@@ -16,7 +18,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
-const { resolveEnvironment, appLinkPathPrefixes } = require("../config/resolve.cjs");
+const { resolveEnvironment, appLinkPathPrefixes, resolveRelease } = require("../config/resolve.cjs");
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -87,6 +89,20 @@ export function iosEntitlements(hostname, apsEnvironment) {
   ].join("\n");
 }
 
+// ADR-256: the store version and build number in Android's defaultConfig.
+export function withAndroidVersion(gradle, { version, build }) {
+  return gradle
+    .replace(/^(\s*)versionCode\s+\d+\s*$/m, `$1versionCode ${build}`)
+    .replace(/^(\s*)versionName\s+"[^"]*"\s*$/m, `$1versionName "${version}"`);
+}
+
+// ADR-256: the same for every iOS build configuration (app and extensions).
+export function withIosVersion(pbxproj, { version, build }) {
+  return pbxproj
+    .replace(/^(\s*)MARKETING_VERSION = [^;]*;$/gm, `$1MARKETING_VERSION = ${version};`)
+    .replace(/^(\s*)CURRENT_PROJECT_VERSION = [^;]*;$/gm, `$1CURRENT_PROJECT_VERSION = ${build};`);
+}
+
 // Points both build configurations at App.entitlements (once).
 export function withEntitlementsSetting(pbxproj) {
   if (pbxproj.includes("CODE_SIGN_ENTITLEMENTS")) return pbxproj;
@@ -125,6 +141,7 @@ function ensureEntitlementsFile(file) {
 
 export function configure(env = process.env, base = root) {
   const environment = resolveEnvironment(env);
+  const release = resolveRelease(env);
   const prefixes = appLinkPathPrefixes();
   const hostnames = environment.navigationHosts.map((host) => host.split(":")[0]);
   const done = [];
@@ -153,10 +170,18 @@ export function configure(env = process.env, base = root) {
     done.push("ios App.entitlements");
   }
 
+  const gradle = path.join(base, "android/app/build.gradle");
+  if (fs.existsSync(gradle)) {
+    const source = fs.readFileSync(gradle, "utf8");
+    const next = withAndroidVersion(source, release);
+    if (next !== source) fs.writeFileSync(gradle, next);
+    done.push("android build.gradle");
+  }
+
   const pbxproj = path.join(base, "ios/App/App.xcodeproj/project.pbxproj");
   if (fs.existsSync(pbxproj)) {
     const source = fs.readFileSync(pbxproj, "utf8");
-    const next = withEntitlementsSetting(source);
+    const next = withIosVersion(withEntitlementsSetting(source), release);
     if (next !== source) fs.writeFileSync(pbxproj, next);
     done.push("ios project.pbxproj");
   }
@@ -165,11 +190,11 @@ export function configure(env = process.env, base = root) {
     done.push("ios Info.plist");
   }
 
-  return { environment, done };
+  return { environment, release, done };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const { environment, done } = configure();
-  console.log(`Palee ${environment.name}: ${environment.url} (${environment.appId})`);
+  const { environment, release, done } = configure();
+  console.log(`Palee ${environment.name}: ${environment.url} (${environment.appId}) ${release.version} (${release.build})`);
   for (const item of done) console.log(`  updated ${item}`);
 }
