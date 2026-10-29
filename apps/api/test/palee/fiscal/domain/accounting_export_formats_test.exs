@@ -164,7 +164,12 @@ defmodule Palee.Fiscal.Domain.AccountingExportFormatsTest do
       generated_at: ~U[2027-03-01 08:30:15.123456Z],
       seller:
         Map.merge(
-          %{legal_name: "Box Berlin GmbH", country_code: "DE", currency: "EUR", vat_scheme: "standard"},
+          %{
+            legal_name: "Box Berlin GmbH",
+            country_code: "DE",
+            currency: "EUR",
+            vat_scheme: "standard"
+          },
           seller
         )
     }
@@ -188,7 +193,12 @@ defmodule Palee.Fiscal.Domain.AccountingExportFormatsTest do
 
       assert invoice.sign == 1 and invoice.gross_cents == 12_000
       assert [%{rate_bp: 1900, gross_cents: 10_000}, %{rate_bp: 700}] = invoice.groups
-      assert invoice.buyer == %{name: "Muster GmbH", vat_number: "DE136695976", country_code: "DE"}
+
+      assert invoice.buyer == %{
+               name: "Muster GmbH",
+               vat_number: "DE136695976",
+               country_code: "DE"
+             }
 
       assert credit.sign == -1
       assert credit.gross_cents == -2_000
@@ -254,7 +264,11 @@ defmodule Palee.Fiscal.Domain.AccountingExportFormatsTest do
       assert {:error, {:invalid_fields, errors}} =
                ExportOptions.normalize(specs, %{"n" => 10, "e" => "c", "m" => %{"x" => "1"}})
 
-      assert errors == %{"options.n" => :out_of_range, "options.e" => :invalid, "options.m" => :invalid}
+      assert errors == %{
+               "options.n" => :out_of_range,
+               "options.e" => :invalid,
+               "options.m" => :invalid
+             }
     end
   end
 
@@ -297,7 +311,19 @@ defmodule Palee.Fiscal.Domain.AccountingExportFormatsTest do
       assert Enum.all?([standard, reduced, credit], &(length(&1) == 120))
 
       assert Enum.take(standard, 11) ==
-               ["100,00", ~s("S"), ~s("EUR"), "", "", "", "1400", "8400", "", "0302", ~s("I-000001")]
+               [
+                 "100,00",
+                 ~s("S"),
+                 ~s("EUR"),
+                 "",
+                 "",
+                 "",
+                 "1400",
+                 "8400",
+                 "",
+                 "0302",
+                 ~s("I-000001")
+               ]
 
       assert Enum.slice(reduced, 0, 2) == ["20,00", ~s("S")]
       assert Enum.at(reduced, 7) == "8300"
@@ -322,13 +348,29 @@ defmodule Palee.Fiscal.Domain.AccountingExportFormatsTest do
 
       {:ok, %{content: content}} = Datev.render(context, options)
       [_header, _columns, payment] = String.split(content, "\r\n", trim: true)
-      assert payment |> String.split(";") |> Enum.slice(0, 8) == ["120,00", ~s("S"), ~s("EUR"), "", "", "", "1800", "1200"]
+
+      assert payment |> String.split(";") |> Enum.slice(0, 8) == [
+               "120,00",
+               ~s("S"),
+               ~s("EUR"),
+               "",
+               "",
+               "",
+               "1800",
+               "1200"
+             ]
 
       exempt = [
         %{
           hd(documents())
           | tax_breakdown: [
-              %{"tax_category" => "exempt", "rate_bp" => 0, "net_cents" => 100, "tax_cents" => 0, "gross_cents" => 100}
+              %{
+                "tax_category" => "exempt",
+                "rate_bp" => 0,
+                "net_cents" => 100,
+                "tax_cents" => 0,
+                "gross_cents" => 100
+              }
             ]
         }
       ]
@@ -358,7 +400,9 @@ defmodule Palee.Fiscal.Domain.AccountingExportFormatsTest do
     test "consultant and client numbers are required" do
       {:ok, options} = Datev.normalize_options(%{})
 
-      assert {:error, {:invalid_fields, %{"options.consultant_number" => :required, "options.client_number" => :required}}} =
+      assert {:error,
+              {:invalid_fields,
+               %{"options.consultant_number" => :required, "options.client_number" => :required}}} =
                Datev.render(context(), options)
 
       assert {:error, {:invalid_fields, %{"options.chart" => :invalid}}} =
@@ -378,7 +422,16 @@ defmodule Palee.Fiscal.Domain.AccountingExportFormatsTest do
 
     assert Enum.at(first, 0) == "Muster GmbH"
     assert Enum.slice(first, 10, 4) == ["I-000001", "", "03/02/2027", "03/02/2027"]
-    assert Enum.slice(first, 15, 6) == ["Unlimited – Februar", "2", "50.00", "", "200", "19% (VAT on Income)"]
+
+    assert Enum.slice(first, 15, 6) == [
+             "Unlimited – Februar",
+             "2",
+             "50.00",
+             "",
+             "200",
+             "19% (VAT on Income)"
+           ]
+
     # A discounted line goes as one unit at its amount; formula text is guarded.
     assert Enum.slice(discounted, 15, 3) == ["'=Shake", "1", "20.00"]
     assert Enum.at(credit, 0) == "Cash sales"
@@ -433,11 +486,37 @@ defmodule Palee.Fiscal.Domain.AccountingExportFormatsTest do
     assert header == Sage.columns()
 
     assert [si_standard, si_reduced, sc, sa] = rows
-    assert si_standard == ["SI", "GYM01", "4000", "0", "03/02/2027", "I-000001", "Muster GmbH", "84.03", "T1", "15.97", "", "", "", "", ""]
+
+    assert si_standard == [
+             "SI",
+             "GYM01",
+             "4000",
+             "0",
+             "03/02/2027",
+             "I-000001",
+             "Muster GmbH",
+             "84.03",
+             "T1",
+             "15.97",
+             "",
+             "",
+             "",
+             "",
+             ""
+           ]
+
     assert Enum.slice(si_reduced, 7, 3) == ["18.69", "T5", "1.31"]
     assert Enum.slice(sc, 0, 1) ++ Enum.slice(sc, 7, 4) == ["SC", "18.69", "T5", "1.31", ""]
     assert Enum.at(sc, 11) == "I-000001"
-    assert Enum.slice(sa, 0, 3) ++ Enum.slice(sa, 7, 3) == ["SA", "GYM01", "1200", "120.00", "T9", "0.00"]
+
+    assert Enum.slice(sa, 0, 3) ++ Enum.slice(sa, 7, 3) == [
+             "SA",
+             "GYM01",
+             "1200",
+             "120.00",
+             "T9",
+             "0.00"
+           ]
   end
 
   test "bexio: gross bookings with the VAT code, credit notes swap accounts" do
@@ -446,7 +525,18 @@ defmodule Palee.Fiscal.Domain.AccountingExportFormatsTest do
     assert header == ~w(Datum Belegnummer Buchungstext SollKonto HabenKonto Betrag MWST Währung)
 
     assert [standard, reduced, credit] = rows
-    assert standard == ["03.02.2027", "I-000001", "Rechnung I-000001 Muster GmbH", "1100", "3400", "100.00", "UN19", "EUR"]
+
+    assert standard == [
+             "03.02.2027",
+             "I-000001",
+             "Rechnung I-000001 Muster GmbH",
+             "1100",
+             "3400",
+             "100.00",
+             "UN19",
+             "EUR"
+           ]
+
     assert Enum.slice(reduced, 5, 2) == ["20.00", "UN7"]
     assert Enum.slice(credit, 3, 3) == ["3400", "1000", "20.00"]
   end
@@ -458,11 +548,26 @@ defmodule Palee.Fiscal.Domain.AccountingExportFormatsTest do
     assert length(rows) == 4
 
     credit = Enum.at(rows, 2)
-    assert Enum.slice(credit, 0, 4) == ["line", "22222222-2222-2222-2222-222222222222", "C-000001", "credit_note"]
+
+    assert Enum.slice(credit, 0, 4) == [
+             "line",
+             "22222222-2222-2222-2222-222222222222",
+             "C-000001",
+             "credit_note"
+           ]
+
     assert Enum.slice(credit, -3, 3) == ["-18,69", "-1,31", "-20,00"]
 
     payment = Enum.at(rows, 3)
-    assert Enum.slice(payment, 0, 5) == ["payment", "33333333-3333-3333-3333-333333333333", "INV-7", "payment", "2027-02-05"]
+
+    assert Enum.slice(payment, 0, 5) == [
+             "payment",
+             "33333333-3333-3333-3333-333333333333",
+             "INV-7",
+             "payment",
+             "2027-02-05"
+           ]
+
     assert List.last(payment) == "120,00"
 
     %{content: cents} = render(GenericCsv)
@@ -476,7 +581,10 @@ defmodule Palee.Fiscal.Domain.AccountingExportFormatsTest do
     assert json["format"] == "palee-accounting-export"
     assert json["version"] == 1
     assert json["from"] == "2027-02-01"
-    assert [%{"number" => "I-000001"}, %{"gross_cents" => -2000, "sign" => -1}] = json["documents"]
+
+    assert [%{"number" => "I-000001"}, %{"gross_cents" => -2000, "sign" => -1}] =
+             json["documents"]
+
     assert [%{"amount_cents" => 12_000}] = json["payments"]
   end
 

@@ -142,7 +142,9 @@ defmodule PaleeWeb.AdminFiscalTaxController do
       %Parameter{name: :from, in: :query, required: true, schema: @date},
       %Parameter{name: :to, in: :query, required: true, schema: @date}
     ],
-    responses: [ok: {"Export file", "application/octet-stream", %Schema{type: :string, format: :binary}}]
+    responses: [
+      ok: {"Export file", "application/octet-stream", %Schema{type: :string, format: :binary}}
+    ]
   )
 
   def export(conn, %{format: format} = params) do

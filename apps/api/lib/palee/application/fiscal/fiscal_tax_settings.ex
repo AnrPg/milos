@@ -13,7 +13,10 @@ defmodule Palee.Application.Fiscal.FiscalTaxSettings do
 
   @doc "`%{country, categories, default, max_exemption_reason}`."
   def categories(context),
-    do: context |> Taxes.categories() |> Map.put(:max_exemption_reason, Taxes.max_exemption_reason())
+    do:
+      context
+      |> Taxes.categories()
+      |> Map.put(:max_exemption_reason, Taxes.max_exemption_reason())
 
   @doc "`%{applies, rates, states}`."
   def sales_tax_rates(context), do: Taxes.sales_tax_rates(context)

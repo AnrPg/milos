@@ -34,7 +34,8 @@ defmodule Palee.Fiscal.Templates do
       labels = labels_for.(language)
 
       original =
-        document.corrects_document_id && Fiscal.get_document(context, document.corrects_document_id)
+        document.corrects_document_id &&
+          Fiscal.get_document(context, document.corrects_document_id)
 
       transmission = context |> Reporting.transmissions_for([document.id]) |> Map.get(document.id)
 
@@ -58,5 +59,6 @@ defmodule Palee.Fiscal.Templates do
 
   def html(view), do: DocumentHtml.render(view)
 
-  def pdf(view, fonts, %{issued_at: issued_at}), do: DocumentPdf.render(view, fonts, created_at: issued_at)
+  def pdf(view, fonts, %{issued_at: issued_at}),
+    do: DocumentPdf.render(view, fonts, created_at: issued_at)
 end

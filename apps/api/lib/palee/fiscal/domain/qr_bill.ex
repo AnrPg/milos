@@ -356,7 +356,8 @@ defmodule Palee.Fiscal.Domain.QrBill do
   defp amount_text(nil), do: ""
 
   defp amount_text(cents),
-    do: "#{div(cents, 100)}.#{cents |> rem(100) |> Integer.to_string() |> String.pad_leading(2, "0")}"
+    do:
+      "#{div(cents, 100)}.#{cents |> rem(100) |> Integer.to_string() |> String.pad_leading(2, "0")}"
 
   @doc "An amount as printed on a QR-bill: `1 590.00`."
   def print_amount(cents) do

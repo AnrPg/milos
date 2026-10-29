@@ -91,7 +91,10 @@ defmodule PaleeWeb.AdminFiscalTaxControllerTest do
 
   describe "with a document" do
     setup ctx do
-      ctx.owner |> send_json(:put, "#{ctx.admin}/fiscal/identity", @identity) |> json_response(200)
+      ctx.owner
+      |> send_json(:put, "#{ctx.admin}/fiscal/identity", @identity)
+      |> json_response(200)
+
       now = DateTime.utc_now()
       today = Organizations.local_date(ctx.context, now)
 

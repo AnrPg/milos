@@ -85,8 +85,7 @@ defmodule Palee.Infrastructure.Fiscal.Exports.Bexio do
 
     skipped = if options["include_payments"], do: 0, else: length(entries.payments)
 
-    {:ok,
-     %{content: ExportCsv.encode([@columns | rows], separator: ";"), skipped: skipped}}
+    {:ok, %{content: ExportCsv.encode([@columns | rows], separator: ";"), skipped: skipped}}
   end
 
   defp document_rows(document, options) do

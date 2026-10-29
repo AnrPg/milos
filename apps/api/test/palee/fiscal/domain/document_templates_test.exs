@@ -204,7 +204,14 @@ defmodule Palee.Fiscal.Domain.DocumentTemplatesTest do
       assert Enum.slice(lines, 11, 7) == List.duplicate("", 7)
       assert Enum.slice(lines, 18, 2) == ["1590.00", "CHF"]
       assert Enum.at(lines, 20) == "S"
-      assert Enum.slice(lines, 27, 4) == ["QRR", "210000000003139471430009017", "Invoice I-000042", "EPD"]
+
+      assert Enum.slice(lines, 27, 4) == [
+               "QRR",
+               "210000000003139471430009017",
+               "Invoice I-000042",
+               "EPD"
+             ]
+
       assert bill.reference == "21 00000 00003 13947 14300 09017"
       assert bill.account == "CH44 3199 9123 0008 8901 2"
     end
@@ -231,20 +238,30 @@ defmodule Palee.Fiscal.Domain.DocumentTemplatesTest do
                QrBill.build(Map.put(base, :reference, {:qrr, "1"}))
 
       assert {:error, :qr_iban_needs_qr_reference} =
-               QrBill.build(%{base | account: "CH4431999123000889012"} |> Map.put(:reference, :none))
+               QrBill.build(
+                 %{base | account: "CH4431999123000889012"}
+                 |> Map.put(:reference, :none)
+               )
 
       assert {:error, :iban_not_swiss} =
-               QrBill.build(%{base | account: "DE89370400440532013000"} |> Map.put(:reference, :none))
+               QrBill.build(
+                 %{base | account: "DE89370400440532013000"}
+                 |> Map.put(:reference, :none)
+               )
 
       assert {:error, :qr_bill_currency} =
                QrBill.build(%{base | currency: "USD"} |> Map.put(:reference, :none))
 
       assert {:error, :creditor_address_incomplete} =
-               QrBill.build(%{base | creditor: Map.delete(@creditor, :city)} |> Map.put(:reference, :none))
+               QrBill.build(
+                 %{base | creditor: Map.delete(@creditor, :city)}
+                 |> Map.put(:reference, :none)
+               )
     end
 
     test "a document gets a bill only when it is a Swiss invoice to be paid" do
-      assert %{reference_type: "QRR"} = QrBill.for_document(swiss_invoice(), @identity, "Rechnung")
+      assert %{reference_type: "QRR"} =
+               QrBill.for_document(swiss_invoice(), @identity, "Rechnung")
 
       assert %{reference_type: "SCOR"} =
                QrBill.for_document(swiss_invoice(), %{iban: @identity.iban}, "Rechnung")
@@ -281,6 +298,7 @@ defmodule Palee.Fiscal.Domain.DocumentTemplatesTest do
 
       assert view.title == "Invoice"
       assert {"UID", "CHE-109.322.551"} in view.seller.ids
+
       assert view.breakdown == [["8.1 %", "185.01 CHF", "14.99 CHF", "200.00 CHF"]] or
                hd(view.breakdown) |> hd() =~ "8.1"
 
@@ -363,7 +381,11 @@ defmodule Palee.Fiscal.Domain.DocumentTemplatesTest do
 
       credit =
         DocumentView.build(
-          swiss_invoice(%{kind: "credit_note", number: "C-000001", corrects_document_id: original.id}),
+          swiss_invoice(%{
+            kind: "credit_note",
+            number: "C-000001",
+            corrects_document_id: original.id
+          }),
           labels: labels,
           language: "en",
           original: original
@@ -379,7 +401,9 @@ defmodule Palee.Fiscal.Domain.DocumentTemplatesTest do
     test "HTML is self-contained, escaped, with the QR-bill's Swiss cross" do
       view =
         DocumentView.build(
-          swiss_invoice(%{lines: [line(1, "<script>x</script>", 20_000, "standard", 810, 18_501, 1_499)]}),
+          swiss_invoice(%{
+            lines: [line(1, "<script>x</script>", 20_000, "standard", 810, 18_501, 1_499)]
+          }),
           labels: DocumentLabels.messages(),
           language: "de",
           identity: @identity

@@ -68,7 +68,8 @@ defmodule Palee.Fiscal.Domain.DocumentLabels do
     fr_operation: "Category of operation: provision of services",
     fr_late_payment:
       "Late payment: penalties at three times the legal interest rate and a fixed recovery fee of 40 euros (Commercial Code, art. L441-10 and D441-5). No discount for early payment.",
-    footer_journal: "This document is recorded in the inalterable fiscal journal of the business.",
+    footer_journal:
+      "This document is recorded in the inalterable fiscal journal of the business.",
     fingerprint: "Document fingerprint (SHA-256)",
     page: "Page"
   }

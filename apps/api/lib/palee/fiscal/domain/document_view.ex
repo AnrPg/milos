@@ -292,7 +292,13 @@ defmodule Palee.Fiscal.Domain.DocumentView do
         }
 
       profile.authority == :mydata ->
-        %{title: label.(:mydata_title), rows: [], qr: nil, qr_url: nil, pending: label.(:mydata_pending)}
+        %{
+          title: label.(:mydata_title),
+          rows: [],
+          qr: nil,
+          qr_url: nil,
+          pending: label.(:mydata_pending)
+        }
 
       true ->
         nil
@@ -393,7 +399,11 @@ defmodule Palee.Fiscal.Domain.DocumentView do
     whole = div(bp, 100)
 
     fraction =
-      bp |> rem(100) |> Integer.to_string() |> String.pad_leading(2, "0") |> String.trim_trailing("0")
+      bp
+      |> rem(100)
+      |> Integer.to_string()
+      |> String.pad_leading(2, "0")
+      |> String.trim_trailing("0")
 
     if fraction == "", do: "#{whole}%", else: "#{whole}#{decimal}#{fraction}%"
   end

@@ -24,7 +24,9 @@ defmodule Palee.Fiscal.Domain.ExportCsv do
 
   defp cell(nil, _separator, _quote_all, _guard), do: ""
   defp cell({:raw, text}, _separator, _quote_all, _guard), do: text
-  defp cell(value, _separator, _quote_all, _guard) when is_integer(value), do: Integer.to_string(value)
+
+  defp cell(value, _separator, _quote_all, _guard) when is_integer(value),
+    do: Integer.to_string(value)
 
   defp cell(value, separator, quote_all, guard) do
     text = value |> to_string() |> then(&if(guard, do: guard_formula(&1), else: &1))

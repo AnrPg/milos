@@ -100,7 +100,9 @@ defmodule Palee.Fiscal.Exports do
          {:ok, options} <- module.normalize_options(Map.merge(saved, stringify(overrides))) do
       documents = FiscalStore.documents_between(context, from, to)
       lines = TaxStore.lines_for_documents(context, Enum.map(documents, & &1.id))
-      entries = ExportEntries.build(documents, lines, payments, outside_numbers(context, documents))
+
+      entries =
+        ExportEntries.build(documents, lines, payments, outside_numbers(context, documents))
 
       render_context = %{
         entries: entries,
@@ -184,5 +186,7 @@ defmodule Palee.Fiscal.Exports do
   end
 
   defp stringify(nil), do: %{}
-  defp stringify(map) when is_map(map), do: Map.new(map, fn {key, value} -> {to_string(key), value} end)
+
+  defp stringify(map) when is_map(map),
+    do: Map.new(map, fn {key, value} -> {to_string(key), value} end)
 end

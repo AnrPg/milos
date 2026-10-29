@@ -154,12 +154,27 @@ defmodule Palee.Fiscal.Domain.TaxEngineTest do
       invoice = %{id: "inv-1", currency: "EUR"}
 
       lines = [
-        %{id: "l1", description: "Unlimited", quantity: 1, unit_amount_cents: 6_000,
-          package_code_snapshot: "UNL"},
-        %{id: "l2", description: "Water", quantity: 3, unit_amount_cents: 100,
-          source_id: "order-line-9"},
-        %{id: "l3", description: "Workshop", quantity: 1, unit_amount_cents: 2_000,
-          charge_category: "event"},
+        %{
+          id: "l1",
+          description: "Unlimited",
+          quantity: 1,
+          unit_amount_cents: 6_000,
+          package_code_snapshot: "UNL"
+        },
+        %{
+          id: "l2",
+          description: "Water",
+          quantity: 3,
+          unit_amount_cents: 100,
+          source_id: "order-line-9"
+        },
+        %{
+          id: "l3",
+          description: "Workshop",
+          quantity: 1,
+          unit_amount_cents: 2_000,
+          charge_category: "event"
+        },
         %{id: "l4", description: "Other", quantity: 1, unit_amount_cents: 500}
       ]
 

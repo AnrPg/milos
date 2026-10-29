@@ -124,7 +124,10 @@ defmodule Palee.Fiscal.Domain.DocumentPdf do
     Enum.reduce(view.lines, s, fn line, s ->
       cols = columns(view)
       description = Pdf.wrap(s.pdf, line.description, mm(cols.desc_width), size: 9)
-      note = if line.note, do: Pdf.wrap(s.pdf, line.note, mm(cols.desc_width), size: 7.5), else: []
+
+      note =
+        if line.note, do: Pdf.wrap(s.pdf, line.note, mm(cols.desc_width), size: 7.5), else: []
+
       height = length(description) * @line + length(note) * 3.6 + 1.5
       s = ensure(s, height, &table_head/1)
       y = s.y + 3.6
@@ -132,7 +135,9 @@ defmodule Palee.Fiscal.Domain.DocumentPdf do
       s =
         description
         |> Enum.with_index()
-        |> Enum.reduce(s, fn {row, index}, s -> text(s, @left, y + index * @line, row, size: 9) end)
+        |> Enum.reduce(s, fn {row, index}, s ->
+          text(s, @left, y + index * @line, row, size: 9)
+        end)
 
       note_y = y + length(description) * @line - 0.8
 
@@ -148,7 +153,9 @@ defmodule Palee.Fiscal.Domain.DocumentPdf do
         |> text(cols.quantity, y, line.quantity, size: 9, align: :right)
         |> text(cols.unit, y, line.unit_price, size: 9, align: :right)
         |> then(fn s ->
-          if cols.discount, do: text(s, cols.discount, y, line.discount, size: 9, align: :right), else: s
+          if cols.discount,
+            do: text(s, cols.discount, y, line.discount, size: 9, align: :right),
+            else: s
         end)
         |> text(cols.rate, y, line.rate, size: 9, align: :right)
         |> text(cols.amount, y, line.amount, size: 9, align: :right)
@@ -169,7 +176,9 @@ defmodule Palee.Fiscal.Domain.DocumentPdf do
       |> text(cols.quantity, y, c.quantity, font: :bold, size: 8, align: :right)
       |> text(cols.unit, y, c.unit_price, font: :bold, size: 8, align: :right)
       |> then(fn s ->
-        if cols.discount, do: text(s, cols.discount, y, c.discount, font: :bold, size: 8, align: :right), else: s
+        if cols.discount,
+          do: text(s, cols.discount, y, c.discount, font: :bold, size: 8, align: :right),
+          else: s
       end)
       |> text(cols.rate, y, c.rate, font: :bold, size: 8, align: :right)
       |> text(cols.amount, y, c.amount, font: :bold, size: 8, align: :right)
@@ -181,7 +190,13 @@ defmodule Palee.Fiscal.Domain.DocumentPdf do
   defp breakdown(%{view: view} = s) do
     s = ensure(s, 12 + length(view.breakdown) * 4.4, & &1)
     s = %{s | y: s.y + 6}
-    s = text(s, @left, s.y, String.upcase(view.breakdown_heading), size: 7.5, color: {0.3, 0.3, 0.3})
+
+    s =
+      text(s, @left, s.y, String.upcase(view.breakdown_heading),
+        size: 7.5,
+        color: {0.3, 0.3, 0.3}
+      )
+
     xs = [@left, 70, 95, 120]
     y = s.y + 4.5
 
@@ -254,14 +269,19 @@ defmodule Palee.Fiscal.Domain.DocumentPdf do
 
   defp authority(%{view: %{authority: authority}} = s) do
     qr_size = if authority.qr, do: 26, else: 0
-    url_rows = if authority.qr_url, do: Pdf.wrap(s.pdf, authority.qr_url, mm(120), size: 6.5), else: []
+
+    url_rows =
+      if authority.qr_url, do: Pdf.wrap(s.pdf, authority.qr_url, mm(120), size: 6.5), else: []
+
     rows = length(authority.rows) + if(authority.pending, do: 1, else: 0)
     height = max(qr_size + 4, 9 + rows * 4.4 + length(url_rows) * 3)
     s = ensure(s, height + 6, & &1)
     top = s.y + 5
     s = box(s, @left, top, @right - @left, height, 0.5)
     s = text(s, @left + 3, top + 5, authority.title, font: :bold, size: 9)
-    s = if authority.pending, do: text(s, @left + 3, top + 9.5, authority.pending, size: 9), else: s
+
+    s =
+      if authority.pending, do: text(s, @left + 3, top + 9.5, authority.pending, size: 9), else: s
 
     s =
       authority.rows
@@ -279,7 +299,11 @@ defmodule Palee.Fiscal.Domain.DocumentPdf do
         text(s, @left + 3, url_top + index * 3, row, size: 6.5, color: {0.3, 0.3, 0.3})
       end)
 
-    s = if authority.qr, do: qr(s, @right - 2 - qr_size, top + 2, qr_size, authority.qr, false), else: s
+    s =
+      if authority.qr,
+        do: qr(s, @right - 2 - qr_size, top + 2, qr_size, authority.qr, false),
+        else: s
+
     %{s | y: top + height}
   end
 
@@ -382,7 +406,8 @@ defmodule Palee.Fiscal.Domain.DocumentPdf do
         do: text(s, 80, top + 78, bill.amount, size: 10),
         else: box(s, 78, top + 75, 40, 15, 0.75)
 
-    {s, y} = slip_block(s, 118, top + 7, h.account, [bill.account | bill.creditor_lines], 8, 10, 87)
+    {s, y} =
+      slip_block(s, 118, top + 7, h.account, [bill.account | bill.creditor_lines], 8, 10, 87)
 
     {s, y} =
       if bill.reference,
@@ -424,7 +449,11 @@ defmodule Palee.Fiscal.Domain.DocumentPdf do
 
   defp hline(s, y, width, color \\ nil, to \\ @right) do
     opts = [line_width: width] ++ if(color, do: [color: color], else: [])
-    %{s | pdf: Pdf.line(s.pdf, mm(@left), mm(@page_height - y), mm(to), mm(@page_height - y), opts)}
+
+    %{
+      s
+      | pdf: Pdf.line(s.pdf, mm(@left), mm(@page_height - y), mm(to), mm(@page_height - y), opts)
+    }
   end
 
   defp dashed(s, x1, y1, x2, y2),
@@ -452,7 +481,9 @@ defmodule Palee.Fiscal.Domain.DocumentPdf do
     do: %{
       s
       | pdf:
-          Pdf.rect(s.pdf, mm(x), mm(@page_height - y - height), mm(width), mm(height), color: color)
+          Pdf.rect(s.pdf, mm(x), mm(@page_height - y - height), mm(width), mm(height),
+            color: color
+          )
     }
 
   # A QR code of `size` mm with its top-left corner at {x, y}; the Swiss
@@ -491,7 +522,8 @@ defmodule Palee.Fiscal.Domain.DocumentPdf do
   end
 
   defp page_number(s),
-    do: text(s, @right, @page_height - 10, "#{s.view.page_label} #{s.page}", size: 7, align: :right)
+    do:
+      text(s, @right, @page_height - 10, "#{s.view.page_label} #{s.page}", size: 7, align: :right)
 
   defp mm(value), do: value * @mm
 end

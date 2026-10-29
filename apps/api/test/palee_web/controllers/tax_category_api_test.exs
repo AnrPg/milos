@@ -85,7 +85,11 @@ defmodule PaleeWeb.TaxCategoryApiTest do
              |> json_response(200)
 
     assert ctx.owner
-           |> send_json(:post, path, Map.merge(@package, %{code: "tax_bad", tax_category: "luxury"}))
+           |> send_json(
+             :post,
+             path,
+             Map.merge(@package, %{code: "tax_bad", tax_category: "luxury"})
+           )
            |> json_response(422)
   end
 
@@ -108,10 +112,14 @@ defmodule PaleeWeb.TaxCategoryApiTest do
     variant_path = "#{ctx.staff}/products/#{id}/variants/#{variant["id"]}"
 
     assert %{"variant" => %{"tax_category" => "standard", "tax_class" => "standard"}} =
-             ctx.owner |> send_json(:patch, variant_path, %{tax_class: "standard"}) |> json_response(200)
+             ctx.owner
+             |> send_json(:patch, variant_path, %{tax_class: "standard"})
+             |> json_response(200)
 
     assert %{"variant" => %{"tax_category" => "zero", "tax_class" => "zero"}} =
-             ctx.owner |> send_json(:patch, variant_path, %{tax_category: "zero"}) |> json_response(200)
+             ctx.owner
+             |> send_json(:patch, variant_path, %{tax_category: "zero"})
+             |> json_response(200)
 
     assert %{"errors" => %{"tax_category" => ["not_available_in_country"]}} =
              ctx.owner

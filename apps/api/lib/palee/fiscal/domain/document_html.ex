@@ -45,7 +45,9 @@ defmodule Palee.Fiscal.Domain.DocumentHtml do
       "<header>\n<h1>",
       e(view.title),
       "</h1>\n<dl class=\"meta\">\n",
-      Enum.map(view.meta, fn {term, value} -> ["<dt>", e(term), "</dt><dd>", e(value), "</dd>\n"] end),
+      Enum.map(view.meta, fn {term, value} ->
+        ["<dt>", e(term), "</dt><dd>", e(value), "</dd>\n"]
+      end),
       "</dl>\n</header>\n"
     ]
   end
@@ -151,7 +153,11 @@ defmodule Palee.Fiscal.Domain.DocumentHtml do
   defp mentions(%{mentions: []}), do: []
 
   defp mentions(view),
-    do: ["<section class=\"mentions\">\n", Enum.map(view.mentions, &["<p>", e(&1), "</p>\n"]), "</section>\n"]
+    do: [
+      "<section class=\"mentions\">\n",
+      Enum.map(view.mentions, &["<p>", e(&1), "</p>\n"]),
+      "</section>\n"
+    ]
 
   defp authority(nil), do: []
 
@@ -166,7 +172,10 @@ defmodule Palee.Fiscal.Domain.DocumentHtml do
       end),
       if(authority.qr_url, do: ["<p class=\"url\">", e(authority.qr_url), "</p>\n"], else: []),
       "</div>\n",
-      if(authority.qr, do: ["<div class=\"qr\">", qr_svg(authority.qr, "28mm", nil), "</div>\n"], else: []),
+      if(authority.qr,
+        do: ["<div class=\"qr\">", qr_svg(authority.qr, "28mm", nil), "</div>\n"],
+        else: []
+      ),
       "</section>\n"
     ]
   end
@@ -279,7 +288,10 @@ defmodule Palee.Fiscal.Domain.DocumentHtml do
 
   @doc false
   def qr_svg(%{size: size, dark: dark}, width, overlay) do
-    path = Enum.map(dark, fn {x, y} -> ["M", Integer.to_string(x), " ", Integer.to_string(y), "h1v1h-1z"] end)
+    path =
+      Enum.map(dark, fn {x, y} ->
+        ["M", Integer.to_string(x), " ", Integer.to_string(y), "h1v1h-1z"]
+      end)
 
     [
       "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 ",
@@ -314,7 +326,19 @@ defmodule Palee.Fiscal.Domain.DocumentHtml do
   end
 
   defp rect(x, y, w, h, fill),
-    do: ["<rect x=\"", n(x), "\" y=\"", n(y), "\" width=\"", n(w), "\" height=\"", n(h), "\" fill=\"", fill, "\"/>"]
+    do: [
+      "<rect x=\"",
+      n(x),
+      "\" y=\"",
+      n(y),
+      "\" width=\"",
+      n(w),
+      "\" height=\"",
+      n(h),
+      "\" fill=\"",
+      fill,
+      "\"/>"
+    ]
 
   defp n(value), do: :erlang.float_to_binary(value * 1.0, [:compact, decimals: 3])
 

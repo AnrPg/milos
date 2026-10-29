@@ -215,7 +215,12 @@ defmodule Palee.Pdf do
     pages = Enum.reverse([pdf.current | pdf.pages])
     {width, height} = pdf.size
     page_count = length(pages)
-    font_keys = pdf.used |> Enum.reject(fn {_key, used} -> used == %{} end) |> Enum.map(&elem(&1, 0)) |> Enum.sort()
+
+    font_keys =
+      pdf.used
+      |> Enum.reject(fn {_key, used} -> used == %{} end)
+      |> Enum.map(&elem(&1, 0))
+      |> Enum.sort()
 
     # 1 catalog, 2 pages, 3 info, then per page (page, content), then per
     # font (type0, cid font, descriptor, font file, to-unicode).
@@ -445,7 +450,11 @@ defmodule Palee.Pdf do
 
   # Info strings as UTF-16BE hex with a byte order mark.
   defp text_string(value) do
-    ["<FEFF", value |> :unicode.characters_to_binary(:utf8, {:utf16, :big}) |> Base.encode16(), ">"]
+    [
+      "<FEFF",
+      value |> :unicode.characters_to_binary(:utf8, {:utf16, :big}) |> Base.encode16(),
+      ">"
+    ]
   end
 
   defp ref(id), do: [Integer.to_string(id), " 0 R"]

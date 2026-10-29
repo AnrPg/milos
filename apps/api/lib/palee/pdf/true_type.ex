@@ -29,14 +29,18 @@ defmodule Palee.Pdf.TrueType do
   @subset_tables ["head", "hhea", "maxp", "hmtx", "loca", "glyf", "cvt ", "fpgm", "prep"]
 
   @doc "Parses a TrueType font file."
-  def parse(<<_version::32, num_tables::16, _search::16, _selector::16, _shift::16, rest::binary>> =
-                data) do
+  def parse(
+        <<_version::32, num_tables::16, _search::16, _selector::16, _shift::16, rest::binary>> =
+          data
+      ) do
     tables =
-      for <<tag::binary-size(4), _checksum::32, offset::32, length::32 <- binary_part(
-              rest,
-              0,
-              num_tables * 16
-            )>>,
+      for <<tag::binary-size(4), _checksum::32, offset::32,
+            length::32 <-
+              binary_part(
+                rest,
+                0,
+                num_tables * 16
+              )>>,
           into: %{},
           do: {tag, binary_part(data, offset, length)}
 
@@ -97,7 +101,9 @@ defmodule Palee.Pdf.TrueType do
       end)
 
     glyf_out = chunks |> Enum.reverse() |> IO.iodata_to_binary()
-    loca_out = for offset <- Enum.reverse([byte_size(glyf_out) | offsets]), into: <<>>, do: <<offset::32>>
+
+    loca_out =
+      for offset <- Enum.reverse([byte_size(glyf_out) | offsets]), into: <<>>, do: <<offset::32>>
 
     <<head_start::binary-size(8), _adjustment::32, head_mid::binary-size(38), _format::16,
       head_rest::binary>> = font.tables["head"]
@@ -194,16 +200,22 @@ defmodule Palee.Pdf.TrueType do
   # ── Tables ────────────────────────────────────────────────────────────────
 
   defp advances(hmtx, metrics_count, num_glyphs) do
-    metrics = for <<advance::16, _lsb::16 <- binary_part(hmtx, 0, metrics_count * 4)>>, do: advance
+    metrics =
+      for <<advance::16, _lsb::16 <- binary_part(hmtx, 0, metrics_count * 4)>>, do: advance
+
     last = List.last(metrics)
     List.to_tuple(metrics ++ List.duplicate(last, max(num_glyphs - metrics_count, 0)))
   end
 
   defp loca(loca, 0, num_glyphs),
-    do: List.to_tuple(for <<offset::16 <- binary_part(loca, 0, (num_glyphs + 1) * 2)>>, do: offset * 2)
+    do:
+      List.to_tuple(
+        for <<offset::16 <- binary_part(loca, 0, (num_glyphs + 1) * 2)>>, do: offset * 2
+      )
 
   defp loca(loca, 1, num_glyphs),
-    do: List.to_tuple(for <<offset::32 <- binary_part(loca, 0, (num_glyphs + 1) * 4)>>, do: offset)
+    do:
+      List.to_tuple(for <<offset::32 <- binary_part(loca, 0, (num_glyphs + 1) * 4)>>, do: offset)
 
   defp cap_height(<<version::16, _::binary-size(86), cap::16-signed, _::binary>>)
        when version >= 2,
@@ -227,8 +239,10 @@ defmodule Palee.Pdf.TrueType do
     end
   end
 
-  defp subtable(<<4::16, length::16, _language::16, seg_x2::16, _::binary-size(6), _::binary>> =
-                  data) do
+  defp subtable(
+         <<4::16, length::16, _language::16, seg_x2::16, _::binary-size(6), _::binary>> =
+           data
+       ) do
     data = binary_part(data, 0, min(length, byte_size(data)))
     segments = div(seg_x2, 2)
     ends = words(data, 14, segments)
@@ -279,7 +293,8 @@ defmodule Palee.Pdf.TrueType do
 
   defp postscript_name(<<_format::16, count::16, storage::16, rest::binary>> = table) do
     records =
-      for <<platform::16, _encoding::16, _language::16, name_id::16, length::16, offset::16 <-
+      for <<platform::16, _encoding::16, _language::16, name_id::16, length::16,
+            offset::16 <-
               binary_part(rest, 0, count * 12)>>,
           name_id == 6,
           do: {platform, binary_part(table, storage + offset, length)}

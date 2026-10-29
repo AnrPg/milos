@@ -35,7 +35,10 @@ defmodule Palee.Infrastructure.Fiscal.EctoTaxStore do
       SalesTaxRate |> where([r], r.organization_id == ^organization_id) |> Repo.delete_all()
 
       Enum.each(rates, fn rate ->
-        case rate |> Map.put(:updated_by_id, actor_id) |> SalesTaxRate.changeset() |> Repo.insert() do
+        case rate
+             |> Map.put(:updated_by_id, actor_id)
+             |> SalesTaxRate.changeset()
+             |> Repo.insert() do
           {:ok, _row} -> :ok
           {:error, changeset} -> Repo.rollback(changeset)
         end

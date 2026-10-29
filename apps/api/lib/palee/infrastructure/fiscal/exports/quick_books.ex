@@ -63,7 +63,8 @@ defmodule Palee.Infrastructure.Fiscal.Exports.QuickBooks do
       type: "map",
       keys: @categories,
       default: %{},
-      description: "QuickBooks tax code per tax category (default US: TAX, exempt NON; else \"<rate>%\")"
+      description:
+        "QuickBooks tax code per tax category (default US: TAX, exempt NON; else \"<rate>%\")"
     },
     %{
       key: "terms",
@@ -87,7 +88,8 @@ defmodule Palee.Infrastructure.Fiscal.Exports.QuickBooks do
     %{
       id: id(),
       name: "QuickBooks Online",
-      description: "Invoice import CSV (one row per line, net amounts); credit notes are skipped.",
+      description:
+        "Invoice import CSV (one row per line, net amounts); credit notes are skipped.",
       file_extension: "csv",
       file_prefix: "quickbooks-invoices",
       content_type: "text/csv; charset=utf-8",

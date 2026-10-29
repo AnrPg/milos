@@ -55,7 +55,12 @@ defmodule Palee.FiscalTaxesAndExportsTest do
 
   test "bank details are validated on the identity", %{context: context, owner: owner} do
     assert {:error, {:invalid_fields, %{iban: :invalid_iban}}} =
-             Fiscal.save_identity(context, %{@swiss | iban: "CH56 0483 5012 3456 7800 8"}, owner.id, @now)
+             Fiscal.save_identity(
+               context,
+               %{@swiss | iban: "CH56 0483 5012 3456 7800 8"},
+               owner.id,
+               @now
+             )
 
     assert {:error, {:invalid_fields, %{iban: :qr_iban_in_iban_field}}} =
              Fiscal.save_identity(context, %{@swiss | iban: @swiss.qr_iban}, owner.id, @now)
@@ -87,26 +92,43 @@ defmodule Palee.FiscalTaxesAndExportsTest do
     assert {:error, {:invalid_fields, %{"rates.0.state" => :invalid}}} =
              Taxes.save_sales_tax_rates(context, [%{state: "XX", rate_bp: 1}], owner.id, @now)
 
-    assert {:ok, %{rates: [%{state: "NY", zip: nil, rate_bp: 400}, %{zip: "11201", rate_bp: 887}]}} =
+    assert {:ok,
+            %{rates: [%{state: "NY", zip: nil, rate_bp: 400}, %{zip: "11201", rate_bp: 887}]}} =
              Taxes.save_sales_tax_rates(
                context,
-               [%{"state" => "NY", "rate_bp" => 400}, %{"state" => "NY", "zip" => "11201", "rate_bp" => 887}],
+               [
+                 %{"state" => "NY", "rate_bp" => 400},
+                 %{"state" => "NY", "zip" => "11201", "rate_bp" => 887}
+               ],
                owner.id,
                @now
              )
 
     assert {:ok, 887} = Taxes.rate(context, "sales_tax", ~D[2027-02-03])
-    assert {:ok, 400} = Taxes.rate(context, "sales_tax", ~D[2027-02-03], %{region: "NY", postal_code: "12207"})
+
+    assert {:ok, 400} =
+             Taxes.rate(context, "sales_tax", ~D[2027-02-03], %{
+               region: "NY",
+               postal_code: "12207"
+             })
 
     assert {:error, :sales_tax_rate_missing} =
-             Taxes.rate(context, "sales_tax", ~D[2027-02-03], %{region: "CA", postal_code: "90001"})
+             Taxes.rate(context, "sales_tax", ~D[2027-02-03], %{
+               region: "CA",
+               postal_code: "90001"
+             })
 
     assert {:ok, [%{rate_bp: 887}, %{tax_category: "exempt", rate_bp: nil}]} =
              Taxes.apply_sales_tax(
                context,
                [
                  %{description: "Membership", unit_price_cents: 9_900, tax_category: "sales_tax"},
-                 %{description: "Gift card", unit_price_cents: 5_000, tax_category: "exempt", rate_bp: nil}
+                 %{
+                   description: "Gift card",
+                   unit_price_cents: 5_000,
+                   tax_category: "exempt",
+                   rate_bp: nil
+                 }
                ],
                ~D[2027-02-03]
              )
@@ -175,12 +197,15 @@ defmodule Palee.FiscalTaxesAndExportsTest do
       context: context,
       invoice: invoice
     } do
-      assert {:ok, %{content: "%PDF-" <> _rest, content_type: "application/pdf", filename: filename}} =
+      assert {:ok,
+              %{content: "%PDF-" <> _rest, content_type: "application/pdf", filename: filename}} =
                FiscalDocumentRendering.call(context, invoice.id, :pdf)
 
       assert filename == "#{invoice.number}.pdf"
 
-      assert {:ok, %{content: html}} = FiscalDocumentRendering.call(context, invoice.id, :html, "fr")
+      assert {:ok, %{content: html}} =
+               FiscalDocumentRendering.call(context, invoice.id, :html, "fr")
+
       assert html =~ "Section paiement"
       assert html =~ "CH44 3199 9123 0008 8901 2"
       assert html =~ "Facture"
@@ -204,7 +229,13 @@ defmodule Palee.FiscalTaxesAndExportsTest do
                Exports.save_settings(context, "datev", %{"chart" => "SKR99"}, owner.id, @now)
 
       assert {:ok, %{format: "bexio", saved: true, options: %{"revenue_account" => "3200"}}} =
-               Exports.save_settings(context, "bexio", %{"revenue_account" => "3200"}, owner.id, @now)
+               Exports.save_settings(
+                 context,
+                 "bexio",
+                 %{"revenue_account" => "3200"},
+                 owner.id,
+                 @now
+               )
 
       settings = Exports.settings(context)
       assert length(settings) == 7
@@ -222,7 +253,16 @@ defmodule Palee.FiscalTaxesAndExportsTest do
         )
 
       assert {:ok, export} =
-               Exports.export(context, "bexio", ~D[2027-02-01], ~D[2027-02-28], %{}, [], owner.id, @now)
+               Exports.export(
+                 context,
+                 "bexio",
+                 ~D[2027-02-01],
+                 ~D[2027-02-28],
+                 %{},
+                 [],
+                 owner.id,
+                 @now
+               )
 
       assert export.filename == "bexio-buchungen_2027-02-01_2027-02-28.csv"
       assert export.documents == 2
@@ -233,7 +273,16 @@ defmodule Palee.FiscalTaxesAndExportsTest do
 
       # An export overriding saved options for once.
       assert {:ok, %{content: json}} =
-               Exports.export(context, "json", ~D[2027-02-01], ~D[2027-02-28], nil, [], owner.id, @now)
+               Exports.export(
+                 context,
+                 "json",
+                 ~D[2027-02-01],
+                 ~D[2027-02-28],
+                 nil,
+                 [],
+                 owner.id,
+                 @now
+               )
 
       assert %{"documents" => [_invoice, %{"corrects_number" => number}]} = Jason.decode!(json)
       assert number == invoice.number
@@ -246,15 +295,24 @@ defmodule Palee.FiscalTaxesAndExportsTest do
 
     test "the use case exports Finance payments of the period too", %{context: context} do
       assert {:ok, %{content: csv, payments: 0, documents: 1}} =
-               FiscalTaxSettings.export(context, "csv", %{"from" => "2027-02-01", "to" => "2027-02-28"})
+               FiscalTaxSettings.export(context, "csv", %{
+                 "from" => "2027-02-01",
+                 "to" => "2027-02-28"
+               })
 
       assert csv =~ "line,"
 
       assert {:error, :invalid_date_range} =
-               FiscalTaxSettings.export(context, "csv", %{"from" => "2027-02-01", "to" => "2028-02-28"})
+               FiscalTaxSettings.export(context, "csv", %{
+                 "from" => "2027-02-01",
+                 "to" => "2028-02-28"
+               })
 
       assert {:error, :unknown_export_format} =
-               FiscalTaxSettings.export(context, "nope", %{"from" => "2027-02-01", "to" => "2027-02-28"})
+               FiscalTaxSettings.export(context, "nope", %{
+                 "from" => "2027-02-01",
+                 "to" => "2027-02-28"
+               })
     end
   end
 end

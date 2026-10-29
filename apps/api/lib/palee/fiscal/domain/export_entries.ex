@@ -40,7 +40,10 @@ defmodule Palee.Fiscal.Domain.ExportEntries do
 
     %{
       documents:
-        Enum.map(documents, &document(&1, Map.get(lines_by_document, field(&1, :id), []), numbers)),
+        Enum.map(
+          documents,
+          &document(&1, Map.get(lines_by_document, field(&1, :id), []), numbers)
+        ),
       payments: payments |> Enum.map(&payment/1) |> Enum.reject(&(&1.amount_cents == 0))
     }
   end
