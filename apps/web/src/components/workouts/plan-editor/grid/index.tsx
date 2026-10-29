@@ -11,7 +11,7 @@ import { occurrences, setsRange, totalRounds } from "./lib-shim";
 import { attr, blockTitle, parseFieldKey, roundWordKey } from "./model";
 import { findRow } from "./mutations";
 import { RowMenu } from "./RowMenu";
-import { usePlanSection, usePlanWriter, useWodExerciseNames } from "./store-adapter";
+import { consumeFocus, requestFocus, usePendingFocus, usePlanSection, usePlanWriter, useWodExerciseNames } from "./store-adapter";
 import { ExerciseTable, SetTable } from "./Tables";
 import { useExerciseCatalog } from "./useExerciseCatalog";
 import s from "./grid.module.css";
@@ -32,7 +32,7 @@ export function PlanGrid({ sectionId }: { sectionId: string }) {
   const usedNames = useWodExerciseNames();
   const rootRef = useRef<HTMLDivElement>(null);
   const phone = usePhoneLayout(rootRef);
-  const [pending, setPending] = useState<string | null>(null);
+  const pending = usePendingFocus();
   const [focused, setFocused] = useState<string | null>(null);
   const [notesOpen, setNotesOpen] = useState<ReadonlySet<string>>(() => new Set());
   const [picker, setPicker] = useState<PickerState | null>(null);
@@ -44,7 +44,7 @@ export function PlanGrid({ sectionId }: { sectionId: string }) {
     if (!el) return;
     el.focus();
     if (el instanceof HTMLInputElement) el.select();
-    setPending(null);
+    consumeFocus(pending);
   }, [pending, plan, phone]);
 
   const ctx = useMemo<GridContextValue | null>(
@@ -55,7 +55,7 @@ export function PlanGrid({ sectionId }: { sectionId: string }) {
             plan,
             write,
             phone,
-            focusKey: setPending,
+            focusKey: requestFocus,
             notesOpen,
             openNote: (rowId) => setNotesOpen((open) => new Set(open).add(rowId)),
             openPicker: setPicker,
@@ -70,7 +70,7 @@ export function PlanGrid({ sectionId }: { sectionId: string }) {
     (refocus: boolean) => {
       const back = picker?.returnKey;
       setPicker(null);
-      if (refocus && back) setPending(back);
+      if (refocus && back) requestFocus(back);
       else if (refocus) picker?.anchor.focus();
     },
     [picker],
