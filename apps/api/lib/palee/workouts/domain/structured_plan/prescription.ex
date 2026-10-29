@@ -19,7 +19,8 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Prescription do
     `clusters`, `intra_secs`, `drops`, `drop_by`, `minis`), `per_side`, and
     `sets`: one per set / round column, each with `index` (1-based), the
     `rounds` (1-based round numbers) it applies to, `reps` (`min`, `max`,
-    `unit` reps | secs | meters | kcal, `max_effort`, `within_secs`, `text`),
+    `unit` reps | secs | meters | kcal, `max_effort`, `within_secs`, `sets` written inside the dose as in
+    "4×10", `text`),
     `load` (`kind` kg | pct_1rm | bodyweight | qualitative, `value` and
     `value_max` as `Decimal`, `text`), `rest_secs` (rest rows) and canonical
     `measures` (`pace_secs_per_500m`, `tempo` in 4 parts, `rpe`, `rir`,
@@ -372,7 +373,15 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Prescription do
   defp reps(text, i) when is_binary(text), do: reps(parse_or_nil(text), i)
 
   defp reps(%{max: %{within: within}} = dose, _i) do
-    %{min: nil, max: nil, unit: unit(dose.unit), max_effort: true, within_secs: within, text: nil}
+    %{
+      min: nil,
+      max: nil,
+      unit: unit(dose.unit),
+      max_effort: true,
+      within_secs: within,
+      sets: dose.sets,
+      text: nil
+    }
   end
 
   defp reps(%{entries: entries} = dose, i) when is_list(entries) do
@@ -384,6 +393,7 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Prescription do
       unit: unit(dose.unit),
       max_effort: false,
       within_secs: nil,
+      sets: dose.sets,
       text: nil
     }
   end
@@ -545,11 +555,14 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Prescription do
 
   defp measure_column(cells, key, n) do
     clock? = Catalog.measure(key).clock
+
     texts =
       Enum.map(0..(n - 1)//1, fn i ->
         text = StructuredPlan.cell_value(Enum.at(cells, i), key)
         # "z2" is zone 2.
-        if key == "zone", do: String.replace(text, ~r/^\s*(z|zone|ζώνη|ζωνη)\s*/iu, ""), else: text
+        if key == "zone",
+          do: String.replace(text, ~r/^\s*(z|zone|ζώνη|ζωνη)\s*/iu, ""),
+          else: text
       end)
 
     {values, _state} =
