@@ -95,7 +95,10 @@ defmodule Palee.Infrastructure.Fiscal.EctoFiscalStore do
     with {:ok, row} <- entry |> JournalEntry.insert_changeset() |> Repo.insert() do
       {1, _} =
         JournalHead
-        |> where([h], h.organization_id == ^organization_id and h.position == ^(entry.position - 1))
+        |> where(
+          [h],
+          h.organization_id == ^organization_id and h.position == ^(entry.position - 1)
+        )
         |> Repo.update_all(set: [position: entry.position, hash: entry.hash, updated_at: now()])
 
       {:ok, entry_map(row)}
@@ -189,7 +192,10 @@ defmodule Palee.Infrastructure.Fiscal.EctoFiscalStore do
 
   defp insert_lines(document_id, lines) do
     Enum.reduce_while(lines, {:ok, []}, fn line, {:ok, acc} ->
-      case line |> Map.put(:document_id, document_id) |> DocumentLine.insert_changeset() |> Repo.insert() do
+      case line
+           |> Map.put(:document_id, document_id)
+           |> DocumentLine.insert_changeset()
+           |> Repo.insert() do
         {:ok, row} -> {:cont, {:ok, [row | acc]}}
         error -> {:halt, error}
       end
@@ -208,7 +214,9 @@ defmodule Palee.Infrastructure.Fiscal.EctoFiscalStore do
            |> where([d], d.organization_id == ^organization_id and d.id == ^id)
            |> then(fn query -> if opts[:lock], do: lock(query, "FOR UPDATE"), else: query end)
            |> Repo.one() do
-      document |> Repo.preload(lines: from(l in DocumentLine, order_by: l.position)) |> document_map()
+      document
+      |> Repo.preload(lines: from(l in DocumentLine, order_by: l.position))
+      |> document_map()
     else
       _missing -> nil
     end
@@ -220,8 +228,13 @@ defmodule Palee.Infrastructure.Fiscal.EctoFiscalStore do
     |> where([d], d.organization_id == ^organization_id and d.idempotency_key == ^key)
     |> Repo.one()
     |> case do
-      nil -> nil
-      document -> document |> Repo.preload(lines: from(l in DocumentLine, order_by: l.position)) |> document_map()
+      nil ->
+        nil
+
+      document ->
+        document
+        |> Repo.preload(lines: from(l in DocumentLine, order_by: l.position))
+        |> document_map()
     end
   end
 
@@ -267,7 +280,10 @@ defmodule Palee.Infrastructure.Fiscal.EctoFiscalStore do
     |> where([l, d], d.organization_id == ^organization_id and d.corrects_document_id == ^id)
     |> where([l], not is_nil(l.corrects_position))
     |> group_by([l], l.corrects_position)
-    |> select([l], {l.corrects_position, %{quantity: sum(l.quantity), amount_cents: sum(l.amount_cents)}})
+    |> select(
+      [l],
+      {l.corrects_position, %{quantity: sum(l.quantity), amount_cents: sum(l.amount_cents)}}
+    )
     |> Repo.all()
     |> Map.new(fn {position, totals} ->
       {position, %{quantity: to_int(totals.quantity), amount_cents: to_int(totals.amount_cents)}}
@@ -277,7 +293,10 @@ defmodule Palee.Infrastructure.Fiscal.EctoFiscalStore do
   @impl true
   def documents_between(%{organization_id: organization_id}, from, to) do
     Document
-    |> where([d], d.organization_id == ^organization_id and d.issue_date >= ^from and d.issue_date <= ^to)
+    |> where(
+      [d],
+      d.organization_id == ^organization_id and d.issue_date >= ^from and d.issue_date <= ^to
+    )
     |> order_by([d], asc: d.journal_position)
     |> Repo.all()
     |> Enum.map(&document_map(%{&1 | lines: []}))
@@ -374,7 +393,9 @@ defmodule Palee.Infrastructure.Fiscal.EctoFiscalStore do
           {"fiscal_business_identities", BusinessIdentity}
         ],
         fn {table, schema} ->
-          {count, _} = schema |> where([r], r.organization_id == ^organization_id) |> Repo.delete_all()
+          {count, _} =
+            schema |> where([r], r.organization_id == ^organization_id) |> Repo.delete_all()
+
           {table, count}
         end
       )

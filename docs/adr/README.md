@@ -225,3 +225,6 @@ must have an ADR. See `template.md` for the format.
 | ADR-226 | Class booking rules explained; approval wait may have no limit; late-cancellation cutoff in minutes (hours + minutes input) | Accepted |
 | ADR-229 | The weekly workout goal is personal (the person, their coach, full-scope staff set it); the box sets only streak shields and their renewal | Accepted |
 | ADR-230 | Day WODs: one WOD for a whole day, inherited by its classes (all or chosen class types), overridable per class | Accepted |
+| ADR-240 | Fiscal context, business legal identity and country profiles (GR, CY, DE, AT, CH, LI, LU, FR, BE, MC, GB, US) | Accepted |
+| ADR-241 | Immutable fiscal documents, gapless series, VAT by rate group, credit notes only | Accepted |
+| ADR-242 | Inalterable fiscal journal: hash chain, Ed25519 signatures, period closings, audit archive | Accepted |

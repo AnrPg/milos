@@ -201,6 +201,43 @@ defmodule PaleeWeb.FallbackController do
     })
   end
 
+  # ADR-240–242: the Fiscal context.
+  @fiscal_errors %{
+    fiscal_identity_missing: {:conflict, "Fill in the business's billing details first"},
+    fiscal_identity_incomplete: {:conflict, "The business's billing details are incomplete"},
+    unsupported_country: {:unprocessable_entity, "This country is not supported yet"},
+    idempotency_key_required: {:unprocessable_entity, "idempotency_key is required"},
+    idempotency_key_reused:
+      {:conflict, "This idempotency key was already used for a different request"},
+    already_credited: {:conflict, "This document has already been fully credited"},
+    credit_exceeds_document: {:unprocessable_entity, "More than what is left on the document"},
+    not_creditable: {:unprocessable_entity, "A credit note cannot be credited"},
+    unknown_line: {:unprocessable_entity, "The document has no such line"},
+    invalid_credit_request: {:unprocessable_entity, "Choose the lines to credit"},
+    invalid_date_range:
+      {:unprocessable_entity, "Choose a start and an end date (up to 10 years)"},
+    journal_signing_unavailable:
+      {:service_unavailable, "Fiscal documents are paused: the journal signing key is missing"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@fiscal_errors, reason) do
+    {status, message} = Map.fetch!(@fiscal_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
+  # ADR-214: field errors stay in the form, one code per field.
+  def call(conn, {:error, {:invalid_fields, errors}}) when is_map(errors) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "validation_failed",
+      errors: Map.new(errors, fn {field, reason} -> {field, [to_string(reason)]} end)
+    })
+  end
+
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
     conn
     |> put_status(:unprocessable_entity)

@@ -19,7 +19,9 @@ defmodule Palee.Fiscal.Domain.PeriodClosing do
 
   @doc "First and last date of the period of `kind` that contains `date`."
   def bounds("day", %Date{} = date), do: {date, date}
-  def bounds("month", %Date{} = date), do: {Date.beginning_of_month(date), Date.end_of_month(date)}
+
+  def bounds("month", %Date{} = date),
+    do: {Date.beginning_of_month(date), Date.end_of_month(date)}
 
   def bounds("year", %Date{year: year}), do: {Date.new!(year, 1, 1), Date.new!(year, 12, 31)}
 
@@ -138,7 +140,10 @@ defmodule Palee.Fiscal.Domain.PeriodClosing do
         Map.update(
           acc,
           rate,
-          %{"net_cents" => sign * value(row, :net_cents), "tax_cents" => sign * value(row, :tax_cents)},
+          %{
+            "net_cents" => sign * value(row, :net_cents),
+            "tax_cents" => sign * value(row, :tax_cents)
+          },
           fn existing ->
             %{
               "net_cents" => existing["net_cents"] + sign * value(row, :net_cents),

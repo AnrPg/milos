@@ -63,7 +63,9 @@ defmodule Palee.Fiscal.Domain.TaxId do
   # ── Germany ───────────────────────────────────────────────────────────────
   defp check("DE", :tax_id, value), do: digits(value, 10..13)
   defp check("DE", :vat_number, value), do: prefixed(value, "DE", &de_vat/1)
-  defp check("DE", :registration_number, value), do: pattern(value, ~r/^(HRA|HRB|GNR|PR|VR)?\d{1,7}[A-Z]?$/)
+
+  defp check("DE", :registration_number, value),
+    do: pattern(value, ~r/^(HRA|HRB|GNR|PR|VR)?\d{1,7}[A-Z]?$/)
 
   # ── Austria ───────────────────────────────────────────────────────────────
   defp check("AT", :tax_id, value), do: digits(value, 9..9)
@@ -90,7 +92,9 @@ defmodule Palee.Fiscal.Domain.TaxId do
   defp check("MC", :registration_number, value), do: pattern(value, ~r/^\d{2}[A-Z]\d{5}$/)
 
   defp check(country, :tax_id, value) when country in ["FR", "MC"], do: digits(value, 13..13)
-  defp check(country, :vat_number, value) when country in ["FR", "MC"], do: prefixed(value, "FR", &fr_vat/1)
+
+  defp check(country, :vat_number, value) when country in ["FR", "MC"],
+    do: prefixed(value, "FR", &fr_vat/1)
 
   # ── Belgium ───────────────────────────────────────────────────────────────
   defp check("BE", kind, value) when kind in [:tax_id, :registration_number],
@@ -100,7 +104,10 @@ defmodule Palee.Fiscal.Domain.TaxId do
 
   # ── United Kingdom ────────────────────────────────────────────────────────
   defp check("GB", :tax_id, value), do: digits(value, 10..10)
-  defp check("GB", :vat_number, value), do: prefixed(value, "GB", &pattern(&1, ~r/^(\d{9}|\d{12}|GD\d{3}|HA\d{3})$/))
+
+  defp check("GB", :vat_number, value),
+    do: prefixed(value, "GB", &pattern(&1, ~r/^(\d{9}|\d{12}|GD\d{3}|HA\d{3})$/))
+
   defp check("GB", :registration_number, value), do: pattern(value, ~r/^([A-Z]{2}\d{6}|\d{8})$/)
 
   # ── United States ─────────────────────────────────────────────────────────
@@ -173,7 +180,9 @@ defmodule Palee.Fiscal.Domain.TaxId do
       {body, [check]} = number |> to_digits() |> Enum.split(8)
 
       sum =
-        body |> Enum.zip([5, 4, 3, 2, 7, 6, 5, 4]) |> Enum.reduce(0, fn {d, w}, a -> a + d * w end)
+        body
+        |> Enum.zip([5, 4, 3, 2, 7, 6, 5, 4])
+        |> Enum.reduce(0, fn {d, w}, a -> a + d * w end)
 
       expected =
         case 11 - rem(sum, 11) do

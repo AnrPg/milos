@@ -64,7 +64,9 @@ config :palee, Oban,
        {"15 3 * * *", Palee.Workers.EmailRetentionJob},
        {"5 7 * * *", Palee.Workers.SmtpKeyExpiryJob},
        # ADR-211: self-service account deletions whose grace is over.
-       {"19 * * * *", Palee.Workers.ExecuteAccountDeletionsJob}
+       {"19 * * * *", Palee.Workers.ExecuteAccountDeletionsJob},
+       # ADR-242: fiscal day/month/year closings on each gym's own clock.
+       {"20 * * * *", Palee.Workers.CloseFiscalPeriodsJob}
      ]}
   ],
   queues: [

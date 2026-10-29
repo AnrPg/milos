@@ -1147,6 +1147,16 @@ defmodule PaleeWeb.Router do
 
     get("/athletes/:id/drill-down", AdminCoachingController, :drill_down)
     get("/finance/summary", AdminFinanceController, :summary)
+    # ADR-240–242: legal identity, fiscal documents, journal, closings.
+    get("/fiscal/countries", AdminFiscalController, :countries)
+    get("/fiscal/identity", AdminFiscalController, :identity)
+    put("/fiscal/identity", AdminFiscalController, :save_identity)
+    get("/fiscal/documents", AdminFiscalController, :documents)
+    get("/fiscal/documents/:id", AdminFiscalController, :document)
+    post("/fiscal/documents/:id/credit-notes", AdminFiscalController, :credit)
+    get("/fiscal/journal/verification", AdminFiscalController, :verify_journal)
+    get("/fiscal/closings", AdminFiscalController, :closings)
+    get("/fiscal/archive", AdminFiscalController, :archive)
     # ADR-192: shop reports, pricing indicators and revenue reconciliation.
     get("/shop/reports/overview", AdminShopReportController, :overview)
     get("/shop/reports/sales", AdminShopReportController, :sales)

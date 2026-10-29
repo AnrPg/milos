@@ -41,7 +41,11 @@ defmodule Palee.Fiscal.Domain.BusinessIdentityPolicy do
       |> check_year_start(merged[:fiscal_year_start_month])
       |> check_texts(merged)
 
-    {ids, errors} = check_ids(country, merged, errors)
+    # An unsupported country has no tax id rules to check against.
+    {ids, errors} =
+      if CountryProfile.supported?(country),
+        do: check_ids(country, merged, errors),
+        else: {%{}, errors}
 
     if errors == %{} do
       currency = CountryProfile.fetch!(country).currency
@@ -88,7 +92,10 @@ defmodule Palee.Fiscal.Domain.BusinessIdentityPolicy do
   end
 
   defp check_branch(errors, nil), do: errors
-  defp check_branch(errors, code) when is_integer(code) and code >= 0 and code <= 9_999, do: errors
+
+  defp check_branch(errors, code) when is_integer(code) and code >= 0 and code <= 9_999,
+    do: errors
+
   defp check_branch(errors, _code), do: Map.put(errors, :branch_code, :invalid)
 
   defp check_year_start(errors, nil), do: errors
@@ -102,7 +109,9 @@ defmodule Palee.Fiscal.Domain.BusinessIdentityPolicy do
           errors
 
         value when is_binary(value) ->
-          if String.length(value) <= @max_text, do: errors, else: Map.put(errors, field, :too_long)
+          if String.length(value) <= @max_text,
+            do: errors,
+            else: Map.put(errors, field, :too_long)
 
         _other ->
           Map.put(errors, field, :invalid)
@@ -114,9 +123,10 @@ defmodule Palee.Fiscal.Domain.BusinessIdentityPolicy do
   defp check_email(errors, nil), do: errors
 
   defp check_email(errors, email) when is_binary(email) do
-    if String.trim(email) == "" or Regex.match?(~r/^[^\s@]+@[^\s@]+\.[^\s@]+$/, String.trim(email)),
-      do: errors,
-      else: Map.put(errors, :email, :invalid)
+    if String.trim(email) == "" or
+         Regex.match?(~r/^[^\s@]+@[^\s@]+\.[^\s@]+$/, String.trim(email)),
+       do: errors,
+       else: Map.put(errors, :email, :invalid)
   end
 
   defp check_email(errors, _email), do: Map.put(errors, :email, :invalid)

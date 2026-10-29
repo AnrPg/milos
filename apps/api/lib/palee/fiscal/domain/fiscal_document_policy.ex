@@ -139,7 +139,9 @@ defmodule Palee.Fiscal.Domain.FiscalDocumentPolicy do
   defp buyer(kind, buyer, profile) when is_map(buyer) do
     buyer =
       buyer
-      |> Map.take(~w(name tax_id vat_number street building_number postal_code city region country_code email)a)
+      |> Map.take(
+        ~w(name tax_id vat_number street building_number postal_code city region country_code email)a
+      )
       |> Map.new(fn {key, value} -> {key, clean(value)} end)
       |> Map.reject(fn {_key, value} -> is_nil(value) end)
 
@@ -148,7 +150,10 @@ defmodule Palee.Fiscal.Domain.FiscalDocumentPolicy do
         {:error, :buyer_field_too_long}
 
       kind == "invoice" and
-          Enum.any?([:name, :street, :postal_code, :city, :country_code], &(!Map.has_key?(buyer, &1))) ->
+          Enum.any?(
+            [:name, :street, :postal_code, :city, :country_code],
+            &(!Map.has_key?(buyer, &1))
+          ) ->
         {:error, :buyer_address_required}
 
       # A Greek ΤΠΥ is reported with the buyer's ΑΦΜ.
@@ -216,8 +221,9 @@ defmodule Palee.Fiscal.Domain.FiscalDocumentPolicy do
   end
 
   # US sales tax: the caller brings the rate from the sales tax port.
-  defp line_rate("US", "sales_tax", rate, _date) when is_integer(rate) and rate >= 0 and rate < 10_000,
-    do: {:ok, rate}
+  defp line_rate("US", "sales_tax", rate, _date)
+       when is_integer(rate) and rate >= 0 and rate < 10_000,
+       do: {:ok, rate}
 
   defp line_rate("US", "sales_tax", _rate, _date), do: {:error, :invalid_tax_rate}
 
@@ -233,13 +239,16 @@ defmodule Palee.Fiscal.Domain.FiscalDocumentPolicy do
   defp wanted_quantities(lines, credited, :all) do
     wanted =
       lines
-      |> Enum.map(fn line -> {line.position, line.quantity - credited_quantity(credited, line)} end)
+      |> Enum.map(fn line ->
+        {line.position, line.quantity - credited_quantity(credited, line)}
+      end)
       |> Enum.reject(fn {_position, quantity} -> quantity <= 0 end)
 
     if wanted == [], do: {:error, :already_credited}, else: {:ok, wanted}
   end
 
-  defp wanted_quantities(lines, credited, requested) when is_list(requested) and requested != [] do
+  defp wanted_quantities(lines, credited, requested)
+       when is_list(requested) and requested != [] do
     by_position = Map.new(lines, &{&1.position, &1})
 
     requested

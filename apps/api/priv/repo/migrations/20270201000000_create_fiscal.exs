@@ -124,7 +124,11 @@ defmodule Palee.Repo.Migrations.CreateFiscal do
            )
 
     create index(:fiscal_documents, [:organization_id, :issue_date])
-    create index(:fiscal_documents, [:corrects_document_id], where: "corrects_document_id IS NOT NULL")
+
+    create index(:fiscal_documents, [:corrects_document_id],
+             where: "corrects_document_id IS NOT NULL"
+           )
+
     create index(:fiscal_documents, [:organization_id, :source_type, :source_id])
 
     execute("""

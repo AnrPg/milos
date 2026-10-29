@@ -21,7 +21,9 @@ defmodule Palee.Fiscal.FiscalStore do
   @impl true
   def lock_journal_head(context), do: tenant_call(context, :lock_journal_head, [])
   @impl true
-  def insert_journal_entry(context, entry), do: tenant_call(context, :insert_journal_entry, [entry])
+  def insert_journal_entry(context, entry),
+    do: tenant_call(context, :insert_journal_entry, [entry])
+
   @impl true
   def list_journal_entries(context, opts), do: tenant_call(context, :list_journal_entries, [opts])
 
@@ -42,7 +44,9 @@ defmodule Palee.Fiscal.FiscalStore do
   @impl true
   def credited_lines(context, id), do: tenant_call(context, :credited_lines, [id])
   @impl true
-  def documents_between(context, from, to), do: tenant_call(context, :documents_between, [from, to])
+  def documents_between(context, from, to),
+    do: tenant_call(context, :documents_between, [from, to])
+
   @impl true
   def first_issue_date(context), do: tenant_call(context, :first_issue_date, [])
 

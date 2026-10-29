@@ -68,7 +68,9 @@ defmodule Palee.Fiscal do
 
     %{
       identity: identity,
-      profile: CountryProfile.public(profile) |> Map.put(:tax_categories, VatRates.categories(identity.country_code)),
+      profile:
+        CountryProfile.public(profile)
+        |> Map.put(:tax_categories, VatRates.categories(identity.country_code)),
       missing: missing,
       complete: missing == []
     }
@@ -83,7 +85,8 @@ defmodule Palee.Fiscal do
       before = FiscalStore.get_identity(context) || %{}
 
       with {:ok, attrs} <- BusinessIdentityPolicy.validate(before, changes),
-           {:ok, saved} <- FiscalStore.save_identity(context, Map.put(attrs, :updated_by_id, actor_id)) do
+           {:ok, saved} <-
+             FiscalStore.save_identity(context, Map.put(attrs, :updated_by_id, actor_id)) do
         changed = BusinessIdentityPolicy.changed_fields(before, saved)
 
         if changed == [] do
@@ -129,10 +132,18 @@ defmodule Palee.Fiscal do
           {:error, reason}
 
         :new ->
-          with identity when is_map(identity) <- FiscalStore.get_identity(context) || {:error, :fiscal_identity_missing},
+          with identity when is_map(identity) <-
+                 FiscalStore.get_identity(context) || {:error, :fiscal_identity_missing},
                {:ok, document} <- FiscalDocumentPolicy.build(identity, request),
                {:ok, saved} <-
-                 store_document(context, document, identity.branch_code, request_hash, actor_id, now) do
+                 store_document(
+                   context,
+                   document,
+                   identity.branch_code,
+                   request_hash,
+                   actor_id,
+                   now
+                 ) do
             {:ok, {saved, :issued}}
           end
       end
@@ -144,7 +155,15 @@ defmodule Palee.Fiscal do
   Issues a credit note correcting `document_id` by `requested` (`:all` or
   `[%{position, quantity}]`). Idempotent by `idempotency_key`.
   """
-  def credit(context, document_id, requested, %Date{} = issue_date, idempotency_key, actor_id, %DateTime{} = now) do
+  def credit(
+        context,
+        document_id,
+        requested,
+        %Date{} = issue_date,
+        idempotency_key,
+        actor_id,
+        %DateTime{} = now
+      ) do
     request_hash = hash_term(%{credit: document_id, requested: requested})
 
     FiscalStore.transaction(context, fn ->
@@ -157,12 +176,16 @@ defmodule Palee.Fiscal do
 
         :new ->
           with original when is_map(original) <-
-                 FiscalStore.get_document(context, document_id, lock: true) || {:error, :not_found},
-               identity when is_map(identity) <- FiscalStore.get_identity(context) || {:error, :fiscal_identity_missing},
+                 FiscalStore.get_document(context, document_id, lock: true) ||
+                   {:error, :not_found},
+               identity when is_map(identity) <-
+                 FiscalStore.get_identity(context) || {:error, :fiscal_identity_missing},
                credited = FiscalStore.credited_lines(context, original.id),
-               {:ok, note} <- FiscalDocumentPolicy.credit_note(original, credited, requested, issue_date),
+               {:ok, note} <-
+                 FiscalDocumentPolicy.credit_note(original, credited, requested, issue_date),
                note = Map.put(note, :idempotency_key, idempotency_key),
-               {:ok, saved} <- store_document(context, note, identity.branch_code, request_hash, actor_id, now) do
+               {:ok, saved} <-
+                 store_document(context, note, identity.branch_code, request_hash, actor_id, now) do
             {:ok, {saved, :issued}}
           end
       end
@@ -262,7 +285,8 @@ defmodule Palee.Fiscal do
 
   @doc "Credit notes issued against a document."
   def credit_notes(context, document_id),
-    do: FiscalStore.list_documents(context, %{corrects_document_id: document_id, limit: 200}).documents
+    do:
+      FiscalStore.list_documents(context, %{corrects_document_id: document_id, limit: 200}).documents
 
   # ── Journal ─────────────────────────────────────────────────────────────
 
@@ -270,7 +294,8 @@ defmodule Palee.Fiscal do
   defp append(context, attrs) do
     head = FiscalStore.lock_journal_head(context)
 
-    with {:ok, entry} <- JournalChain.next(head, Map.put(attrs, :organization_id, context.organization_id)),
+    with {:ok, entry} <-
+           JournalChain.next(head, Map.put(attrs, :organization_id, context.organization_id)),
          {:ok, %{signature: signature, key_id: key_id}} <- signer().sign(entry.hash) do
       FiscalStore.insert_journal_entry(
         context,
@@ -302,10 +327,16 @@ defmodule Palee.Fiscal do
 
   defp check_chain(context) do
     signer = signer()
-    verify_signature = fn entry -> signer.verify(entry.hash, entry.signature, entry.signature_key_id) end
+
+    verify_signature = fn entry ->
+      signer.verify(entry.hash, entry.signature, entry.signature_key_id)
+    end
 
     Stream.unfold(0, fn after_position ->
-      case FiscalStore.list_journal_entries(context, %{after_position: after_position, limit: @verify_batch}) do
+      case FiscalStore.list_journal_entries(context, %{
+             after_position: after_position,
+             limit: @verify_batch
+           }) do
         [] -> nil
         batch -> {batch, List.last(batch).position}
       end
@@ -400,7 +431,8 @@ defmodule Palee.Fiscal do
       from: from,
       to: to,
       generated_at: JournalChain.microseconds(now),
-      journal_head: journal |> List.last() |> then(&(&1 && %{position: &1.position, hash: &1.hash})),
+      journal_head:
+        journal |> List.last() |> then(&(&1 && %{position: &1.position, hash: &1.hash})),
       files:
         Enum.map(files, fn {name, content} ->
           %{
@@ -424,7 +456,8 @@ defmodule Palee.Fiscal do
                payload: %{
                  from: from,
                  to: to,
-                 manifest_sha256: :crypto.hash(:sha256, manifest_json) |> Base.encode16(case: :lower)
+                 manifest_sha256:
+                   :crypto.hash(:sha256, manifest_json) |> Base.encode16(case: :lower)
                }
              }),
            entries =
@@ -451,7 +484,10 @@ defmodule Palee.Fiscal do
 
   defp all_journal_entries(context) do
     Stream.unfold(0, fn after_position ->
-      case FiscalStore.list_journal_entries(context, %{after_position: after_position, limit: @verify_batch}) do
+      case FiscalStore.list_journal_entries(context, %{
+             after_position: after_position,
+             limit: @verify_batch
+           }) do
         [] -> nil
         batch -> {batch, List.last(batch).position}
       end

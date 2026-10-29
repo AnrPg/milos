@@ -6600,6 +6600,149 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/fiscal/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download the signed audit archive of a date range (ZIP) */
+        get: operations["PaleeWeb.AdminFiscalController.archive"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/closings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daily, monthly and yearly closings */
+        get: operations["PaleeWeb.AdminFiscalController.closings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/countries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Supported countries, what each asks of a business, and the VAT schemes */
+        get: operations["PaleeWeb.AdminFiscalController.countries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fiscal documents, newest first */
+        get: operations["PaleeWeb.AdminFiscalController.documents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A fiscal document with its lines and the credit notes against it */
+        get: operations["PaleeWeb.AdminFiscalController.document"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/credit-notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Issue a credit note for a document (all that is left, or chosen quantities)
+         * @description Documents are never changed: a credit note corrects them. Idempotent by `idempotency_key`.
+         */
+        post: operations["PaleeWeb.AdminFiscalController.credit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/identity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The business's legal identity, its country profile and the fields still missing */
+        get: operations["PaleeWeb.AdminFiscalController.identity"];
+        /**
+         * Save the business's legal identity (partial updates allowed)
+         * @description Tax ids are checked against their country's format and check digits; field errors come back as `validation_failed` with one code per field. Every change is journaled.
+         */
+        put: operations["PaleeWeb.AdminFiscalController.save_identity"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/journal/verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Recompute the journal's hash chain and signatures */
+        get: operations["PaleeWeb.AdminFiscalController.verify_journal"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/geocode": {
         parameters: {
             query?: never;
@@ -72259,6 +72402,675 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalController.archive": {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description ZIP archive */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/zip": string;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalController.closings": {
+        parameters: {
+            query?: {
+                kind?: "day" | "month" | "year";
+                from?: string;
+                to?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Closings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        closings: {
+                            /** Format: date-time */
+                            closed_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            journal_position: number;
+                            /** Format: date */
+                            period_end: string;
+                            /** @enum {string} */
+                            period_kind: "day" | "month" | "year";
+                            /** Format: date */
+                            period_start: string;
+                            totals: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalController.countries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Countries */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        countries: {
+                            /** @enum {string} */
+                            authority: "mydata" | "none";
+                            country: string;
+                            currency: string;
+                            einvoicing: string[];
+                            languages: string[];
+                            /** @enum {string} */
+                            register: "nf525" | "standard";
+                            required_fields: string[];
+                            retention_years: number;
+                            tax_categories: string[];
+                            tax_office: boolean;
+                            /** @enum {string} */
+                            tax_system: "vat" | "sales_tax";
+                            /** @enum {string} */
+                            till_device: "tse" | "rksv" | "none";
+                        }[];
+                        vat_schemes: string[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalController.documents": {
+        parameters: {
+            query?: {
+                kind?: "receipt" | "invoice" | "credit_note";
+                from?: string;
+                to?: string;
+                number?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Documents */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        documents: {
+                            buyer?: {
+                                [key: string]: unknown;
+                            } | null;
+                            content_hash: string;
+                            /** Format: uuid */
+                            corrects_document_id?: string | null;
+                            country_code: string;
+                            currency: string;
+                            gross_cents: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            issue_date: string;
+                            /** Format: date-time */
+                            issued_at: string;
+                            journal_position: number;
+                            /** @enum {string} */
+                            kind: "receipt" | "invoice" | "credit_note";
+                            language: string;
+                            lines?: {
+                                amount_cents: number;
+                                corrects_position?: number | null;
+                                description: string;
+                                discount_cents: number;
+                                exemption_reason?: string | null;
+                                gross_cents: number;
+                                net_cents: number;
+                                position: number;
+                                quantity: number;
+                                rate_bp: number;
+                                tax_category: string;
+                                tax_cents: number;
+                                unit_price_cents: number;
+                            }[];
+                            net_cents: number;
+                            number: string;
+                            payment_method?: string | null;
+                            prices_include_tax: boolean;
+                            seller: {
+                                [key: string]: unknown;
+                            };
+                            sequence: number;
+                            series: string;
+                            /** Format: uuid */
+                            source_id?: string | null;
+                            source_type?: string | null;
+                            tax_breakdown: {
+                                gross_cents: number;
+                                net_cents: number;
+                                rate_bp: number;
+                                tax_category: string;
+                                tax_cents: number;
+                            }[];
+                            tax_cents: number;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalController.document": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Document */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        document: {
+                            buyer?: {
+                                [key: string]: unknown;
+                            } | null;
+                            content_hash: string;
+                            /** Format: uuid */
+                            corrects_document_id?: string | null;
+                            country_code: string;
+                            credit_notes?: {
+                                buyer?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                content_hash: string;
+                                /** Format: uuid */
+                                corrects_document_id?: string | null;
+                                country_code: string;
+                                currency: string;
+                                gross_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date */
+                                issue_date: string;
+                                /** Format: date-time */
+                                issued_at: string;
+                                journal_position: number;
+                                /** @enum {string} */
+                                kind: "receipt" | "invoice" | "credit_note";
+                                language: string;
+                                lines?: {
+                                    amount_cents: number;
+                                    corrects_position?: number | null;
+                                    description: string;
+                                    discount_cents: number;
+                                    exemption_reason?: string | null;
+                                    gross_cents: number;
+                                    net_cents: number;
+                                    position: number;
+                                    quantity: number;
+                                    rate_bp: number;
+                                    tax_category: string;
+                                    tax_cents: number;
+                                    unit_price_cents: number;
+                                }[];
+                                net_cents: number;
+                                number: string;
+                                payment_method?: string | null;
+                                prices_include_tax: boolean;
+                                seller: {
+                                    [key: string]: unknown;
+                                };
+                                sequence: number;
+                                series: string;
+                                /** Format: uuid */
+                                source_id?: string | null;
+                                source_type?: string | null;
+                                tax_breakdown: {
+                                    gross_cents: number;
+                                    net_cents: number;
+                                    rate_bp: number;
+                                    tax_category: string;
+                                    tax_cents: number;
+                                }[];
+                                tax_cents: number;
+                            }[];
+                            currency: string;
+                            gross_cents: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            issue_date: string;
+                            /** Format: date-time */
+                            issued_at: string;
+                            journal_position: number;
+                            /** @enum {string} */
+                            kind: "receipt" | "invoice" | "credit_note";
+                            language: string;
+                            lines?: {
+                                amount_cents: number;
+                                corrects_position?: number | null;
+                                description: string;
+                                discount_cents: number;
+                                exemption_reason?: string | null;
+                                gross_cents: number;
+                                net_cents: number;
+                                position: number;
+                                quantity: number;
+                                rate_bp: number;
+                                tax_category: string;
+                                tax_cents: number;
+                                unit_price_cents: number;
+                            }[];
+                            net_cents: number;
+                            number: string;
+                            payment_method?: string | null;
+                            prices_include_tax: boolean;
+                            seller: {
+                                [key: string]: unknown;
+                            };
+                            sequence: number;
+                            series: string;
+                            /** Format: uuid */
+                            source_id?: string | null;
+                            source_type?: string | null;
+                            tax_breakdown: {
+                                gross_cents: number;
+                                net_cents: number;
+                                rate_bp: number;
+                                tax_category: string;
+                                tax_cents: number;
+                            }[];
+                            tax_cents: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalController.credit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    idempotency_key: string;
+                    lines?: {
+                        position: number;
+                        quantity: number;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description The credit note of an earlier identical request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        document: {
+                            buyer?: {
+                                [key: string]: unknown;
+                            } | null;
+                            content_hash: string;
+                            /** Format: uuid */
+                            corrects_document_id?: string | null;
+                            country_code: string;
+                            currency: string;
+                            gross_cents: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            issue_date: string;
+                            /** Format: date-time */
+                            issued_at: string;
+                            journal_position: number;
+                            /** @enum {string} */
+                            kind: "receipt" | "invoice" | "credit_note";
+                            language: string;
+                            lines?: {
+                                amount_cents: number;
+                                corrects_position?: number | null;
+                                description: string;
+                                discount_cents: number;
+                                exemption_reason?: string | null;
+                                gross_cents: number;
+                                net_cents: number;
+                                position: number;
+                                quantity: number;
+                                rate_bp: number;
+                                tax_category: string;
+                                tax_cents: number;
+                                unit_price_cents: number;
+                            }[];
+                            net_cents: number;
+                            number: string;
+                            payment_method?: string | null;
+                            prices_include_tax: boolean;
+                            seller: {
+                                [key: string]: unknown;
+                            };
+                            sequence: number;
+                            series: string;
+                            /** Format: uuid */
+                            source_id?: string | null;
+                            source_type?: string | null;
+                            tax_breakdown: {
+                                gross_cents: number;
+                                net_cents: number;
+                                rate_bp: number;
+                                tax_category: string;
+                                tax_cents: number;
+                            }[];
+                            tax_cents: number;
+                        };
+                    };
+                };
+            };
+            /** @description Credit note */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        document: {
+                            buyer?: {
+                                [key: string]: unknown;
+                            } | null;
+                            content_hash: string;
+                            /** Format: uuid */
+                            corrects_document_id?: string | null;
+                            country_code: string;
+                            currency: string;
+                            gross_cents: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            issue_date: string;
+                            /** Format: date-time */
+                            issued_at: string;
+                            journal_position: number;
+                            /** @enum {string} */
+                            kind: "receipt" | "invoice" | "credit_note";
+                            language: string;
+                            lines?: {
+                                amount_cents: number;
+                                corrects_position?: number | null;
+                                description: string;
+                                discount_cents: number;
+                                exemption_reason?: string | null;
+                                gross_cents: number;
+                                net_cents: number;
+                                position: number;
+                                quantity: number;
+                                rate_bp: number;
+                                tax_category: string;
+                                tax_cents: number;
+                                unit_price_cents: number;
+                            }[];
+                            net_cents: number;
+                            number: string;
+                            payment_method?: string | null;
+                            prices_include_tax: boolean;
+                            seller: {
+                                [key: string]: unknown;
+                            };
+                            sequence: number;
+                            series: string;
+                            /** Format: uuid */
+                            source_id?: string | null;
+                            source_type?: string | null;
+                            tax_breakdown: {
+                                gross_cents: number;
+                                net_cents: number;
+                                rate_bp: number;
+                                tax_category: string;
+                                tax_cents: number;
+                            }[];
+                            tax_cents: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalController.identity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Identity */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        complete: boolean;
+                        identity: {
+                            activity_code?: string | null;
+                            branch_code: number;
+                            building_number?: string | null;
+                            city?: string | null;
+                            country_code: string;
+                            currency: string;
+                            document_language?: string | null;
+                            email?: string | null;
+                            fiscal_year_start_month: number;
+                            /** Format: uuid */
+                            id: string;
+                            legal_name?: string | null;
+                            phone?: string | null;
+                            postal_code?: string | null;
+                            region?: string | null;
+                            registration_number?: string | null;
+                            street?: string | null;
+                            tax_id?: string | null;
+                            tax_office?: string | null;
+                            trade_name?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                            vat_number?: string | null;
+                            /** @enum {string} */
+                            vat_scheme: "standard" | "small_business" | "exempt";
+                        } | null;
+                        missing: string[];
+                        profile: {
+                            /** @enum {string} */
+                            authority: "mydata" | "none";
+                            country: string;
+                            currency: string;
+                            einvoicing: string[];
+                            languages: string[];
+                            /** @enum {string} */
+                            register: "nf525" | "standard";
+                            required_fields: string[];
+                            retention_years: number;
+                            tax_categories: string[];
+                            tax_office: boolean;
+                            /** @enum {string} */
+                            tax_system: "vat" | "sales_tax";
+                            /** @enum {string} */
+                            till_device: "tse" | "rksv" | "none";
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalController.save_identity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    activity_code?: string | null;
+                    branch_code?: number;
+                    building_number?: string | null;
+                    city?: string | null;
+                    country_code?: string;
+                    document_language?: string | null;
+                    email?: string | null;
+                    fiscal_year_start_month?: number;
+                    legal_name?: string | null;
+                    phone?: string | null;
+                    postal_code?: string | null;
+                    region?: string | null;
+                    registration_number?: string | null;
+                    street?: string | null;
+                    tax_id?: string | null;
+                    tax_office?: string | null;
+                    trade_name?: string | null;
+                    vat_number?: string | null;
+                    /** @enum {string} */
+                    vat_scheme?: "standard" | "small_business" | "exempt";
+                };
+            };
+        };
+        responses: {
+            /** @description Identity */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        complete: boolean;
+                        identity: {
+                            activity_code?: string | null;
+                            branch_code: number;
+                            building_number?: string | null;
+                            city?: string | null;
+                            country_code: string;
+                            currency: string;
+                            document_language?: string | null;
+                            email?: string | null;
+                            fiscal_year_start_month: number;
+                            /** Format: uuid */
+                            id: string;
+                            legal_name?: string | null;
+                            phone?: string | null;
+                            postal_code?: string | null;
+                            region?: string | null;
+                            registration_number?: string | null;
+                            street?: string | null;
+                            tax_id?: string | null;
+                            tax_office?: string | null;
+                            trade_name?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                            vat_number?: string | null;
+                            /** @enum {string} */
+                            vat_scheme: "standard" | "small_business" | "exempt";
+                        } | null;
+                        missing: string[];
+                        profile: {
+                            /** @enum {string} */
+                            authority: "mydata" | "none";
+                            country: string;
+                            currency: string;
+                            einvoicing: string[];
+                            languages: string[];
+                            /** @enum {string} */
+                            register: "nf525" | "standard";
+                            required_fields: string[];
+                            retention_years: number;
+                            tax_categories: string[];
+                            tax_office: boolean;
+                            /** @enum {string} */
+                            tax_system: "vat" | "sales_tax";
+                            /** @enum {string} */
+                            till_device: "tse" | "rksv" | "none";
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalController.verify_journal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Verification */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        verification: {
+                            broken_at?: number;
+                            entries: number;
+                            head?: string;
+                            reason?: string;
+                            valid: boolean;
+                        };
                     };
                 };
             };

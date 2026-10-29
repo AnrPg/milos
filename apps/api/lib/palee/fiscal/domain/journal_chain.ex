@@ -41,15 +41,17 @@ defmodule Palee.Fiscal.Domain.JournalChain do
         {position, previous_hash} = head_values(head)
 
         entry =
-          attrs
-          |> Map.take(@hashed_fields)
+          @hashed_fields
+          |> Map.new(&{&1, Map.get(attrs, &1)})
           |> Map.put(:position, position + 1)
-          |> Map.put_new(:payload, %{})
+          |> Map.update!(:payload, &(&1 || %{}))
           |> Map.update!(:occurred_at, &microseconds/1)
 
         with {:ok, payload} <- canonical_payload(entry.payload) do
           entry = %{entry | payload: payload}
-          {:ok, Map.merge(entry, %{previous_hash: previous_hash, hash: hash(previous_hash, entry)})}
+
+          {:ok,
+           Map.merge(entry, %{previous_hash: previous_hash, hash: hash(previous_hash, entry)})}
         end
     end
   end
@@ -67,10 +69,11 @@ defmodule Palee.Fiscal.Domain.JournalChain do
 
   @doc "The hash of an entry given the previous hash."
   def hash(previous_hash, entry) do
+    # Absent and nil fields hash alike: both are `null`.
     body =
-      entry
-      |> Map.take(@hashed_fields)
-      |> Map.update(:occurred_at, nil, &timestamp/1)
+      @hashed_fields
+      |> Map.new(&{&1, Map.get(entry, &1)})
+      |> Map.update!(:occurred_at, &timestamp/1)
       |> CanonicalJson.encode!()
 
     :crypto.hash(:sha256, [previous_hash, "\n", body]) |> Base.encode16(case: :lower)
@@ -100,11 +103,20 @@ defmodule Palee.Fiscal.Domain.JournalChain do
     entries
     |> Enum.reduce_while({0, @genesis}, fn entry, {position, previous_hash} ->
       cond do
-        entry.position != position + 1 -> {:halt, {:broken, position + 1, :position_gap}}
-        entry.previous_hash != previous_hash -> {:halt, {:broken, entry.position, :broken_link}}
-        hash(previous_hash, entry) != entry.hash -> {:halt, {:broken, entry.position, :hash_mismatch}}
-        not verify_signature.(entry) -> {:halt, {:broken, entry.position, :bad_signature}}
-        true -> {:cont, {entry.position, entry.hash}}
+        entry.position != position + 1 ->
+          {:halt, {:broken, position + 1, :position_gap}}
+
+        entry.previous_hash != previous_hash ->
+          {:halt, {:broken, entry.position, :broken_link}}
+
+        hash(previous_hash, entry) != entry.hash ->
+          {:halt, {:broken, entry.position, :hash_mismatch}}
+
+        not verify_signature.(entry) ->
+          {:halt, {:broken, entry.position, :bad_signature}}
+
+        true ->
+          {:cont, {entry.position, entry.hash}}
       end
     end)
     |> case do

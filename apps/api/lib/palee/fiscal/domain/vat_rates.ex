@@ -114,7 +114,8 @@ defmodule Palee.Fiscal.Domain.VatRates do
       true ->
         with %{} = rates <- Map.get(@rates, country),
              [_ | _] = history <- Map.get(rates, category),
-             {_from, bp} <- Enum.find(history, fn {from, _bp} -> Date.compare(from, on) != :gt end) do
+             {_from, bp} <-
+               Enum.find(history, fn {from, _bp} -> Date.compare(from, on) != :gt end) do
           {:ok, bp}
         else
           _ -> {:error, :unknown_tax_category}

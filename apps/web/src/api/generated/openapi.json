@@ -168439,6 +168439,2218 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/fiscal/archive": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalController.archive",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/zip": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "ZIP archive"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Download the signed audit archive of a date range (ZIP)",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/closings": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalController.closings",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "enum": [
+                "day",
+                "month",
+                "year"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 2000,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "closings": {
+                      "items": {
+                        "properties": {
+                          "closed_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "journal_position": {
+                            "type": "integer"
+                          },
+                          "period_end": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "period_kind": {
+                            "enum": [
+                              "day",
+                              "month",
+                              "year"
+                            ],
+                            "type": "string"
+                          },
+                          "period_start": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "totals": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "closed_at",
+                          "id",
+                          "journal_position",
+                          "period_end",
+                          "period_kind",
+                          "period_start",
+                          "totals"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "closings"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Closings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Daily, monthly and yearly closings",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/countries": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalController.countries",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "countries": {
+                      "items": {
+                        "properties": {
+                          "authority": {
+                            "enum": [
+                              "mydata",
+                              "none"
+                            ],
+                            "type": "string"
+                          },
+                          "country": {
+                            "maxLength": 2,
+                            "minLength": 2,
+                            "type": "string"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "einvoicing": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "languages": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "register": {
+                            "enum": [
+                              "nf525",
+                              "standard"
+                            ],
+                            "type": "string"
+                          },
+                          "required_fields": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "retention_years": {
+                            "type": "integer"
+                          },
+                          "tax_categories": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "tax_office": {
+                            "type": "boolean"
+                          },
+                          "tax_system": {
+                            "enum": [
+                              "vat",
+                              "sales_tax"
+                            ],
+                            "type": "string"
+                          },
+                          "till_device": {
+                            "enum": [
+                              "tse",
+                              "rksv",
+                              "none"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "authority",
+                          "country",
+                          "currency",
+                          "einvoicing",
+                          "languages",
+                          "register",
+                          "required_fields",
+                          "retention_years",
+                          "tax_categories",
+                          "tax_office",
+                          "tax_system",
+                          "till_device"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "vat_schemes": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "countries",
+                    "vat_schemes"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Countries"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Supported countries, what each asks of a business, and the VAT schemes",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/documents": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalController.documents",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "enum": [
+                "receipt",
+                "invoice",
+                "credit_note"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "number",
+            "required": false,
+            "schema": {
+              "maxLength": 40,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 200,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "documents": {
+                      "items": {
+                        "properties": {
+                          "buyer": {
+                            "additionalProperties": true,
+                            "nullable": true,
+                            "type": "object"
+                          },
+                          "content_hash": {
+                            "type": "string"
+                          },
+                          "corrects_document_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "country_code": {
+                            "type": "string"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "gross_cents": {
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "issue_date": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "issued_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "journal_position": {
+                            "type": "integer"
+                          },
+                          "kind": {
+                            "enum": [
+                              "receipt",
+                              "invoice",
+                              "credit_note"
+                            ],
+                            "type": "string"
+                          },
+                          "language": {
+                            "type": "string"
+                          },
+                          "lines": {
+                            "items": {
+                              "properties": {
+                                "amount_cents": {
+                                  "type": "integer"
+                                },
+                                "corrects_position": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "description": {
+                                  "type": "string"
+                                },
+                                "discount_cents": {
+                                  "type": "integer"
+                                },
+                                "exemption_reason": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "gross_cents": {
+                                  "type": "integer"
+                                },
+                                "net_cents": {
+                                  "type": "integer"
+                                },
+                                "position": {
+                                  "type": "integer"
+                                },
+                                "quantity": {
+                                  "type": "integer"
+                                },
+                                "rate_bp": {
+                                  "type": "integer"
+                                },
+                                "tax_category": {
+                                  "type": "string"
+                                },
+                                "tax_cents": {
+                                  "type": "integer"
+                                },
+                                "unit_price_cents": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "amount_cents",
+                                "description",
+                                "discount_cents",
+                                "gross_cents",
+                                "net_cents",
+                                "position",
+                                "quantity",
+                                "rate_bp",
+                                "tax_category",
+                                "tax_cents",
+                                "unit_price_cents"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "net_cents": {
+                            "type": "integer"
+                          },
+                          "number": {
+                            "type": "string"
+                          },
+                          "payment_method": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "prices_include_tax": {
+                            "type": "boolean"
+                          },
+                          "seller": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "sequence": {
+                            "type": "integer"
+                          },
+                          "series": {
+                            "type": "string"
+                          },
+                          "source_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "source_type": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "tax_breakdown": {
+                            "items": {
+                              "properties": {
+                                "gross_cents": {
+                                  "type": "integer"
+                                },
+                                "net_cents": {
+                                  "type": "integer"
+                                },
+                                "rate_bp": {
+                                  "type": "integer"
+                                },
+                                "tax_category": {
+                                  "type": "string"
+                                },
+                                "tax_cents": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "gross_cents",
+                                "net_cents",
+                                "rate_bp",
+                                "tax_category",
+                                "tax_cents"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "tax_cents": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "content_hash",
+                          "country_code",
+                          "currency",
+                          "gross_cents",
+                          "id",
+                          "issue_date",
+                          "issued_at",
+                          "journal_position",
+                          "kind",
+                          "language",
+                          "net_cents",
+                          "number",
+                          "prices_include_tax",
+                          "seller",
+                          "sequence",
+                          "series",
+                          "tax_breakdown",
+                          "tax_cents"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "documents",
+                    "total"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Documents"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Fiscal documents, newest first",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalController.document",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "document": {
+                      "properties": {
+                        "buyer": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "content_hash": {
+                          "type": "string"
+                        },
+                        "corrects_document_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "country_code": {
+                          "type": "string"
+                        },
+                        "credit_notes": {
+                          "items": {
+                            "properties": {
+                              "buyer": {
+                                "additionalProperties": true,
+                                "nullable": true,
+                                "type": "object"
+                              },
+                              "content_hash": {
+                                "type": "string"
+                              },
+                              "corrects_document_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "country_code": {
+                                "type": "string"
+                              },
+                              "currency": {
+                                "type": "string"
+                              },
+                              "gross_cents": {
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "issue_date": {
+                                "format": "date",
+                                "type": "string"
+                              },
+                              "issued_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "journal_position": {
+                                "type": "integer"
+                              },
+                              "kind": {
+                                "enum": [
+                                  "receipt",
+                                  "invoice",
+                                  "credit_note"
+                                ],
+                                "type": "string"
+                              },
+                              "language": {
+                                "type": "string"
+                              },
+                              "lines": {
+                                "items": {
+                                  "properties": {
+                                    "amount_cents": {
+                                      "type": "integer"
+                                    },
+                                    "corrects_position": {
+                                      "nullable": true,
+                                      "type": "integer"
+                                    },
+                                    "description": {
+                                      "type": "string"
+                                    },
+                                    "discount_cents": {
+                                      "type": "integer"
+                                    },
+                                    "exemption_reason": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "gross_cents": {
+                                      "type": "integer"
+                                    },
+                                    "net_cents": {
+                                      "type": "integer"
+                                    },
+                                    "position": {
+                                      "type": "integer"
+                                    },
+                                    "quantity": {
+                                      "type": "integer"
+                                    },
+                                    "rate_bp": {
+                                      "type": "integer"
+                                    },
+                                    "tax_category": {
+                                      "type": "string"
+                                    },
+                                    "tax_cents": {
+                                      "type": "integer"
+                                    },
+                                    "unit_price_cents": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "required": [
+                                    "amount_cents",
+                                    "description",
+                                    "discount_cents",
+                                    "gross_cents",
+                                    "net_cents",
+                                    "position",
+                                    "quantity",
+                                    "rate_bp",
+                                    "tax_category",
+                                    "tax_cents",
+                                    "unit_price_cents"
+                                  ],
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "net_cents": {
+                                "type": "integer"
+                              },
+                              "number": {
+                                "type": "string"
+                              },
+                              "payment_method": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "prices_include_tax": {
+                                "type": "boolean"
+                              },
+                              "seller": {
+                                "additionalProperties": true,
+                                "type": "object"
+                              },
+                              "sequence": {
+                                "type": "integer"
+                              },
+                              "series": {
+                                "type": "string"
+                              },
+                              "source_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "source_type": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "tax_breakdown": {
+                                "items": {
+                                  "properties": {
+                                    "gross_cents": {
+                                      "type": "integer"
+                                    },
+                                    "net_cents": {
+                                      "type": "integer"
+                                    },
+                                    "rate_bp": {
+                                      "type": "integer"
+                                    },
+                                    "tax_category": {
+                                      "type": "string"
+                                    },
+                                    "tax_cents": {
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "required": [
+                                    "gross_cents",
+                                    "net_cents",
+                                    "rate_bp",
+                                    "tax_category",
+                                    "tax_cents"
+                                  ],
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "tax_cents": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "content_hash",
+                              "country_code",
+                              "currency",
+                              "gross_cents",
+                              "id",
+                              "issue_date",
+                              "issued_at",
+                              "journal_position",
+                              "kind",
+                              "language",
+                              "net_cents",
+                              "number",
+                              "prices_include_tax",
+                              "seller",
+                              "sequence",
+                              "series",
+                              "tax_breakdown",
+                              "tax_cents"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "gross_cents": {
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "issue_date": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "issued_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "journal_position": {
+                          "type": "integer"
+                        },
+                        "kind": {
+                          "enum": [
+                            "receipt",
+                            "invoice",
+                            "credit_note"
+                          ],
+                          "type": "string"
+                        },
+                        "language": {
+                          "type": "string"
+                        },
+                        "lines": {
+                          "items": {
+                            "properties": {
+                              "amount_cents": {
+                                "type": "integer"
+                              },
+                              "corrects_position": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "description": {
+                                "type": "string"
+                              },
+                              "discount_cents": {
+                                "type": "integer"
+                              },
+                              "exemption_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "gross_cents": {
+                                "type": "integer"
+                              },
+                              "net_cents": {
+                                "type": "integer"
+                              },
+                              "position": {
+                                "type": "integer"
+                              },
+                              "quantity": {
+                                "type": "integer"
+                              },
+                              "rate_bp": {
+                                "type": "integer"
+                              },
+                              "tax_category": {
+                                "type": "string"
+                              },
+                              "tax_cents": {
+                                "type": "integer"
+                              },
+                              "unit_price_cents": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "amount_cents",
+                              "description",
+                              "discount_cents",
+                              "gross_cents",
+                              "net_cents",
+                              "position",
+                              "quantity",
+                              "rate_bp",
+                              "tax_category",
+                              "tax_cents",
+                              "unit_price_cents"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "net_cents": {
+                          "type": "integer"
+                        },
+                        "number": {
+                          "type": "string"
+                        },
+                        "payment_method": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "prices_include_tax": {
+                          "type": "boolean"
+                        },
+                        "seller": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "sequence": {
+                          "type": "integer"
+                        },
+                        "series": {
+                          "type": "string"
+                        },
+                        "source_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "source_type": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tax_breakdown": {
+                          "items": {
+                            "properties": {
+                              "gross_cents": {
+                                "type": "integer"
+                              },
+                              "net_cents": {
+                                "type": "integer"
+                              },
+                              "rate_bp": {
+                                "type": "integer"
+                              },
+                              "tax_category": {
+                                "type": "string"
+                              },
+                              "tax_cents": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "gross_cents",
+                              "net_cents",
+                              "rate_bp",
+                              "tax_category",
+                              "tax_cents"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "tax_cents": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "content_hash",
+                        "country_code",
+                        "currency",
+                        "gross_cents",
+                        "id",
+                        "issue_date",
+                        "issued_at",
+                        "journal_position",
+                        "kind",
+                        "language",
+                        "net_cents",
+                        "number",
+                        "prices_include_tax",
+                        "seller",
+                        "sequence",
+                        "series",
+                        "tax_breakdown",
+                        "tax_cents"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "document"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Document"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A fiscal document with its lines and the credit notes against it",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/credit-notes": {
+      "post": {
+        "callbacks": {},
+        "description": "Documents are never changed: a credit note corrects them. Idempotent by `idempotency_key`.",
+        "operationId": "PaleeWeb.AdminFiscalController.credit",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "idempotency_key": {
+                    "maxLength": 120,
+                    "minLength": 8,
+                    "type": "string"
+                  },
+                  "lines": {
+                    "items": {
+                      "properties": {
+                        "position": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "quantity": {
+                          "minimum": 1,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "position",
+                        "quantity"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "idempotency_key"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "document": {
+                      "properties": {
+                        "buyer": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "content_hash": {
+                          "type": "string"
+                        },
+                        "corrects_document_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "country_code": {
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "gross_cents": {
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "issue_date": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "issued_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "journal_position": {
+                          "type": "integer"
+                        },
+                        "kind": {
+                          "enum": [
+                            "receipt",
+                            "invoice",
+                            "credit_note"
+                          ],
+                          "type": "string"
+                        },
+                        "language": {
+                          "type": "string"
+                        },
+                        "lines": {
+                          "items": {
+                            "properties": {
+                              "amount_cents": {
+                                "type": "integer"
+                              },
+                              "corrects_position": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "description": {
+                                "type": "string"
+                              },
+                              "discount_cents": {
+                                "type": "integer"
+                              },
+                              "exemption_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "gross_cents": {
+                                "type": "integer"
+                              },
+                              "net_cents": {
+                                "type": "integer"
+                              },
+                              "position": {
+                                "type": "integer"
+                              },
+                              "quantity": {
+                                "type": "integer"
+                              },
+                              "rate_bp": {
+                                "type": "integer"
+                              },
+                              "tax_category": {
+                                "type": "string"
+                              },
+                              "tax_cents": {
+                                "type": "integer"
+                              },
+                              "unit_price_cents": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "amount_cents",
+                              "description",
+                              "discount_cents",
+                              "gross_cents",
+                              "net_cents",
+                              "position",
+                              "quantity",
+                              "rate_bp",
+                              "tax_category",
+                              "tax_cents",
+                              "unit_price_cents"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "net_cents": {
+                          "type": "integer"
+                        },
+                        "number": {
+                          "type": "string"
+                        },
+                        "payment_method": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "prices_include_tax": {
+                          "type": "boolean"
+                        },
+                        "seller": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "sequence": {
+                          "type": "integer"
+                        },
+                        "series": {
+                          "type": "string"
+                        },
+                        "source_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "source_type": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tax_breakdown": {
+                          "items": {
+                            "properties": {
+                              "gross_cents": {
+                                "type": "integer"
+                              },
+                              "net_cents": {
+                                "type": "integer"
+                              },
+                              "rate_bp": {
+                                "type": "integer"
+                              },
+                              "tax_category": {
+                                "type": "string"
+                              },
+                              "tax_cents": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "gross_cents",
+                              "net_cents",
+                              "rate_bp",
+                              "tax_category",
+                              "tax_cents"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "tax_cents": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "content_hash",
+                        "country_code",
+                        "currency",
+                        "gross_cents",
+                        "id",
+                        "issue_date",
+                        "issued_at",
+                        "journal_position",
+                        "kind",
+                        "language",
+                        "net_cents",
+                        "number",
+                        "prices_include_tax",
+                        "seller",
+                        "sequence",
+                        "series",
+                        "tax_breakdown",
+                        "tax_cents"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "document"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The credit note of an earlier identical request"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "document": {
+                      "properties": {
+                        "buyer": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "content_hash": {
+                          "type": "string"
+                        },
+                        "corrects_document_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "country_code": {
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "gross_cents": {
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "issue_date": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "issued_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "journal_position": {
+                          "type": "integer"
+                        },
+                        "kind": {
+                          "enum": [
+                            "receipt",
+                            "invoice",
+                            "credit_note"
+                          ],
+                          "type": "string"
+                        },
+                        "language": {
+                          "type": "string"
+                        },
+                        "lines": {
+                          "items": {
+                            "properties": {
+                              "amount_cents": {
+                                "type": "integer"
+                              },
+                              "corrects_position": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "description": {
+                                "type": "string"
+                              },
+                              "discount_cents": {
+                                "type": "integer"
+                              },
+                              "exemption_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "gross_cents": {
+                                "type": "integer"
+                              },
+                              "net_cents": {
+                                "type": "integer"
+                              },
+                              "position": {
+                                "type": "integer"
+                              },
+                              "quantity": {
+                                "type": "integer"
+                              },
+                              "rate_bp": {
+                                "type": "integer"
+                              },
+                              "tax_category": {
+                                "type": "string"
+                              },
+                              "tax_cents": {
+                                "type": "integer"
+                              },
+                              "unit_price_cents": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "amount_cents",
+                              "description",
+                              "discount_cents",
+                              "gross_cents",
+                              "net_cents",
+                              "position",
+                              "quantity",
+                              "rate_bp",
+                              "tax_category",
+                              "tax_cents",
+                              "unit_price_cents"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "net_cents": {
+                          "type": "integer"
+                        },
+                        "number": {
+                          "type": "string"
+                        },
+                        "payment_method": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "prices_include_tax": {
+                          "type": "boolean"
+                        },
+                        "seller": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "sequence": {
+                          "type": "integer"
+                        },
+                        "series": {
+                          "type": "string"
+                        },
+                        "source_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "source_type": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tax_breakdown": {
+                          "items": {
+                            "properties": {
+                              "gross_cents": {
+                                "type": "integer"
+                              },
+                              "net_cents": {
+                                "type": "integer"
+                              },
+                              "rate_bp": {
+                                "type": "integer"
+                              },
+                              "tax_category": {
+                                "type": "string"
+                              },
+                              "tax_cents": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "gross_cents",
+                              "net_cents",
+                              "rate_bp",
+                              "tax_category",
+                              "tax_cents"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "tax_cents": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "content_hash",
+                        "country_code",
+                        "currency",
+                        "gross_cents",
+                        "id",
+                        "issue_date",
+                        "issued_at",
+                        "journal_position",
+                        "kind",
+                        "language",
+                        "net_cents",
+                        "number",
+                        "prices_include_tax",
+                        "seller",
+                        "sequence",
+                        "series",
+                        "tax_breakdown",
+                        "tax_cents"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "document"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Credit note"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Issue a credit note for a document (all that is left, or chosen quantities)",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/identity": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalController.identity",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "complete": {
+                      "type": "boolean"
+                    },
+                    "identity": {
+                      "nullable": true,
+                      "properties": {
+                        "activity_code": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "branch_code": {
+                          "type": "integer"
+                        },
+                        "building_number": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "city": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "country_code": {
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "document_language": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "email": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fiscal_year_start_month": {
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "legal_name": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "phone": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "postal_code": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "region": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "registration_number": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "street": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tax_id": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tax_office": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "trade_name": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "vat_number": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "vat_scheme": {
+                          "enum": [
+                            "standard",
+                            "small_business",
+                            "exempt"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "branch_code",
+                        "country_code",
+                        "currency",
+                        "fiscal_year_start_month",
+                        "id",
+                        "vat_scheme"
+                      ],
+                      "type": "object"
+                    },
+                    "missing": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "profile": {
+                      "nullable": true,
+                      "properties": {
+                        "authority": {
+                          "enum": [
+                            "mydata",
+                            "none"
+                          ],
+                          "type": "string"
+                        },
+                        "country": {
+                          "maxLength": 2,
+                          "minLength": 2,
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "einvoicing": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "languages": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "register": {
+                          "enum": [
+                            "nf525",
+                            "standard"
+                          ],
+                          "type": "string"
+                        },
+                        "required_fields": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "retention_years": {
+                          "type": "integer"
+                        },
+                        "tax_categories": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "tax_office": {
+                          "type": "boolean"
+                        },
+                        "tax_system": {
+                          "enum": [
+                            "vat",
+                            "sales_tax"
+                          ],
+                          "type": "string"
+                        },
+                        "till_device": {
+                          "enum": [
+                            "tse",
+                            "rksv",
+                            "none"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "authority",
+                        "country",
+                        "currency",
+                        "einvoicing",
+                        "languages",
+                        "register",
+                        "required_fields",
+                        "retention_years",
+                        "tax_categories",
+                        "tax_office",
+                        "tax_system",
+                        "till_device"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "complete",
+                    "identity",
+                    "missing",
+                    "profile"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Identity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The business's legal identity, its country profile and the fields still missing",
+        "tags": [
+          "Fiscal"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "description": "Tax ids are checked against their country's format and check digits; field errors come back as `validation_failed` with one code per field. Every change is journaled.",
+        "operationId": "PaleeWeb.AdminFiscalController.save_identity",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "activity_code": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "branch_code": {
+                    "maximum": 9999,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "building_number": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "city": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "country_code": {
+                    "maxLength": 2,
+                    "minLength": 2,
+                    "type": "string"
+                  },
+                  "document_language": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "email": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "fiscal_year_start_month": {
+                    "maximum": 12,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "legal_name": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "phone": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "postal_code": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "region": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "registration_number": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "street": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "tax_id": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "tax_office": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "trade_name": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "vat_number": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "vat_scheme": {
+                    "enum": [
+                      "standard",
+                      "small_business",
+                      "exempt"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "complete": {
+                      "type": "boolean"
+                    },
+                    "identity": {
+                      "nullable": true,
+                      "properties": {
+                        "activity_code": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "branch_code": {
+                          "type": "integer"
+                        },
+                        "building_number": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "city": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "country_code": {
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "document_language": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "email": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fiscal_year_start_month": {
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "legal_name": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "phone": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "postal_code": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "region": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "registration_number": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "street": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tax_id": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tax_office": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "trade_name": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "vat_number": {
+                          "maxLength": 200,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "vat_scheme": {
+                          "enum": [
+                            "standard",
+                            "small_business",
+                            "exempt"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "branch_code",
+                        "country_code",
+                        "currency",
+                        "fiscal_year_start_month",
+                        "id",
+                        "vat_scheme"
+                      ],
+                      "type": "object"
+                    },
+                    "missing": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "profile": {
+                      "nullable": true,
+                      "properties": {
+                        "authority": {
+                          "enum": [
+                            "mydata",
+                            "none"
+                          ],
+                          "type": "string"
+                        },
+                        "country": {
+                          "maxLength": 2,
+                          "minLength": 2,
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "einvoicing": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "languages": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "register": {
+                          "enum": [
+                            "nf525",
+                            "standard"
+                          ],
+                          "type": "string"
+                        },
+                        "required_fields": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "retention_years": {
+                          "type": "integer"
+                        },
+                        "tax_categories": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "tax_office": {
+                          "type": "boolean"
+                        },
+                        "tax_system": {
+                          "enum": [
+                            "vat",
+                            "sales_tax"
+                          ],
+                          "type": "string"
+                        },
+                        "till_device": {
+                          "enum": [
+                            "tse",
+                            "rksv",
+                            "none"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "authority",
+                        "country",
+                        "currency",
+                        "einvoicing",
+                        "languages",
+                        "register",
+                        "required_fields",
+                        "retention_years",
+                        "tax_categories",
+                        "tax_office",
+                        "tax_system",
+                        "till_device"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "complete",
+                    "identity",
+                    "missing",
+                    "profile"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Identity"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Save the business's legal identity (partial updates allowed)",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/journal/verification": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalController.verify_journal",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "verification": {
+                      "properties": {
+                        "broken_at": {
+                          "type": "integer"
+                        },
+                        "entries": {
+                          "type": "integer"
+                        },
+                        "head": {
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        },
+                        "valid": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "entries",
+                        "valid"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "verification"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Verification"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Recompute the journal's hash chain and signatures",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/geocode": {
       "get": {
         "callbacks": {},
