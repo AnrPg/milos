@@ -164,7 +164,10 @@ config :palee, :fiscal_journal_signer, Palee.Infrastructure.Fiscal.Ed25519Journa
 config :palee, :fiscal_transmission_store, Palee.Infrastructure.Fiscal.EctoTransmissionStore
 
 # ADR-255: setup recipes.
-config :palee, :setup_recipe_application_store, Palee.Infrastructure.Setup.EctoRecipeApplicationStore
+config :palee,
+       :setup_recipe_application_store,
+       Palee.Infrastructure.Setup.EctoRecipeApplicationStore
+
 config :palee, :setup_business_configurator, Palee.Application.Setup.ServicesConfigurator
 
 # ADR-243: the gateway that reports documents, per connection environment.

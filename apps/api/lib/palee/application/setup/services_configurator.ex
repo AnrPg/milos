@@ -18,7 +18,16 @@ defmodule Palee.Application.Setup.ServicesConfigurator do
 
   @behaviour Palee.Setup.Ports.BusinessConfigurator
 
-  alias Palee.{Community, Facility, Finance, Fiscal, Gamification, Organizations, Scheduling, Trials}
+  alias Palee.{
+    Community,
+    Facility,
+    Finance,
+    Fiscal,
+    Gamification,
+    Organizations,
+    Scheduling,
+    Trials
+  }
 
   alias Palee.Application.{
     BroadcastUserSync,

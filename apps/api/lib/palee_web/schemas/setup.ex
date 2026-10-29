@@ -11,7 +11,10 @@ defmodule PaleeWeb.Schemas.Setup do
     properties: %{en: %Schema{type: :string}, el: %Schema{type: :string}},
     required: [:el, :en]
   }
-  @any %Schema{nullable: true, description: "A setting value: boolean, number, text, list or null"}
+  @any %Schema{
+    nullable: true,
+    description: "A setting value: boolean, number, text, list or null"
+  }
   @verdict %Schema{type: :string, enum: ["advanced", "basic", "derive", "remove"]}
   @grants %Schema{
     type: :object,

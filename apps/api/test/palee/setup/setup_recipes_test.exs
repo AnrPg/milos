@@ -12,7 +12,17 @@ defmodule Palee.Setup.SetupRecipesTest do
 
   import Palee.AnalyticsHelpers, only: [organization_fixture: 0, member_context: 2]
 
-  alias Palee.{Community, Facility, Finance, Gamification, Organizations, Scheduling, Setup, Trials}
+  alias Palee.{
+    Community,
+    Facility,
+    Finance,
+    Gamification,
+    Organizations,
+    Scheduling,
+    Setup,
+    Trials
+  }
+
   alias Palee.Application.Setup.SetupRecipes
 
   @now ~U[2027-02-11 09:00:00.000000Z]
@@ -22,7 +32,8 @@ defmodule Palee.Setup.SetupRecipesTest do
     %{organization: organization, owner: owner, context: context}
   end
 
-  defp packages(context), do: context |> Finance.list_packages() |> Enum.map(& &1.code) |> Enum.sort()
+  defp packages(context),
+    do: context |> Finance.list_packages() |> Enum.map(& &1.code) |> Enum.sort()
 
   defp class_types(context) do
     {:ok, types} = Palee.Application.ListClassTypes.call(context, include_archived: true)
@@ -58,7 +69,9 @@ defmodule Palee.Setup.SetupRecipesTest do
 
     # Packages, through Finance.
     assert packages(context) ==
-             Enum.sort(~w(setup_drop_in setup_ten_classes setup_three_a_week setup_trial setup_unlimited))
+             Enum.sort(
+               ~w(setup_drop_in setup_ten_classes setup_three_a_week setup_trial setup_unlimited)
+             )
 
     unlimited = Enum.find(Finance.list_packages(context), &(&1.code == "setup_unlimited"))
     assert unlimited.base_price_cents == 8_000
@@ -89,6 +102,7 @@ defmodule Palee.Setup.SetupRecipesTest do
 
     # Again: nothing left to do, nothing changed, the application recorded.
     before = {packages(context), class_types(context)}
+
     assert {:ok, %{plan: again, application: second}} =
              SetupRecipes.apply_recipe(context, "crossfit_box", @now)
 

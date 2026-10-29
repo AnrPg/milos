@@ -137,6 +137,7 @@ defmodule Palee.Setup.Domain.SettingsCatalog do
   @doc "`%{verdict => count}` for every verdict."
   def counts do
     base = Map.new(@verdicts, &{&1, 0})
+
     Enum.reduce(@entries, base, fn {_key, verdict, _default, _recipe}, acc ->
       Map.update!(acc, verdict, &(&1 + 1))
     end)

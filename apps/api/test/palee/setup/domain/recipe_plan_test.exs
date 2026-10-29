@@ -32,7 +32,12 @@ defmodule Palee.Setup.Domain.RecipePlanTest do
       }
     ],
     role_grants: %{"front_desk" => ["manage_billing"]},
-    documents: [%{key: "health_certificate", names: %{"en" => "Health certificate", "el" => "Βεβαίωση υγείας"}}]
+    documents: [
+      %{
+        key: "health_certificate",
+        names: %{"en" => "Health certificate", "el" => "Βεβαίωση υγείας"}
+      }
+    ]
   }
 
   @fresh %{
@@ -165,7 +170,9 @@ defmodule Palee.Setup.Domain.RecipePlanTest do
   end
 
   test "class type names compare trimmed and case-insensitive" do
-    plan = RecipePlan.build(@recipe, %{@fresh | class_type_names: [RecipePlan.normalize_name(" Wod ")]})
+    plan =
+      RecipePlan.build(@recipe, %{@fresh | class_type_names: [RecipePlan.normalize_name(" Wod ")]})
+
     assert "class_type.wod" in plan.unchanged
   end
 end

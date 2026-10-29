@@ -111,7 +111,9 @@ defmodule PaleeWeb.AdminSetupControllerTest do
     assert {:ok, _} =
              OpenApiSpex.cast_value(catalog, PaleeWeb.Schemas.Setup.settings_catalog(), spec)
 
-    applied = owner |> post_json(base <> "/setup/recipes/crossfit_box/apply") |> json_response(200)
+    applied =
+      owner |> post_json(base <> "/setup/recipes/crossfit_box/apply") |> json_response(200)
+
     assert {:ok, _} = OpenApiSpex.cast_value(applied, PaleeWeb.Schemas.Setup.applied(), spec)
 
     paths = spec.paths

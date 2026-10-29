@@ -240,7 +240,10 @@ defmodule Palee.Setup.Domain.Recipes do
       class_types: [
         %{slug: "yoga", names: %{"en" => "Yoga", "el" => "Yoga"}},
         %{slug: "pilates-mat", names: %{"en" => "Mat pilates", "el" => "Pilates στο στρώμα"}},
-        %{slug: "pilates-reformer", names: %{"en" => "Reformer pilates", "el" => "Pilates reformer"}}
+        %{
+          slug: "pilates-reformer",
+          names: %{"en" => "Reformer pilates", "el" => "Pilates reformer"}
+        }
       ],
       packages: [
         %{
