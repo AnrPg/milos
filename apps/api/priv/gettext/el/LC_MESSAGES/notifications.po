@@ -746,3 +746,9 @@ msgstr "Η βεβαίωση υγείας σου λήγει σύντομα"
 
 msgid "Upload a new health certificate before %{date}."
 msgstr "Ανέβασε νέα βεβαίωση υγείας πριν από τις %{date}."
+
+msgid "A fiscal connection needs attention"
+msgstr "Μια φορολογική σύνδεση θέλει προσοχή"
+
+msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
+msgstr "Το %{connection} σταμάτησε να λειτουργεί. Άνοιξε Στοιχεία τιμολόγησης › Συνδέσεις για να το διορθώσεις."

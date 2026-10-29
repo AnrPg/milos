@@ -16,7 +16,7 @@ defmodule Palee.Fiscal.Reporting do
   """
 
   alias Palee.Fiscal
-  alias Palee.Fiscal.{FiscalStore, TransmissionStore}
+  alias Palee.Fiscal.{Connections, FiscalStore, TransmissionStore}
   alias Palee.Fiscal.Domain.{CountryProfile, MyDataInvoice, TransmissionPolicy}
 
   @authority "mydata"
@@ -154,11 +154,12 @@ defmodule Palee.Fiscal.Reporting do
 
     with {:ok, _saved} <- record(context, transmission, document, changes, attempt, now) do
       if match?({:error, {:unauthorized, _}}, result) do
-        TransmissionStore.set_connection_status(
+        Connections.mark_invalid(
           context,
-          transmission.authority,
-          "invalid",
-          error_text(result)
+          "mydata",
+          "credentials_rejected",
+          error_text(result),
+          now
         )
       end
 
@@ -247,9 +248,14 @@ defmodule Palee.Fiscal.Reporting do
 
   defp public_connection(connection) do
     connection
-    |> Map.take([:authority, :environment, :user_id, :status, :last_error, :updated_at])
+    |> Map.take([:authority, :environment, :user_id, :status, :updated_at])
+    |> Map.merge(Connections.public_check(connection))
     |> Map.put(:has_subscription_key, is_binary(connection.subscription_key))
   end
+
+  @doc false
+  # ADR-273: «Δοκιμή σύνδεσης» with the connection's own credentials.
+  def check_connection(connection), do: gateway(connection.environment).check(connection)
 
   @doc """
   Saves the myDATA connection. `test` and `production` need the
@@ -266,7 +272,12 @@ defmodule Palee.Fiscal.Reporting do
                TransmissionStore.save_connection(
                  context,
                  @authority,
-                 Map.merge(attrs, %{status: "active", last_error: nil, updated_by_id: actor_id})
+                 attrs
+                 |> Map.merge(Connections.saved_fields())
+                 |> Map.merge(%{
+                   updated_by_id: actor_id,
+                   updated_by_platform: params[:updated_by_platform] == true
+                 })
                ),
              {:ok, _entry} <-
                Fiscal.append(context, %{
@@ -281,6 +292,7 @@ defmodule Palee.Fiscal.Reporting do
                    user_id: saved.user_id,
                    key_changed: Map.has_key?(attrs, :subscription_key)
                  }
+                 |> Connections.platform_mark(params)
                }) do
           TransmissionStore.wake_waiting(context, now)
           {:ok, public_connection(saved)}

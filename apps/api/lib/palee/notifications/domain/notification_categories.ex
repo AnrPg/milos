@@ -98,7 +98,7 @@ defmodule Palee.Notifications.Domain.NotificationCategories do
         trial_requested trial_booked trial_cancelled season_requested class_workout_missing
         community_group_proposed community_report_created referral_review
         inventory_repair_needed inventory_stock_low inventory_digest
-        shop_stock_low shop_order_placed payment_needs_attention
+        shop_stock_low shop_order_placed payment_needs_attention fiscal_connection_failed
       )
     },
     %{

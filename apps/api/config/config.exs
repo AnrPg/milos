@@ -221,6 +221,9 @@ config :palee, :fiscal_einvoice_networks, %{
 # ADR-251/266: TSE (DE), RKSV (AT) and SIGN FR (FR) signing, the provider per connection.
 config :palee, :fiscal_till_store, Palee.Infrastructure.Fiscal.EctoTillSignatureStore
 
+# ADR-273: who hears that a fiscal connection stopped working.
+config :palee, :fiscal_connection_notifier, Palee.Application.Fiscal.ConnectionFailureNotices
+
 config :palee, :fiscal_cash_register_security, %{
   {"tse", "sandbox"} => Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity,
   {"rksv", "sandbox"} => Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity,

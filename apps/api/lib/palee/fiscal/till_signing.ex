@@ -21,7 +21,7 @@ defmodule Palee.Fiscal.TillSigning do
   """
 
   alias Palee.Fiscal
-  alias Palee.Fiscal.{FiscalStore, TillSignatureStore}
+  alias Palee.Fiscal.{Connections, FiscalStore, TillSignatureStore}
 
   alias Palee.Fiscal.Domain.{
     CountryProfile,
@@ -349,14 +349,22 @@ defmodule Palee.Fiscal.TillSigning do
       :public_key,
       :provisioned_at,
       :status,
-      :last_error,
       :updated_at
     ])
+    |> Map.merge(Connections.public_check(connection))
     |> Map.merge(%{
       has_api_key: is_binary(connection.api_key),
       has_api_secret: is_binary(connection.api_secret)
     })
   end
+
+  @doc false
+  # ADR-273: «Δοκιμή σύνδεσης». A device whose provisioning never finished
+  # has nothing to check: saving it again finishes it.
+  def check_connection(%{status: "provisioning"}), do: {:error, :provisioning_failed}
+
+  def check_connection(connection),
+    do: adapter(connection.device, connection.provider).check(connection)
 
   @doc """
   Saves the till connection of `device` and, when it is new, has changed
@@ -372,6 +380,8 @@ defmodule Palee.Fiscal.TillSigning do
     identity = FiscalStore.get_identity(context)
 
     with {:ok, attrs} <- validate_connection(before, identity, device, params) do
+      attrs = Map.put(attrs, :updated_by_platform, params[:updated_by_platform] == true)
+
       provision? =
         is_nil(before) or before.status != "active" or before.environment != attrs.environment or
           params[:reprovision] == true
@@ -439,14 +449,33 @@ defmodule Palee.Fiscal.TillSigning do
         {:error, reason} ->
           message = reason |> inspect() |> String.slice(0, 500)
           TillSignatureStore.set_connection_status(context, device, "provisioning", message)
+          code = provisioning_error_code(reason)
 
-          case reason do
-            {:unauthorized, _} -> {:error, :till_credentials_refused}
+          TillSignatureStore.update_connection_check(context, device, %{
+            error_code: code,
+            checked_at: now
+          })
+
+          case code do
+            "credentials_rejected" -> {:error, :till_credentials_refused}
+            "siren_missing" -> {:error, :siren_missing}
             _other -> {:error, :till_provisioning_failed}
           end
       end
     end
   end
+
+  # ADR-273: a stable code for the screens; the provider's text stays in
+  # `last_error` for support.
+  defp provisioning_error_code({:unauthorized, _reason}), do: "credentials_rejected"
+
+  defp provisioning_error_code({:rejected, errors}) when is_list(errors) do
+    if Enum.any?(errors, &(Map.get(&1, :code) == "siren_missing")),
+      do: "siren_missing",
+      else: "provisioning_failed"
+  end
+
+  defp provisioning_error_code(_reason), do: "provisioning_failed"
 
   defp store(context, device, attrs, actor_id, start, now) do
     FiscalStore.transaction(context, fn ->
@@ -454,7 +483,9 @@ defmodule Palee.Fiscal.TillSigning do
              TillSignatureStore.save_connection(
                context,
                device,
-               Map.merge(attrs, %{status: "active", last_error: nil, updated_by_id: actor_id})
+               attrs
+               |> Map.merge(Connections.saved_fields())
+               |> Map.put(:updated_by_id, actor_id)
              ),
            :ok <- store_start(context, device, saved, start, now),
            {:ok, _entry} <-
@@ -474,6 +505,7 @@ defmodule Palee.Fiscal.TillSigning do
                  register_serial: saved.register_serial,
                  key_changed: Map.has_key?(attrs, :api_key) or Map.has_key?(attrs, :api_secret)
                }
+               |> Connections.platform_mark(attrs)
              }) do
         TillSignatureStore.wake_waiting(context, now)
         {:ok, public_connection(saved)}

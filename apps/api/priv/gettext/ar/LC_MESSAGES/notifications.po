@@ -746,3 +746,9 @@ msgstr "تنتهي شهادتك الصحية قريبًا"
 
 msgid "Upload a new health certificate before %{date}."
 msgstr "ارفع شهادة صحية جديدة قبل %{date}."
+
+msgid "A fiscal connection needs attention"
+msgstr "اتصال ضريبي يحتاج إلى انتباه"
+
+msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
+msgstr "توقف %{connection} عن العمل. افتح بيانات الفوترة › الاتصالات لإصلاحه."

@@ -746,3 +746,9 @@ msgstr "Медицинската ти бележка изтича скоро"
 
 msgid "Upload a new health certificate before %{date}."
 msgstr "Качи нова медицинска бележка преди %{date}."
+
+msgid "A fiscal connection needs attention"
+msgstr "Фискална връзка се нуждае от внимание"
+
+msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
+msgstr "%{connection} спря да работи. Отворете Данни за фактуриране › Връзки, за да го оправите."
