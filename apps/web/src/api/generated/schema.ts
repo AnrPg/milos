@@ -7942,7 +7942,7 @@ export interface paths {
         };
         /**
          * Get the common role-aware admin user profile shell
-         * @description `programming` (clients only, else null): `{allowed, grant, reason}` says whether a WOD can be assigned to the person: their subscription package needs online programming (`online_programming`) or personal training (`personal_training`), ADR-225.
+         * @description `programming` (clients only, else null): `{allowed, grant, reason}` says whether a WOD can be assigned to the person: their subscription package needs online programming (`online_programming`) or personal training (`personal_training`), ADR-232.
          */
         get: operations["PaleeWeb.AdminUserController.show"];
         put?: never;
@@ -8205,7 +8205,7 @@ export interface paths {
         put?: never;
         /**
          * Copy or save a workout and associate it with this user's assignment, class variant or booked class
-         * @description Athletes receive a personal assignment. Members follow `mode` (ADR-125). Without folder_id, copies are filed automatically (ADR-136): athletes in their folder, class workouts in the class-day folder, member variations in the member's variations folder. Athletes, and members in the personal and class_variant modes, need a package with online programming or personal training (ADR-225); otherwise 403 `programming_not_in_package`.
+         * @description Athletes receive a personal assignment. Members follow `mode` (ADR-125). Without folder_id, copies are filed automatically (ADR-136): athletes in their folder, class workouts in the class-day folder, member variations in the member's variations folder. Athletes, and members in the personal and class_variant modes, need a package with online programming or personal training (ADR-232); otherwise 403 `programming_not_in_package`.
          */
         post: operations["PaleeWeb.AdminUserController.program_workout"];
         delete?: never;
@@ -31060,6 +31060,130 @@ export interface components {
             ref?: string | null;
             slug: string;
         };
+        /** PlanBodySection */
+        PlanBodySection: {
+            /** Format: uuid */
+            id: string | null;
+            name: string;
+            /**
+             * PlanSection
+             * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+             */
+            plan: ({
+                blocks: {
+                    [key: string]: unknown;
+                }[][];
+                /** @enum {string} */
+                flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                interrupt?: {
+                    [key: string]: unknown;
+                }[];
+                levelNotes?: {
+                    [key: string]: string;
+                };
+                mods?: {
+                    [key: string]: boolean;
+                };
+                note?: string;
+                params: {
+                    [key: string]: string;
+                };
+                preset?: string | null;
+                score: string;
+                structs?: {
+                    [key: string]: {
+                        [key: string]: unknown;
+                    };
+                };
+                /** @enum {integer} */
+                v: 1;
+            } & {
+                [key: string]: unknown;
+            }) | null;
+        };
+        /**
+         * PlanSection
+         * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+         */
+        PlanSection: ({
+            blocks: {
+                [key: string]: unknown;
+            }[][];
+            /** @enum {string} */
+            flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+            interrupt?: {
+                [key: string]: unknown;
+            }[];
+            levelNotes?: {
+                [key: string]: string;
+            };
+            mods?: {
+                [key: string]: boolean;
+            };
+            note?: string;
+            params: {
+                [key: string]: string;
+            };
+            preset?: string | null;
+            score: string;
+            structs?: {
+                [key: string]: {
+                    [key: string]: unknown;
+                };
+            };
+            /** @enum {integer} */
+            v: 1;
+        } & {
+            [key: string]: unknown;
+        }) | null;
+        /**
+         * PlanWorkoutBody
+         * @description ADR-270: written in the structured WOD editor, one plan per section
+         */
+        PlanWorkoutBody: {
+            /** @enum {string} */
+            kind: "plan";
+            sections: {
+                /** Format: uuid */
+                id: string | null;
+                name: string;
+                /**
+                 * PlanSection
+                 * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                 */
+                plan: ({
+                    blocks: {
+                        [key: string]: unknown;
+                    }[][];
+                    /** @enum {string} */
+                    flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                    interrupt?: {
+                        [key: string]: unknown;
+                    }[];
+                    levelNotes?: {
+                        [key: string]: string;
+                    };
+                    mods?: {
+                        [key: string]: boolean;
+                    };
+                    note?: string;
+                    params: {
+                        [key: string]: string;
+                    };
+                    preset?: string | null;
+                    score: string;
+                    structs?: {
+                        [key: string]: {
+                            [key: string]: unknown;
+                        };
+                    };
+                    /** @enum {integer} */
+                    v: 1;
+                } & {
+                    [key: string]: unknown;
+                }) | null;
+            }[];
+        };
         /** PlatformPlan */
         PlatformPlan: {
             active: boolean;
@@ -38862,12 +38986,55 @@ export interface components {
                     [key: string]: unknown;
                 } | null;
             }[];
+        } | {
+            /** @enum {string} */
+            kind: "plan";
+            sections: {
+                /** Format: uuid */
+                id: string | null;
+                name: string;
+                /**
+                 * PlanSection
+                 * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                 */
+                plan: ({
+                    blocks: {
+                        [key: string]: unknown;
+                    }[][];
+                    /** @enum {string} */
+                    flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                    interrupt?: {
+                        [key: string]: unknown;
+                    }[];
+                    levelNotes?: {
+                        [key: string]: string;
+                    };
+                    mods?: {
+                        [key: string]: boolean;
+                    };
+                    note?: string;
+                    params: {
+                        [key: string]: string;
+                    };
+                    preset?: string | null;
+                    score: string;
+                    structs?: {
+                        [key: string]: {
+                            [key: string]: unknown;
+                        };
+                    };
+                    /** @enum {integer} */
+                    v: 1;
+                } & {
+                    [key: string]: unknown;
+                }) | null;
+            }[];
         };
         /** WorkoutBodySummary */
         WorkoutBodySummary: {
             excerpt?: string | null;
             /** @enum {string} */
-            kind: "free_text" | "text_sections" | "structured";
+            kind: "free_text" | "text_sections" | "structured" | "plan";
             sections?: {
                 [key: string]: unknown;
             }[];
@@ -81178,7 +81345,7 @@ export interface operations {
                             body?: {
                                 excerpt?: string | null;
                                 /** @enum {string} */
-                                kind: "free_text" | "text_sections" | "structured";
+                                kind: "free_text" | "text_sections" | "structured" | "plan";
                                 sections?: {
                                     [key: string]: unknown;
                                 }[];
@@ -81787,7 +81954,7 @@ export interface operations {
                     "application/json": {
                         workout: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | "structured_plan";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -81854,6 +82021,49 @@ export interface operations {
                                     timer: {
                                         [key: string]: unknown;
                                     } | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "plan";
+                                sections: {
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                                     */
+                                    plan: ({
+                                        blocks: {
+                                            [key: string]: unknown;
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                                        interrupt?: {
+                                            [key: string]: unknown;
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        mods?: {
+                                            [key: string]: boolean;
+                                        };
+                                        note?: string;
+                                        params: {
+                                            [key: string]: string;
+                                        };
+                                        preset?: string | null;
+                                        score: string;
+                                        structs?: {
+                                            [key: string]: {
+                                                [key: string]: unknown;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } & {
+                                        [key: string]: unknown;
+                                    }) | null;
                                 }[];
                             };
                             content?: {
@@ -82118,6 +82328,41 @@ export interface operations {
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
+                                /**
+                                 * PlanSection
+                                 * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                                 */
+                                plan?: ({
+                                    blocks: {
+                                        [key: string]: unknown;
+                                    }[][];
+                                    /** @enum {string} */
+                                    flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                                    interrupt?: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    levelNotes?: {
+                                        [key: string]: string;
+                                    };
+                                    mods?: {
+                                        [key: string]: boolean;
+                                    };
+                                    note?: string;
+                                    params: {
+                                        [key: string]: string;
+                                    };
+                                    preset?: string | null;
+                                    score: string;
+                                    structs?: {
+                                        [key: string]: {
+                                            [key: string]: unknown;
+                                        };
+                                    };
+                                    /** @enum {integer} */
+                                    v: 1;
+                                } & {
+                                    [key: string]: unknown;
+                                }) | null;
                                 rest_after_seconds?: number | null;
                                 rest_before_next_section_seconds?: number | null;
                                 score_config?: {
@@ -82338,6 +82583,41 @@ export interface operations {
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                                     */
+                                    plan?: ({
+                                        blocks: {
+                                            [key: string]: unknown;
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                                        interrupt?: {
+                                            [key: string]: unknown;
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        mods?: {
+                                            [key: string]: boolean;
+                                        };
+                                        note?: string;
+                                        params: {
+                                            [key: string]: string;
+                                        };
+                                        preset?: string | null;
+                                        score: string;
+                                        structs?: {
+                                            [key: string]: {
+                                                [key: string]: unknown;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } & {
+                                        [key: string]: unknown;
+                                    }) | null;
                                     rest_after_seconds?: number | null;
                                     rest_before_next_section_seconds?: number | null;
                                     score_config?: {
@@ -82488,7 +82768,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string|null} */
-                    authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | null;
+                    authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | "structured_plan" | null;
                     content?: {
                         body: string;
                         document?: {
@@ -82740,6 +83020,41 @@ export interface operations {
                         order?: number;
                         /** Format: uuid */
                         parent_section_id?: string | null;
+                        /**
+                         * PlanSection
+                         * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                         */
+                        plan?: ({
+                            blocks: {
+                                [key: string]: unknown;
+                            }[][];
+                            /** @enum {string} */
+                            flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                            interrupt?: {
+                                [key: string]: unknown;
+                            }[];
+                            levelNotes?: {
+                                [key: string]: string;
+                            };
+                            mods?: {
+                                [key: string]: boolean;
+                            };
+                            note?: string;
+                            params: {
+                                [key: string]: string;
+                            };
+                            preset?: string | null;
+                            score: string;
+                            structs?: {
+                                [key: string]: {
+                                    [key: string]: unknown;
+                                };
+                            };
+                            /** @enum {integer} */
+                            v: 1;
+                        } & {
+                            [key: string]: unknown;
+                        }) | null;
                         rest_after_seconds?: number | null;
                         rest_before_next_section_seconds?: number | null;
                         score_config?: {
@@ -82960,6 +83275,41 @@ export interface operations {
                             order?: number;
                             /** Format: uuid */
                             parent_section_id?: string | null;
+                            /**
+                             * PlanSection
+                             * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                             */
+                            plan?: ({
+                                blocks: {
+                                    [key: string]: unknown;
+                                }[][];
+                                /** @enum {string} */
+                                flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                                interrupt?: {
+                                    [key: string]: unknown;
+                                }[];
+                                levelNotes?: {
+                                    [key: string]: string;
+                                };
+                                mods?: {
+                                    [key: string]: boolean;
+                                };
+                                note?: string;
+                                params: {
+                                    [key: string]: string;
+                                };
+                                preset?: string | null;
+                                score: string;
+                                structs?: {
+                                    [key: string]: {
+                                        [key: string]: unknown;
+                                    };
+                                };
+                                /** @enum {integer} */
+                                v: 1;
+                            } & {
+                                [key: string]: unknown;
+                            }) | null;
                             rest_after_seconds?: number | null;
                             rest_before_next_section_seconds?: number | null;
                             score_config?: {
@@ -83542,7 +83892,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string|null} */
-                    authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | null;
+                    authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | "structured_plan" | null;
                     content?: {
                         body: string;
                         document?: {
@@ -83794,6 +84144,41 @@ export interface operations {
                         order?: number;
                         /** Format: uuid */
                         parent_section_id?: string | null;
+                        /**
+                         * PlanSection
+                         * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                         */
+                        plan?: ({
+                            blocks: {
+                                [key: string]: unknown;
+                            }[][];
+                            /** @enum {string} */
+                            flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                            interrupt?: {
+                                [key: string]: unknown;
+                            }[];
+                            levelNotes?: {
+                                [key: string]: string;
+                            };
+                            mods?: {
+                                [key: string]: boolean;
+                            };
+                            note?: string;
+                            params: {
+                                [key: string]: string;
+                            };
+                            preset?: string | null;
+                            score: string;
+                            structs?: {
+                                [key: string]: {
+                                    [key: string]: unknown;
+                                };
+                            };
+                            /** @enum {integer} */
+                            v: 1;
+                        } & {
+                            [key: string]: unknown;
+                        }) | null;
                         rest_after_seconds?: number | null;
                         rest_before_next_section_seconds?: number | null;
                         score_config?: {
@@ -84014,6 +84399,41 @@ export interface operations {
                             order?: number;
                             /** Format: uuid */
                             parent_section_id?: string | null;
+                            /**
+                             * PlanSection
+                             * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                             */
+                            plan?: ({
+                                blocks: {
+                                    [key: string]: unknown;
+                                }[][];
+                                /** @enum {string} */
+                                flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                                interrupt?: {
+                                    [key: string]: unknown;
+                                }[];
+                                levelNotes?: {
+                                    [key: string]: string;
+                                };
+                                mods?: {
+                                    [key: string]: boolean;
+                                };
+                                note?: string;
+                                params: {
+                                    [key: string]: string;
+                                };
+                                preset?: string | null;
+                                score: string;
+                                structs?: {
+                                    [key: string]: {
+                                        [key: string]: unknown;
+                                    };
+                                };
+                                /** @enum {integer} */
+                                v: 1;
+                            } & {
+                                [key: string]: unknown;
+                            }) | null;
                             rest_after_seconds?: number | null;
                             rest_before_next_section_seconds?: number | null;
                             score_config?: {
@@ -84077,7 +84497,7 @@ export interface operations {
                     "application/json": {
                         workout: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | "structured_plan";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -84144,6 +84564,49 @@ export interface operations {
                                     timer: {
                                         [key: string]: unknown;
                                     } | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "plan";
+                                sections: {
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                                     */
+                                    plan: ({
+                                        blocks: {
+                                            [key: string]: unknown;
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                                        interrupt?: {
+                                            [key: string]: unknown;
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        mods?: {
+                                            [key: string]: boolean;
+                                        };
+                                        note?: string;
+                                        params: {
+                                            [key: string]: string;
+                                        };
+                                        preset?: string | null;
+                                        score: string;
+                                        structs?: {
+                                            [key: string]: {
+                                                [key: string]: unknown;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } & {
+                                        [key: string]: unknown;
+                                    }) | null;
                                 }[];
                             };
                             content?: {
@@ -84408,6 +84871,41 @@ export interface operations {
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
+                                /**
+                                 * PlanSection
+                                 * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                                 */
+                                plan?: ({
+                                    blocks: {
+                                        [key: string]: unknown;
+                                    }[][];
+                                    /** @enum {string} */
+                                    flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                                    interrupt?: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    levelNotes?: {
+                                        [key: string]: string;
+                                    };
+                                    mods?: {
+                                        [key: string]: boolean;
+                                    };
+                                    note?: string;
+                                    params: {
+                                        [key: string]: string;
+                                    };
+                                    preset?: string | null;
+                                    score: string;
+                                    structs?: {
+                                        [key: string]: {
+                                            [key: string]: unknown;
+                                        };
+                                    };
+                                    /** @enum {integer} */
+                                    v: 1;
+                                } & {
+                                    [key: string]: unknown;
+                                }) | null;
                                 rest_after_seconds?: number | null;
                                 rest_before_next_section_seconds?: number | null;
                                 score_config?: {
@@ -84628,6 +85126,41 @@ export interface operations {
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                                     */
+                                    plan?: ({
+                                        blocks: {
+                                            [key: string]: unknown;
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                                        interrupt?: {
+                                            [key: string]: unknown;
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        mods?: {
+                                            [key: string]: boolean;
+                                        };
+                                        note?: string;
+                                        params: {
+                                            [key: string]: string;
+                                        };
+                                        preset?: string | null;
+                                        score: string;
+                                        structs?: {
+                                            [key: string]: {
+                                                [key: string]: unknown;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } & {
+                                        [key: string]: unknown;
+                                    }) | null;
                                     rest_after_seconds?: number | null;
                                     rest_before_next_section_seconds?: number | null;
                                     score_config?: {
@@ -100495,7 +101028,7 @@ export interface operations {
                     "application/json": {
                         workout: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | "structured_plan";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -100562,6 +101095,49 @@ export interface operations {
                                     timer: {
                                         [key: string]: unknown;
                                     } | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "plan";
+                                sections: {
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                                     */
+                                    plan: ({
+                                        blocks: {
+                                            [key: string]: unknown;
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                                        interrupt?: {
+                                            [key: string]: unknown;
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        mods?: {
+                                            [key: string]: boolean;
+                                        };
+                                        note?: string;
+                                        params: {
+                                            [key: string]: string;
+                                        };
+                                        preset?: string | null;
+                                        score: string;
+                                        structs?: {
+                                            [key: string]: {
+                                                [key: string]: unknown;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } & {
+                                        [key: string]: unknown;
+                                    }) | null;
                                 }[];
                             };
                             content?: {
@@ -100826,6 +101402,41 @@ export interface operations {
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
+                                /**
+                                 * PlanSection
+                                 * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                                 */
+                                plan?: ({
+                                    blocks: {
+                                        [key: string]: unknown;
+                                    }[][];
+                                    /** @enum {string} */
+                                    flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                                    interrupt?: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    levelNotes?: {
+                                        [key: string]: string;
+                                    };
+                                    mods?: {
+                                        [key: string]: boolean;
+                                    };
+                                    note?: string;
+                                    params: {
+                                        [key: string]: string;
+                                    };
+                                    preset?: string | null;
+                                    score: string;
+                                    structs?: {
+                                        [key: string]: {
+                                            [key: string]: unknown;
+                                        };
+                                    };
+                                    /** @enum {integer} */
+                                    v: 1;
+                                } & {
+                                    [key: string]: unknown;
+                                }) | null;
                                 rest_after_seconds?: number | null;
                                 rest_before_next_section_seconds?: number | null;
                                 score_config?: {
@@ -101046,6 +101657,41 @@ export interface operations {
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                                     */
+                                    plan?: ({
+                                        blocks: {
+                                            [key: string]: unknown;
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                                        interrupt?: {
+                                            [key: string]: unknown;
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        mods?: {
+                                            [key: string]: boolean;
+                                        };
+                                        note?: string;
+                                        params: {
+                                            [key: string]: string;
+                                        };
+                                        preset?: string | null;
+                                        score: string;
+                                        structs?: {
+                                            [key: string]: {
+                                                [key: string]: unknown;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } & {
+                                        [key: string]: unknown;
+                                    }) | null;
                                     rest_after_seconds?: number | null;
                                     rest_before_next_section_seconds?: number | null;
                                     score_config?: {
@@ -101190,7 +101836,7 @@ export interface operations {
                     "application/json": {
                         scales: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | "structured_plan";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -101257,6 +101903,49 @@ export interface operations {
                                     timer: {
                                         [key: string]: unknown;
                                     } | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "plan";
+                                sections: {
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                                     */
+                                    plan: ({
+                                        blocks: {
+                                            [key: string]: unknown;
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                                        interrupt?: {
+                                            [key: string]: unknown;
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        mods?: {
+                                            [key: string]: boolean;
+                                        };
+                                        note?: string;
+                                        params: {
+                                            [key: string]: string;
+                                        };
+                                        preset?: string | null;
+                                        score: string;
+                                        structs?: {
+                                            [key: string]: {
+                                                [key: string]: unknown;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } & {
+                                        [key: string]: unknown;
+                                    }) | null;
                                 }[];
                             };
                             content?: {
@@ -101521,6 +102210,41 @@ export interface operations {
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
+                                /**
+                                 * PlanSection
+                                 * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                                 */
+                                plan?: ({
+                                    blocks: {
+                                        [key: string]: unknown;
+                                    }[][];
+                                    /** @enum {string} */
+                                    flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                                    interrupt?: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    levelNotes?: {
+                                        [key: string]: string;
+                                    };
+                                    mods?: {
+                                        [key: string]: boolean;
+                                    };
+                                    note?: string;
+                                    params: {
+                                        [key: string]: string;
+                                    };
+                                    preset?: string | null;
+                                    score: string;
+                                    structs?: {
+                                        [key: string]: {
+                                            [key: string]: unknown;
+                                        };
+                                    };
+                                    /** @enum {integer} */
+                                    v: 1;
+                                } & {
+                                    [key: string]: unknown;
+                                }) | null;
                                 rest_after_seconds?: number | null;
                                 rest_before_next_section_seconds?: number | null;
                                 score_config?: {
@@ -101741,6 +102465,41 @@ export interface operations {
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                                     */
+                                    plan?: ({
+                                        blocks: {
+                                            [key: string]: unknown;
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                                        interrupt?: {
+                                            [key: string]: unknown;
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        mods?: {
+                                            [key: string]: boolean;
+                                        };
+                                        note?: string;
+                                        params: {
+                                            [key: string]: string;
+                                        };
+                                        preset?: string | null;
+                                        score: string;
+                                        structs?: {
+                                            [key: string]: {
+                                                [key: string]: unknown;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } & {
+                                        [key: string]: unknown;
+                                    }) | null;
                                     rest_after_seconds?: number | null;
                                     rest_before_next_section_seconds?: number | null;
                                     score_config?: {
@@ -101797,7 +102556,7 @@ export interface operations {
                         }[];
                         workout: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | "structured_plan";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -101864,6 +102623,49 @@ export interface operations {
                                     timer: {
                                         [key: string]: unknown;
                                     } | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "plan";
+                                sections: {
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                                     */
+                                    plan: ({
+                                        blocks: {
+                                            [key: string]: unknown;
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                                        interrupt?: {
+                                            [key: string]: unknown;
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        mods?: {
+                                            [key: string]: boolean;
+                                        };
+                                        note?: string;
+                                        params: {
+                                            [key: string]: string;
+                                        };
+                                        preset?: string | null;
+                                        score: string;
+                                        structs?: {
+                                            [key: string]: {
+                                                [key: string]: unknown;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } & {
+                                        [key: string]: unknown;
+                                    }) | null;
                                 }[];
                             };
                             content?: {
@@ -102128,6 +102930,41 @@ export interface operations {
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
+                                /**
+                                 * PlanSection
+                                 * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                                 */
+                                plan?: ({
+                                    blocks: {
+                                        [key: string]: unknown;
+                                    }[][];
+                                    /** @enum {string} */
+                                    flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                                    interrupt?: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    levelNotes?: {
+                                        [key: string]: string;
+                                    };
+                                    mods?: {
+                                        [key: string]: boolean;
+                                    };
+                                    note?: string;
+                                    params: {
+                                        [key: string]: string;
+                                    };
+                                    preset?: string | null;
+                                    score: string;
+                                    structs?: {
+                                        [key: string]: {
+                                            [key: string]: unknown;
+                                        };
+                                    };
+                                    /** @enum {integer} */
+                                    v: 1;
+                                } & {
+                                    [key: string]: unknown;
+                                }) | null;
                                 rest_after_seconds?: number | null;
                                 rest_before_next_section_seconds?: number | null;
                                 score_config?: {
@@ -102348,6 +103185,41 @@ export interface operations {
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)
+                                     */
+                                    plan?: ({
+                                        blocks: {
+                                            [key: string]: unknown;
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "amrap" | "emom" | "for_time" | "intervals" | "rest" | "sets";
+                                        interrupt?: {
+                                            [key: string]: unknown;
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        mods?: {
+                                            [key: string]: boolean;
+                                        };
+                                        note?: string;
+                                        params: {
+                                            [key: string]: string;
+                                        };
+                                        preset?: string | null;
+                                        score: string;
+                                        structs?: {
+                                            [key: string]: {
+                                                [key: string]: unknown;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } & {
+                                        [key: string]: unknown;
+                                    }) | null;
                                     rest_after_seconds?: number | null;
                                     rest_before_next_section_seconds?: number | null;
                                     score_config?: {
