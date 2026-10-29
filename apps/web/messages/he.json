@@ -12768,7 +12768,16 @@
       "too_many_rows": "לכל היותר 60 תרגילים",
       "too_many_cells": "לכל היותר 30 סטים",
       "too_long": "לכל היותר 200 תווים",
-      "note_too_long": "לכל היותר 2000 תווים"
+      "note_too_long": "לכל היותר 2000 תווים",
+      "wrong_unit": "זו לא יחידת משקל: כתוב kg או %",
+      "no_base": "אין ערך קודם לשנות: כתוב קודם מספר",
+      "bad_shape": "לערך הזה צורה שגויה"
+    },
+    "ambiguous": {
+      "rangeOrList": "טווח {range}, הספורטאי בוחר · ל-{count} סטים כתוב {write}",
+      "listOrLadder": "{list}, ואז האחרון חוזר · כדי להמשיך לעלות כתוב {write}",
+      "windows": "{count} חלונות AMRAP: {list} · ל-AMRAP אחד כתוב {write}",
+      "clock": "נקרא {reading} · ליחידה האחרת כתוב {write}"
     }
   },
   "PlanRun": {

@@ -93,7 +93,7 @@ describe("parseTimes", () => {
 describe("parseNums", () => {
   it("reads per-set lists, ranges and keep-going lists", () => {
     expect(parseNums("12-10-8-8")).toEqual({ entries: [12, 10, 8, 8].map((n) => ({ min: n, max: n })), cont: false });
-    expect(parseNums("8-12")).toEqual({ entries: [{ min: 8, max: 12 }], cont: false });
+    expect(parseNums("8-12")).toEqual({ entries: [{ min: 8, max: 12 }], cont: false, ambiguous: "list" });
     expect(parseNums("8 έως 12")).toEqual({ entries: [{ min: 8, max: 12 }], cont: false });
     expect(parseNums("8-10, 6-8")).toEqual({ entries: [{ min: 8, max: 10 }, { min: 6, max: 8 }], cont: false });
     expect(parseNums("5-10-15…")).toEqual({ entries: [5, 10, 15].map((n) => ({ min: n, max: n })), cont: true });

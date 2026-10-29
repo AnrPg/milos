@@ -12768,7 +12768,16 @@
       "too_many_rows": "Al massimo 60 esercizi",
       "too_many_cells": "Al massimo 30 serie",
       "too_long": "Al massimo 200 caratteri",
-      "note_too_long": "Al massimo 2000 caratteri"
+      "note_too_long": "Al massimo 2000 caratteri",
+      "wrong_unit": "Non è un'unità di carico: scrivi kg o %",
+      "no_base": "Non c'è niente prima da cambiare: scrivi prima un numero",
+      "bad_shape": "Questo valore non ha la forma giusta"
+    },
+    "ambiguous": {
+      "rangeOrList": "intervallo {range}, sceglie l'atleta · per {count} serie scrivi {write}",
+      "listOrLadder": "{list}, poi si ripete l'ultimo · per continuare a salire scrivi {write}",
+      "windows": "{count} finestre AMRAP: {list} · per un solo AMRAP scrivi {write}",
+      "clock": "letto come {reading} · per l'altra unità scrivi {write}"
     }
   },
   "PlanRun": {
