@@ -4,7 +4,7 @@ import { Socket } from "phoenix";
 
 // ADR-253: the TV's own socket, `/box_screen_socket`, which accepts only the
 // display token (never a person's session, so it is separate from
-// lib/realtime.ts). One socket per token; each topic has one channel.
+// lib/realtime.ts). One socket per token, closed with its last topic.
 
 function endpoint() {
   const explicit = process.env.NEXT_PUBLIC_API_WS_URL;
@@ -17,26 +17,27 @@ function endpoint() {
 type Handlers = Record<string, (payload: unknown) => void>;
 type Lifecycle = { onJoin?: () => void; onDown?: () => void };
 
-let current: { token: string; socket: Socket } | null = null;
-let users = 0;
+const sockets = new Map<string, { socket: Socket; users: number }>();
 
 function socketFor(token: string) {
-  if (current?.token === token) return current.socket;
-  current?.socket.disconnect();
-  const socket = new Socket(endpoint(), { params: { token } });
-  socket.connect();
-  current = { token, socket };
-  return socket;
+  let record = sockets.get(token);
+  if (!record) {
+    const socket = new Socket(endpoint(), { params: { token } });
+    socket.connect();
+    record = { socket, users: 0 };
+    sockets.set(token, record);
+  }
+  record.users += 1;
+  return record;
 }
 
 /** Joins `topic` on the screen's socket; returns the leave function. */
 export function subscribeScreenTopic(token: string, topic: string, handlers: Handlers, lifecycle: Lifecycle = {}) {
-  const socket = socketFor(token);
-  users += 1;
-  const channel = socket.channel(topic, {});
+  const record = socketFor(token);
+  const channel = record.socket.channel(topic, {});
   Object.entries(handlers).forEach(([event, handler]) => channel.on(event, handler));
-  channel.onError(() => lifecycle.onDown?.());
-  channel.onClose(() => lifecycle.onDown?.());
+  channel.on("phx_error", () => lifecycle.onDown?.());
+  channel.on("phx_close", () => lifecycle.onDown?.());
   channel
     .join()
     .receive("ok", () => lifecycle.onJoin?.())
@@ -44,10 +45,10 @@ export function subscribeScreenTopic(token: string, topic: string, handlers: Han
 
   return () => {
     channel.leave();
-    users -= 1;
-    if (users === 0 && current?.socket === socket) {
-      socket.disconnect();
-      current = null;
+    record.users -= 1;
+    if (record.users === 0 && sockets.get(token) === record) {
+      record.socket.disconnect();
+      sockets.delete(token);
     }
   };
 }
