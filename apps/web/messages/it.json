@@ -12870,5 +12870,23 @@
       "from": "da",
       "zone": "zona"
     }
+  },
+  "SaveBar": {
+    "region": "Modifiche non salvate",
+    "unsaved": "{count, plural, one {# modifica non salvata} other {# modifiche non salvate}}",
+    "noChanges": "Nessuna modifica",
+    "undo": "Annulla",
+    "undoHint": "Annulla (Ctrl+Z)",
+    "redo": "Ripeti",
+    "redoHint": "Ripeti (Ctrl+Maiusc+Z)",
+    "cancel": "Annulla modifiche",
+    "save": "Salva",
+    "saving": "Salvataggio…",
+    "saved": "Modifiche salvate.",
+    "leaveTitle": "Hai modifiche non salvate",
+    "leaveBody": "Salvale prima di lasciare questa scheda, oppure scartale.",
+    "leaveStay": "Resta qui",
+    "leaveDiscard": "Scarta",
+    "changed": "Modificato"
   }
 }

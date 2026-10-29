@@ -12870,5 +12870,23 @@
       "from": "à partir de",
       "zone": "zone"
     }
+  },
+  "SaveBar": {
+    "region": "Modifications non enregistrées",
+    "unsaved": "{count, plural, one {# modification non enregistrée} other {# modifications non enregistrées}}",
+    "noChanges": "Aucune modification",
+    "undo": "Annuler",
+    "undoHint": "Annuler (Ctrl+Z)",
+    "redo": "Rétablir",
+    "redoHint": "Rétablir (Ctrl+Maj+Z)",
+    "cancel": "Abandonner",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "saved": "Modifications enregistrées.",
+    "leaveTitle": "Vous avez des modifications non enregistrées",
+    "leaveBody": "Enregistrez-les avant de quitter cet onglet, ou abandonnez-les.",
+    "leaveStay": "Rester ici",
+    "leaveDiscard": "Abandonner",
+    "changed": "Modifié"
   }
 }

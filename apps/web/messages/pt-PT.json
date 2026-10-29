@@ -12870,5 +12870,23 @@
       "from": "desde",
       "zone": "zona"
     }
+  },
+  "SaveBar": {
+    "region": "Alterações por guardar",
+    "unsaved": "{count, plural, one {# alteração por guardar} other {# alterações por guardar}}",
+    "noChanges": "Sem alterações",
+    "undo": "Anular",
+    "undoHint": "Anular (Ctrl+Z)",
+    "redo": "Refazer",
+    "redoHint": "Refazer (Ctrl+Shift+Z)",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "A guardar…",
+    "saved": "Alterações guardadas.",
+    "leaveTitle": "Tem alterações por guardar",
+    "leaveBody": "Guarde-as antes de sair deste separador, ou descarte-as.",
+    "leaveStay": "Ficar aqui",
+    "leaveDiscard": "Descartar",
+    "changed": "Alterado"
   }
 }

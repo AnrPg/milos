@@ -12870,5 +12870,23 @@
       "from": "vanaf",
       "zone": "zone"
     }
+  },
+  "SaveBar": {
+    "region": "Niet-opgeslagen wijzigingen",
+    "unsaved": "{count, plural, one {# niet-opgeslagen wijziging} other {# niet-opgeslagen wijzigingen}}",
+    "noChanges": "Geen wijzigingen",
+    "undo": "Ongedaan maken",
+    "undoHint": "Ongedaan maken (Ctrl+Z)",
+    "redo": "Opnieuw",
+    "redoHint": "Opnieuw (Ctrl+Shift+Z)",
+    "cancel": "Annuleren",
+    "save": "Opslaan",
+    "saving": "Opslaan…",
+    "saved": "Wijzigingen opgeslagen.",
+    "leaveTitle": "Je hebt niet-opgeslagen wijzigingen",
+    "leaveBody": "Sla ze op voordat je dit tabblad verlaat, of gooi ze weg.",
+    "leaveStay": "Hier blijven",
+    "leaveDiscard": "Weggooien",
+    "changed": "Gewijzigd"
   }
 }

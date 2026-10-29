@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
   deleteAdminUser,
@@ -24,11 +24,32 @@ import {
 } from "@/api/admin-users";
 import type { PRSupportingMetrics } from "@/api/gamification";
 import type { EffectiveEntitlement } from "@/api/my-finance";
-import { updateFinanceMember } from "@/api/finance";
+import { setFinanceMemberAutoRenew, updateFinanceMember } from "@/api/finance";
 import { shouldShowAllowanceQuota } from "@/components/finance/billing-entitlement-visibility";
 import { dossierMode, grantableAllowances, packageSubscriptionLabel, prSectionContentCount, visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
 import { MembershipFreezes } from "@/components/admin/users/MembershipFreezes";
 import { MembershipLeaving } from "@/components/admin/users/MembershipLeaving";
+import {
+  changedRenewals,
+  membershipChangeCount,
+  membershipDraftFrom,
+  membershipSaveRequests,
+  statusOptions,
+  type MembershipDraft,
+} from "@/components/admin/users/membership-draft";
+import {
+  changedKeys,
+  commitDraft,
+  createDraftHistory,
+  discardDraft,
+  editDraft,
+  rebaseDraft,
+  redoDraft,
+  undoDraft,
+} from "@/lib/draft-history";
+import { ChangedMark } from "@/components/ui/ChangedMark";
+import { SaveBar } from "@/components/ui/SaveBar";
+import { UnsavedChangesDialog, UnsavedChangesProvider, useRegisterUnsaved, useUnsavedChanges } from "@/components/ui/UnsavedChanges";
 import { CommitmentOverridePrompt } from "@/components/admin/finance/shared/CommitmentOverridePrompt";
 import { commitmentConflict } from "@/components/admin/finance/shared/membership-commitment";
 import {
@@ -98,7 +119,7 @@ function Panel({ id, title, children }: { id: string; title: string; children: R
   }, [id]);
 
   return (
-    <article id={id} className="scroll-mt-20 overflow-hidden rounded-[2rem]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+    <article id={id} className="scroll-mt-20 overflow-clip rounded-[2rem]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
       <button
         type="button"
         aria-expanded={open}
@@ -109,11 +130,10 @@ function Panel({ id, title, children }: { id: string; title: string; children: R
         <span className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--primary)" }}>{title}</span>
         <span className="text-sm font-semibold" style={{ color: "var(--dim)" }}>{open ? i18n("hide34d8b60") : i18n("showd97d1ee")}</span>
       </button>
-      {open ? (
-        <div id={`${id}-content`} className="border-t px-6 pb-6 pt-4 text-sm leading-6" style={{ borderColor: "var(--border)", color: "var(--text-soft)" }}>
-          {children}
-        </div>
-      ) : null}
+      {/* Hidden, not unmounted: hiding a panel keeps its unsaved edits (ADR-274). */}
+      <div id={`${id}-content`} hidden={!open} className="border-t px-6 pb-6 pt-4 text-sm leading-6" style={{ borderColor: "var(--border)", color: "var(--text-soft)" }}>
+        {children}
+      </div>
     </article>
   );
 }
@@ -306,37 +326,60 @@ function FinanceDetails({
   const claims = finance.details.referral_claims;
   const referredMembers = finance.details.referred_members;
   const rewards = finance.details.referral_rewards;
-  const [editing, setEditing] = useState<string | null>(null);
-  const [draft, setDraft] = useState(() => ({
-    status: valueText(membership?.status) === "—" ? "active" : valueText(membership?.status),
-    starts_on: typeof membership?.starts_on === "string" ? membership.starts_on.slice(0, 10) : "",
-    expires_on: typeof membership?.expires_on === "string" ? membership.expires_on.slice(0, 10) : "",
-    signup_source: valueText(membership?.signup_source) === "—" ? "" : valueText(membership?.signup_source),
-    notes: valueText(membership?.notes) === "—" ? "" : valueText(membership?.notes),
-  }));
-  // ADR-220: leaving (or undoing it) changes status and expiry on the server;
-  // the cards show what the refreshed profile says, not the earlier edit.
-  const serverStatus = valueText(membership?.status) === "—" ? "active" : valueText(membership?.status);
-  const serverExpiresOn = typeof membership?.expires_on === "string" ? membership.expires_on.slice(0, 10) : "";
-  const [synced, setSynced] = useState({ status: serverStatus, expires_on: serverExpiresOn });
-  if (synced.status !== serverStatus || synced.expires_on !== serverExpiresOn) {
-    setSynced({ status: serverStatus, expires_on: serverExpiresOn });
-    setDraft((current) => ({ ...current, status: serverStatus, expires_on: serverExpiresOn }));
+  // ADR-274: edits stay a draft until «Αποθήκευση»; the server copy follows
+  // refetches (leaving the box changes status and expiry) without eating
+  // fields staff are still editing.
+  const serverDraft = membershipDraftFrom(membership, subscriptions);
+  const serverKey = JSON.stringify(serverDraft);
+  const [syncedKey, setSyncedKey] = useState(serverKey);
+  const [history, setHistory] = useState(() => createDraftHistory(serverDraft));
+  if (syncedKey !== serverKey) {
+    setSyncedKey(serverKey);
+    setHistory((current) => rebaseDraft(current, serverDraft));
   }
-  const [commitment, setCommitment] = useState<{ patch: Record<string, unknown>; endsOn: string | null } | null>(null);
-  const updateMembership = useMutation({
-    mutationFn: (patch: Record<string, unknown>) => updateFinanceMember(token, userId, patch),
-    onSuccess: async () => {
-      setEditing(null);
+  const draft = history.draft;
+  const changed = new Set<string>(changedKeys(history));
+  const renewalChanges = changedRenewals(history);
+  const changes = membershipChangeCount(history);
+  const [justSaved, setJustSaved] = useState(false);
+  const [commitment, setCommitment] = useState<{ endsOn: string | null } | null>(null);
+  const edit = (patch: Partial<MembershipDraft>) => {
+    setJustSaved(false);
+    setHistory((current) => editDraft(current, patch));
+  };
+  const saveMembership = useMutation({
+    mutationFn: async (overrideReason: string | null) => {
+      const { patch, renewals } = membershipSaveRequests(history);
+      if (patch) await updateFinanceMember(token, userId, overrideReason ? { ...patch, commitment_override_reason: overrideReason } : patch);
+      for (const renewal of renewals) await setFinanceMemberAutoRenew(token, userId, renewal.id, renewal.autoRenew);
+      return history.draft;
+    },
+    onSuccess: async (sent) => {
+      setHistory((current) => commitDraft(current, sent));
       setCommitment(null);
+      setJustSaved(true);
       await onRefresh();
     },
     // ADR-097: ending a membership inside its minimum commitment needs a reason.
-    onError: (error, patch) => {
+    onError: (error) => {
       const conflict = commitmentConflict(error);
-      if (conflict) setCommitment({ patch, endsOn: conflict.endsOn });
+      if (conflict) setCommitment({ endsOn: conflict.endsOn });
     },
   });
+  const save = async (overrideReason: string | null = null) => {
+    try {
+      await saveMembership.mutateAsync(overrideReason);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+  const discard = () => {
+    setCommitment(null);
+    saveMembership.reset();
+    setHistory((current) => discardDraft(current));
+  };
+  useRegisterUnsaved({ dirty: () => changes > 0, save: () => save(), discard });
   const fieldStyle = { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" };
   const packageContent = subscriptions
     .map((subscription) => {
@@ -354,33 +397,42 @@ function FinanceDetails({
         <p className="mb-3 font-semibold" style={{ color: "var(--text)" }}>{i18n("membership53bc967")}</p>
         {membership ? (
           <div className="space-y-2">
-            <EditableFinanceCard label={i18n("statusbae7d5b")} editing={editing === "status"} value={<SemanticLabel value={draft.status} />} onOpen={() => setEditing("status")}>
-              <Select className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft.status} onValueChange={(value) => { const status = value; setDraft((current) => ({ ...current, status })); updateMembership.mutate({ status }); }}>
-                {['active', 'paused', 'cancelled'].map((status) => <option key={status} value={status}>{semanticLabel(status, i18n)}</option>)}
-              </Select>
-            </EditableFinanceCard>
-            {([['starts_on', i18n("startsOn6d888f7")], ['expires_on', i18n("expiresOn549cabe")]] as const).map(([key, label]) => (
-              <EditableFinanceCard key={key} label={label} editing={editing === key} value={date(draft[key])} onOpen={() => setEditing(key)}>
-                <DateInput className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft[key]} onValueChange={(value) => setDraft((current) => ({ ...current, [key]: value }))} onBlur={() => updateMembership.mutate({ [key]: draft[key] || null })} />
+            <div className="grid gap-2 sm:grid-cols-2">
+              <EditableFinanceCard label={i18n("statusbae7d5b")} changed={changed.has("status")}>
+                <Select aria-label={i18n("statusbae7d5b")} className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft.status} disabled={saveMembership.isPending} onValueChange={(status) => edit({ status })} data-testid="membership-status">
+                  {statusOptions(draft.status).map((status) => <option key={status} value={status}>{semanticLabel(status, i18n)}</option>)}
+                </Select>
               </EditableFinanceCard>
-            ))}
-            <EditableFinanceCard label={i18n("packageSubscriptions09a33f1")} value={packageContent || ""} />
-            {updateMembership.isPending ? <p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("quickTextSaving")}</p> : null}
-            {updateMembership.isError && !commitment ? <ErrorNotice variant="field">{i18n("quickTextSaveError")}</ErrorNotice> : null}
+              <EditableFinanceCard label={i18n("packageSubscriptions09a33f1")} value={packageContent || "—"} />
+              {([['starts_on', i18n("startsOn6d888f7")], ['expires_on', i18n("expiresOn549cabe")]] as const).map(([key, label]) => (
+                <EditableFinanceCard key={key} label={label} changed={changed.has(key)}>
+                  <DateInput aria-label={label} className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft[key]} disabled={saveMembership.isPending} onValueChange={(value) => edit({ [key]: value })} data-testid={`membership-${key}`} />
+                </EditableFinanceCard>
+              ))}
+            </div>
             {commitment ? (
               <CommitmentOverridePrompt
                 endsOn={commitment.endsOn}
-                pending={updateMembership.isPending}
-                onConfirm={(reason) => updateMembership.mutate({ ...commitment.patch, commitment_override_reason: reason })}
+                pending={saveMembership.isPending}
+                onConfirm={(reason) => void save(reason)}
                 onCancel={() => {
                   setCommitment(null);
-                  updateMembership.reset();
-                  setDraft((current) => ({ ...current, status: valueText(membership.status) === "—" ? "active" : valueText(membership.status) }));
+                  saveMembership.reset();
                 }}
               />
             ) : null}
             <MembershipFreezes token={token} userId={userId} subscriptions={subscriptions} onRefresh={onRefresh} />
-            <MembershipLeaving token={token} userId={userId} membership={membership} subscriptions={subscriptions} onRefresh={onRefresh} />
+            <MembershipLeaving
+              token={token}
+              userId={userId}
+              membership={membership}
+              subscriptions={subscriptions}
+              autoRenew={draft.auto_renew}
+              changedRenewals={renewalChanges}
+              renewDisabled={saveMembership.isPending}
+              onAutoRenewChange={(id, next) => edit({ auto_renew: { ...draft.auto_renew, [id]: next } })}
+              onRefresh={onRefresh}
+            />
           </div>
         ) : <Empty>{i18n("noMembershipRecord741b5d9")}</Empty>}
       </div>
@@ -395,21 +447,38 @@ function FinanceDetails({
           {rewards.length ? <div><p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("referralRewards22d6a91")}</p><div className="mt-2 grid gap-2 sm:grid-cols-2">{rewards.map((reward) => <GenericRecordCard key={valueText(reward.id)} title={<SemanticLabel value={valueText(reward.reward_type)} />} meta={<><SemanticLabel value={valueText(reward.status)} /> · {date(reward.applied_at ?? reward.inserted_at)}</>} value={valueText(reward.reward_value)} />)}</div></div> : null}
         </div>
       </details>
+
+      {membership ? (
+        <SaveBar
+          testId="finance-save-bar"
+          changes={changes}
+          canUndo={history.past.length > 0}
+          canRedo={history.future.length > 0}
+          onUndo={() => setHistory((current) => undoDraft(current))}
+          onRedo={() => setHistory((current) => redoDraft(current))}
+          onCancel={discard}
+          onSave={() => void save()}
+          saving={saveMembership.isPending}
+          saved={justSaved}
+          error={saveMembership.isError && !commitment ? localizeError(saveMembership.error, i18n) : null}
+        />
+      ) : null}
     </div>
   );
 }
 
-function EditableFinanceCard({ label, value, editing = false, onOpen, children }: { label: string; value: React.ReactNode; editing?: boolean; onOpen?: () => void; children?: React.ReactNode }) {
-  const content = (
-    <>
-      <span className="block text-xs uppercase tracking-[0.14em]" style={{ color: "var(--muted)" }}>{label}</span>
-      {!editing ? <span className="mt-1 block whitespace-pre-line font-semibold" style={{ color: "var(--text)" }}>{value || ""}</span> : null}
-    </>
-  );
+function EditableFinanceCard({ label, value, changed = false, children }: { label: string; value?: React.ReactNode; changed?: boolean; children?: React.ReactNode }) {
   return (
-    <div className="w-full rounded-[1.25rem] p-4 text-start" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-      {onOpen ? <button type="button" className="w-full text-start" onClick={onOpen}>{content}</button> : <div>{content}</div>}
-      {editing ? <div className="mt-3">{children}</div> : null}
+    <div
+      className="w-full rounded-[1.25rem] p-4 text-start"
+      style={{ background: "var(--panel-muted)", border: `1px solid ${changed ? "var(--warning)" : "var(--border)"}` }}
+      data-changed={changed ? "true" : undefined}
+    >
+      <span className="flex items-center justify-between gap-2 text-xs uppercase tracking-[0.14em]" style={{ color: "var(--muted)" }}>
+        {label}
+        {changed ? <ChangedMark /> : null}
+      </span>
+      {children ? <div className="mt-2">{children}</div> : <span className="mt-1 block whitespace-pre-line font-semibold" style={{ color: "var(--text)" }}>{value || ""}</span>}
     </div>
   );
 }
@@ -554,6 +623,12 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const queryClient = useQueryClient();
   const { membership: actor } = useSelectedMembershipRole();
   const [hashSection, setHashSection] = useState<string | null>(null);
+  // ADR-274: a tab with unsaved edits asks before it is left.
+  const unsaved = useUnsavedChanges();
+  const guardRef = useRef(unsaved.guard);
+  useEffect(() => {
+    guardRef.current = unsaved.guard;
+  });
   const profileQuery = useDossierQuery(token, userId, "profile", fetchAdminUserProfile);
   const profile = profileQuery.data?.user;
   const finance = useDossierQuery(token, userId, "finance", fetchAdminUserFinance, Boolean(profile?.available_sections.includes("finance")));
@@ -588,7 +663,8 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => setHashSection(window.location.hash.slice(1) || null));
     function handleSectionRequest(event: Event) {
-      setHashSection((event as AdminProfileSectionRequest).detail.section);
+      const section = (event as AdminProfileSectionRequest).detail.section;
+      guardRef.current(() => setHashSection(section));
     }
     window.addEventListener(ADMIN_PROFILE_SECTION_REQUEST, handleSectionRequest);
     return () => {
@@ -672,10 +748,13 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const tab = activeProfileTab(tabs, searchParams.get("tab"), hashSection);
   const inTab = (section: string) => SECTION_TAB[section] === tab && tabSections.has(section);
   const selectTab = (next: ProfileTab) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("tab", next);
-    setHashSection(null);
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    if (next === tab) return;
+    unsaved.guard(() => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("tab", next);
+      setHashSection(null);
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    });
   };
 
   // What a new coach note can be about (ADR-140 §5).
@@ -711,7 +790,9 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   if (incidents.data?.incidents.length) overviewItems.push([i18n("activeInjuriesdaecfa6"), incidents.data.summary.active]);
 
   return (
+    <UnsavedChangesProvider registry={unsaved.registry}>
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
+      <UnsavedChangesDialog prompt={unsaved.prompt} />
       <div className="mx-auto max-w-6xl space-y-6">
         <BackLink href={adminHref("/admin/users", organizationSlug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>{i18n("users206fc04")}</BackLink>
         <section className="flex flex-col gap-6 rounded-[2.4rem] p-8 md:flex-row md:items-center" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
@@ -905,6 +986,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
         </section>
       </div>
     </main>
+    </UnsavedChangesProvider>
   );
 }
 

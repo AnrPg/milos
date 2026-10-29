@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useLocale } from "next-intl";
 import { useState } from "react";
 
-import { markFinanceMemberLeft, setFinanceMemberAutoRenew, undoFinanceMemberLeft } from "@/api/finance";
+import { markFinanceMemberLeft, undoFinanceMemberLeft } from "@/api/finance";
 import { Switch } from "@/components/body/BodyPreferenceSettings";
 import { CommitmentOverridePrompt } from "@/components/admin/finance/shared/CommitmentOverridePrompt";
 import { commitmentConflict } from "@/components/admin/finance/shared/membership-commitment";
@@ -12,6 +12,7 @@ import { localIsoDate } from "@/components/admin/users/membership-freezes";
 import { packageSubscriptionLabel } from "@/components/admin/users/admin-user-profile";
 import { DateInput } from "@/components/ui/DateInput";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { ChangedMark } from "@/components/ui/ChangedMark";
 import { Select } from "@/components/ui/Select";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
@@ -25,18 +26,31 @@ const fieldStyle = { background: "var(--panel)", color: "var(--text)", border: "
  * member decides it in the app; staff can change it for them) and leaving
  * the box. Leaving cancels only unpaid invoices for later periods and for
  * packages that never started; anything already used stays owed.
+ *
+ * ADR-274: the renewal switches are part of the Finance tab's unsaved edits;
+ * the parent holds them and saves them with «Αποθήκευση». Leaving and its
+ * undo stay their own confirmed steps.
  */
 export function MembershipLeaving({
   token,
   userId,
   membership,
   subscriptions,
+  autoRenew,
+  onAutoRenewChange,
+  changedRenewals,
+  renewDisabled = false,
   onRefresh,
 }: {
   token: string;
   userId: string;
   membership: Record<string, unknown>;
   subscriptions: Array<Record<string, unknown>>;
+  /** The edited choice per subscription id. */
+  autoRenew: Record<string, boolean>;
+  onAutoRenewChange: (subscriptionId: string, next: boolean) => void;
+  changedRenewals: ReadonlySet<string>;
+  renewDisabled?: boolean;
   onRefresh: () => Promise<unknown>;
 }) {
   const i18n = useUiTranslations();
@@ -49,10 +63,6 @@ export function MembershipLeaving({
       ? new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeZone: "UTC" }).format(new Date(Date.parse(value.slice(0, 10))))
       : "—";
 
-  const renew = useMutation({
-    mutationFn: ({ id, next }: { id: string; next: boolean }) => setFinanceMemberAutoRenew(token, userId, id, next),
-    onSuccess: () => onRefresh(),
-  });
   const leave = useMutation({
     mutationFn: (overrideReason: string | null) => markFinanceMemberLeft(token, userId, leaveRequest(form!, today, overrideReason)),
     onSuccess: async () => {
@@ -69,27 +79,27 @@ export function MembershipLeaving({
 
   return (
     <div className="space-y-3 rounded-[1.25rem] p-4" style={{ border: "1px solid var(--border)" }} data-testid="admin-membership-leaving">
-      {renewable.map((subscription) => (
-        <div key={String(subscription.id)}>
-          <Switch
-            checked={subscription.auto_renew === true}
-            disabled={renew.isPending || Boolean(leavingOn)}
-            label={`${i18n("admRenewalTitle")} · ${packageSubscriptionLabel(subscription)}`}
-            hint={
-              subscription.auto_renew === true
-                ? i18n("admRenewalOnHint")
-                : i18n("admRenewalOffHint", { date: formatDay(subscription.ends_on) })
-            }
-            onChange={(next) => renew.mutate({ id: String(subscription.id), next })}
-          />
-          {subscription.renewal_changed_by ? (
-            <p className="text-xs" style={{ color: "var(--muted)" }}>
-              {i18n("admRenewalChangedBy", { who: String(subscription.renewal_changed_by), date: formatDay(subscription.renewal_changed_at) })}
-            </p>
-          ) : null}
-        </div>
-      ))}
-      {renew.isError ? <ErrorNotice variant="field">{localizeError(renew.error, i18n)}</ErrorNotice> : null}
+      {renewable.map((subscription) => {
+        const id = String(subscription.id);
+        const checked = autoRenew[id] ?? subscription.auto_renew === true;
+        return (
+          <div key={id} data-changed={changedRenewals.has(id) ? "true" : undefined}>
+            <Switch
+              checked={checked}
+              disabled={renewDisabled || Boolean(leavingOn)}
+              label={`${i18n("admRenewalTitle")} · ${packageSubscriptionLabel(subscription)}`}
+              hint={checked ? i18n("admRenewalOnHint") : i18n("admRenewalOffHint", { date: formatDay(subscription.ends_on) })}
+              onChange={(next) => onAutoRenewChange(id, next)}
+            />
+            {changedRenewals.has(id) ? <ChangedMark /> : null}
+            {subscription.renewal_changed_by ? (
+              <p className="text-xs" style={{ color: "var(--muted)" }}>
+                {i18n("admRenewalChangedBy", { who: String(subscription.renewal_changed_by), date: formatDay(subscription.renewal_changed_at) })}
+              </p>
+            ) : null}
+          </div>
+        );
+      })}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
