@@ -45,8 +45,7 @@ accountant):
   ν. 5162/2024 tips collected by card «καταχωρούνται ευδιάκριτα στα
   βιβλία της επιχείρησης, αποδίδονται στο ακέραιο, δεν επιβαρύνονται με
   ΦΠΑ και δεν αποστέλλονται στο myDATA», and up to €300 a month they are
-  free of the employee's income tax (a 2026 bill in consultation raises
-  the limit). AADE's guidance: they are booked as pending items
+  free of the employee's income tax. AADE's guidance: they are booked as pending items
   (εκκρεμείς συναλλαγές) and paid to the staff with payroll; the POS has
   a separate tip entry so that the card amount and the receipt's total do
   not show a turnover difference.
