@@ -25,6 +25,26 @@ export function Pill({ tone = "neutral", children, testId }: { tone?: Tone; chil
   );
 }
 
+/** A filter or choice chip («Όλα», «Οκτώβριος 2026»). */
+export function Chip({ on, onClick, children, testId }: { on: boolean; onClick: () => void; children: ReactNode; testId?: string }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={on}
+      onClick={onClick}
+      data-testid={testId}
+      className="inline-flex min-h-8 items-center gap-1 whitespace-nowrap rounded-full px-3 text-xs font-bold"
+      style={
+        on
+          ? { color: "var(--text)", border: "1px solid var(--primary)", background: "color-mix(in srgb, var(--primary) 12%, var(--panel))" }
+          : { color: "var(--dim)", border: "1px solid var(--border)", background: "var(--panel)" }
+      }
+    >
+      {children}
+    </button>
+  );
+}
+
 export function Card({ children, className = "", style, testId }: { children: ReactNode; className?: string; style?: CSSProperties; testId?: string }) {
   return (
     <section
