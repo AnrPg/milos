@@ -65,6 +65,7 @@ defmodule Palee.BoxScreens.Domain.ClassScreenPolicyTest do
   test "screen managers keep their rights within their branches, any view" do
     assert Policy.views(@manager) == ~w(wod timer leaderboard bookings class)
     assert Policy.may_pin?(@manager, @class, @elsewhere, "bookings", @today) == :ok
+    assert Policy.screens(@manager, @class, [@room, @whole, @elsewhere], @today) == [@room, @whole]
     assert Policy.may_clear?(@manager, @class, @room, %{slot_id: nil}, @today) == :ok
 
     branch_manager = %{@manager | scope: ["branch-a"]}

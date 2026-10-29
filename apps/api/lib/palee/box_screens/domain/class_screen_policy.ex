@@ -45,9 +45,9 @@ defmodule Palee.BoxScreens.Domain.ClassScreenPolicy do
       Date.compare(class.date, today) == :eq
   end
 
-  @doc "The screens `actor` may change for `class`, out of `screens`."
+  @doc "The screens that show `class` and that `actor` may change, out of `screens`."
   def screens(actor, class, screens, %Date{} = today),
-    do: Enum.filter(screens, &(may_change?(actor, class, &1, today) == :ok))
+    do: Enum.filter(screens, &(shows?(&1, class) and may_change?(actor, class, &1, today) == :ok))
 
   @doc """
   `:ok` when `actor` may pin `class` on `screen` with `view`, else
