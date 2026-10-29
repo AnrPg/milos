@@ -44,8 +44,9 @@ export function ClassWorkoutNotice({
   const kind = classWorkoutNoticeKind(slot);
   if (!kind) return null;
 
-  const urgent = kind !== "awaiting";
-  const tone = urgent ? "var(--danger)" : "var(--warning)";
+  // A class without its WOD is always an error to fix: a draft is hidden from
+  // clients, and a series class must get its WOD before it starts.
+  const tone = "var(--danger)";
 
   async function link(workoutId: string | null) {
     if (!workoutId || busy) return;
@@ -63,18 +64,21 @@ export function ClassWorkoutNotice({
 
   return (
     <div
-      className="mt-6 space-y-3 rounded-[1.4rem] p-4"
-      role={urgent ? "alert" : "status"}
+      className="mt-4 space-y-3 rounded-[1.4rem] p-4"
+      role="alert"
+      data-testid="class-wod-notice"
       aria-busy={busy}
-      style={{ background: `color-mix(in srgb, ${tone} 10%, transparent)`, border: `1px solid color-mix(in srgb, ${tone} 35%, transparent)` }}
+      style={{ background: `color-mix(in srgb, ${tone} 10%, transparent)`, border: `2px solid ${tone}` }}
     >
-      <p className="text-sm font-semibold" style={{ color: tone }}>
+      <p className="text-base font-semibold" style={{ color: tone }}>
+        <span aria-hidden="true">⚠ </span>
         {kind === "draft" ? i18n("classDraftTitle") : kind === "missing" ? i18n("classWodMissingTitle") : i18n("classWodAwaitingTitle")}
       </p>
       <p className="text-sm" style={{ color: "var(--text-soft)" }}>
         {kind === "draft" ? i18n("classDraftBody") : kind === "missing" ? i18n("classWodMissingBody") : i18n("classWodAwaitingBody")}
       </p>
       <WodPicker
+        variant="actions"
         label={i18n("classLinkWodLabel")}
         token={accessToken}
         value={null}

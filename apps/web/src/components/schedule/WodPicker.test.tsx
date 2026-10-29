@@ -59,6 +59,17 @@ describe("WodPicker", () => {
     });
   });
 
+  it("as calls to action, opens the library or the editor from two plain buttons", async () => {
+    const { onCreateNew } = renderPicker({ variant: "actions" });
+    expect(screen.getByRole("group", { name: "WOD" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "+ wodPickerNew" }));
+    expect(onCreateNew).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByRole("button", { name: "wodPickerChoose" }));
+    expect(await screen.findByRole("dialog")).toBeInTheDocument();
+    // The day's WOD stays one tap away.
+    expect(await screen.findAllByRole("button", { name: "wodPickerUse:Murph" })).not.toHaveLength(0);
+  });
+
   it("offers the day's WOD as one tap under an empty field", async () => {
     const { onChange } = renderPicker();
     fireEvent.click(await screen.findByRole("button", { name: "wodPickerUse:Murph" }));

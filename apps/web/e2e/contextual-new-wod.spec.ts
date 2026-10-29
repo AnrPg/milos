@@ -169,7 +169,7 @@ test.describe("Schedule › «+ New WOD» comes back to the class", () => {
     await page.getByRole("button", { name: "+ New WOD" }).click();
     await publishFromCreator(page);
 
-    const notice = page.getByRole("alert").filter({ hasText: "WOD to link" });
+    const notice = page.getByTestId("class-wod-notice");
     await expect(notice).toContainText("The WOD “Legs” has no content yet");
     await expect(page.getByText(/check the highlighted values/i)).toHaveCount(0);
   });
