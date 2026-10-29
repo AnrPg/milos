@@ -12102,6 +12102,234 @@
     "rowButtonLabel": "Registar um pagamento de {name}",
     "panelButton": "+ Registar pagamento"
   },
+  "PlanCore": {
+    "flow": {
+      "sets": "Séries",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Intervalos",
+      "rest": "Descanso"
+    },
+    "flowHint": {
+      "sets": "sem relógio: séries com descanso entre elas",
+      "for_time": "termina o mais rápido possível",
+      "amrap": "o máximo de rondas no tempo",
+      "emom": "a cada X minutos recomeças",
+      "intervals": "trabalho e descanso a ritmo fixo",
+      "rest": "uma pausa entre secções"
+    },
+    "param": {
+      "sets": "Séries",
+      "rest": "Descanso",
+      "restBetween": "Descanso entre",
+      "restWindows": "Descanso entre janelas",
+      "rounds": "Rondas",
+      "cap": "Tempo limite",
+      "dur": "Duração",
+      "every": "A cada",
+      "times": "Vezes",
+      "work": "Trabalho",
+      "off": "Descanso",
+      "intEvery": "Interrupção a cada",
+      "hrTarget": "Descanso até"
+    },
+    "struct": {
+      "single": "Simples",
+      "cluster": "Cluster",
+      "drop": "Drop set",
+      "restpause": "Rest-pause",
+      "superset": "Superset",
+      "complex": "Complex"
+    },
+    "structHint": {
+      "single": "um exercício, tal como está",
+      "cluster": "a série divide-se em partes com uma pausa curta",
+      "drop": "baixa o peso e continua",
+      "restpause": "até à falha, pausa, outra vez",
+      "superset": "todos os exercícios, depois a série seguinte",
+      "complex": "todos sem largar a barra"
+    },
+    "structParam": {
+      "clusters": "partes",
+      "intra": "pausa",
+      "drops": "descidas",
+      "dropby": "de cada vez",
+      "minis": "minisséries"
+    },
+    "mod": {
+      "interrupt": "Interrupção a cada…",
+      "hr": "Descanso até a frequência cardíaca baixar"
+    },
+    "modHint": {
+      "interrupt": "a cada X minutos paras para outro exercício",
+      "hr": "o descanso acaba a X batimentos por minuto"
+    },
+    "measure": {
+      "pace": "Ritmo",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "Zona cardíaca",
+      "height": "Altura / alvo",
+      "dist": "Distância",
+      "hold": "Manter",
+      "side": "Por lado"
+    },
+    "measureHint": {
+      "tempo": "segundos a descer, pausa, subir (X = explosivo), pausa"
+    },
+    "unit": {
+      "per500m": "/500m",
+      "outOf10": "/10",
+      "repsLeft": "rep. em reserva",
+      "zone": "zona",
+      "cm": "cm",
+      "m": "m",
+      "sec": "s"
+    },
+    "score": {
+      "none": "Sem pontuação",
+      "best_load": "Carga (melhor série)",
+      "reps": "Repetições",
+      "time": "Tempo",
+      "rounds_reps": "Rondas + rep.",
+      "done": "Concluído",
+      "total_reps": "Repetições (total)",
+      "lowest_round": "Ronda mais baixa",
+      "distance": "Distância"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "death_by": "Death by",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "hrr": "Recuperação cardíaca (HRR)",
+      "even_odd": "Alternado (ímpar / par)",
+      "ladder": "Escada / pirâmide",
+      "calorie_target": "Objetivo de calorias",
+      "to_failure": "Até à falha",
+      "superset": "Supersérie / série gigante",
+      "interrupt": "Com interrupções"
+    },
+    "roundWord": {
+      "set": "Série",
+      "interval": "Intervalo",
+      "round": "Ronda"
+    },
+    "block": {
+      "one": "{word, select, set {Série} interval {Intervalo} other {Ronda}} {n}",
+      "list": "{word, select, set {Série} interval {Intervalo} other {Ronda}} {list}",
+      "slot": "{word, select, set {Série} interval {Intervalo} other {Ronda}} {list} · {at}",
+      "minute": "Minuto {list}"
+    },
+    "caption": {
+      "sets": "{count} séries",
+      "setsRange": "{min} ou {max} séries",
+      "max": "{unit, select, kcal {o máximo de calorias} m {o máximo de metros} other {o máximo possível}}",
+      "maxWithin": "{unit, select, kcal {o máximo de calorias} m {o máximo de metros} other {o máximo possível}} em {within}",
+      "setList": "{count} séries: {list}",
+      "perList": "por {word, select, set {série} interval {intervalo} other {ronda}}: {list}",
+      "cont": "depois {step} a cada {word, select, set {série} interval {intervalo} other {ronda}}",
+      "range": "intervalo {range}, decide o atleta",
+      "reps": "{count, plural, one {# repetição} other {# repetições}}",
+      "value": "{value}",
+      "perSide": "por lado",
+      "badDose": "p. ex. 10, 4×10, 12-10-8-8, 8-10, 3-4×12-15, 5-10-15…, 30 s, 500 m, máx."
+    },
+    "loadCaption": {
+      "bw": "peso corporal",
+      "text": "como texto para o atleta",
+      "zone": "zona cardíaca {zone}",
+      "rpe": "quão difícil (1–10)",
+      "pace": "ritmo {pace} por {per}",
+      "perSet": "por série: {list}{kind, select, pct { do 1RM} other {}}",
+      "buildUp": "começa em {value}{kind, select, pct { do 1RM} other {}} e vai subindo",
+      "range": "intervalo {value}{kind, select, pct { do 1RM} other {}}, escolhe o atleta",
+      "value": "{value}{kind, select, pct { do 1RM} other {}}"
+    },
+    "show": {
+      "perSide": "/lado",
+      "within": "em",
+      "from": "desde",
+      "zone": "zona"
+    },
+    "tempo": {
+      "down": "↓{secs}″",
+      "downExplosive": "↓explosivo",
+      "bottom": "em baixo {secs}″",
+      "bottomExplosive": "em baixo: sem pausa",
+      "up": "↑{secs}″",
+      "upExplosive": "↑explosivo",
+      "top": "em cima {secs}″",
+      "topExplosive": "em cima: sem pausa"
+    },
+    "human": {
+      "min": "{min} min",
+      "sec": "{sec} s",
+      "minSec": "{min} min {sec} s"
+    },
+    "describe": {
+      "emom": "A cada {every}, {times} vezes: {total} no total.",
+      "emomOpen": "A cada {every}, até deixares de conseguir.",
+      "amrapWindows": "{count} janelas AMRAP ({list}).",
+      "amrapWindowsRest": "{count} janelas AMRAP ({list}), {rest} de descanso entre elas.",
+      "amrap": "O máximo de rondas em {dur}.",
+      "forTime": "{rounds, plural, one {Uma vez} other {# rondas}}, o mais rápido possível.",
+      "forTimeCap": "{rounds, plural, one {Uma vez} other {# rondas}}, o mais rápido possível, limite {cap}.",
+      "intervals": "{rounds} rondas: {work} de trabalho, {off} de descanso.",
+      "intervalsHr": "{rounds} rondas: {work} de trabalho, descanso até o pulso descer a {hr}.",
+      "sets": "{sets} séries.",
+      "setsRest": "{sets} séries, {rest} de descanso entre elas.",
+      "rest": "Descanso {dur}.",
+      "interrupt": "A cada {every} paras para a interrupção e depois continuas onde paraste."
+    },
+    "summary": {
+      "emom": "a cada {every} × {times}",
+      "emomOpen": "a cada {every}",
+      "sets": "{sets} séries",
+      "windows": "{count} janelas",
+      "dur": "{dur}",
+      "rounds": "{rounds} rondas",
+      "intervals": "{rounds} × {work}/{off}",
+      "intervalsHr": "{rounds} × {work}/pulso",
+      "interrupt": "interrupção a cada {every}",
+      "perSide": "(por lado)"
+    },
+    "error": {
+      "bad_dose": "Não se lê: p. ex. 10, 8-12, máx., 400 m",
+      "missing_unit": "Escreve kg ou % numa série da linha; as outras usam esse",
+      "mixed_unit": "Mesma unidade em toda a linha: kg ou %",
+      "bad_tempo": "Tempo em 4 marcas, p. ex. 31X1",
+      "bad_measure_value": "Um número, +x ou a→b",
+      "rpe_over_max": "O RPE vai até 10",
+      "bad_param": "Este valor não se lê",
+      "unknown_param": "Não é um parâmetro deste formato",
+      "unknown_flow": "Formato desconhecido",
+      "unknown_measure": "Medida desconhecida",
+      "duplicate_measure": "Esta medida está duplicada",
+      "unknown_struct": "Estrutura de série desconhecida",
+      "struct_not_allowed": "Esta estrutura não serve para este formato",
+      "bad_struct_param": "Este valor não se lê",
+      "mod_not_allowed": "Este extra não serve para este formato",
+      "unknown_score": "Escolhe uma pontuação para este formato",
+      "bad_version": "Versão do plano não suportada",
+      "bad_row_kind": "Linha desconhecida",
+      "duplicate_id": "Linha duplicada",
+      "blocks_not_allowed": "O descanso não tem exercícios",
+      "too_many_blocks": "No máximo 12 rondas diferentes",
+      "too_many_rows": "No máximo 60 exercícios",
+      "too_many_cells": "No máximo 30 séries",
+      "too_long": "No máximo 200 caracteres",
+      "note_too_long": "No máximo 2000 caracteres"
+    }
+  },
   "PlanRun": {
     "start": "Começar",
     "next": "Seguinte",

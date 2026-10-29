@@ -12102,6 +12102,234 @@
     "rowButtonLabel": "Записать оплату от {name}",
     "panelButton": "+ Записать оплату"
   },
+  "PlanCore": {
+    "flow": {
+      "sets": "Подходы",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Интервалы",
+      "rest": "Отдых"
+    },
+    "flowHint": {
+      "sets": "без таймера: подходы с отдыхом между ними",
+      "for_time": "закончи как можно быстрее",
+      "amrap": "как можно больше раундов за время",
+      "emom": "каждые X минут начинаешь снова",
+      "intervals": "работа и отдых в ровном ритме",
+      "rest": "пауза между частями"
+    },
+    "param": {
+      "sets": "Подходы",
+      "rest": "Отдых",
+      "restBetween": "Отдых между",
+      "restWindows": "Отдых между окнами",
+      "rounds": "Раунды",
+      "cap": "Лимит времени",
+      "dur": "Длительность",
+      "every": "Каждые",
+      "times": "Раз",
+      "work": "Работа",
+      "off": "Отдых",
+      "intEvery": "Прерывание каждые",
+      "hrTarget": "Отдых до"
+    },
+    "struct": {
+      "single": "Обычный",
+      "cluster": "Cluster",
+      "drop": "Drop set",
+      "restpause": "Rest-pause",
+      "superset": "Superset",
+      "complex": "Complex"
+    },
+    "structHint": {
+      "single": "одно упражнение как есть",
+      "cluster": "подход делится на части с короткой паузой",
+      "drop": "снижаешь вес и продолжаешь",
+      "restpause": "до отказа, пауза, снова",
+      "superset": "все упражнения, потом следующий подход",
+      "complex": "все, не выпуская штангу"
+    },
+    "structParam": {
+      "clusters": "части",
+      "intra": "пауза",
+      "drops": "снижения",
+      "dropby": "каждый раз",
+      "minis": "мини-подходы"
+    },
+    "mod": {
+      "interrupt": "Прерывание каждые…",
+      "hr": "Отдых, пока не упадёт пульс"
+    },
+    "modHint": {
+      "interrupt": "каждые X минут останавливаешься на другое упражнение",
+      "hr": "отдых заканчивается на X ударах в минуту"
+    },
+    "measure": {
+      "pace": "Темп (pace)",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "Пульсовая зона",
+      "height": "Высота / цель",
+      "dist": "Дистанция",
+      "hold": "Удержание",
+      "side": "На сторону"
+    },
+    "measureHint": {
+      "tempo": "секунды вниз, пауза, вверх (X = взрывно), пауза"
+    },
+    "unit": {
+      "per500m": "/500m",
+      "outOf10": "/10",
+      "repsLeft": "повт. в запасе",
+      "zone": "зона",
+      "cm": "cm",
+      "m": "м",
+      "sec": "с"
+    },
+    "score": {
+      "none": "Без результата",
+      "best_load": "Вес (лучший подход)",
+      "reps": "Повторения",
+      "time": "Время",
+      "rounds_reps": "Раунды + повторения",
+      "done": "Выполнено",
+      "total_reps": "Повторения (всего)",
+      "lowest_round": "Худший раунд",
+      "distance": "Дистанция"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "death_by": "Death by",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "hrr": "Восстановление пульса (HRR)",
+      "even_odd": "Чередование (нечёт / чёт)",
+      "ladder": "Лесенка / пирамида",
+      "calorie_target": "Цель по калориям",
+      "to_failure": "До отказа",
+      "superset": "Суперсет / гигантский сет",
+      "interrupt": "С прерываниями"
+    },
+    "roundWord": {
+      "set": "Подход",
+      "interval": "Интервал",
+      "round": "Раунд"
+    },
+    "block": {
+      "one": "{word, select, set {Подход} interval {Интервал} other {Раунд}} {n}",
+      "list": "{word, select, set {Подход} interval {Интервал} other {Раунд}} {list}",
+      "slot": "{word, select, set {Подход} interval {Интервал} other {Раунд}} {list} · {at}",
+      "minute": "Минута {list}"
+    },
+    "caption": {
+      "sets": "{count} подх.",
+      "setsRange": "{min} или {max} подх.",
+      "max": "{unit, select, kcal {как можно больше калорий} m {как можно больше метров} other {как можно больше}}",
+      "maxWithin": "{unit, select, kcal {как можно больше калорий} m {как можно больше метров} other {как можно больше}} за {within}",
+      "setList": "{count} подх.: {list}",
+      "perList": "за {word, select, set {подход} interval {интервал} other {раунд}}: {list}",
+      "cont": "дальше {step} каждый {word, select, set {подход} interval {интервал} other {раунд}}",
+      "range": "диапазон {range}, решает спортсмен",
+      "reps": "{count, plural, one {# повторение} few {# повторения} other {# повторений}}",
+      "value": "{value}",
+      "perSide": "на сторону",
+      "badDose": "напр. 10, 4×10, 12-10-8-8, 8-10, 3-4×12-15, 5-10-15…, 30s, 500m, max"
+    },
+    "loadCaption": {
+      "bw": "собственный вес",
+      "text": "текстом для спортсмена",
+      "zone": "пульсовая зона {zone}",
+      "rpe": "насколько тяжело (1–10)",
+      "pace": "темп {pace} на {per}",
+      "perSet": "по подходам: {list}{kind, select, pct { от 1ПМ} other {}}",
+      "buildUp": "начинается с {value}{kind, select, pct { от 1ПМ} other {}} и растёт",
+      "range": "диапазон {value}{kind, select, pct { от 1ПМ} other {}}, выбирает спортсмен",
+      "value": "{value}{kind, select, pct { от 1ПМ} other {}}"
+    },
+    "show": {
+      "perSide": "/сторону",
+      "within": "за",
+      "from": "от",
+      "zone": "зона"
+    },
+    "tempo": {
+      "down": "↓{secs}″",
+      "downExplosive": "↓взрывно",
+      "bottom": "внизу {secs}″",
+      "bottomExplosive": "внизу: без паузы",
+      "up": "↑{secs}″",
+      "upExplosive": "↑взрывно",
+      "top": "вверху {secs}″",
+      "topExplosive": "вверху: без паузы"
+    },
+    "human": {
+      "min": "{min} мин",
+      "sec": "{sec} с",
+      "minSec": "{min} мин {sec} с"
+    },
+    "describe": {
+      "emom": "Каждые {every}, {times} раз: всего {total}.",
+      "emomOpen": "Каждые {every}, пока успеваешь.",
+      "amrapWindows": "{count} окна AMRAP ({list}).",
+      "amrapWindowsRest": "{count} окна AMRAP ({list}), {rest} отдыха между ними.",
+      "amrap": "Как можно больше раундов за {dur}.",
+      "forTime": "{rounds, plural, one {Один раз} other {# раунд.}}, как можно быстрее.",
+      "forTimeCap": "{rounds, plural, one {Один раз} other {# раунд.}}, как можно быстрее, лимит {cap}.",
+      "intervals": "{rounds} раундов: {work} работа, {off} отдых.",
+      "intervalsHr": "{rounds} раундов: {work} работа, отдых, пока пульс не упадёт до {hr}.",
+      "sets": "{sets} подх.",
+      "setsRest": "{sets} подх., {rest} отдыха между ними.",
+      "rest": "Отдых {dur}.",
+      "interrupt": "Каждые {every} останавливаешься на прерывание, потом продолжаешь с того же места."
+    },
+    "summary": {
+      "emom": "каждые {every} × {times}",
+      "emomOpen": "каждые {every}",
+      "sets": "{sets} подх.",
+      "windows": "{count} окна",
+      "dur": "{dur}",
+      "rounds": "{rounds} раунд.",
+      "intervals": "{rounds} × {work}/{off}",
+      "intervalsHr": "{rounds} × {work}/пульс",
+      "interrupt": "прерывание каждые {every}",
+      "perSide": "(на сторону)"
+    },
+    "error": {
+      "bad_dose": "Не читается: напр. 10, 8-12, max, 400 м",
+      "missing_unit": "Укажи кг или % в одном подходе строки; остальные возьмут оттуда",
+      "mixed_unit": "Одна единица на всю строку: кг или %",
+      "bad_tempo": "Темп из 4 знаков, напр. 31X1",
+      "bad_measure_value": "Число, +x или a→b",
+      "rpe_over_max": "RPE — максимум 10",
+      "bad_param": "Это значение не читается",
+      "unknown_param": "Не параметр этого формата",
+      "unknown_flow": "Неизвестный формат",
+      "unknown_measure": "Неизвестный показатель",
+      "duplicate_measure": "Показатель указан дважды",
+      "unknown_struct": "Неизвестная структура подхода",
+      "struct_not_allowed": "Эта структура не подходит к формату",
+      "bad_struct_param": "Это значение не читается",
+      "mod_not_allowed": "Это дополнение не подходит к формату",
+      "unknown_score": "Выбери результат для формата",
+      "bad_version": "Неподдерживаемая версия плана",
+      "bad_row_kind": "Неизвестная строка",
+      "duplicate_id": "Повторная строка",
+      "blocks_not_allowed": "В отдыхе нет упражнений",
+      "too_many_blocks": "Не больше 12 разных раундов",
+      "too_many_rows": "Не больше 60 упражнений",
+      "too_many_cells": "Не больше 30 подходов",
+      "too_long": "Не больше 200 символов",
+      "note_too_long": "Не больше 2000 символов"
+    }
+  },
   "PlanRun": {
     "start": "Старт",
     "next": "Дальше",

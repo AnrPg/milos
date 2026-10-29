@@ -53,9 +53,12 @@ export function PlanExecutionMode({ executionId }: { executionId: string }) {
     (async () => {
       try {
         const execution = await fetchExecution(accessToken, executionId);
-        if (!execution.master_workout_id) throw new Error("no workout");
-        const workout = await fetchWorkout(accessToken, execution.master_workout_id);
+        const workout = execution.master_workout_id ? await fetchWorkout(accessToken, execution.master_workout_id) : null;
         if (cancelled) return;
+        if (!workout) {
+          setFailed(true);
+          return;
+        }
         setLoaded({ title: workout.title, sections: planSections(workout) });
         setComments(execution.comments ?? []);
       } catch {
