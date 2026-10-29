@@ -7926,6 +7926,80 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/setup/recipes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Setup recipes per kind of box, and the recipes this business applied */
+        get: operations["PaleeWeb.AdminSetupController.recipes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/setup/recipes/{key}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Apply a recipe (owner only); applying it again changes nothing
+         * @description Creates the recipe's subscription packages and class types that are missing and sets its settings through the same services as the settings screens, in one transaction, then records which recipe was applied, when and by whom. Documents are listed in `manual`.
+         */
+        post: operations["PaleeWeb.AdminSetupController.apply_recipe"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/setup/recipes/{key}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** What applying a recipe would change now (dry run; nothing is saved) */
+        post: operations["PaleeWeb.AdminSetupController.preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/setup/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Every business setting with its level (basic or under «Προχωρημένα»)
+         * @description CP-H1: the web shows the settings with `advanced: false` and keeps the rest under «Προχωρημένα», closed by default. `verdict` says why (derive: the app or a recipe sets it; remove: not shown to owners).
+         */
+        get: operations["PaleeWeb.AdminSetupController.settings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/shop/pricing-targets": {
         parameters: {
             query?: never;
@@ -10258,6 +10332,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/packages/{id}/buy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Buy a package on the payment provider's page (and book a class once paid)
+         * @description Where the law gives 14 days to withdraw, `start_now` must be true: the member asks for the package to start at once. `book_slot_id` books that class once the package is paid.
+         */
+        post: operations["PaleeWeb.MyPaymentsController.buy_package"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/packages/{id}/purchase-terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What buying a package online costs, and the texts to agree to */
+        get: operations["PaleeWeb.MyPaymentsController.package_terms"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/payment-methods": {
         parameters: {
             query?: never;
@@ -10354,6 +10465,26 @@ export interface paths {
         get: operations["PaleeWeb.MyPaymentsController.show"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/payments/{id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Withdraw from a package bought online within 14 days
+         * @description Gives back the price less the part already used, and ends the package.
+         */
+        post: operations["PaleeWeb.MyPaymentsController.withdraw"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10648,6 +10779,23 @@ export interface paths {
         put?: never;
         /** Pay an unpaid order online (409 online_payment_unavailable until a provider exists) */
         post: operations["PaleeWeb.MyShopController.pay"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/orders/{id}/pay-online": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pay an unpaid shop order on the payment provider's page */
+        post: operations["PaleeWeb.MyPaymentsController.pay_shop_order"];
         delete?: never;
         options?: never;
         head?: never;
@@ -13738,6 +13886,23 @@ export interface paths {
         };
         /** A published box: who it is, its «Σχετικά» and its locations */
         get: operations["PaleeWeb.PublicBoxController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/boxes/{slug}/packages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The packages a published box sells online (ADR-248) */
+        get: operations["PaleeWeb.PublicBoxController.packages"];
         put?: never;
         post?: never;
         delete?: never;
@@ -71204,6 +71369,7 @@ export interface operations {
                     name: string;
                     /** @enum {string} */
                     package_type: "membership" | "class_pack" | "drop_in" | "trial" | "pt_pack" | "add_on" | "shared" | "corporate";
+                    sold_online?: boolean;
                     tags?: string[];
                 };
             };
@@ -71371,6 +71537,7 @@ export interface operations {
                     name?: string;
                     /** @enum {string} */
                     package_type?: "membership" | "class_pack" | "drop_in" | "trial" | "pt_pack" | "add_on" | "shared" | "corporate";
+                    sold_online?: boolean;
                     tags?: string[];
                 };
             };
@@ -74278,6 +74445,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -74441,6 +74611,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -74559,6 +74732,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -79166,6 +79342,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description ADR-255 (CP-H1): catalog keys (`<section>.<field>`, e.g. `finance.subscription_grace_days`) of the settings the web keeps under «Προχωρημένα», closed by default */
+                        advanced_settings: string[];
                         finance: {
                             /** @enum {string} */
                             document_mode: "invoice" | "receipt";
@@ -79293,6 +79471,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description ADR-255 (CP-H1): catalog keys (`<section>.<field>`, e.g. `finance.subscription_grace_days`) of the settings the web keeps under «Προχωρημένα», closed by default */
+                        advanced_settings: string[];
                         finance: {
                             /** @enum {string} */
                             document_mode: "invoice" | "receipt";
@@ -79393,6 +79573,344 @@ export interface operations {
                             source: "confirmed" | "inferred" | null;
                             timezone: string;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminSetupController.recipes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Recipes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        applications: {
+                            /** Format: date-time */
+                            applied_at: string;
+                            /** Format: uuid */
+                            applied_by_id: string | null;
+                            change_count: number;
+                            changes: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            manual: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            recipe_key: string;
+                            recipe_version: number;
+                        }[];
+                        /** @description Only the owner applies a recipe */
+                        can_apply: boolean;
+                        recipes: {
+                            class_types: string[];
+                            documents: string[];
+                            key: string;
+                            /** @description In the business's language */
+                            name: string;
+                            /** @description The same text in English and Greek */
+                            names: {
+                                el: string;
+                                en: string;
+                            };
+                            packages: {
+                                base_price_cents: number;
+                                billing_period: string;
+                                code: string;
+                                name: string;
+                                package_type: string;
+                            }[];
+                            /** @enum {string} */
+                            provider_kind: "coach" | "gym" | "organiser";
+                            role_grants: {
+                                [key: string]: string[];
+                            };
+                            settings: {
+                                advanced: boolean;
+                                key: string;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                value: unknown;
+                            }[];
+                            /** @description The same text in English and Greek */
+                            summaries: {
+                                el: string;
+                                en: string;
+                            };
+                            summary: string;
+                            version: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminSetupController.apply_recipe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Applied */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description An applied recipe: which, when, by whom and what changed */
+                        application: {
+                            /** Format: date-time */
+                            applied_at: string;
+                            /** Format: uuid */
+                            applied_by_id: string | null;
+                            change_count: number;
+                            changes: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            manual: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            recipe_key: string;
+                            recipe_version: number;
+                        };
+                        /** @description What applying the recipe changes now (a dry run until applied) */
+                        plan: {
+                            change_count: number;
+                            changes: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            manual: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            name: string;
+                            recipe: string;
+                            unchanged: string[];
+                            version: number;
+                        };
+                    };
+                };
+            };
+            /** @description Not the owner */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        step?: string;
+                    };
+                };
+            };
+            /** @description No such recipe */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        step?: string;
+                    };
+                };
+            };
+            /** @description A step failed; nothing changed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        step?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminSetupController.preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Plan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        change_count: number;
+                        changes: {
+                            /** @enum {string} */
+                            action: "add" | "create" | "manual" | "set";
+                            advanced: boolean;
+                            /** @enum {string} */
+                            area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                            /** @description A setting value: boolean, number, text, list or null */
+                            from: unknown;
+                            key: string;
+                            name: string | null;
+                            /** @description A setting value: boolean, number, text, list or null */
+                            to: unknown;
+                        }[];
+                        manual: {
+                            /** @enum {string} */
+                            action: "add" | "create" | "manual" | "set";
+                            advanced: boolean;
+                            /** @enum {string} */
+                            area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                            /** @description A setting value: boolean, number, text, list or null */
+                            from: unknown;
+                            key: string;
+                            name: string | null;
+                            /** @description A setting value: boolean, number, text, list or null */
+                            to: unknown;
+                        }[];
+                        name: string;
+                        recipe: string;
+                        unchanged: string[];
+                        version: number;
+                    };
+                };
+            };
+            /** @description No such recipe */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        step?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminSetupController.settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settings catalog */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        advanced_settings: string[];
+                        counts: {
+                            advanced: number;
+                            basic: number;
+                            derive: number;
+                            remove: number;
+                        };
+                        settings: {
+                            advanced: boolean;
+                            /** @description A setting value: boolean, number, text, list or null */
+                            default: unknown;
+                            field: string;
+                            /** @description `<section>.<field>` */
+                            key: string;
+                            section: string;
+                            set_by_recipe: boolean;
+                            /** @enum {string} */
+                            verdict: "advanced" | "basic" | "derive" | "remove";
+                        }[];
                     };
                 };
             };
@@ -91510,6 +92028,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -91750,6 +92271,120 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.MyPaymentsController.buy_package": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    book_slot_id?: string;
+                    consent_accepted?: boolean;
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    language?: "el" | "en";
+                    save_card?: boolean;
+                    start_now?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.package_terms": {
+        parameters: {
+            query?: {
+                language?: "el" | "en";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Terms */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        available: boolean;
+                        consent_text: string;
+                        consent_version: string;
+                        package: {
+                            base_price_cents: number;
+                            billing_period: string;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            package_type: string;
+                        };
+                        start_now_text: string | null;
+                        withdrawal_days: number | null;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.MyPaymentsController.methods": {
         parameters: {
             query?: never;
@@ -91918,6 +92553,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -91983,6 +92621,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -92041,6 +92682,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -92057,6 +92701,33 @@ export interface operations {
                             /** Format: uuid */
                             user_id?: string | null;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Withdrawal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        refund: {
+                            [key: string]: unknown;
+                        };
+                        refunded_cents: number;
                     };
                 };
             };
@@ -93574,6 +94245,75 @@ export interface operations {
                             status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
                             subtotal_cents?: number;
                             total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.pay_shop_order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    language?: "el" | "en";
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
@@ -108781,6 +109521,51 @@ export interface operations {
                         published_at?: string | null;
                         /** @description ADR-179: the gym's IANA zone; its classes show on this clock */
                         time_zone?: string;
+                    };
+                };
+            };
+            /** @description No published box with this slug */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.PublicBoxController.packages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The gym's slug or one of its former slugs */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Packages */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        online_payments: boolean;
+                        packages: {
+                            base_price_cents: number;
+                            billing_period: string;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            package_type: string;
+                        }[];
+                        withdrawal_days: number | null;
                     };
                 };
             };

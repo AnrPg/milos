@@ -164714,6 +164714,9 @@
                     ],
                     "type": "string"
                   },
+                  "sold_online": {
+                    "type": "boolean"
+                  },
                   "tags": {
                     "items": {
                       "type": "string"
@@ -165365,6 +165368,9 @@
                       "corporate"
                     ],
                     "type": "string"
+                  },
+                  "sold_online": {
+                    "type": "boolean"
                   },
                   "tags": {
                     "items": {
@@ -173236,6 +173242,10 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "metadata": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
                           "next_attempt_at": {
                             "format": "date-time",
                             "nullable": true,
@@ -173701,6 +173711,10 @@
                               "nullable": true,
                               "type": "string"
                             },
+                            "metadata": {
+                              "additionalProperties": true,
+                              "type": "object"
+                            },
                             "next_attempt_at": {
                               "format": "date-time",
                               "nullable": true,
@@ -174042,6 +174056,10 @@
                           "format": "date-time",
                           "nullable": true,
                           "type": "string"
+                        },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
                         },
                         "next_attempt_at": {
                           "format": "date-time",
@@ -186095,6 +186113,13 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "advanced_settings": {
+                      "description": "ADR-255 (CP-H1): catalog keys (`<section>.<field>`, e.g. `finance.subscription_grace_days`) of the settings the web keeps under «Προχωρημένα», closed by default",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
                     "finance": {
                       "properties": {
                         "document_mode": {
@@ -186309,11 +186334,12 @@
                     }
                   },
                   "required": [
-                    "gamification",
+                    "advanced_settings",
                     "finance",
+                    "gamification",
+                    "provider",
                     "scheduling",
-                    "workouts",
-                    "provider"
+                    "workouts"
                   ],
                   "type": "object"
                 }
@@ -186478,6 +186504,13 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "advanced_settings": {
+                      "description": "ADR-255 (CP-H1): catalog keys (`<section>.<field>`, e.g. `finance.subscription_grace_days`) of the settings the web keeps under «Προχωρημένα», closed by default",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
                     "finance": {
                       "properties": {
                         "document_mode": {
@@ -186692,11 +186725,12 @@
                     }
                   },
                   "required": [
-                    "gamification",
+                    "advanced_settings",
                     "finance",
+                    "gamification",
+                    "provider",
                     "scheduling",
-                    "workouts",
-                    "provider"
+                    "workouts"
                   ],
                   "type": "object"
                 }
@@ -186800,6 +186834,1085 @@
         "summary": "Confirm the gym's time zone, or report a guess from this device",
         "tags": [
           "Admin Settings"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/setup/recipes": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminSetupController.recipes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "applications": {
+                      "items": {
+                        "description": "An applied recipe: which, when, by whom and what changed",
+                        "properties": {
+                          "applied_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "applied_by_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "change_count": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "changes": {
+                            "items": {
+                              "description": "One step of a plan. `area`: provider, package, class_type, setting, role_grant or document; `action`: set, create, add or manual (to do by hand).",
+                              "properties": {
+                                "action": {
+                                  "enum": [
+                                    "add",
+                                    "create",
+                                    "manual",
+                                    "set"
+                                  ],
+                                  "type": "string"
+                                },
+                                "advanced": {
+                                  "type": "boolean"
+                                },
+                                "area": {
+                                  "enum": [
+                                    "class_type",
+                                    "document",
+                                    "package",
+                                    "provider",
+                                    "role_grant",
+                                    "setting"
+                                  ],
+                                  "type": "string"
+                                },
+                                "from": {
+                                  "description": "A setting value: boolean, number, text, list or null",
+                                  "nullable": true
+                                },
+                                "key": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "to": {
+                                  "description": "A setting value: boolean, number, text, list or null",
+                                  "nullable": true
+                                }
+                              },
+                              "required": [
+                                "action",
+                                "advanced",
+                                "area",
+                                "from",
+                                "key",
+                                "name",
+                                "to"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "manual": {
+                            "items": {
+                              "description": "One step of a plan. `area`: provider, package, class_type, setting, role_grant or document; `action`: set, create, add or manual (to do by hand).",
+                              "properties": {
+                                "action": {
+                                  "enum": [
+                                    "add",
+                                    "create",
+                                    "manual",
+                                    "set"
+                                  ],
+                                  "type": "string"
+                                },
+                                "advanced": {
+                                  "type": "boolean"
+                                },
+                                "area": {
+                                  "enum": [
+                                    "class_type",
+                                    "document",
+                                    "package",
+                                    "provider",
+                                    "role_grant",
+                                    "setting"
+                                  ],
+                                  "type": "string"
+                                },
+                                "from": {
+                                  "description": "A setting value: boolean, number, text, list or null",
+                                  "nullable": true
+                                },
+                                "key": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "to": {
+                                  "description": "A setting value: boolean, number, text, list or null",
+                                  "nullable": true
+                                }
+                              },
+                              "required": [
+                                "action",
+                                "advanced",
+                                "area",
+                                "from",
+                                "key",
+                                "name",
+                                "to"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "recipe_key": {
+                            "type": "string"
+                          },
+                          "recipe_version": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "applied_at",
+                          "applied_by_id",
+                          "change_count",
+                          "changes",
+                          "id",
+                          "manual",
+                          "recipe_key",
+                          "recipe_version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "can_apply": {
+                      "description": "Only the owner applies a recipe",
+                      "type": "boolean"
+                    },
+                    "recipes": {
+                      "items": {
+                        "description": "A setup recipe: starting choices for one kind of box (CP-H2)",
+                        "properties": {
+                          "class_types": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "documents": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "key": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "description": "In the business's language",
+                            "type": "string"
+                          },
+                          "names": {
+                            "description": "The same text in English and Greek",
+                            "properties": {
+                              "el": {
+                                "type": "string"
+                              },
+                              "en": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "el",
+                              "en"
+                            ],
+                            "type": "object"
+                          },
+                          "packages": {
+                            "items": {
+                              "properties": {
+                                "base_price_cents": {
+                                  "minimum": 0,
+                                  "type": "integer"
+                                },
+                                "billing_period": {
+                                  "type": "string"
+                                },
+                                "code": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "package_type": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "base_price_cents",
+                                "billing_period",
+                                "code",
+                                "name",
+                                "package_type"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "provider_kind": {
+                            "enum": [
+                              "coach",
+                              "gym",
+                              "organiser"
+                            ],
+                            "type": "string"
+                          },
+                          "role_grants": {
+                            "additionalProperties": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            "type": "object"
+                          },
+                          "settings": {
+                            "items": {
+                              "properties": {
+                                "advanced": {
+                                  "type": "boolean"
+                                },
+                                "key": {
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "description": "A setting value: boolean, number, text, list or null",
+                                  "nullable": true
+                                }
+                              },
+                              "required": [
+                                "advanced",
+                                "key",
+                                "value"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "summaries": {
+                            "description": "The same text in English and Greek",
+                            "properties": {
+                              "el": {
+                                "type": "string"
+                              },
+                              "en": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "el",
+                              "en"
+                            ],
+                            "type": "object"
+                          },
+                          "summary": {
+                            "type": "string"
+                          },
+                          "version": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "class_types",
+                          "documents",
+                          "key",
+                          "name",
+                          "names",
+                          "packages",
+                          "provider_kind",
+                          "role_grants",
+                          "settings",
+                          "summaries",
+                          "summary",
+                          "version"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "applications",
+                    "can_apply",
+                    "recipes"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Recipes"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Setup recipes per kind of box, and the recipes this business applied",
+        "tags": [
+          "Setup"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/setup/recipes/{key}/apply": {
+      "post": {
+        "callbacks": {},
+        "description": "Creates the recipe's subscription packages and class types that are missing and sets its settings through the same services as the settings screens, in one transaction, then records which recipe was applied, when and by whom. Documents are listed in `manual`.",
+        "operationId": "PaleeWeb.AdminSetupController.apply_recipe",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "maxLength": 60,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "application": {
+                      "description": "An applied recipe: which, when, by whom and what changed",
+                      "properties": {
+                        "applied_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "applied_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "change_count": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "changes": {
+                          "items": {
+                            "description": "One step of a plan. `area`: provider, package, class_type, setting, role_grant or document; `action`: set, create, add or manual (to do by hand).",
+                            "properties": {
+                              "action": {
+                                "enum": [
+                                  "add",
+                                  "create",
+                                  "manual",
+                                  "set"
+                                ],
+                                "type": "string"
+                              },
+                              "advanced": {
+                                "type": "boolean"
+                              },
+                              "area": {
+                                "enum": [
+                                  "class_type",
+                                  "document",
+                                  "package",
+                                  "provider",
+                                  "role_grant",
+                                  "setting"
+                                ],
+                                "type": "string"
+                              },
+                              "from": {
+                                "description": "A setting value: boolean, number, text, list or null",
+                                "nullable": true
+                              },
+                              "key": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "to": {
+                                "description": "A setting value: boolean, number, text, list or null",
+                                "nullable": true
+                              }
+                            },
+                            "required": [
+                              "action",
+                              "advanced",
+                              "area",
+                              "from",
+                              "key",
+                              "name",
+                              "to"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "manual": {
+                          "items": {
+                            "description": "One step of a plan. `area`: provider, package, class_type, setting, role_grant or document; `action`: set, create, add or manual (to do by hand).",
+                            "properties": {
+                              "action": {
+                                "enum": [
+                                  "add",
+                                  "create",
+                                  "manual",
+                                  "set"
+                                ],
+                                "type": "string"
+                              },
+                              "advanced": {
+                                "type": "boolean"
+                              },
+                              "area": {
+                                "enum": [
+                                  "class_type",
+                                  "document",
+                                  "package",
+                                  "provider",
+                                  "role_grant",
+                                  "setting"
+                                ],
+                                "type": "string"
+                              },
+                              "from": {
+                                "description": "A setting value: boolean, number, text, list or null",
+                                "nullable": true
+                              },
+                              "key": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "to": {
+                                "description": "A setting value: boolean, number, text, list or null",
+                                "nullable": true
+                              }
+                            },
+                            "required": [
+                              "action",
+                              "advanced",
+                              "area",
+                              "from",
+                              "key",
+                              "name",
+                              "to"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "recipe_key": {
+                          "type": "string"
+                        },
+                        "recipe_version": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "applied_at",
+                        "applied_by_id",
+                        "change_count",
+                        "changes",
+                        "id",
+                        "manual",
+                        "recipe_key",
+                        "recipe_version"
+                      ],
+                      "type": "object"
+                    },
+                    "plan": {
+                      "description": "What applying the recipe changes now (a dry run until applied)",
+                      "properties": {
+                        "change_count": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "changes": {
+                          "items": {
+                            "description": "One step of a plan. `area`: provider, package, class_type, setting, role_grant or document; `action`: set, create, add or manual (to do by hand).",
+                            "properties": {
+                              "action": {
+                                "enum": [
+                                  "add",
+                                  "create",
+                                  "manual",
+                                  "set"
+                                ],
+                                "type": "string"
+                              },
+                              "advanced": {
+                                "type": "boolean"
+                              },
+                              "area": {
+                                "enum": [
+                                  "class_type",
+                                  "document",
+                                  "package",
+                                  "provider",
+                                  "role_grant",
+                                  "setting"
+                                ],
+                                "type": "string"
+                              },
+                              "from": {
+                                "description": "A setting value: boolean, number, text, list or null",
+                                "nullable": true
+                              },
+                              "key": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "to": {
+                                "description": "A setting value: boolean, number, text, list or null",
+                                "nullable": true
+                              }
+                            },
+                            "required": [
+                              "action",
+                              "advanced",
+                              "area",
+                              "from",
+                              "key",
+                              "name",
+                              "to"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "manual": {
+                          "items": {
+                            "description": "One step of a plan. `area`: provider, package, class_type, setting, role_grant or document; `action`: set, create, add or manual (to do by hand).",
+                            "properties": {
+                              "action": {
+                                "enum": [
+                                  "add",
+                                  "create",
+                                  "manual",
+                                  "set"
+                                ],
+                                "type": "string"
+                              },
+                              "advanced": {
+                                "type": "boolean"
+                              },
+                              "area": {
+                                "enum": [
+                                  "class_type",
+                                  "document",
+                                  "package",
+                                  "provider",
+                                  "role_grant",
+                                  "setting"
+                                ],
+                                "type": "string"
+                              },
+                              "from": {
+                                "description": "A setting value: boolean, number, text, list or null",
+                                "nullable": true
+                              },
+                              "key": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "to": {
+                                "description": "A setting value: boolean, number, text, list or null",
+                                "nullable": true
+                              }
+                            },
+                            "required": [
+                              "action",
+                              "advanced",
+                              "area",
+                              "from",
+                              "key",
+                              "name",
+                              "to"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "recipe": {
+                          "type": "string"
+                        },
+                        "unchanged": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "version": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "change_count",
+                        "changes",
+                        "manual",
+                        "name",
+                        "recipe",
+                        "unchanged",
+                        "version"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "application",
+                    "plan"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Applied"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "step": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not the owner"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "step": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such recipe"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "step": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A step failed; nothing changed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Apply a recipe (owner only); applying it again changes nothing",
+        "tags": [
+          "Setup"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/setup/recipes/{key}/preview": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminSetupController.preview",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "maxLength": 60,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "What applying the recipe changes now (a dry run until applied)",
+                  "properties": {
+                    "change_count": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "changes": {
+                      "items": {
+                        "description": "One step of a plan. `area`: provider, package, class_type, setting, role_grant or document; `action`: set, create, add or manual (to do by hand).",
+                        "properties": {
+                          "action": {
+                            "enum": [
+                              "add",
+                              "create",
+                              "manual",
+                              "set"
+                            ],
+                            "type": "string"
+                          },
+                          "advanced": {
+                            "type": "boolean"
+                          },
+                          "area": {
+                            "enum": [
+                              "class_type",
+                              "document",
+                              "package",
+                              "provider",
+                              "role_grant",
+                              "setting"
+                            ],
+                            "type": "string"
+                          },
+                          "from": {
+                            "description": "A setting value: boolean, number, text, list or null",
+                            "nullable": true
+                          },
+                          "key": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "to": {
+                            "description": "A setting value: boolean, number, text, list or null",
+                            "nullable": true
+                          }
+                        },
+                        "required": [
+                          "action",
+                          "advanced",
+                          "area",
+                          "from",
+                          "key",
+                          "name",
+                          "to"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "manual": {
+                      "items": {
+                        "description": "One step of a plan. `area`: provider, package, class_type, setting, role_grant or document; `action`: set, create, add or manual (to do by hand).",
+                        "properties": {
+                          "action": {
+                            "enum": [
+                              "add",
+                              "create",
+                              "manual",
+                              "set"
+                            ],
+                            "type": "string"
+                          },
+                          "advanced": {
+                            "type": "boolean"
+                          },
+                          "area": {
+                            "enum": [
+                              "class_type",
+                              "document",
+                              "package",
+                              "provider",
+                              "role_grant",
+                              "setting"
+                            ],
+                            "type": "string"
+                          },
+                          "from": {
+                            "description": "A setting value: boolean, number, text, list or null",
+                            "nullable": true
+                          },
+                          "key": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "to": {
+                            "description": "A setting value: boolean, number, text, list or null",
+                            "nullable": true
+                          }
+                        },
+                        "required": [
+                          "action",
+                          "advanced",
+                          "area",
+                          "from",
+                          "key",
+                          "name",
+                          "to"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "recipe": {
+                      "type": "string"
+                    },
+                    "unchanged": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "version": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "change_count",
+                    "changes",
+                    "manual",
+                    "name",
+                    "recipe",
+                    "unchanged",
+                    "version"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Plan"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "step": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such recipe"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "What applying a recipe would change now (dry run; nothing is saved)",
+        "tags": [
+          "Setup"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/setup/settings": {
+      "get": {
+        "callbacks": {},
+        "description": "CP-H1: the web shows the settings with `advanced: false` and keeps the rest under «Προχωρημένα», closed by default. `verdict` says why (derive: the app or a recipe sets it; remove: not shown to owners).",
+        "operationId": "PaleeWeb.AdminSetupController.settings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "advanced_settings": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "counts": {
+                      "properties": {
+                        "advanced": {
+                          "type": "integer"
+                        },
+                        "basic": {
+                          "type": "integer"
+                        },
+                        "derive": {
+                          "type": "integer"
+                        },
+                        "remove": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "advanced",
+                        "basic",
+                        "derive",
+                        "remove"
+                      ],
+                      "type": "object"
+                    },
+                    "settings": {
+                      "items": {
+                        "description": "A business setting with its CP-H1 verdict. `advanced` settings stay under «Προχωρημένα», closed by default.",
+                        "properties": {
+                          "advanced": {
+                            "type": "boolean"
+                          },
+                          "default": {
+                            "description": "A setting value: boolean, number, text, list or null",
+                            "nullable": true
+                          },
+                          "field": {
+                            "type": "string"
+                          },
+                          "key": {
+                            "description": "`<section>.<field>`",
+                            "type": "string"
+                          },
+                          "section": {
+                            "type": "string"
+                          },
+                          "set_by_recipe": {
+                            "type": "boolean"
+                          },
+                          "verdict": {
+                            "enum": [
+                              "advanced",
+                              "basic",
+                              "derive",
+                              "remove"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "advanced",
+                          "default",
+                          "field",
+                          "key",
+                          "section",
+                          "set_by_recipe",
+                          "verdict"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "advanced_settings",
+                    "counts",
+                    "settings"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Settings catalog"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Every business setting with its level (basic or under «Προχωρημένα»)",
+        "tags": [
+          "Setup"
         ]
       }
     },
@@ -220128,6 +221241,10 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
                         "next_attempt_at": {
                           "format": "date-time",
                           "nullable": true,
@@ -220639,6 +221756,327 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/me/packages/{id}/buy": {
+      "post": {
+        "callbacks": {},
+        "description": "Where the law gives 14 days to withdraw, `start_now` must be true: the member asks for the package to start at once. `book_slot_id` books that class once the package is paid.",
+        "operationId": "PaleeWeb.MyPaymentsController.buy_package",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "book_slot_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "consent_accepted": {
+                    "type": "boolean"
+                  },
+                  "idempotency_key": {
+                    "maxLength": 200,
+                    "minLength": 8,
+                    "type": "string"
+                  },
+                  "language": {
+                    "enum": [
+                      "el",
+                      "en"
+                    ],
+                    "type": "string"
+                  },
+                  "save_card": {
+                    "type": "boolean"
+                  },
+                  "start_now": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "idempotency_key"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "payment": {
+                      "properties": {
+                        "amount_cents": {
+                          "type": "integer"
+                        },
+                        "card_brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_last4": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "environment": {
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finance_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fulfilment_status": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "initiation": {
+                          "enum": [
+                            "payer",
+                            "merchant"
+                          ],
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "provider_transaction_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purpose_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "purpose_type": {
+                          "type": "string"
+                        },
+                        "redirect_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "refunded_cents": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "scheduled",
+                            "awaiting_payer",
+                            "processing",
+                            "succeeded",
+                            "failed",
+                            "cancelled",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "succeeded_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "amount_cents",
+                        "currency",
+                        "description",
+                        "environment",
+                        "fulfilment_status",
+                        "id",
+                        "initiation",
+                        "provider",
+                        "purpose_id",
+                        "purpose_type",
+                        "refunded_cents",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "payment"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Payment"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Buy a package on the payment provider's page (and book a class once paid)",
+        "tags": [
+          "Member Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/packages/{id}/purchase-terms": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyPaymentsController.package_terms",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "enum": [
+                "el",
+                "en"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "consent_text": {
+                      "type": "string"
+                    },
+                    "consent_version": {
+                      "type": "string"
+                    },
+                    "package": {
+                      "properties": {
+                        "base_price_cents": {
+                          "type": "integer"
+                        },
+                        "billing_period": {
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "package_type": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "base_price_cents",
+                        "billing_period",
+                        "currency",
+                        "id",
+                        "name",
+                        "package_type"
+                      ],
+                      "type": "object"
+                    },
+                    "start_now_text": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "withdrawal_days": {
+                      "nullable": true,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "available",
+                    "consent_text",
+                    "consent_version",
+                    "package",
+                    "start_now_text",
+                    "withdrawal_days"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Terms"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "What buying a package online costs, and the texts to agree to",
+        "tags": [
+          "Member Finance"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/me/payment-methods": {
       "get": {
         "callbacks": {},
@@ -221052,6 +222490,10 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
                         "next_attempt_at": {
                           "format": "date-time",
                           "nullable": true,
@@ -221236,6 +222678,10 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
                         "next_attempt_at": {
                           "format": "date-time",
                           "nullable": true,
@@ -221399,6 +222845,10 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
                         "next_attempt_at": {
                           "format": "date-time",
                           "nullable": true,
@@ -221481,6 +222931,58 @@
           }
         ],
         "summary": "One of my online payments",
+        "tags": [
+          "Member Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/payments/{id}/withdraw": {
+      "post": {
+        "callbacks": {},
+        "description": "Gives back the price less the part already used, and ends the package.",
+        "operationId": "PaleeWeb.MyPaymentsController.withdraw",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "refund": {
+                      "additionalProperties": true,
+                      "type": "object"
+                    },
+                    "refunded_cents": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "refund",
+                    "refunded_cents"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Withdrawal"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Withdraw from a package bought online within 14 days",
         "tags": [
           "Member Finance"
         ]
@@ -225728,6 +227230,200 @@
         "summary": "Pay an unpaid order online (409 online_payment_unavailable until a provider exists)",
         "tags": [
           "Shop (member)"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/shop/orders/{id}/pay-online": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyPaymentsController.pay_shop_order",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "idempotency_key": {
+                    "maxLength": 200,
+                    "minLength": 8,
+                    "type": "string"
+                  },
+                  "language": {
+                    "enum": [
+                      "el",
+                      "en"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "idempotency_key"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "payment": {
+                      "properties": {
+                        "amount_cents": {
+                          "type": "integer"
+                        },
+                        "card_brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_last4": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "environment": {
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finance_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fulfilment_status": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "initiation": {
+                          "enum": [
+                            "payer",
+                            "merchant"
+                          ],
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "provider_transaction_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purpose_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "purpose_type": {
+                          "type": "string"
+                        },
+                        "redirect_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "refunded_cents": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "scheduled",
+                            "awaiting_payer",
+                            "processing",
+                            "succeeded",
+                            "failed",
+                            "cancelled",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "succeeded_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "amount_cents",
+                        "currency",
+                        "description",
+                        "environment",
+                        "fulfilment_status",
+                        "id",
+                        "initiation",
+                        "provider",
+                        "purpose_id",
+                        "purpose_type",
+                        "refunded_cents",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "payment"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Payment"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Pay an unpaid shop order on the payment provider's page",
+        "tags": [
+          "Member Finance"
         ]
       }
     },
@@ -268406,6 +270102,103 @@
           }
         },
         "summary": "A published box: who it is, its «Σχετικά» and its locations",
+        "tags": [
+          "Public box page"
+        ]
+      }
+    },
+    "/api/public/boxes/{slug}/packages": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PublicBoxController.packages",
+        "parameters": [
+          {
+            "description": "The gym's slug or one of its former slugs",
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "maxLength": 120,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "online_payments": {
+                      "type": "boolean"
+                    },
+                    "packages": {
+                      "items": {
+                        "properties": {
+                          "base_price_cents": {
+                            "type": "integer"
+                          },
+                          "billing_period": {
+                            "type": "string"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "package_type": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "base_price_cents",
+                          "billing_period",
+                          "currency",
+                          "id",
+                          "name",
+                          "package_type"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "withdrawal_days": {
+                      "nullable": true,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "online_payments",
+                    "packages",
+                    "withdrawal_days"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Packages"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No published box with this slug"
+          }
+        },
+        "summary": "The packages a published box sells online (ADR-248)",
         "tags": [
           "Public box page"
         ]
