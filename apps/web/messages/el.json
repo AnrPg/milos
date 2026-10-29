@@ -12797,7 +12797,10 @@
       "cluster": "Cluster",
       "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
-      "interrupt": "Με διακοπή"
+      "interrupt": "Με διακοπή",
+      "kcal_target": "Στόχος θερμίδων",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
     },
     "params": {
       "sets": "{sets} σετ",
@@ -12847,7 +12850,8 @@
       "done": "Ολοκληρώθηκε",
       "total_reps": "Επαναλήψεις (σύνολο)",
       "lowest_round": "Χαμηλότερος γύρος",
-      "distance": "Απόσταση"
+      "distance": "Απόσταση",
+      "load": "Φορτίο (καλύτερο σετ)"
     },
     "levelNotes": "Σημειώσεις ανά επίπεδο",
     "sectionNote": "Σημείωση ενότητας",

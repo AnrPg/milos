@@ -67,7 +67,14 @@ defmodule Palee.Workouts.Domain.WorkoutAuthoringMetadata do
       "rest_until" => :short_string,
       "rest_range_seconds" => :duration_range,
       "deload" => :boolean,
-      "catalog_alias" => :short_string
+      "catalog_alias" => :short_string,
+      # ADR-270: an exercise materialised from a structured plan row.
+      "plan_row_id" => :short_string,
+      "plan_block_index" => {:integer_range, -1, 11},
+      "plan_interrupt" => :boolean,
+      "hold_seconds" => :non_negative_number,
+      "pace_seconds_per_500m" => :positive_number,
+      "hr_zone" => {:integer_range, 1, 5}
     },
     group: %{
       "type" => {:enum, ~w(superset alternating)},
@@ -84,7 +91,20 @@ defmodule Palee.Workouts.Domain.WorkoutAuthoringMetadata do
       "distance_meters" => :positive_number,
       "rest_after_seconds" => :non_negative_integer,
       "deload" => :boolean,
-      "side" => {:enum, ~w(left right both each alternating)}
+      "side" => {:enum, ~w(left right both each alternating)},
+      # ADR-270: what the integer columns cannot hold (decimal loads, rep
+      # ranges, max effort, words) and the plan's canonical measures.
+      "load_decimal" => :non_negative_number,
+      "load_text" => :short_string,
+      "reps_min" => :non_negative_number,
+      "reps_max" => :non_negative_number,
+      "max_effort" => :boolean,
+      "within_seconds" => :non_negative_integer,
+      "hold_seconds" => :non_negative_number,
+      "pace_seconds_per_500m" => :positive_number,
+      "hr_zone" => {:integer_range, 1, 5},
+      "height_cm" => :positive_number,
+      "plan_rounds" => :positive_integer_list
     }
   }
 
@@ -125,6 +145,12 @@ defmodule Palee.Workouts.Domain.WorkoutAuthoringMetadata do
   defp valid_value?(:positive_number, value), do: is_number(value) and value > 0
   defp valid_value?(:non_negative_number, value), do: is_number(value) and value >= 0
   defp valid_value?(:boolean, value), do: is_boolean(value)
+
+  defp valid_value?({:integer_range, minimum, maximum}, value),
+    do: is_integer(value) and value >= minimum and value <= maximum
+
+  defp valid_value?(:positive_integer_list, value),
+    do: is_list(value) and length(value) <= 500 and Enum.all?(value, &(is_integer(&1) and &1 > 0))
 
   defp valid_value?(:string_list, value),
     do:

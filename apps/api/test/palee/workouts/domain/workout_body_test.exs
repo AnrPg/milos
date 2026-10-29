@@ -77,13 +77,18 @@ defmodule Palee.Workouts.Domain.WorkoutBodyTest do
       ]
     }
 
-    assert WorkoutBody.build(workout) == %{
+    assert %{
              kind: "plan",
              sections: [
-               %{id: "s1", name: "Engine", plan: plan},
-               %{id: "s2", name: "Rest", plan: nil}
+               %{
+                 id: "s1",
+                 name: "Engine",
+                 plan: ^plan,
+                 prescription: %{clock: %{flow: "for_time"}, rows: [_, _, _, _]}
+               },
+               %{id: "s2", name: "Rest", plan: nil, prescription: nil}
              ]
-           }
+           } = WorkoutBody.build(workout)
 
     assert WorkoutBody.summary(workout) == %{
              kind: "plan",

@@ -1,6 +1,7 @@
 defmodule Palee.Workouts do
   alias Palee.Workouts.Domain.{
     ExerciseDescriptors,
+    StructuredPlan,
     TimerConfig,
     WorkoutDsl,
     WorkoutFocus,
@@ -270,6 +271,24 @@ defmodule Palee.Workouts do
   # ADR-117 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,
   # always inside a RepoContext session for the purge's tenant.
+  @doc """
+  ADR-270: section id => row id => block (`-1` for interruption rows) of the
+  plan sections of a workout read model; what plan actuals are checked against.
+  """
+  def plan_rows_by_section(sections) when is_list(sections) do
+    sections
+    |> Enum.flat_map(fn section ->
+      case {section_value(section, :id), section_value(section, :plan)} do
+        {id, %{} = plan} when is_binary(id) -> [{id, StructuredPlan.row_blocks(plan)}]
+        _other -> []
+      end
+    end)
+    |> Map.new()
+  end
+
+  defp section_value(section, key),
+    do: Map.get(section, key) || Map.get(section, Atom.to_string(key))
+
   def tenant_data_policy, do: Palee.Workouts.Domain.TenantDataPolicy.policy()
 
   def tenant_data_inventory(context),

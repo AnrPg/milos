@@ -12,10 +12,10 @@ defmodule Palee.Workouts.Domain.StructuredPlanWorkoutTest do
     refute StructuredPlanWorkout.plan?(nil)
   end
 
-  test "per-set rows: first column reps and load, sets, tempo and note" do
+  test "per-set rows: one set prescription per set, the first on the exercise" do
     [squat] = StructuredPlanWorkout.exercises(Enum.at(program(), 0))
 
-    assert squat == %{
+    assert %{
              "item_type" => "exercise",
              "name" => "Back Squat",
              "exercise_ref" => nil,
@@ -26,8 +26,36 @@ defmodule Palee.Workouts.Domain.StructuredPlanWorkoutTest do
              "prescription_value" => 12,
              "prescription_unit" => "reps",
              "load_value" => 60,
-             "load_mode" => "pct_1rm"
-           }
+             "load_mode" => "pct_1rm",
+             "prescription_metadata" => %{
+               "plan_row_id" => "r1",
+               "plan_block_index" => 0,
+               "plan_interrupt" => false
+             }
+           } = squat
+
+    assert Enum.map(
+             squat["set_prescriptions"],
+             &{&1["set_index"], &1["prescription_value"], &1["load_value"]}
+           ) ==
+             [{1, 12, 60}, {2, 10, 65}, {3, 8, 70}, {4, 8, 75}]
+
+    assert %{"tempo" => "31X1", "load_unit" => "pct_1rm", "plan_rounds" => [2]} =
+             Enum.at(squat["set_prescriptions"], 1)["metadata"]
+  end
+
+  test "decimals, ranges and spreads go to metadata" do
+    [bench] = StructuredPlanWorkout.exercises(Enum.at(program(), 15))
+    second = Enum.at(bench["set_prescriptions"], 1)
+    refute Map.has_key?(second, "load_value")
+    assert second["metadata"]["load_decimal"] == 66.67
+
+    [knee | _rest] = StructuredPlanWorkout.exercises(Enum.at(program(), 1))
+    assert %{"reps_min" => 12, "reps_max" => 15} = hd(knee["set_prescriptions"])["metadata"]
+
+    [bulgarian] = StructuredPlanWorkout.exercises(Enum.at(program(), 13))
+    assert bulgarian["prescription_metadata"]["side"] == "each"
+    assert bulgarian["prescription_metadata"]["target_rpe"] == 8
   end
 
   test "a group of exercises shares a stable superset id; rest rows are not exercises" do
@@ -51,7 +79,7 @@ defmodule Palee.Workouts.Domain.StructuredPlanWorkoutTest do
     [front, press] = StructuredPlanWorkout.exercises(Enum.at(program(), 4))
     assert front["prescription_value"] == 7
     refute Map.has_key?(press, "load_value")
-    assert front["sets"] == nil
+    assert front["sets"] == 1
 
     assert ["Wall Ball", "Burpee to Target"] ==
              program()

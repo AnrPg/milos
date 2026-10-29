@@ -4,7 +4,8 @@ defmodule Palee.Infrastructure.Execution.EctoExecutionStore do
   import Ecto.Query
 
   alias Ecto.Multi
-  alias Palee.Execution.{ProgressOperation, WorkoutExecution}
+  alias Palee.Execution.{ExecutionPlanSet, ProgressOperation, WorkoutExecution}
+  alias Palee.Execution.Domain.PlanActuals
   alias Palee.Infrastructure.Journal.{FeedBound, FeedScope}
   alias Palee.Infrastructure.Tenancy.RepoContext
   alias Palee.Repo
@@ -24,6 +25,8 @@ defmodule Palee.Infrastructure.Execution.EctoExecutionStore do
 
   @impl true
   def complete_execution(id, params) do
+    {plan_sets, params} = Map.pop(params, :plan_sets, [])
+
     Repo.transaction(fn ->
       case WorkoutExecution
            |> scoped_to_user()
@@ -41,8 +44,11 @@ defmodule Palee.Infrastructure.Execution.EctoExecutionStore do
           |> WorkoutExecution.complete_changeset(params)
           |> Repo.update()
           |> case do
-            {:ok, updated} -> normalize(updated)
-            {:error, %Ecto.Changeset{} = changeset} -> Repo.rollback(changeset)
+            {:ok, updated} ->
+              updated |> normalize() |> Map.put(:plan_sets, json_sets(insert_plan_sets(Repo, updated, plan_sets)))
+
+            {:error, %Ecto.Changeset{} = changeset} ->
+              Repo.rollback(changeset)
           end
       end
     end)
@@ -56,6 +62,8 @@ defmodule Palee.Infrastructure.Execution.EctoExecutionStore do
 
   @impl true
   def complete_execution_with_job(id, params, job_changeset) do
+    {plan_sets, params} = Map.pop(params, :plan_sets, [])
+
     Multi.new()
     |> Multi.run(:execution, fn repo, _changes ->
       case WorkoutExecution
@@ -76,11 +84,14 @@ defmodule Palee.Infrastructure.Execution.EctoExecutionStore do
     |> Multi.update(:completed_execution, fn %{execution: execution} ->
       WorkoutExecution.complete_changeset(execution, params)
     end)
+    |> Multi.run(:plan_sets, fn repo, %{completed_execution: execution} ->
+      {:ok, insert_plan_sets(repo, execution, plan_sets)}
+    end)
     |> Oban.insert(:completion_job, job_changeset)
     |> Repo.transaction()
     |> case do
-      {:ok, %{completed_execution: execution}} ->
-        {:ok, normalize(execution)}
+      {:ok, %{completed_execution: execution, plan_sets: sets}} ->
+        {:ok, execution |> normalize() |> Map.put(:plan_sets, json_sets(sets))}
 
       {:error, :execution, reason, _changes} ->
         {:error, reason}
@@ -124,9 +135,73 @@ defmodule Palee.Infrastructure.Execution.EctoExecutionStore do
   @impl true
   def get_execution(id) do
     case WorkoutExecution |> scoped_to_user() |> Repo.get(id) do
-      nil -> nil
-      %WorkoutExecution{} = execution -> normalize(execution)
+      nil ->
+        nil
+
+      %WorkoutExecution{} = execution ->
+        execution |> normalize() |> Map.put(:plan_sets, json_sets(plan_sets_of(execution)))
     end
+  end
+
+  # ADR-270: the plan actuals of completed executions, in run order, for
+  # consumers (training volume, PRs, planned-vs-done). Reads what the
+  # session may see of the parent executions.
+  @impl true
+  def list_plan_sets(execution_ids) when is_list(execution_ids) do
+    case Enum.filter(execution_ids, &is_binary/1) do
+      [] ->
+        []
+
+      ids ->
+        ExecutionPlanSet
+        |> where([set], set.execution_id in ^ids)
+        |> order_by([set], asc: set.execution_id, asc: set.inserted_at, asc: set.id)
+        |> Repo.all()
+        |> Enum.map(&plan_set_map/1)
+    end
+  end
+
+  # The execution read model is JSON as is: decimals become numbers there;
+  # `list_plan_sets/1` keeps them `Decimal` for consumers.
+  defp json_sets(sets), do: Enum.map(sets, &PlanActuals.to_json/1)
+
+  defp plan_sets_of(%WorkoutExecution{completed_at_utc: nil}), do: []
+
+  defp plan_sets_of(%WorkoutExecution{id: id}),
+    do: id |> List.wrap() |> list_plan_sets() |> Enum.map(&Map.delete(&1, :execution_id))
+
+  defp plan_set_map(%ExecutionPlanSet{} = set),
+    do: set |> ExecutionPlanSet.to_map() |> Map.put(:execution_id, set.execution_id)
+
+  # Inserted in order, so `inserted_at` + id keep the run order the client sent.
+  defp insert_plan_sets(_repo, _execution, []), do: []
+
+  defp insert_plan_sets(repo, %WorkoutExecution{} = execution, records) do
+    now = DateTime.utc_now()
+
+    rows =
+      records
+      |> Enum.with_index()
+      |> Enum.map(fn {record, index} ->
+        record
+        |> Map.take(ExecutionPlanSet.fields())
+        |> Map.merge(%{
+          id: Ecto.UUID.generate(),
+          execution_id: execution.id,
+          user_id: execution.user_id,
+          organization_id: execution.organization_id,
+          master_workout_id: execution.master_workout_id,
+          inserted_at: DateTime.add(now, index, :microsecond)
+        })
+      end)
+
+    rows
+    |> Enum.chunk_every(1_000)
+    |> Enum.each(&repo.insert_all(ExecutionPlanSet, &1))
+
+    Enum.map(rows, fn row ->
+      struct(ExecutionPlanSet, row) |> ExecutionPlanSet.to_map()
+    end)
   end
 
   @impl true

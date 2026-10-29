@@ -12,6 +12,8 @@ defmodule Palee.Execution do
     ExecutionAnalytics,
     ExecutionKpis,
     ModificationPatchValidator,
+    PlanActuals,
+    PlanTimer,
     TextSectionScores,
     TimerPresets,
     TimerSequenceBuilder,
@@ -77,6 +79,11 @@ defmodule Palee.Execution do
   def build_timer_sequence(%{authoring_mode: "sectioned_text"} = workout),
     do: TimerPresets.build_sections(Map.get(workout, :sections) || [])
 
+  # ADR-270: a structured plan runs on the web from its plan; the server's
+  # segments are one per plan section, from its clock, carrying its score.
+  def build_timer_sequence(%{authoring_mode: "structured_plan"} = workout),
+    do: PlanTimer.build(Map.get(workout, :sections) || [])
+
   def build_timer_sequence(workout), do: TimerSequenceBuilder.build(workout)
 
   @doc "ADR-180: the athlete's results for the scores a coach set on text sections."
@@ -85,6 +92,12 @@ defmodule Palee.Execution do
     as: :normalize
 
   defdelegate text_section_metrics(workout), to: TextSectionScores, as: :section_metrics
+
+  @doc "ADR-270: the athlete's plan actuals, checked against the plan rows of each section."
+  defdelegate normalize_plan_actuals(entries, rows_by_section), to: PlanActuals, as: :normalize
+
+  @doc "ADR-270: the plan actuals (decimals) of these executions, for consumers."
+  def list_plan_sets(execution_ids), do: ExecutionStore.list_plan_sets(execution_ids)
 
   defdelegate preview_timer_sequence(workout), to: TimerSequenceBuilder, as: :preview
 
