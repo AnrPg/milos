@@ -76,7 +76,12 @@ defmodule Palee.Fiscal.TillSigningTest do
             payment_method: "cash",
             lines: [
               %{description: "Monatsbeitrag", quantity: 1, unit_price_cents: 5_950},
-              %{description: "Wasser", quantity: 2, unit_price_cents: 150, tax_category: "reduced"}
+              %{
+                description: "Wasser",
+                quantity: 2,
+                unit_price_cents: 150,
+                tax_category: "reduced"
+              }
             ]
           },
           extra
@@ -125,7 +130,13 @@ defmodule Palee.Fiscal.TillSigningTest do
         issue(context, owner, "k-2", %{
           kind: "invoice",
           payment_method: "bank_transfer",
-          buyer: %{name: "Firma", street: "Weg 1", postal_code: "10115", city: "Berlin", country_code: "DE"}
+          buyer: %{
+            name: "Firma",
+            street: "Weg 1",
+            postal_code: "10115",
+            city: "Berlin",
+            country_code: "DE"
+          }
         })
 
       assert signature(context, invoice) == nil
@@ -152,7 +163,9 @@ defmodule Palee.Fiscal.TillSigningTest do
       assert %{status: "signed", transaction_number: n, signature_counter: c} = signed
       assert is_integer(n) and is_integer(c)
       labels = signed |> TillSigning.print() |> Enum.map(& &1.label)
-      assert "Transaktionsnummer" in labels and "Signaturzähler" in labels and "Signatur" in labels
+
+      assert "Transaktionsnummer" in labels and "Signaturzähler" in labels and
+               "Signatur" in labels
 
       events = context |> journal() |> Enum.map(& &1.event_type)
       assert "till_connection_saved" in events and "receipt_signed" in events
@@ -173,8 +186,12 @@ defmodule Palee.Fiscal.TillSigningTest do
 
       receipt = issue(context, owner, "k-1")
 
-      assert {:ok, %{status: "active", unit_serial: "tss-serial", register_serial: "client-serial"}} =
-               connect(context, owner, "tse", "test", %{api_key: "fk-key", api_secret: "fk-secret"})
+      assert {:ok,
+              %{status: "active", unit_serial: "tss-serial", register_serial: "client-serial"}} =
+               connect(context, owner, "tse", "test", %{
+                 api_key: "fk-key",
+                 api_secret: "fk-secret"
+               })
 
       calls = drain()
 
@@ -225,7 +242,11 @@ defmodule Palee.Fiscal.TillSigningTest do
       refute Enum.any?(attempts, &((&1.request_body || "") =~ "fk-secret"))
 
       [{key, secret, pin}] =
-        bypass_rls(fn -> Repo.all(from c in "fiscal_till_connections", select: {c.api_key, c.api_secret, c.admin_pin}) end)
+        bypass_rls(fn ->
+          Repo.all(
+            from c in "fiscal_till_connections", select: {c.api_key, c.api_secret, c.admin_pin}
+          )
+        end)
 
       refute key =~ "fk-key"
       refute secret =~ "fk-secret"
@@ -241,7 +262,9 @@ defmodule Palee.Fiscal.TillSigningTest do
         fiskaly_de(conn, body)
       end)
 
-      {:ok, _} = connect(context, owner, "tse", "test", %{api_key: "fk-key", api_secret: "fk-secret"})
+      {:ok, _} =
+        connect(context, owner, "tse", "test", %{api_key: "fk-key", api_secret: "fk-secret"})
+
       receipt = issue(context, owner, "k-1")
 
       Req.Test.stub(Palee.FiscalHttp, fn conn ->
@@ -278,7 +301,9 @@ defmodule Palee.Fiscal.TillSigningTest do
         fiskaly_de(conn, body)
       end)
 
-      {:ok, _} = connect(context, owner, "tse", "test", %{api_key: "fk-key", api_secret: "fk-secret"})
+      {:ok, _} =
+        connect(context, owner, "tse", "test", %{api_key: "fk-key", api_secret: "fk-secret"})
+
       receipt = issue(context, owner, "k-1")
 
       Req.Test.stub(Palee.FiscalHttp, fn conn ->
@@ -306,7 +331,9 @@ defmodule Palee.Fiscal.TillSigningTest do
       assert {:error, {:invalid_fields, errors}} = connect(context, owner, "tse", "production")
       assert Map.keys(errors) |> Enum.sort() == [:api_key, :api_secret]
 
-      Req.Test.stub(Palee.FiscalHttp, fn conn -> conn |> Plug.Conn.put_status(401) |> Req.Test.json(%{}) end)
+      Req.Test.stub(Palee.FiscalHttp, fn conn ->
+        conn |> Plug.Conn.put_status(401) |> Req.Test.json(%{})
+      end)
 
       assert {:error, :till_credentials_refused} =
                connect(context, owner, "tse", "test", %{api_key: "bad", api_secret: "bad"})
@@ -328,11 +355,20 @@ defmodule Palee.Fiscal.TillSigningTest do
       context: context,
       owner: owner
     } do
-      receipt = issue(context, owner, "k-1", %{lines: [%{description: "Monatsbeitrag", quantity: 1, unit_price_cents: 6_000}]})
+      receipt =
+        issue(context, owner, "k-1", %{
+          lines: [%{description: "Monatsbeitrag", quantity: 1, unit_price_cents: 6_000}]
+        })
+
       assert {:error, :till_not_connected} = TillSigning.null_receipt(context, @now)
 
       assert {:ok, %{status: "active"}} = connect(context, owner, "rksv", "sandbox")
-      assert %{signatures: [%{kind: "start", status: "signed"}]} = TillSigning.list(context, %{})
+
+      assert [%{kind: "start", status: "signed", document_id: nil}] =
+               context
+               |> TillSigning.list(%{})
+               |> Map.fetch!(:signatures)
+               |> Enum.reject(&(&1.kind == "receipt"))
 
       assert {:ok, %{signed: 1}} = TillSigning.transmit(context, :due, later(5))
       signed = signature(context, receipt)
@@ -343,7 +379,9 @@ defmodule Palee.Fiscal.TillSigningTest do
 
       assert {:ok, null} = TillSigning.null_receipt(context, later(10))
       assert {:ok, %{signed: 1}} = TillSigning.transmit(context, :due, later(10))
-      assert %{kind: "null", status: "signed", document_id: nil} = TillSigning.get(context, null.id)
+
+      assert %{kind: "null", status: "signed", document_id: nil} =
+               TillSigning.get(context, null.id)
     end
 
     test "fiskaly SIGN AT: a unit outage is printed as 'Sicherheitseinrichtung ausgefallen'", %{
@@ -359,7 +397,10 @@ defmodule Palee.Fiscal.TillSigningTest do
       end)
 
       assert {:ok, %{status: "active", register_serial: "kasse-1"}} =
-               connect(context, owner, "rksv", "test", %{api_key: "fk-key", api_secret: "fk-secret"})
+               connect(context, owner, "rksv", "test", %{
+                 api_key: "fk-key",
+                 api_secret: "fk-secret"
+               })
 
       assert Enum.map(drain(), fn {method, path, _q, _b} -> {method, strip(path)} end) == [
                {"POST", "/auth"},
@@ -381,12 +422,21 @@ defmodule Palee.Fiscal.TillSigningTest do
 
       assert Jason.decode!(body)["schema"]["standard_v1"]["receipt"]["amounts_per_vat_rate"] == [
                %{"vat_rate" => "STANDARD", "amount" => "59.50"},
-               %{"vat_rate" => "REDUCED_1", "amount" => "3.00"}
+               %{"vat_rate" => "REDUCED_2", "amount" => "3.00"}
              ]
 
       failed = signature(context, receipt)
-      assert %{status: "device_failed", receipt_number: "2", qr_code_data: "_R1-AT1_kasse-1_2_" <> _} = failed
-      assert Enum.any?(TillSigning.print(failed), &(&1.value == "Sicherheitseinrichtung ausgefallen"))
+
+      assert %{
+               status: "device_failed",
+               receipt_number: "2",
+               qr_code_data: "_R1-AT1_kasse-1_2_" <> _
+             } = failed
+
+      assert Enum.any?(
+               TillSigning.print(failed),
+               &(&1.value == "Sicherheitseinrichtung ausgefallen")
+             )
     end
   end
 
@@ -403,8 +453,8 @@ defmodule Palee.Fiscal.TillSigningTest do
   # "/api/v2/tss/<uuid>/client/<uuid>" → "/tss/client"
   defp strip(path) do
     path
-    |> String.replace(~r{^/api/v[12]}, "")
-    |> String.replace(~r{/[0-9a-f]{8}-[0-9a-f-]{27}}, "")
+    |> String.replace(~r"^/api/v[12]", "")
+    |> String.replace(~r"/[0-9a-f]{8}-[0-9a-f-]{27}", "")
   end
 
   defp fiskaly_de(conn, _body) do
@@ -415,16 +465,22 @@ defmodule Palee.Fiscal.TillSigningTest do
         Req.Test.json(conn, %{"access_token" => "token"})
 
       {"PUT", "/tss"} ->
-        Req.Test.json(conn, %{"state" => "CREATED", "admin_puk" => "puk", "serial_number" => "tss-serial", "public_key" => "pk"})
+        Req.Test.json(conn, %{
+          "state" => "CREATED",
+          "admin_puk" => "puk",
+          "serial_number" => "tss-serial",
+          "public_key" => "pk"
+        })
 
       {"PATCH", "/tss"} ->
-        Req.Test.json(conn, %{"state" => "INITIALIZED", "serial_number" => "tss-serial", "public_key" => "pk"})
+        Req.Test.json(conn, %{
+          "state" => "INITIALIZED",
+          "serial_number" => "tss-serial",
+          "public_key" => "pk"
+        })
 
       {"PUT", "/tss/client"} ->
         Req.Test.json(conn, %{"serial_number" => "client-serial", "state" => "REGISTERED"})
-
-      {_method, "/tss/" <> _admin} ->
-        Req.Test.json(conn, %{})
 
       {"PUT", "/tss/tx"} ->
         state = if conn.query_string == "tx_revision=1", do: "ACTIVE", else: "FINISHED"
@@ -432,6 +488,9 @@ defmodule Palee.Fiscal.TillSigningTest do
 
       {"GET", "/tss/tx"} ->
         Req.Test.json(conn, tx("FINISHED"))
+
+      {_method, "/tss/admin" <> _} ->
+        Req.Test.json(conn, %{})
     end
   end
 
@@ -441,13 +500,23 @@ defmodule Palee.Fiscal.TillSigningTest do
     %{
       "state" => "FINISHED",
       "number" => 18,
-      "time_start" => 1_801_994_401,
-      "time_end" => 1_801_994_402,
+      "time_start" => 1_802_080_801,
+      "time_end" => 1_802_080_802,
       "tss_serial_number" => "tss-serial",
       "client_serial_number" => "client-serial",
-      "signature" => %{"value" => "MEQCIAy4", "algorithm" => "ecdsa-plain-SHA256", "counter" => 112, "public_key" => "pk"},
-      "log" => %{"timestamp_format" => "unixTime", "operation" => "FINISH", "timestamp" => 1_801_994_402},
-      "qr_code_data" => "V0;client-serial;Kassenbeleg-V1;Beleg^59.50_3.00_0.00_0.00_0.00^62.50:Bar;18;112;..."
+      "signature" => %{
+        "value" => "MEQCIAy4",
+        "algorithm" => "ecdsa-plain-SHA256",
+        "counter" => 112,
+        "public_key" => "pk"
+      },
+      "log" => %{
+        "timestamp_format" => "unixTime",
+        "operation" => "FINISH",
+        "timestamp" => 1_802_080_802
+      },
+      "qr_code_data" =>
+        "V0;client-serial;Kassenbeleg-V1;Beleg^59.50_3.00_0.00_0.00_0.00^62.50:Bar;18;112;..."
     }
   end
 
@@ -476,7 +545,7 @@ defmodule Palee.Fiscal.TillSigningTest do
   defp at_receipt(number, signature, hints) do
     %{
       "receipt_number" => number,
-      "time_signature" => 1_801_994_405,
+      "time_signature" => 1_802_080_805,
       "cash_register_serial_number" => "kasse-1",
       "signed" => true,
       "hints" => hints,

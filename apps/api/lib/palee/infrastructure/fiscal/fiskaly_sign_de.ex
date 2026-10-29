@@ -70,7 +70,8 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignDe do
     String.replace(base, ~r/[^A-Za-z0-9 '()+,\-.:=?]/, "-") |> String.slice(0, 70)
   end
 
-  defp random_pin, do: 12 |> :crypto.strong_rand_bytes() |> Base.encode32(padding: false) |> String.slice(0, 12)
+  defp random_pin,
+    do: 12 |> :crypto.strong_rand_bytes() |> Base.encode32(padding: false) |> String.slice(0, 12)
 
   # ── Signing ─────────────────────────────────────────────────────────────
 
@@ -86,7 +87,7 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignDe do
                client_id: connection.register_id
              }),
            {:ok, finished} <- call(token, :put, path <> "?tx_revision=2", body) do
-        {:ok, signature(finished)}
+        finished_signature(finished)
       end
     end
 
@@ -100,7 +101,7 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignDe do
     steps = fn token ->
       case call(token, :get, path, nil) do
         {:ok, %{"state" => "FINISHED"} = tx} ->
-          {:ok, signature(tx)}
+          finished_signature(tx)
 
         {:ok, %{"state" => "ACTIVE"} = tx} ->
           revision = (tx["latest_revision"] || 1) + 1
@@ -111,11 +112,12 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignDe do
                    client_id: connection.register_id,
                    schema: schema
                  }) do
-            {:ok, signature(finished)}
+            finished_signature(finished)
           end
 
         {:ok, %{"state" => other}} ->
-          {:error, {:rejected, [%{code: "tx_#{String.downcase(other)}", message: "Transaction #{other}"}]}}
+          {:error,
+           {:rejected, [%{code: "tx_#{String.downcase(other)}", message: "Transaction #{other}"}]}}
 
         {:error, {:not_found, _body}} ->
           {:error, :not_found}
@@ -131,6 +133,13 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignDe do
 
     with_token(connection, steps, nil)
   end
+
+  # A finish answered without a signature is read back, never signed again.
+  defp finished_signature(%{"signature" => %{"value" => value}} = tx)
+       when is_binary(value) and value != "",
+       do: {:ok, signature(tx)}
+
+  defp finished_signature(_tx), do: {:error, {:uncertain, :signature_missing}}
 
   defp signature(tx) do
     sig = tx["signature"] || %{}
@@ -154,6 +163,7 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignDe do
 
   defp unix(seconds) when is_integer(seconds),
     do: %{DateTime.from_unix!(seconds) | microsecond: {0, 6}}
+
   defp unix(_seconds), do: nil
 
   # ── HTTP ────────────────────────────────────────────────────────────────
@@ -185,7 +195,10 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignDe do
   defp credentials(_connection), do: {:error, {:unauthorized, :credentials_missing}}
 
   defp authenticate(connection) do
-    case request(nil, :post, "/auth", %{api_key: connection.api_key, api_secret: connection.api_secret}) do
+    case request(nil, :post, "/auth", %{
+           api_key: connection.api_key,
+           api_secret: connection.api_secret
+         }) do
       {:ok, %{"access_token" => token}} -> {:ok, token}
       {:ok, _other} -> {:error, {:unauthorized, :no_token}}
       {:error, {:rejected, _}} -> {:error, {:unauthorized, :auth_refused}}
@@ -207,7 +220,9 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignDe do
     |> Http.request()
     |> case do
       {:ok, response} ->
-        unless path == "/auth", do: Process.put(:fiskaly_last_response, {response.status, response.body})
+        unless path == "/auth",
+          do: Process.put(:fiskaly_last_response, {response.status, response.body})
+
         interpret(response)
 
       error ->
@@ -231,7 +246,9 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignDe do
           {:error, {:device_unavailable, body["code"]}}
 
         response.status in 400..499 ->
-          {:error, {:rejected, [%{code: body["code"] || to_string(response.status), message: body["message"] || ""}]}}
+          {:error,
+           {:rejected,
+            [%{code: body["code"] || to_string(response.status), message: body["message"] || ""}]}}
 
         true ->
           {:error, {:http, response.status}}
