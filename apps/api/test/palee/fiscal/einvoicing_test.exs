@@ -2,7 +2,7 @@ defmodule Palee.Fiscal.EInvoicingTest do
   @moduledoc """
   ADR-250 end to end: issuing a Belgian B2B invoice queues its Peppol
   submission; workers defer without a connection, send through the sandbox
-  or Storecove (stubbed), poll the delivery, journal it, keep the attempt
+  or fiskaly E-INVOICE (stubbed), poll the delivery, journal it, keep the attempt
   log, never resend an uncertain submission by themselves, and treat
   webhooks as hints. Runs with Row Level Security enforced.
   """
@@ -14,7 +14,8 @@ defmodule Palee.Fiscal.EInvoicingTest do
   import Palee.AnalyticsHelpers, only: [organization_fixture: 0]
 
   alias Palee.{Fiscal, Repo}
-  alias Palee.Fiscal.{EInvoiceAttempt, EInvoicing, NetworkConnection}
+  alias Palee.Fiscal.{EInvoiceAttempt, EInvoicing, NetworkConnection, TillSignatureStore}
+  alias Palee.Infrastructure.Fiscal.FiskalyUnified
 
   @now ~U[2027-02-08 10:00:00.000000Z]
 
@@ -42,15 +43,6 @@ defmodule Palee.Fiscal.EInvoicingTest do
   setup do
     {organization, owner, context} = bypass_rls(fn -> organization_fixture() end)
     {:ok, %{complete: true}} = Fiscal.save_identity(context, @identity, owner.id, @now)
-
-    previous = Application.get_env(:palee, :storecove)
-    Application.put_env(:palee, :storecove, base_url: "https://storecove.test/api/v2")
-
-    on_exit(fn ->
-      if previous,
-        do: Application.put_env(:palee, :storecove, previous),
-        else: Application.delete_env(:palee, :storecove)
-    end)
 
     %{organization: organization, owner: owner, context: context}
   end
@@ -94,8 +86,12 @@ defmodule Palee.Fiscal.EInvoicingTest do
     connection
   end
 
-  defp storecove(context, owner) do
-    connect(context, owner, "test", %{legal_entity_id: "12345", api_key: "sc-secret-key"})
+  defp fiskaly(context, owner) do
+    connect(context, owner, "test", %{
+      legal_entity_id: "0190f8a2-0000-7000-8000-00000000e1e1",
+      api_key: "fk-secret-key",
+      api_secret: "fk-secret-value"
+    })
   end
 
   defp later(minutes), do: DateTime.add(@now, minutes * 60, :second)
@@ -192,12 +188,7 @@ defmodule Palee.Fiscal.EInvoicingTest do
     assert retried.provider_submission_id == nil
   end
 
-  test "Storecove gets the UBL, its GUID and routing; the key is never logged", %{
-    context: context,
-    owner: owner
-  } do
-    invoice = issue(context, owner, "k-1")
-    storecove(context, owner)
+  defp stub_fiskaly(transaction, records \\ %{}) do
     test_pid = self()
 
     Req.Test.stub(Palee.FiscalHttp, fn conn ->
@@ -206,54 +197,155 @@ defmodule Palee.Fiscal.EInvoicingTest do
       send(
         test_pid,
         {:request, conn.method, conn.request_path,
-         Plug.Conn.get_req_header(conn, "authorization"), body}
+         Plug.Conn.get_req_header(conn, "x-idempotency-key"), body}
       )
 
-      case conn.request_path do
-        "/api/v2/document_submissions" ->
-          Req.Test.json(conn |> Plug.Conn.put_status(200), %{"guid" => "sc-guid-1"})
+      reply = fn status, json -> conn |> Plug.Conn.put_status(status) |> Req.Test.json(json) end
 
-        "/api/v2/document_submissions/sc-guid-1/evidence/sending" ->
-          Req.Test.json(conn, %{"receiving_accesspoint" => "CN=PBE000001", "documents" => []})
+      case {conn.method, conn.request_path} do
+        {"POST", "/tokens"} ->
+          reply.(200, %{"content" => %{"authentication" => %{"bearer" => "jwt"}}})
+
+        {"GET", "/systems/" <> _id} ->
+          reply.(200, %{
+            "content" => %{
+              "vat_rates" => [%{"code" => "STANDARD", "percentage" => "21.00"}],
+              "vat_exemptions" => []
+            }
+          })
+
+        {"POST", "/records"} ->
+          case Jason.decode!(body) do
+            %{"content" => %{"type" => "INTENTION"}} ->
+              reply.(200, %{"content" => %{"id" => "rec-intention", "state" => "COMPLETED"}})
+
+            _transaction ->
+              case transaction.() do
+                {status, json} -> reply.(status, json)
+                :timeout -> Req.Test.transport_error(conn, :timeout)
+              end
+          end
+
+        {"GET", "/records/" <> id} ->
+          reply.(200, %{"content" => Map.fetch!(records, id)})
+      end
+    end)
+  end
+
+  defp accepted, do: {200, %{"content" => %{"id" => "rec-tx", "state" => "ACCEPTED"}}}
+
+  test "fiskaly gets the invoice's fields with derived keys; credentials are never logged", %{
+    context: context,
+    owner: owner
+  } do
+    invoice = issue(context, owner, "k-1")
+    connection = fiskaly(context, owner)
+    assert %{provider: "fiskaly", credentials_source: "own", has_api_secret: true} = connection
+
+    stub_fiskaly(&accepted/0, %{
+      "rec-tx" => %{"id" => "rec-tx", "state" => "COMPLETED", "used_in" => %{"id" => "rec-tm"}},
+      "rec-tm" => %{"id" => "rec-tm", "state" => "COMPLETED", "mode" => "FINISHED"}
+    })
+
+    assert {:ok, %{submitted: 1}} = EInvoicing.transmit(context, :due, @now)
+    row = submission(context, invoice)
+    assert %{status: "submitted", provider_submission_id: "rec-tx"} = row
+
+    transaction_key = FiskalyUnified.idempotency_key("einvoice:#{row.idempotency_guid}:transaction")
+
+    assert_received {:request, "POST", "/records", [^transaction_key], body}
+    operation = Jason.decode!(body)["content"]["operation"]
+    assert operation["type"] == "INVOICE"
+    assert operation["document"]["number"] == invoice.number
+
+    assert [%{"invoicing" => %{"type" => "PEPPOL", "identifier" => "0208:0202239951"}}] =
+             operation["recipients"]
+
+    assert {:ok, %{delivered: 1}} = EInvoicing.transmit(context, :due, later(3))
+    assert %{status: "delivered"} = submission(context, invoice)
+
+    attempts = bypass_rls(fn -> Repo.all(EInvoiceAttempt) end)
+    assert Enum.map(attempts, & &1.operation) |> Enum.sort() == ["status", "submit"]
+
+    for attempt <- attempts, text <- ["fk-secret-key", "fk-secret-value"] do
+      refute (attempt.request_body || "") =~ text
+      refute (attempt.response_body || "") =~ text
+    end
+
+    # Key and secret are encrypted at rest and never shown.
+    [{stored_key, stored_secret}] =
+      bypass_rls(fn ->
+        Repo.all(from c in "fiscal_network_connections", select: {c.api_key, c.api_secret})
+      end)
+
+    refute stored_key =~ "fk-secret-key"
+    refute stored_secret =~ "fk-secret-value"
+    shown = EInvoicing.connection(context)
+    refute Map.has_key?(shown, :api_key)
+    refute Map.has_key?(shown, :api_secret)
+  end
+
+  test "without its own credentials a fiskaly connection uses the fiskaly till connection's", %{
+    context: context,
+    owner: owner
+  } do
+    assert {:error, {:invalid_fields, errors}} =
+             EInvoicing.save_connection(
+               context,
+               %{environment: "test", legal_entity_id: "sys-1"},
+               owner.id,
+               @now
+             )
+
+    assert Map.keys(errors) |> Enum.sort() == [:api_key, :api_secret]
+
+    {:ok, _till} =
+      TillSignatureStore.save_connection(context, "tse", %{
+        provider: "fiskaly",
+        environment: "test",
+        api_key: "till-key",
+        api_secret: "till-secret",
+        unit_id: Ecto.UUID.generate(),
+        register_id: Ecto.UUID.generate(),
+        status: "active",
+        provisioned_at: @now
+      })
+
+    connection = connect(context, owner, "test", %{legal_entity_id: "sys-1"})
+    assert %{credentials_source: "till_connection", has_api_key: false} = connection
+
+    invoice = issue(context, owner, "k-1")
+    test_pid = self()
+
+    Req.Test.stub(Palee.FiscalHttp, fn conn ->
+      {:ok, body, conn} = Plug.Conn.read_body(conn)
+
+      if conn.request_path == "/tokens", do: send(test_pid, {:token, Jason.decode!(body)})
+
+      case {conn.method, conn.request_path} do
+        {"POST", "/tokens"} ->
+          Req.Test.json(conn, %{"content" => %{"authentication" => %{"bearer" => "jwt"}}})
+
+        {"GET", _path} ->
+          Req.Test.json(conn, %{
+            "content" => %{"vat_rates" => [%{"code" => "STANDARD", "percentage" => "21.00"}]}
+          })
+
+        {"POST", "/records"} ->
+          Req.Test.json(conn, %{"content" => %{"id" => "rec-1", "state" => "ACCEPTED"}})
       end
     end)
 
     assert {:ok, %{submitted: 1}} = EInvoicing.transmit(context, :due, @now)
-
-    assert_received {:request, "POST", "/api/v2/document_submissions", ["Bearer sc-secret-key"],
-                     body}
-
-    payload = Jason.decode!(body)
-    row = submission(context, invoice)
-    assert payload["legalEntityId"] == 12_345
-    assert payload["idempotencyGuid"] == row.idempotency_guid
-    assert payload["routing"]["eIdentifiers"] == [%{"scheme" => "BE:EN", "id" => "0202239951"}]
-    assert payload["document"]["rawDocumentData"]["parseStrategy"] == "ubl"
-
-    ubl = Base.decode64!(payload["document"]["rawDocumentData"]["document"])
-    assert Palee.PeppolBisRules.check(ubl) == []
-    assert ubl =~ invoice.number
-
-    assert {:ok, %{delivered: 1}} = EInvoicing.transmit(context, :due, later(3))
-
-    attempts = bypass_rls(fn -> Repo.all(EInvoiceAttempt) end)
-    assert Enum.map(attempts, & &1.operation) |> Enum.sort() == ["status", "submit"]
-    refute Enum.any?(attempts, &((&1.request_body || "") =~ "sc-secret-key"))
-    refute Enum.any?(attempts, &((&1.response_body || "") =~ "sc-secret-key"))
-
-    # The key is encrypted at rest and never shown.
-    [stored] =
-      bypass_rls(fn -> Repo.all(from c in "fiscal_network_connections", select: c.api_key) end)
-
-    refute stored =~ "sc-secret-key"
-    refute Map.has_key?(EInvoicing.connection(context), :api_key)
+    assert_received {:token, %{"content" => %{"key" => "till-key", "secret" => "till-secret"}}}
+    assert %{status: "submitted"} = submission(context, invoice)
   end
 
   test "an uncertain submission is never sent again by itself", %{context: context, owner: owner} do
     invoice = issue(context, owner, "k-1")
-    storecove(context, owner)
+    fiskaly(context, owner)
 
-    Req.Test.stub(Palee.FiscalHttp, fn conn -> Req.Test.transport_error(conn, :timeout) end)
+    stub_fiskaly(fn -> :timeout end)
 
     assert {:ok, %{uncertain: 1}} = EInvoicing.transmit(context, :due, @now)
     assert %{status: "uncertain", next_attempt_at: nil} = submission(context, invoice)
@@ -261,20 +353,18 @@ defmodule Palee.Fiscal.EInvoicingTest do
     Req.Test.stub(Palee.FiscalHttp, fn _conn -> flunk("an uncertain submission was resent") end)
     assert {:ok, %{submitted: 0}} = EInvoicing.transmit(context, :due, later(60 * 24))
 
-    # Staff retry keeps the GUID, so Storecove refuses a copy instead of delivering it twice.
+    # Staff retry keeps the GUID, so fiskaly replays (or refuses) instead of
+    # creating a second invoice.
     guid = submission(context, invoice).idempotency_guid
     assert {:ok, _} = EInvoicing.retry(context, invoice.id, later(10))
 
-    Req.Test.stub(Palee.FiscalHttp, fn conn ->
-      conn
-      |> Plug.Conn.put_status(422)
-      |> Req.Test.json(%{
-        "errors" => [%{"source" => "idempotencyGuid", "details" => "already used"}]
-      })
-    end)
+    stub_fiskaly(fn -> {422, %{"code" => "E_IDEMPOTENCY", "message" => "Idempotency key reused"}} end)
 
     assert {:ok, %{uncertain: 1}} = EInvoicing.transmit(context, :due, later(11))
     assert %{status: "uncertain", idempotency_guid: ^guid} = submission(context, invoice)
+
+    key = FiskalyUnified.idempotency_key("einvoice:#{guid}:transaction")
+    assert_received {:request, "POST", "/records", [^key], _body}
   end
 
   test "rejections stop, transient errors back off, refused keys invalidate the connection", %{
@@ -282,7 +372,7 @@ defmodule Palee.Fiscal.EInvoicingTest do
     owner: owner
   } do
     invoice = issue(context, owner, "k-1")
-    storecove(context, owner)
+    fiskaly(context, owner)
 
     Req.Test.stub(Palee.FiscalHttp, fn conn ->
       conn |> Plug.Conn.put_status(503) |> Req.Test.json(%{})
@@ -296,7 +386,7 @@ defmodule Palee.Fiscal.EInvoicingTest do
     assert DateTime.compare(row.next_attempt_at, later(1)) == :eq
 
     Req.Test.stub(Palee.FiscalHttp, fn conn ->
-      conn |> Plug.Conn.put_status(401) |> Req.Test.json(%{})
+      conn |> Plug.Conn.put_status(401) |> Req.Test.json(%{"code" => "E_UNAUTHORIZED"})
     end)
 
     assert {:ok, %{retrying: 1}} = EInvoicing.transmit(context, :due, later(1))
@@ -305,24 +395,64 @@ defmodule Palee.Fiscal.EInvoicingTest do
     assert %{status: "pending", last_error_code: "connection_invalid"} =
              submission(context, invoice)
 
-    storecove(context, owner)
+    fiskaly(context, owner)
 
-    Req.Test.stub(Palee.FiscalHttp, fn conn ->
-      conn
-      |> Plug.Conn.put_status(422)
-      |> Req.Test.json(%{"errors" => [%{"source" => "routing", "details" => "Unknown receiver"}]})
+    stub_fiskaly(fn ->
+      {422, %{"code" => "E_VALIDATION", "message" => "Unknown receiver"}}
     end)
 
     assert {:ok, %{rejected: 1}} = EInvoicing.transmit(context, :due, later(2))
 
     assert %{
              status: "rejected",
-             last_error_code: "routing",
-             last_error_message: "routing: Unknown receiver"
-           } =
-             submission(context, invoice)
+             last_error_code: "E_VALIDATION",
+             last_error_message: "E_VALIDATION: Unknown receiver"
+           } = submission(context, invoice)
 
     assert {:error, :not_found} = EInvoicing.retry(context, Ecto.UUID.generate(), later(3))
+  end
+
+  test "an old Storecove connection is invalid until reconnected through fiskaly", %{
+    context: context,
+    organization: organization,
+    owner: owner
+  } do
+    invoice = issue(context, owner, "k-1")
+
+    bypass_rls(fn ->
+      Repo.insert!(%NetworkConnection{
+        organization_id: organization.id,
+        network: "peppol",
+        provider: "storecove",
+        environment: "test",
+        peppol_scheme: "0208",
+        peppol_identifier: "0403170701",
+        legal_entity_id: "123",
+        api_key: "old-key",
+        status: "active"
+      })
+    end)
+
+    Req.Test.stub(Palee.FiscalHttp, fn _conn -> flunk("no request expected") end)
+
+    assert {:ok, %{deferred: 1}} = EInvoicing.transmit(context, :due, @now)
+    assert %{status: "invalid", provider: "storecove"} = EInvoicing.connection(context)
+    assert %{status: "pending", last_error_code: "connection_invalid"} = submission(context, invoice)
+
+    # Reconnecting through fiskaly drops Storecove's key.
+    assert %{provider: "fiskaly", status: "active", credentials_source: "own"} =
+             fiskaly(context, owner)
+
+    [stored] = bypass_rls(fn -> Repo.all(NetworkConnection) end)
+    assert stored.api_key == "fk-secret-key"
+
+    assert {:error, {:invalid_fields, %{provider: ["invalid"]}}} =
+             EInvoicing.save_connection(
+               context,
+               %{environment: "test", provider: "storecove", legal_entity_id: "1", api_key: "k"},
+               owner.id,
+               @now
+             )
   end
 
   test "a webhook with the right token makes the poll due; a wrong token is not found", %{
@@ -354,7 +484,7 @@ defmodule Palee.Fiscal.EInvoicingTest do
     assert {:error, {:invalid_fields, errors}} =
              EInvoicing.save_connection(context, %{environment: "production"}, owner.id, @now)
 
-    assert Map.keys(errors) |> Enum.sort() == [:api_key, :legal_entity_id]
+    assert Map.keys(errors) |> Enum.sort() == [:api_key, :api_secret, :legal_entity_id]
 
     assert {:error, {:invalid_fields, %{peppol_id: ["invalid"]}}} =
              EInvoicing.save_connection(
