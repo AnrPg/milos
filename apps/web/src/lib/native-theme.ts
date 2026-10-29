@@ -122,7 +122,7 @@ function capacitorTheme() {
 
 /** Print colours for the API's emails, receipts and wallet passes (paper is light). */
 function elixirPalette() {
-  const tokens: (keyof ThemeTokens)[] = ["paper", "bg", "text", "textSoft", "muted", "border", "primary", "primaryContrast", "deep", "deepContrast"];
+  const tokens: (keyof ThemeTokens)[] = ["paper", "bg", "text", "textSoft", "muted", "border", "primary", "primaryContrast", "deep", "deepContrast", "onPaper"];
   const snake = (name: string) => name.replace(/([A-Z])/g, "_$1").toLowerCase();
   const rows = tokens.map((token) => `    ${snake(token)}: "${PRINT_TOKENS[token]}"`);
   return `defmodule Palee.BrandPalette do

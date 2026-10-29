@@ -10,6 +10,12 @@ defmodule Palee.Fiscal.Domain.DocumentHtml do
   Renders a `DocumentView` map; the same view always renders the same bytes.
   """
 
+  # Print colours from the brand palette: the Swiss QR code needs black on white.
+  @paper Palee.BrandPalette.colour(:paper)
+  @ink Palee.BrandPalette.colour(:on_paper)
+  @sheet Palee.BrandPalette.colour(:bg)
+  @soft Palee.BrandPalette.colour(:text_soft)
+  @rule Palee.BrandPalette.colour(:border)
   alias Palee.Fiscal.Domain.DocumentView
 
   @doc "The HTML page of `view` (from `DocumentView.build/2`)."
@@ -303,8 +309,8 @@ defmodule Palee.Fiscal.Domain.DocumentHtml do
       width,
       "\" height=\"",
       width,
-      "\" shape-rendering=\"crispEdges\"><rect width=\"100%\" height=\"100%\" fill=\"#fff\"/>",
-      "<path fill=\"#000\" d=\"",
+      "\" shape-rendering=\"crispEdges\"><rect width=\"100%\" height=\"100%\" fill=\"#{@paper}\"/>",
+      "<path fill=\"#{@ink}\" d=\"",
       path,
       "\"/>",
       if(overlay == :swiss_cross, do: swiss_cross(size), else: []),
@@ -319,10 +325,10 @@ defmodule Palee.Fiscal.Domain.DocumentHtml do
     c = size / 2
 
     [
-      rect(c - outer / 2, c - outer / 2, outer, outer, "#fff"),
-      rect(c - inner / 2, c - inner / 2, inner, inner, "#000"),
-      rect(c - bar / 2, c - arm / 2, bar, arm, "#fff"),
-      rect(c - arm / 2, c - bar / 2, arm, bar, "#fff")
+      rect(c - outer / 2, c - outer / 2, outer, outer, @paper),
+      rect(c - inner / 2, c - inner / 2, inner, inner, @ink),
+      rect(c - bar / 2, c - arm / 2, bar, arm, @paper),
+      rect(c - arm / 2, c - bar / 2, arm, bar, @paper)
     ]
   end
 
@@ -344,30 +350,30 @@ defmodule Palee.Fiscal.Domain.DocumentHtml do
   defp n(value), do: :erlang.float_to_binary(value * 1.0, [:compact, decimals: 3])
 
   defp stylesheet do
-    "@page{size:A4;margin:0}body{margin:0;background:#f4f4f4;color:#000;" <>
+    "@page{size:A4;margin:0}body{margin:0;background:#{@sheet};color:#{@ink};" <>
       "font:10pt/1.4 \"Liberation Sans\",Arial,Helvetica,sans-serif}" <>
       ".document{box-sizing:border-box;width:210mm;min-height:297mm;margin:0 auto;padding:18mm 18mm 12mm;" <>
-      "background:#fff}header{display:flex;justify-content:space-between;align-items:flex-start;" <>
-      "border-bottom:1.5pt solid #000;padding-bottom:4mm}h1{font-size:17pt;margin:0}" <>
-      "h2{font-size:8pt;text-transform:uppercase;letter-spacing:.06em;margin:0 0 1.5mm;color:#444}" <>
+      "background:#{@paper}}header{display:flex;justify-content:space-between;align-items:flex-start;" <>
+      "border-bottom:1.5pt solid #{@ink};padding-bottom:4mm}h1{font-size:17pt;margin:0}" <>
+      "h2{font-size:8pt;text-transform:uppercase;letter-spacing:.06em;margin:0 0 1.5mm;color:#{@soft}}" <>
       "dl.meta{display:grid;grid-template-columns:auto auto;gap:.5mm 4mm;margin:0;font-size:9pt}" <>
-      "dl.meta dt{color:#444}dl.meta dd{margin:0;font-weight:700;text-align:right}" <>
+      "dl.meta dt{color:#{@soft}}dl.meta dd{margin:0;font-weight:700;text-align:right}" <>
       ".parties{display:flex;gap:10mm;margin:6mm 0}.party{flex:1}.party p{margin:0}" <>
       ".party .name{font-weight:700}table{width:100%;border-collapse:collapse}" <>
-      "th{font-size:8pt;text-align:left;border-bottom:.75pt solid #000;padding:1mm}" <>
-      "td{padding:1mm;border-bottom:.25pt solid #bbb;vertical-align:top}.num{text-align:right;" <>
-      "white-space:nowrap}small{color:#444}.breakdown{margin-top:6mm;width:60%}" <>
+      "th{font-size:8pt;text-align:left;border-bottom:.75pt solid #{@ink};padding:1mm}" <>
+      "td{padding:1mm;border-bottom:.25pt solid #{@rule};vertical-align:top}.num{text-align:right;" <>
+      "white-space:nowrap}small{color:#{@soft}}.breakdown{margin-top:6mm;width:60%}" <>
       "dl.totals{display:grid;grid-template-columns:1fr auto;gap:1mm 6mm;width:45%;margin:4mm 0 0 auto}" <>
       "dl.totals dd{margin:0;text-align:right}.grand{font-weight:700;font-size:12pt}" <>
       ".mentions,.bank,.authority{margin-top:6mm;font-size:9pt}.mentions p,.bank p,.authority p{margin:0}" <>
-      ".authority{display:flex;justify-content:space-between;gap:6mm;border:.5pt solid #000;padding:3mm}" <>
+      ".authority{display:flex;justify-content:space-between;gap:6mm;border:.5pt solid #{@ink};padding:3mm}" <>
       ".authority p{overflow-wrap:anywhere}.authority .url{font-size:7pt}footer{margin-top:8mm;font-size:7.5pt;" <>
-      "color:#444}footer p{margin:0}code{font-size:7pt;overflow-wrap:anywhere}" <>
+      "color:#{@soft}}footer p{margin:0}code{font-size:7pt;overflow-wrap:anywhere}" <>
       ".qr-bill{box-sizing:border-box;width:210mm;height:297mm;margin:0 auto;position:relative;" <>
-      "background:#fff;page-break-before:always;break-before:page}.separate{position:absolute;" <>
+      "background:#{@paper};page-break-before:always;break-before:page}.separate{position:absolute;" <>
       "bottom:106mm;left:0;right:0;text-align:center;font-size:8pt;margin:0}.slip{position:absolute;" <>
-      "bottom:0;left:0;width:210mm;height:105mm;border-top:.5pt dashed #000;display:flex}" <>
-      ".receipt{box-sizing:border-box;width:62mm;padding:5mm;border-right:.5pt dashed #000;" <>
+      "bottom:0;left:0;width:210mm;height:105mm;border-top:.5pt dashed #{@ink};display:flex}" <>
+      ".receipt{box-sizing:border-box;width:62mm;padding:5mm;border-right:.5pt dashed #{@ink};" <>
       "position:relative}.payment{box-sizing:border-box;width:148mm;padding:5mm;position:relative}" <>
       "h3{font-size:11pt;margin:0 0 3mm}h4{margin:0;font-size:8pt}.block p{margin:0;font-size:10pt}" <>
       ".block{margin-bottom:3mm}.block.r h4{font-size:6pt}.block.r p{font-size:8pt}" <>
@@ -376,9 +382,9 @@ defmodule Palee.Fiscal.Domain.DocumentHtml do
       ".amount{display:flex;gap:5mm}.amount p{margin:0}.amount.p{position:absolute;left:5mm;top:68mm}" <>
       ".amount.r{position:absolute;left:5mm;top:63mm}.amount.r h4{font-size:6pt}.amount.r p{font-size:8pt}" <>
       ".acceptance{position:absolute;right:5mm;top:82mm;margin:0;font-size:6pt;font-weight:700}" <>
-      ".blank{border:.75pt solid #000}.debtor-p{width:65mm;height:25mm}.debtor-r{width:52mm;height:20mm}" <>
+      ".blank{border:.75pt solid #{@ink}}.debtor-p{width:65mm;height:25mm}.debtor-r{width:52mm;height:20mm}" <>
       ".amount-p{width:40mm;height:15mm}.amount-r{width:30mm;height:10mm}" <>
-      "@media print{body{background:#fff}.document{margin:0}}"
+      "@media print{body{background:#{@paper}}.document{margin:0}}"
   end
 
   defp e(value), do: DocumentView.escape(value)

@@ -15,7 +15,8 @@ defmodule Palee.BrandPalette do
     primary: "#2F5BFF",
     primary_contrast: "#FFFFFF",
     deep: "#17181C",
-    deep_contrast: "#F4F5F7"
+    deep_contrast: "#F4F5F7",
+    on_paper: "#000000"
   }
 
   @doc "A print colour by its theme token name, e.g. `colour(:primary)`."
