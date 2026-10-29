@@ -4625,6 +4625,7 @@
     "groupProgrammingRemovePerson": "Убрать {nickname}",
     "groupProgrammingNoMatches": "Никто не найден.",
     "roleAccessSpaces": "Помещения и планы этажей",
+    "roleAccessHealthCertificates": "Медицинские справки",
     "apiErrorSpaceUnavailable": "В это время помещение недоступно. Выбери другое помещение или другое время.",
     "apiErrorSpaceArchived": "Это помещение в архиве.",
     "apiErrorSpaceWrongBranch": "Это помещение относится к другому филиалу.",

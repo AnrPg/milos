@@ -4625,6 +4625,7 @@
     "groupProgrammingRemovePerson": "إزالة {nickname}",
     "groupProgrammingNoMatches": "لا يوجد تطابق.",
     "roleAccessSpaces": "المساحات ومخططات الطوابق",
+    "roleAccessHealthCertificates": "الشهادات الصحية",
     "apiErrorSpaceUnavailable": "المساحة غير متاحة في ذلك الوقت. اختر مساحة أخرى أو وقتًا آخر.",
     "apiErrorSpaceArchived": "هذه المساحة مؤرشفة.",
     "apiErrorSpaceWrongBranch": "هذه المساحة تابعة لفرع آخر.",

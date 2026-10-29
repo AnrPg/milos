@@ -4625,6 +4625,7 @@
     "groupProgrammingRemovePerson": "הסר את {nickname}",
     "groupProgrammingNoMatches": "אין התאמות.",
     "roleAccessSpaces": "חללים ותוכניות קומה",
+    "roleAccessHealthCertificates": "אישורים רפואיים",
     "apiErrorSpaceUnavailable": "החלל לא זמין בזמן הזה. בחרו חלל אחר או שעה אחרת.",
     "apiErrorSpaceArchived": "החלל הזה בארכיון.",
     "apiErrorSpaceWrongBranch": "החלל הזה שייך לסניף אחר.",

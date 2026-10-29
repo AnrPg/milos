@@ -4625,6 +4625,7 @@
     "groupProgrammingRemovePerson": "Αφαίρεση {nickname}",
     "groupProgrammingNoMatches": "Κανείς δεν ταιριάζει.",
     "roleAccessSpaces": "Χώροι και κατόψεις",
+    "roleAccessHealthCertificates": "Βεβαιώσεις υγείας",
     "apiErrorSpaceUnavailable": "Ο χώρος δεν είναι διαθέσιμος εκείνη την ώρα. Διάλεξε άλλον χώρο ή άλλη ώρα.",
     "apiErrorSpaceArchived": "Αυτός ο χώρος είναι αρχειοθετημένος.",
     "apiErrorSpaceWrongBranch": "Αυτός ο χώρος ανήκει σε άλλο παράρτημα.",

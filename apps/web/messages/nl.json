@@ -4625,6 +4625,7 @@
     "groupProgrammingRemovePerson": "{nickname} verwijderen",
     "groupProgrammingNoMatches": "Niemand gevonden.",
     "roleAccessSpaces": "Ruimtes en plattegronden",
+    "roleAccessHealthCertificates": "Medische verklaringen",
     "apiErrorSpaceUnavailable": "De ruimte is op dat moment niet beschikbaar. Kies een andere ruimte of een ander tijdstip.",
     "apiErrorSpaceArchived": "Die ruimte is gearchiveerd.",
     "apiErrorSpaceWrongBranch": "Die ruimte hoort bij een andere vestiging.",
