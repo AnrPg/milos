@@ -142,6 +142,10 @@ async function stub(page: Page, writes: Write[]) {
       });
     }
     if (path.endsWith("/join-link")) return json(route, { member: { enabled: false }, athlete: { enabled: false, key: null } });
+    // ADR-271: «Τι πωλείται online» counts the packages once payments are connected.
+    if (path === "/api/admin/payments/account") {
+      return json(route, { account: { id: "acc-1", provider: "viva", environment: "live", status: "active" }, providers: [], environments: [], connect_providers: {}, online_sales: { sold_online: 2, packages: 2 } });
+    }
     return json(route, {});
   });
 }
@@ -178,6 +182,9 @@ test("the owner picks a kind of box, changes a price and applies the recipe", as
   await expect(page.getByTestId("recipe-kept")).toContainText("1 setting kept as you set it");
   expect(writes.find((write) => write.path.endsWith("/apply"))?.body).toEqual({ prices: { setup_unlimited: 8000 }, mode: "defaults_only" });
   await expect(page.getByRole("link", { name: /Bring your members/ })).toHaveAttribute("href", /\/admin\/users\/import$/);
+  const soldOnline = page.getByRole("link", { name: /What is sold online/ });
+  await expect(soldOnline).toHaveAttribute("href", /\/admin\/finance\?tab=packages$/);
+  await expect(soldOnline).toContainText("Sales page · 2 of 2 subscription packages");
 });
 
 test("Settings keep the settings with a good default in one closed «Advanced» card", async ({ page }) => {
