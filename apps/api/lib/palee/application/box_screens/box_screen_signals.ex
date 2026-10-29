@@ -2,7 +2,7 @@ defmodule Palee.Application.BoxScreens.BoxScreenSignals do
   @moduledoc """
   What box screens are told in real time (ADR-253), published on
   `Palee.PubSub` (`"box_screen:signal"`) and delivered by the web layer
-  (`PaleeWeb.RealtimeEventHandler`) to `box_screen:<organization_id>`:
+  (its realtime event handler) to `box_screen:<organization_id>`:
 
     * `hint/3` – `box_screen:refresh` `%{kind, slot_id}`: something on the
       day changed, read `/today` again. Hints never say who;
