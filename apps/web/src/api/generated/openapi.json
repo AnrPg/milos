@@ -186710,6 +186710,141 @@
       }
     },
     "/api/org/{organization_slug}/admin/users/{id}/class-placement": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminUserController.class_placement_options",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "bookings": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "booking_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "slot_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "approved"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "booking_id",
+                          "name",
+                          "scheduled_at",
+                          "slot_id",
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "classes": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "blocked_reason": {
+                            "description": "Why the class cannot take the member now, as the booking error code (slot_full, class_paused, class_not_published, already_booked, finance_*), or null.",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "capacity": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "duration_minutes": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "slot_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "spots_remaining": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "blocked_reason",
+                          "capacity",
+                          "duration_minutes",
+                          "name",
+                          "scheduled_at",
+                          "slot_id",
+                          "spots_remaining"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "lookahead_days": {
+                      "type": "integer"
+                    },
+                    "timezone": {
+                      "description": "The box's IANA time zone (ADR-179).",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "bookings",
+                    "classes",
+                    "lookahead_days",
+                    "timezone"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Class placement options"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "What staff can choose when booking a member into a class or moving them (ADR-232)",
+        "tags": [
+          "Admin Users"
+        ]
+      },
       "post": {
         "callbacks": {},
         "operationId": "PaleeWeb.AdminUserController.place_in_class",
@@ -186771,7 +186906,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Book a member into a class, optionally moving them out of an existing booking",
+        "summary": "Book a member into a class, optionally moving them out of an upcoming booking in one transaction (ADR-232)",
         "tags": [
           "Admin Users"
         ]

@@ -7995,9 +7995,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** What staff can choose when booking a member into a class or moving them (ADR-232) */
+        get: operations["PaleeWeb.AdminUserController.class_placement_options"];
         put?: never;
-        /** Book a member into a class, optionally moving them out of an existing booking */
+        /** Book a member into a class, optionally moving them out of an upcoming booking in one transaction (ADR-232) */
         post: operations["PaleeWeb.AdminUserController.place_in_class"];
         delete?: never;
         options?: never;
@@ -79265,6 +79266,55 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminUserController.class_placement_options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Class placement options */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        bookings: {
+                            /** Format: uuid */
+                            booking_id: string;
+                            name: string;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                            /** Format: uuid */
+                            slot_id: string;
+                            /** @enum {string} */
+                            status: "pending" | "approved";
+                        }[];
+                        classes: {
+                            /** @description Why the class cannot take the member now, as the booking error code (slot_full, class_paused, class_not_published, already_booked, finance_*), or null. */
+                            blocked_reason: string | null;
+                            capacity: number | null;
+                            duration_minutes: number | null;
+                            name: string;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                            /** Format: uuid */
+                            slot_id: string;
+                            spots_remaining: number;
+                        }[];
+                        lookahead_days: number;
+                        /** @description The box's IANA time zone (ADR-179). */
+                        timezone: string;
                     };
                 };
             };
