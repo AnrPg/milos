@@ -12075,5 +12075,102 @@
     "rowButton": "+ Zahlung",
     "rowButtonLabel": "Zahlung von {name} erfassen",
     "panelButton": "+ Zahlung erfassen"
+  },
+  "FiscalIdentity": {
+    "backToSettings": "Einstellungen",
+    "loading": "Wird geladen…",
+    "loadFailed": "Die Rechnungsangaben konnten nicht geladen werden. Versuche es gleich noch einmal.",
+    "crumbSettings": "Einstellungen",
+    "title": "Rechnungsangaben",
+    "linkHint": "Auf jeder Quittung und Rechnung gedruckt",
+    "intro": "Auf jeder Quittung und Rechnung gedruckt. Ohne sie lassen sich keine gültigen Belege ausstellen.",
+    "progress": "{percent} % erledigt",
+    "ready": "Fertig. Quittungen und Rechnungen werden rechtsgültig ausgestellt.",
+    "rowCountry": "Land",
+    "countryDone": "{country} · {currency} · die Felder wurden angepasst",
+    "countryStart": "Beginne hier: alles andere hängt davon ab",
+    "change": "Ändern",
+    "choose": "Auswählen",
+    "fill": "Ausfüllen",
+    "afterCountry": "Nach dem Land",
+    "legalNote": "Jede Änderung wird protokolliert. Bereits ausgestellte Belege behalten die alten Angaben.",
+    "countryPanelTitle": "Land des Unternehmens",
+    "countryPanelHint": "Vom Land hängen die Felder, die Währung, die Sprache und die Regeln der Belege ab.",
+    "countryChangeWarning": "Wenn du es änderst, öffnen sich die anderen Schritte erneut.",
+    "done": "Fertig",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "saving": "Wird gespeichert…",
+    "group": {
+      "business": "Unternehmen",
+      "address": "Sitzadresse",
+      "tax": "Steuern"
+    },
+    "scheme": {
+      "standard": "Regelbesteuerung",
+      "small_business": "Kleinunternehmer (ohne USt.)",
+      "exempt": "Von der USt. befreit"
+    },
+    "field": {
+      "legal_name": "Firmenname",
+      "trade_name": "Handelsname",
+      "tax_id": "Steuernummer",
+      "tax_office": "Finanzamt",
+      "street": "Straße und Hausnummer",
+      "postal_code": "PLZ",
+      "city": "Ort",
+      "region": "Bundesstaat",
+      "vat_scheme": "Umsatzsteuerregelung",
+      "vat_number": "USt-IdNr.",
+      "registration_number": "Registernummer",
+      "activity_code": "Haupttätigkeitscode",
+      "branch_code": "Betriebsstättennummer (myDATA)",
+      "iban": "IBAN",
+      "qr_iban": "QR-IBAN"
+    },
+    "hint": {
+      "checkDigits": "Wir prüfen die Prüfziffern beim Speichern.",
+      "greekVatNumber": "Die USt-IdNr. wird automatisch ergänzt: {number}.",
+      "branchCode": "Nur ändern, wenn du eine bei der AADE gemeldete Zweigstelle hast.",
+      "optional": "Optional.",
+      "iban": "Optional. Wird auf Rechnungen zur Zahlung per Überweisung gedruckt.",
+      "qrIban": "Optional. Für QR-Rechnungen mit QR-Referenz."
+    },
+    "reason": {
+      "blank": "Bitte ausfüllen.",
+      "check_digit": "Diese Nummer ist ungültig: eine Ziffer stimmt nicht. Vergleiche sie mit deinen Unterlagen.",
+      "format": "Das sieht nicht nach einer solchen Nummer für das gewählte Land aus. Bitte prüfen.",
+      "not_applicable": "Das gewählte Land verwendet diese Nummer nicht. Lass das Feld leer.",
+      "too_long": "Das ist zu lang. Kürze es auf 200 Zeichen.",
+      "invalid": "Dieser Wert ist ungültig. Bitte prüfen.",
+      "invalid_iban": "Diese IBAN ist ungültig. Vergleiche sie mit deinem Kontoauszug.",
+      "qr_iban_in_iban_field": "Das ist eine QR-IBAN. Trage sie im Feld QR-IBAN ein und hier deine normale IBAN.",
+      "qr_iban_country": "Eine QR-IBAN gibt es nur in der Schweiz und in Liechtenstein.",
+      "not_a_qr_iban": "Das ist eine normale IBAN, keine QR-IBAN. Die QR-IBAN erhältst du separat von deiner Bank."
+    },
+    "next": {
+      "noneTitle": "Kein weiterer Schritt nötig",
+      "noneHint": "{country} verlangt keine Übermittlung an eine Steuerbehörde.",
+      "mydataTitle": "Verbindung mit myDATA",
+      "mydataActive": "Aktiv ({environment}). Jeder Beleg wird an die AADE übermittelt.",
+      "mydataInvalid": "Die AADE hat die Zugangsdaten nicht akzeptiert. Die Belege warten und werden übermittelt, sobald das behoben ist.",
+      "mydataNone": "Noch nicht verbunden. Belege werden normal ausgestellt und nach der Verbindung an die AADE übermittelt.",
+      "connected": "Verbunden",
+      "needsCheck": "Prüfung nötig",
+      "notConnected": "Nicht verbunden",
+      "later": "Nächster Schritt, später: {step}",
+      "soon": "Bald",
+      "tseTitle": "Technische Sicherheitseinrichtung (TSE)",
+      "tseHint": "Nur für Zahlungen an der Kasse nötig. Wir verbinden sie in einem späteren Schritt mit fiskaly.",
+      "rksvTitle": "Sicherheitseinrichtung (RKSV)",
+      "rksvHint": "Nur für Zahlungen an der Kasse nötig. Wir verbinden sie in einem späteren Schritt.",
+      "nf525Title": "NF525-Bescheinigung",
+      "nf525Hint": "Das unveränderbare Register ist bereits aktiv. Die Herstellerbescheinigung stellt Palee bereit."
+    },
+    "environment": {
+      "sandbox": "Sandbox",
+      "test": "Test",
+      "production": "Produktion"
+    }
   }
 }

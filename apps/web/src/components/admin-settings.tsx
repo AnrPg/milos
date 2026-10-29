@@ -33,6 +33,7 @@ import { PublicPageLink } from "@/components/admin/public-page/PublicPageLink";
 import { TrialsLink } from "@/components/admin/trials/TrialsLink";
 import { CommunitySettingsLink } from "@/components/admin/community/CommunitySettings";
 import { CheckInSettingsLink } from "@/components/check-in/CheckInSettings";
+import { FiscalIdentityLink } from "@/components/fiscal/FiscalIdentityLink";
 import { SpacesSettingsLink } from "@/components/spaces/SpacesSettings";
 import { RoleAccessSettings } from "@/components/admin/RoleAccessSettings";
 import { OrganizationOwnerSettings } from "@/components/admin/OrganizationOwnerSettings";
@@ -1182,6 +1183,10 @@ export function AdminSettingsHub() {
               title={i18n("finance1b48d3f")}
               description={i18n("paymentReminders64c6e44")}
             >
+              {/* Mockup s1 (ADR-240): the business's billing details. */}
+              <div className="mb-3">
+                <FiscalIdentityLink />
+              </div>
               <FinanceSection token={token} />
             </CollapsibleSection>
 

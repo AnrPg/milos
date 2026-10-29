@@ -12075,5 +12075,102 @@
     "rowButton": "+ Betaling",
     "rowButtonLabel": "Betaling van {name} vastleggen",
     "panelButton": "+ Betaling vastleggen"
+  },
+  "FiscalIdentity": {
+    "backToSettings": "Instellingen",
+    "loading": "Laden…",
+    "loadFailed": "De factuurgegevens konden niet worden geladen. Probeer het zo opnieuw.",
+    "crumbSettings": "Instellingen",
+    "title": "Factuurgegevens",
+    "linkHint": "Staan op elk bonnetje en elke factuur",
+    "intro": "Staan op elk bonnetje en elke factuur. Zonder deze gegevens kunnen geen geldige documenten worden uitgegeven.",
+    "progress": "{percent}% klaar",
+    "ready": "Klaar. Bonnetjes en facturen worden rechtsgeldig uitgegeven.",
+    "rowCountry": "Land",
+    "countryDone": "{country} · {currency} · de velden zijn aangepast",
+    "countryStart": "Begin hier: al het andere hangt hiervan af",
+    "change": "Wijzigen",
+    "choose": "Kiezen",
+    "fill": "Invullen",
+    "afterCountry": "Na het land",
+    "legalNote": "Elke wijziging wordt vastgelegd. Al uitgegeven documenten houden de oude gegevens.",
+    "countryPanelTitle": "Land van het bedrijf",
+    "countryPanelHint": "Het land bepaalt de velden, de valuta, de taal en de regels van de documenten.",
+    "countryChangeWarning": "Als je het wijzigt, gaan de andere stappen opnieuw open.",
+    "done": "Klaar",
+    "cancel": "Annuleren",
+    "save": "Opslaan",
+    "saving": "Opslaan…",
+    "group": {
+      "business": "Bedrijf",
+      "address": "Adres van de zetel",
+      "tax": "Belastingen"
+    },
+    "scheme": {
+      "standard": "Normaal",
+      "small_business": "Kleine onderneming (zonder btw)",
+      "exempt": "Vrijgesteld van btw"
+    },
+    "field": {
+      "legal_name": "Statutaire naam",
+      "trade_name": "Handelsnaam",
+      "tax_id": "Fiscaal nummer",
+      "tax_office": "Belastingkantoor",
+      "street": "Straat en huisnummer",
+      "postal_code": "Postcode",
+      "city": "Plaats",
+      "region": "Staat",
+      "vat_scheme": "Btw-regeling",
+      "vat_number": "Btw-nummer",
+      "registration_number": "Inschrijvingsnummer",
+      "activity_code": "Code hoofdactiviteit",
+      "branch_code": "Vestigingsnummer (myDATA)",
+      "iban": "IBAN",
+      "qr_iban": "QR-IBAN"
+    },
+    "hint": {
+      "checkDigits": "We controleren de controlecijfers bij het opslaan.",
+      "greekVatNumber": "Het btw-nummer wordt vanzelf ingevuld: {number}.",
+      "branchCode": "Alleen wijzigen als je een vestiging hebt die bij de AADE is aangemeld.",
+      "optional": "Optioneel.",
+      "iban": "Optioneel. Staat op facturen die per overschrijving worden betaald.",
+      "qrIban": "Optioneel. Voor QR-facturen met een QR-referentie."
+    },
+    "reason": {
+      "blank": "Vul dit in.",
+      "check_digit": "Dit nummer is niet geldig: er klopt een cijfer niet. Vergelijk het met je papieren.",
+      "format": "Dit lijkt niet op een nummer van deze soort voor het gekozen land. Controleer het.",
+      "not_applicable": "Het gekozen land gebruikt dit nummer niet. Laat het leeg.",
+      "too_long": "Dit is te lang. Kort het in tot 200 tekens.",
+      "invalid": "Deze waarde is niet geldig. Controleer haar.",
+      "invalid_iban": "Deze IBAN is niet geldig. Vergelijk hem met je bankafschrift.",
+      "qr_iban_in_iban_field": "Dit is een QR-IBAN. Vul hem in bij QR-IBAN en zet hier je gewone IBAN.",
+      "qr_iban_country": "Een QR-IBAN bestaat alleen in Zwitserland en Liechtenstein.",
+      "not_a_qr_iban": "Dit is een gewone IBAN, geen QR-IBAN. Je bank geeft je de QR-IBAN apart."
+    },
+    "next": {
+      "noneTitle": "Geen volgende stap nodig",
+      "noneHint": "{country} vraagt niet om documenten door te sturen naar een belastingdienst.",
+      "mydataTitle": "Koppeling met myDATA",
+      "mydataActive": "Actief ({environment}). Elk document wordt naar de AADE gestuurd.",
+      "mydataInvalid": "De AADE heeft de koppelgegevens niet aanvaard. De documenten wachten en worden verstuurd zodra dit is opgelost.",
+      "mydataNone": "Nog niet gekoppeld. Documenten worden gewoon uitgegeven en naar de AADE gestuurd zodra de koppeling er is.",
+      "connected": "Gekoppeld",
+      "needsCheck": "Controle nodig",
+      "notConnected": "Niet gekoppeld",
+      "later": "Volgende stap, later: {step}",
+      "soon": "Binnenkort",
+      "tseTitle": "Kassabeveiligingsapparaat (TSE)",
+      "tseHint": "Alleen nodig voor betalingen aan de kassa. We koppelen het in een latere stap met fiskaly.",
+      "rksvTitle": "Kassabeveiligingsapparaat (RKSV)",
+      "rksvHint": "Alleen nodig voor betalingen aan de kassa. We koppelen het in een latere stap.",
+      "nf525Title": "NF525-verklaring",
+      "nf525Hint": "Het onveranderbare register is al actief. Palee levert de verklaring van de uitgever."
+    },
+    "environment": {
+      "sandbox": "sandbox",
+      "test": "test",
+      "production": "productie"
+    }
   }
 }

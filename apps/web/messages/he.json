@@ -12075,5 +12075,102 @@
     "rowButton": "+ תשלום",
     "rowButtonLabel": "רישום תשלום מ-{name}",
     "panelButton": "+ רישום תשלום"
+  },
+  "FiscalIdentity": {
+    "backToSettings": "הגדרות",
+    "loading": "טוען…",
+    "loadFailed": "לא הצלחנו לטעון את פרטי החיוב. נסו שוב בעוד רגע.",
+    "crumbSettings": "הגדרות",
+    "title": "פרטי חיוב",
+    "linkHint": "מודפסים על כל קבלה וחשבונית",
+    "intro": "מודפסים על כל קבלה וחשבונית. בלעדיהם אי אפשר להנפיק מסמכים חוקיים.",
+    "progress": "הושלם {percent}%",
+    "ready": "מוכן. קבלות וחשבוניות מונפקות כחוק.",
+    "rowCountry": "מדינה",
+    "countryDone": "{country} · {currency} · השדות הותאמו",
+    "countryStart": "התחילו כאן: כל השאר תלוי בזה",
+    "change": "שינוי",
+    "choose": "בחירה",
+    "fill": "מילוי",
+    "afterCountry": "אחרי המדינה",
+    "legalNote": "כל שינוי נרשם. מסמכים שכבר הונפקו שומרים על הפרטים הישנים.",
+    "countryPanelTitle": "מדינת העסק",
+    "countryPanelHint": "המדינה קובעת את השדות, את המטבע, את השפה ואת כללי המסמכים.",
+    "countryChangeWarning": "אם תשנו אותה, השלבים האחרים ייפתחו מחדש.",
+    "done": "סיום",
+    "cancel": "ביטול",
+    "save": "שמירה",
+    "saving": "שומר…",
+    "group": {
+      "business": "העסק",
+      "address": "כתובת רשומה",
+      "tax": "מיסים"
+    },
+    "scheme": {
+      "standard": "רגיל",
+      "small_business": "עסק קטן (ללא מע\"מ)",
+      "exempt": "פטור ממע\"מ"
+    },
+    "field": {
+      "legal_name": "שם משפטי",
+      "trade_name": "שם מסחרי",
+      "tax_id": "מספר מזהה לצורכי מס",
+      "tax_office": "משרד מס",
+      "street": "רחוב ומספר",
+      "postal_code": "מיקוד",
+      "city": "עיר",
+      "region": "מדינה (בארה\"ב)",
+      "vat_scheme": "משטר מע\"מ",
+      "vat_number": "מספר עוסק במע\"מ",
+      "registration_number": "מספר רישום החברה",
+      "activity_code": "קוד הפעילות העיקרית",
+      "branch_code": "מספר סניף (myDATA)",
+      "iban": "IBAN",
+      "qr_iban": "QR-IBAN"
+    },
+    "hint": {
+      "checkDigits": "נבדוק את ספרות הביקורת בשמירה.",
+      "greekVatNumber": "מספר המע\"מ ימולא אוטומטית: {number}.",
+      "branchCode": "שנו רק אם יש לכם סניף הרשום ב-AADE.",
+      "optional": "לא חובה.",
+      "iban": "לא חובה. מודפס על חשבוניות לתשלום בהעברה בנקאית.",
+      "qrIban": "לא חובה. לחשבוניות QR עם אסמכתת QR."
+    },
+    "reason": {
+      "blank": "מלאו את השדה.",
+      "check_digit": "המספר אינו תקין: אחת הספרות שגויה. בדקו מול המסמכים שלכם.",
+      "format": "זה לא נראה כמו מספר מסוג זה במדינה שנבחרה. בדקו אותו.",
+      "not_applicable": "המדינה שנבחרה לא משתמשת במספר הזה. השאירו את השדה ריק.",
+      "too_long": "הטקסט ארוך מדי. קצרו ל-200 תווים.",
+      "invalid": "הערך אינו תקין. בדקו אותו.",
+      "invalid_iban": "ה-IBAN אינו תקין. בדקו מול דף החשבון.",
+      "qr_iban_in_iban_field": "זהו QR-IBAN. הזינו אותו בשדה QR-IBAN, וכאן את ה-IBAN הרגיל.",
+      "qr_iban_country": "QR-IBAN קיים רק בשווייץ ובליכטנשטיין.",
+      "not_a_qr_iban": "זהו IBAN רגיל ולא QR-IBAN. הבנק נותן את ה-QR-IBAN בנפרד."
+    },
+    "next": {
+      "noneTitle": "לא נדרש שלב נוסף",
+      "noneHint": "המדינה «{country}» לא דורשת לשלוח מסמכים לרשות מס.",
+      "mydataTitle": "חיבור ל-myDATA",
+      "mydataActive": "פעיל ({environment}). כל מסמך נשלח ל-AADE.",
+      "mydataInvalid": "‏AADE לא קיבלה את פרטי החיבור. המסמכים ממתינים וישלחו ברגע שזה יתוקן.",
+      "mydataNone": "עדיין לא מחובר. המסמכים מונפקים כרגיל ונשלחים ל-AADE ברגע שיתחבר.",
+      "connected": "מחובר",
+      "needsCheck": "דורש בדיקה",
+      "notConnected": "לא מחובר",
+      "later": "השלב הבא, בהמשך: {step}",
+      "soon": "בקרוב",
+      "tseTitle": "התקן אבטחה לקופה (TSE)",
+      "tseHint": "נדרש רק לתשלומים בקופה. נחבר אותו דרך fiskaly בשלב מאוחר יותר.",
+      "rksvTitle": "התקן אבטחה לקופה (RKSV)",
+      "rksvHint": "נדרש רק לתשלומים בקופה. נחבר אותו בשלב מאוחר יותר.",
+      "nf525Title": "אישור NF525",
+      "nf525Hint": "היומן הבלתי ניתן לשינוי כבר פעיל. את אישור המפרסם מספקת Palee."
+    },
+    "environment": {
+      "sandbox": "סביבת ניסוי",
+      "test": "בדיקה",
+      "production": "סביבת ייצור"
+    }
   }
 }

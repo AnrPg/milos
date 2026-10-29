@@ -12075,5 +12075,102 @@
     "rowButton": "+ Payment",
     "rowButtonLabel": "Record a payment from {name}",
     "panelButton": "+ Record payment"
+  },
+  "FiscalIdentity": {
+    "backToSettings": "Settings",
+    "loading": "Loading…",
+    "loadFailed": "The billing details could not be loaded. Try again in a moment.",
+    "crumbSettings": "Settings",
+    "title": "Billing details",
+    "linkHint": "Printed on every receipt and invoice",
+    "intro": "Printed on every receipt and invoice. Without them no legal documents can be issued.",
+    "progress": "{percent}% complete",
+    "ready": "Done. Receipts and invoices are issued legally.",
+    "rowCountry": "Country",
+    "countryDone": "{country} · {currency} · the fields were adjusted",
+    "countryStart": "Start here: everything else depends on it",
+    "change": "Change",
+    "choose": "Choose",
+    "fill": "Fill in",
+    "afterCountry": "After the country",
+    "legalNote": "Every change is recorded. Documents already issued keep the old details.",
+    "countryPanelTitle": "Country of the business",
+    "countryPanelHint": "The country decides the fields, the currency, the language and the rules of the documents.",
+    "countryChangeWarning": "If you change it, the other steps open again.",
+    "done": "Done",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "group": {
+      "business": "Business",
+      "address": "Registered address",
+      "tax": "Tax"
+    },
+    "scheme": {
+      "standard": "Standard",
+      "small_business": "Small business (no VAT)",
+      "exempt": "VAT exempt"
+    },
+    "field": {
+      "legal_name": "Legal name",
+      "trade_name": "Trading name",
+      "tax_id": "Tax ID",
+      "tax_office": "Tax office",
+      "street": "Street and number",
+      "postal_code": "Postcode",
+      "city": "City",
+      "region": "State",
+      "vat_scheme": "VAT scheme",
+      "vat_number": "VAT number",
+      "registration_number": "Company registration number",
+      "activity_code": "Main activity code",
+      "branch_code": "Branch number (myDATA)",
+      "iban": "IBAN",
+      "qr_iban": "QR-IBAN"
+    },
+    "hint": {
+      "checkDigits": "We check the check digits when you save.",
+      "greekVatNumber": "The VAT number is filled in by itself: {number}.",
+      "branchCode": "Change it only if you have a branch registered with AADE.",
+      "optional": "Optional.",
+      "iban": "Optional. Printed on invoices to be paid by bank transfer.",
+      "qrIban": "Optional. For QR-bills with a QR reference."
+    },
+    "reason": {
+      "blank": "Fill this in.",
+      "check_digit": "This number is not valid: a digit is wrong. Check it against your papers.",
+      "format": "This doesn't look like a number of this kind for the chosen country. Check it.",
+      "not_applicable": "The chosen country doesn't use this number. Leave it empty.",
+      "too_long": "This is too long. Shorten it to 200 characters.",
+      "invalid": "This value isn't valid. Check it.",
+      "invalid_iban": "This IBAN is not valid. Check it against your bank statement.",
+      "qr_iban_in_iban_field": "This is a QR-IBAN. Enter it in the QR-IBAN field and put your plain IBAN here.",
+      "qr_iban_country": "A QR-IBAN is used only in Switzerland and Liechtenstein.",
+      "not_a_qr_iban": "This is a plain IBAN, not a QR-IBAN. Your bank gives you the QR-IBAN separately."
+    },
+    "next": {
+      "noneTitle": "No further step needed",
+      "noneHint": "{country} does not ask for documents to be sent to a tax authority.",
+      "mydataTitle": "Connection with myDATA",
+      "mydataActive": "Active ({environment}). Every document is sent to AADE.",
+      "mydataInvalid": "AADE did not accept the connection details. Documents wait and are sent once this is fixed.",
+      "mydataNone": "Not connected yet. Documents are issued normally and are sent to AADE once connected.",
+      "connected": "Connected",
+      "needsCheck": "Needs a check",
+      "notConnected": "Not connected",
+      "later": "Next step, later: {step}",
+      "soon": "Soon",
+      "tseTitle": "Till security device (TSE)",
+      "tseHint": "Needed only for payments at the till. We connect it with fiskaly in a later step.",
+      "rksvTitle": "Till security device (RKSV)",
+      "rksvHint": "Needed only for payments at the till. We connect it in a later step.",
+      "nf525Title": "NF525 attestation",
+      "nf525Hint": "The inalterable register is already active. Palee provides the publisher's attestation."
+    },
+    "environment": {
+      "sandbox": "sandbox",
+      "test": "test",
+      "production": "production"
+    }
   }
 }

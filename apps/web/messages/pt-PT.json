@@ -12075,5 +12075,102 @@
     "rowButton": "+ Pagamento",
     "rowButtonLabel": "Registar um pagamento de {name}",
     "panelButton": "+ Registar pagamento"
+  },
+  "FiscalIdentity": {
+    "backToSettings": "Definições",
+    "loading": "A carregar…",
+    "loadFailed": "Não foi possível carregar os dados de faturação. Tenta novamente daqui a pouco.",
+    "crumbSettings": "Definições",
+    "title": "Dados de faturação",
+    "linkHint": "Impressos em cada recibo e fatura",
+    "intro": "Impressos em cada recibo e fatura. Sem eles não é possível emitir documentos legais.",
+    "progress": "{percent}% concluído",
+    "ready": "Pronto. Os recibos e as faturas são emitidos legalmente.",
+    "rowCountry": "País",
+    "countryDone": "{country} · {currency} · os campos foram ajustados",
+    "countryStart": "Começa aqui: tudo o resto depende disto",
+    "change": "Alterar",
+    "choose": "Escolher",
+    "fill": "Preencher",
+    "afterCountry": "Depois do país",
+    "legalNote": "Cada alteração fica registada. Os documentos já emitidos mantêm os dados antigos.",
+    "countryPanelTitle": "País da empresa",
+    "countryPanelHint": "Do país dependem os campos, a moeda, a língua e as regras dos documentos.",
+    "countryChangeWarning": "Se o alterares, os outros passos voltam a abrir.",
+    "done": "Concluir",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "saving": "A guardar…",
+    "group": {
+      "business": "Empresa",
+      "address": "Morada da sede",
+      "tax": "Dados fiscais"
+    },
+    "scheme": {
+      "standard": "Normal",
+      "small_business": "Pequena empresa (sem IVA)",
+      "exempt": "Isento de IVA"
+    },
+    "field": {
+      "legal_name": "Denominação social",
+      "trade_name": "Nome comercial",
+      "tax_id": "Número de identificação fiscal",
+      "tax_office": "Serviço de finanças",
+      "street": "Rua e número",
+      "postal_code": "Código postal",
+      "city": "Cidade",
+      "region": "Estado",
+      "vat_scheme": "Regime de IVA",
+      "vat_number": "Número de IVA",
+      "registration_number": "Número de registo comercial",
+      "activity_code": "Código da atividade principal",
+      "branch_code": "Número de estabelecimento (myDATA)",
+      "iban": "IBAN",
+      "qr_iban": "QR-IBAN"
+    },
+    "hint": {
+      "checkDigits": "Verificamos os dígitos de controlo ao guardar.",
+      "greekVatNumber": "O número de IVA é preenchido automaticamente: {number}.",
+      "branchCode": "Altera apenas se tiveres um estabelecimento registado na AADE.",
+      "optional": "Opcional.",
+      "iban": "Opcional. Impresso nas faturas a pagar por transferência.",
+      "qrIban": "Opcional. Para faturas QR com referência QR."
+    },
+    "reason": {
+      "blank": "Preenche este campo.",
+      "check_digit": "Este número não é válido: há um dígito errado. Confirma nos teus documentos.",
+      "format": "Não parece um número deste tipo para o país escolhido. Confirma-o.",
+      "not_applicable": "O país escolhido não usa este número. Deixa-o vazio.",
+      "too_long": "É demasiado longo. Reduz para 200 caracteres.",
+      "invalid": "Este valor não é válido. Confirma-o.",
+      "invalid_iban": "Este IBAN não é válido. Confirma-o no extrato bancário.",
+      "qr_iban_in_iban_field": "Isto é um QR-IBAN. Coloca-o no campo QR-IBAN e aqui o teu IBAN normal.",
+      "qr_iban_country": "O QR-IBAN só é usado na Suíça e no Listenstaine.",
+      "not_a_qr_iban": "Isto é um IBAN normal, não um QR-IBAN. O banco dá-te o QR-IBAN em separado."
+    },
+    "next": {
+      "noneTitle": "Não é preciso mais nenhum passo",
+      "noneHint": "{country} não exige o envio dos documentos a uma autoridade fiscal.",
+      "mydataTitle": "Ligação ao myDATA",
+      "mydataActive": "Ativa ({environment}). Cada documento é enviado à AADE.",
+      "mydataInvalid": "A AADE não aceitou os dados de ligação. Os documentos aguardam e são enviados assim que isto for corrigido.",
+      "mydataNone": "Ainda sem ligação. Os documentos são emitidos normalmente e enviados à AADE assim que houver ligação.",
+      "connected": "Ligado",
+      "needsCheck": "Precisa de verificação",
+      "notConnected": "Sem ligação",
+      "later": "Próximo passo, mais tarde: {step}",
+      "soon": "Em breve",
+      "tseTitle": "Dispositivo de segurança da caixa (TSE)",
+      "tseHint": "Só é preciso para pagamentos na caixa. Ligamo-lo ao fiskaly num passo posterior.",
+      "rksvTitle": "Dispositivo de segurança da caixa (RKSV)",
+      "rksvHint": "Só é preciso para pagamentos na caixa. Ligamo-lo num passo posterior.",
+      "nf525Title": "Certificação NF525",
+      "nf525Hint": "O registo inalterável já está ativo. A Palee fornece a certificação do editor."
+    },
+    "environment": {
+      "sandbox": "ambiente de testes",
+      "test": "teste",
+      "production": "produção"
+    }
   }
 }
