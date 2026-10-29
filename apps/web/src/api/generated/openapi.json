@@ -183574,9 +183574,10 @@
       }
     },
     "/api/org/{organization_slug}/admin/payments/account": {
-      "get": {
+      "delete": {
         "callbacks": {},
-        "operationId": "PaleeWeb.AdminPaymentsController.account",
+        "description": "A one-button connection also loses Palee's access at the provider.",
+        "operationId": "PaleeWeb.AdminPaymentsController.disconnect",
         "parameters": [],
         "responses": {
           "200": {
@@ -183590,6 +183591,13 @@
                         "checked_at": {
                           "format": "date-time",
                           "nullable": true,
+                          "type": "string"
+                        },
+                        "connection": {
+                          "enum": [
+                            "keys",
+                            "platform"
+                          ],
                           "type": "string"
                         },
                         "credentials_set": {
@@ -183683,6 +183691,7 @@
                         }
                       },
                       "required": [
+                        "connection",
                         "credentials_set",
                         "environment",
                         "id",
@@ -183692,6 +183701,16 @@
                         "status",
                         "webhook_url"
                       ],
+                      "type": "object"
+                    },
+                    "connect_providers": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "description": "Providers that connect with one button, per environment (ADR-261)",
                       "type": "object"
                     },
                     "environments": {
@@ -183709,6 +183728,181 @@
                   },
                   "required": [
                     "account",
+                    "connect_providers",
+                    "environments",
+                    "providers"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Account"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Stop online payments: saved cards are no longer charged",
+        "tags": [
+          "Payments"
+        ]
+      },
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminPaymentsController.account",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "account": {
+                      "nullable": true,
+                      "properties": {
+                        "checked_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "connection": {
+                          "enum": [
+                            "keys",
+                            "platform"
+                          ],
+                          "type": "string"
+                        },
+                        "credentials_set": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "environment": {
+                          "enum": [
+                            "test",
+                            "live"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "options": {
+                          "properties": {
+                            "notify_member": {
+                              "type": "boolean"
+                            },
+                            "notify_staff": {
+                              "type": "boolean"
+                            },
+                            "purposes": {
+                              "properties": {
+                                "autopay": {
+                                  "type": "boolean"
+                                },
+                                "drop_in": {
+                                  "type": "boolean"
+                                },
+                                "packages": {
+                                  "type": "boolean"
+                                },
+                                "personal_training": {
+                                  "type": "boolean"
+                                },
+                                "shop": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "autopay",
+                                "drop_in",
+                                "packages",
+                                "personal_training",
+                                "shop"
+                              ],
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "notify_member",
+                            "notify_staff",
+                            "purposes"
+                          ],
+                          "type": "object"
+                        },
+                        "provider": {
+                          "enum": [
+                            "sandbox",
+                            "viva",
+                            "stripe"
+                          ],
+                          "type": "string"
+                        },
+                        "settings": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "webhook_url": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "connection",
+                        "credentials_set",
+                        "environment",
+                        "id",
+                        "options",
+                        "provider",
+                        "settings",
+                        "status",
+                        "webhook_url"
+                      ],
+                      "type": "object"
+                    },
+                    "connect_providers": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "description": "Providers that connect with one button, per environment (ADR-261)",
+                      "type": "object"
+                    },
+                    "environments": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "providers": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "account",
+                    "connect_providers",
                     "environments",
                     "providers"
                   ],
@@ -183817,6 +184011,13 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "connection": {
+                          "enum": [
+                            "keys",
+                            "platform"
+                          ],
+                          "type": "string"
+                        },
                         "credentials_set": {
                           "items": {
                             "type": "string"
@@ -183908,6 +184109,7 @@
                         }
                       },
                       "required": [
+                        "connection",
                         "credentials_set",
                         "environment",
                         "id",
@@ -183917,6 +184119,16 @@
                         "status",
                         "webhook_url"
                       ],
+                      "type": "object"
+                    },
+                    "connect_providers": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "description": "Providers that connect with one button, per environment (ADR-261)",
                       "type": "object"
                     },
                     "environments": {
@@ -183934,6 +184146,7 @@
                   },
                   "required": [
                     "account",
+                    "connect_providers",
                     "environments",
                     "providers"
                   ],
@@ -184013,6 +184226,13 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "connection": {
+                          "enum": [
+                            "keys",
+                            "platform"
+                          ],
+                          "type": "string"
+                        },
                         "credentials_set": {
                           "items": {
                             "type": "string"
@@ -184104,6 +184324,7 @@
                         }
                       },
                       "required": [
+                        "connection",
                         "credentials_set",
                         "environment",
                         "id",
@@ -184113,6 +184334,16 @@
                         "status",
                         "webhook_url"
                       ],
+                      "type": "object"
+                    },
+                    "connect_providers": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "description": "Providers that connect with one button, per environment (ADR-261)",
                       "type": "object"
                     },
                     "environments": {
@@ -184130,6 +184361,7 @@
                   },
                   "required": [
                     "account",
+                    "connect_providers",
                     "environments",
                     "providers"
                   ],
@@ -184329,6 +184561,73 @@
           }
         ],
         "summary": "Saved-card charges that need a person (Ουρές)",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/payments/connect": {
+      "post": {
+        "callbacks": {},
+        "description": "Answers the provider page to send the owner to. There they sign in or open a merchant account and allow Palee; the provider sends them back to `/api/payments/connect/callback`, which opens the settings page with `connect=ok` or `connect=<error code>`.",
+        "operationId": "PaleeWeb.AdminPaymentsController.connect",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "environment": {
+                    "default": "live",
+                    "enum": [
+                      "test",
+                      "live"
+                    ],
+                    "type": "string"
+                  },
+                  "provider": {
+                    "enum": [
+                      "viva",
+                      "stripe"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "provider"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "url"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Provider page"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Start connecting the business's Stripe or Viva account with one button",
         "tags": [
           "Payments"
         ]
