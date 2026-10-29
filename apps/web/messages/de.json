@@ -12915,5 +12915,23 @@
       "description": "Die Arten, die Coaches für ein WOD wählen können",
       "hint": "Tippe auf eine Art, um sie in den WOD-Editoren auszublenden. Ein WOD mit einer ausgeblendeten Art behält sie."
     }
+  },
+  "SaveBar": {
+    "region": "Ungespeicherte Änderungen",
+    "unsaved": "{count, plural, one {# ungespeicherte Änderung} other {# ungespeicherte Änderungen}}",
+    "noChanges": "Keine Änderungen",
+    "undo": "Rückgängig",
+    "undoHint": "Rückgängig (Strg+Z)",
+    "redo": "Wiederholen",
+    "redoHint": "Wiederholen (Strg+Umschalt+Z)",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "saving": "Wird gespeichert…",
+    "saved": "Änderungen gespeichert.",
+    "leaveTitle": "Du hast ungespeicherte Änderungen",
+    "leaveBody": "Speichere sie, bevor du diesen Tab verlässt, oder verwirf sie.",
+    "leaveStay": "Hierbleiben",
+    "leaveDiscard": "Verwerfen",
+    "changed": "Geändert"
   }
 }

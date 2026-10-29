@@ -229,5 +229,6 @@ must have an ADR. See `template.md` for the format.
 | ADR-232 | Staff book or move a member into a class: one transaction, no late charge, server-listed choices | Accepted |
 | ADR-270 | Structured WOD plan: flow, set structure and add-ons (presets as shortcuts), values stored as typed in `workout_sections.plan` | Accepted |
 | ADR-275 | Workout types: one fixed list grouped in families (martial arts and dance included), the gym chooses which its editors offer; stats, badges and colours read the family | Accepted |
+| ADR-276 | Unsaved edits on staff forms: draft with undo/redo, save bar, ask before leaving a tab | Accepted |
 | ADR-300 | Operation registry: one spec per use case generates REST, MCP and LLM tools; previewable commands, problem details, idempotency keys, ETags (v4) | Proposed |
 | ADR-301 | AI agents as delegated principals: rights intersected on every call, durable runs, Rule-of-Two policy, approvals, one LLM provider port, multi-agent via delegation (v4) | Proposed |

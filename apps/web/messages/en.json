@@ -12915,5 +12915,23 @@
       "description": "The types coaches can pick for a WOD",
       "hint": "Tap a type to hide it from the WOD editors. A WOD that already has a hidden type keeps it."
     }
+  },
+  "SaveBar": {
+    "region": "Unsaved changes",
+    "unsaved": "{count, plural, one {# unsaved change} other {# unsaved changes}}",
+    "noChanges": "No changes",
+    "undo": "Undo",
+    "undoHint": "Undo (Ctrl+Z)",
+    "redo": "Redo",
+    "redoHint": "Redo (Ctrl+Shift+Z)",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Changes saved.",
+    "leaveTitle": "You have unsaved changes",
+    "leaveBody": "Save them before you leave this tab, or discard them.",
+    "leaveStay": "Stay here",
+    "leaveDiscard": "Discard",
+    "changed": "Changed"
   }
 }

@@ -2,7 +2,8 @@ import { expect, test, type Page, type Request } from "./support/test";
 import { chooseOption } from "./support/select";
 
 // ADR-220, staff side: on a box member's profile (Finance tab) staff see the
-// member's own automatic renewal, can change it for them, mark them as
+// member's own automatic renewal, can change it for them (ADR-276: saved
+// with the tab's «Save», not on the click), mark them as
 // leaving (end of the paid period, today or a date) and undo it. The API is
 // stubbed; every route not listed answers an empty object.
 
@@ -134,7 +135,11 @@ test.describe("member leaving (staff)", () => {
 
     await renewal.click();
     await expect(renewal).not.toBeChecked();
+    await expect(page.getByTestId("profile-save-bar-count")).toHaveText("1 unsaved change");
+    expect(calls).toHaveLength(0);
+    await page.getByTestId("profile-save-bar-save").click();
     await expect(card.getByText("Last changed by staff", { exact: false })).toBeVisible();
+    await expect(page.getByTestId("profile-save-bar")).toContainText("Changes saved.");
     expect(calls[0]).toMatchObject({ method: "PUT", path: "/api/org/box1/admin/finance/members/u-2/subscriptions/sub-1/auto-renew", body: { auto_renew: false } });
 
     await card.getByTestId("admin-leave-open").click();

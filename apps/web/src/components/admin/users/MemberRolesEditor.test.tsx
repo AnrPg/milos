@@ -51,7 +51,7 @@ describe("Roles in this box (ADR-219)", () => {
     expect(screen.getByRole("button", { name: "Owner" })).toBeDisabled();
     expect(screen.getByText(en.Ui.myRolesHelp)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Coach" }));
-    fireEvent.click(screen.getByRole("button", { name: "Save roles" }));
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
     await waitFor(() => expect(updateMemberRoles).toHaveBeenCalledWith("access", "me", ["owner", "coach"]));
   });
