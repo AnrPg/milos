@@ -29,7 +29,7 @@ defmodule Palee.Application.Payments.OnlineSales do
       {:ok,
        %{
          packages: context |> sold_online() |> Enum.map(&public_package/1),
-         online_payments: Payments.available?(context),
+         online_payments: Payments.available?(context, "packages"),
          withdrawal_days: if(withdrawal_applies?(context), do: Withdrawal.days())
        }}
     end
@@ -39,7 +39,13 @@ defmodule Palee.Application.Payments.OnlineSales do
     context
     |> Finance.list_packages()
     |> Enum.filter(&(&1.active and &1[:sold_online] == true and &1.base_price_cents > 0))
+    |> Enum.filter(&Payments.available?(context, online_purpose(&1)))
   end
+
+  # ADR-260: which «what is paid online» switch covers a package.
+  defp online_purpose(%{package_type: "pt_pack"}), do: "personal_training"
+  defp online_purpose(%{package_type: type}) when type in ["drop_in", "trial"], do: "drop_in"
+  defp online_purpose(_package), do: "packages"
 
   defp public_package(package) do
     Map.take(package, [
@@ -62,7 +68,7 @@ defmodule Palee.Application.Payments.OnlineSales do
       {:ok,
        %{
          package: public_package(package),
-         available: Payments.available?(context),
+         available: Payments.available?(context, online_purpose(package)),
          withdrawal_days: if(applies, do: Withdrawal.days()),
          start_now_text: if(applies, do: Withdrawal.text(language)),
          consent_text: Consent.text(language, card_terms(context, package, language)),
@@ -82,6 +88,9 @@ defmodule Palee.Application.Payments.OnlineSales do
     now = DateTime.utc_now()
 
     with {:ok, package} <- package_for_sale(context, package_id),
+         true <-
+           Payments.available?(context, online_purpose(package)) ||
+             {:error, :online_payments_unavailable},
          {:ok, withdrawal} <-
            Withdrawal.record(
              withdrawal_applies?(context),

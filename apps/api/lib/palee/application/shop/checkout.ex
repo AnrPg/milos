@@ -69,7 +69,7 @@ defmodule Palee.Application.Shop.Checkout do
   @doc "The online-payment flag the basket shows: `%{available, reason, provider}`."
   def online_payment(context) do
     # ADR-248: the business's own provider account (ADR-246) when connected.
-    if Payments.available?(context),
+    if Payments.available?(context, "shop"),
       do: %{available: true, reason: nil, provider: "online"},
       else: context |> Shop.online_payment() |> Map.take([:available, :reason, :provider])
   end

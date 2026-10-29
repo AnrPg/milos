@@ -230,7 +230,7 @@ defmodule Palee.Application.Payments.OnlinePayments do
   through or are being retried.
   """
   def autopay(context, now \\ DateTime.utc_now()) do
-    if Payments.available?(context) do
+    if Payments.available?(context, "autopay") do
       today = Palee.Organizations.local_today(context.organization_id, now)
 
       context
