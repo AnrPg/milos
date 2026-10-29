@@ -4,7 +4,7 @@ import { keepPreviousData, useInfiniteQuery, useMutation, useQuery, useQueryClie
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState, type CSSProperties, type DragEvent, type ReactNode } from "react";
+import { useEffect, useState, type CSSProperties, type DragEvent, type ReactNode } from "react";
 
 import { ApiError } from "@/api/client";
 import {
@@ -169,7 +169,8 @@ export function CsvImport() {
   const params = useSearchParams();
   const id = params.get("import");
   // The file stays in memory for «Άλλο σύστημα» (upload again with another preset).
-  const fileRef = useRef<File | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const fileSlot: FileSlot = { file, set: setFile };
   const supportEmail = process.env.NEXT_PUBLIC_SUPPORT_EMAIL;
 
   const open = (next: string | null) => router.replace(next ? `${pathname}?import=${next}` : pathname);
@@ -200,24 +201,27 @@ export function CsvImport() {
         {!token ? (
           <p className="text-sm" style={quiet}>{t("loading")}</p>
         ) : id ? (
-          <ImportView key={id} token={token} id={id} fileRef={fileRef} onOpen={open} />
+          <ImportView key={id} token={token} id={id} fileSlot={fileSlot} onOpen={open} />
         ) : (
-          <StartView token={token} fileRef={fileRef} onOpen={open} />
+          <StartView token={token} fileSlot={fileSlot} onOpen={open} />
         )}
       </div>
     </main>
   );
 }
 
+/** The dropped file, kept in memory for «Άλλο σύστημα» (upload again with another preset). */
+type FileSlot = { file: File | null; set: (file: File | null) => void };
+
 // ── Start: drop the file ─────────────────────────────────────────────────────
 
 function StartView({
   token,
-  fileRef,
+  fileSlot,
   onOpen,
 }: {
   token: string;
-  fileRef: React.MutableRefObject<File | null>;
+  fileSlot: FileSlot;
   onOpen: (id: string | null) => void;
 }) {
   const t = useTranslations("CsvImport");
@@ -229,7 +233,7 @@ function StartView({
 
   const upload = useMutation({
     mutationFn: async (file: File) => {
-      fileRef.current = file;
+      fileSlot.set(file);
       const created = await uploadImport(token, file, null);
       return previewImport(token, created.id);
     },
@@ -328,12 +332,12 @@ function StartView({
 function ImportView({
   token,
   id,
-  fileRef,
+  fileSlot,
   onOpen,
 }: {
   token: string;
   id: string;
-  fileRef: React.MutableRefObject<File | null>;
+  fileSlot: FileSlot;
   onOpen: (id: string | null) => void;
 }) {
   const t = useTranslations("CsvImport");
@@ -380,7 +384,7 @@ function ImportView({
   }
 
   if (phase === "review") {
-    return <ReviewView token={token} entry={entry} sample={sample.data!.rows} fileRef={fileRef} onOpen={onOpen} />;
+    return <ReviewView token={token} entry={entry} sample={sample.data!.rows} fileSlot={fileSlot} onOpen={onOpen} />;
   }
   if (phase === "applying") return <ApplyingView entry={entry} />;
   if (phase === "undone") return <UndoneView onOpen={onOpen} />;
@@ -393,13 +397,13 @@ function ReviewView({
   token,
   entry,
   sample,
-  fileRef,
+  fileSlot,
   onOpen,
 }: {
   token: string;
   entry: PeopleImport;
   sample: ImportRow[];
-  fileRef: React.MutableRefObject<File | null>;
+  fileSlot: FileSlot;
   onOpen: (id: string | null) => void;
 }) {
   const t = useTranslations("CsvImport");
@@ -447,7 +451,7 @@ function ReviewView({
   const discard = useMutation({
     mutationFn: () => deleteImport(token, entry.id),
     onSuccess: () => {
-      fileRef.current = null;
+      fileSlot.set(null);
       void queryClient.invalidateQueries({ queryKey: [...KEY, "list"] });
       onOpen(null);
     },
@@ -455,7 +459,7 @@ function ReviewView({
 
   const reupload = useMutation({
     mutationFn: async (source: ImportSource) => {
-      const file = fileRef.current;
+      const file = fileSlot.file;
       if (!file) throw new Error("import_file_missing");
       const created = await uploadImport(token, file, source);
       const previewed = await previewImport(token, created.id);
@@ -490,7 +494,7 @@ function ReviewView({
                 ? t("recognizedExcel", { rows: entry.row_count })
                 : t("recognized", { source: sourceName(t, entry.source), rows: entry.row_count })}
               {" · "}
-              {fileRef.current ? (
+              {fileSlot.file ? (
                 <>
                   <button type="button" className="font-semibold underline" style={{ color: "var(--primary)" }} onClick={() => setSystemOpen((v) => !v)}>
                     {t("otherSystem")}
@@ -510,7 +514,7 @@ function ReviewView({
             </p>
           </div>
         </div>
-        {systemOpen && fileRef.current ? (
+        {systemOpen && fileSlot.file ? (
           <div className="max-w-xs space-y-1">
             <span id="import-system-label" className="block text-xs font-semibold" style={quiet}>{t("systemLabel")}</span>
             <Select
