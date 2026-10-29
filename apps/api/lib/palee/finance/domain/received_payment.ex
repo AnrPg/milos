@@ -12,6 +12,9 @@ defmodule Palee.Finance.Domain.ReceivedPayment do
   """
 
   @methods ["cash", "card_manual", "bank_transfer", "other"]
+  # ADR-246: recorded by Palee after the provider confirmed a payment;
+  # never offered at the desk.
+  @online_methods ["online"]
   @document_modes ["invoice", "receipt"]
 
   @type document :: :settle_invoice | :receipt | :invoice
@@ -39,10 +42,17 @@ defmodule Palee.Finance.Domain.ReceivedPayment do
   """
   def validate(params) when is_map(params) do
     cond do
-      blank?(params["idempotency_key"]) -> {:error, :idempotency_key_required}
-      params["payment_method"] not in @methods -> {:error, :invalid_payment_method}
-      not positive_integer?(params["amount_cents"]) -> {:error, :invalid_payment_amount}
-      true -> :ok
+      blank?(params["idempotency_key"]) ->
+        {:error, :idempotency_key_required}
+
+      params["payment_method"] not in (@methods ++ @online_methods) ->
+        {:error, :invalid_payment_method}
+
+      not positive_integer?(params["amount_cents"]) ->
+        {:error, :invalid_payment_amount}
+
+      true ->
+        :ok
     end
   end
 

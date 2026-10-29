@@ -230,6 +230,37 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: to_string(reason), error: message})
   end
 
+  # ADR-246/247: online payments.
+  @payment_errors %{
+    online_payments_unavailable: {:conflict, "Online payments are not set up for this business"},
+    payment_provider_unavailable:
+      {:service_unavailable, "The payment provider did not answer; try again in a moment"},
+    payment_provider_rejected_credentials:
+      {:conflict, "The payment provider refused the business's credentials"},
+    payment_declined: {:payment_required, "The card was declined"},
+    invalid_payment_purpose: {:unprocessable_entity, "Nothing to pay for"},
+    unsupported_currency: {:unprocessable_entity, "This currency is not supported"},
+    duplicate_idempotency_key:
+      {:conflict, "This idempotency key was already used for a different request"},
+    consent_required: {:unprocessable_entity, "Agree to save the card first"},
+    invalid_consent_limit: {:unprocessable_entity, "The amount to allow is missing"},
+    payment_method_inactive: {:conflict, "This card can no longer be charged"},
+    consent_currency_mismatch: {:conflict, "The card was saved for another currency"},
+    consent_limit_exceeded: {:conflict, "More than the amount the payer allowed"},
+    payment_method_expired: {:conflict, "The card has expired"},
+    refund_exceeds_payment: {:unprocessable_entity, "More than what is left of the payment"},
+    refund_refused: {:conflict, "The payment provider refused the refund"},
+    invoice_not_payable: {:conflict, "This invoice has nothing left to pay"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@payment_errors, reason) do
+    {status, message} = Map.fetch!(@payment_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
   # ADR-253: box screens.
   @box_screen_errors %{
     invalid_pairing_code:

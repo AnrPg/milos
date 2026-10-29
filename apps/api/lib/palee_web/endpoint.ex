@@ -55,6 +55,8 @@ defmodule PaleeWeb.Endpoint do
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
+    # ADR-246: payment webhooks keep their raw body for signature checks.
+    body_reader: {PaleeWeb.Plugs.CacheRawBody, :read_body, []},
     json_decoder: Phoenix.json_library()
 
   plug Plug.MethodOverride

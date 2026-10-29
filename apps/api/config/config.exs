@@ -68,7 +68,10 @@ config :palee, Oban,
        # ADR-242: fiscal day/month/year closings on each gym's own clock.
        {"20 * * * *", Palee.Workers.CloseFiscalPeriodsJob},
        # ADR-243: retries and deferred reports to the tax authority.
-       {"*/5 * * * *", Palee.Workers.TransmitFiscalDocumentsJob}
+       {"*/5 * * * *", Palee.Workers.TransmitFiscalDocumentsJob},
+       # ADR-246/247: settle online payments; hourly autopay of due invoices.
+       {"*/3 * * * *", Palee.Workers.ProcessPaymentsJob},
+       {"11 * * * *", Palee.Workers.ProcessPaymentsJob, args: %{"autopay" => true}}
      ]}
   ],
   queues: [
@@ -82,7 +85,9 @@ config :palee, Oban,
     # to exact (each job counts today's sent mail before it sends).
     email: 2,
     # ADR-243: reports to the tax authority (one HTTP call per document).
-    fiscal: 2
+    fiscal: 2,
+    # ADR-246: provider calls for online payments.
+    payments: 2
   ]
 
 config :palee, Palee.Infrastructure.Auth.Guardian,
@@ -163,6 +168,16 @@ config :palee, :fiscal_authority_gateways, %{
   "sandbox" => Palee.Infrastructure.Fiscal.SandboxAuthorityGateway,
   "test" => Palee.Infrastructure.Fiscal.MyDataGateway,
   "production" => Palee.Infrastructure.Fiscal.MyDataGateway
+}
+
+# ADR-246/247: online payments through the business's own provider account.
+config :palee, :payment_store, Palee.Infrastructure.Payments.EctoPaymentStore
+config :palee, :payment_fulfilment, Palee.Application.Payments.FinanceFulfilment
+
+config :palee, :payment_gateways, %{
+  "sandbox" => Palee.Infrastructure.Payments.SandboxGateway,
+  "viva" => Palee.Infrastructure.Payments.VivaGateway,
+  "stripe" => Palee.Infrastructure.Payments.StripeGateway
 }
 
 # ADR-190: the e-shop and Finance's revenue streams.

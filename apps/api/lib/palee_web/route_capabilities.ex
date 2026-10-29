@@ -237,6 +237,13 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminFiscalReportingController, :save_connection} => [:manage_billing],
     {W.AdminFiscalReportingController, :transmissions} => [:view_finance_reports],
     {W.AdminFiscalReportingController, :retry} => [:manage_billing],
+    # ADR-246/247: online payments.
+    {W.AdminPaymentsController, :account} => [:view_finance_reports, :manage_billing],
+    {W.AdminPaymentsController, :save_account} => [:manage_billing],
+    {W.AdminPaymentsController, :index} => [:view_finance_reports, :manage_billing],
+    {W.AdminPaymentsController, :show} => [:view_finance_reports, :manage_billing],
+    {W.AdminPaymentsController, :refund} => [:manage_billing],
+    {W.AdminPaymentsController, :retry} => [:manage_billing],
     # ADR-192: shop reports read like the business statistics; the
     # reconciliation is also a finance check; targets are a setting.
     {W.AdminShopReportController, :reconciliation} => [

@@ -197,6 +197,10 @@ defmodule PaleeWeb.Router do
     plug(PaleeWeb.Plugs.WebhookSecret, config_key: :brevo_webhook_secret)
   end
 
+  pipeline :payment_provider_webhook do
+    plug(PaleeWeb.Plugs.RateLimit, max: 600, interval: 60_000, bucket: "payment-webhook")
+  end
+
   pipeline :email_unsubscribe do
     plug(PaleeWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "email-unsubscribe")
   end
@@ -362,6 +366,14 @@ defmodule PaleeWeb.Router do
     post("/brevo", BrevoWebhookController, :create)
   end
 
+  # ADR-246: payment providers' webhooks (one URL per business account).
+  scope "/api/webhooks/payments", PaleeWeb do
+    pipe_through([:payment_provider_webhook])
+
+    get("/:organization_id/:account_id", PaymentWebhookController, :show)
+    post("/:organization_id/:account_id", PaymentWebhookController, :create)
+  end
+
   scope "/api/email/unsubscribe", PaleeWeb do
     pipe_through([:email_unsubscribe])
 
@@ -504,6 +516,15 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/finance", MyFinanceController, :index)
+    # ADR-246/247: paying invoices online and saved cards.
+    get("/invoices/:id/payment-terms", MyPaymentsController, :terms)
+    post("/invoices/:id/pay", MyPaymentsController, :pay)
+    post("/payments/return", MyPaymentsController, :returned)
+    post("/payments/sandbox/complete", MyPaymentsController, :sandbox_complete)
+    get("/payments/:id", MyPaymentsController, :show)
+    get("/payment-methods", MyPaymentsController, :methods)
+    delete("/payment-methods/:id", MyPaymentsController, :revoke_method)
+    put("/payment-methods/:id/autopay", MyPaymentsController, :set_autopay)
     # ADR-220: the member's renewal choice and leaving the box.
     put(
       "/membership/subscriptions/:id/auto-renew",
@@ -1208,6 +1229,14 @@ defmodule PaleeWeb.Router do
       AdminFiscalReportingController,
       :retry
     )
+
+    # ADR-246/247: online payments through the business's provider account.
+    get("/payments/account", AdminPaymentsController, :account)
+    put("/payments/account", AdminPaymentsController, :save_account)
+    get("/payments", AdminPaymentsController, :index)
+    get("/payments/:id", AdminPaymentsController, :show)
+    post("/payments/:id/refunds", AdminPaymentsController, :refund)
+    post("/payments/:id/retry", AdminPaymentsController, :retry)
 
     # ADR-192: shop reports, pricing indicators and revenue reconciliation.
     get("/shop/reports/overview", AdminShopReportController, :overview)
