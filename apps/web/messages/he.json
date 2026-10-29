@@ -12361,17 +12361,6 @@
       "l": "משקל",
       "lUnit": "משקל {unit}"
     },
-    "measure": {
-      "pace": "קצב",
-      "tempo": "טמפו",
-      "rpe": "RPE",
-      "rir": "RIR",
-      "zone": "אזור דופק",
-      "height": "גובה / יעד",
-      "dist": "מרחק",
-      "hold": "החזקה",
-      "side": "לכל צד"
-    },
     "measureHint": {
       "pace": "זמן ביניים · למשל 2:00/500m",
       "tempo": "הורדה, עצירה, הרמה, עצירה · למשל 31X1",
@@ -12387,31 +12376,8 @@
       "side": "לכל צד"
     },
     "unit": {
-      "sec": "שנ׳",
-      "min": "דק׳"
-    },
-    "struct": {
-      "single": "בודד",
-      "superset": "סופרסט",
-      "complex": "קומפלקס",
-      "cluster": "קלאסטר",
-      "drop": "דרופ סט",
-      "restpause": "רסט-פוז"
-    },
-    "structHint": {
-      "single": "תרגיל אחד, כמו שהוא",
-      "superset": "כל התרגילים, ואז הסט הבא",
-      "complex": "כל התרגילים בלי להניח את המוט",
-      "cluster": "הסט מתחלק לחלקים עם עצירה קצרה",
-      "drop": "מורידים משקל וממשיכים",
-      "restpause": "עד כשל, עצירה, שוב"
-    },
-    "structField": {
-      "clusters": "חלקים",
-      "intra": "עצירה",
-      "drops": "הורדות",
-      "dropby": "בכל פעם",
-      "minis": "מיני סטים"
+      "min": "דק׳",
+      "sec": "שנ׳"
     },
     "structChip": "מבנה הסט (Alt+T)",
     "rest": "מנוחה",
@@ -12444,7 +12410,8 @@
       "delete": "מחיקה",
       "deleteHint": "⌫ על שם ריק",
       "structTitle": "מבנה הסט",
-      "measureTitle": "מדד"
+      "measureTitle": "מדד",
+      "withKey": "{key} · {hint}"
     },
     "add": {
       "exercise": "+ תרגיל",
@@ -12506,7 +12473,8 @@
       "kg": "{value} kg",
       "pct": "{value}% מ-1RM",
       "words": "כטקסט למתאמן",
-      "tempo": "↓{down} הורדה · {bottom} למטה · ↑{up} הרמה · {top} למעלה (שניות, X = מתפרץ)"
+      "tempo": "↓{down} הורדה · {bottom} למטה · ↑{up} הרמה · {top} למעלה (שניות, X = מתפרץ)",
+      "equalsUnit": "= {value} {unit}"
     },
     "word": {
       "set": "סט",
@@ -12539,6 +12507,40 @@
       "set": "סט",
       "round": "סבב",
       "slot": "אינטרוול"
+    },
+    "measure": {
+      "pace": "קצב",
+      "tempo": "טמפו",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "אזור דופק",
+      "height": "גובה / יעד",
+      "dist": "מרחק",
+      "hold": "החזקה",
+      "side": "לכל צד"
+    },
+    "struct": {
+      "single": "בודד",
+      "superset": "סופרסט",
+      "complex": "קומפלקס",
+      "cluster": "קלאסטר",
+      "drop": "דרופ סט",
+      "restpause": "רסט-פוז"
+    },
+    "structHint": {
+      "single": "תרגיל אחד, כמו שהוא",
+      "superset": "כל התרגילים, ואז הסט הבא",
+      "complex": "כל התרגילים בלי להניח את המוט",
+      "cluster": "הסט מתחלק לחלקים עם עצירה קצרה",
+      "drop": "מורידים משקל וממשיכים",
+      "restpause": "עד כשל, עצירה, שוב"
+    },
+    "structField": {
+      "clusters": "חלקים",
+      "intra": "עצירה",
+      "drops": "הורדות",
+      "dropby": "בכל פעם",
+      "minis": "מיני סטים"
     }
   },
   "PlanCore": {

@@ -12361,17 +12361,6 @@
       "l": "Gewicht",
       "lUnit": "Gewicht {unit}"
     },
-    "measure": {
-      "pace": "Pace",
-      "tempo": "Tempo",
-      "rpe": "RPE",
-      "rir": "RIR",
-      "zone": "Pulszone",
-      "height": "Höhe / Ziel",
-      "dist": "Distanz",
-      "hold": "Halten",
-      "side": "Pro Seite"
-    },
     "measureHint": {
       "pace": "Zwischenzeit · z. B. 2:00/500m",
       "tempo": "absenken, Pause, heben, Pause · z. B. 31X1",
@@ -12387,31 +12376,8 @@
       "side": "pro Seite"
     },
     "unit": {
-      "sec": "s",
-      "min": "Min."
-    },
-    "struct": {
-      "single": "Einzeln",
-      "superset": "Superset",
-      "complex": "Complex",
-      "cluster": "Cluster",
-      "drop": "Drop-Set",
-      "restpause": "Rest-Pause"
-    },
-    "structHint": {
-      "single": "eine Übung, wie sie ist",
-      "superset": "alle Übungen, dann der nächste Satz",
-      "complex": "alle Übungen, ohne die Stange abzulegen",
-      "cluster": "der Satz wird in Teile mit kurzer Pause zerlegt",
-      "drop": "Gewicht reduzieren und weitermachen",
-      "restpause": "bis zum Versagen, Pause, noch einmal"
-    },
-    "structField": {
-      "clusters": "Teile",
-      "intra": "Pause",
-      "drops": "Reduzierungen",
-      "dropby": "jedes Mal",
-      "minis": "Mini-Sätze"
+      "min": "Min.",
+      "sec": "s"
     },
     "structChip": "Satzstruktur (Alt+T)",
     "rest": "Pause",
@@ -12444,7 +12410,8 @@
       "delete": "Löschen",
       "deleteHint": "⌫ bei leerem Namen",
       "structTitle": "Satzstruktur",
-      "measureTitle": "Messwert"
+      "measureTitle": "Messwert",
+      "withKey": "{key} · {hint}"
     },
     "add": {
       "exercise": "+ Übung",
@@ -12506,7 +12473,8 @@
       "kg": "{value} kg",
       "pct": "{value} % des 1RM",
       "words": "als Text für den Athleten",
-      "tempo": "↓{down} absenken · {bottom} unten · ↑{up} heben · {top} oben (Sekunden, X = explosiv)"
+      "tempo": "↓{down} absenken · {bottom} unten · ↑{up} heben · {top} oben (Sekunden, X = explosiv)",
+      "equalsUnit": "= {value} {unit}"
     },
     "word": {
       "set": "Satz",
@@ -12539,6 +12507,40 @@
       "set": "Satz",
       "round": "Runde",
       "slot": "Intervall"
+    },
+    "measure": {
+      "pace": "Pace",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "Pulszone",
+      "height": "Höhe / Ziel",
+      "dist": "Distanz",
+      "hold": "Halten",
+      "side": "Pro Seite"
+    },
+    "struct": {
+      "single": "Einzeln",
+      "superset": "Superset",
+      "complex": "Complex",
+      "cluster": "Cluster",
+      "drop": "Drop-Set",
+      "restpause": "Rest-Pause"
+    },
+    "structHint": {
+      "single": "eine Übung, wie sie ist",
+      "superset": "alle Übungen, dann der nächste Satz",
+      "complex": "alle Übungen, ohne die Stange abzulegen",
+      "cluster": "der Satz wird in Teile mit kurzer Pause zerlegt",
+      "drop": "Gewicht reduzieren und weitermachen",
+      "restpause": "bis zum Versagen, Pause, noch einmal"
+    },
+    "structField": {
+      "clusters": "Teile",
+      "intra": "Pause",
+      "drops": "Reduzierungen",
+      "dropby": "jedes Mal",
+      "minis": "Mini-Sätze"
     }
   },
   "PlanCore": {

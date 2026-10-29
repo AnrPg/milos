@@ -12361,17 +12361,6 @@
       "l": "Carico",
       "lUnit": "Carico {unit}"
     },
-    "measure": {
-      "pace": "Passo",
-      "tempo": "Tempo",
-      "rpe": "RPE",
-      "rir": "RIR",
-      "zone": "Zona cardio",
-      "height": "Altezza / bersaglio",
-      "dist": "Distanza",
-      "hold": "Tenuta",
-      "side": "Per lato"
-    },
     "measureHint": {
       "pace": "tempo parziale · es. 2:00/500m",
       "tempo": "discesa, pausa, salita, pausa · es. 31X1",
@@ -12387,31 +12376,8 @@
       "side": "per lato"
     },
     "unit": {
-      "sec": "s",
-      "min": "min"
-    },
-    "struct": {
-      "single": "Singolo",
-      "superset": "Superserie",
-      "complex": "Complex",
-      "cluster": "Cluster",
-      "drop": "Drop set",
-      "restpause": "Rest-pause"
-    },
-    "structHint": {
-      "single": "un esercizio, così com’è",
-      "superset": "tutti gli esercizi, poi la serie successiva",
-      "complex": "tutti gli esercizi senza mollare il bilanciere",
-      "cluster": "la serie si spezza in blocchi con una breve pausa",
-      "drop": "riduci il peso e continui",
-      "restpause": "fino a cedimento, pausa, di nuovo"
-    },
-    "structField": {
-      "clusters": "blocchi",
-      "intra": "pausa",
-      "drops": "scalate",
-      "dropby": "ogni volta",
-      "minis": "mini serie"
+      "min": "min",
+      "sec": "s"
     },
     "structChip": "Struttura della serie (Alt+T)",
     "rest": "Recupero",
@@ -12444,7 +12410,8 @@
       "delete": "Elimina",
       "deleteHint": "⌫ con il nome vuoto",
       "structTitle": "Struttura della serie",
-      "measureTitle": "Parametro"
+      "measureTitle": "Parametro",
+      "withKey": "{key} · {hint}"
     },
     "add": {
       "exercise": "+ Esercizio",
@@ -12506,7 +12473,8 @@
       "kg": "{value} kg",
       "pct": "{value}% dell’1RM",
       "words": "come testo per l’atleta",
-      "tempo": "↓{down} discesa · {bottom} in basso · ↑{up} salita · {top} in alto (secondi, X = esplosivo)"
+      "tempo": "↓{down} discesa · {bottom} in basso · ↑{up} salita · {top} in alto (secondi, X = esplosivo)",
+      "equalsUnit": "= {value} {unit}"
     },
     "word": {
       "set": "serie",
@@ -12539,6 +12507,40 @@
       "set": "Serie",
       "round": "Round",
       "slot": "Intervallo"
+    },
+    "measure": {
+      "pace": "Passo",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "Zona cardio",
+      "height": "Altezza / bersaglio",
+      "dist": "Distanza",
+      "hold": "Tenuta",
+      "side": "Per lato"
+    },
+    "struct": {
+      "single": "Singolo",
+      "superset": "Superserie",
+      "complex": "Complex",
+      "cluster": "Cluster",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
+    },
+    "structHint": {
+      "single": "un esercizio, così com’è",
+      "superset": "tutti gli esercizi, poi la serie successiva",
+      "complex": "tutti gli esercizi senza mollare il bilanciere",
+      "cluster": "la serie si spezza in blocchi con una breve pausa",
+      "drop": "riduci il peso e continui",
+      "restpause": "fino a cedimento, pausa, di nuovo"
+    },
+    "structField": {
+      "clusters": "blocchi",
+      "intra": "pausa",
+      "drops": "scalate",
+      "dropby": "ogni volta",
+      "minis": "mini serie"
     }
   },
   "PlanCore": {
