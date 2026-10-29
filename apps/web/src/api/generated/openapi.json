@@ -187962,6 +187962,7 @@
                     "type": "string"
                   },
                   "user_id": {
+                    "description": "The member; none for a walk-in (a shop order or a free sale, ADR-264).",
                     "format": "uuid",
                     "nullable": true,
                     "type": "string"
@@ -188134,6 +188135,16 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "surcharge_cents": {
+                          "description": "Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "tip_cents": {
+                          "description": "Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
                         "user_id": {
                           "format": "uuid",
                           "nullable": true,
@@ -188155,7 +188166,9 @@
                         "reference",
                         "refunded_cents",
                         "retries",
-                        "status"
+                        "status",
+                        "surcharge_cents",
+                        "tip_cents"
                       ],
                       "type": "object"
                     }
@@ -188414,6 +188427,16 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "surcharge_cents": {
+                          "description": "Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "tip_cents": {
+                          "description": "Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
                         "user_id": {
                           "format": "uuid",
                           "nullable": true,
@@ -188435,7 +188458,9 @@
                         "reference",
                         "refunded_cents",
                         "retries",
-                        "status"
+                        "status",
+                        "surcharge_cents",
+                        "tip_cents"
                       ],
                       "type": "object"
                     }
@@ -188632,6 +188657,16 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "surcharge_cents": {
+                          "description": "Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "tip_cents": {
+                          "description": "Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
                         "user_id": {
                           "format": "uuid",
                           "nullable": true,
@@ -188653,7 +188688,9 @@
                         "reference",
                         "refunded_cents",
                         "retries",
-                        "status"
+                        "status",
+                        "surcharge_cents",
+                        "tip_cents"
                       ],
                       "type": "object"
                     }
@@ -188850,6 +188887,16 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "surcharge_cents": {
+                          "description": "Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "tip_cents": {
+                          "description": "Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
                         "user_id": {
                           "format": "uuid",
                           "nullable": true,
@@ -188871,7 +188918,9 @@
                         "reference",
                         "refunded_cents",
                         "retries",
-                        "status"
+                        "status",
+                        "surcharge_cents",
+                        "tip_cents"
                       ],
                       "type": "object"
                     }
@@ -188917,6 +188966,12 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "amount_cents": {
+                    "description": "What the card paid in all, to try a mismatch (default: amount + extras).",
+                    "minimum": 1,
+                    "nullable": true,
+                    "type": "integer"
+                  },
                   "outcome": {
                     "enum": [
                       "succeeded",
@@ -188924,6 +188979,16 @@
                       "cancelled"
                     ],
                     "type": "string"
+                  },
+                  "surcharge_cents": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "tip_cents": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
                   }
                 },
                 "required": [
@@ -189091,6 +189156,16 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "surcharge_cents": {
+                          "description": "Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "tip_cents": {
+                          "description": "Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
                         "user_id": {
                           "format": "uuid",
                           "nullable": true,
@@ -189112,7 +189187,9 @@
                         "reference",
                         "refunded_cents",
                         "retries",
-                        "status"
+                        "status",
+                        "surcharge_cents",
+                        "tip_cents"
                       ],
                       "type": "object"
                     }

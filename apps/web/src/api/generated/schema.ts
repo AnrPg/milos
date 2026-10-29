@@ -80832,7 +80832,10 @@ export interface operations {
                     purpose: "finance_invoice" | "membership_package" | "shop_order" | "free_sale";
                     /** Format: uuid */
                     purpose_id?: string | null;
-                    /** Format: uuid */
+                    /**
+                     * Format: uuid
+                     * @description The member; none for a walk-in (a shop order or a free sale, ADR-264).
+                     */
                     user_id?: string | null;
                 };
             };
@@ -80896,6 +80899,10 @@ export interface operations {
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
                             succeeded_at?: string | null;
+                            /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
+                            surcharge_cents: number;
+                            /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
+                            tip_cents: number;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
@@ -81002,6 +81009,10 @@ export interface operations {
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
                             succeeded_at?: string | null;
+                            /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
+                            surcharge_cents: number;
+                            /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
+                            tip_cents: number;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
@@ -81079,6 +81090,10 @@ export interface operations {
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
                             succeeded_at?: string | null;
+                            /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
+                            surcharge_cents: number;
+                            /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
+                            tip_cents: number;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
@@ -81156,6 +81171,10 @@ export interface operations {
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
                             succeeded_at?: string | null;
+                            /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
+                            surcharge_cents: number;
+                            /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
+                            tip_cents: number;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
@@ -81176,8 +81195,12 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description What the card paid in all, to try a mismatch (default: amount + extras). */
+                    amount_cents?: number | null;
                     /** @enum {string} */
                     outcome: "succeeded" | "failed" | "cancelled";
+                    surcharge_cents?: number | null;
+                    tip_cents?: number | null;
                 };
             };
         };
@@ -81240,6 +81263,10 @@ export interface operations {
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
                             succeeded_at?: string | null;
+                            /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
+                            surcharge_cents: number;
+                            /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
+                            tip_cents: number;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
