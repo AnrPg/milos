@@ -122,8 +122,10 @@ The store-release gap analysis (V3-M12, `v3-store-release-prep.md` §3.2 and
 - **A signed download link in the email:** see Rationale.
 
 ## Consequences
-- Every sign-up client must send `age_confirmed: true`; the web form does.
-  The native apps load the web app, so nothing else changes.
+- Every sign-up client must send `age_confirmed: true`; the three web forms
+  do (personal sign-up, business sign-up for a new account, the owner
+  invitation `/set-admin`), with `AgeConfirmationField` and its error under
+  the box. The native apps load the web app, so nothing else changes.
 - New tables with personal data should get a catalog entry; the schema
   test only proves that what is listed exists, not that everything is
   listed.
@@ -131,8 +133,9 @@ The store-release gap analysis (V3-M12, `v3-store-release-prep.md` §3.2 and
   the controller, contact, hosting provider, DPO (if any) and supervisory
   authority, and confirms the retention periods and the legal bases.
 - Ontology rows: Privacy policy / Πολιτική απορρήτου, Terms of use / Όροι
-  χρήσης, Download my data / Λήψη των δεδομένων μου, Data export / Αρχείο
-  δεδομένων, Minimum age / Ελάχιστη ηλικία.
+  χρήσης, Your data / Τα δεδομένα σου, Download my data / Λήψη των
+  δεδομένων μου, Data file / Αρχείο δεδομένων, Minimum age / Ελάχιστη
+  ηλικία, Sub-processor / Εκτελών την επεξεργασία.
 
 ## Implementation Notes
 - Migration `20270305000000_personal_data_exports_and_age_confirmation`.
