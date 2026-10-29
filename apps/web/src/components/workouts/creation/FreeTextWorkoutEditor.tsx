@@ -13,7 +13,7 @@ import { Plugin } from "@tiptap/pm/state";
 import { EditorContent, useEditor, type Editor, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
 
 import { ApiError } from "@/api/client";
 import {
@@ -81,6 +81,8 @@ type Props = {
   onPublished: (workoutId: string) => void;
   /** ADR-180: switch this workout off the assistant, to text sections (the draft is saved first). */
   onUseSections?: () => void;
+  /** ADR-270: filled with "save the text now", so the host can switch editors without losing it. */
+  saveHandleRef?: MutableRefObject<(() => Promise<void>) | null>;
 };
 
 type AsideTab = "assistant" | "preview";
@@ -95,7 +97,7 @@ const WORKOUT_TYPES: WorkoutType[] = [
   "recovery",
 ];
 
-export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, onPublished, onUseSections }: Props) {
+export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, onPublished, onUseSections, saveHandleRef }: Props) {
   const i18n = useUiTranslations();
   const assistantT = useTranslations("WorkoutAssistant");
   const goalsT = useTranslations("WodGoals");
@@ -256,6 +258,17 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
     if (!payload || !saver.started) return;
     await saver.saveNow(payload);
   }
+
+  useEffect(() => {
+    if (!saveHandleRef) return;
+    saveHandleRef.current = async () => {
+      const payload = draftPayload();
+      if (payload && saver.started) await saver.saveNow(payload);
+    };
+    return () => {
+      saveHandleRef.current = null;
+    };
+  }, [draftPayload, saveHandleRef, saver]);
 
   async function keepMyVersion() {
     if (!accessToken || !draftId) return;
