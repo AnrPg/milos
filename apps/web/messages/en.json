@@ -12229,5 +12229,108 @@
       "keyUnit": "kg or %",
       "keyDeleteRow": "⌫ on an empty name"
     }
+  },
+  "PlanView": {
+    "label": "Structured workout",
+    "untitledSection": "Section {letter}",
+    "empty": "Nothing written yet.",
+    "flow": {
+      "sets": "Sets",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Intervals",
+      "rest": "Rest"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "hrr": "Heart rate recovery (HRR)",
+      "death_by": "Death by",
+      "even_odd": "Alternating (odd / even)",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "ladder": "Ladder / pyramid",
+      "kcal_target": "Calorie target",
+      "to_failure": "To failure",
+      "superset": "Superset / giant set",
+      "cluster": "Cluster",
+      "drop": "Drop set",
+      "restpause": "Rest-pause",
+      "interrupt": "With interruptions"
+    },
+    "params": {
+      "sets": "{sets} sets",
+      "rest": "{time} rest",
+      "rounds": "{rounds} rounds",
+      "cap": "cap {time}",
+      "windows": "{count} windows: {times}",
+      "restBetween": "{time} rest between",
+      "every": "every {time}",
+      "times": "× {count}",
+      "untilFailure": "until you can't keep up",
+      "intervals": "{rounds} × {work} work / {off} rest",
+      "intervalsHr": "{rounds} × {work} work, rest until heart rate falls to {bpm}"
+    },
+    "roundWord": {
+      "set": "Set {numbers}",
+      "round": "Round {numbers}",
+      "interval": "Interval {numbers}",
+      "minute": "Minute {numbers}"
+    },
+    "struct": {
+      "superset": "Superset",
+      "complex": "Complex",
+      "cluster": "Cluster · {clusters} parts · {intra} pause",
+      "drop": "Drop set · {drops} drops of {dropby}",
+      "restpause": "Rest-pause · {minis} mini sets · {intra} pause"
+    },
+    "perSide": "per side",
+    "rest": "Rest",
+    "measure": {
+      "pace": "Pace {value}",
+      "tempo": "Tempo {value}",
+      "rpe": "RPE {value}",
+      "rir": "RIR {value}",
+      "zone": "Zone {value}",
+      "height": "Height {value}",
+      "dist": "Distance {value}",
+      "hold": "Hold {value}"
+    },
+    "interruptEvery": "Every {time}, stop for",
+    "scoreLine": "Score: {score}",
+    "score": {
+      "load": "Load (best set)",
+      "reps": "Reps",
+      "time": "Time",
+      "rounds_reps": "Rounds + reps",
+      "done": "Completed",
+      "total_reps": "Reps (total)",
+      "lowest_round": "Lowest round",
+      "distance": "Distance"
+    },
+    "levelNotes": "Notes per level",
+    "sectionNote": "Section note",
+    "exerciseCount": "{count, plural, one {# exercise} other {# exercises}}",
+    "authoring": {
+      "label": "How this workout is written",
+      "freeText": "Free text",
+      "structured": "Structured",
+      "toStructuredTitle": "Switch to structured?",
+      "toStructuredBody": "The structured plan starts empty. Your text stays as the note of the first section, so nothing is lost.",
+      "toTextTitle": "Switch to free text?",
+      "toTextBody": "The plan becomes text you can keep editing. Flows, per-set values and structures are written out as text and are no longer structured.",
+      "confirm": "Switch",
+      "cancel": "Cancel",
+      "switchFailed": "The workout could not be saved before switching. Try again.",
+      "switching": "Saving…"
+    },
+    "editor": {
+      "planEmpty": "Add at least one exercise or a rest before publishing.",
+      "fixProblems": "Some values do not read: fix the rows marked in red.",
+      "sectionCount": "{count, plural, one {# section} other {# sections}}"
+    }
   }
 }
