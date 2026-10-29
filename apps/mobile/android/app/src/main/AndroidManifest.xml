@@ -117,6 +117,9 @@
     <!-- ADR-175: voice logging records in the web view (getUserMedia). -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <!-- ADR-256: the camera in the web view (check-in QR scanner, body photos, photo posts). Asked when first used. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
 
     <!-- ADR-173: the arrival reminder (opt-in in Box › Check-in) and writing NFC door tags. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
