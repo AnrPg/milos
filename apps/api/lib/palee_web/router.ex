@@ -1380,6 +1380,7 @@ defmodule PaleeWeb.Router do
       AdminPaymentsController,
       :dismiss_packages_notice
     )
+
     delete("/payments/account", AdminPaymentsController, :disconnect)
     post("/payments/connect", AdminPaymentsController, :connect)
     get("/payments/attention", AdminPaymentsController, :attention)

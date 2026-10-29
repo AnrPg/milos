@@ -26,7 +26,12 @@ defmodule PaleeWeb.SoldOnlineControllerTest do
         Finance.create_package(
           context,
           Map.merge(
-            %{name: name, family: "unlimited", billing_period: "monthly", base_price_cents: cents},
+            %{
+              name: name,
+              family: "unlimited",
+              billing_period: "monthly",
+              base_price_cents: cents
+            },
             extra
           )
         )

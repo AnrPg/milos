@@ -196,7 +196,7 @@ defmodule PaleeWeb.AdminFinanceController do
       sold_online: %Schema{type: :boolean},
       online_visibility: %Schema{
         type: :string,
-        enum: Palee.Payments.Domain.PackageSale.visibilities(),
+        enum: Palee.Payments.package_visibilities(),
         description:
           "ADR-271: `visible` (listed and bought online); otherwise why not: `inactive`, " <>
             "`free` (price 0), `off` (front desk only), `purpose_off` (its purpose is off in " <>

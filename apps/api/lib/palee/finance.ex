@@ -100,6 +100,7 @@ defmodule Palee.Finance do
 
   def open_packages_online(context, ids),
     do: scoped(context, fn -> FinanceStore.open_packages_online(ids) end)
+
   defdelegate upsert_membership(user_id, params), to: UpsertMembership, as: :call
 
   def upsert_membership(context, user_id, params),

@@ -63,6 +63,9 @@ defmodule Palee.Payments do
     end
   end
 
+  @doc "ADR-271: the values of a package's `online_visibility`."
+  def package_visibilities, do: Palee.Payments.Domain.PackageSale.visibilities()
+
   @doc """
   ADR-271: what `PackageSale` needs to know about the business's online
   payments, read once: `%{available: boolean, options: map}`.
@@ -341,7 +344,9 @@ defmodule Palee.Payments do
   end
 
   # ADR-271: «Τα N πακέτα σου πωλούνται τώρα online» until the owner closes it.
-  defp packages_notice(%{packages_opened_at: %DateTime{} = at, packages_notice_dismissed_at: nil} = account)
+  defp packages_notice(
+         %{packages_opened_at: %DateTime{} = at, packages_notice_dismissed_at: nil} = account
+       )
        when is_integer(account.packages_opened_count) and account.packages_opened_count > 0,
        do: %{count: account.packages_opened_count, opened_at: at}
 
