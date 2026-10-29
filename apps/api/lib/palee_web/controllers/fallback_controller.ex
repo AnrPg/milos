@@ -268,6 +268,27 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: to_string(reason), error: message})
   end
 
+  # ADR-249: Tap to Pay at the desk.
+  @terminal_payment_errors %{
+    terminal_payments_unavailable:
+      {:conflict, "Tap to Pay is not set up for this business (connect a Viva account)"},
+    terminal_member_required: {:unprocessable_entity, "Choose the member who pays"},
+    terminal_request_used:
+      {:conflict, "This payment request was already used for another card payment"},
+    terminal_transaction_used:
+      {:conflict, "This card payment is already recorded for another request"},
+    payment_not_cancellable: {:conflict, "This payment can no longer be cancelled"},
+    package_inactive: {:conflict, "This package is no longer offered"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@terminal_payment_errors, reason) do
+    {status, message} = Map.fetch!(@terminal_payment_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
   # ADR-214: field errors stay in the form, one code per field.
   def call(conn, {:error, {:invalid_fields, errors}}) when is_map(errors) do
     conn

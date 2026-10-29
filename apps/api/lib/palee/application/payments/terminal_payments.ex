@@ -171,7 +171,7 @@ defmodule Palee.Application.Payments.TerminalPayments do
   defp package_for_desk(context, package_id) do
     case Finance.get_package(context, package_id) do
       {:ok, %{active: true} = package} -> {:ok, package}
-      {:ok, _inactive} -> {:error, :package_not_for_sale}
+      {:ok, _inactive} -> {:error, :package_inactive}
       _missing -> {:error, :not_found}
     end
   end
