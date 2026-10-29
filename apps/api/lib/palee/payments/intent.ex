@@ -18,7 +18,7 @@ defmodule Palee.Payments.Intent do
              failure_message card_brand card_last4 refunded_cents fulfilment_status
              fulfilment_attempts fulfilment_error fulfilled_at finance_payment_id
              fiscal_document_id created_by_id metadata attention_resolved_at
-             attention_resolved_by_id attention_resolution)a
+             attention_resolved_by_id attention_resolution tip_cents surcharge_cents)a
 
   schema "payment_intents" do
     field :organization_id, :binary_id, read_after_writes: true
@@ -63,6 +63,9 @@ defmodule Palee.Payments.Intent do
     field :finance_payment_id, :binary_id
     field :fiscal_document_id, :binary_id
     field :created_by_id, :binary_id
+    # ADR-264: confirmed by the provider on top of `amount_cents` (a terminal sale).
+    field :tip_cents, :integer, default: 0
+    field :surcharge_cents, :integer, default: 0
 
     timestamps(type: :utc_datetime_usec)
   end

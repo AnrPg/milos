@@ -27,13 +27,17 @@ defmodule Palee.Payments.Ports.TerminalGateway do
   @typedoc """
   A transaction as the provider reports it: the gateway's `payment`, plus
   the merchant reference it was taken with and when it was created, when
-  the provider tells.
+  the provider tells. ADR-264: `amount_cents` is everything the card paid;
+  `tip_cents` and `surcharge_cents` are the parts of it that are a tip and
+  a card surcharge (0 or nil when none).
   """
   @type transaction :: %{
           required(:status) => :succeeded | :pending | :failed | :cancelled,
           required(:transaction_id) => String.t() | nil,
           optional(:amount_cents) => integer() | nil,
           optional(:currency) => String.t() | nil,
+          optional(:tip_cents) => non_neg_integer() | nil,
+          optional(:surcharge_cents) => non_neg_integer() | nil,
           optional(:reference) => String.t() | nil,
           optional(:created_at) => DateTime.t() | nil,
           optional(:card) => Gateway.card() | nil,
