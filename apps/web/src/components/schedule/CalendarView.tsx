@@ -6,7 +6,10 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
-import type { ScheduleLocation, ScheduleSlot } from "@/api/schedule";
+import type { ClassTypeRecord, ScheduleLocation, ScheduleSlot } from "@/api/schedule";
+import type { DayWorkout } from "@/api/day-workouts";
+import { DayWorkoutStrip } from "@/components/schedule/DayWorkoutStrip";
+import { dayWorkoutsOn } from "@/components/schedule/day-workouts";
 import { useLocale, useTranslations } from "next-intl";
 import { buildScheduleWindow, monthKey, parseLocalDate, type ScheduleDays } from "@/components/schedule/calendar-window";
 import { dateKeyInZone, formatInZone } from "@/lib/zoned-time";
@@ -29,6 +32,11 @@ type CalendarViewProps = {
   onOpenDay?: (isoDate: string) => void;
   /** ADR-179: the gym's zone; days and times are on its clock. */
   timeZone?: string | null;
+  /** ADR-230, staff: the WOD of each day, shown under the day's header. */
+  dayWorkouts?: DayWorkout[];
+  classTypes?: ClassTypeRecord[];
+  /** Opens the day WOD dialog of a date (today or later). */
+  onOpenDayWorkout?: (isoDate: string) => void;
 };
 
 function formatDayLabel(locale: string, isoDate: string) {
@@ -55,7 +63,20 @@ function slotClassType(slot: ScheduleSlot) {
   };
 }
 
-export function CalendarView({ days, startDate, slots, isAdmin, locations, onSelectSlot, onCreateSlot, onOpenDay, timeZone = null }: CalendarViewProps) {
+export function CalendarView({
+  days,
+  startDate,
+  slots,
+  isAdmin,
+  locations,
+  onSelectSlot,
+  onCreateSlot,
+  onOpenDay,
+  timeZone = null,
+  dayWorkouts,
+  classTypes,
+  onOpenDayWorkout,
+}: CalendarViewProps) {
   const i18n = useUiTranslations();
   const t = useTranslations("Schedule");
   const locale = useLocale();
@@ -134,6 +155,15 @@ export function CalendarView({ days, startDate, slots, isAdmin, locations, onSel
                     </button>
                   ) : null}
                 </div>
+                {!outsideMonth ? (
+                  <DayWorkoutStrip
+                    variant="month"
+                    date={date}
+                    rules={dayWorkoutsOn(dayWorkouts, date, classTypes)}
+                    classTypes={classTypes}
+                    onOpen={onOpenDay ? () => onOpenDay(date) : undefined}
+                  />
+                ) : null}
                 {daySlots.slice(0, 3).map((slot) => {
                   const classType = slotClassType(slot);
                   const slotColor = WORKOUT_TYPE_COLORS[classType.slug] ?? "var(--primary)";
@@ -223,6 +253,16 @@ export function CalendarView({ days, startDate, slots, isAdmin, locations, onSel
                     </button>
                   ) : null}
               </div>
+
+              <DayWorkoutStrip
+                variant={days === 7 ? "compact" : "full"}
+                date={date}
+                rules={dayWorkoutsOn(dayWorkouts, date, classTypes)}
+                classTypes={classTypes}
+                // ADR-230: offered on days with classes, from today on.
+                canAdd={canAddOn(date) && daySlots.length > 0}
+                onOpen={onOpenDayWorkout && date >= todayKey ? () => onOpenDayWorkout(date) : undefined}
+              />
 
               <div className="mt-4 space-y-3">
                 {daySlots.length === 0 ? (
