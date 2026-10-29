@@ -6,6 +6,7 @@ defmodule Palee.Workouts.WorkoutSection do
 
   alias Palee.Workouts.Domain.{
     SectionedText,
+    StructuredPlan,
     TimerConfig,
     WorkoutAuthoringMetadata,
     WorkoutContent
@@ -32,6 +33,10 @@ defmodule Palee.Workouts.WorkoutSection do
     field :free_text_body, :string
     field :free_text_document, :map
     field :timer_preset, :map
+    # ADR-270: the section's plan from the structured WOD editor (the web
+    # contract `PlanSection`), the source of truth of a `structured_plan`
+    # workout; its exercises are materialised from it.
+    field :plan, :map
 
     belongs_to :master_workout, MasterWorkout
     belongs_to :parent_section, __MODULE__
@@ -68,7 +73,8 @@ defmodule Palee.Workouts.WorkoutSection do
       :section_metadata,
       :free_text_body,
       :free_text_document,
-      :timer_preset
+      :timer_preset,
+      :plan
     ])
     |> update_change(:name, &normalize_name/1)
     |> validate_required([:name, :order])
@@ -80,6 +86,7 @@ defmodule Palee.Workouts.WorkoutSection do
     |> validate_bounded_metadata()
     |> validate_content()
     |> normalize_timer_config()
+    |> validate_plan()
     |> foreign_key_constraint(:master_workout_id)
     |> foreign_key_constraint(:parent_section_id,
       name: :workout_sections_parent_same_workout_fkey
@@ -118,6 +125,19 @@ defmodule Palee.Workouts.WorkoutSection do
       :error ->
         changeset
     end
+  end
+
+  # Only a `structured_plan` workout's sections carry a plan.
+  defp validate_plan(changeset) do
+    validate_change(changeset, :plan, fn :plan, plan ->
+      case StructuredPlan.validate(plan) do
+        :ok ->
+          []
+
+        {:error, [first | _rest]} ->
+          [plan: {"is invalid at %{path} (%{code})", [path: first.path, code: first.code]}]
+      end
+    end)
   end
 
   defp validate_bounded_metadata(changeset) do
