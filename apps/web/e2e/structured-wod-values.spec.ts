@@ -3,6 +3,7 @@ import { expect, test, type Locator, type Page } from "./support/test";
 import {
   cell,
   cellInput,
+  type Col,
   clickOutside,
   columns,
   expectStep,
@@ -39,7 +40,7 @@ async function section(page: Page, flow: string, params: Record<string, string>,
 }
 
 /** What a field shows: what was typed, else the computed value drawn inside it, else its placeholder. */
-async function shown(page: Page, rowId: string, col: number, key: string) {
+async function shown(page: Page, rowId: string, col: Col, key: string) {
   const input = cellInput(page, rowId, col, key);
   const box = cell(page, rowId, col, key);
   const value = await input.inputValue();
@@ -67,15 +68,17 @@ test("Σετ: reps 12-10-8-8 per set, load 60% then +5 shows 65 inside the field
   const plus = cellInput(page, id, 1, "l");
   await plus.fill("+5");
 
-  // The coach's own text stays; the computed 65 sits inside the same field.
+  // The coach's own text stays; once the field is left, the computed 65 sits
+  // inside the same field (with a small +5 badge), never on a line under it.
+  await cellInput(page, id, 2, "d").focus();
   await expect(plus).toHaveValue("+5");
-  const box = cell(page, id, 1, "l");
-  const computed = box.getByText("65", { exact: true });
+  const computed = page.getByTestId(`plan-cell-${id}-1-l-display`);
   await expect(computed).toBeVisible();
-  await expectInside(computed, plus);
+  await expect(computed).toContainText("65");
+  await expectInside(computed, cell(page, id, 1, "l"));
   // The quiet hint line explains the focused value.
   await plus.focus();
-  await expect(page.getByTestId("plan-hint")).toContainText("65");
+  await expect(page.getByTestId("plan-hint").filter({ hasText: "65" })).toBeVisible();
 
   // +5 keeps going in the empty sets after it; no row is red (the unit is on set 1).
   await expect.poll(() => shown(page, id, 2, "l")).toContain("70");
@@ -105,20 +108,25 @@ test("bare load numbers with no unit anywhere in the row are red until kg or % i
 
   // A kg / % mix in one row is red too.
   await cellInput(page, id, 1, "l").fill("80%");
-  await expect(cellInput(page, id, 1, "l").or(cellInput(page, id, 0, "l")).first()).toHaveAttribute("aria-invalid", "true");
+  await expect
+    .poll(async () => [await cellInput(page, id, 0, "l").getAttribute("aria-invalid"), await cellInput(page, id, 1, "l").getAttribute("aria-invalid")])
+    .toContain("true");
 });
 
 test("Alt+P adds a measure through fuzzy search", async ({ page }) => {
   const id = await section(page, "σετ", { sets: "3" }, "Back Squat");
   await cellInput(page, id, 0, "d").focus();
   await page.keyboard.press("Alt+P");
-  const picker = openPopups(page).first();
+  const picker = page.getByTestId("plan-row-menu");
   await expect(picker).toBeVisible();
   await expect(picker).toContainText("RPE");
 
-  // A typo still finds Tempo; Enter adds its column to every set.
+  // Keyboard only: what the coach types next filters the list (never lands
+  // in the field), and a typo still finds Tempo. Enter adds its column.
   await page.keyboard.type("tmpo");
+  await expect(cellInput(page, id, 0, "d")).toHaveValue("");
   await expect(picker).toContainText("Tempo");
+  await expect(picker).not.toContainText("RPE");
   await page.keyboard.press("Enter");
   await expect(openPopups(page)).toHaveCount(0);
   await expect(columns(page, id, "tempo")).toHaveCount(3);
@@ -129,8 +137,8 @@ test("AMRAP: Alt+V gives values per round and the round columns grow as the coac
   const id = await section(page, "amrap", { dur: "12" }, "Wall Ball");
   // One value for every round until Alt+V.
   await expect(columns(page, id, "d")).toHaveCount(1);
-  await cellInput(page, id, 0, "d").fill("15");
-  await cellInput(page, id, 0, "d").focus();
+  await cellInput(page, id, "same", "d").fill("15");
+  await cellInput(page, id, "same", "d").focus();
 
   await page.keyboard.press("Alt+V");
   // AMRAP has no last round: the written round plus one empty column.
@@ -154,7 +162,7 @@ test("Alt+S adds a different round: rounds 1, 3… and 2, 4… alternate", async
   await page.keyboard.press("Alt+S");
   await expect(rows(page)).toHaveCount(before + 1);
   // The new kind of round starts with its own empty exercise, focused.
-  await expect(rows(page).last().locator("input").first()).toBeFocused();
+  await expect(rows(page).last().locator('[data-testid^="plan-name-"]')).toBeFocused();
   const editor = page.getByTestId("plan-editor");
   await expect(editor).toContainText(/1, 3/);
   await expect(editor).toContainText(/2, 4/);
@@ -201,7 +209,7 @@ test("the row menu opens with Alt+M and every pop-up closes on a click outside a
   // Exercise name suggestions.
   await nameInput(page, id).focus();
   await page.keyboard.press("Enter");
-  const fresh = rows(page).last().locator("input").first();
+  const fresh = rows(page).last().locator('[data-testid^="plan-name-"]');
   await fresh.focus();
   await fresh.pressSequentially("squ");
   await expect(openPopups(page).first()).toBeVisible();

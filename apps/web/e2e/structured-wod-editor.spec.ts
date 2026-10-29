@@ -69,14 +69,14 @@ test.describe("structured WOD editor", () => {
     await page.keyboard.press("Alt+ArrowRight");
     await expectStep(page, "exercises");
     await expect(rows(page)).toHaveCount(1);
-    await expect(rows(page).first().locator("input").first()).toBeFocused();
+    await expect(rows(page).first().locator('[data-testid^="plan-name-"]')).toBeFocused();
 
     // Enter adds the next exercise and moves there.
     await nameAndEnter(page, "Burpee");
-    await expect(rows(page).nth(1).locator("input").first()).toBeFocused();
+    await expect(rows(page).nth(1).locator('[data-testid^="plan-name-"]')).toBeFocused();
     await nameAndEnter(page, "Wall Ball");
     await expect(rows(page)).toHaveCount(3);
-    await expect(rows(page).first().locator("input").first()).not.toHaveValue("");
+    await expect(rows(page).first().locator('[data-testid^="plan-name-"]')).not.toHaveValue("");
 
     // Alt+→ to Σκορ.
     await page.keyboard.press("Alt+ArrowRight");

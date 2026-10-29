@@ -153,16 +153,18 @@ export async function openStructuredEditor(page: Page) {
 }
 
 /**
- * Flips the free text / structured toggle. The toggle is either one switch
- * (`authoring-toggle` itself is the control) or a small group of choices.
+ * Flips the «Ελεύθερο κείμενο / Δομημένο» toggle and confirms the switch when
+ * the editor asks (text that becomes a note, a plan written out as text).
  */
 export async function switchAuthoring(page: Page, to: "structured" | "free") {
   const toggle = page.getByTestId("authoring-toggle");
   await expect(toggle).toBeVisible({ timeout: 15_000 });
-  const name = to === "structured" ? /structured|δομημένο/i : /free text|ελεύθερο κείμενο|κείμενο/i;
-  const choice = toggle.getByRole("tab", { name }).or(toggle.getByRole("radio", { name })).or(toggle.getByRole("button", { name }));
-  if ((await choice.count()) > 0) await choice.first().click();
-  else await toggle.click();
+  const choice = page.getByTestId(to === "structured" ? "authoring-toggle-structured" : "authoring-toggle-text");
+  await expect(choice).toBeEnabled({ timeout: 15_000 });
+  await choice.click();
+  const confirm = page.getByTestId("authoring-switch-confirm");
+  if (await confirm.isVisible({ timeout: 1_500 }).catch(() => false)) await confirm.click();
+  await expect(choice).toHaveAttribute("aria-pressed", "true");
 }
 
 /** The open section's flow step: an empty section opens on it; otherwise «+ Ενότητα» (Shift+Enter) starts one. */
@@ -215,9 +217,9 @@ export async function expectStep(page: Page, step: "flow" | "time" | "exercises"
 
 // ── Rows and cells ──────────────────────────────────────────────────────────
 
-/** Exercise rows of the open section, in order (not the ⋯ menu, which shares the prefix). */
+/** Exercise rows of the open section, in order (not the ⋯ menu or ⋯ buttons, which share the prefix). */
 export function rows(page: Page) {
-  return page.locator('[data-testid^="plan-row-"]:not([data-testid="plan-row-menu"])');
+  return page.locator('[data-testid^="plan-row-"]:not([data-testid="plan-row-menu"]):not([data-testid^="plan-row-more-"])');
 }
 
 export async function rowIds(page: Page): Promise<string[]> {
@@ -227,23 +229,25 @@ export async function rowIds(page: Page): Promise<string[]> {
 
 /** The exercise-name input of a row. */
 export function nameInput(page: Page, rowId: string) {
-  return page.getByTestId(`plan-row-${rowId}`).locator("input").first();
+  return page.getByTestId(`plan-name-${rowId}`);
 }
 
-/** The element carrying `plan-cell-<row>-<col>-<key>` (the field's box). */
-export function cell(page: Page, rowId: string, col: number, key: string) {
+/** A set / round column, or "same" for the one value every round shares (before Alt+V). */
+export type Col = number | "same";
+
+/** The box of a value field (`plan-cell-<row>-<col>-<key>-field`): input, unit and computed value. */
+export function cell(page: Page, rowId: string, col: Col, key: string) {
+  return page.getByTestId(`plan-cell-${rowId}-${col}-${key}-field`);
+}
+
+/** The text input of a value field (`plan-cell-<row>-<col>-<key>`). */
+export function cellInput(page: Page, rowId: string, col: Col, key: string) {
   return page.getByTestId(`plan-cell-${rowId}-${col}-${key}`);
 }
 
-/** The text input of a cell, whether the test id sits on the input or on its box. */
-export function cellInput(page: Page, rowId: string, col: number, key: string) {
-  const id = `plan-cell-${rowId}-${col}-${key}`;
-  return page.locator(`input[data-testid="${id}"], [data-testid="${id}"] input`).first();
-}
-
-/** All columns of one value key in a row (sets or rounds). */
+/** All set / round columns of one value key in a row (inputs only). */
 export function columns(page: Page, rowId: string, key: string) {
-  return page.locator(`[data-testid^="plan-cell-${rowId}-"][data-testid$="-${key}"]`);
+  return page.locator(`input[data-testid^="plan-cell-${rowId}-"][data-testid$="-${key}"]`);
 }
 
 /**

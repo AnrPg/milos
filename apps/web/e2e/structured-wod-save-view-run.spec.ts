@@ -79,7 +79,8 @@ test("saving sends authoring_mode structured_plan with sections[].plan", async (
   // Alt+G: one superset group.
   expect(first.group).toBeTruthy();
   expect(second.group).toBe(first.group);
-  expect(plan.structs?.[first.group!]).toEqual({ kind: "superset" });
+  // A group is a superset unless another structure is set for it.
+  expect([undefined, { kind: "superset" }]).toContainEqual(plan.structs?.[first.group!]);
   expect(page.url()).toContain(draftId);
 });
 
@@ -110,24 +111,31 @@ test("execution runs the superset set-wise and stops for the interruption", asyn
 
   const run = page.getByTestId("plan-run");
   await expect(run).toBeVisible({ timeout: 15_000 });
-  const current = run.locator('[aria-current="step"]').first();
+  const current = run.locator('section[aria-live="polite"]');
+  const name = current.getByRole("heading", { level: 2 });
   const next = page.getByTestId("plan-run-next");
 
+  // Ready: the first exercise is announced; Next starts.
+  await expect(current).toContainText("Bench Press");
+  await next.click();
+
   // Set 1 of every exercise in the group, then set 2.
-  await expect(current).toContainText("Bench Press");
-  await expect(current).toContainText(/1/);
+  await expect(name).toHaveText("Bench Press");
+  await expect(current).toContainText("Σετ 1 από 2");
   await next.click();
-  await expect(current).toContainText("Pull-up");
-  await expect(current).toContainText(/1/);
+  await expect(name).toHaveText("Pull-up");
+  await expect(current).toContainText("Σετ 1 από 2");
   await next.click();
-  await expect(current).toContainText("Bench Press");
-  await expect(current).toContainText(/2/);
+  // The 90″ rest between sets runs on the clock.
+  if (!(await name.isVisible())) await page.clock.fastForward(91_000);
+  await expect(name).toHaveText("Bench Press");
+  await expect(current).toContainText("Σετ 2 από 2");
 
   // Every 2:00: stop for the interrupt rows, then resume where you left off.
-  await page.clock.fastForward("02:01");
-  await expect(run).toContainText("Διακοπή");
-  await expect(current).toContainText("Burpee");
+  await page.clock.fastForward(30_000);
+  await expect(current).toContainText("Διακοπή");
+  await expect(name).toHaveText("Burpee");
   await next.click();
-  await expect(current).toContainText("Bench Press");
-  await expect(current).toContainText(/2/);
+  await expect(name).toHaveText("Bench Press");
+  await expect(current).toContainText("Σετ 2 από 2");
 });
