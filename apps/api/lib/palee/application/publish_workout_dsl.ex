@@ -5,6 +5,7 @@ defmodule Palee.Application.PublishWorkoutDsl do
 
   alias Palee.Application.PublishWorkout
   alias Palee.{Execution, Workouts}
+  alias Palee.Workouts.Queries.PlanPrescriptions
 
   # Scale slugs are preflighted against the acting tenant's scale levels
   # (ADR-128), so there is no context-free arity.
@@ -12,7 +13,8 @@ defmodule Palee.Application.PublishWorkoutDsl do
     source = value(params, :source)
     acknowledge_warnings? = value(params, :acknowledge_warnings, false) == true
 
-    with {:ok, parsed} <- Workouts.parse_dsl(source),
+    with :ok <- keep_plan(context, id),
+         {:ok, parsed} <- Workouts.parse_dsl(source),
          :ok <- require_warning_acknowledgement(parsed.diagnostics, acknowledge_warnings?),
          :ok <- preflight(context, parsed.workout),
          {:ok, execution_preview} <- build_execution_preview(parsed.workout),
@@ -27,6 +29,11 @@ defmodule Palee.Application.PublishWorkoutDsl do
        }}
     end
   end
+
+  # ADR-270: Quick Text cannot hold a structured plan; publishing it over a
+  # plan workout would replace the plan with its materialised rows.
+  defp keep_plan(context, id),
+    do: context |> Workouts.get_workout_for_admin(id) |> PlanPrescriptions.check_quick_text()
 
   defp require_warning_acknowledgement(diagnostics, false) do
     warnings = Enum.filter(diagnostics, &(&1.severity == :warning))

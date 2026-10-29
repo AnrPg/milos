@@ -166,6 +166,8 @@ defmodule PaleeWeb.Schemas.Workout do
         },
         free_text_document: %Schema{type: :object, additionalProperties: true, nullable: true},
         timer_preset: section_timer_preset_schema(),
+        plan: plan_section_schema(),
+        prescription: PaleeWeb.Schemas.StructuredPlan.prescription_schema(),
         exercises: %Schema{type: :array, items: workout_item_schema()},
         sections: %Schema{type: :array, items: child_schema}
       },
@@ -173,6 +175,9 @@ defmodule PaleeWeb.Schemas.Workout do
       additionalProperties: false
     }
   end
+
+  @doc "ADR-270: one section of a structured WOD plan (see `PaleeWeb.Schemas.StructuredPlan`)."
+  def plan_section_schema, do: PaleeWeb.Schemas.StructuredPlan.plan_section_schema()
 
   @doc "ADR-180: the timer a coach picked for one text section (the free-text preset shape)."
   def section_timer_preset_schema do
@@ -299,7 +304,12 @@ defmodule PaleeWeb.Schemas.Workout do
   def body_schema do
     %Schema{
       title: "WorkoutBody",
-      oneOf: [free_text_body_schema(), text_sections_body_schema(), structured_body_schema()],
+      oneOf: [
+        free_text_body_schema(),
+        text_sections_body_schema(),
+        structured_body_schema(),
+        plan_body_schema()
+      ],
       discriminator: %OpenApiSpex.Discriminator{propertyName: "kind"}
     }
   end
@@ -384,6 +394,34 @@ defmodule PaleeWeb.Schemas.Workout do
               }
             },
             required: [:id, :name, :timer, :scoreable, :exercises],
+            additionalProperties: false
+          }
+        }
+      },
+      required: [:kind, :sections],
+      additionalProperties: false
+    }
+  end
+
+  defp plan_body_schema do
+    %Schema{
+      title: "PlanWorkoutBody",
+      description: "ADR-270: written in the structured WOD editor, one plan per section",
+      type: :object,
+      properties: %{
+        kind: %Schema{type: :string, enum: ["plan"]},
+        sections: %Schema{
+          type: :array,
+          items: %Schema{
+            title: "PlanBodySection",
+            type: :object,
+            properties: %{
+              id: @nullable_uuid,
+              name: %Schema{type: :string},
+              plan: plan_section_schema(),
+              prescription: PaleeWeb.Schemas.StructuredPlan.prescription_schema()
+            },
+            required: [:id, :name, :plan, :prescription],
             additionalProperties: false
           }
         }

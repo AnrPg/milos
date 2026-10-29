@@ -2385,6 +2385,30 @@ defmodule PaleeWeb.FallbackController do
     })
   end
 
+  # ADR-270: which plan values stop a structured plan workout from saving,
+  # each with its section (from 1), the path inside the plan and a code.
+  def call(conn, {:error, {:invalid_plan_sections, problems}}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_plan_sections",
+      error: "Some values of the workout plan do not read",
+      details: %{sections: problems}
+    })
+  end
+
+  # ADR-270: a legacy editor (Quick Text, the old structured editor) would
+  # replace a structured plan with its materialised rows.
+  def call(conn, {:error, :structured_plan_mode_change}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "structured_plan_mode_change",
+      error:
+        "This workout is written as a structured plan; edit it in the structured editor or switch it to free text there."
+    })
+  end
+
   def call(conn, {:error, :no_sections}) do
     conn
     |> put_status(:unprocessable_entity)

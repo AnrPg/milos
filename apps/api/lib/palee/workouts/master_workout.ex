@@ -85,8 +85,13 @@ defmodule Palee.Workouts.MasterWorkout do
     |> cast_assoc(:sections, required: true, with: &WorkoutSection.changeset/2)
   end
 
-  @doc "ADR-180: `sectioned_text` is free text in sections, written without the assistant."
-  def authoring_modes, do: ["structured", "quick_text", "free_text", "sectioned_text"]
+  @doc """
+  ADR-180: `sectioned_text` is free text in sections, written without the
+  assistant. ADR-270: `structured_plan` is written in the structured WOD
+  editor, one plan per section (`workout_sections.plan`).
+  """
+  def authoring_modes,
+    do: ["structured", "quick_text", "free_text", "sectioned_text", "structured_plan"]
 
   def types, do: @types
   def statuses, do: @statuses

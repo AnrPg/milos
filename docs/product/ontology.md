@@ -473,6 +473,27 @@ Staff screens only (Fiscal). The German and Austrian texts a receipt prints are 
 | Data file | Αρχείο δεδομένων | `personal_data_exports` | The ZIP (JSON files) «Λήψη των δεδομένων μου» makes; downloadable for 7 days, one a day. | Audit archive; a box's tenant export (ADR-117). |
 | Sub-processor | Εκτελών την επεξεργασία | `lib/legal/sub-processors.ts` | A company that processes personal data for Palee (email, hosting, maps, payments…), listed on the privacy policy. | Payment provider (the box's own choice). |
 
+### 4.20 Structured WOD (ADR-270)
+
+How a coach writes a WOD in the structured editor. A section («ενότητα») is set up on three levels that
+never mix (flow, set structure, add-ons); presets only fill them in. Code names come from
+`apps/web/src/lib/structured-plan/types.ts`.
+
+| English | Ελληνικά | Code | What it is | Not to be confused with |
+|---|---|---|---|---|
+| Free text | Ελεύθερο κείμενο | authoring mode `free_text` | The default way to write a WOD: text, optionally read by the assistant. | Structured. |
+| Structured | Δομημένο | authoring mode `structured_plan` | Writing a WOD section by section in the wizard (Ροή → Χρόνος → Ασκήσεις → Σκορ). Switched on with a visible toggle; a workout opens in the mode it was written in. | The old structured editor (`structured`, ADR-005), which keeps its name in code only. |
+| Section | Ενότητα | `workout_sections`, `PlanSection` | One part of a WOD (warm-up, strength, metcon), with one flow. | Class («Τμήμα»): never call a section «τμήμα». |
+| Flow | Ροή | `PlanFlow` | How the clock runs for a whole section: Σετ (Sets, no clock), For Time, AMRAP, EMOM, Intervals, Ξεκούραση (Rest). Six only. | Format (the old 19 formats, retired from the UI); the club page tab «Ροή» (feed). |
+| Set structure | Δομή σετ | `PlanStructure` | What happens inside one set or round of an exercise or group: Απλό (Single), Superset, Complex, Cluster, Drop set, Rest-pause. Set with Alt+T. | Flow; Superset as a preset. |
+| Add-on | Προσθήκη | `PlanMods` | Something added on top of a flow: an interruption, or rest until heart rate falls («Ξεκούραση μέχρι να πέσουν οι παλμοί»). When it could be read as the verb, say «Προσθήκη στη ροή» / "flow add-on". | Package add-on («Πρόσθετο», `pkgTypeAddOn`); the action «Προσθήκη …» on buttons. |
+| Preset | Έτοιμη μορφή | `PRESETS`, `PlanSection.preset` | A known name (Tabata, Billat, HRR, Death by, EDT, Chipper, 21-15-9, Σκάλα / πυραμίδα, …) that pre-fills flow, structure, add-ons and values. Shown grouped under its flow, in a grey box. A name never includes the instance ("AMRAP", not "AMRAP 12'"). | Flow; «Έτοιμα χρονόμετρα» (class timer presets). |
+| Parameter | Παράμετρος | `PlanMeasure` (`extra`, `x`) | An optional measure a row adds (Alt+P): Ρυθμός (Pace), Tempo, RPE, RIR, Ζώνη παλμών (Heart-rate zone), Ύψος / στόχος (Height / target), Απόσταση (Distance), Κράτημα (Hold), Ανά πλευρά (Per side, a flag shown as a tag). | Flow params (Χρόνος step: sets, rest, cap, duration). |
+| Interruption | Διακοπή | `mods.interrupt`, `interrupt` rows | Every X minutes the athlete stops the main work, does the interruption rows, then resumes. Picker label «Διακοπή κάθε…». | The «Διακοπή» (Stop) button of the interval timer. |
+| Different round | Διαφορετικός γύρος | `blocks` | A block of other exercises; blocks alternate (rounds 1, 3, 5… / 2, 4, 6…). Added with Alt+S. | Per round. |
+| Per round | Ανά γύρο | `PlanRow.perRound` | Values that change round by round (Alt+V) in every flow other than Σετ, where they change per set («ανά σετ»). «Ίδιες τιμές σε κάθε γύρο» turns it off. | Different round (other exercises, not other values). |
+| Rest row | Ξεκούραση | `PlanRow.kind: "rest"` | A rest written as a row between exercises (e.g. inside a superset). | The flow Ξεκούραση (a whole rest section). |
+
 ## 5. Name clashes found, and proposals
 
 Each needs ANR's choice before the UI changes. The recommended option is first.
@@ -506,8 +527,17 @@ Each needs ANR's choice before the UI changes. The recommended option is first.
    "Competitive athletes".
    - **Proposal:** keep the role, but show it as "Athlete (personal programming)" /
      «Αθλητής (προσωπικό πρόγραμμα)» wherever roles are picked.
+10. **Structured WOD terms (ADR-270) that meet existing words.**
+   - «Ροή» is also the club page's feed tab. They never share a screen (editor vs club), so both stay.
+   - "Add-on" / «Πρόσθετο» is already a subscription-package type. The WOD level uses the mockup's
+     «Προσθήκη» in Greek and is called "flow add-on" in English wherever both could appear.
+   - «Διακοπή» is also the interval timer's Stop button; the add-on is always «Διακοπή κάθε…» in pickers.
+   - «Ξεκούραση» names both the rest flow and a rest row; the context (section vs row) tells them apart.
+   - "Plan" in the code (`PlanSection`, `structured_plan`) never appears in the UI: «Πακέτο Palee» and
+     personal training plans keep the word.
+   - The old 19 «μορφές» (formats) disappear from the structured editor; their names live on as presets.
 
-10. **"Guest" names two things in English** (ADR-272): the box role `guest` («Επισκέπτης») and
+11. **"Guest" names two things in English** (ADR-272): the box role `guest` («Επισκέπτης») and
     someone a member brings to an event («Καλεσμένος», §4.7). Greek also uses «επισκέπτης» for package
     guest passes («προσκλήσεις επισκεπτών»), the door's visitors («Επισκέπτες») and the shop's
     «Και επισκέπτες».

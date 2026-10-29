@@ -12,14 +12,19 @@ import { workoutPublishedHref } from "@/lib/workout-return";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 
 import { FreeTextWorkoutEditor } from "./FreeTextWorkoutEditor";
+import { AuthoringSwitchDialog, AuthoringToggle, type AuthoringKind } from "./AuthoringToggle";
 import { QuickTextWorkoutEditor } from "./QuickTextWorkoutEditor";
 import { SectionedWorkoutEditor } from "./SectionedWorkoutEditor";
+import { textOfWorkout } from "./structured-plan-authoring";
+import { StructuredPlanWorkoutEditor, type PlanEditorHandle } from "./StructuredPlanWorkoutEditor";
 import { WorkoutCreationCanvas } from "./WorkoutCreationCanvas";
 
-type AuthoringMode = "structured" | "quick-text" | "free-text" | "sectioned";
+/** `plan`: the structured WOD editor (ADR-270); `structured`: the legacy canvas. */
+type AuthoringMode = "structured" | "quick-text" | "free-text" | "sectioned" | "plan";
 
 /**
- * Free text is the only way to create new workouts. Structured and Quick Text
+ * Free text is how new workouts start (ADR-270: the «Ελεύθερο κείμενο /
+ * Δομημένο» toggle turns one into a structured plan and back). Structured and Quick Text
  * stay in the codebase (and keep editing workouts that were authored with
  * them), but their tabs are hidden. Flip this to bring the switcher back.
  */
@@ -79,16 +84,80 @@ export function WorkoutAuthoringModes({ embedded = false, initialDraftId = null,
     : draftId
       ? legacyEditorFor(draftQuery.data)
       : "free-text";
-  const textMode = storedMode === "free-text" || storedMode === "sectioned";
+  // ADR-270: the «Ελεύθερο κείμενο / Δομημένο» toggle's choice for this draft.
+  const [planChoice, setPlanChoice] = useState<{ draftId: string; structured: boolean } | null>(null);
+  const planChosen = planChoice && planChoice.draftId === draftId ? planChoice.structured : null;
+  const baseMode: AuthoringMode =
+    planChosen === true ? "plan" : planChosen === false && storedMode === "plan" ? "free-text" : storedMode;
+  const textMode = baseMode === "free-text" || baseMode === "sectioned";
   const chosen =
     assistantChoice && (assistantChoice.draftId === draftId || assistantChoice.draftId === null)
       ? assistantChoice.useAssistant
         ? "free-text"
         : "sectioned"
-      : storedMode;
-  const mode: AuthoringMode = textMode && !assistantAvailable ? "sectioned" : textMode ? chosen : storedMode;
+      : baseMode;
+  const mode: AuthoringMode = textMode && !assistantAvailable ? "sectioned" : textMode ? chosen : baseMode;
   const resolvingDraft =
     (!SHOW_AUTHORING_MODE_SWITCHER && Boolean(draftId) && draftQuery.isPending) || availability.isLoading;
+
+  const textSaveRef = useRef<(() => Promise<void>) | null>(null);
+  const planHandleRef = useRef<PlanEditorHandle | null>(null);
+  const [confirmSwitch, setConfirmSwitch] = useState<"toStructured" | "toText" | null>(null);
+  const [switching, setSwitching] = useState(false);
+  const [switchFailed, setSwitchFailed] = useState(false);
+  const showToggle = !SHOW_AUTHORING_MODE_SWITCHER && (mode === "free-text" || mode === "sectioned" || mode === "plan");
+
+  /**
+   * Text → structured: the text is saved first; when there is any, the coach
+   * confirms that the plan starts empty with the text as its first note.
+   */
+  async function requestStructured() {
+    if (!draftId || !tokens?.access_token) return;
+    setSwitching(true);
+    setSwitchFailed(false);
+    try {
+      await textSaveRef.current?.();
+      const workout = await fetchAdminWorkout(tokens.access_token, draftId);
+      if (textOfWorkout(workout)) setConfirmSwitch("toStructured");
+      else setPlanChoice({ draftId, structured: true });
+    } catch {
+      setSwitchFailed(true);
+    } finally {
+      setSwitching(false);
+    }
+  }
+
+  /** Structured → text: the plan is written out as text and saved, after the coach confirms. */
+  async function switchToText() {
+    if (!draftId) return;
+    setSwitching(true);
+    setSwitchFailed(false);
+    try {
+      await planHandleRef.current?.switchToText();
+      setConfirmSwitch(null);
+      setPlanChoice({ draftId, structured: false });
+    } catch {
+      setSwitchFailed(true);
+      setConfirmSwitch(null);
+    } finally {
+      setSwitching(false);
+    }
+  }
+
+  function toggleAuthoring(next: AuthoringKind) {
+    if (next === "structured") void requestStructured();
+    else if (planHandleRef.current?.hasContent()) setConfirmSwitch("toText");
+    else void switchToText();
+  }
+
+  function confirmAuthoringSwitch() {
+    if (confirmSwitch === "toText") {
+      void switchToText();
+      return;
+    }
+    if (draftId) setPlanChoice({ draftId, structured: true });
+    setConfirmSwitch(null);
+  }
 
   // New workouts started from inside a library folder are created in that folder.
   const folderId = embedded ? null : searchParams.get("folder");
@@ -214,8 +283,37 @@ export function WorkoutAuthoringModes({ embedded = false, initialDraftId = null,
       </>
       ) : null}
 
+      {showToggle ? (
+        <div className="mx-auto w-full max-w-4xl px-4 pt-2 sm:px-6">
+          <AuthoringToggle
+            value={mode === "plan" ? "structured" : "text"}
+            disabled={!draftId}
+            busy={switching}
+            failed={switchFailed}
+            onChange={toggleAuthoring}
+          />
+        </div>
+      ) : null}
+      {confirmSwitch ? (
+        <AuthoringSwitchDialog
+          kind={confirmSwitch}
+          busy={switching}
+          onConfirm={confirmAuthoringSwitch}
+          onCancel={() => setConfirmSwitch(null)}
+        />
+      ) : null}
+
       <div className="min-h-0 flex-1">
-        {mode === "quick-text" ? (
+        {mode === "plan" ? (
+          <StructuredPlanWorkoutEditor
+            key="plan"
+            draftId={draftId}
+            folderId={folderId}
+            onDraftReady={(id) => selectMode("free-text", id)}
+            onPublished={published}
+            handleRef={planHandleRef}
+          />
+        ) : mode === "quick-text" ? (
           <QuickTextWorkoutEditor
             draftId={draftId}
             folderId={folderId}
@@ -231,6 +329,7 @@ export function WorkoutAuthoringModes({ embedded = false, initialDraftId = null,
             onDraftReady={(id) => selectMode("free-text", id)}
             onPublished={published}
             onUseSections={() => setAssistantChoice({ draftId, useAssistant: false })}
+            saveHandleRef={textSaveRef}
           />
         ) : mode === "sectioned" ? (
           <SectionedWorkoutEditor
@@ -244,6 +343,7 @@ export function WorkoutAuthoringModes({ embedded = false, initialDraftId = null,
             onPublished={published}
             assistantAvailable={assistantAvailable}
             onUseAssistant={() => setAssistantChoice({ draftId, useAssistant: true })}
+            saveHandleRef={textSaveRef}
           />
         ) : (
           embedded ? (
@@ -259,6 +359,7 @@ export function WorkoutAuthoringModes({ embedded = false, initialDraftId = null,
 
 function legacyEditorFor(workout: Awaited<ReturnType<typeof fetchAdminWorkout>> | undefined): AuthoringMode {
   if (!workout) return "free-text";
+  if (workout.authoring_mode === "structured_plan") return "plan";
   if (workout.authoring_mode === "quick_text") return "quick-text";
   if (workout.authoring_mode === "sectioned_text") return "sectioned";
   // New drafts default to "structured" before their first save; only drafts

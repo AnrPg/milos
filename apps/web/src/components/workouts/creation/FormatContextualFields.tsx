@@ -11,22 +11,18 @@ import { LONG_DURATION_PRESETS, SHORT_DURATION_PRESETS, TimeInput } from "./Time
 const LONG_DURATION_FIELDS = new Set(["duration_seconds", "time_cap_seconds", "recovery_cap_seconds"]);
 import { SemanticLabel } from "@/components/semantic-label";
 
-type FieldLabel = {
+export type FieldLabel = {
   key: string;
   label: string;
   unit: string;
   optional?: boolean;
 };
 
-type Props = {
-  format: SectionFormat;
-  params: FormatParams;
-  onChange: (params: FormatParams) => void;
-};
+type UiTranslate = (key: string, values?: Record<string, string | number>) => string;
 
-export function FormatContextualFields({ format, params, onChange }: Props) {
-  const i18n = useUiTranslations();
-  const FORMAT_FIELD_LABELS: Partial<Record<SectionFormat, FieldLabel[]>> = {
+/** Each format's fields with their names, units and whether they may stay empty (also used by the structured editor's inline fields). */
+export function formatFieldLabels(i18n: UiTranslate): Partial<Record<SectionFormat, FieldLabel[]>> {
+  return {
     for_time: [
       { key: "time_cap_seconds", label: i18n("timeCap42f692a"), unit: "secs", optional: true },
       { key: "rounds", label: i18n("roundsceeac4a"), unit: "", optional: true },
@@ -95,6 +91,17 @@ export function FormatContextualFields({ format, params, onChange }: Props) {
     ],
     rest: [{ key: "duration_seconds", label: i18n("duration1370004"), unit: "secs" }],
   };
+}
+
+type Props = {
+  format: SectionFormat;
+  params: FormatParams;
+  onChange: (params: FormatParams) => void;
+};
+
+export function FormatContextualFields({ format, params, onChange }: Props) {
+  const i18n = useUiTranslations();
+  const FORMAT_FIELD_LABELS = formatFieldLabels(i18n);
 
   const labelDefs = FORMAT_FIELD_LABELS[format];
   const fieldDefs = FORMAT_FIELD_DEFS[format];

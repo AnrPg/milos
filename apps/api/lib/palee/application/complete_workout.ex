@@ -1,5 +1,6 @@
 defmodule Palee.Application.CompleteWorkout do
   alias Palee.Application.{
+    AthleteOneRepMax,
     BroadcastUserSync,
     InjuryWarningEvaluation,
     InvalidateLandingPages,
@@ -9,6 +10,7 @@ defmodule Palee.Application.CompleteWorkout do
 
   alias Palee.{Execution, Gamification, Identity, Journal, Notifications, Workouts}
   alias Palee.Execution.ExecutionStore
+  alias Palee.Workouts.Queries.PlanPrescriptions
   alias Palee.Workers.ProcessWorkoutCompletionJob
   alias Palee.Workers.RefreshLeaderboardJob
 
@@ -22,12 +24,16 @@ defmodule Palee.Application.CompleteWorkout do
     with {:ok, current_execution} <- fetch_execution(execution_id, user_id),
          {:ok, segments, workout} <- timer_sequence_for_execution(current_execution),
          {:ok, text_scores} <- text_section_scores(workout, params),
+         {:ok, plan_sets} <- plan_actuals(workout, params),
          {:ok, execution} <-
            Execution.complete_execution(
              execution_id,
              user_id,
              Map.put(params, :segments, segments),
-             [{:text_section_scores, text_scores} | completion_options(execution_id)]
+             [
+               {:text_section_scores, text_scores},
+               {:plan_sets, plan_sets} | completion_options(execution_id)
+             ]
            ),
          :ok <- process_inline_if_needed(execution) do
       broadcast_completion(execution)
@@ -39,6 +45,7 @@ defmodule Palee.Application.CompleteWorkout do
           execution
           |> Execution.completion_analytics_facts(segments)
           |> Map.merge(InjuryWarningEvaluation.completion_facts(execution, workout))
+          |> Map.merge(plan_completion_facts(execution, workout))
       })
 
       {:ok, execution}
@@ -235,6 +242,48 @@ defmodule Palee.Application.CompleteWorkout do
       )
 
   defp text_section_scores(_workout, _params), do: {:ok, []}
+
+  # ADR-270: the volume of a structured plan workout for analytics, next to
+  # the set counts and tonnage of its actuals (`ExecutionAnalytics`): kg ×
+  # reps with what the actuals lack read from the plan (% loads through the
+  # 1RM, ranges at their midpoint, scored rounds of an AMRAP done without
+  # actuals), and whether any of it is an estimate.
+  defp plan_completion_facts(execution, %{} = workout) do
+    if PlanPrescriptions.plan_workout?(workout) do
+      case PlanPrescriptions.workload(workout, Map.get(execution, :plan_sets) || [],
+             section_scores: execution.section_scores,
+             section_elapsed_ms: Map.get(execution, :section_elapsed_ms),
+             one_rep_max:
+               AthleteOneRepMax.lookup(%{user_id: execution.user_id}, execution.user_id)
+           ) do
+        %{totals: totals} ->
+          %{
+            authoring_mode: "structured_plan",
+            plan_volume_kg: totals.volume_kg,
+            plan_volume_estimated: totals.estimated
+          }
+
+        nil ->
+          %{authoring_mode: "structured_plan"}
+      end
+    else
+      %{}
+    end
+  end
+
+  defp plan_completion_facts(_execution, _workout), do: %{}
+
+  # ADR-270: what the athlete did in each set / round of a structured plan,
+  # checked against the plan rows of the workout's sections. Other workouts
+  # keep no plan actuals.
+  defp plan_actuals(%{authoring_mode: "structured_plan", sections: sections}, params),
+    do:
+      Execution.normalize_plan_actuals(
+        params[:plan_actuals] || params["plan_actuals"],
+        Workouts.plan_rows_by_section(sections || [])
+      )
+
+  defp plan_actuals(_workout, _params), do: {:ok, []}
 
   defp resolve_workout(context, workout_id, slug) when slug in [nil, ""],
     do: Workouts.get_workout(context, workout_id)

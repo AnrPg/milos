@@ -21431,6 +21431,248 @@ export interface components {
                             [key: string]: unknown;
                         } | null;
                     }[];
+                } | {
+                    /** @enum {string} */
+                    kind: "plan";
+                    sections: {
+                        /** Format: uuid */
+                        id: string | null;
+                        name: string;
+                        /**
+                         * PlanSection
+                         * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                         */
+                        plan: {
+                            blocks: {
+                                cells: ({
+                                    d?: string;
+                                    dist?: string;
+                                    height?: string;
+                                    hold?: string;
+                                    l?: string;
+                                    pace?: string;
+                                    rir?: string;
+                                    rpe?: string;
+                                    tempo?: string;
+                                    zone?: string;
+                                } | null)[];
+                                dose: string;
+                                exerciseRef?: string | null;
+                                extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                group?: string | null;
+                                id: string;
+                                /** @enum {string} */
+                                kind: "ex" | "rest";
+                                load: string;
+                                name: string;
+                                note?: string;
+                                perRound?: boolean;
+                                x?: {
+                                    dist?: string;
+                                    height?: string;
+                                    hold?: string;
+                                    pace?: string;
+                                    rir?: string;
+                                    rpe?: string;
+                                    tempo?: string;
+                                    zone?: string;
+                                };
+                            }[][];
+                            /** @enum {string} */
+                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                            interrupt?: {
+                                cells: ({
+                                    d?: string;
+                                    dist?: string;
+                                    height?: string;
+                                    hold?: string;
+                                    l?: string;
+                                    pace?: string;
+                                    rir?: string;
+                                    rpe?: string;
+                                    tempo?: string;
+                                    zone?: string;
+                                } | null)[];
+                                dose: string;
+                                exerciseRef?: string | null;
+                                extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                group?: string | null;
+                                id: string;
+                                /** @enum {string} */
+                                kind: "ex" | "rest";
+                                load: string;
+                                name: string;
+                                note?: string;
+                                perRound?: boolean;
+                                x?: {
+                                    dist?: string;
+                                    height?: string;
+                                    hold?: string;
+                                    pace?: string;
+                                    rir?: string;
+                                    rpe?: string;
+                                    tempo?: string;
+                                    zone?: string;
+                                };
+                            }[];
+                            levelNotes?: {
+                                [key: string]: string;
+                            };
+                            /** PlanMods */
+                            mods?: {
+                                hr?: boolean;
+                                interrupt?: boolean;
+                            };
+                            note?: string;
+                            /** PlanParams */
+                            params: {
+                                cap?: string;
+                                dur?: string;
+                                every?: string;
+                                hrTarget?: string;
+                                intEvery?: string;
+                                off?: string;
+                                rest?: string;
+                                rounds?: string;
+                                sets?: string;
+                                times?: string;
+                                work?: string;
+                            };
+                            preset?: string | null;
+                            /** @enum {string} */
+                            score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                            structs?: {
+                                [key: string]: {
+                                    clusters?: string;
+                                    dropby?: string;
+                                    drops?: string;
+                                    intra?: string;
+                                    /** @enum {string} */
+                                    kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                    minis?: string;
+                                };
+                            };
+                            /** @enum {integer} */
+                            v: 1;
+                        } | null;
+                        /**
+                         * PlanPrescription
+                         * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                         */
+                        prescription: {
+                            /**
+                             * PlanClock
+                             * @description How a plan section runs, unit-normalised (seconds, counts)
+                             */
+                            clock: {
+                                blocks: number;
+                                cap_secs: number | null;
+                                dur_secs: number | null;
+                                every_secs: number | null;
+                                /** @enum {string} */
+                                flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                hr_target_bpm: number | null;
+                                interrupt_every_secs: number | null;
+                                off_secs: number | null;
+                                /** @description AMRAP, or EMOM without times: no last round */
+                                open_ended: boolean;
+                                preset: string | null;
+                                rest_secs: {
+                                    max: number;
+                                    min: number;
+                                } | null;
+                                rounds: number | null;
+                                score: string | null;
+                                sets: {
+                                    max: number;
+                                    min: number;
+                                } | null;
+                                times: number | null;
+                                /** @description Null when open-ended */
+                                total_rounds: number | null;
+                                windows_secs: number[] | null;
+                                work_secs: number | null;
+                            };
+                            rows: {
+                                /** @description -1: an interruption row */
+                                block_index: number;
+                                exercise_ref: string | null;
+                                group_id: string | null;
+                                interrupt: boolean;
+                                /** @enum {string} */
+                                kind: "exercise" | "rest";
+                                name: string | null;
+                                note: string | null;
+                                per_side: boolean;
+                                row_id: string;
+                                sets: {
+                                    index: number;
+                                    /** PlanLoad */
+                                    load: {
+                                        /** @enum {string} */
+                                        kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                        text: string | null;
+                                        /** @description Decimal (22.5) */
+                                        value: number | null;
+                                        value_max: number | null;
+                                    } | null;
+                                    /** PlanMeasures */
+                                    measures: {
+                                        distance_m: number | null;
+                                        height_cm: number | null;
+                                        hold_secs: number | null;
+                                        hr_zone: number | null;
+                                        pace_secs_per_500m: number | null;
+                                        rir: number | null;
+                                        rpe: number | null;
+                                        tempo: {
+                                            bottom: number | "X";
+                                            down: number | "X";
+                                            top: number | "X";
+                                            up: number | "X";
+                                        } | null;
+                                    };
+                                    /** PlanReps */
+                                    reps: {
+                                        max: number | null;
+                                        max_effort: boolean;
+                                        min: number | null;
+                                        sets: {
+                                            max: number;
+                                            min: number;
+                                        } | null;
+                                        text: string | null;
+                                        /** @enum {string} */
+                                        unit: "reps" | "secs" | "meters" | "kcal";
+                                        within_secs: number | null;
+                                    } | null;
+                                    rest_secs: number | null;
+                                    /** @description 1-based rounds it applies to (empty: every interruption) */
+                                    rounds: number[];
+                                }[];
+                                /** PlanStructurePrescription */
+                                structure: {
+                                    clusters: number | null;
+                                    drop_by: string | null;
+                                    drops: number | null;
+                                    intra_secs: number | null;
+                                    /** @enum {string} */
+                                    kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                    minis: number | null;
+                                };
+                                /**
+                                 * PlanThenRule
+                                 * @description Open-ended flows: what follows the written rounds
+                                 */
+                                then: {
+                                    load_step: number | null;
+                                    reps_step: number | null;
+                                    /** @enum {string} */
+                                    rule: "repeat" | "step";
+                                } | null;
+                            }[];
+                        } | null;
+                    }[];
                 };
                 /** Format: uuid */
                 id: string;
@@ -21503,6 +21745,248 @@ export interface components {
                     subtitle?: string | null;
                     timer: {
                         [key: string]: unknown;
+                    } | null;
+                }[];
+            } | {
+                /** @enum {string} */
+                kind: "plan";
+                sections: {
+                    /** Format: uuid */
+                    id: string | null;
+                    name: string;
+                    /**
+                     * PlanSection
+                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                     */
+                    plan: {
+                        blocks: {
+                            cells: ({
+                                d?: string;
+                                dist?: string;
+                                height?: string;
+                                hold?: string;
+                                l?: string;
+                                pace?: string;
+                                rir?: string;
+                                rpe?: string;
+                                tempo?: string;
+                                zone?: string;
+                            } | null)[];
+                            dose: string;
+                            exerciseRef?: string | null;
+                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                            group?: string | null;
+                            id: string;
+                            /** @enum {string} */
+                            kind: "ex" | "rest";
+                            load: string;
+                            name: string;
+                            note?: string;
+                            perRound?: boolean;
+                            x?: {
+                                dist?: string;
+                                height?: string;
+                                hold?: string;
+                                pace?: string;
+                                rir?: string;
+                                rpe?: string;
+                                tempo?: string;
+                                zone?: string;
+                            };
+                        }[][];
+                        /** @enum {string} */
+                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                        interrupt?: {
+                            cells: ({
+                                d?: string;
+                                dist?: string;
+                                height?: string;
+                                hold?: string;
+                                l?: string;
+                                pace?: string;
+                                rir?: string;
+                                rpe?: string;
+                                tempo?: string;
+                                zone?: string;
+                            } | null)[];
+                            dose: string;
+                            exerciseRef?: string | null;
+                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                            group?: string | null;
+                            id: string;
+                            /** @enum {string} */
+                            kind: "ex" | "rest";
+                            load: string;
+                            name: string;
+                            note?: string;
+                            perRound?: boolean;
+                            x?: {
+                                dist?: string;
+                                height?: string;
+                                hold?: string;
+                                pace?: string;
+                                rir?: string;
+                                rpe?: string;
+                                tempo?: string;
+                                zone?: string;
+                            };
+                        }[];
+                        levelNotes?: {
+                            [key: string]: string;
+                        };
+                        /** PlanMods */
+                        mods?: {
+                            hr?: boolean;
+                            interrupt?: boolean;
+                        };
+                        note?: string;
+                        /** PlanParams */
+                        params: {
+                            cap?: string;
+                            dur?: string;
+                            every?: string;
+                            hrTarget?: string;
+                            intEvery?: string;
+                            off?: string;
+                            rest?: string;
+                            rounds?: string;
+                            sets?: string;
+                            times?: string;
+                            work?: string;
+                        };
+                        preset?: string | null;
+                        /** @enum {string} */
+                        score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                        structs?: {
+                            [key: string]: {
+                                clusters?: string;
+                                dropby?: string;
+                                drops?: string;
+                                intra?: string;
+                                /** @enum {string} */
+                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                minis?: string;
+                            };
+                        };
+                        /** @enum {integer} */
+                        v: 1;
+                    } | null;
+                    /**
+                     * PlanPrescription
+                     * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                     */
+                    prescription: {
+                        /**
+                         * PlanClock
+                         * @description How a plan section runs, unit-normalised (seconds, counts)
+                         */
+                        clock: {
+                            blocks: number;
+                            cap_secs: number | null;
+                            dur_secs: number | null;
+                            every_secs: number | null;
+                            /** @enum {string} */
+                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                            hr_target_bpm: number | null;
+                            interrupt_every_secs: number | null;
+                            off_secs: number | null;
+                            /** @description AMRAP, or EMOM without times: no last round */
+                            open_ended: boolean;
+                            preset: string | null;
+                            rest_secs: {
+                                max: number;
+                                min: number;
+                            } | null;
+                            rounds: number | null;
+                            score: string | null;
+                            sets: {
+                                max: number;
+                                min: number;
+                            } | null;
+                            times: number | null;
+                            /** @description Null when open-ended */
+                            total_rounds: number | null;
+                            windows_secs: number[] | null;
+                            work_secs: number | null;
+                        };
+                        rows: {
+                            /** @description -1: an interruption row */
+                            block_index: number;
+                            exercise_ref: string | null;
+                            group_id: string | null;
+                            interrupt: boolean;
+                            /** @enum {string} */
+                            kind: "exercise" | "rest";
+                            name: string | null;
+                            note: string | null;
+                            per_side: boolean;
+                            row_id: string;
+                            sets: {
+                                index: number;
+                                /** PlanLoad */
+                                load: {
+                                    /** @enum {string} */
+                                    kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                    text: string | null;
+                                    /** @description Decimal (22.5) */
+                                    value: number | null;
+                                    value_max: number | null;
+                                } | null;
+                                /** PlanMeasures */
+                                measures: {
+                                    distance_m: number | null;
+                                    height_cm: number | null;
+                                    hold_secs: number | null;
+                                    hr_zone: number | null;
+                                    pace_secs_per_500m: number | null;
+                                    rir: number | null;
+                                    rpe: number | null;
+                                    tempo: {
+                                        bottom: number | "X";
+                                        down: number | "X";
+                                        top: number | "X";
+                                        up: number | "X";
+                                    } | null;
+                                };
+                                /** PlanReps */
+                                reps: {
+                                    max: number | null;
+                                    max_effort: boolean;
+                                    min: number | null;
+                                    sets: {
+                                        max: number;
+                                        min: number;
+                                    } | null;
+                                    text: string | null;
+                                    /** @enum {string} */
+                                    unit: "reps" | "secs" | "meters" | "kcal";
+                                    within_secs: number | null;
+                                } | null;
+                                rest_secs: number | null;
+                                /** @description 1-based rounds it applies to (empty: every interruption) */
+                                rounds: number[];
+                            }[];
+                            /** PlanStructurePrescription */
+                            structure: {
+                                clusters: number | null;
+                                drop_by: string | null;
+                                drops: number | null;
+                                intra_secs: number | null;
+                                /** @enum {string} */
+                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                minis: number | null;
+                            };
+                            /**
+                             * PlanThenRule
+                             * @description Open-ended flows: what follows the written rounds
+                             */
+                            then: {
+                                load_step: number | null;
+                                reps_step: number | null;
+                                /** @enum {string} */
+                                rule: "repeat" | "step";
+                            } | null;
+                        }[];
                     } | null;
                 }[];
             };
@@ -28474,6 +28958,75 @@ export interface components {
             /** Format: date-time */
             occurred_at: string;
         };
+        /** ExecutionPlanSet */
+        ExecutionPlanSet: {
+            actual_load_kg: number | null;
+            actual_reps: number | null;
+            /** @description The row's block; -1 for an interruption row */
+            block_index: number;
+            exercise_name: string;
+            exercise_ref: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at: string;
+            interrupt: boolean;
+            /** @description The athlete typed a value (otherwise actual = prescribed) */
+            logged: boolean;
+            one_rep_max_kg: number | null;
+            /** @description Cluster / drop part */
+            part_index: number;
+            /** @description AMRAP window, EMOM slot */
+            phase_index: number;
+            prescribed_load_kg: number | null;
+            prescribed_load_pct: number | null;
+            prescribed_load_text: string;
+            prescribed_reps: number | null;
+            prescribed_reps_text: string;
+            /** @description 1-based set / round / slot / interval; for an interruption, which one */
+            round_index: number;
+            row_id: string;
+            /** Format: uuid */
+            section_id: string;
+        };
+        /** ExecutionResponse */
+        ExecutionResponse: {
+            execution: {
+                /** @description ADR-270: plan actuals of a completed structured_plan execution, in run order */
+                plan_sets?: {
+                    actual_load_kg: number | null;
+                    actual_reps: number | null;
+                    /** @description The row's block; -1 for an interruption row */
+                    block_index: number;
+                    exercise_name: string;
+                    exercise_ref: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    inserted_at: string;
+                    interrupt: boolean;
+                    /** @description The athlete typed a value (otherwise actual = prescribed) */
+                    logged: boolean;
+                    one_rep_max_kg: number | null;
+                    /** @description Cluster / drop part */
+                    part_index: number;
+                    /** @description AMRAP window, EMOM slot */
+                    phase_index: number;
+                    prescribed_load_kg: number | null;
+                    prescribed_load_pct: number | null;
+                    prescribed_load_text: string;
+                    prescribed_reps: number | null;
+                    prescribed_reps_text: string;
+                    /** @description 1-based set / round / slot / interval; for an interruption, which one */
+                    round_index: number;
+                    row_id: string;
+                    /** Format: uuid */
+                    section_id: string;
+                }[];
+            } & {
+                [key: string]: unknown;
+            };
+        };
         /** FacilityCheckIn */
         FacilityCheckIn: {
             already_checked_in?: boolean;
@@ -33771,6 +34324,1127 @@ export interface components {
             ref?: string | null;
             slug: string;
         };
+        /** PlanBodySection */
+        PlanBodySection: {
+            /** Format: uuid */
+            id: string | null;
+            name: string;
+            /**
+             * PlanSection
+             * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+             */
+            plan: {
+                blocks: {
+                    cells: ({
+                        d?: string;
+                        dist?: string;
+                        height?: string;
+                        hold?: string;
+                        l?: string;
+                        pace?: string;
+                        rir?: string;
+                        rpe?: string;
+                        tempo?: string;
+                        zone?: string;
+                    } | null)[];
+                    dose: string;
+                    exerciseRef?: string | null;
+                    extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                    group?: string | null;
+                    id: string;
+                    /** @enum {string} */
+                    kind: "ex" | "rest";
+                    load: string;
+                    name: string;
+                    note?: string;
+                    perRound?: boolean;
+                    x?: {
+                        dist?: string;
+                        height?: string;
+                        hold?: string;
+                        pace?: string;
+                        rir?: string;
+                        rpe?: string;
+                        tempo?: string;
+                        zone?: string;
+                    };
+                }[][];
+                /** @enum {string} */
+                flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                interrupt?: {
+                    cells: ({
+                        d?: string;
+                        dist?: string;
+                        height?: string;
+                        hold?: string;
+                        l?: string;
+                        pace?: string;
+                        rir?: string;
+                        rpe?: string;
+                        tempo?: string;
+                        zone?: string;
+                    } | null)[];
+                    dose: string;
+                    exerciseRef?: string | null;
+                    extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                    group?: string | null;
+                    id: string;
+                    /** @enum {string} */
+                    kind: "ex" | "rest";
+                    load: string;
+                    name: string;
+                    note?: string;
+                    perRound?: boolean;
+                    x?: {
+                        dist?: string;
+                        height?: string;
+                        hold?: string;
+                        pace?: string;
+                        rir?: string;
+                        rpe?: string;
+                        tempo?: string;
+                        zone?: string;
+                    };
+                }[];
+                levelNotes?: {
+                    [key: string]: string;
+                };
+                /** PlanMods */
+                mods?: {
+                    hr?: boolean;
+                    interrupt?: boolean;
+                };
+                note?: string;
+                /** PlanParams */
+                params: {
+                    cap?: string;
+                    dur?: string;
+                    every?: string;
+                    hrTarget?: string;
+                    intEvery?: string;
+                    off?: string;
+                    rest?: string;
+                    rounds?: string;
+                    sets?: string;
+                    times?: string;
+                    work?: string;
+                };
+                preset?: string | null;
+                /** @enum {string} */
+                score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                structs?: {
+                    [key: string]: {
+                        clusters?: string;
+                        dropby?: string;
+                        drops?: string;
+                        intra?: string;
+                        /** @enum {string} */
+                        kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                        minis?: string;
+                    };
+                };
+                /** @enum {integer} */
+                v: 1;
+            } | null;
+            /**
+             * PlanPrescription
+             * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+             */
+            prescription: {
+                /**
+                 * PlanClock
+                 * @description How a plan section runs, unit-normalised (seconds, counts)
+                 */
+                clock: {
+                    blocks: number;
+                    cap_secs: number | null;
+                    dur_secs: number | null;
+                    every_secs: number | null;
+                    /** @enum {string} */
+                    flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                    hr_target_bpm: number | null;
+                    interrupt_every_secs: number | null;
+                    off_secs: number | null;
+                    /** @description AMRAP, or EMOM without times: no last round */
+                    open_ended: boolean;
+                    preset: string | null;
+                    rest_secs: {
+                        max: number;
+                        min: number;
+                    } | null;
+                    rounds: number | null;
+                    score: string | null;
+                    sets: {
+                        max: number;
+                        min: number;
+                    } | null;
+                    times: number | null;
+                    /** @description Null when open-ended */
+                    total_rounds: number | null;
+                    windows_secs: number[] | null;
+                    work_secs: number | null;
+                };
+                rows: {
+                    /** @description -1: an interruption row */
+                    block_index: number;
+                    exercise_ref: string | null;
+                    group_id: string | null;
+                    interrupt: boolean;
+                    /** @enum {string} */
+                    kind: "exercise" | "rest";
+                    name: string | null;
+                    note: string | null;
+                    per_side: boolean;
+                    row_id: string;
+                    sets: {
+                        index: number;
+                        /** PlanLoad */
+                        load: {
+                            /** @enum {string} */
+                            kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                            text: string | null;
+                            /** @description Decimal (22.5) */
+                            value: number | null;
+                            value_max: number | null;
+                        } | null;
+                        /** PlanMeasures */
+                        measures: {
+                            distance_m: number | null;
+                            height_cm: number | null;
+                            hold_secs: number | null;
+                            hr_zone: number | null;
+                            pace_secs_per_500m: number | null;
+                            rir: number | null;
+                            rpe: number | null;
+                            tempo: {
+                                bottom: number | "X";
+                                down: number | "X";
+                                top: number | "X";
+                                up: number | "X";
+                            } | null;
+                        };
+                        /** PlanReps */
+                        reps: {
+                            max: number | null;
+                            max_effort: boolean;
+                            min: number | null;
+                            sets: {
+                                max: number;
+                                min: number;
+                            } | null;
+                            text: string | null;
+                            /** @enum {string} */
+                            unit: "reps" | "secs" | "meters" | "kcal";
+                            within_secs: number | null;
+                        } | null;
+                        rest_secs: number | null;
+                        /** @description 1-based rounds it applies to (empty: every interruption) */
+                        rounds: number[];
+                    }[];
+                    /** PlanStructurePrescription */
+                    structure: {
+                        clusters: number | null;
+                        drop_by: string | null;
+                        drops: number | null;
+                        intra_secs: number | null;
+                        /** @enum {string} */
+                        kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                        minis: number | null;
+                    };
+                    /**
+                     * PlanThenRule
+                     * @description Open-ended flows: what follows the written rounds
+                     */
+                    then: {
+                        load_step: number | null;
+                        reps_step: number | null;
+                        /** @enum {string} */
+                        rule: "repeat" | "step";
+                    } | null;
+                }[];
+            } | null;
+        };
+        /** PlanCell */
+        PlanCell: {
+            d?: string;
+            dist?: string;
+            height?: string;
+            hold?: string;
+            l?: string;
+            pace?: string;
+            rir?: string;
+            rpe?: string;
+            tempo?: string;
+            zone?: string;
+        } | null;
+        /**
+         * PlanClock
+         * @description How a plan section runs, unit-normalised (seconds, counts)
+         */
+        PlanClock: {
+            blocks: number;
+            cap_secs: number | null;
+            dur_secs: number | null;
+            every_secs: number | null;
+            /** @enum {string} */
+            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+            hr_target_bpm: number | null;
+            interrupt_every_secs: number | null;
+            off_secs: number | null;
+            /** @description AMRAP, or EMOM without times: no last round */
+            open_ended: boolean;
+            preset: string | null;
+            rest_secs: {
+                max: number;
+                min: number;
+            } | null;
+            rounds: number | null;
+            score: string | null;
+            sets: {
+                max: number;
+                min: number;
+            } | null;
+            times: number | null;
+            /** @description Null when open-ended */
+            total_rounds: number | null;
+            windows_secs: number[] | null;
+            work_secs: number | null;
+        };
+        /** PlanLoad */
+        PlanLoad: {
+            /** @enum {string} */
+            kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+            text: string | null;
+            /** @description Decimal (22.5) */
+            value: number | null;
+            value_max: number | null;
+        } | null;
+        /** PlanMeasures */
+        PlanMeasures: {
+            distance_m: number | null;
+            height_cm: number | null;
+            hold_secs: number | null;
+            hr_zone: number | null;
+            pace_secs_per_500m: number | null;
+            rir: number | null;
+            rpe: number | null;
+            tempo: {
+                bottom: number | "X";
+                down: number | "X";
+                top: number | "X";
+                up: number | "X";
+            } | null;
+        };
+        /** PlanMods */
+        PlanMods: {
+            hr?: boolean;
+            interrupt?: boolean;
+        };
+        /** PlanParams */
+        PlanParams: {
+            cap?: string;
+            dur?: string;
+            every?: string;
+            hrTarget?: string;
+            intEvery?: string;
+            off?: string;
+            rest?: string;
+            rounds?: string;
+            sets?: string;
+            times?: string;
+            work?: string;
+        };
+        /**
+         * PlanPrescription
+         * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+         */
+        PlanPrescription: {
+            /**
+             * PlanClock
+             * @description How a plan section runs, unit-normalised (seconds, counts)
+             */
+            clock: {
+                blocks: number;
+                cap_secs: number | null;
+                dur_secs: number | null;
+                every_secs: number | null;
+                /** @enum {string} */
+                flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                hr_target_bpm: number | null;
+                interrupt_every_secs: number | null;
+                off_secs: number | null;
+                /** @description AMRAP, or EMOM without times: no last round */
+                open_ended: boolean;
+                preset: string | null;
+                rest_secs: {
+                    max: number;
+                    min: number;
+                } | null;
+                rounds: number | null;
+                score: string | null;
+                sets: {
+                    max: number;
+                    min: number;
+                } | null;
+                times: number | null;
+                /** @description Null when open-ended */
+                total_rounds: number | null;
+                windows_secs: number[] | null;
+                work_secs: number | null;
+            };
+            rows: {
+                /** @description -1: an interruption row */
+                block_index: number;
+                exercise_ref: string | null;
+                group_id: string | null;
+                interrupt: boolean;
+                /** @enum {string} */
+                kind: "exercise" | "rest";
+                name: string | null;
+                note: string | null;
+                per_side: boolean;
+                row_id: string;
+                sets: {
+                    index: number;
+                    /** PlanLoad */
+                    load: {
+                        /** @enum {string} */
+                        kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                        text: string | null;
+                        /** @description Decimal (22.5) */
+                        value: number | null;
+                        value_max: number | null;
+                    } | null;
+                    /** PlanMeasures */
+                    measures: {
+                        distance_m: number | null;
+                        height_cm: number | null;
+                        hold_secs: number | null;
+                        hr_zone: number | null;
+                        pace_secs_per_500m: number | null;
+                        rir: number | null;
+                        rpe: number | null;
+                        tempo: {
+                            bottom: number | "X";
+                            down: number | "X";
+                            top: number | "X";
+                            up: number | "X";
+                        } | null;
+                    };
+                    /** PlanReps */
+                    reps: {
+                        max: number | null;
+                        max_effort: boolean;
+                        min: number | null;
+                        sets: {
+                            max: number;
+                            min: number;
+                        } | null;
+                        text: string | null;
+                        /** @enum {string} */
+                        unit: "reps" | "secs" | "meters" | "kcal";
+                        within_secs: number | null;
+                    } | null;
+                    rest_secs: number | null;
+                    /** @description 1-based rounds it applies to (empty: every interruption) */
+                    rounds: number[];
+                }[];
+                /** PlanStructurePrescription */
+                structure: {
+                    clusters: number | null;
+                    drop_by: string | null;
+                    drops: number | null;
+                    intra_secs: number | null;
+                    /** @enum {string} */
+                    kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                    minis: number | null;
+                };
+                /**
+                 * PlanThenRule
+                 * @description Open-ended flows: what follows the written rounds
+                 */
+                then: {
+                    load_step: number | null;
+                    reps_step: number | null;
+                    /** @enum {string} */
+                    rule: "repeat" | "step";
+                } | null;
+            }[];
+        } | null;
+        /** PlanReps */
+        PlanReps: {
+            max: number | null;
+            max_effort: boolean;
+            min: number | null;
+            sets: {
+                max: number;
+                min: number;
+            } | null;
+            text: string | null;
+            /** @enum {string} */
+            unit: "reps" | "secs" | "meters" | "kcal";
+            within_secs: number | null;
+        } | null;
+        /** PlanRow */
+        PlanRow: {
+            cells: ({
+                d?: string;
+                dist?: string;
+                height?: string;
+                hold?: string;
+                l?: string;
+                pace?: string;
+                rir?: string;
+                rpe?: string;
+                tempo?: string;
+                zone?: string;
+            } | null)[];
+            dose: string;
+            exerciseRef?: string | null;
+            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+            group?: string | null;
+            id: string;
+            /** @enum {string} */
+            kind: "ex" | "rest";
+            load: string;
+            name: string;
+            note?: string;
+            perRound?: boolean;
+            x?: {
+                dist?: string;
+                height?: string;
+                hold?: string;
+                pace?: string;
+                rir?: string;
+                rpe?: string;
+                tempo?: string;
+                zone?: string;
+            };
+        };
+        /** PlanRowPrescription */
+        PlanRowPrescription: {
+            /** @description -1: an interruption row */
+            block_index: number;
+            exercise_ref: string | null;
+            group_id: string | null;
+            interrupt: boolean;
+            /** @enum {string} */
+            kind: "exercise" | "rest";
+            name: string | null;
+            note: string | null;
+            per_side: boolean;
+            row_id: string;
+            sets: {
+                index: number;
+                /** PlanLoad */
+                load: {
+                    /** @enum {string} */
+                    kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                    text: string | null;
+                    /** @description Decimal (22.5) */
+                    value: number | null;
+                    value_max: number | null;
+                } | null;
+                /** PlanMeasures */
+                measures: {
+                    distance_m: number | null;
+                    height_cm: number | null;
+                    hold_secs: number | null;
+                    hr_zone: number | null;
+                    pace_secs_per_500m: number | null;
+                    rir: number | null;
+                    rpe: number | null;
+                    tempo: {
+                        bottom: number | "X";
+                        down: number | "X";
+                        top: number | "X";
+                        up: number | "X";
+                    } | null;
+                };
+                /** PlanReps */
+                reps: {
+                    max: number | null;
+                    max_effort: boolean;
+                    min: number | null;
+                    sets: {
+                        max: number;
+                        min: number;
+                    } | null;
+                    text: string | null;
+                    /** @enum {string} */
+                    unit: "reps" | "secs" | "meters" | "kcal";
+                    within_secs: number | null;
+                } | null;
+                rest_secs: number | null;
+                /** @description 1-based rounds it applies to (empty: every interruption) */
+                rounds: number[];
+            }[];
+            /** PlanStructurePrescription */
+            structure: {
+                clusters: number | null;
+                drop_by: string | null;
+                drops: number | null;
+                intra_secs: number | null;
+                /** @enum {string} */
+                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                minis: number | null;
+            };
+            /**
+             * PlanThenRule
+             * @description Open-ended flows: what follows the written rounds
+             */
+            then: {
+                load_step: number | null;
+                reps_step: number | null;
+                /** @enum {string} */
+                rule: "repeat" | "step";
+            } | null;
+        };
+        /**
+         * PlanSection
+         * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+         */
+        PlanSection: {
+            blocks: {
+                cells: ({
+                    d?: string;
+                    dist?: string;
+                    height?: string;
+                    hold?: string;
+                    l?: string;
+                    pace?: string;
+                    rir?: string;
+                    rpe?: string;
+                    tempo?: string;
+                    zone?: string;
+                } | null)[];
+                dose: string;
+                exerciseRef?: string | null;
+                extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                group?: string | null;
+                id: string;
+                /** @enum {string} */
+                kind: "ex" | "rest";
+                load: string;
+                name: string;
+                note?: string;
+                perRound?: boolean;
+                x?: {
+                    dist?: string;
+                    height?: string;
+                    hold?: string;
+                    pace?: string;
+                    rir?: string;
+                    rpe?: string;
+                    tempo?: string;
+                    zone?: string;
+                };
+            }[][];
+            /** @enum {string} */
+            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+            interrupt?: {
+                cells: ({
+                    d?: string;
+                    dist?: string;
+                    height?: string;
+                    hold?: string;
+                    l?: string;
+                    pace?: string;
+                    rir?: string;
+                    rpe?: string;
+                    tempo?: string;
+                    zone?: string;
+                } | null)[];
+                dose: string;
+                exerciseRef?: string | null;
+                extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                group?: string | null;
+                id: string;
+                /** @enum {string} */
+                kind: "ex" | "rest";
+                load: string;
+                name: string;
+                note?: string;
+                perRound?: boolean;
+                x?: {
+                    dist?: string;
+                    height?: string;
+                    hold?: string;
+                    pace?: string;
+                    rir?: string;
+                    rpe?: string;
+                    tempo?: string;
+                    zone?: string;
+                };
+            }[];
+            levelNotes?: {
+                [key: string]: string;
+            };
+            /** PlanMods */
+            mods?: {
+                hr?: boolean;
+                interrupt?: boolean;
+            };
+            note?: string;
+            /** PlanParams */
+            params: {
+                cap?: string;
+                dur?: string;
+                every?: string;
+                hrTarget?: string;
+                intEvery?: string;
+                off?: string;
+                rest?: string;
+                rounds?: string;
+                sets?: string;
+                times?: string;
+                work?: string;
+            };
+            preset?: string | null;
+            /** @enum {string} */
+            score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+            structs?: {
+                [key: string]: {
+                    clusters?: string;
+                    dropby?: string;
+                    drops?: string;
+                    intra?: string;
+                    /** @enum {string} */
+                    kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                    minis?: string;
+                };
+            };
+            /** @enum {integer} */
+            v: 1;
+        } | null;
+        /**
+         * PlanSetActual
+         * @description ADR-270: one set / round of a structured plan row, prescribed next to actual (checked by Palee.Execution.Domain.PlanActuals)
+         */
+        PlanSetActual: {
+            actual_load_kg?: number | null;
+            actual_reps?: number | null;
+            /** @description The row's block; -1 for an interruption row */
+            block_index: number;
+            exercise_name?: string;
+            exercise_ref?: string | null;
+            interrupt?: boolean;
+            /** @description The athlete typed a value (otherwise actual = prescribed) */
+            logged?: boolean;
+            one_rep_max_kg?: number | null;
+            /** @description Cluster / drop part */
+            part_index?: number;
+            /** @description AMRAP window, EMOM slot */
+            phase_index?: number;
+            prescribed_load_kg?: number | null;
+            prescribed_load_pct?: number | null;
+            prescribed_load_text?: string;
+            prescribed_reps?: number | null;
+            prescribed_reps_text?: string;
+            /** @description 1-based set / round / slot / interval; for an interruption, which one */
+            round_index: number;
+            row_id: string;
+            /** Format: uuid */
+            section_id: string;
+        };
+        /** PlanSetPrescription */
+        PlanSetPrescription: {
+            index: number;
+            /** PlanLoad */
+            load: {
+                /** @enum {string} */
+                kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                text: string | null;
+                /** @description Decimal (22.5) */
+                value: number | null;
+                value_max: number | null;
+            } | null;
+            /** PlanMeasures */
+            measures: {
+                distance_m: number | null;
+                height_cm: number | null;
+                hold_secs: number | null;
+                hr_zone: number | null;
+                pace_secs_per_500m: number | null;
+                rir: number | null;
+                rpe: number | null;
+                tempo: {
+                    bottom: number | "X";
+                    down: number | "X";
+                    top: number | "X";
+                    up: number | "X";
+                } | null;
+            };
+            /** PlanReps */
+            reps: {
+                max: number | null;
+                max_effort: boolean;
+                min: number | null;
+                sets: {
+                    max: number;
+                    min: number;
+                } | null;
+                text: string | null;
+                /** @enum {string} */
+                unit: "reps" | "secs" | "meters" | "kcal";
+                within_secs: number | null;
+            } | null;
+            rest_secs: number | null;
+            /** @description 1-based rounds it applies to (empty: every interruption) */
+            rounds: number[];
+        };
+        /** PlanStructure */
+        PlanStructure: {
+            clusters?: string;
+            dropby?: string;
+            drops?: string;
+            intra?: string;
+            /** @enum {string} */
+            kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+            minis?: string;
+        };
+        /** PlanStructurePrescription */
+        PlanStructurePrescription: {
+            clusters: number | null;
+            drop_by: string | null;
+            drops: number | null;
+            intra_secs: number | null;
+            /** @enum {string} */
+            kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+            minis: number | null;
+        };
+        /**
+         * PlanThenRule
+         * @description Open-ended flows: what follows the written rounds
+         */
+        PlanThenRule: {
+            load_step: number | null;
+            reps_step: number | null;
+            /** @enum {string} */
+            rule: "repeat" | "step";
+        } | null;
+        /** PlanWorkload */
+        PlanWorkload: {
+            exercises?: {
+                calories?: number;
+                distance_m?: number;
+                estimated?: boolean;
+                exercise_ref?: string | null;
+                logged_sets?: number;
+                name?: string | null;
+                reps?: number;
+                sets?: number;
+                top_set?: {
+                    load_kg?: number;
+                    reps?: number | null;
+                } | null;
+                volume_kg?: number;
+                work_secs?: number;
+            }[];
+            sections?: {
+                exercises?: {
+                    block_index?: number;
+                    calories?: number;
+                    distance_m?: number;
+                    estimated?: boolean;
+                    exercise_ref?: string | null;
+                    group_id?: string | null;
+                    interrupt?: boolean;
+                    logged_sets?: number;
+                    name?: string | null;
+                    per_side?: boolean;
+                    reps?: number;
+                    row_id?: string;
+                    sets?: number;
+                    top_set?: {
+                        load_kg?: number;
+                        reps?: number | null;
+                    } | null;
+                    volume_kg?: number;
+                    work_secs?: number;
+                }[];
+                flow?: string;
+                name?: string | null;
+                open_ended?: boolean;
+                preset?: string | null;
+                score?: string | null;
+                section_id?: string;
+                /** @enum {string} */
+                source?: "actuals" | "prescription";
+                time_domain?: {
+                    cap_secs?: number | null;
+                    open_ended?: boolean;
+                    planned_secs?: number | null;
+                };
+                totals?: {
+                    calories?: number;
+                    distance_m?: number;
+                    estimated?: boolean;
+                    logged_sets?: number;
+                    reps?: number;
+                    sets?: number;
+                    volume_kg?: number;
+                    work_secs?: number;
+                };
+            }[];
+            totals?: {
+                calories?: number;
+                distance_m?: number;
+                estimated?: boolean;
+                logged_sets?: number;
+                reps?: number;
+                sets?: number;
+                volume_kg?: number;
+                work_secs?: number;
+            };
+        } | null;
+        /**
+         * PlanWorkoutBody
+         * @description ADR-270: written in the structured WOD editor, one plan per section
+         */
+        PlanWorkoutBody: {
+            /** @enum {string} */
+            kind: "plan";
+            sections: {
+                /** Format: uuid */
+                id: string | null;
+                name: string;
+                /**
+                 * PlanSection
+                 * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                 */
+                plan: {
+                    blocks: {
+                        cells: ({
+                            d?: string;
+                            dist?: string;
+                            height?: string;
+                            hold?: string;
+                            l?: string;
+                            pace?: string;
+                            rir?: string;
+                            rpe?: string;
+                            tempo?: string;
+                            zone?: string;
+                        } | null)[];
+                        dose: string;
+                        exerciseRef?: string | null;
+                        extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                        group?: string | null;
+                        id: string;
+                        /** @enum {string} */
+                        kind: "ex" | "rest";
+                        load: string;
+                        name: string;
+                        note?: string;
+                        perRound?: boolean;
+                        x?: {
+                            dist?: string;
+                            height?: string;
+                            hold?: string;
+                            pace?: string;
+                            rir?: string;
+                            rpe?: string;
+                            tempo?: string;
+                            zone?: string;
+                        };
+                    }[][];
+                    /** @enum {string} */
+                    flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                    interrupt?: {
+                        cells: ({
+                            d?: string;
+                            dist?: string;
+                            height?: string;
+                            hold?: string;
+                            l?: string;
+                            pace?: string;
+                            rir?: string;
+                            rpe?: string;
+                            tempo?: string;
+                            zone?: string;
+                        } | null)[];
+                        dose: string;
+                        exerciseRef?: string | null;
+                        extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                        group?: string | null;
+                        id: string;
+                        /** @enum {string} */
+                        kind: "ex" | "rest";
+                        load: string;
+                        name: string;
+                        note?: string;
+                        perRound?: boolean;
+                        x?: {
+                            dist?: string;
+                            height?: string;
+                            hold?: string;
+                            pace?: string;
+                            rir?: string;
+                            rpe?: string;
+                            tempo?: string;
+                            zone?: string;
+                        };
+                    }[];
+                    levelNotes?: {
+                        [key: string]: string;
+                    };
+                    /** PlanMods */
+                    mods?: {
+                        hr?: boolean;
+                        interrupt?: boolean;
+                    };
+                    note?: string;
+                    /** PlanParams */
+                    params: {
+                        cap?: string;
+                        dur?: string;
+                        every?: string;
+                        hrTarget?: string;
+                        intEvery?: string;
+                        off?: string;
+                        rest?: string;
+                        rounds?: string;
+                        sets?: string;
+                        times?: string;
+                        work?: string;
+                    };
+                    preset?: string | null;
+                    /** @enum {string} */
+                    score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                    structs?: {
+                        [key: string]: {
+                            clusters?: string;
+                            dropby?: string;
+                            drops?: string;
+                            intra?: string;
+                            /** @enum {string} */
+                            kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                            minis?: string;
+                        };
+                    };
+                    /** @enum {integer} */
+                    v: 1;
+                } | null;
+                /**
+                 * PlanPrescription
+                 * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                 */
+                prescription: {
+                    /**
+                     * PlanClock
+                     * @description How a plan section runs, unit-normalised (seconds, counts)
+                     */
+                    clock: {
+                        blocks: number;
+                        cap_secs: number | null;
+                        dur_secs: number | null;
+                        every_secs: number | null;
+                        /** @enum {string} */
+                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                        hr_target_bpm: number | null;
+                        interrupt_every_secs: number | null;
+                        off_secs: number | null;
+                        /** @description AMRAP, or EMOM without times: no last round */
+                        open_ended: boolean;
+                        preset: string | null;
+                        rest_secs: {
+                            max: number;
+                            min: number;
+                        } | null;
+                        rounds: number | null;
+                        score: string | null;
+                        sets: {
+                            max: number;
+                            min: number;
+                        } | null;
+                        times: number | null;
+                        /** @description Null when open-ended */
+                        total_rounds: number | null;
+                        windows_secs: number[] | null;
+                        work_secs: number | null;
+                    };
+                    rows: {
+                        /** @description -1: an interruption row */
+                        block_index: number;
+                        exercise_ref: string | null;
+                        group_id: string | null;
+                        interrupt: boolean;
+                        /** @enum {string} */
+                        kind: "exercise" | "rest";
+                        name: string | null;
+                        note: string | null;
+                        per_side: boolean;
+                        row_id: string;
+                        sets: {
+                            index: number;
+                            /** PlanLoad */
+                            load: {
+                                /** @enum {string} */
+                                kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                text: string | null;
+                                /** @description Decimal (22.5) */
+                                value: number | null;
+                                value_max: number | null;
+                            } | null;
+                            /** PlanMeasures */
+                            measures: {
+                                distance_m: number | null;
+                                height_cm: number | null;
+                                hold_secs: number | null;
+                                hr_zone: number | null;
+                                pace_secs_per_500m: number | null;
+                                rir: number | null;
+                                rpe: number | null;
+                                tempo: {
+                                    bottom: number | "X";
+                                    down: number | "X";
+                                    top: number | "X";
+                                    up: number | "X";
+                                } | null;
+                            };
+                            /** PlanReps */
+                            reps: {
+                                max: number | null;
+                                max_effort: boolean;
+                                min: number | null;
+                                sets: {
+                                    max: number;
+                                    min: number;
+                                } | null;
+                                text: string | null;
+                                /** @enum {string} */
+                                unit: "reps" | "secs" | "meters" | "kcal";
+                                within_secs: number | null;
+                            } | null;
+                            rest_secs: number | null;
+                            /** @description 1-based rounds it applies to (empty: every interruption) */
+                            rounds: number[];
+                        }[];
+                        /** PlanStructurePrescription */
+                        structure: {
+                            clusters: number | null;
+                            drop_by: string | null;
+                            drops: number | null;
+                            intra_secs: number | null;
+                            /** @enum {string} */
+                            kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                            minis: number | null;
+                        };
+                        /**
+                         * PlanThenRule
+                         * @description Open-ended flows: what follows the written rounds
+                         */
+                        then: {
+                            load_step: number | null;
+                            reps_step: number | null;
+                            /** @enum {string} */
+                            rule: "repeat" | "step";
+                        } | null;
+                    }[];
+                } | null;
+            }[];
+        };
         /** PlatformPlan */
         PlatformPlan: {
             active: boolean;
@@ -33914,6 +35588,19 @@ export interface components {
                 date: string;
                 sessions: number;
             }[];
+            /** @description ADR-270: the heaviest set of each exercise per session (structured plan workouts), for exercises done in more than one session */
+            exercise_loads?: {
+                exercise_ref?: string | null;
+                name?: string | null;
+                points: {
+                    /** Format: date */
+                    completed_on: string;
+                    /** Format: uuid */
+                    execution_id: string;
+                    load_kg: number;
+                    reps?: number | null;
+                }[];
+            }[];
             pr_timeline: {
                 /** Format: date */
                 beaten_on: string;
@@ -33949,11 +35636,14 @@ export interface components {
             totals: {
                 minutes: number;
                 sessions: number;
+                volume_kg?: number;
                 workouts: number;
             };
             weekly: {
                 minutes: number;
                 sessions: number;
+                /** @description ADR-270: kg × reps lifted in structured plan workouts */
+                volume_kg?: number;
                 /** Format: date */
                 week_start: string;
             }[];
@@ -40377,6 +42067,81 @@ export interface components {
                     }[];
                     started_at?: string | null;
                     status: string;
+                    /** PlanWorkload */
+                    workload?: {
+                        exercises?: {
+                            calories?: number;
+                            distance_m?: number;
+                            estimated?: boolean;
+                            exercise_ref?: string | null;
+                            logged_sets?: number;
+                            name?: string | null;
+                            reps?: number;
+                            sets?: number;
+                            top_set?: {
+                                load_kg?: number;
+                                reps?: number | null;
+                            } | null;
+                            volume_kg?: number;
+                            work_secs?: number;
+                        }[];
+                        sections?: {
+                            exercises?: {
+                                block_index?: number;
+                                calories?: number;
+                                distance_m?: number;
+                                estimated?: boolean;
+                                exercise_ref?: string | null;
+                                group_id?: string | null;
+                                interrupt?: boolean;
+                                logged_sets?: number;
+                                name?: string | null;
+                                per_side?: boolean;
+                                reps?: number;
+                                row_id?: string;
+                                sets?: number;
+                                top_set?: {
+                                    load_kg?: number;
+                                    reps?: number | null;
+                                } | null;
+                                volume_kg?: number;
+                                work_secs?: number;
+                            }[];
+                            flow?: string;
+                            name?: string | null;
+                            open_ended?: boolean;
+                            preset?: string | null;
+                            score?: string | null;
+                            section_id?: string;
+                            /** @enum {string} */
+                            source?: "actuals" | "prescription";
+                            time_domain?: {
+                                cap_secs?: number | null;
+                                open_ended?: boolean;
+                                planned_secs?: number | null;
+                            };
+                            totals?: {
+                                calories?: number;
+                                distance_m?: number;
+                                estimated?: boolean;
+                                logged_sets?: number;
+                                reps?: number;
+                                sets?: number;
+                                volume_kg?: number;
+                                work_secs?: number;
+                            };
+                        }[];
+                        totals?: {
+                            calories?: number;
+                            distance_m?: number;
+                            estimated?: boolean;
+                            logged_sets?: number;
+                            reps?: number;
+                            sets?: number;
+                            volume_kg?: number;
+                            work_secs?: number;
+                        };
+                    } | null;
                 } | null;
                 source?: string | null;
                 workout: {
@@ -40385,6 +42150,8 @@ export interface components {
                         exercises?: {
                             [key: string]: unknown;
                         }[];
+                        /** @description ADR-270: the flow of a structured plan section */
+                        flow?: string | null;
                         format?: string;
                         id?: string;
                         name?: string | null;
@@ -41664,12 +43431,254 @@ export interface components {
                     [key: string]: unknown;
                 } | null;
             }[];
+        } | {
+            /** @enum {string} */
+            kind: "plan";
+            sections: {
+                /** Format: uuid */
+                id: string | null;
+                name: string;
+                /**
+                 * PlanSection
+                 * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                 */
+                plan: {
+                    blocks: {
+                        cells: ({
+                            d?: string;
+                            dist?: string;
+                            height?: string;
+                            hold?: string;
+                            l?: string;
+                            pace?: string;
+                            rir?: string;
+                            rpe?: string;
+                            tempo?: string;
+                            zone?: string;
+                        } | null)[];
+                        dose: string;
+                        exerciseRef?: string | null;
+                        extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                        group?: string | null;
+                        id: string;
+                        /** @enum {string} */
+                        kind: "ex" | "rest";
+                        load: string;
+                        name: string;
+                        note?: string;
+                        perRound?: boolean;
+                        x?: {
+                            dist?: string;
+                            height?: string;
+                            hold?: string;
+                            pace?: string;
+                            rir?: string;
+                            rpe?: string;
+                            tempo?: string;
+                            zone?: string;
+                        };
+                    }[][];
+                    /** @enum {string} */
+                    flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                    interrupt?: {
+                        cells: ({
+                            d?: string;
+                            dist?: string;
+                            height?: string;
+                            hold?: string;
+                            l?: string;
+                            pace?: string;
+                            rir?: string;
+                            rpe?: string;
+                            tempo?: string;
+                            zone?: string;
+                        } | null)[];
+                        dose: string;
+                        exerciseRef?: string | null;
+                        extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                        group?: string | null;
+                        id: string;
+                        /** @enum {string} */
+                        kind: "ex" | "rest";
+                        load: string;
+                        name: string;
+                        note?: string;
+                        perRound?: boolean;
+                        x?: {
+                            dist?: string;
+                            height?: string;
+                            hold?: string;
+                            pace?: string;
+                            rir?: string;
+                            rpe?: string;
+                            tempo?: string;
+                            zone?: string;
+                        };
+                    }[];
+                    levelNotes?: {
+                        [key: string]: string;
+                    };
+                    /** PlanMods */
+                    mods?: {
+                        hr?: boolean;
+                        interrupt?: boolean;
+                    };
+                    note?: string;
+                    /** PlanParams */
+                    params: {
+                        cap?: string;
+                        dur?: string;
+                        every?: string;
+                        hrTarget?: string;
+                        intEvery?: string;
+                        off?: string;
+                        rest?: string;
+                        rounds?: string;
+                        sets?: string;
+                        times?: string;
+                        work?: string;
+                    };
+                    preset?: string | null;
+                    /** @enum {string} */
+                    score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                    structs?: {
+                        [key: string]: {
+                            clusters?: string;
+                            dropby?: string;
+                            drops?: string;
+                            intra?: string;
+                            /** @enum {string} */
+                            kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                            minis?: string;
+                        };
+                    };
+                    /** @enum {integer} */
+                    v: 1;
+                } | null;
+                /**
+                 * PlanPrescription
+                 * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                 */
+                prescription: {
+                    /**
+                     * PlanClock
+                     * @description How a plan section runs, unit-normalised (seconds, counts)
+                     */
+                    clock: {
+                        blocks: number;
+                        cap_secs: number | null;
+                        dur_secs: number | null;
+                        every_secs: number | null;
+                        /** @enum {string} */
+                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                        hr_target_bpm: number | null;
+                        interrupt_every_secs: number | null;
+                        off_secs: number | null;
+                        /** @description AMRAP, or EMOM without times: no last round */
+                        open_ended: boolean;
+                        preset: string | null;
+                        rest_secs: {
+                            max: number;
+                            min: number;
+                        } | null;
+                        rounds: number | null;
+                        score: string | null;
+                        sets: {
+                            max: number;
+                            min: number;
+                        } | null;
+                        times: number | null;
+                        /** @description Null when open-ended */
+                        total_rounds: number | null;
+                        windows_secs: number[] | null;
+                        work_secs: number | null;
+                    };
+                    rows: {
+                        /** @description -1: an interruption row */
+                        block_index: number;
+                        exercise_ref: string | null;
+                        group_id: string | null;
+                        interrupt: boolean;
+                        /** @enum {string} */
+                        kind: "exercise" | "rest";
+                        name: string | null;
+                        note: string | null;
+                        per_side: boolean;
+                        row_id: string;
+                        sets: {
+                            index: number;
+                            /** PlanLoad */
+                            load: {
+                                /** @enum {string} */
+                                kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                text: string | null;
+                                /** @description Decimal (22.5) */
+                                value: number | null;
+                                value_max: number | null;
+                            } | null;
+                            /** PlanMeasures */
+                            measures: {
+                                distance_m: number | null;
+                                height_cm: number | null;
+                                hold_secs: number | null;
+                                hr_zone: number | null;
+                                pace_secs_per_500m: number | null;
+                                rir: number | null;
+                                rpe: number | null;
+                                tempo: {
+                                    bottom: number | "X";
+                                    down: number | "X";
+                                    top: number | "X";
+                                    up: number | "X";
+                                } | null;
+                            };
+                            /** PlanReps */
+                            reps: {
+                                max: number | null;
+                                max_effort: boolean;
+                                min: number | null;
+                                sets: {
+                                    max: number;
+                                    min: number;
+                                } | null;
+                                text: string | null;
+                                /** @enum {string} */
+                                unit: "reps" | "secs" | "meters" | "kcal";
+                                within_secs: number | null;
+                            } | null;
+                            rest_secs: number | null;
+                            /** @description 1-based rounds it applies to (empty: every interruption) */
+                            rounds: number[];
+                        }[];
+                        /** PlanStructurePrescription */
+                        structure: {
+                            clusters: number | null;
+                            drop_by: string | null;
+                            drops: number | null;
+                            intra_secs: number | null;
+                            /** @enum {string} */
+                            kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                            minis: number | null;
+                        };
+                        /**
+                         * PlanThenRule
+                         * @description Open-ended flows: what follows the written rounds
+                         */
+                        then: {
+                            load_step: number | null;
+                            reps_step: number | null;
+                            /** @enum {string} */
+                            rule: "repeat" | "step";
+                        } | null;
+                    }[];
+                } | null;
+            }[];
         };
         /** WorkoutBodySummary */
         WorkoutBodySummary: {
             excerpt?: string | null;
             /** @enum {string} */
-            kind: "free_text" | "text_sections" | "structured";
+            kind: "free_text" | "text_sections" | "structured" | "plan";
             sections?: {
                 [key: string]: unknown;
             }[];
@@ -45531,6 +47540,248 @@ export interface operations {
                                         [key: string]: unknown;
                                     } | null;
                                 }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "plan";
+                                sections: {
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                                     */
+                                    plan: {
+                                        blocks: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                        interrupt?: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        /** PlanMods */
+                                        mods?: {
+                                            hr?: boolean;
+                                            interrupt?: boolean;
+                                        };
+                                        note?: string;
+                                        /** PlanParams */
+                                        params: {
+                                            cap?: string;
+                                            dur?: string;
+                                            every?: string;
+                                            hrTarget?: string;
+                                            intEvery?: string;
+                                            off?: string;
+                                            rest?: string;
+                                            rounds?: string;
+                                            sets?: string;
+                                            times?: string;
+                                            work?: string;
+                                        };
+                                        preset?: string | null;
+                                        /** @enum {string} */
+                                        score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                        structs?: {
+                                            [key: string]: {
+                                                clusters?: string;
+                                                dropby?: string;
+                                                drops?: string;
+                                                intra?: string;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis?: string;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } | null;
+                                    /**
+                                     * PlanPrescription
+                                     * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                                     */
+                                    prescription: {
+                                        /**
+                                         * PlanClock
+                                         * @description How a plan section runs, unit-normalised (seconds, counts)
+                                         */
+                                        clock: {
+                                            blocks: number;
+                                            cap_secs: number | null;
+                                            dur_secs: number | null;
+                                            every_secs: number | null;
+                                            /** @enum {string} */
+                                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                            hr_target_bpm: number | null;
+                                            interrupt_every_secs: number | null;
+                                            off_secs: number | null;
+                                            /** @description AMRAP, or EMOM without times: no last round */
+                                            open_ended: boolean;
+                                            preset: string | null;
+                                            rest_secs: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            rounds: number | null;
+                                            score: string | null;
+                                            sets: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            times: number | null;
+                                            /** @description Null when open-ended */
+                                            total_rounds: number | null;
+                                            windows_secs: number[] | null;
+                                            work_secs: number | null;
+                                        };
+                                        rows: {
+                                            /** @description -1: an interruption row */
+                                            block_index: number;
+                                            exercise_ref: string | null;
+                                            group_id: string | null;
+                                            interrupt: boolean;
+                                            /** @enum {string} */
+                                            kind: "exercise" | "rest";
+                                            name: string | null;
+                                            note: string | null;
+                                            per_side: boolean;
+                                            row_id: string;
+                                            sets: {
+                                                index: number;
+                                                /** PlanLoad */
+                                                load: {
+                                                    /** @enum {string} */
+                                                    kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                                    text: string | null;
+                                                    /** @description Decimal (22.5) */
+                                                    value: number | null;
+                                                    value_max: number | null;
+                                                } | null;
+                                                /** PlanMeasures */
+                                                measures: {
+                                                    distance_m: number | null;
+                                                    height_cm: number | null;
+                                                    hold_secs: number | null;
+                                                    hr_zone: number | null;
+                                                    pace_secs_per_500m: number | null;
+                                                    rir: number | null;
+                                                    rpe: number | null;
+                                                    tempo: {
+                                                        bottom: number | "X";
+                                                        down: number | "X";
+                                                        top: number | "X";
+                                                        up: number | "X";
+                                                    } | null;
+                                                };
+                                                /** PlanReps */
+                                                reps: {
+                                                    max: number | null;
+                                                    max_effort: boolean;
+                                                    min: number | null;
+                                                    sets: {
+                                                        max: number;
+                                                        min: number;
+                                                    } | null;
+                                                    text: string | null;
+                                                    /** @enum {string} */
+                                                    unit: "reps" | "secs" | "meters" | "kcal";
+                                                    within_secs: number | null;
+                                                } | null;
+                                                rest_secs: number | null;
+                                                /** @description 1-based rounds it applies to (empty: every interruption) */
+                                                rounds: number[];
+                                            }[];
+                                            /** PlanStructurePrescription */
+                                            structure: {
+                                                clusters: number | null;
+                                                drop_by: string | null;
+                                                drops: number | null;
+                                                intra_secs: number | null;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis: number | null;
+                                            };
+                                            /**
+                                             * PlanThenRule
+                                             * @description Open-ended flows: what follows the written rounds
+                                             */
+                                            then: {
+                                                load_step: number | null;
+                                                reps_step: number | null;
+                                                /** @enum {string} */
+                                                rule: "repeat" | "step";
+                                            } | null;
+                                        }[];
+                                    } | null;
+                                }[];
                             };
                             /** Format: uuid */
                             id: string;
@@ -47404,7 +49655,43 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        execution: {
+                            /** @description ADR-270: plan actuals of a completed structured_plan execution, in run order */
+                            plan_sets?: {
+                                actual_load_kg: number | null;
+                                actual_reps: number | null;
+                                /** @description The row's block; -1 for an interruption row */
+                                block_index: number;
+                                exercise_name: string;
+                                exercise_ref: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                interrupt: boolean;
+                                /** @description The athlete typed a value (otherwise actual = prescribed) */
+                                logged: boolean;
+                                one_rep_max_kg: number | null;
+                                /** @description Cluster / drop part */
+                                part_index: number;
+                                /** @description AMRAP window, EMOM slot */
+                                phase_index: number;
+                                prescribed_load_kg: number | null;
+                                prescribed_load_pct: number | null;
+                                prescribed_load_text: string;
+                                prescribed_reps: number | null;
+                                prescribed_reps_text: string;
+                                /** @description 1-based set / round / slot / interval; for an interruption, which one */
+                                round_index: number;
+                                row_id: string;
+                                /** Format: uuid */
+                                section_id: string;
+                            }[];
+                        } & {
+                            [key: string]: unknown;
+                        };
+                    };
                 };
             };
             /** @description Error */
@@ -47441,6 +49728,33 @@ export interface operations {
                     kpi_counters?: {
                         [key: string]: number;
                     };
+                    /** @description ADR-270: structured_plan workouts: one record per set / round done, prescribed next to actual */
+                    plan_actuals?: {
+                        actual_load_kg?: number | null;
+                        actual_reps?: number | null;
+                        /** @description The row's block; -1 for an interruption row */
+                        block_index: number;
+                        exercise_name?: string;
+                        exercise_ref?: string | null;
+                        interrupt?: boolean;
+                        /** @description The athlete typed a value (otherwise actual = prescribed) */
+                        logged?: boolean;
+                        one_rep_max_kg?: number | null;
+                        /** @description Cluster / drop part */
+                        part_index?: number;
+                        /** @description AMRAP window, EMOM slot */
+                        phase_index?: number;
+                        prescribed_load_kg?: number | null;
+                        prescribed_load_pct?: number | null;
+                        prescribed_load_text?: string;
+                        prescribed_reps?: number | null;
+                        prescribed_reps_text?: string;
+                        /** @description 1-based set / round / slot / interval; for an interruption, which one */
+                        round_index: number;
+                        row_id: string;
+                        /** Format: uuid */
+                        section_id: string;
+                    }[];
                     section_elapsed_ms?: {
                         [key: string]: number;
                     };
@@ -47474,7 +49788,43 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": Record<string, never>;
+                    "application/json": {
+                        execution: {
+                            /** @description ADR-270: plan actuals of a completed structured_plan execution, in run order */
+                            plan_sets?: {
+                                actual_load_kg: number | null;
+                                actual_reps: number | null;
+                                /** @description The row's block; -1 for an interruption row */
+                                block_index: number;
+                                exercise_name: string;
+                                exercise_ref: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                interrupt: boolean;
+                                /** @description The athlete typed a value (otherwise actual = prescribed) */
+                                logged: boolean;
+                                one_rep_max_kg: number | null;
+                                /** @description Cluster / drop part */
+                                part_index: number;
+                                /** @description AMRAP window, EMOM slot */
+                                phase_index: number;
+                                prescribed_load_kg: number | null;
+                                prescribed_load_pct: number | null;
+                                prescribed_load_text: string;
+                                prescribed_reps: number | null;
+                                prescribed_reps_text: string;
+                                /** @description 1-based set / round / slot / interval; for an interruption, which one */
+                                round_index: number;
+                                row_id: string;
+                                /** Format: uuid */
+                                section_id: string;
+                            }[];
+                        } & {
+                            [key: string]: unknown;
+                        };
+                    };
                 };
             };
             /** @description Error */
@@ -90996,6 +93346,81 @@ export interface operations {
                                 }[];
                                 started_at?: string | null;
                                 status: string;
+                                /** PlanWorkload */
+                                workload?: {
+                                    exercises?: {
+                                        calories?: number;
+                                        distance_m?: number;
+                                        estimated?: boolean;
+                                        exercise_ref?: string | null;
+                                        logged_sets?: number;
+                                        name?: string | null;
+                                        reps?: number;
+                                        sets?: number;
+                                        top_set?: {
+                                            load_kg?: number;
+                                            reps?: number | null;
+                                        } | null;
+                                        volume_kg?: number;
+                                        work_secs?: number;
+                                    }[];
+                                    sections?: {
+                                        exercises?: {
+                                            block_index?: number;
+                                            calories?: number;
+                                            distance_m?: number;
+                                            estimated?: boolean;
+                                            exercise_ref?: string | null;
+                                            group_id?: string | null;
+                                            interrupt?: boolean;
+                                            logged_sets?: number;
+                                            name?: string | null;
+                                            per_side?: boolean;
+                                            reps?: number;
+                                            row_id?: string;
+                                            sets?: number;
+                                            top_set?: {
+                                                load_kg?: number;
+                                                reps?: number | null;
+                                            } | null;
+                                            volume_kg?: number;
+                                            work_secs?: number;
+                                        }[];
+                                        flow?: string;
+                                        name?: string | null;
+                                        open_ended?: boolean;
+                                        preset?: string | null;
+                                        score?: string | null;
+                                        section_id?: string;
+                                        /** @enum {string} */
+                                        source?: "actuals" | "prescription";
+                                        time_domain?: {
+                                            cap_secs?: number | null;
+                                            open_ended?: boolean;
+                                            planned_secs?: number | null;
+                                        };
+                                        totals?: {
+                                            calories?: number;
+                                            distance_m?: number;
+                                            estimated?: boolean;
+                                            logged_sets?: number;
+                                            reps?: number;
+                                            sets?: number;
+                                            volume_kg?: number;
+                                            work_secs?: number;
+                                        };
+                                    }[];
+                                    totals?: {
+                                        calories?: number;
+                                        distance_m?: number;
+                                        estimated?: boolean;
+                                        logged_sets?: number;
+                                        reps?: number;
+                                        sets?: number;
+                                        volume_kg?: number;
+                                        work_secs?: number;
+                                    };
+                                } | null;
                             } | null;
                             source?: string | null;
                             workout: {
@@ -91004,6 +93429,8 @@ export interface operations {
                                     exercises?: {
                                         [key: string]: unknown;
                                     }[];
+                                    /** @description ADR-270: the flow of a structured plan section */
+                                    flow?: string | null;
                                     format?: string;
                                     id?: string;
                                     name?: string | null;
@@ -92478,7 +94905,7 @@ export interface operations {
                             body?: {
                                 excerpt?: string | null;
                                 /** @enum {string} */
-                                kind: "free_text" | "text_sections" | "structured";
+                                kind: "free_text" | "text_sections" | "structured" | "plan";
                                 sections?: {
                                     [key: string]: unknown;
                                 }[];
@@ -93087,7 +95514,7 @@ export interface operations {
                     "application/json": {
                         workout: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | "structured_plan";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -93153,6 +95580,248 @@ export interface operations {
                                     subtitle?: string | null;
                                     timer: {
                                         [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "plan";
+                                sections: {
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                                     */
+                                    plan: {
+                                        blocks: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                        interrupt?: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        /** PlanMods */
+                                        mods?: {
+                                            hr?: boolean;
+                                            interrupt?: boolean;
+                                        };
+                                        note?: string;
+                                        /** PlanParams */
+                                        params: {
+                                            cap?: string;
+                                            dur?: string;
+                                            every?: string;
+                                            hrTarget?: string;
+                                            intEvery?: string;
+                                            off?: string;
+                                            rest?: string;
+                                            rounds?: string;
+                                            sets?: string;
+                                            times?: string;
+                                            work?: string;
+                                        };
+                                        preset?: string | null;
+                                        /** @enum {string} */
+                                        score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                        structs?: {
+                                            [key: string]: {
+                                                clusters?: string;
+                                                dropby?: string;
+                                                drops?: string;
+                                                intra?: string;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis?: string;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } | null;
+                                    /**
+                                     * PlanPrescription
+                                     * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                                     */
+                                    prescription: {
+                                        /**
+                                         * PlanClock
+                                         * @description How a plan section runs, unit-normalised (seconds, counts)
+                                         */
+                                        clock: {
+                                            blocks: number;
+                                            cap_secs: number | null;
+                                            dur_secs: number | null;
+                                            every_secs: number | null;
+                                            /** @enum {string} */
+                                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                            hr_target_bpm: number | null;
+                                            interrupt_every_secs: number | null;
+                                            off_secs: number | null;
+                                            /** @description AMRAP, or EMOM without times: no last round */
+                                            open_ended: boolean;
+                                            preset: string | null;
+                                            rest_secs: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            rounds: number | null;
+                                            score: string | null;
+                                            sets: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            times: number | null;
+                                            /** @description Null when open-ended */
+                                            total_rounds: number | null;
+                                            windows_secs: number[] | null;
+                                            work_secs: number | null;
+                                        };
+                                        rows: {
+                                            /** @description -1: an interruption row */
+                                            block_index: number;
+                                            exercise_ref: string | null;
+                                            group_id: string | null;
+                                            interrupt: boolean;
+                                            /** @enum {string} */
+                                            kind: "exercise" | "rest";
+                                            name: string | null;
+                                            note: string | null;
+                                            per_side: boolean;
+                                            row_id: string;
+                                            sets: {
+                                                index: number;
+                                                /** PlanLoad */
+                                                load: {
+                                                    /** @enum {string} */
+                                                    kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                                    text: string | null;
+                                                    /** @description Decimal (22.5) */
+                                                    value: number | null;
+                                                    value_max: number | null;
+                                                } | null;
+                                                /** PlanMeasures */
+                                                measures: {
+                                                    distance_m: number | null;
+                                                    height_cm: number | null;
+                                                    hold_secs: number | null;
+                                                    hr_zone: number | null;
+                                                    pace_secs_per_500m: number | null;
+                                                    rir: number | null;
+                                                    rpe: number | null;
+                                                    tempo: {
+                                                        bottom: number | "X";
+                                                        down: number | "X";
+                                                        top: number | "X";
+                                                        up: number | "X";
+                                                    } | null;
+                                                };
+                                                /** PlanReps */
+                                                reps: {
+                                                    max: number | null;
+                                                    max_effort: boolean;
+                                                    min: number | null;
+                                                    sets: {
+                                                        max: number;
+                                                        min: number;
+                                                    } | null;
+                                                    text: string | null;
+                                                    /** @enum {string} */
+                                                    unit: "reps" | "secs" | "meters" | "kcal";
+                                                    within_secs: number | null;
+                                                } | null;
+                                                rest_secs: number | null;
+                                                /** @description 1-based rounds it applies to (empty: every interruption) */
+                                                rounds: number[];
+                                            }[];
+                                            /** PlanStructurePrescription */
+                                            structure: {
+                                                clusters: number | null;
+                                                drop_by: string | null;
+                                                drops: number | null;
+                                                intra_secs: number | null;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis: number | null;
+                                            };
+                                            /**
+                                             * PlanThenRule
+                                             * @description Open-ended flows: what follows the written rounds
+                                             */
+                                            then: {
+                                                load_step: number | null;
+                                                reps_step: number | null;
+                                                /** @enum {string} */
+                                                rule: "repeat" | "step";
+                                            } | null;
+                                        }[];
                                     } | null;
                                 }[];
                             };
@@ -93418,6 +96087,240 @@ export interface operations {
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
+                                /**
+                                 * PlanSection
+                                 * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                                 */
+                                plan?: {
+                                    blocks: {
+                                        cells: ({
+                                            d?: string;
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            l?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        } | null)[];
+                                        dose: string;
+                                        exerciseRef?: string | null;
+                                        extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                        group?: string | null;
+                                        id: string;
+                                        /** @enum {string} */
+                                        kind: "ex" | "rest";
+                                        load: string;
+                                        name: string;
+                                        note?: string;
+                                        perRound?: boolean;
+                                        x?: {
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        };
+                                    }[][];
+                                    /** @enum {string} */
+                                    flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                    interrupt?: {
+                                        cells: ({
+                                            d?: string;
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            l?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        } | null)[];
+                                        dose: string;
+                                        exerciseRef?: string | null;
+                                        extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                        group?: string | null;
+                                        id: string;
+                                        /** @enum {string} */
+                                        kind: "ex" | "rest";
+                                        load: string;
+                                        name: string;
+                                        note?: string;
+                                        perRound?: boolean;
+                                        x?: {
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        };
+                                    }[];
+                                    levelNotes?: {
+                                        [key: string]: string;
+                                    };
+                                    /** PlanMods */
+                                    mods?: {
+                                        hr?: boolean;
+                                        interrupt?: boolean;
+                                    };
+                                    note?: string;
+                                    /** PlanParams */
+                                    params: {
+                                        cap?: string;
+                                        dur?: string;
+                                        every?: string;
+                                        hrTarget?: string;
+                                        intEvery?: string;
+                                        off?: string;
+                                        rest?: string;
+                                        rounds?: string;
+                                        sets?: string;
+                                        times?: string;
+                                        work?: string;
+                                    };
+                                    preset?: string | null;
+                                    /** @enum {string} */
+                                    score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                    structs?: {
+                                        [key: string]: {
+                                            clusters?: string;
+                                            dropby?: string;
+                                            drops?: string;
+                                            intra?: string;
+                                            /** @enum {string} */
+                                            kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                            minis?: string;
+                                        };
+                                    };
+                                    /** @enum {integer} */
+                                    v: 1;
+                                } | null;
+                                /**
+                                 * PlanPrescription
+                                 * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                                 */
+                                prescription?: {
+                                    /**
+                                     * PlanClock
+                                     * @description How a plan section runs, unit-normalised (seconds, counts)
+                                     */
+                                    clock: {
+                                        blocks: number;
+                                        cap_secs: number | null;
+                                        dur_secs: number | null;
+                                        every_secs: number | null;
+                                        /** @enum {string} */
+                                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                        hr_target_bpm: number | null;
+                                        interrupt_every_secs: number | null;
+                                        off_secs: number | null;
+                                        /** @description AMRAP, or EMOM without times: no last round */
+                                        open_ended: boolean;
+                                        preset: string | null;
+                                        rest_secs: {
+                                            max: number;
+                                            min: number;
+                                        } | null;
+                                        rounds: number | null;
+                                        score: string | null;
+                                        sets: {
+                                            max: number;
+                                            min: number;
+                                        } | null;
+                                        times: number | null;
+                                        /** @description Null when open-ended */
+                                        total_rounds: number | null;
+                                        windows_secs: number[] | null;
+                                        work_secs: number | null;
+                                    };
+                                    rows: {
+                                        /** @description -1: an interruption row */
+                                        block_index: number;
+                                        exercise_ref: string | null;
+                                        group_id: string | null;
+                                        interrupt: boolean;
+                                        /** @enum {string} */
+                                        kind: "exercise" | "rest";
+                                        name: string | null;
+                                        note: string | null;
+                                        per_side: boolean;
+                                        row_id: string;
+                                        sets: {
+                                            index: number;
+                                            /** PlanLoad */
+                                            load: {
+                                                /** @enum {string} */
+                                                kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                                text: string | null;
+                                                /** @description Decimal (22.5) */
+                                                value: number | null;
+                                                value_max: number | null;
+                                            } | null;
+                                            /** PlanMeasures */
+                                            measures: {
+                                                distance_m: number | null;
+                                                height_cm: number | null;
+                                                hold_secs: number | null;
+                                                hr_zone: number | null;
+                                                pace_secs_per_500m: number | null;
+                                                rir: number | null;
+                                                rpe: number | null;
+                                                tempo: {
+                                                    bottom: number | "X";
+                                                    down: number | "X";
+                                                    top: number | "X";
+                                                    up: number | "X";
+                                                } | null;
+                                            };
+                                            /** PlanReps */
+                                            reps: {
+                                                max: number | null;
+                                                max_effort: boolean;
+                                                min: number | null;
+                                                sets: {
+                                                    max: number;
+                                                    min: number;
+                                                } | null;
+                                                text: string | null;
+                                                /** @enum {string} */
+                                                unit: "reps" | "secs" | "meters" | "kcal";
+                                                within_secs: number | null;
+                                            } | null;
+                                            rest_secs: number | null;
+                                            /** @description 1-based rounds it applies to (empty: every interruption) */
+                                            rounds: number[];
+                                        }[];
+                                        /** PlanStructurePrescription */
+                                        structure: {
+                                            clusters: number | null;
+                                            drop_by: string | null;
+                                            drops: number | null;
+                                            intra_secs: number | null;
+                                            /** @enum {string} */
+                                            kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                            minis: number | null;
+                                        };
+                                        /**
+                                         * PlanThenRule
+                                         * @description Open-ended flows: what follows the written rounds
+                                         */
+                                        then: {
+                                            load_step: number | null;
+                                            reps_step: number | null;
+                                            /** @enum {string} */
+                                            rule: "repeat" | "step";
+                                        } | null;
+                                    }[];
+                                } | null;
                                 rest_after_seconds?: number | null;
                                 rest_before_next_section_seconds?: number | null;
                                 score_config?: {
@@ -93638,6 +96541,240 @@ export interface operations {
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                                     */
+                                    plan?: {
+                                        blocks: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                        interrupt?: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        /** PlanMods */
+                                        mods?: {
+                                            hr?: boolean;
+                                            interrupt?: boolean;
+                                        };
+                                        note?: string;
+                                        /** PlanParams */
+                                        params: {
+                                            cap?: string;
+                                            dur?: string;
+                                            every?: string;
+                                            hrTarget?: string;
+                                            intEvery?: string;
+                                            off?: string;
+                                            rest?: string;
+                                            rounds?: string;
+                                            sets?: string;
+                                            times?: string;
+                                            work?: string;
+                                        };
+                                        preset?: string | null;
+                                        /** @enum {string} */
+                                        score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                        structs?: {
+                                            [key: string]: {
+                                                clusters?: string;
+                                                dropby?: string;
+                                                drops?: string;
+                                                intra?: string;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis?: string;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } | null;
+                                    /**
+                                     * PlanPrescription
+                                     * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                                     */
+                                    prescription?: {
+                                        /**
+                                         * PlanClock
+                                         * @description How a plan section runs, unit-normalised (seconds, counts)
+                                         */
+                                        clock: {
+                                            blocks: number;
+                                            cap_secs: number | null;
+                                            dur_secs: number | null;
+                                            every_secs: number | null;
+                                            /** @enum {string} */
+                                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                            hr_target_bpm: number | null;
+                                            interrupt_every_secs: number | null;
+                                            off_secs: number | null;
+                                            /** @description AMRAP, or EMOM without times: no last round */
+                                            open_ended: boolean;
+                                            preset: string | null;
+                                            rest_secs: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            rounds: number | null;
+                                            score: string | null;
+                                            sets: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            times: number | null;
+                                            /** @description Null when open-ended */
+                                            total_rounds: number | null;
+                                            windows_secs: number[] | null;
+                                            work_secs: number | null;
+                                        };
+                                        rows: {
+                                            /** @description -1: an interruption row */
+                                            block_index: number;
+                                            exercise_ref: string | null;
+                                            group_id: string | null;
+                                            interrupt: boolean;
+                                            /** @enum {string} */
+                                            kind: "exercise" | "rest";
+                                            name: string | null;
+                                            note: string | null;
+                                            per_side: boolean;
+                                            row_id: string;
+                                            sets: {
+                                                index: number;
+                                                /** PlanLoad */
+                                                load: {
+                                                    /** @enum {string} */
+                                                    kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                                    text: string | null;
+                                                    /** @description Decimal (22.5) */
+                                                    value: number | null;
+                                                    value_max: number | null;
+                                                } | null;
+                                                /** PlanMeasures */
+                                                measures: {
+                                                    distance_m: number | null;
+                                                    height_cm: number | null;
+                                                    hold_secs: number | null;
+                                                    hr_zone: number | null;
+                                                    pace_secs_per_500m: number | null;
+                                                    rir: number | null;
+                                                    rpe: number | null;
+                                                    tempo: {
+                                                        bottom: number | "X";
+                                                        down: number | "X";
+                                                        top: number | "X";
+                                                        up: number | "X";
+                                                    } | null;
+                                                };
+                                                /** PlanReps */
+                                                reps: {
+                                                    max: number | null;
+                                                    max_effort: boolean;
+                                                    min: number | null;
+                                                    sets: {
+                                                        max: number;
+                                                        min: number;
+                                                    } | null;
+                                                    text: string | null;
+                                                    /** @enum {string} */
+                                                    unit: "reps" | "secs" | "meters" | "kcal";
+                                                    within_secs: number | null;
+                                                } | null;
+                                                rest_secs: number | null;
+                                                /** @description 1-based rounds it applies to (empty: every interruption) */
+                                                rounds: number[];
+                                            }[];
+                                            /** PlanStructurePrescription */
+                                            structure: {
+                                                clusters: number | null;
+                                                drop_by: string | null;
+                                                drops: number | null;
+                                                intra_secs: number | null;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis: number | null;
+                                            };
+                                            /**
+                                             * PlanThenRule
+                                             * @description Open-ended flows: what follows the written rounds
+                                             */
+                                            then: {
+                                                load_step: number | null;
+                                                reps_step: number | null;
+                                                /** @enum {string} */
+                                                rule: "repeat" | "step";
+                                            } | null;
+                                        }[];
+                                    } | null;
                                     rest_after_seconds?: number | null;
                                     rest_before_next_section_seconds?: number | null;
                                     score_config?: {
@@ -93788,7 +96925,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string|null} */
-                    authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | null;
+                    authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | "structured_plan" | null;
                     content?: {
                         body: string;
                         document?: {
@@ -94040,6 +97177,240 @@ export interface operations {
                         order?: number;
                         /** Format: uuid */
                         parent_section_id?: string | null;
+                        /**
+                         * PlanSection
+                         * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                         */
+                        plan?: {
+                            blocks: {
+                                cells: ({
+                                    d?: string;
+                                    dist?: string;
+                                    height?: string;
+                                    hold?: string;
+                                    l?: string;
+                                    pace?: string;
+                                    rir?: string;
+                                    rpe?: string;
+                                    tempo?: string;
+                                    zone?: string;
+                                } | null)[];
+                                dose: string;
+                                exerciseRef?: string | null;
+                                extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                group?: string | null;
+                                id: string;
+                                /** @enum {string} */
+                                kind: "ex" | "rest";
+                                load: string;
+                                name: string;
+                                note?: string;
+                                perRound?: boolean;
+                                x?: {
+                                    dist?: string;
+                                    height?: string;
+                                    hold?: string;
+                                    pace?: string;
+                                    rir?: string;
+                                    rpe?: string;
+                                    tempo?: string;
+                                    zone?: string;
+                                };
+                            }[][];
+                            /** @enum {string} */
+                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                            interrupt?: {
+                                cells: ({
+                                    d?: string;
+                                    dist?: string;
+                                    height?: string;
+                                    hold?: string;
+                                    l?: string;
+                                    pace?: string;
+                                    rir?: string;
+                                    rpe?: string;
+                                    tempo?: string;
+                                    zone?: string;
+                                } | null)[];
+                                dose: string;
+                                exerciseRef?: string | null;
+                                extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                group?: string | null;
+                                id: string;
+                                /** @enum {string} */
+                                kind: "ex" | "rest";
+                                load: string;
+                                name: string;
+                                note?: string;
+                                perRound?: boolean;
+                                x?: {
+                                    dist?: string;
+                                    height?: string;
+                                    hold?: string;
+                                    pace?: string;
+                                    rir?: string;
+                                    rpe?: string;
+                                    tempo?: string;
+                                    zone?: string;
+                                };
+                            }[];
+                            levelNotes?: {
+                                [key: string]: string;
+                            };
+                            /** PlanMods */
+                            mods?: {
+                                hr?: boolean;
+                                interrupt?: boolean;
+                            };
+                            note?: string;
+                            /** PlanParams */
+                            params: {
+                                cap?: string;
+                                dur?: string;
+                                every?: string;
+                                hrTarget?: string;
+                                intEvery?: string;
+                                off?: string;
+                                rest?: string;
+                                rounds?: string;
+                                sets?: string;
+                                times?: string;
+                                work?: string;
+                            };
+                            preset?: string | null;
+                            /** @enum {string} */
+                            score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                            structs?: {
+                                [key: string]: {
+                                    clusters?: string;
+                                    dropby?: string;
+                                    drops?: string;
+                                    intra?: string;
+                                    /** @enum {string} */
+                                    kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                    minis?: string;
+                                };
+                            };
+                            /** @enum {integer} */
+                            v: 1;
+                        } | null;
+                        /**
+                         * PlanPrescription
+                         * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                         */
+                        prescription?: {
+                            /**
+                             * PlanClock
+                             * @description How a plan section runs, unit-normalised (seconds, counts)
+                             */
+                            clock: {
+                                blocks: number;
+                                cap_secs: number | null;
+                                dur_secs: number | null;
+                                every_secs: number | null;
+                                /** @enum {string} */
+                                flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                hr_target_bpm: number | null;
+                                interrupt_every_secs: number | null;
+                                off_secs: number | null;
+                                /** @description AMRAP, or EMOM without times: no last round */
+                                open_ended: boolean;
+                                preset: string | null;
+                                rest_secs: {
+                                    max: number;
+                                    min: number;
+                                } | null;
+                                rounds: number | null;
+                                score: string | null;
+                                sets: {
+                                    max: number;
+                                    min: number;
+                                } | null;
+                                times: number | null;
+                                /** @description Null when open-ended */
+                                total_rounds: number | null;
+                                windows_secs: number[] | null;
+                                work_secs: number | null;
+                            };
+                            rows: {
+                                /** @description -1: an interruption row */
+                                block_index: number;
+                                exercise_ref: string | null;
+                                group_id: string | null;
+                                interrupt: boolean;
+                                /** @enum {string} */
+                                kind: "exercise" | "rest";
+                                name: string | null;
+                                note: string | null;
+                                per_side: boolean;
+                                row_id: string;
+                                sets: {
+                                    index: number;
+                                    /** PlanLoad */
+                                    load: {
+                                        /** @enum {string} */
+                                        kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                        text: string | null;
+                                        /** @description Decimal (22.5) */
+                                        value: number | null;
+                                        value_max: number | null;
+                                    } | null;
+                                    /** PlanMeasures */
+                                    measures: {
+                                        distance_m: number | null;
+                                        height_cm: number | null;
+                                        hold_secs: number | null;
+                                        hr_zone: number | null;
+                                        pace_secs_per_500m: number | null;
+                                        rir: number | null;
+                                        rpe: number | null;
+                                        tempo: {
+                                            bottom: number | "X";
+                                            down: number | "X";
+                                            top: number | "X";
+                                            up: number | "X";
+                                        } | null;
+                                    };
+                                    /** PlanReps */
+                                    reps: {
+                                        max: number | null;
+                                        max_effort: boolean;
+                                        min: number | null;
+                                        sets: {
+                                            max: number;
+                                            min: number;
+                                        } | null;
+                                        text: string | null;
+                                        /** @enum {string} */
+                                        unit: "reps" | "secs" | "meters" | "kcal";
+                                        within_secs: number | null;
+                                    } | null;
+                                    rest_secs: number | null;
+                                    /** @description 1-based rounds it applies to (empty: every interruption) */
+                                    rounds: number[];
+                                }[];
+                                /** PlanStructurePrescription */
+                                structure: {
+                                    clusters: number | null;
+                                    drop_by: string | null;
+                                    drops: number | null;
+                                    intra_secs: number | null;
+                                    /** @enum {string} */
+                                    kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                    minis: number | null;
+                                };
+                                /**
+                                 * PlanThenRule
+                                 * @description Open-ended flows: what follows the written rounds
+                                 */
+                                then: {
+                                    load_step: number | null;
+                                    reps_step: number | null;
+                                    /** @enum {string} */
+                                    rule: "repeat" | "step";
+                                } | null;
+                            }[];
+                        } | null;
                         rest_after_seconds?: number | null;
                         rest_before_next_section_seconds?: number | null;
                         score_config?: {
@@ -94260,6 +97631,240 @@ export interface operations {
                             order?: number;
                             /** Format: uuid */
                             parent_section_id?: string | null;
+                            /**
+                             * PlanSection
+                             * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                             */
+                            plan?: {
+                                blocks: {
+                                    cells: ({
+                                        d?: string;
+                                        dist?: string;
+                                        height?: string;
+                                        hold?: string;
+                                        l?: string;
+                                        pace?: string;
+                                        rir?: string;
+                                        rpe?: string;
+                                        tempo?: string;
+                                        zone?: string;
+                                    } | null)[];
+                                    dose: string;
+                                    exerciseRef?: string | null;
+                                    extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                    group?: string | null;
+                                    id: string;
+                                    /** @enum {string} */
+                                    kind: "ex" | "rest";
+                                    load: string;
+                                    name: string;
+                                    note?: string;
+                                    perRound?: boolean;
+                                    x?: {
+                                        dist?: string;
+                                        height?: string;
+                                        hold?: string;
+                                        pace?: string;
+                                        rir?: string;
+                                        rpe?: string;
+                                        tempo?: string;
+                                        zone?: string;
+                                    };
+                                }[][];
+                                /** @enum {string} */
+                                flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                interrupt?: {
+                                    cells: ({
+                                        d?: string;
+                                        dist?: string;
+                                        height?: string;
+                                        hold?: string;
+                                        l?: string;
+                                        pace?: string;
+                                        rir?: string;
+                                        rpe?: string;
+                                        tempo?: string;
+                                        zone?: string;
+                                    } | null)[];
+                                    dose: string;
+                                    exerciseRef?: string | null;
+                                    extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                    group?: string | null;
+                                    id: string;
+                                    /** @enum {string} */
+                                    kind: "ex" | "rest";
+                                    load: string;
+                                    name: string;
+                                    note?: string;
+                                    perRound?: boolean;
+                                    x?: {
+                                        dist?: string;
+                                        height?: string;
+                                        hold?: string;
+                                        pace?: string;
+                                        rir?: string;
+                                        rpe?: string;
+                                        tempo?: string;
+                                        zone?: string;
+                                    };
+                                }[];
+                                levelNotes?: {
+                                    [key: string]: string;
+                                };
+                                /** PlanMods */
+                                mods?: {
+                                    hr?: boolean;
+                                    interrupt?: boolean;
+                                };
+                                note?: string;
+                                /** PlanParams */
+                                params: {
+                                    cap?: string;
+                                    dur?: string;
+                                    every?: string;
+                                    hrTarget?: string;
+                                    intEvery?: string;
+                                    off?: string;
+                                    rest?: string;
+                                    rounds?: string;
+                                    sets?: string;
+                                    times?: string;
+                                    work?: string;
+                                };
+                                preset?: string | null;
+                                /** @enum {string} */
+                                score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                structs?: {
+                                    [key: string]: {
+                                        clusters?: string;
+                                        dropby?: string;
+                                        drops?: string;
+                                        intra?: string;
+                                        /** @enum {string} */
+                                        kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                        minis?: string;
+                                    };
+                                };
+                                /** @enum {integer} */
+                                v: 1;
+                            } | null;
+                            /**
+                             * PlanPrescription
+                             * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                             */
+                            prescription?: {
+                                /**
+                                 * PlanClock
+                                 * @description How a plan section runs, unit-normalised (seconds, counts)
+                                 */
+                                clock: {
+                                    blocks: number;
+                                    cap_secs: number | null;
+                                    dur_secs: number | null;
+                                    every_secs: number | null;
+                                    /** @enum {string} */
+                                    flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                    hr_target_bpm: number | null;
+                                    interrupt_every_secs: number | null;
+                                    off_secs: number | null;
+                                    /** @description AMRAP, or EMOM without times: no last round */
+                                    open_ended: boolean;
+                                    preset: string | null;
+                                    rest_secs: {
+                                        max: number;
+                                        min: number;
+                                    } | null;
+                                    rounds: number | null;
+                                    score: string | null;
+                                    sets: {
+                                        max: number;
+                                        min: number;
+                                    } | null;
+                                    times: number | null;
+                                    /** @description Null when open-ended */
+                                    total_rounds: number | null;
+                                    windows_secs: number[] | null;
+                                    work_secs: number | null;
+                                };
+                                rows: {
+                                    /** @description -1: an interruption row */
+                                    block_index: number;
+                                    exercise_ref: string | null;
+                                    group_id: string | null;
+                                    interrupt: boolean;
+                                    /** @enum {string} */
+                                    kind: "exercise" | "rest";
+                                    name: string | null;
+                                    note: string | null;
+                                    per_side: boolean;
+                                    row_id: string;
+                                    sets: {
+                                        index: number;
+                                        /** PlanLoad */
+                                        load: {
+                                            /** @enum {string} */
+                                            kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                            text: string | null;
+                                            /** @description Decimal (22.5) */
+                                            value: number | null;
+                                            value_max: number | null;
+                                        } | null;
+                                        /** PlanMeasures */
+                                        measures: {
+                                            distance_m: number | null;
+                                            height_cm: number | null;
+                                            hold_secs: number | null;
+                                            hr_zone: number | null;
+                                            pace_secs_per_500m: number | null;
+                                            rir: number | null;
+                                            rpe: number | null;
+                                            tempo: {
+                                                bottom: number | "X";
+                                                down: number | "X";
+                                                top: number | "X";
+                                                up: number | "X";
+                                            } | null;
+                                        };
+                                        /** PlanReps */
+                                        reps: {
+                                            max: number | null;
+                                            max_effort: boolean;
+                                            min: number | null;
+                                            sets: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            text: string | null;
+                                            /** @enum {string} */
+                                            unit: "reps" | "secs" | "meters" | "kcal";
+                                            within_secs: number | null;
+                                        } | null;
+                                        rest_secs: number | null;
+                                        /** @description 1-based rounds it applies to (empty: every interruption) */
+                                        rounds: number[];
+                                    }[];
+                                    /** PlanStructurePrescription */
+                                    structure: {
+                                        clusters: number | null;
+                                        drop_by: string | null;
+                                        drops: number | null;
+                                        intra_secs: number | null;
+                                        /** @enum {string} */
+                                        kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                        minis: number | null;
+                                    };
+                                    /**
+                                     * PlanThenRule
+                                     * @description Open-ended flows: what follows the written rounds
+                                     */
+                                    then: {
+                                        load_step: number | null;
+                                        reps_step: number | null;
+                                        /** @enum {string} */
+                                        rule: "repeat" | "step";
+                                    } | null;
+                                }[];
+                            } | null;
                             rest_after_seconds?: number | null;
                             rest_before_next_section_seconds?: number | null;
                             score_config?: {
@@ -94842,7 +98447,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string|null} */
-                    authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | null;
+                    authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | "structured_plan" | null;
                     content?: {
                         body: string;
                         document?: {
@@ -95094,6 +98699,240 @@ export interface operations {
                         order?: number;
                         /** Format: uuid */
                         parent_section_id?: string | null;
+                        /**
+                         * PlanSection
+                         * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                         */
+                        plan?: {
+                            blocks: {
+                                cells: ({
+                                    d?: string;
+                                    dist?: string;
+                                    height?: string;
+                                    hold?: string;
+                                    l?: string;
+                                    pace?: string;
+                                    rir?: string;
+                                    rpe?: string;
+                                    tempo?: string;
+                                    zone?: string;
+                                } | null)[];
+                                dose: string;
+                                exerciseRef?: string | null;
+                                extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                group?: string | null;
+                                id: string;
+                                /** @enum {string} */
+                                kind: "ex" | "rest";
+                                load: string;
+                                name: string;
+                                note?: string;
+                                perRound?: boolean;
+                                x?: {
+                                    dist?: string;
+                                    height?: string;
+                                    hold?: string;
+                                    pace?: string;
+                                    rir?: string;
+                                    rpe?: string;
+                                    tempo?: string;
+                                    zone?: string;
+                                };
+                            }[][];
+                            /** @enum {string} */
+                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                            interrupt?: {
+                                cells: ({
+                                    d?: string;
+                                    dist?: string;
+                                    height?: string;
+                                    hold?: string;
+                                    l?: string;
+                                    pace?: string;
+                                    rir?: string;
+                                    rpe?: string;
+                                    tempo?: string;
+                                    zone?: string;
+                                } | null)[];
+                                dose: string;
+                                exerciseRef?: string | null;
+                                extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                group?: string | null;
+                                id: string;
+                                /** @enum {string} */
+                                kind: "ex" | "rest";
+                                load: string;
+                                name: string;
+                                note?: string;
+                                perRound?: boolean;
+                                x?: {
+                                    dist?: string;
+                                    height?: string;
+                                    hold?: string;
+                                    pace?: string;
+                                    rir?: string;
+                                    rpe?: string;
+                                    tempo?: string;
+                                    zone?: string;
+                                };
+                            }[];
+                            levelNotes?: {
+                                [key: string]: string;
+                            };
+                            /** PlanMods */
+                            mods?: {
+                                hr?: boolean;
+                                interrupt?: boolean;
+                            };
+                            note?: string;
+                            /** PlanParams */
+                            params: {
+                                cap?: string;
+                                dur?: string;
+                                every?: string;
+                                hrTarget?: string;
+                                intEvery?: string;
+                                off?: string;
+                                rest?: string;
+                                rounds?: string;
+                                sets?: string;
+                                times?: string;
+                                work?: string;
+                            };
+                            preset?: string | null;
+                            /** @enum {string} */
+                            score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                            structs?: {
+                                [key: string]: {
+                                    clusters?: string;
+                                    dropby?: string;
+                                    drops?: string;
+                                    intra?: string;
+                                    /** @enum {string} */
+                                    kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                    minis?: string;
+                                };
+                            };
+                            /** @enum {integer} */
+                            v: 1;
+                        } | null;
+                        /**
+                         * PlanPrescription
+                         * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                         */
+                        prescription?: {
+                            /**
+                             * PlanClock
+                             * @description How a plan section runs, unit-normalised (seconds, counts)
+                             */
+                            clock: {
+                                blocks: number;
+                                cap_secs: number | null;
+                                dur_secs: number | null;
+                                every_secs: number | null;
+                                /** @enum {string} */
+                                flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                hr_target_bpm: number | null;
+                                interrupt_every_secs: number | null;
+                                off_secs: number | null;
+                                /** @description AMRAP, or EMOM without times: no last round */
+                                open_ended: boolean;
+                                preset: string | null;
+                                rest_secs: {
+                                    max: number;
+                                    min: number;
+                                } | null;
+                                rounds: number | null;
+                                score: string | null;
+                                sets: {
+                                    max: number;
+                                    min: number;
+                                } | null;
+                                times: number | null;
+                                /** @description Null when open-ended */
+                                total_rounds: number | null;
+                                windows_secs: number[] | null;
+                                work_secs: number | null;
+                            };
+                            rows: {
+                                /** @description -1: an interruption row */
+                                block_index: number;
+                                exercise_ref: string | null;
+                                group_id: string | null;
+                                interrupt: boolean;
+                                /** @enum {string} */
+                                kind: "exercise" | "rest";
+                                name: string | null;
+                                note: string | null;
+                                per_side: boolean;
+                                row_id: string;
+                                sets: {
+                                    index: number;
+                                    /** PlanLoad */
+                                    load: {
+                                        /** @enum {string} */
+                                        kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                        text: string | null;
+                                        /** @description Decimal (22.5) */
+                                        value: number | null;
+                                        value_max: number | null;
+                                    } | null;
+                                    /** PlanMeasures */
+                                    measures: {
+                                        distance_m: number | null;
+                                        height_cm: number | null;
+                                        hold_secs: number | null;
+                                        hr_zone: number | null;
+                                        pace_secs_per_500m: number | null;
+                                        rir: number | null;
+                                        rpe: number | null;
+                                        tempo: {
+                                            bottom: number | "X";
+                                            down: number | "X";
+                                            top: number | "X";
+                                            up: number | "X";
+                                        } | null;
+                                    };
+                                    /** PlanReps */
+                                    reps: {
+                                        max: number | null;
+                                        max_effort: boolean;
+                                        min: number | null;
+                                        sets: {
+                                            max: number;
+                                            min: number;
+                                        } | null;
+                                        text: string | null;
+                                        /** @enum {string} */
+                                        unit: "reps" | "secs" | "meters" | "kcal";
+                                        within_secs: number | null;
+                                    } | null;
+                                    rest_secs: number | null;
+                                    /** @description 1-based rounds it applies to (empty: every interruption) */
+                                    rounds: number[];
+                                }[];
+                                /** PlanStructurePrescription */
+                                structure: {
+                                    clusters: number | null;
+                                    drop_by: string | null;
+                                    drops: number | null;
+                                    intra_secs: number | null;
+                                    /** @enum {string} */
+                                    kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                    minis: number | null;
+                                };
+                                /**
+                                 * PlanThenRule
+                                 * @description Open-ended flows: what follows the written rounds
+                                 */
+                                then: {
+                                    load_step: number | null;
+                                    reps_step: number | null;
+                                    /** @enum {string} */
+                                    rule: "repeat" | "step";
+                                } | null;
+                            }[];
+                        } | null;
                         rest_after_seconds?: number | null;
                         rest_before_next_section_seconds?: number | null;
                         score_config?: {
@@ -95314,6 +99153,240 @@ export interface operations {
                             order?: number;
                             /** Format: uuid */
                             parent_section_id?: string | null;
+                            /**
+                             * PlanSection
+                             * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                             */
+                            plan?: {
+                                blocks: {
+                                    cells: ({
+                                        d?: string;
+                                        dist?: string;
+                                        height?: string;
+                                        hold?: string;
+                                        l?: string;
+                                        pace?: string;
+                                        rir?: string;
+                                        rpe?: string;
+                                        tempo?: string;
+                                        zone?: string;
+                                    } | null)[];
+                                    dose: string;
+                                    exerciseRef?: string | null;
+                                    extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                    group?: string | null;
+                                    id: string;
+                                    /** @enum {string} */
+                                    kind: "ex" | "rest";
+                                    load: string;
+                                    name: string;
+                                    note?: string;
+                                    perRound?: boolean;
+                                    x?: {
+                                        dist?: string;
+                                        height?: string;
+                                        hold?: string;
+                                        pace?: string;
+                                        rir?: string;
+                                        rpe?: string;
+                                        tempo?: string;
+                                        zone?: string;
+                                    };
+                                }[][];
+                                /** @enum {string} */
+                                flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                interrupt?: {
+                                    cells: ({
+                                        d?: string;
+                                        dist?: string;
+                                        height?: string;
+                                        hold?: string;
+                                        l?: string;
+                                        pace?: string;
+                                        rir?: string;
+                                        rpe?: string;
+                                        tempo?: string;
+                                        zone?: string;
+                                    } | null)[];
+                                    dose: string;
+                                    exerciseRef?: string | null;
+                                    extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                    group?: string | null;
+                                    id: string;
+                                    /** @enum {string} */
+                                    kind: "ex" | "rest";
+                                    load: string;
+                                    name: string;
+                                    note?: string;
+                                    perRound?: boolean;
+                                    x?: {
+                                        dist?: string;
+                                        height?: string;
+                                        hold?: string;
+                                        pace?: string;
+                                        rir?: string;
+                                        rpe?: string;
+                                        tempo?: string;
+                                        zone?: string;
+                                    };
+                                }[];
+                                levelNotes?: {
+                                    [key: string]: string;
+                                };
+                                /** PlanMods */
+                                mods?: {
+                                    hr?: boolean;
+                                    interrupt?: boolean;
+                                };
+                                note?: string;
+                                /** PlanParams */
+                                params: {
+                                    cap?: string;
+                                    dur?: string;
+                                    every?: string;
+                                    hrTarget?: string;
+                                    intEvery?: string;
+                                    off?: string;
+                                    rest?: string;
+                                    rounds?: string;
+                                    sets?: string;
+                                    times?: string;
+                                    work?: string;
+                                };
+                                preset?: string | null;
+                                /** @enum {string} */
+                                score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                structs?: {
+                                    [key: string]: {
+                                        clusters?: string;
+                                        dropby?: string;
+                                        drops?: string;
+                                        intra?: string;
+                                        /** @enum {string} */
+                                        kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                        minis?: string;
+                                    };
+                                };
+                                /** @enum {integer} */
+                                v: 1;
+                            } | null;
+                            /**
+                             * PlanPrescription
+                             * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                             */
+                            prescription?: {
+                                /**
+                                 * PlanClock
+                                 * @description How a plan section runs, unit-normalised (seconds, counts)
+                                 */
+                                clock: {
+                                    blocks: number;
+                                    cap_secs: number | null;
+                                    dur_secs: number | null;
+                                    every_secs: number | null;
+                                    /** @enum {string} */
+                                    flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                    hr_target_bpm: number | null;
+                                    interrupt_every_secs: number | null;
+                                    off_secs: number | null;
+                                    /** @description AMRAP, or EMOM without times: no last round */
+                                    open_ended: boolean;
+                                    preset: string | null;
+                                    rest_secs: {
+                                        max: number;
+                                        min: number;
+                                    } | null;
+                                    rounds: number | null;
+                                    score: string | null;
+                                    sets: {
+                                        max: number;
+                                        min: number;
+                                    } | null;
+                                    times: number | null;
+                                    /** @description Null when open-ended */
+                                    total_rounds: number | null;
+                                    windows_secs: number[] | null;
+                                    work_secs: number | null;
+                                };
+                                rows: {
+                                    /** @description -1: an interruption row */
+                                    block_index: number;
+                                    exercise_ref: string | null;
+                                    group_id: string | null;
+                                    interrupt: boolean;
+                                    /** @enum {string} */
+                                    kind: "exercise" | "rest";
+                                    name: string | null;
+                                    note: string | null;
+                                    per_side: boolean;
+                                    row_id: string;
+                                    sets: {
+                                        index: number;
+                                        /** PlanLoad */
+                                        load: {
+                                            /** @enum {string} */
+                                            kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                            text: string | null;
+                                            /** @description Decimal (22.5) */
+                                            value: number | null;
+                                            value_max: number | null;
+                                        } | null;
+                                        /** PlanMeasures */
+                                        measures: {
+                                            distance_m: number | null;
+                                            height_cm: number | null;
+                                            hold_secs: number | null;
+                                            hr_zone: number | null;
+                                            pace_secs_per_500m: number | null;
+                                            rir: number | null;
+                                            rpe: number | null;
+                                            tempo: {
+                                                bottom: number | "X";
+                                                down: number | "X";
+                                                top: number | "X";
+                                                up: number | "X";
+                                            } | null;
+                                        };
+                                        /** PlanReps */
+                                        reps: {
+                                            max: number | null;
+                                            max_effort: boolean;
+                                            min: number | null;
+                                            sets: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            text: string | null;
+                                            /** @enum {string} */
+                                            unit: "reps" | "secs" | "meters" | "kcal";
+                                            within_secs: number | null;
+                                        } | null;
+                                        rest_secs: number | null;
+                                        /** @description 1-based rounds it applies to (empty: every interruption) */
+                                        rounds: number[];
+                                    }[];
+                                    /** PlanStructurePrescription */
+                                    structure: {
+                                        clusters: number | null;
+                                        drop_by: string | null;
+                                        drops: number | null;
+                                        intra_secs: number | null;
+                                        /** @enum {string} */
+                                        kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                        minis: number | null;
+                                    };
+                                    /**
+                                     * PlanThenRule
+                                     * @description Open-ended flows: what follows the written rounds
+                                     */
+                                    then: {
+                                        load_step: number | null;
+                                        reps_step: number | null;
+                                        /** @enum {string} */
+                                        rule: "repeat" | "step";
+                                    } | null;
+                                }[];
+                            } | null;
                             rest_after_seconds?: number | null;
                             rest_before_next_section_seconds?: number | null;
                             score_config?: {
@@ -95377,7 +99450,7 @@ export interface operations {
                     "application/json": {
                         workout: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | "structured_plan";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -95443,6 +99516,248 @@ export interface operations {
                                     subtitle?: string | null;
                                     timer: {
                                         [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "plan";
+                                sections: {
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                                     */
+                                    plan: {
+                                        blocks: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                        interrupt?: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        /** PlanMods */
+                                        mods?: {
+                                            hr?: boolean;
+                                            interrupt?: boolean;
+                                        };
+                                        note?: string;
+                                        /** PlanParams */
+                                        params: {
+                                            cap?: string;
+                                            dur?: string;
+                                            every?: string;
+                                            hrTarget?: string;
+                                            intEvery?: string;
+                                            off?: string;
+                                            rest?: string;
+                                            rounds?: string;
+                                            sets?: string;
+                                            times?: string;
+                                            work?: string;
+                                        };
+                                        preset?: string | null;
+                                        /** @enum {string} */
+                                        score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                        structs?: {
+                                            [key: string]: {
+                                                clusters?: string;
+                                                dropby?: string;
+                                                drops?: string;
+                                                intra?: string;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis?: string;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } | null;
+                                    /**
+                                     * PlanPrescription
+                                     * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                                     */
+                                    prescription: {
+                                        /**
+                                         * PlanClock
+                                         * @description How a plan section runs, unit-normalised (seconds, counts)
+                                         */
+                                        clock: {
+                                            blocks: number;
+                                            cap_secs: number | null;
+                                            dur_secs: number | null;
+                                            every_secs: number | null;
+                                            /** @enum {string} */
+                                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                            hr_target_bpm: number | null;
+                                            interrupt_every_secs: number | null;
+                                            off_secs: number | null;
+                                            /** @description AMRAP, or EMOM without times: no last round */
+                                            open_ended: boolean;
+                                            preset: string | null;
+                                            rest_secs: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            rounds: number | null;
+                                            score: string | null;
+                                            sets: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            times: number | null;
+                                            /** @description Null when open-ended */
+                                            total_rounds: number | null;
+                                            windows_secs: number[] | null;
+                                            work_secs: number | null;
+                                        };
+                                        rows: {
+                                            /** @description -1: an interruption row */
+                                            block_index: number;
+                                            exercise_ref: string | null;
+                                            group_id: string | null;
+                                            interrupt: boolean;
+                                            /** @enum {string} */
+                                            kind: "exercise" | "rest";
+                                            name: string | null;
+                                            note: string | null;
+                                            per_side: boolean;
+                                            row_id: string;
+                                            sets: {
+                                                index: number;
+                                                /** PlanLoad */
+                                                load: {
+                                                    /** @enum {string} */
+                                                    kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                                    text: string | null;
+                                                    /** @description Decimal (22.5) */
+                                                    value: number | null;
+                                                    value_max: number | null;
+                                                } | null;
+                                                /** PlanMeasures */
+                                                measures: {
+                                                    distance_m: number | null;
+                                                    height_cm: number | null;
+                                                    hold_secs: number | null;
+                                                    hr_zone: number | null;
+                                                    pace_secs_per_500m: number | null;
+                                                    rir: number | null;
+                                                    rpe: number | null;
+                                                    tempo: {
+                                                        bottom: number | "X";
+                                                        down: number | "X";
+                                                        top: number | "X";
+                                                        up: number | "X";
+                                                    } | null;
+                                                };
+                                                /** PlanReps */
+                                                reps: {
+                                                    max: number | null;
+                                                    max_effort: boolean;
+                                                    min: number | null;
+                                                    sets: {
+                                                        max: number;
+                                                        min: number;
+                                                    } | null;
+                                                    text: string | null;
+                                                    /** @enum {string} */
+                                                    unit: "reps" | "secs" | "meters" | "kcal";
+                                                    within_secs: number | null;
+                                                } | null;
+                                                rest_secs: number | null;
+                                                /** @description 1-based rounds it applies to (empty: every interruption) */
+                                                rounds: number[];
+                                            }[];
+                                            /** PlanStructurePrescription */
+                                            structure: {
+                                                clusters: number | null;
+                                                drop_by: string | null;
+                                                drops: number | null;
+                                                intra_secs: number | null;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis: number | null;
+                                            };
+                                            /**
+                                             * PlanThenRule
+                                             * @description Open-ended flows: what follows the written rounds
+                                             */
+                                            then: {
+                                                load_step: number | null;
+                                                reps_step: number | null;
+                                                /** @enum {string} */
+                                                rule: "repeat" | "step";
+                                            } | null;
+                                        }[];
                                     } | null;
                                 }[];
                             };
@@ -95708,6 +100023,240 @@ export interface operations {
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
+                                /**
+                                 * PlanSection
+                                 * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                                 */
+                                plan?: {
+                                    blocks: {
+                                        cells: ({
+                                            d?: string;
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            l?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        } | null)[];
+                                        dose: string;
+                                        exerciseRef?: string | null;
+                                        extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                        group?: string | null;
+                                        id: string;
+                                        /** @enum {string} */
+                                        kind: "ex" | "rest";
+                                        load: string;
+                                        name: string;
+                                        note?: string;
+                                        perRound?: boolean;
+                                        x?: {
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        };
+                                    }[][];
+                                    /** @enum {string} */
+                                    flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                    interrupt?: {
+                                        cells: ({
+                                            d?: string;
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            l?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        } | null)[];
+                                        dose: string;
+                                        exerciseRef?: string | null;
+                                        extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                        group?: string | null;
+                                        id: string;
+                                        /** @enum {string} */
+                                        kind: "ex" | "rest";
+                                        load: string;
+                                        name: string;
+                                        note?: string;
+                                        perRound?: boolean;
+                                        x?: {
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        };
+                                    }[];
+                                    levelNotes?: {
+                                        [key: string]: string;
+                                    };
+                                    /** PlanMods */
+                                    mods?: {
+                                        hr?: boolean;
+                                        interrupt?: boolean;
+                                    };
+                                    note?: string;
+                                    /** PlanParams */
+                                    params: {
+                                        cap?: string;
+                                        dur?: string;
+                                        every?: string;
+                                        hrTarget?: string;
+                                        intEvery?: string;
+                                        off?: string;
+                                        rest?: string;
+                                        rounds?: string;
+                                        sets?: string;
+                                        times?: string;
+                                        work?: string;
+                                    };
+                                    preset?: string | null;
+                                    /** @enum {string} */
+                                    score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                    structs?: {
+                                        [key: string]: {
+                                            clusters?: string;
+                                            dropby?: string;
+                                            drops?: string;
+                                            intra?: string;
+                                            /** @enum {string} */
+                                            kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                            minis?: string;
+                                        };
+                                    };
+                                    /** @enum {integer} */
+                                    v: 1;
+                                } | null;
+                                /**
+                                 * PlanPrescription
+                                 * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                                 */
+                                prescription?: {
+                                    /**
+                                     * PlanClock
+                                     * @description How a plan section runs, unit-normalised (seconds, counts)
+                                     */
+                                    clock: {
+                                        blocks: number;
+                                        cap_secs: number | null;
+                                        dur_secs: number | null;
+                                        every_secs: number | null;
+                                        /** @enum {string} */
+                                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                        hr_target_bpm: number | null;
+                                        interrupt_every_secs: number | null;
+                                        off_secs: number | null;
+                                        /** @description AMRAP, or EMOM without times: no last round */
+                                        open_ended: boolean;
+                                        preset: string | null;
+                                        rest_secs: {
+                                            max: number;
+                                            min: number;
+                                        } | null;
+                                        rounds: number | null;
+                                        score: string | null;
+                                        sets: {
+                                            max: number;
+                                            min: number;
+                                        } | null;
+                                        times: number | null;
+                                        /** @description Null when open-ended */
+                                        total_rounds: number | null;
+                                        windows_secs: number[] | null;
+                                        work_secs: number | null;
+                                    };
+                                    rows: {
+                                        /** @description -1: an interruption row */
+                                        block_index: number;
+                                        exercise_ref: string | null;
+                                        group_id: string | null;
+                                        interrupt: boolean;
+                                        /** @enum {string} */
+                                        kind: "exercise" | "rest";
+                                        name: string | null;
+                                        note: string | null;
+                                        per_side: boolean;
+                                        row_id: string;
+                                        sets: {
+                                            index: number;
+                                            /** PlanLoad */
+                                            load: {
+                                                /** @enum {string} */
+                                                kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                                text: string | null;
+                                                /** @description Decimal (22.5) */
+                                                value: number | null;
+                                                value_max: number | null;
+                                            } | null;
+                                            /** PlanMeasures */
+                                            measures: {
+                                                distance_m: number | null;
+                                                height_cm: number | null;
+                                                hold_secs: number | null;
+                                                hr_zone: number | null;
+                                                pace_secs_per_500m: number | null;
+                                                rir: number | null;
+                                                rpe: number | null;
+                                                tempo: {
+                                                    bottom: number | "X";
+                                                    down: number | "X";
+                                                    top: number | "X";
+                                                    up: number | "X";
+                                                } | null;
+                                            };
+                                            /** PlanReps */
+                                            reps: {
+                                                max: number | null;
+                                                max_effort: boolean;
+                                                min: number | null;
+                                                sets: {
+                                                    max: number;
+                                                    min: number;
+                                                } | null;
+                                                text: string | null;
+                                                /** @enum {string} */
+                                                unit: "reps" | "secs" | "meters" | "kcal";
+                                                within_secs: number | null;
+                                            } | null;
+                                            rest_secs: number | null;
+                                            /** @description 1-based rounds it applies to (empty: every interruption) */
+                                            rounds: number[];
+                                        }[];
+                                        /** PlanStructurePrescription */
+                                        structure: {
+                                            clusters: number | null;
+                                            drop_by: string | null;
+                                            drops: number | null;
+                                            intra_secs: number | null;
+                                            /** @enum {string} */
+                                            kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                            minis: number | null;
+                                        };
+                                        /**
+                                         * PlanThenRule
+                                         * @description Open-ended flows: what follows the written rounds
+                                         */
+                                        then: {
+                                            load_step: number | null;
+                                            reps_step: number | null;
+                                            /** @enum {string} */
+                                            rule: "repeat" | "step";
+                                        } | null;
+                                    }[];
+                                } | null;
                                 rest_after_seconds?: number | null;
                                 rest_before_next_section_seconds?: number | null;
                                 score_config?: {
@@ -95928,6 +100477,240 @@ export interface operations {
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                                     */
+                                    plan?: {
+                                        blocks: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                        interrupt?: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        /** PlanMods */
+                                        mods?: {
+                                            hr?: boolean;
+                                            interrupt?: boolean;
+                                        };
+                                        note?: string;
+                                        /** PlanParams */
+                                        params: {
+                                            cap?: string;
+                                            dur?: string;
+                                            every?: string;
+                                            hrTarget?: string;
+                                            intEvery?: string;
+                                            off?: string;
+                                            rest?: string;
+                                            rounds?: string;
+                                            sets?: string;
+                                            times?: string;
+                                            work?: string;
+                                        };
+                                        preset?: string | null;
+                                        /** @enum {string} */
+                                        score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                        structs?: {
+                                            [key: string]: {
+                                                clusters?: string;
+                                                dropby?: string;
+                                                drops?: string;
+                                                intra?: string;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis?: string;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } | null;
+                                    /**
+                                     * PlanPrescription
+                                     * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                                     */
+                                    prescription?: {
+                                        /**
+                                         * PlanClock
+                                         * @description How a plan section runs, unit-normalised (seconds, counts)
+                                         */
+                                        clock: {
+                                            blocks: number;
+                                            cap_secs: number | null;
+                                            dur_secs: number | null;
+                                            every_secs: number | null;
+                                            /** @enum {string} */
+                                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                            hr_target_bpm: number | null;
+                                            interrupt_every_secs: number | null;
+                                            off_secs: number | null;
+                                            /** @description AMRAP, or EMOM without times: no last round */
+                                            open_ended: boolean;
+                                            preset: string | null;
+                                            rest_secs: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            rounds: number | null;
+                                            score: string | null;
+                                            sets: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            times: number | null;
+                                            /** @description Null when open-ended */
+                                            total_rounds: number | null;
+                                            windows_secs: number[] | null;
+                                            work_secs: number | null;
+                                        };
+                                        rows: {
+                                            /** @description -1: an interruption row */
+                                            block_index: number;
+                                            exercise_ref: string | null;
+                                            group_id: string | null;
+                                            interrupt: boolean;
+                                            /** @enum {string} */
+                                            kind: "exercise" | "rest";
+                                            name: string | null;
+                                            note: string | null;
+                                            per_side: boolean;
+                                            row_id: string;
+                                            sets: {
+                                                index: number;
+                                                /** PlanLoad */
+                                                load: {
+                                                    /** @enum {string} */
+                                                    kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                                    text: string | null;
+                                                    /** @description Decimal (22.5) */
+                                                    value: number | null;
+                                                    value_max: number | null;
+                                                } | null;
+                                                /** PlanMeasures */
+                                                measures: {
+                                                    distance_m: number | null;
+                                                    height_cm: number | null;
+                                                    hold_secs: number | null;
+                                                    hr_zone: number | null;
+                                                    pace_secs_per_500m: number | null;
+                                                    rir: number | null;
+                                                    rpe: number | null;
+                                                    tempo: {
+                                                        bottom: number | "X";
+                                                        down: number | "X";
+                                                        top: number | "X";
+                                                        up: number | "X";
+                                                    } | null;
+                                                };
+                                                /** PlanReps */
+                                                reps: {
+                                                    max: number | null;
+                                                    max_effort: boolean;
+                                                    min: number | null;
+                                                    sets: {
+                                                        max: number;
+                                                        min: number;
+                                                    } | null;
+                                                    text: string | null;
+                                                    /** @enum {string} */
+                                                    unit: "reps" | "secs" | "meters" | "kcal";
+                                                    within_secs: number | null;
+                                                } | null;
+                                                rest_secs: number | null;
+                                                /** @description 1-based rounds it applies to (empty: every interruption) */
+                                                rounds: number[];
+                                            }[];
+                                            /** PlanStructurePrescription */
+                                            structure: {
+                                                clusters: number | null;
+                                                drop_by: string | null;
+                                                drops: number | null;
+                                                intra_secs: number | null;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis: number | null;
+                                            };
+                                            /**
+                                             * PlanThenRule
+                                             * @description Open-ended flows: what follows the written rounds
+                                             */
+                                            then: {
+                                                load_step: number | null;
+                                                reps_step: number | null;
+                                                /** @enum {string} */
+                                                rule: "repeat" | "step";
+                                            } | null;
+                                        }[];
+                                    } | null;
                                     rest_after_seconds?: number | null;
                                     rest_before_next_section_seconds?: number | null;
                                     score_config?: {
@@ -101740,6 +106523,81 @@ export interface operations {
                                 }[];
                                 started_at?: string | null;
                                 status: string;
+                                /** PlanWorkload */
+                                workload?: {
+                                    exercises?: {
+                                        calories?: number;
+                                        distance_m?: number;
+                                        estimated?: boolean;
+                                        exercise_ref?: string | null;
+                                        logged_sets?: number;
+                                        name?: string | null;
+                                        reps?: number;
+                                        sets?: number;
+                                        top_set?: {
+                                            load_kg?: number;
+                                            reps?: number | null;
+                                        } | null;
+                                        volume_kg?: number;
+                                        work_secs?: number;
+                                    }[];
+                                    sections?: {
+                                        exercises?: {
+                                            block_index?: number;
+                                            calories?: number;
+                                            distance_m?: number;
+                                            estimated?: boolean;
+                                            exercise_ref?: string | null;
+                                            group_id?: string | null;
+                                            interrupt?: boolean;
+                                            logged_sets?: number;
+                                            name?: string | null;
+                                            per_side?: boolean;
+                                            reps?: number;
+                                            row_id?: string;
+                                            sets?: number;
+                                            top_set?: {
+                                                load_kg?: number;
+                                                reps?: number | null;
+                                            } | null;
+                                            volume_kg?: number;
+                                            work_secs?: number;
+                                        }[];
+                                        flow?: string;
+                                        name?: string | null;
+                                        open_ended?: boolean;
+                                        preset?: string | null;
+                                        score?: string | null;
+                                        section_id?: string;
+                                        /** @enum {string} */
+                                        source?: "actuals" | "prescription";
+                                        time_domain?: {
+                                            cap_secs?: number | null;
+                                            open_ended?: boolean;
+                                            planned_secs?: number | null;
+                                        };
+                                        totals?: {
+                                            calories?: number;
+                                            distance_m?: number;
+                                            estimated?: boolean;
+                                            logged_sets?: number;
+                                            reps?: number;
+                                            sets?: number;
+                                            volume_kg?: number;
+                                            work_secs?: number;
+                                        };
+                                    }[];
+                                    totals?: {
+                                        calories?: number;
+                                        distance_m?: number;
+                                        estimated?: boolean;
+                                        logged_sets?: number;
+                                        reps?: number;
+                                        sets?: number;
+                                        volume_kg?: number;
+                                        work_secs?: number;
+                                    };
+                                } | null;
                             } | null;
                             source?: string | null;
                             workout: {
@@ -101748,6 +106606,8 @@ export interface operations {
                                     exercises?: {
                                         [key: string]: unknown;
                                     }[];
+                                    /** @description ADR-270: the flow of a structured plan section */
+                                    flow?: string | null;
                                     format?: string;
                                     id?: string;
                                     name?: string | null;
@@ -102671,6 +107531,19 @@ export interface operations {
                                 date: string;
                                 sessions: number;
                             }[];
+                            /** @description ADR-270: the heaviest set of each exercise per session (structured plan workouts), for exercises done in more than one session */
+                            exercise_loads?: {
+                                exercise_ref?: string | null;
+                                name?: string | null;
+                                points: {
+                                    /** Format: date */
+                                    completed_on: string;
+                                    /** Format: uuid */
+                                    execution_id: string;
+                                    load_kg: number;
+                                    reps?: number | null;
+                                }[];
+                            }[];
                             pr_timeline: {
                                 /** Format: date */
                                 beaten_on: string;
@@ -102706,11 +107579,14 @@ export interface operations {
                             totals: {
                                 minutes: number;
                                 sessions: number;
+                                volume_kg?: number;
                                 workouts: number;
                             };
                             weekly: {
                                 minutes: number;
                                 sessions: number;
+                                /** @description ADR-270: kg × reps lifted in structured plan workouts */
+                                volume_kg?: number;
                                 /** Format: date */
                                 week_start: string;
                             }[];
@@ -113428,7 +118304,7 @@ export interface operations {
                     "application/json": {
                         workout: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | "structured_plan";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -113494,6 +118370,248 @@ export interface operations {
                                     subtitle?: string | null;
                                     timer: {
                                         [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "plan";
+                                sections: {
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                                     */
+                                    plan: {
+                                        blocks: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                        interrupt?: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        /** PlanMods */
+                                        mods?: {
+                                            hr?: boolean;
+                                            interrupt?: boolean;
+                                        };
+                                        note?: string;
+                                        /** PlanParams */
+                                        params: {
+                                            cap?: string;
+                                            dur?: string;
+                                            every?: string;
+                                            hrTarget?: string;
+                                            intEvery?: string;
+                                            off?: string;
+                                            rest?: string;
+                                            rounds?: string;
+                                            sets?: string;
+                                            times?: string;
+                                            work?: string;
+                                        };
+                                        preset?: string | null;
+                                        /** @enum {string} */
+                                        score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                        structs?: {
+                                            [key: string]: {
+                                                clusters?: string;
+                                                dropby?: string;
+                                                drops?: string;
+                                                intra?: string;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis?: string;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } | null;
+                                    /**
+                                     * PlanPrescription
+                                     * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                                     */
+                                    prescription: {
+                                        /**
+                                         * PlanClock
+                                         * @description How a plan section runs, unit-normalised (seconds, counts)
+                                         */
+                                        clock: {
+                                            blocks: number;
+                                            cap_secs: number | null;
+                                            dur_secs: number | null;
+                                            every_secs: number | null;
+                                            /** @enum {string} */
+                                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                            hr_target_bpm: number | null;
+                                            interrupt_every_secs: number | null;
+                                            off_secs: number | null;
+                                            /** @description AMRAP, or EMOM without times: no last round */
+                                            open_ended: boolean;
+                                            preset: string | null;
+                                            rest_secs: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            rounds: number | null;
+                                            score: string | null;
+                                            sets: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            times: number | null;
+                                            /** @description Null when open-ended */
+                                            total_rounds: number | null;
+                                            windows_secs: number[] | null;
+                                            work_secs: number | null;
+                                        };
+                                        rows: {
+                                            /** @description -1: an interruption row */
+                                            block_index: number;
+                                            exercise_ref: string | null;
+                                            group_id: string | null;
+                                            interrupt: boolean;
+                                            /** @enum {string} */
+                                            kind: "exercise" | "rest";
+                                            name: string | null;
+                                            note: string | null;
+                                            per_side: boolean;
+                                            row_id: string;
+                                            sets: {
+                                                index: number;
+                                                /** PlanLoad */
+                                                load: {
+                                                    /** @enum {string} */
+                                                    kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                                    text: string | null;
+                                                    /** @description Decimal (22.5) */
+                                                    value: number | null;
+                                                    value_max: number | null;
+                                                } | null;
+                                                /** PlanMeasures */
+                                                measures: {
+                                                    distance_m: number | null;
+                                                    height_cm: number | null;
+                                                    hold_secs: number | null;
+                                                    hr_zone: number | null;
+                                                    pace_secs_per_500m: number | null;
+                                                    rir: number | null;
+                                                    rpe: number | null;
+                                                    tempo: {
+                                                        bottom: number | "X";
+                                                        down: number | "X";
+                                                        top: number | "X";
+                                                        up: number | "X";
+                                                    } | null;
+                                                };
+                                                /** PlanReps */
+                                                reps: {
+                                                    max: number | null;
+                                                    max_effort: boolean;
+                                                    min: number | null;
+                                                    sets: {
+                                                        max: number;
+                                                        min: number;
+                                                    } | null;
+                                                    text: string | null;
+                                                    /** @enum {string} */
+                                                    unit: "reps" | "secs" | "meters" | "kcal";
+                                                    within_secs: number | null;
+                                                } | null;
+                                                rest_secs: number | null;
+                                                /** @description 1-based rounds it applies to (empty: every interruption) */
+                                                rounds: number[];
+                                            }[];
+                                            /** PlanStructurePrescription */
+                                            structure: {
+                                                clusters: number | null;
+                                                drop_by: string | null;
+                                                drops: number | null;
+                                                intra_secs: number | null;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis: number | null;
+                                            };
+                                            /**
+                                             * PlanThenRule
+                                             * @description Open-ended flows: what follows the written rounds
+                                             */
+                                            then: {
+                                                load_step: number | null;
+                                                reps_step: number | null;
+                                                /** @enum {string} */
+                                                rule: "repeat" | "step";
+                                            } | null;
+                                        }[];
                                     } | null;
                                 }[];
                             };
@@ -113759,6 +118877,240 @@ export interface operations {
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
+                                /**
+                                 * PlanSection
+                                 * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                                 */
+                                plan?: {
+                                    blocks: {
+                                        cells: ({
+                                            d?: string;
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            l?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        } | null)[];
+                                        dose: string;
+                                        exerciseRef?: string | null;
+                                        extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                        group?: string | null;
+                                        id: string;
+                                        /** @enum {string} */
+                                        kind: "ex" | "rest";
+                                        load: string;
+                                        name: string;
+                                        note?: string;
+                                        perRound?: boolean;
+                                        x?: {
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        };
+                                    }[][];
+                                    /** @enum {string} */
+                                    flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                    interrupt?: {
+                                        cells: ({
+                                            d?: string;
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            l?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        } | null)[];
+                                        dose: string;
+                                        exerciseRef?: string | null;
+                                        extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                        group?: string | null;
+                                        id: string;
+                                        /** @enum {string} */
+                                        kind: "ex" | "rest";
+                                        load: string;
+                                        name: string;
+                                        note?: string;
+                                        perRound?: boolean;
+                                        x?: {
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        };
+                                    }[];
+                                    levelNotes?: {
+                                        [key: string]: string;
+                                    };
+                                    /** PlanMods */
+                                    mods?: {
+                                        hr?: boolean;
+                                        interrupt?: boolean;
+                                    };
+                                    note?: string;
+                                    /** PlanParams */
+                                    params: {
+                                        cap?: string;
+                                        dur?: string;
+                                        every?: string;
+                                        hrTarget?: string;
+                                        intEvery?: string;
+                                        off?: string;
+                                        rest?: string;
+                                        rounds?: string;
+                                        sets?: string;
+                                        times?: string;
+                                        work?: string;
+                                    };
+                                    preset?: string | null;
+                                    /** @enum {string} */
+                                    score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                    structs?: {
+                                        [key: string]: {
+                                            clusters?: string;
+                                            dropby?: string;
+                                            drops?: string;
+                                            intra?: string;
+                                            /** @enum {string} */
+                                            kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                            minis?: string;
+                                        };
+                                    };
+                                    /** @enum {integer} */
+                                    v: 1;
+                                } | null;
+                                /**
+                                 * PlanPrescription
+                                 * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                                 */
+                                prescription?: {
+                                    /**
+                                     * PlanClock
+                                     * @description How a plan section runs, unit-normalised (seconds, counts)
+                                     */
+                                    clock: {
+                                        blocks: number;
+                                        cap_secs: number | null;
+                                        dur_secs: number | null;
+                                        every_secs: number | null;
+                                        /** @enum {string} */
+                                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                        hr_target_bpm: number | null;
+                                        interrupt_every_secs: number | null;
+                                        off_secs: number | null;
+                                        /** @description AMRAP, or EMOM without times: no last round */
+                                        open_ended: boolean;
+                                        preset: string | null;
+                                        rest_secs: {
+                                            max: number;
+                                            min: number;
+                                        } | null;
+                                        rounds: number | null;
+                                        score: string | null;
+                                        sets: {
+                                            max: number;
+                                            min: number;
+                                        } | null;
+                                        times: number | null;
+                                        /** @description Null when open-ended */
+                                        total_rounds: number | null;
+                                        windows_secs: number[] | null;
+                                        work_secs: number | null;
+                                    };
+                                    rows: {
+                                        /** @description -1: an interruption row */
+                                        block_index: number;
+                                        exercise_ref: string | null;
+                                        group_id: string | null;
+                                        interrupt: boolean;
+                                        /** @enum {string} */
+                                        kind: "exercise" | "rest";
+                                        name: string | null;
+                                        note: string | null;
+                                        per_side: boolean;
+                                        row_id: string;
+                                        sets: {
+                                            index: number;
+                                            /** PlanLoad */
+                                            load: {
+                                                /** @enum {string} */
+                                                kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                                text: string | null;
+                                                /** @description Decimal (22.5) */
+                                                value: number | null;
+                                                value_max: number | null;
+                                            } | null;
+                                            /** PlanMeasures */
+                                            measures: {
+                                                distance_m: number | null;
+                                                height_cm: number | null;
+                                                hold_secs: number | null;
+                                                hr_zone: number | null;
+                                                pace_secs_per_500m: number | null;
+                                                rir: number | null;
+                                                rpe: number | null;
+                                                tempo: {
+                                                    bottom: number | "X";
+                                                    down: number | "X";
+                                                    top: number | "X";
+                                                    up: number | "X";
+                                                } | null;
+                                            };
+                                            /** PlanReps */
+                                            reps: {
+                                                max: number | null;
+                                                max_effort: boolean;
+                                                min: number | null;
+                                                sets: {
+                                                    max: number;
+                                                    min: number;
+                                                } | null;
+                                                text: string | null;
+                                                /** @enum {string} */
+                                                unit: "reps" | "secs" | "meters" | "kcal";
+                                                within_secs: number | null;
+                                            } | null;
+                                            rest_secs: number | null;
+                                            /** @description 1-based rounds it applies to (empty: every interruption) */
+                                            rounds: number[];
+                                        }[];
+                                        /** PlanStructurePrescription */
+                                        structure: {
+                                            clusters: number | null;
+                                            drop_by: string | null;
+                                            drops: number | null;
+                                            intra_secs: number | null;
+                                            /** @enum {string} */
+                                            kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                            minis: number | null;
+                                        };
+                                        /**
+                                         * PlanThenRule
+                                         * @description Open-ended flows: what follows the written rounds
+                                         */
+                                        then: {
+                                            load_step: number | null;
+                                            reps_step: number | null;
+                                            /** @enum {string} */
+                                            rule: "repeat" | "step";
+                                        } | null;
+                                    }[];
+                                } | null;
                                 rest_after_seconds?: number | null;
                                 rest_before_next_section_seconds?: number | null;
                                 score_config?: {
@@ -113979,6 +119331,240 @@ export interface operations {
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                                     */
+                                    plan?: {
+                                        blocks: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                        interrupt?: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        /** PlanMods */
+                                        mods?: {
+                                            hr?: boolean;
+                                            interrupt?: boolean;
+                                        };
+                                        note?: string;
+                                        /** PlanParams */
+                                        params: {
+                                            cap?: string;
+                                            dur?: string;
+                                            every?: string;
+                                            hrTarget?: string;
+                                            intEvery?: string;
+                                            off?: string;
+                                            rest?: string;
+                                            rounds?: string;
+                                            sets?: string;
+                                            times?: string;
+                                            work?: string;
+                                        };
+                                        preset?: string | null;
+                                        /** @enum {string} */
+                                        score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                        structs?: {
+                                            [key: string]: {
+                                                clusters?: string;
+                                                dropby?: string;
+                                                drops?: string;
+                                                intra?: string;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis?: string;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } | null;
+                                    /**
+                                     * PlanPrescription
+                                     * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                                     */
+                                    prescription?: {
+                                        /**
+                                         * PlanClock
+                                         * @description How a plan section runs, unit-normalised (seconds, counts)
+                                         */
+                                        clock: {
+                                            blocks: number;
+                                            cap_secs: number | null;
+                                            dur_secs: number | null;
+                                            every_secs: number | null;
+                                            /** @enum {string} */
+                                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                            hr_target_bpm: number | null;
+                                            interrupt_every_secs: number | null;
+                                            off_secs: number | null;
+                                            /** @description AMRAP, or EMOM without times: no last round */
+                                            open_ended: boolean;
+                                            preset: string | null;
+                                            rest_secs: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            rounds: number | null;
+                                            score: string | null;
+                                            sets: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            times: number | null;
+                                            /** @description Null when open-ended */
+                                            total_rounds: number | null;
+                                            windows_secs: number[] | null;
+                                            work_secs: number | null;
+                                        };
+                                        rows: {
+                                            /** @description -1: an interruption row */
+                                            block_index: number;
+                                            exercise_ref: string | null;
+                                            group_id: string | null;
+                                            interrupt: boolean;
+                                            /** @enum {string} */
+                                            kind: "exercise" | "rest";
+                                            name: string | null;
+                                            note: string | null;
+                                            per_side: boolean;
+                                            row_id: string;
+                                            sets: {
+                                                index: number;
+                                                /** PlanLoad */
+                                                load: {
+                                                    /** @enum {string} */
+                                                    kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                                    text: string | null;
+                                                    /** @description Decimal (22.5) */
+                                                    value: number | null;
+                                                    value_max: number | null;
+                                                } | null;
+                                                /** PlanMeasures */
+                                                measures: {
+                                                    distance_m: number | null;
+                                                    height_cm: number | null;
+                                                    hold_secs: number | null;
+                                                    hr_zone: number | null;
+                                                    pace_secs_per_500m: number | null;
+                                                    rir: number | null;
+                                                    rpe: number | null;
+                                                    tempo: {
+                                                        bottom: number | "X";
+                                                        down: number | "X";
+                                                        top: number | "X";
+                                                        up: number | "X";
+                                                    } | null;
+                                                };
+                                                /** PlanReps */
+                                                reps: {
+                                                    max: number | null;
+                                                    max_effort: boolean;
+                                                    min: number | null;
+                                                    sets: {
+                                                        max: number;
+                                                        min: number;
+                                                    } | null;
+                                                    text: string | null;
+                                                    /** @enum {string} */
+                                                    unit: "reps" | "secs" | "meters" | "kcal";
+                                                    within_secs: number | null;
+                                                } | null;
+                                                rest_secs: number | null;
+                                                /** @description 1-based rounds it applies to (empty: every interruption) */
+                                                rounds: number[];
+                                            }[];
+                                            /** PlanStructurePrescription */
+                                            structure: {
+                                                clusters: number | null;
+                                                drop_by: string | null;
+                                                drops: number | null;
+                                                intra_secs: number | null;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis: number | null;
+                                            };
+                                            /**
+                                             * PlanThenRule
+                                             * @description Open-ended flows: what follows the written rounds
+                                             */
+                                            then: {
+                                                load_step: number | null;
+                                                reps_step: number | null;
+                                                /** @enum {string} */
+                                                rule: "repeat" | "step";
+                                            } | null;
+                                        }[];
+                                    } | null;
                                     rest_after_seconds?: number | null;
                                     rest_before_next_section_seconds?: number | null;
                                     score_config?: {
@@ -114123,7 +119709,7 @@ export interface operations {
                     "application/json": {
                         scales: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | "structured_plan";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -114189,6 +119775,248 @@ export interface operations {
                                     subtitle?: string | null;
                                     timer: {
                                         [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "plan";
+                                sections: {
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                                     */
+                                    plan: {
+                                        blocks: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                        interrupt?: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        /** PlanMods */
+                                        mods?: {
+                                            hr?: boolean;
+                                            interrupt?: boolean;
+                                        };
+                                        note?: string;
+                                        /** PlanParams */
+                                        params: {
+                                            cap?: string;
+                                            dur?: string;
+                                            every?: string;
+                                            hrTarget?: string;
+                                            intEvery?: string;
+                                            off?: string;
+                                            rest?: string;
+                                            rounds?: string;
+                                            sets?: string;
+                                            times?: string;
+                                            work?: string;
+                                        };
+                                        preset?: string | null;
+                                        /** @enum {string} */
+                                        score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                        structs?: {
+                                            [key: string]: {
+                                                clusters?: string;
+                                                dropby?: string;
+                                                drops?: string;
+                                                intra?: string;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis?: string;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } | null;
+                                    /**
+                                     * PlanPrescription
+                                     * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                                     */
+                                    prescription: {
+                                        /**
+                                         * PlanClock
+                                         * @description How a plan section runs, unit-normalised (seconds, counts)
+                                         */
+                                        clock: {
+                                            blocks: number;
+                                            cap_secs: number | null;
+                                            dur_secs: number | null;
+                                            every_secs: number | null;
+                                            /** @enum {string} */
+                                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                            hr_target_bpm: number | null;
+                                            interrupt_every_secs: number | null;
+                                            off_secs: number | null;
+                                            /** @description AMRAP, or EMOM without times: no last round */
+                                            open_ended: boolean;
+                                            preset: string | null;
+                                            rest_secs: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            rounds: number | null;
+                                            score: string | null;
+                                            sets: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            times: number | null;
+                                            /** @description Null when open-ended */
+                                            total_rounds: number | null;
+                                            windows_secs: number[] | null;
+                                            work_secs: number | null;
+                                        };
+                                        rows: {
+                                            /** @description -1: an interruption row */
+                                            block_index: number;
+                                            exercise_ref: string | null;
+                                            group_id: string | null;
+                                            interrupt: boolean;
+                                            /** @enum {string} */
+                                            kind: "exercise" | "rest";
+                                            name: string | null;
+                                            note: string | null;
+                                            per_side: boolean;
+                                            row_id: string;
+                                            sets: {
+                                                index: number;
+                                                /** PlanLoad */
+                                                load: {
+                                                    /** @enum {string} */
+                                                    kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                                    text: string | null;
+                                                    /** @description Decimal (22.5) */
+                                                    value: number | null;
+                                                    value_max: number | null;
+                                                } | null;
+                                                /** PlanMeasures */
+                                                measures: {
+                                                    distance_m: number | null;
+                                                    height_cm: number | null;
+                                                    hold_secs: number | null;
+                                                    hr_zone: number | null;
+                                                    pace_secs_per_500m: number | null;
+                                                    rir: number | null;
+                                                    rpe: number | null;
+                                                    tempo: {
+                                                        bottom: number | "X";
+                                                        down: number | "X";
+                                                        top: number | "X";
+                                                        up: number | "X";
+                                                    } | null;
+                                                };
+                                                /** PlanReps */
+                                                reps: {
+                                                    max: number | null;
+                                                    max_effort: boolean;
+                                                    min: number | null;
+                                                    sets: {
+                                                        max: number;
+                                                        min: number;
+                                                    } | null;
+                                                    text: string | null;
+                                                    /** @enum {string} */
+                                                    unit: "reps" | "secs" | "meters" | "kcal";
+                                                    within_secs: number | null;
+                                                } | null;
+                                                rest_secs: number | null;
+                                                /** @description 1-based rounds it applies to (empty: every interruption) */
+                                                rounds: number[];
+                                            }[];
+                                            /** PlanStructurePrescription */
+                                            structure: {
+                                                clusters: number | null;
+                                                drop_by: string | null;
+                                                drops: number | null;
+                                                intra_secs: number | null;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis: number | null;
+                                            };
+                                            /**
+                                             * PlanThenRule
+                                             * @description Open-ended flows: what follows the written rounds
+                                             */
+                                            then: {
+                                                load_step: number | null;
+                                                reps_step: number | null;
+                                                /** @enum {string} */
+                                                rule: "repeat" | "step";
+                                            } | null;
+                                        }[];
                                     } | null;
                                 }[];
                             };
@@ -114454,6 +120282,240 @@ export interface operations {
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
+                                /**
+                                 * PlanSection
+                                 * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                                 */
+                                plan?: {
+                                    blocks: {
+                                        cells: ({
+                                            d?: string;
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            l?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        } | null)[];
+                                        dose: string;
+                                        exerciseRef?: string | null;
+                                        extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                        group?: string | null;
+                                        id: string;
+                                        /** @enum {string} */
+                                        kind: "ex" | "rest";
+                                        load: string;
+                                        name: string;
+                                        note?: string;
+                                        perRound?: boolean;
+                                        x?: {
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        };
+                                    }[][];
+                                    /** @enum {string} */
+                                    flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                    interrupt?: {
+                                        cells: ({
+                                            d?: string;
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            l?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        } | null)[];
+                                        dose: string;
+                                        exerciseRef?: string | null;
+                                        extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                        group?: string | null;
+                                        id: string;
+                                        /** @enum {string} */
+                                        kind: "ex" | "rest";
+                                        load: string;
+                                        name: string;
+                                        note?: string;
+                                        perRound?: boolean;
+                                        x?: {
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        };
+                                    }[];
+                                    levelNotes?: {
+                                        [key: string]: string;
+                                    };
+                                    /** PlanMods */
+                                    mods?: {
+                                        hr?: boolean;
+                                        interrupt?: boolean;
+                                    };
+                                    note?: string;
+                                    /** PlanParams */
+                                    params: {
+                                        cap?: string;
+                                        dur?: string;
+                                        every?: string;
+                                        hrTarget?: string;
+                                        intEvery?: string;
+                                        off?: string;
+                                        rest?: string;
+                                        rounds?: string;
+                                        sets?: string;
+                                        times?: string;
+                                        work?: string;
+                                    };
+                                    preset?: string | null;
+                                    /** @enum {string} */
+                                    score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                    structs?: {
+                                        [key: string]: {
+                                            clusters?: string;
+                                            dropby?: string;
+                                            drops?: string;
+                                            intra?: string;
+                                            /** @enum {string} */
+                                            kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                            minis?: string;
+                                        };
+                                    };
+                                    /** @enum {integer} */
+                                    v: 1;
+                                } | null;
+                                /**
+                                 * PlanPrescription
+                                 * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                                 */
+                                prescription?: {
+                                    /**
+                                     * PlanClock
+                                     * @description How a plan section runs, unit-normalised (seconds, counts)
+                                     */
+                                    clock: {
+                                        blocks: number;
+                                        cap_secs: number | null;
+                                        dur_secs: number | null;
+                                        every_secs: number | null;
+                                        /** @enum {string} */
+                                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                        hr_target_bpm: number | null;
+                                        interrupt_every_secs: number | null;
+                                        off_secs: number | null;
+                                        /** @description AMRAP, or EMOM without times: no last round */
+                                        open_ended: boolean;
+                                        preset: string | null;
+                                        rest_secs: {
+                                            max: number;
+                                            min: number;
+                                        } | null;
+                                        rounds: number | null;
+                                        score: string | null;
+                                        sets: {
+                                            max: number;
+                                            min: number;
+                                        } | null;
+                                        times: number | null;
+                                        /** @description Null when open-ended */
+                                        total_rounds: number | null;
+                                        windows_secs: number[] | null;
+                                        work_secs: number | null;
+                                    };
+                                    rows: {
+                                        /** @description -1: an interruption row */
+                                        block_index: number;
+                                        exercise_ref: string | null;
+                                        group_id: string | null;
+                                        interrupt: boolean;
+                                        /** @enum {string} */
+                                        kind: "exercise" | "rest";
+                                        name: string | null;
+                                        note: string | null;
+                                        per_side: boolean;
+                                        row_id: string;
+                                        sets: {
+                                            index: number;
+                                            /** PlanLoad */
+                                            load: {
+                                                /** @enum {string} */
+                                                kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                                text: string | null;
+                                                /** @description Decimal (22.5) */
+                                                value: number | null;
+                                                value_max: number | null;
+                                            } | null;
+                                            /** PlanMeasures */
+                                            measures: {
+                                                distance_m: number | null;
+                                                height_cm: number | null;
+                                                hold_secs: number | null;
+                                                hr_zone: number | null;
+                                                pace_secs_per_500m: number | null;
+                                                rir: number | null;
+                                                rpe: number | null;
+                                                tempo: {
+                                                    bottom: number | "X";
+                                                    down: number | "X";
+                                                    top: number | "X";
+                                                    up: number | "X";
+                                                } | null;
+                                            };
+                                            /** PlanReps */
+                                            reps: {
+                                                max: number | null;
+                                                max_effort: boolean;
+                                                min: number | null;
+                                                sets: {
+                                                    max: number;
+                                                    min: number;
+                                                } | null;
+                                                text: string | null;
+                                                /** @enum {string} */
+                                                unit: "reps" | "secs" | "meters" | "kcal";
+                                                within_secs: number | null;
+                                            } | null;
+                                            rest_secs: number | null;
+                                            /** @description 1-based rounds it applies to (empty: every interruption) */
+                                            rounds: number[];
+                                        }[];
+                                        /** PlanStructurePrescription */
+                                        structure: {
+                                            clusters: number | null;
+                                            drop_by: string | null;
+                                            drops: number | null;
+                                            intra_secs: number | null;
+                                            /** @enum {string} */
+                                            kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                            minis: number | null;
+                                        };
+                                        /**
+                                         * PlanThenRule
+                                         * @description Open-ended flows: what follows the written rounds
+                                         */
+                                        then: {
+                                            load_step: number | null;
+                                            reps_step: number | null;
+                                            /** @enum {string} */
+                                            rule: "repeat" | "step";
+                                        } | null;
+                                    }[];
+                                } | null;
                                 rest_after_seconds?: number | null;
                                 rest_before_next_section_seconds?: number | null;
                                 score_config?: {
@@ -114674,6 +120736,240 @@ export interface operations {
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                                     */
+                                    plan?: {
+                                        blocks: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                        interrupt?: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        /** PlanMods */
+                                        mods?: {
+                                            hr?: boolean;
+                                            interrupt?: boolean;
+                                        };
+                                        note?: string;
+                                        /** PlanParams */
+                                        params: {
+                                            cap?: string;
+                                            dur?: string;
+                                            every?: string;
+                                            hrTarget?: string;
+                                            intEvery?: string;
+                                            off?: string;
+                                            rest?: string;
+                                            rounds?: string;
+                                            sets?: string;
+                                            times?: string;
+                                            work?: string;
+                                        };
+                                        preset?: string | null;
+                                        /** @enum {string} */
+                                        score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                        structs?: {
+                                            [key: string]: {
+                                                clusters?: string;
+                                                dropby?: string;
+                                                drops?: string;
+                                                intra?: string;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis?: string;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } | null;
+                                    /**
+                                     * PlanPrescription
+                                     * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                                     */
+                                    prescription?: {
+                                        /**
+                                         * PlanClock
+                                         * @description How a plan section runs, unit-normalised (seconds, counts)
+                                         */
+                                        clock: {
+                                            blocks: number;
+                                            cap_secs: number | null;
+                                            dur_secs: number | null;
+                                            every_secs: number | null;
+                                            /** @enum {string} */
+                                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                            hr_target_bpm: number | null;
+                                            interrupt_every_secs: number | null;
+                                            off_secs: number | null;
+                                            /** @description AMRAP, or EMOM without times: no last round */
+                                            open_ended: boolean;
+                                            preset: string | null;
+                                            rest_secs: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            rounds: number | null;
+                                            score: string | null;
+                                            sets: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            times: number | null;
+                                            /** @description Null when open-ended */
+                                            total_rounds: number | null;
+                                            windows_secs: number[] | null;
+                                            work_secs: number | null;
+                                        };
+                                        rows: {
+                                            /** @description -1: an interruption row */
+                                            block_index: number;
+                                            exercise_ref: string | null;
+                                            group_id: string | null;
+                                            interrupt: boolean;
+                                            /** @enum {string} */
+                                            kind: "exercise" | "rest";
+                                            name: string | null;
+                                            note: string | null;
+                                            per_side: boolean;
+                                            row_id: string;
+                                            sets: {
+                                                index: number;
+                                                /** PlanLoad */
+                                                load: {
+                                                    /** @enum {string} */
+                                                    kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                                    text: string | null;
+                                                    /** @description Decimal (22.5) */
+                                                    value: number | null;
+                                                    value_max: number | null;
+                                                } | null;
+                                                /** PlanMeasures */
+                                                measures: {
+                                                    distance_m: number | null;
+                                                    height_cm: number | null;
+                                                    hold_secs: number | null;
+                                                    hr_zone: number | null;
+                                                    pace_secs_per_500m: number | null;
+                                                    rir: number | null;
+                                                    rpe: number | null;
+                                                    tempo: {
+                                                        bottom: number | "X";
+                                                        down: number | "X";
+                                                        top: number | "X";
+                                                        up: number | "X";
+                                                    } | null;
+                                                };
+                                                /** PlanReps */
+                                                reps: {
+                                                    max: number | null;
+                                                    max_effort: boolean;
+                                                    min: number | null;
+                                                    sets: {
+                                                        max: number;
+                                                        min: number;
+                                                    } | null;
+                                                    text: string | null;
+                                                    /** @enum {string} */
+                                                    unit: "reps" | "secs" | "meters" | "kcal";
+                                                    within_secs: number | null;
+                                                } | null;
+                                                rest_secs: number | null;
+                                                /** @description 1-based rounds it applies to (empty: every interruption) */
+                                                rounds: number[];
+                                            }[];
+                                            /** PlanStructurePrescription */
+                                            structure: {
+                                                clusters: number | null;
+                                                drop_by: string | null;
+                                                drops: number | null;
+                                                intra_secs: number | null;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis: number | null;
+                                            };
+                                            /**
+                                             * PlanThenRule
+                                             * @description Open-ended flows: what follows the written rounds
+                                             */
+                                            then: {
+                                                load_step: number | null;
+                                                reps_step: number | null;
+                                                /** @enum {string} */
+                                                rule: "repeat" | "step";
+                                            } | null;
+                                        }[];
+                                    } | null;
                                     rest_after_seconds?: number | null;
                                     rest_before_next_section_seconds?: number | null;
                                     score_config?: {
@@ -114730,7 +121026,7 @@ export interface operations {
                         }[];
                         workout: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | "structured_plan";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -114796,6 +121092,248 @@ export interface operations {
                                     subtitle?: string | null;
                                     timer: {
                                         [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "plan";
+                                sections: {
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                                     */
+                                    plan: {
+                                        blocks: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                        interrupt?: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        /** PlanMods */
+                                        mods?: {
+                                            hr?: boolean;
+                                            interrupt?: boolean;
+                                        };
+                                        note?: string;
+                                        /** PlanParams */
+                                        params: {
+                                            cap?: string;
+                                            dur?: string;
+                                            every?: string;
+                                            hrTarget?: string;
+                                            intEvery?: string;
+                                            off?: string;
+                                            rest?: string;
+                                            rounds?: string;
+                                            sets?: string;
+                                            times?: string;
+                                            work?: string;
+                                        };
+                                        preset?: string | null;
+                                        /** @enum {string} */
+                                        score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                        structs?: {
+                                            [key: string]: {
+                                                clusters?: string;
+                                                dropby?: string;
+                                                drops?: string;
+                                                intra?: string;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis?: string;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } | null;
+                                    /**
+                                     * PlanPrescription
+                                     * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                                     */
+                                    prescription: {
+                                        /**
+                                         * PlanClock
+                                         * @description How a plan section runs, unit-normalised (seconds, counts)
+                                         */
+                                        clock: {
+                                            blocks: number;
+                                            cap_secs: number | null;
+                                            dur_secs: number | null;
+                                            every_secs: number | null;
+                                            /** @enum {string} */
+                                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                            hr_target_bpm: number | null;
+                                            interrupt_every_secs: number | null;
+                                            off_secs: number | null;
+                                            /** @description AMRAP, or EMOM without times: no last round */
+                                            open_ended: boolean;
+                                            preset: string | null;
+                                            rest_secs: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            rounds: number | null;
+                                            score: string | null;
+                                            sets: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            times: number | null;
+                                            /** @description Null when open-ended */
+                                            total_rounds: number | null;
+                                            windows_secs: number[] | null;
+                                            work_secs: number | null;
+                                        };
+                                        rows: {
+                                            /** @description -1: an interruption row */
+                                            block_index: number;
+                                            exercise_ref: string | null;
+                                            group_id: string | null;
+                                            interrupt: boolean;
+                                            /** @enum {string} */
+                                            kind: "exercise" | "rest";
+                                            name: string | null;
+                                            note: string | null;
+                                            per_side: boolean;
+                                            row_id: string;
+                                            sets: {
+                                                index: number;
+                                                /** PlanLoad */
+                                                load: {
+                                                    /** @enum {string} */
+                                                    kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                                    text: string | null;
+                                                    /** @description Decimal (22.5) */
+                                                    value: number | null;
+                                                    value_max: number | null;
+                                                } | null;
+                                                /** PlanMeasures */
+                                                measures: {
+                                                    distance_m: number | null;
+                                                    height_cm: number | null;
+                                                    hold_secs: number | null;
+                                                    hr_zone: number | null;
+                                                    pace_secs_per_500m: number | null;
+                                                    rir: number | null;
+                                                    rpe: number | null;
+                                                    tempo: {
+                                                        bottom: number | "X";
+                                                        down: number | "X";
+                                                        top: number | "X";
+                                                        up: number | "X";
+                                                    } | null;
+                                                };
+                                                /** PlanReps */
+                                                reps: {
+                                                    max: number | null;
+                                                    max_effort: boolean;
+                                                    min: number | null;
+                                                    sets: {
+                                                        max: number;
+                                                        min: number;
+                                                    } | null;
+                                                    text: string | null;
+                                                    /** @enum {string} */
+                                                    unit: "reps" | "secs" | "meters" | "kcal";
+                                                    within_secs: number | null;
+                                                } | null;
+                                                rest_secs: number | null;
+                                                /** @description 1-based rounds it applies to (empty: every interruption) */
+                                                rounds: number[];
+                                            }[];
+                                            /** PlanStructurePrescription */
+                                            structure: {
+                                                clusters: number | null;
+                                                drop_by: string | null;
+                                                drops: number | null;
+                                                intra_secs: number | null;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis: number | null;
+                                            };
+                                            /**
+                                             * PlanThenRule
+                                             * @description Open-ended flows: what follows the written rounds
+                                             */
+                                            then: {
+                                                load_step: number | null;
+                                                reps_step: number | null;
+                                                /** @enum {string} */
+                                                rule: "repeat" | "step";
+                                            } | null;
+                                        }[];
                                     } | null;
                                 }[];
                             };
@@ -115061,6 +121599,240 @@ export interface operations {
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
+                                /**
+                                 * PlanSection
+                                 * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                                 */
+                                plan?: {
+                                    blocks: {
+                                        cells: ({
+                                            d?: string;
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            l?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        } | null)[];
+                                        dose: string;
+                                        exerciseRef?: string | null;
+                                        extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                        group?: string | null;
+                                        id: string;
+                                        /** @enum {string} */
+                                        kind: "ex" | "rest";
+                                        load: string;
+                                        name: string;
+                                        note?: string;
+                                        perRound?: boolean;
+                                        x?: {
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        };
+                                    }[][];
+                                    /** @enum {string} */
+                                    flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                    interrupt?: {
+                                        cells: ({
+                                            d?: string;
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            l?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        } | null)[];
+                                        dose: string;
+                                        exerciseRef?: string | null;
+                                        extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                        group?: string | null;
+                                        id: string;
+                                        /** @enum {string} */
+                                        kind: "ex" | "rest";
+                                        load: string;
+                                        name: string;
+                                        note?: string;
+                                        perRound?: boolean;
+                                        x?: {
+                                            dist?: string;
+                                            height?: string;
+                                            hold?: string;
+                                            pace?: string;
+                                            rir?: string;
+                                            rpe?: string;
+                                            tempo?: string;
+                                            zone?: string;
+                                        };
+                                    }[];
+                                    levelNotes?: {
+                                        [key: string]: string;
+                                    };
+                                    /** PlanMods */
+                                    mods?: {
+                                        hr?: boolean;
+                                        interrupt?: boolean;
+                                    };
+                                    note?: string;
+                                    /** PlanParams */
+                                    params: {
+                                        cap?: string;
+                                        dur?: string;
+                                        every?: string;
+                                        hrTarget?: string;
+                                        intEvery?: string;
+                                        off?: string;
+                                        rest?: string;
+                                        rounds?: string;
+                                        sets?: string;
+                                        times?: string;
+                                        work?: string;
+                                    };
+                                    preset?: string | null;
+                                    /** @enum {string} */
+                                    score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                    structs?: {
+                                        [key: string]: {
+                                            clusters?: string;
+                                            dropby?: string;
+                                            drops?: string;
+                                            intra?: string;
+                                            /** @enum {string} */
+                                            kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                            minis?: string;
+                                        };
+                                    };
+                                    /** @enum {integer} */
+                                    v: 1;
+                                } | null;
+                                /**
+                                 * PlanPrescription
+                                 * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                                 */
+                                prescription?: {
+                                    /**
+                                     * PlanClock
+                                     * @description How a plan section runs, unit-normalised (seconds, counts)
+                                     */
+                                    clock: {
+                                        blocks: number;
+                                        cap_secs: number | null;
+                                        dur_secs: number | null;
+                                        every_secs: number | null;
+                                        /** @enum {string} */
+                                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                        hr_target_bpm: number | null;
+                                        interrupt_every_secs: number | null;
+                                        off_secs: number | null;
+                                        /** @description AMRAP, or EMOM without times: no last round */
+                                        open_ended: boolean;
+                                        preset: string | null;
+                                        rest_secs: {
+                                            max: number;
+                                            min: number;
+                                        } | null;
+                                        rounds: number | null;
+                                        score: string | null;
+                                        sets: {
+                                            max: number;
+                                            min: number;
+                                        } | null;
+                                        times: number | null;
+                                        /** @description Null when open-ended */
+                                        total_rounds: number | null;
+                                        windows_secs: number[] | null;
+                                        work_secs: number | null;
+                                    };
+                                    rows: {
+                                        /** @description -1: an interruption row */
+                                        block_index: number;
+                                        exercise_ref: string | null;
+                                        group_id: string | null;
+                                        interrupt: boolean;
+                                        /** @enum {string} */
+                                        kind: "exercise" | "rest";
+                                        name: string | null;
+                                        note: string | null;
+                                        per_side: boolean;
+                                        row_id: string;
+                                        sets: {
+                                            index: number;
+                                            /** PlanLoad */
+                                            load: {
+                                                /** @enum {string} */
+                                                kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                                text: string | null;
+                                                /** @description Decimal (22.5) */
+                                                value: number | null;
+                                                value_max: number | null;
+                                            } | null;
+                                            /** PlanMeasures */
+                                            measures: {
+                                                distance_m: number | null;
+                                                height_cm: number | null;
+                                                hold_secs: number | null;
+                                                hr_zone: number | null;
+                                                pace_secs_per_500m: number | null;
+                                                rir: number | null;
+                                                rpe: number | null;
+                                                tempo: {
+                                                    bottom: number | "X";
+                                                    down: number | "X";
+                                                    top: number | "X";
+                                                    up: number | "X";
+                                                } | null;
+                                            };
+                                            /** PlanReps */
+                                            reps: {
+                                                max: number | null;
+                                                max_effort: boolean;
+                                                min: number | null;
+                                                sets: {
+                                                    max: number;
+                                                    min: number;
+                                                } | null;
+                                                text: string | null;
+                                                /** @enum {string} */
+                                                unit: "reps" | "secs" | "meters" | "kcal";
+                                                within_secs: number | null;
+                                            } | null;
+                                            rest_secs: number | null;
+                                            /** @description 1-based rounds it applies to (empty: every interruption) */
+                                            rounds: number[];
+                                        }[];
+                                        /** PlanStructurePrescription */
+                                        structure: {
+                                            clusters: number | null;
+                                            drop_by: string | null;
+                                            drops: number | null;
+                                            intra_secs: number | null;
+                                            /** @enum {string} */
+                                            kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                            minis: number | null;
+                                        };
+                                        /**
+                                         * PlanThenRule
+                                         * @description Open-ended flows: what follows the written rounds
+                                         */
+                                        then: {
+                                            load_step: number | null;
+                                            reps_step: number | null;
+                                            /** @enum {string} */
+                                            rule: "repeat" | "step";
+                                        } | null;
+                                    }[];
+                                } | null;
                                 rest_after_seconds?: number | null;
                                 rest_before_next_section_seconds?: number | null;
                                 score_config?: {
@@ -115281,6 +122053,240 @@ export interface operations {
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                                     */
+                                    plan?: {
+                                        blocks: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                        interrupt?: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        /** PlanMods */
+                                        mods?: {
+                                            hr?: boolean;
+                                            interrupt?: boolean;
+                                        };
+                                        note?: string;
+                                        /** PlanParams */
+                                        params: {
+                                            cap?: string;
+                                            dur?: string;
+                                            every?: string;
+                                            hrTarget?: string;
+                                            intEvery?: string;
+                                            off?: string;
+                                            rest?: string;
+                                            rounds?: string;
+                                            sets?: string;
+                                            times?: string;
+                                            work?: string;
+                                        };
+                                        preset?: string | null;
+                                        /** @enum {string} */
+                                        score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                        structs?: {
+                                            [key: string]: {
+                                                clusters?: string;
+                                                dropby?: string;
+                                                drops?: string;
+                                                intra?: string;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis?: string;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } | null;
+                                    /**
+                                     * PlanPrescription
+                                     * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                                     */
+                                    prescription?: {
+                                        /**
+                                         * PlanClock
+                                         * @description How a plan section runs, unit-normalised (seconds, counts)
+                                         */
+                                        clock: {
+                                            blocks: number;
+                                            cap_secs: number | null;
+                                            dur_secs: number | null;
+                                            every_secs: number | null;
+                                            /** @enum {string} */
+                                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                            hr_target_bpm: number | null;
+                                            interrupt_every_secs: number | null;
+                                            off_secs: number | null;
+                                            /** @description AMRAP, or EMOM without times: no last round */
+                                            open_ended: boolean;
+                                            preset: string | null;
+                                            rest_secs: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            rounds: number | null;
+                                            score: string | null;
+                                            sets: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            times: number | null;
+                                            /** @description Null when open-ended */
+                                            total_rounds: number | null;
+                                            windows_secs: number[] | null;
+                                            work_secs: number | null;
+                                        };
+                                        rows: {
+                                            /** @description -1: an interruption row */
+                                            block_index: number;
+                                            exercise_ref: string | null;
+                                            group_id: string | null;
+                                            interrupt: boolean;
+                                            /** @enum {string} */
+                                            kind: "exercise" | "rest";
+                                            name: string | null;
+                                            note: string | null;
+                                            per_side: boolean;
+                                            row_id: string;
+                                            sets: {
+                                                index: number;
+                                                /** PlanLoad */
+                                                load: {
+                                                    /** @enum {string} */
+                                                    kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                                    text: string | null;
+                                                    /** @description Decimal (22.5) */
+                                                    value: number | null;
+                                                    value_max: number | null;
+                                                } | null;
+                                                /** PlanMeasures */
+                                                measures: {
+                                                    distance_m: number | null;
+                                                    height_cm: number | null;
+                                                    hold_secs: number | null;
+                                                    hr_zone: number | null;
+                                                    pace_secs_per_500m: number | null;
+                                                    rir: number | null;
+                                                    rpe: number | null;
+                                                    tempo: {
+                                                        bottom: number | "X";
+                                                        down: number | "X";
+                                                        top: number | "X";
+                                                        up: number | "X";
+                                                    } | null;
+                                                };
+                                                /** PlanReps */
+                                                reps: {
+                                                    max: number | null;
+                                                    max_effort: boolean;
+                                                    min: number | null;
+                                                    sets: {
+                                                        max: number;
+                                                        min: number;
+                                                    } | null;
+                                                    text: string | null;
+                                                    /** @enum {string} */
+                                                    unit: "reps" | "secs" | "meters" | "kcal";
+                                                    within_secs: number | null;
+                                                } | null;
+                                                rest_secs: number | null;
+                                                /** @description 1-based rounds it applies to (empty: every interruption) */
+                                                rounds: number[];
+                                            }[];
+                                            /** PlanStructurePrescription */
+                                            structure: {
+                                                clusters: number | null;
+                                                drop_by: string | null;
+                                                drops: number | null;
+                                                intra_secs: number | null;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis: number | null;
+                                            };
+                                            /**
+                                             * PlanThenRule
+                                             * @description Open-ended flows: what follows the written rounds
+                                             */
+                                            then: {
+                                                load_step: number | null;
+                                                reps_step: number | null;
+                                                /** @enum {string} */
+                                                rule: "repeat" | "step";
+                                            } | null;
+                                        }[];
+                                    } | null;
                                     rest_after_seconds?: number | null;
                                     rest_before_next_section_seconds?: number | null;
                                     score_config?: {

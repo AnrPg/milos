@@ -29,6 +29,8 @@ import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { AssignWorkoutPanel } from "@/components/workouts/AssignWorkoutPanel";
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
+import { PlanSummaryList } from "@/components/workouts/plan-view/PlanSummaryList";
+import { readPlanSummary } from "@/components/workouts/plan-view/read";
 import { LibraryIconDialog } from "@/components/workouts/library/LibraryIconDialog";
 import { LibraryItemMenu, type LibraryMenuAction } from "@/components/workouts/library/LibraryItemMenu";
 import { LibraryTransferDialog, type FolderOption } from "@/components/workouts/library/LibraryTransferDialog";
@@ -572,6 +574,8 @@ export function WorkoutAdminConsole() {
 
   function renderWorkoutTile(workout: WorkoutRecord) {
     const menuKey = `tile:${workout.id}`;
+    // ADR-270: a plan workout lists its sections with their flow.
+    const planSummary = readPlanSummary(workout);
     return (
       <article
         key={workout.id}
@@ -644,7 +648,7 @@ export function WorkoutAdminConsole() {
         </div>
 
         <div className="mt-4 space-y-2 text-sm" style={{ color: "var(--muted)" }}>
-          {(workout.sections ?? []).map((section) => (
+          {planSummary.length > 0 ? <PlanSummaryList entries={planSummary} /> : (workout.sections ?? []).map((section) => (
             <div key={(workout.id) + "-" + (section.order)} className="flex items-center justify-between gap-4">
               <span>{section.name}</span>
               <span style={{ color: "var(--dim)" }}>{section.exercises.length} {i18n("exercises0ee6e81")}</span>

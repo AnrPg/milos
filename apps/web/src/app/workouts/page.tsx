@@ -21,6 +21,7 @@ import { AuthGuard } from "@/components/auth-guard";
 import { useSession } from "@/components/session-provider";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
 import { storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
+import { usesPlanRunner } from "@/components/workouts/execution/plan/plan-workout";
 import { usesManualTimer } from "@/lib/workout-execution-mode";
 import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
 import { useExecutionStore } from "@/stores/execution";
@@ -300,6 +301,12 @@ function WorkoutsPageContent() {
         source: "self_selected",
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
+
+      // ADR-270: a structured plan runs in its own runner, which loads the plan itself.
+      if (usesPlanRunner(selectedWorkout)) {
+        router.push(`/workouts/${execution.id}/execute`);
+        return;
+      }
 
       const { segments, briefing } = await fetchTimerSequence(
         tokens.access_token,

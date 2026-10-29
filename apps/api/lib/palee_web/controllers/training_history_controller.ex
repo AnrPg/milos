@@ -11,6 +11,7 @@ defmodule PaleeWeb.TrainingHistoryController do
   alias Guardian.Plug, as: GuardianPlug
   alias Palee.Application.GetTrainingHistory
   alias OpenApiSpex.{Parameter, Schema}
+  alias PaleeWeb.Schemas.PlanWorkload
 
   action_fallback PaleeWeb.FallbackController
 
@@ -37,6 +38,11 @@ defmodule PaleeWeb.TrainingHistoryController do
             name: @nullable_string,
             nested: %Schema{type: :boolean},
             format: %Schema{type: :string},
+            flow: %Schema{
+              type: :string,
+              nullable: true,
+              description: "ADR-270: the flow of a structured plan section"
+            },
             timer_config: %Schema{type: :object, nullable: true, additionalProperties: true},
             score_type: @nullable_string,
             exercises: %Schema{
@@ -71,7 +77,8 @@ defmodule PaleeWeb.TrainingHistoryController do
             unit: @nullable_string
           }
         }
-      }
+      },
+      workload: PlanWorkload.schema()
     },
     required: [:execution_id, :status, :scores]
   }
