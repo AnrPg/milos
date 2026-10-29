@@ -11,7 +11,10 @@ defmodule Palee.Application.Fiscal.FiscalTillSigning do
 
   @doc "`%{connection, environments}`; the credentials are never returned."
   def connection(context, device),
-    do: %{connection: TillSigning.connection(context, device), environments: TillSigning.environments()}
+    do: %{
+      connection: TillSigning.connection(context, device),
+      environments: TillSigning.environments()
+    }
 
   def save_connection(context, device, params, now \\ DateTime.utc_now()) do
     params = %{

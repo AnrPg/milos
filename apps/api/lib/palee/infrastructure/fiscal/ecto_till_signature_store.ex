@@ -95,7 +95,12 @@ defmodule Palee.Infrastructure.Fiscal.EctoTillSignatureStore do
       |> where([s], s.organization_id == ^organization_id)
       |> where([s], s.status == "sending" and s.claimed_at < ^stale)
       |> Repo.update_all(
-        set: [status: "uncertain", next_attempt_at: now, last_error_code: "uncertain", updated_at: now]
+        set: [
+          status: "uncertain",
+          next_attempt_at: now,
+          last_error_code: "uncertain",
+          updated_at: now
+        ]
       )
 
       to_sign =
@@ -188,7 +193,10 @@ defmodule Palee.Infrastructure.Fiscal.EctoTillSignatureStore do
   def wake_waiting(%{organization_id: organization_id}, %DateTime{} = now) do
     {count, _rows} =
       TillSignature
-      |> where([s], s.organization_id == ^organization_id and s.status in ["pending", "uncertain"])
+      |> where(
+        [s],
+        s.organization_id == ^organization_id and s.status in ["pending", "uncertain"]
+      )
       |> where([s], s.next_attempt_at > ^now)
       |> Repo.update_all(set: [next_attempt_at: now, updated_at: now])
 

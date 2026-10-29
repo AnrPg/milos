@@ -60,7 +60,8 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignAt do
         {:ok,
          %{
            unit_serial: unit["certificate_serial_number"],
-           register_serial: initialized["serial_number"] || initialized["cash_register_serial_number"],
+           register_serial:
+             initialized["serial_number"] || initialized["cash_register_serial_number"],
            public_key: nil,
            admin_pin: nil,
            start: start
@@ -79,7 +80,12 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignAt do
       connection,
       fn token ->
         with {:ok, receipt} <-
-               request(token, :put, "/cash-register/#{connection.register_id}/receipt/#{id}", body) do
+               request(
+                 token,
+                 :put,
+                 "/cash-register/#{connection.register_id}/receipt/#{id}",
+                 body
+               ) do
           {:ok, signature(receipt)}
         end
       end,
@@ -108,7 +114,10 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignAt do
     code = receipt["qr_code_data"]
     parsed = with {:ok, parsed} <- RksvReceipt.parse_code(code), do: parsed, else: (_ -> %{})
     hints = receipt["hints"] |> List.wrap() |> Enum.map(&to_string/1)
-    outage? = Enum.any?(hints, &String.contains?(&1, RksvReceipt.failed_marker())) or parsed[:device_failed] == true
+
+    outage? =
+      Enum.any?(hints, &String.contains?(&1, RksvReceipt.failed_marker())) or
+        parsed[:device_failed] == true
 
     %{
       transaction_number: integer(receipt["receipt_number"]),
@@ -138,7 +147,8 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignAt do
 
   defp integer(_value), do: nil
 
-  defp time(seconds) when is_integer(seconds), do: %{DateTime.from_unix!(seconds) | microsecond: {0, 6}}
+  defp time(seconds) when is_integer(seconds),
+    do: %{DateTime.from_unix!(seconds) | microsecond: {0, 6}}
 
   defp time(text) when is_binary(text) do
     case DateTime.from_iso8601(text) do
@@ -164,8 +174,11 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignAt do
 
     result =
       case result do
-        {:error, {:not_found, body}} -> {:error, {:rejected, [%{code: "not_found", message: inspect(body)}]}}
-        other -> other
+        {:error, {:not_found, body}} ->
+          {:error, {:rejected, [%{code: "not_found", message: inspect(body)}]}}
+
+        other ->
+          other
       end
 
     {result, Http.wire(logged_request, status, body)}
@@ -178,7 +191,10 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignAt do
   defp credentials(_connection), do: {:error, {:unauthorized, :credentials_missing}}
 
   defp authenticate(connection) do
-    case request(nil, :post, "/auth", %{api_key: connection.api_key, api_secret: connection.api_secret}) do
+    case request(nil, :post, "/auth", %{
+           api_key: connection.api_key,
+           api_secret: connection.api_secret
+         }) do
       {:ok, %{"access_token" => token}} -> {:ok, token}
       {:ok, _other} -> {:error, {:unauthorized, :no_token}}
       {:error, {:rejected, _}} -> {:error, {:unauthorized, :auth_refused}}
@@ -197,7 +213,9 @@ defmodule Palee.Infrastructure.Fiscal.FiskalySignAt do
     |> Http.request()
     |> case do
       {:ok, response} ->
-        unless path == "/auth", do: Process.put(:fiskaly_at_last_response, {response.status, response.body})
+        unless path == "/auth",
+          do: Process.put(:fiskaly_at_last_response, {response.status, response.body})
+
         interpret(response)
 
       error ->

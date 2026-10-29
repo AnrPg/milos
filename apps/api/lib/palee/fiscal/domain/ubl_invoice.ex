@@ -180,8 +180,7 @@ defmodule Palee.Fiscal.Domain.UblInvoice do
     [
       {"cac:PaymentTerms",
        [
-         {"cbc:Note",
-          Map.get(@payable_on_receipt, document.language, @payable_on_receipt["en"])}
+         {"cbc:Note", Map.get(@payable_on_receipt, document.language, @payable_on_receipt["en"])}
        ]}
     ]
   end
@@ -379,8 +378,16 @@ defmodule Palee.Fiscal.Domain.UblInvoice do
     whole = Integer.to_string(div(bp, 100))
 
     case rem(bp, 100) do
-      0 -> whole
-      fraction -> whole <> "." <> (fraction |> Integer.to_string() |> String.pad_leading(2, "0") |> String.trim_trailing("0"))
+      0 ->
+        whole
+
+      fraction ->
+        whole <>
+          "." <>
+          (fraction
+           |> Integer.to_string()
+           |> String.pad_leading(2, "0")
+           |> String.trim_trailing("0"))
     end
   end
 

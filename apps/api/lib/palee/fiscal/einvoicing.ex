@@ -185,7 +185,10 @@ defmodule Palee.Fiscal.EInvoicing do
       end
 
     UblInvoice.build(document,
-      seller_endpoint: %{scheme: connection.peppol_scheme, identifier: connection.peppol_identifier},
+      seller_endpoint: %{
+        scheme: connection.peppol_scheme,
+        identifier: connection.peppol_identifier
+      },
       buyer_endpoint: %{
         scheme: submission.recipient_scheme,
         identifier: submission.recipient_identifier
@@ -358,9 +361,21 @@ defmodule Palee.Fiscal.EInvoicing do
 
   defp public_connection(connection) do
     connection
-    |> Map.take([:network, :provider, :environment, :legal_entity_id, :status, :last_error, :updated_at])
+    |> Map.take([
+      :network,
+      :provider,
+      :environment,
+      :legal_entity_id,
+      :status,
+      :last_error,
+      :updated_at
+    ])
     |> Map.merge(%{
-      peppol_id: PeppolId.format(%{scheme: connection.peppol_scheme, identifier: connection.peppol_identifier}),
+      peppol_id:
+        PeppolId.format(%{
+          scheme: connection.peppol_scheme,
+          identifier: connection.peppol_identifier
+        }),
       has_api_key: is_binary(connection.api_key),
       has_webhook_token: is_binary(connection.webhook_token_hash)
     })

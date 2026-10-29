@@ -84,8 +84,11 @@ defmodule Palee.Fiscal.TillSigning do
   @doc "A signature with its attempts."
   def get(context, id) do
     case TillSignatureStore.get_signature(context, id) do
-      nil -> nil
-      signature -> Map.put(signature, :attempts_log, TillSignatureStore.list_attempts(context, id))
+      nil ->
+        nil
+
+      signature ->
+        Map.put(signature, :attempts_log, TillSignatureStore.list_attempts(context, id))
     end
   end
 
@@ -125,12 +128,23 @@ defmodule Palee.Fiscal.TillSigning do
 
   defp handle(context, signature, now) do
     connection = TillSignatureStore.get_connection(context, signature.device)
-    document = signature.document_id && FiscalStore.get_document(context, signature.document_id, [])
+
+    document =
+      signature.document_id && FiscalStore.get_document(context, signature.document_id, [])
+
     issued_at = document && document.issued_at
 
     cond do
       TillSigningPolicy.operation(signature, now, issued_at) == :fail ->
-        record(context, signature, connection, document, TillSigningPolicy.tse_failure(now, "not_signed_in_time"), nil, now)
+        record(
+          context,
+          signature,
+          connection,
+          document,
+          TillSigningPolicy.tse_failure(now, "not_signed_in_time"),
+          nil,
+          now
+        )
 
       is_nil(connection) or connection.status != "active" ->
         reason = if is_nil(connection), do: :connection_missing, else: :connection_invalid
@@ -173,7 +187,13 @@ defmodule Palee.Fiscal.TillSigning do
       })
 
     if match?({:error, {:unauthorized, _}}, result),
-      do: TillSignatureStore.set_connection_status(context, connection.device, "invalid", error_text(result))
+      do:
+        TillSignatureStore.set_connection_status(
+          context,
+          connection.device,
+          "invalid",
+          error_text(result)
+        )
 
     record(context, signature, connection, document, changes, attempt, now)
   end
@@ -188,7 +208,8 @@ defmodule Palee.Fiscal.TillSigning do
       with {:ok, saved} <- TillSignatureStore.finish(context, signature.id, changes, attempt),
            {:ok, _entry} <-
              Fiscal.append(context, %{
-               event_type: if(status == "signed", do: "receipt_signed", else: "till_device_failed"),
+               event_type:
+                 if(status == "signed", do: "receipt_signed", else: "till_device_failed"),
                subject_type: if(document, do: "fiscal_document", else: "till_signature"),
                subject_id: if(document, do: document.id, else: signature.id),
                actor_id: nil,
@@ -321,7 +342,8 @@ defmodule Palee.Fiscal.TillSigning do
   `test` and `production` go through fiskaly and need the API key and
   secret; saved ones are kept when none are sent.
   """
-  def save_connection(context, device, params, actor_id, %DateTime{} = now) when device in @devices do
+  def save_connection(context, device, params, actor_id, %DateTime{} = now)
+      when device in @devices do
     before = TillSignatureStore.get_connection(context, device)
     identity = FiscalStore.get_identity(context)
 
@@ -348,7 +370,9 @@ defmodule Palee.Fiscal.TillSigning do
 
     # The new ids are saved before the provider is called, so a retry after
     # a lost answer never leaves a unit Palee does not know about.
-    pending = Map.merge(attrs, ids) |> Map.merge(%{status: "provisioning", provisioned_at: nil, updated_by_id: actor_id})
+    pending =
+      Map.merge(attrs, ids)
+      |> Map.merge(%{status: "provisioning", provisioned_at: nil, updated_by_id: actor_id})
 
     with {:ok, _saved} <- TillSignatureStore.save_connection(context, device, pending) do
       provider_context = %{
@@ -449,13 +473,19 @@ defmodule Palee.Fiscal.TillSigning do
     sandbox? = environment == "sandbox"
     key = clean(params[:api_key])
     secret = clean(params[:api_secret])
-    expected = identity && identity.country_code |> CountryProfile.fetch!() |> TillSigningPolicy.device()
+
+    expected =
+      identity && identity.country_code |> CountryProfile.fetch!() |> TillSigningPolicy.device()
 
     errors =
       %{}
       |> add_error(environment not in @environments, :environment, "invalid")
       |> add_error(expected != device, :device, "not_for_country")
-      |> add_error(not sandbox? and is_nil(key) and is_nil(before && before.api_key), :api_key, "required")
+      |> add_error(
+        not sandbox? and is_nil(key) and is_nil(before && before.api_key),
+        :api_key,
+        "required"
+      )
       |> add_error(
         not sandbox? and is_nil(secret) and is_nil(before && before.api_secret),
         :api_secret,

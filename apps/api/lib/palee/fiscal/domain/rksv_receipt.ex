@@ -26,7 +26,13 @@ defmodule Palee.Fiscal.Domain.RksvReceipt do
   fiskaly SIGN AT (https://workspace.fiskaly.com/api/rksv/v1/).
   """
 
-  @vat_rates %{2000 => "STANDARD", 1000 => "REDUCED_1", 1300 => "REDUCED_2", 0 => "ZERO", 1900 => "SPECIAL"}
+  @vat_rates %{
+    2000 => "STANDARD",
+    1000 => "REDUCED_1",
+    1300 => "REDUCED_2",
+    0 => "ZERO",
+    1900 => "SPECIAL"
+  }
   @rate_order ["STANDARD", "REDUCED_1", "REDUCED_2", "ZERO", "SPECIAL"]
   @failed_marker "Sicherheitseinrichtung ausgefallen"
   @failed_signature Base.encode64(@failed_marker)
@@ -46,7 +52,8 @@ defmodule Palee.Fiscal.Domain.RksvReceipt do
              "amounts_per_vat_rate" => rates,
              "amounts_per_payment_type" => [
                %{
-                 "payment_type" => if(document.payment_method == "cash", do: "CASH", else: "NON_CASH"),
+                 "payment_type" =>
+                   if(document.payment_method == "cash", do: "CASH", else: "NON_CASH"),
                  "amount" => decimal(sign * document.gross_cents),
                  "currency_code" => document.currency
                }
@@ -105,8 +112,22 @@ defmodule Palee.Fiscal.Domain.RksvReceipt do
   """
   def parse_code(code) when is_binary(code) do
     case String.split(code, "_") do
-      ["", "R1-AT" <> _ = suite, register, number, at, normal, reduced_1, reduced_2, zero,
-       special, counter, certificate, previous, signature] ->
+      [
+        "",
+        "R1-AT" <> _ = suite,
+        register,
+        number,
+        at,
+        normal,
+        reduced_1,
+        reduced_2,
+        zero,
+        special,
+        counter,
+        certificate,
+        previous,
+        signature
+      ] ->
         {:ok,
          %{
            suite: suite,
@@ -140,8 +161,8 @@ defmodule Palee.Fiscal.Domain.RksvReceipt do
       signature.status == "device_failed" or
         match?({:ok, %{device_failed: true}}, parse_code(code))
 
-    [{"Kassen-ID", signature.register_serial}, {"Belegnummer", signature.receipt_number}] ++
-      if(failed, do: [{"Hinweis", @failed_marker}], else: []) ++ [{"QR", code}]
+    ([{"Kassen-ID", signature.register_serial}, {"Belegnummer", signature.receipt_number}] ++
+       if(failed, do: [{"Hinweis", @failed_marker}], else: []) ++ [{"QR", code}])
     |> Enum.reject(fn {_label, value} -> value in [nil, ""] end)
   end
 

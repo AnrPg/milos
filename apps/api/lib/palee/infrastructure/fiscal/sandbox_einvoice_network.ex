@@ -23,7 +23,10 @@ defmodule Palee.Infrastructure.Fiscal.SandboxEInvoiceNetwork do
     {_root, children} = ubl
 
     result =
-      if Enum.any?(children, &match?({line, _} when line in ["cac:InvoiceLine", "cac:CreditNoteLine"], &1)) do
+      if Enum.any?(
+           children,
+           &match?({line, _} when line in ["cac:InvoiceLine", "cac:CreditNoteLine"], &1)
+         ) do
         id =
           if recipient.identifier == @unreachable,
             do: "sandbox-unreachable-" <> guid,

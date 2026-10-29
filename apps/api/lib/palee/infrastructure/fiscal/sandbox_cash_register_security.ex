@@ -18,7 +18,12 @@ defmodule Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity do
   def provision(connection, _context) do
     start =
       if connection.device == "rksv",
-        do: signature(connection, %{external_id: connection.register_id, kind: "start", schema: RksvReceipt.null_schema()})
+        do:
+          signature(connection, %{
+            external_id: connection.register_id,
+            kind: "start",
+            schema: RksvReceipt.null_schema()
+          })
 
     {{:ok,
       %{
@@ -38,8 +43,17 @@ defmodule Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity do
   def lookup(connection, request), do: {{:ok, signature(connection, request)}, wire(nil)}
 
   defp signature(connection, request) do
-    digest = :crypto.mac(:hmac, :sha256, "palee-sandbox", "#{request.external_id}:#{Jason.encode!(request.schema)}")
-    <<number::unsigned-integer-size(32), counter::unsigned-integer-size(32), _rest::binary>> = digest
+    digest =
+      :crypto.mac(
+        :hmac,
+        :sha256,
+        "palee-sandbox",
+        "#{request.external_id}:#{Jason.encode!(request.schema)}"
+      )
+
+    <<number::unsigned-integer-size(32), counter::unsigned-integer-size(32), _rest::binary>> =
+      digest
+
     now = DateTime.utc_now()
     value = Base.encode64(digest)
     unit_serial = "SANDBOX-" <> short(connection.unit_id)
@@ -91,7 +105,16 @@ defmodule Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity do
           receipt_number: number,
           qr_code_data:
             Enum.join(
-              ["", "R1-AT1", register_serial, number, now |> DateTime.truncate(:second) |> DateTime.to_naive() |> NaiveDateTime.to_iso8601()] ++
+              [
+                "",
+                "R1-AT1",
+                register_serial,
+                number,
+                now
+                |> DateTime.truncate(:second)
+                |> DateTime.to_naive()
+                |> NaiveDateTime.to_iso8601()
+              ] ++
                 amounts ++ [Base.encode64("sandbox"), "SANDBOX", Base.encode64("previous"), value],
               "_"
             )

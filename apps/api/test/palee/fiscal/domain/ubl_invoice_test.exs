@@ -76,7 +76,8 @@ defmodule Palee.Fiscal.Domain.UblInvoiceTest do
     UblWriter.write(tree)
   end
 
-  defp atomize(map), do: Map.new(map, fn {key, value} -> {String.to_existing_atom(key), value} end)
+  defp atomize(map),
+    do: Map.new(map, fn {key, value} -> {String.to_existing_atom(key), value} end)
 
   defp lines(specs) do
     Enum.map(specs, fn {description, quantity, price, category} ->

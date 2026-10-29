@@ -29,8 +29,6 @@ defmodule Palee.Fiscal.EInvoiceAttempt do
   def insert_changeset(attrs) do
     %__MODULE__{}
     |> cast(attrs, @fields)
-    |> validate_required(
-      ~w(submission_id attempt operation environment outcome started_at)a
-    )
+    |> validate_required(~w(submission_id attempt operation environment outcome started_at)a)
   end
 end

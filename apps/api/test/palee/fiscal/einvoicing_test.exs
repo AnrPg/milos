@@ -66,7 +66,9 @@ defmodule Palee.Fiscal.EInvoicingTest do
             idempotency_key: key,
             payment_method: "bank_transfer",
             buyer: @buyer,
-            lines: [%{description: "Abonnement entreprise", quantity: 10, unit_price_cents: 4_900}]
+            lines: [
+              %{description: "Abonnement entreprise", quantity: 10, unit_price_cents: 4_900}
+            ]
           },
           extra
         ),
@@ -109,7 +111,13 @@ defmodule Palee.Fiscal.EInvoicingTest do
 
     consumer =
       issue(context, owner, "k-3", %{
-        buyer: %{name: "Jean Dupont", street: "Rue 1", postal_code: "1000", city: "Bruxelles", country_code: "BE"}
+        buyer: %{
+          name: "Jean Dupont",
+          street: "Rue 1",
+          postal_code: "1000",
+          city: "Bruxelles",
+          country_code: "BE"
+        }
       })
 
     own_id =
@@ -144,7 +152,9 @@ defmodule Palee.Fiscal.EInvoicingTest do
     assert is_binary(connection.webhook_token)
 
     assert {:ok, %{submitted: 1}} = EInvoicing.transmit(context, :due, @now)
-    assert %{status: "submitted", provider_submission_id: "sandbox-" <> _} = submission(context, invoice)
+
+    assert %{status: "submitted", provider_submission_id: "sandbox-" <> _} =
+             submission(context, invoice)
 
     # Not due before the first poll.
     assert {:ok, %{polling: 0, delivered: 0}} = EInvoicing.transmit(context, :due, @now)
@@ -171,9 +181,12 @@ defmodule Palee.Fiscal.EInvoicingTest do
     {:ok, _} = EInvoicing.transmit(context, :due, @now)
     {:ok, %{rejected: 1}} = EInvoicing.transmit(context, :due, later(3))
 
-    assert %{status: "rejected", last_error_code: "delivery_failed"} = submission(context, invoice)
+    assert %{status: "rejected", last_error_code: "delivery_failed"} =
+             submission(context, invoice)
 
-    assert {:ok, %{status: "pending", attempts: 0}} = EInvoicing.retry(context, invoice.id, later(5))
+    assert {:ok, %{status: "pending", attempts: 0}} =
+             EInvoicing.retry(context, invoice.id, later(5))
+
     retried = submission(context, invoice)
     refute retried.idempotency_guid == first.idempotency_guid
     assert retried.provider_submission_id == nil
@@ -189,7 +202,12 @@ defmodule Palee.Fiscal.EInvoicingTest do
 
     Req.Test.stub(Palee.FiscalHttp, fn conn ->
       {:ok, body, conn} = Plug.Conn.read_body(conn)
-      send(test_pid, {:request, conn.method, conn.request_path, Plug.Conn.get_req_header(conn, "authorization"), body})
+
+      send(
+        test_pid,
+        {:request, conn.method, conn.request_path,
+         Plug.Conn.get_req_header(conn, "authorization"), body}
+      )
 
       case conn.request_path do
         "/api/v2/document_submissions" ->
@@ -201,7 +219,9 @@ defmodule Palee.Fiscal.EInvoicingTest do
     end)
 
     assert {:ok, %{submitted: 1}} = EInvoicing.transmit(context, :due, @now)
-    assert_received {:request, "POST", "/api/v2/document_submissions", ["Bearer sc-secret-key"], body}
+
+    assert_received {:request, "POST", "/api/v2/document_submissions", ["Bearer sc-secret-key"],
+                     body}
 
     payload = Jason.decode!(body)
     row = submission(context, invoice)
@@ -222,7 +242,9 @@ defmodule Palee.Fiscal.EInvoicingTest do
     refute Enum.any?(attempts, &((&1.response_body || "") =~ "sc-secret-key"))
 
     # The key is encrypted at rest and never shown.
-    [stored] = bypass_rls(fn -> Repo.all(from c in "fiscal_network_connections", select: c.api_key) end)
+    [stored] =
+      bypass_rls(fn -> Repo.all(from c in "fiscal_network_connections", select: c.api_key) end)
+
     refute stored =~ "sc-secret-key"
     refute Map.has_key?(EInvoicing.connection(context), :api_key)
   end
@@ -246,7 +268,9 @@ defmodule Palee.Fiscal.EInvoicingTest do
     Req.Test.stub(Palee.FiscalHttp, fn conn ->
       conn
       |> Plug.Conn.put_status(422)
-      |> Req.Test.json(%{"errors" => [%{"source" => "idempotencyGuid", "details" => "already used"}]})
+      |> Req.Test.json(%{
+        "errors" => [%{"source" => "idempotencyGuid", "details" => "already used"}]
+      })
     end)
 
     assert {:ok, %{uncertain: 1}} = EInvoicing.transmit(context, :due, later(11))
@@ -260,15 +284,26 @@ defmodule Palee.Fiscal.EInvoicingTest do
     invoice = issue(context, owner, "k-1")
     storecove(context, owner)
 
-    Req.Test.stub(Palee.FiscalHttp, fn conn -> conn |> Plug.Conn.put_status(503) |> Req.Test.json(%{}) end)
+    Req.Test.stub(Palee.FiscalHttp, fn conn ->
+      conn |> Plug.Conn.put_status(503) |> Req.Test.json(%{})
+    end)
+
     assert {:ok, %{retrying: 1}} = EInvoicing.transmit(context, :due, @now)
-    assert %{status: "pending", attempts: 1, last_error_code: "transient"} = row = submission(context, invoice)
+
+    assert %{status: "pending", attempts: 1, last_error_code: "transient"} =
+             row = submission(context, invoice)
+
     assert DateTime.compare(row.next_attempt_at, later(1)) == :eq
 
-    Req.Test.stub(Palee.FiscalHttp, fn conn -> conn |> Plug.Conn.put_status(401) |> Req.Test.json(%{}) end)
+    Req.Test.stub(Palee.FiscalHttp, fn conn ->
+      conn |> Plug.Conn.put_status(401) |> Req.Test.json(%{})
+    end)
+
     assert {:ok, %{retrying: 1}} = EInvoicing.transmit(context, :due, later(1))
     assert %{status: "invalid"} = EInvoicing.connection(context)
-    assert %{status: "pending", last_error_code: "connection_invalid"} = submission(context, invoice)
+
+    assert %{status: "pending", last_error_code: "connection_invalid"} =
+             submission(context, invoice)
 
     storecove(context, owner)
 
@@ -280,7 +315,11 @@ defmodule Palee.Fiscal.EInvoicingTest do
 
     assert {:ok, %{rejected: 1}} = EInvoicing.transmit(context, :due, later(2))
 
-    assert %{status: "rejected", last_error_code: "routing", last_error_message: "routing: Unknown receiver"} =
+    assert %{
+             status: "rejected",
+             last_error_code: "routing",
+             last_error_message: "routing: Unknown receiver"
+           } =
              submission(context, invoice)
 
     assert {:error, :not_found} = EInvoicing.retry(context, Ecto.UUID.generate(), later(3))
@@ -297,11 +336,17 @@ defmodule Palee.Fiscal.EInvoicingTest do
 
     assert {:error, :not_found} = EInvoicing.webhook(context, "wrong", %{"guid" => id}, @now)
 
-    body = %{"guid" => "webhook-guid", "body" => Jason.encode!(%{"guid" => id, "event" => "succeeded"})}
+    body = %{
+      "guid" => "webhook-guid",
+      "body" => Jason.encode!(%{"guid" => id, "event" => "succeeded"})
+    }
+
     assert :ok = EInvoicing.webhook(context, token, body, later(1))
     assert DateTime.compare(submission(context, invoice).next_attempt_at, later(1)) == :eq
 
-    [hash] = bypass_rls(fn -> Repo.all(from c in NetworkConnection, select: c.webhook_token_hash) end)
+    [hash] =
+      bypass_rls(fn -> Repo.all(from c in NetworkConnection, select: c.webhook_token_hash) end)
+
     refute hash == token
   end
 

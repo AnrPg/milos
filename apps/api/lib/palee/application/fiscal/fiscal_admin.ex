@@ -109,7 +109,8 @@ defmodule Palee.Application.Fiscal.FiscalAdmin do
           FiscalEInvoicing.schedule(context)
           FiscalTillSigning.schedule(context)
 
-        _other -> :ok
+        _other ->
+          :ok
       end)
     end
   end

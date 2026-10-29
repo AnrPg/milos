@@ -19,7 +19,13 @@ defmodule Palee.Fiscal.Domain.TseTransaction do
   DSFinV-K (https://www.bzst.de/DE/Unternehmen/Aussenpruefungen/DigitaleSchnittstelleFinV/digitaleschnittstellefinv_node.html).
   """
 
-  @vat_rates %{1900 => "NORMAL", 700 => "REDUCED_1", 1070 => "SPECIAL_RATE_1", 550 => "SPECIAL_RATE_2", 0 => "NULL"}
+  @vat_rates %{
+    1900 => "NORMAL",
+    700 => "REDUCED_1",
+    1070 => "SPECIAL_RATE_1",
+    550 => "SPECIAL_RATE_2",
+    0 => "NULL"
+  }
   # DSFinV-K order of the QR code's amounts.
   @rate_order ["NORMAL", "REDUCED_1", "SPECIAL_RATE_1", "SPECIAL_RATE_2", "NULL"]
 
@@ -57,7 +63,9 @@ defmodule Palee.Fiscal.Domain.TseTransaction do
 
       case Map.fetch(@vat_rates, rate) do
         {:ok, name} ->
-          {:cont, {:ok, Map.update(acc, name, field(group, :gross_cents), &(&1 + field(group, :gross_cents)))}}
+          {:cont,
+           {:ok,
+            Map.update(acc, name, field(group, :gross_cents), &(&1 + field(group, :gross_cents)))}}
 
         :error ->
           {:halt, {:error, :unsupported_vat_rate}}

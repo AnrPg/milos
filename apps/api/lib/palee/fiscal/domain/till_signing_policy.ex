@@ -147,7 +147,8 @@ defmodule Palee.Fiscal.Domain.TillSigningPolicy do
           true ->
             late_or(signature, now, opts, %{
               status: "pending",
-              next_attempt_at: TransmissionPolicy.next_attempt_at(max(signature.attempts, 1), now),
+              next_attempt_at:
+                TransmissionPolicy.next_attempt_at(max(signature.attempts, 1), now),
               last_error_code: "transient",
               last_error_message: text(reason)
             })

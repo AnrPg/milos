@@ -35,7 +35,9 @@ defmodule Palee.Infrastructure.Fiscal.Peppol.UblWriter do
   end
 
   defp attrs(attributes) do
-    Enum.map(attributes, fn {key, value} -> [" ", Atom.to_string(key), "=\"", escape(value), "\""] end)
+    Enum.map(attributes, fn {key, value} ->
+      [" ", Atom.to_string(key), "=\"", escape(value), "\""]
+    end)
   end
 
   @doc "XML text escaping."

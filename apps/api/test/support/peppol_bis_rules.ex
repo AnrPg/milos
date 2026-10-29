@@ -12,8 +12,17 @@ defmodule Palee.PeppolBisRules do
 
   require Record
 
-  Record.defrecordp(:xml_element, :xmlElement, Record.extract(:xmlElement, from_lib: "xmerl/include/xmerl.hrl"))
-  Record.defrecordp(:xml_text, :xmlText, Record.extract(:xmlText, from_lib: "xmerl/include/xmerl.hrl"))
+  Record.defrecordp(
+    :xml_element,
+    :xmlElement,
+    Record.extract(:xmlElement, from_lib: "xmerl/include/xmerl.hrl")
+  )
+
+  Record.defrecordp(
+    :xml_text,
+    :xmlText,
+    Record.extract(:xmlText, from_lib: "xmerl/include/xmerl.hrl")
+  )
 
   Record.defrecordp(
     :xml_attribute,
@@ -172,10 +181,13 @@ defmodule Palee.PeppolBisRules do
            present?(text(line, "cac:Item/cbc:Name")) and
            present?(text(line, "cac:Price/cbc:PriceAmount"))
        end)},
-      {"BR-27", Enum.all?(lines, &(not Decimal.negative?(decimal(text(&1, "cac:Price/cbc:PriceAmount")))))},
-      {"PEPPOL-EN16931-R120", Enum.all?(lines, &(line_amount_ok?(&1, quantity_name)))},
+      {"BR-27",
+       Enum.all?(lines, &(not Decimal.negative?(decimal(text(&1, "cac:Price/cbc:PriceAmount")))))},
+      {"PEPPOL-EN16931-R120", Enum.all?(lines, &line_amount_ok?(&1, quantity_name))},
       {"PEPPOL-EN16931-R051", currencies_ok?(root, currency)},
-      {"BR-55", not credit? or present?(text(root, "cac:BillingReference/cac:InvoiceDocumentReference/cbc:ID"))}
+      {"BR-55",
+       not credit? or
+         present?(text(root, "cac:BillingReference/cac:InvoiceDocumentReference/cbc:ID"))}
     ]
     |> Enum.reject(&elem(&1, 1))
     |> Enum.map(&elem(&1, 0))
@@ -200,7 +212,9 @@ defmodule Palee.PeppolBisRules do
   defp seller_vat?(seller) do
     seller
     |> all("cac:PartyTaxScheme")
-    |> Enum.any?(&(text(&1, "cac:TaxScheme/cbc:ID") == "VAT" and present?(text(&1, "cbc:CompanyID"))))
+    |> Enum.any?(
+      &(text(&1, "cac:TaxScheme/cbc:ID") == "VAT" and present?(text(&1, "cbc:CompanyID")))
+    )
   end
 
   # BR-CO-17 in the official Schematron allows one currency unit either way.

@@ -11,7 +11,15 @@ defmodule PaleeWeb.Schemas.FiscalCompliance do
 
   # ── Peppol ──────────────────────────────────────────────────────────────
 
-  @einvoice_statuses ["pending", "sending", "submitted", "delivered", "rejected", "failed", "uncertain"]
+  @einvoice_statuses [
+    "pending",
+    "sending",
+    "submitted",
+    "delivered",
+    "rejected",
+    "failed",
+    "uncertain"
+  ]
 
   def einvoice_statuses, do: @einvoice_statuses
 
@@ -158,7 +166,15 @@ defmodule PaleeWeb.Schemas.FiscalCompliance do
 
   # ── TSE / RKSV ──────────────────────────────────────────────────────────
 
-  @signature_statuses ["pending", "sending", "signed", "uncertain", "device_failed", "rejected", "failed"]
+  @signature_statuses [
+    "pending",
+    "sending",
+    "signed",
+    "uncertain",
+    "device_failed",
+    "rejected",
+    "failed"
+  ]
 
   def signature_statuses, do: @signature_statuses
 
@@ -182,7 +198,10 @@ defmodule PaleeWeb.Schemas.FiscalCompliance do
         id: @uuid,
         document_id: nullable(@uuid),
         device: %Schema{type: :string, enum: ["tse", "rksv"]},
-        kind: %Schema{type: :string, enum: ["receipt", "start", "null", "monthly", "yearly", "closing"]},
+        kind: %Schema{
+          type: :string,
+          enum: ["receipt", "start", "null", "monthly", "yearly", "closing"]
+        },
         period: %Schema{type: :string, format: :date, nullable: true},
         status: %Schema{type: :string, enum: @signature_statuses},
         attempts: %Schema{type: :integer},
@@ -215,7 +234,10 @@ defmodule PaleeWeb.Schemas.FiscalCompliance do
     %Schema{
       till_signature()
       | properties:
-          Map.put(till_signature().properties, :attempts_log, %Schema{type: :array, items: attempt()}),
+          Map.put(till_signature().properties, :attempts_log, %Schema{
+            type: :array,
+            items: attempt()
+          }),
         required: Enum.sort([:attempts_log | till_signature().required])
     }
   end
