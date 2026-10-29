@@ -219,7 +219,14 @@ defmodule PaleeWeb.FallbackController do
     journal_signing_unavailable:
       {:service_unavailable, "Fiscal documents are paused: the journal signing key is missing"},
     not_retryable:
-      {:conflict, "Only a refused or failed report can be sent again; this one is on its way"}
+      {:conflict, "Only a refused or failed report can be sent again; this one is on its way"},
+    # ADR-250/251: Peppol and the till's security device.
+    invalid_peppol_id:
+      {:unprocessable_entity, "This is not a valid Peppol address (scheme:identifier)"},
+    till_not_connected: {:conflict, "Connect the till's security device (RKSV) first"},
+    till_credentials_refused: {:conflict, "fiskaly refused the business's API key or secret"},
+    till_provisioning_failed:
+      {:bad_gateway, "The security device could not be set up; see the connection's last error"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@fiscal_errors, reason) do
