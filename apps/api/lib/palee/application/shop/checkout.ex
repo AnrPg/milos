@@ -26,7 +26,7 @@ defmodule Palee.Application.Shop.Checkout do
 
   alias Palee.Application.GoLive
   alias Palee.Application.Shop.{ManageCatalog, Observability, OrderMoney}
-  alias Palee.{Facility, Finance, Organizations, Shop}
+  alias Palee.{Facility, Finance, Organizations, Payments, Shop}
 
   @doc """
   Prices a cart for the acting member without placing it: lines, totals,
@@ -68,7 +68,10 @@ defmodule Palee.Application.Shop.Checkout do
 
   @doc "The online-payment flag the basket shows: `%{available, reason, provider}`."
   def online_payment(context) do
-    context |> Shop.online_payment() |> Map.take([:available, :reason, :provider])
+    # ADR-248: the business's own provider account (ADR-246) when connected.
+    if Payments.available?(context),
+      do: %{available: true, reason: nil, provider: "online"},
+      else: context |> Shop.online_payment() |> Map.take([:available, :reason, :provider])
   end
 
   defp payment_modes(context, terms) do
@@ -180,24 +183,47 @@ defmodule Palee.Application.Shop.Checkout do
                    payment_token: params[:payment_token]
                  }),
                {:ok, paid} <-
-                 Shop.transaction(context, fn ->
-                   with %{} = locked <- Shop.get_order(context, order.id, lock: true),
-                        {:ok, paid, _payment} <-
-                          OrderMoney.settle(context, locked, :online, %{
-                            provider: receipt.provider,
-                            reference: receipt.reference,
-                            idempotency_key: capture_key
-                          }) do
-                     {:ok, paid}
-                   end
-                 end) do
-            Observability.order(:paid, context, paid)
+                 settle_online(context, order.id, %{
+                   provider: receipt.provider,
+                   reference: receipt.reference,
+                   idempotency_key: capture_key
+                 }) do
             {:ok, paid}
           end
 
         _other ->
           {:error, :order_not_payable}
       end
+    end
+  end
+
+  @doc """
+  Records the money a provider confirmed for an online order (the capture
+  above, or an ADR-246 checkout). Idempotent: a paid order is returned as
+  it is.
+  """
+  def settle_online(context, order_id, receipt) do
+    with {:ok, paid} <-
+           Shop.transaction(context, fn ->
+             case Shop.get_order(context, order_id, lock: true) do
+               %{payment_status: :paid} = paid ->
+                 {:ok, paid}
+
+               %{payment_status: :pending_payment} = locked ->
+                 with {:ok, paid, _payment} <-
+                        OrderMoney.settle(context, locked, :online, receipt) do
+                   {:ok, paid}
+                 end
+
+               %{} ->
+                 {:error, :order_not_payable}
+
+               nil ->
+                 {:error, :not_found}
+             end
+           end) do
+      Observability.order(:paid, context, paid)
+      {:ok, paid}
     end
   end
 

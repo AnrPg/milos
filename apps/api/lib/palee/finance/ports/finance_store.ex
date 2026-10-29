@@ -96,6 +96,10 @@ defmodule Palee.Finance.Ports.FinanceStore do
               [map()]
   @callback mark_subscription_notice_sent(Ecto.UUID.t(), :expiry_reminder | :grace_notice) :: :ok
   @doc "ADR-220: the member's (or staff's) renewal choice for one subscription."
+  # ADR-248: withdrawal from a package bought online.
+  @callback withdrawal_facts(payment_id :: Ecto.UUID.t()) :: {:ok, map()} | {:error, term()}
+  @callback withdraw_subscription(subscription_id :: Ecto.UUID.t(), Date.t()) ::
+              {:ok, map()} | {:error, term()}
   @callback set_subscription_auto_renew(Ecto.UUID.t(), String.t(), boolean(), String.t()) ::
               {:ok, map()} | {:error, term()}
   @doc "ADR-220: the last day a member leaving today would keep, or nil without a membership."

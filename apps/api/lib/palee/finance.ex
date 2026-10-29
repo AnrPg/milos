@@ -432,6 +432,13 @@ defmodule Palee.Finance do
   def subscriptions_needing_expiry_notice(context, kind, days),
     do: scoped(context, fn -> FinanceStore.subscriptions_needing_expiry_notice(kind, days) end)
 
+  # ADR-248: withdrawal (14 days) from a package bought online.
+  def withdrawal_facts(context, payment_id),
+    do: scoped(context, fn -> FinanceStore.withdrawal_facts(payment_id) end)
+
+  def withdraw_subscription(context, subscription_id, %Date{} = today),
+    do: scoped(context, fn -> FinanceStore.withdraw_subscription(subscription_id, today) end)
+
   # ADR-220: renewal choice and leaving the box.
   def set_subscription_auto_renew(context, user_id, subscription_id, auto_renew, by),
     do:

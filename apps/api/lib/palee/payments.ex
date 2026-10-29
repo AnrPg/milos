@@ -229,6 +229,7 @@ defmodule Palee.Payments do
              idempotency_key: request.idempotency_key,
              save_method: consent != nil,
              consent: consent,
+             metadata: request[:metadata] || %{},
              expires_at: DateTime.add(now, IntentPolicy.checkout_ttl_seconds(), :second),
              next_attempt_at: DateTime.add(now, 120, :second),
              claimed_at: now,
@@ -874,7 +875,8 @@ defmodule Palee.Payments do
       :expires_at,
       :succeeded_at,
       :next_attempt_at,
-      :inserted_at
+      :inserted_at,
+      :metadata
     ])
   end
 

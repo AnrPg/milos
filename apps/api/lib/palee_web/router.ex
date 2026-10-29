@@ -305,6 +305,8 @@ defmodule PaleeWeb.Router do
     pipe_through([:api, :public_box_rate_limited])
 
     get("/:slug", PublicBoxController, :show)
+    # ADR-248: the packages a box sells online.
+    get("/:slug/packages", PublicBoxController, :packages)
   end
 
   # ADR-170: the public platform plan catalog (pricing, coach onboarding).
@@ -525,6 +527,11 @@ defmodule PaleeWeb.Router do
     get("/payment-methods", MyPaymentsController, :methods)
     delete("/payment-methods/:id", MyPaymentsController, :revoke_method)
     put("/payment-methods/:id/autopay", MyPaymentsController, :set_autopay)
+    # ADR-248: buying packages online, withdrawal, paying shop orders.
+    get("/packages/:id/purchase-terms", MyPaymentsController, :package_terms)
+    post("/packages/:id/buy", MyPaymentsController, :buy_package)
+    post("/payments/:id/withdraw", MyPaymentsController, :withdraw)
+    post("/shop/orders/:id/pay-online", MyPaymentsController, :pay_shop_order)
     # ADR-220: the member's renewal choice and leaving the box.
     put(
       "/membership/subscriptions/:id/auto-renew",

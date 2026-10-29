@@ -8,7 +8,7 @@ defmodule PaleeWeb.MyPaymentsController do
   use OpenApiSpex.ControllerSpecs
 
   alias OpenApiSpex.{Parameter, Schema}
-  alias Palee.Application.Payments.OnlinePayments
+  alias Palee.Application.Payments.{OnlinePayments, OnlineSales}
   alias PaleeWeb.Schemas.Payments, as: P
 
   action_fallback PaleeWeb.FallbackController
@@ -53,14 +53,8 @@ defmodule PaleeWeb.MyPaymentsController do
   )
 
   def pay(conn, %{id: id}) do
-    params =
-      conn.body_params
-      |> Map.merge(%{
-        ip: conn.remote_ip |> :inet.ntoa() |> to_string(),
-        user_agent: conn |> get_req_header("user-agent") |> List.first()
-      })
-
-    with {:ok, payment} <- OnlinePayments.pay_invoice(conn.assigns.tenant_context, id, params) do
+    with {:ok, payment} <-
+           OnlinePayments.pay_invoice(conn.assigns.tenant_context, id, with_client(conn)) do
       json(conn, %{payment: payment})
     end
   end
@@ -138,5 +132,79 @@ defmodule PaleeWeb.MyPaymentsController do
            OnlinePayments.sandbox_complete(conn.assigns.tenant_context, conn.body_params) do
       json(conn, %{payment: payment})
     end
+  end
+
+  # ── ADR-248: online sales ───────────────────────────────────────────────
+
+  operation(:package_terms,
+    summary: "What buying a package online costs, and the texts to agree to",
+    parameters: [
+      @id,
+      %Parameter{
+        name: :language,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :string, enum: ["el", "en"]}
+      }
+    ],
+    responses: [ok: {"Terms", "application/json", P.package_terms()}]
+  )
+
+  def package_terms(conn, %{id: id} = params) do
+    with {:ok, terms} <-
+           OnlineSales.package_terms(conn.assigns.tenant_context, id, params[:language]) do
+      json(conn, terms)
+    end
+  end
+
+  operation(:buy_package,
+    summary: "Buy a package on the payment provider's page (and book a class once paid)",
+    description:
+      "Where the law gives 14 days to withdraw, `start_now` must be true: the member asks " <>
+        "for the package to start at once. `book_slot_id` books that class once the package is paid.",
+    parameters: [@id],
+    request_body: P.body(P.buy_body()),
+    responses: [ok: {"Payment", "application/json", P.one(:payment, P.intent())}]
+  )
+
+  def buy_package(conn, %{id: id}) do
+    with {:ok, payment} <-
+           OnlineSales.buy_package(conn.assigns.tenant_context, id, with_client(conn)) do
+      json(conn, %{payment: payment})
+    end
+  end
+
+  operation(:withdraw,
+    summary: "Withdraw from a package bought online within 14 days",
+    description: "Gives back the price less the part already used, and ends the package.",
+    parameters: [@id],
+    responses: [ok: {"Withdrawal", "application/json", P.withdrawal()}]
+  )
+
+  def withdraw(conn, %{id: id}) do
+    with {:ok, result} <- OnlineSales.withdraw(conn.assigns.tenant_context, id) do
+      json(conn, result)
+    end
+  end
+
+  operation(:pay_shop_order,
+    summary: "Pay an unpaid shop order on the payment provider's page",
+    parameters: [@id],
+    request_body: P.body(P.shop_pay_body()),
+    responses: [ok: {"Payment", "application/json", P.one(:payment, P.intent())}]
+  )
+
+  def pay_shop_order(conn, %{id: id}) do
+    with {:ok, payment} <-
+           OnlineSales.pay_shop_order(conn.assigns.tenant_context, id, conn.body_params) do
+      json(conn, %{payment: payment})
+    end
+  end
+
+  defp with_client(conn) do
+    Map.merge(conn.body_params, %{
+      ip: conn.remote_ip |> :inet.ntoa() |> to_string(),
+      user_agent: conn |> get_req_header("user-agent") |> List.first()
+    })
   end
 end

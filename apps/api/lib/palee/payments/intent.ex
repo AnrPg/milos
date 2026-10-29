@@ -17,7 +17,7 @@ defmodule Palee.Payments.Intent do
              attempts next_attempt_at claimed_at expires_at succeeded_at failure_code
              failure_message card_brand card_last4 refunded_cents fulfilment_status
              fulfilment_attempts fulfilment_error fulfilled_at finance_payment_id
-             fiscal_document_id created_by_id)a
+             fiscal_document_id created_by_id metadata)a
 
   schema "payment_intents" do
     field :organization_id, :binary_id, read_after_writes: true
@@ -39,6 +39,8 @@ defmodule Palee.Payments.Intent do
     field :return_url, :string
     field :save_method, :boolean, default: false
     field :consent, :map
+    # ADR-248: what else the payment is for (e.g. the class to book after it).
+    field :metadata, :map, default: %{}
     field :payment_method_id, :binary_id
     field :attempts, :integer, default: 0
     field :next_attempt_at, :utc_datetime_usec
