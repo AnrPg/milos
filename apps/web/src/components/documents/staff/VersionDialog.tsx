@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 
 import { fetchDocumentVersion, publishDocumentVersion, type ChangeKind, type DocumentSettings, type DocumentTemplate } from "@/api/documents";
@@ -35,8 +35,8 @@ export function VersionDialog({
   const t = useTranslations("Documents");
   const i18n = useUiTranslations();
   const token = useToken();
-  const [title, setTitle] = useState(template.title);
-  const [body, setBody] = useState<string | null>(null);
+  const [editedTitle, setTitle] = useState<string | null>(null);
+  const [editedBody, setBody] = useState<string | null>(null);
   const [changeKind, setChangeKind] = useState<ChangeKind>("major");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<{ message: string; fields: Record<string, string | undefined> } | null>(null);
@@ -47,12 +47,10 @@ export function VersionDialog({
     queryFn: () => fetchDocumentVersion(token!, template.id, template.current_version_id!),
   });
 
-  useEffect(() => {
-    if (current.data && body === null) {
-      setBody(current.data.body ?? "");
-      setTitle(current.data.title || template.title);
-    }
-  }, [current.data, body, template.title]);
+  // The current text is the starting point; what staff type replaces it.
+  const loaded = Boolean(current.data) || !template.current_version_id;
+  const body = editedBody ?? (loaded ? current.data?.body ?? "" : null);
+  const title = editedTitle ?? (current.data?.title || template.title);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
