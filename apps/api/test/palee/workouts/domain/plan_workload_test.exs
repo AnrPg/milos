@@ -317,4 +317,64 @@ defmodule Palee.Workouts.Domain.PlanWorkloadTest do
     assert %{sets: 9, reps: 83, volume_kg: 6130, estimated: false} = totals
     assert %{name: "Back Squat", sets: 9, top_set: %{load_kg: 80, reps: 3}} = squat
   end
+
+  test "the reps of an AMRAP score past its full rounds go through the next round in order" do
+    # 2 rounds + 20 reps: the 3rd round's 15 pull-ups, then 5 of its 15 snatches.
+    rows = by_name(PlanWorkload.section(plan(6), [], rounds_done: 2, partial_reps: 20))
+
+    assert %{reps: 45, sets: 3} = rows["Butterfly Pull-up"]
+    # 5×40 + 10×45 + 5×50
+    assert %{reps: 20, volume_kg: 900, sets: 2.33} = rows["Power Snatch"]
+
+    # A partial inside the first row only.
+    rows = by_name(PlanWorkload.section(plan(6), [], rounds_done: 2, partial_reps: 6))
+    assert %{reps: 36, sets: 2.4} = rows["Butterfly Pull-up"]
+    assert %{reps: 15, volume_kg: 650, sets: 2} = rows["Power Snatch"]
+
+    assert PlanWorkload.partial_reps_from_score("5+3") == 3
+    assert PlanWorkload.partial_reps_from_score("5") == 0
+    assert PlanWorkload.partial_reps_from_score(nil) == 0
+  end
+
+  test "the 1RM lookup follows the web runner: kg one-rep-max PRs, names matched loosely, best wins" do
+    lookup =
+      PlanWorkload.one_rep_max_lookup([
+        %{
+          name: "Back Squat 1RM",
+          unit: "kg",
+          current_score: Decimal.new(140),
+          supporting_metrics: %{}
+        },
+        %{name: "back squat", unit: "kg", current_score: 150, supporting_metrics: %{"reps" => 1}},
+        %{
+          name: "Back squat 5RM",
+          unit: "kg",
+          current_score: 200,
+          supporting_metrics: %{"reps" => 5}
+        },
+        %{
+          name: "Clean & Jerk",
+          unit: "lb",
+          current_score: 300,
+          supporting_metrics: %{"reps" => 1}
+        },
+        %{
+          "name" => "Πρόσθιο κάθισμα",
+          "unit" => "kg",
+          "current_score" => 90,
+          "supporting_metrics" => %{"reps" => 1}
+        }
+      ])
+
+    assert lookup.("Back Squat", nil) == Decimal.new(150)
+    assert lookup.("Clean & Jerk", nil) == nil
+    assert lookup.("ΠΡΟΣΘΙΟ ΚΑΘΙΣΜΑ", nil) == Decimal.new(90)
+    assert lookup.(nil, nil) == nil
+
+    assert PlanWorkload.normalize_exercise_name("Bench-Press (1RM)") == "bench press"
+
+    workload = PlanWorkload.section(plan(0), [], one_rep_max: lookup)
+    # 12×60% + 10×65% + 8×70% + 8×75% of 150 kg.
+    assert %{volume_kg: 3795, estimated: false} = workload.totals
+  end
 end

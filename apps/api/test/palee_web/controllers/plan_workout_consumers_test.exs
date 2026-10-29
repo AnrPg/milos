@@ -10,7 +10,8 @@ defmodule PaleeWeb.PlanWorkoutConsumersTest do
   import Palee.StructuredPlanFixtures
 
   alias Palee.Analytics.Domain.ProgressStats
-  alias Palee.Application.{AthleteTrainingVolume, ListWorkoutExecutions}
+  alias Palee.Application.{AthleteTrainingVolume, CreatePR, ListWorkoutExecutions}
+  alias Palee.Identity.UserContext
   alias Palee.{Identity, Organizations}
 
   defp create_user!(nickname, role) do
@@ -117,6 +118,14 @@ defmodule PaleeWeb.PlanWorkoutConsumersTest do
     assert %{"kind" => "countup", "score_config" => %{"type" => "time"}} =
              by_section[thrusters["id"]]
 
+    {:ok, _pr} =
+      CreatePR.call(UserContext.new(athlete), %{
+        "name" => "Back squat 1RM",
+        "current_score" => 100,
+        "unit" => "kg",
+        "beaten_on" => Date.to_iso8601(Date.utc_today())
+      })
+
     execution_id =
       athlete_conn
       |> json(:post, "/api/executions", %{
@@ -132,7 +141,7 @@ defmodule PaleeWeb.PlanWorkoutConsumersTest do
       |> json(:patch, "/api/executions/#{execution_id}/complete", %{
         checked_exercise_ids: [],
         section_scores: [
-          %{section_id: amrap["id"], value: "3+4", score_type: "rounds_reps"},
+          %{section_id: amrap["id"], value: "3+20", score_type: "rounds_reps"},
           %{section_id: thrusters["id"], value: "6:10", score_type: "time"}
         ],
         total_elapsed_ms: 1_500_000,
@@ -145,7 +154,9 @@ defmodule PaleeWeb.PlanWorkoutConsumersTest do
         plan_actuals: [
           squat(strength["id"], 1, 12, 60, true),
           squat(strength["id"], 2, 10, 65, true),
-          squat(strength["id"], 3, 8, 70, false)
+          squat(strength["id"], 3, 8, 70, false),
+          # 75% of a 1RM the runner did not know: the server reads it from the PRs.
+          %{squat(strength["id"], 4, 8, nil, false) | prescribed_load_pct: 75}
         ]
       })
       |> json_response(200)
@@ -156,7 +167,7 @@ defmodule PaleeWeb.PlanWorkoutConsumersTest do
     assert completed["section_scores"]
            |> Enum.filter(&(&1["source"] != "auto"))
            |> Map.new(&{&1["section_id"], &1["value"]}) ==
-             %{amrap["id"] => "3+4", thrusters["id"] => "6:10"}
+             %{amrap["id"] => "3+20", thrusters["id"] => "6:10"}
 
     # History: the plan's flows and what was done.
     page =
@@ -172,25 +183,26 @@ defmodule PaleeWeb.PlanWorkoutConsumersTest do
     workload = entry["performance"]["workload"]
 
     assert [
-             %{"source" => "actuals", "totals" => %{"sets" => 3, "logged_sets" => 2}},
-             # 3 full rounds: 45 pull-ups, 5 + 10 + 15 snatches @ 40/45/50 kg.
-             %{"source" => "prescription", "totals" => %{"reps" => 75, "volume_kg" => 1400}},
+             %{"source" => "actuals", "totals" => %{"sets" => 4, "logged_sets" => 2}},
+             # 3 full rounds (45 pull-ups, 5 + 10 + 15 snatches @ 40/45/50 kg)
+             # and 20 reps of the 4th: 15 pull-ups, 5 snatches @ 55 kg.
+             %{"source" => "prescription", "totals" => %{"reps" => 95, "volume_kg" => 1675}},
              # 75 thrusters and 3 interruptions of 10 burpees in 6:10.
              %{"source" => "prescription", "totals" => %{"reps" => 105}}
            ] = workload["sections"]
 
-    # 12×60 + 10×65 + 8×70 = 1930 kg of squats.
-    assert %{"volume_kg" => 3330, "estimated" => false} = workload["totals"]
+    # 12×60 + 10×65 + 8×70 + 8×75 (75% of the 100 kg 1RM) = 2530 kg of squats.
+    assert %{"volume_kg" => 4205, "estimated" => false} = workload["totals"]
 
     # Training volume (coverage, qualities, load): sets done per exercise.
     %{performances: [performance]} =
       AthleteTrainingVolume.load(%{user_id: athlete.id, organization_id: nil}, nil)
 
-    assert performance.volume_kg == 3330
+    assert performance.volume_kg == 4205
 
     assert performance.exercises |> Map.new(&{&1.name, &1.sets}) == %{
-             "Back Squat" => 3,
-             "Butterfly Pull-up" => 3,
+             "Back Squat" => 4,
+             "Butterfly Pull-up" => 4,
              "Power Snatch" => 3,
              "Thruster" => 1,
              "Burpee over Bar" => 3
@@ -200,10 +212,49 @@ defmodule PaleeWeb.PlanWorkoutConsumersTest do
     {:ok, [listed]} =
       ListWorkoutExecutions.call(%{user_id: athlete.id, organization_id: nil}, athlete.id)
 
-    assert %{volume_kg: 3330, sets: 13, logged_sets: 2, top_sets: top_sets} = listed.plan_workload
+    assert %{volume_kg: 4205, sets: 15.33, logged_sets: 2, top_sets: top_sets} =
+             listed.plan_workload
 
-    assert %{load_kg: 70, reps: 8} = Enum.find(top_sets, &(&1.name == "Back Squat"))
+    assert %{load_kg: 75, reps: 8} = Enum.find(top_sets, &(&1.name == "Back Squat"))
 
-    assert %{totals: %{volume_kg: 3330}} = ProgressStats.build([listed], Date.utc_today())
+    assert %{totals: %{volume_kg: 4205}} = ProgressStats.build([listed], Date.utc_today())
+  end
+
+  test "a Quick Text or legacy editor publish never drops a structured plan", %{conn: conn} do
+    admin = create_user!("plan_guard_admin", :admin)
+    admin_conn = put_bearer_token(conn, admin)
+    workout = plan_workout!(conn, admin)
+    base = org_path("/admin/workouts")
+
+    assert %{"code" => "structured_plan_mode_change"} =
+             admin_conn
+             |> json(:post, "#{base}/#{workout["id"]}/dsl/publish", %{
+               source: "Back squat 5x5 @ 100kg",
+               expected_source_revision: 0,
+               acknowledge_warnings: true
+             })
+             |> json_response(409)
+
+    assert %{"code" => "structured_plan_mode_change"} =
+             admin_conn
+             |> json(:post, "#{base}/#{workout["id"]}/publish", %{
+               title: "Legacy save",
+               type: "crossfit",
+               authoring_mode: "structured",
+               sections: [
+                 %{name: "Main", order: 1, exercises: [%{name: "Back squat", order: 1, sets: 5}]}
+               ]
+             })
+             |> json_response(409)
+
+    # The plan is untouched.
+    sections =
+      admin_conn
+      |> recycle()
+      |> get("#{base}/#{workout["id"]}")
+      |> json_response(200)
+      |> get_in(["workout", "sections"])
+
+    assert Enum.all?(sections, &is_map(&1["plan"]))
   end
 end

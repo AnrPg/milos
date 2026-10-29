@@ -1,12 +1,19 @@
 defmodule Palee.Application.ListWorkoutExecutions do
-  alias Palee.Application.JournalComments
+  alias Palee.Application.{AthleteOneRepMax, JournalComments}
   alias Palee.Execution
   alias Palee.Execution.ExecutionStore
   alias Palee.{Organizations, Seasons, Workouts}
   alias Palee.Workouts.Queries.PlanPrescriptions
 
-  def call(context, user_id),
-    do: ExecutionStore.with_user_context(context, fn -> call(user_id) end)
+  # The caller's own list: a plan load in % counts in kg through their PRs.
+  def call(context, user_id) do
+    one_rep_max = AthleteOneRepMax.lookup(context, user_id)
+
+    ExecutionStore.with_user_context(context, fn ->
+      {:ok,
+       user_id |> Execution.list_executions_for_user() |> summarize(one_rep_max: one_rep_max)}
+    end)
+  end
 
   def call(user_id) do
     {:ok, user_id |> Execution.list_executions_for_user() |> summarize()}
@@ -22,11 +29,12 @@ defmodule Palee.Application.ListWorkoutExecutions do
   Executions as readers see them: with their Σχόλια, the title, type and
   section names of the workout done and, for a season's workout, the season
   (ADR-167). Each gym's context is resolved once and each workout read once.
+  `opts`: `:one_rep_max` (`AthleteOneRepMax.lookup/2`) for plan loads in %.
   A completed structured plan workout (ADR-270) also carries `plan_workload`:
   its sets, reps and volume and the heaviest set of each exercise, from its
   plan actuals (else its prescription and scored rounds).
   """
-  def summarize(executions) do
+  def summarize(executions, opts \\ []) do
     contexts =
       executions
       |> Enum.map(& &1.organization_id)
@@ -46,7 +54,7 @@ defmodule Palee.Application.ListWorkoutExecutions do
     executions
     |> JournalComments.attach("execution")
     |> Enum.map(&attach_workout_summary(&1, workouts))
-    |> Enum.map(&attach_plan_workload(&1, workouts, plan_sets))
+    |> Enum.map(&attach_plan_workload(&1, workouts, plan_sets, Keyword.get(opts, :one_rep_max)))
     |> Enum.map(
       &Map.put(
         &1,
@@ -116,14 +124,15 @@ defmodule Palee.Application.ListWorkoutExecutions do
     |> Enum.group_by(& &1.execution_id)
   end
 
-  defp attach_plan_workload(execution, workouts, plan_sets) do
+  defp attach_plan_workload(execution, workouts, plan_sets, one_rep_max) do
     if completed?(execution) and plan_workout?(execution, workouts) do
       workout = Map.get(workouts, {execution.organization_id, execution.master_workout_id})
 
       workload =
         PlanPrescriptions.workload(workout, Map.get(plan_sets, execution.id, []),
           section_scores: execution.section_scores,
-          section_elapsed_ms: Map.get(execution, :section_elapsed_ms)
+          section_elapsed_ms: Map.get(execution, :section_elapsed_ms),
+          one_rep_max: one_rep_max
         )
 
       Map.put(execution, :plan_workload, workload && plan_summary(workload))

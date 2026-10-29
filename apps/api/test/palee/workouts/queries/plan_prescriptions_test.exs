@@ -51,12 +51,12 @@ defmodule Palee.Workouts.Queries.PlanPrescriptionsTest do
       )
 
     assert [%{section_id: "s1", source: "actuals"}, s2, s3] = workload.sections
-    # AMRAP: 2 full rounds of 15 pull-ups and 5 + 10 snatches.
-    assert %{source: "prescription", totals: %{reps: 45, volume_kg: 650}} = s2
+    # AMRAP "2+5": 2 full rounds of 15 pull-ups and 5 + 10 snatches, then 5 pull-ups.
+    assert %{source: "prescription", totals: %{reps: 50, volume_kg: 650}} = s2
     # 75 thrusters and an interruption at 2:00 and 4:00.
     assert %{totals: %{reps: 95}} = s3
 
-    assert %{sets: 8, logged_sets: 1, reps: 152, volume_kg: 1370} = workload.totals
+    assert %{sets: 8.33, logged_sets: 1, reps: 157, volume_kg: 1370} = workload.totals
 
     assert Enum.map(workload.exercises, & &1.name) |> Enum.sort() ==
              ["Back Squat", "Burpee over Bar", "Butterfly Pull-up", "Power Snatch", "Thruster"]

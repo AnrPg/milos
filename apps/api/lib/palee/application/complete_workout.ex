@@ -1,5 +1,6 @@
 defmodule Palee.Application.CompleteWorkout do
   alias Palee.Application.{
+    AthleteOneRepMax,
     BroadcastUserSync,
     InjuryWarningEvaluation,
     InvalidateLandingPages,
@@ -234,7 +235,9 @@ defmodule Palee.Application.CompleteWorkout do
     if PlanPrescriptions.plan_workout?(workout) do
       case PlanPrescriptions.workload(workout, Map.get(execution, :plan_sets) || [],
              section_scores: execution.section_scores,
-             section_elapsed_ms: Map.get(execution, :section_elapsed_ms)
+             section_elapsed_ms: Map.get(execution, :section_elapsed_ms),
+             one_rep_max:
+               AthleteOneRepMax.lookup(%{user_id: execution.user_id}, execution.user_id)
            ) do
         %{totals: totals} ->
           %{

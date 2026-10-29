@@ -19,7 +19,7 @@ defmodule Palee.Application.GetTrainingHistory do
   the performance; the gym keeps its bookings and attendance.
   """
 
-  alias Palee.Application.StaffJournalAccess
+  alias Palee.Application.{AthleteOneRepMax, StaffJournalAccess}
   alias Palee.Execution
   alias Palee.Execution.ExecutionStore
   alias Palee.{Scheduling, Workouts}
@@ -53,7 +53,7 @@ defmodule Palee.Application.GetTrainingHistory do
       executions = Execution.list_executions_for_user(user_id)
       page = executions |> Enum.drop(offset) |> Enum.take(limit)
       workouts = load_workouts(context, Enum.map(page, & &1.master_workout_id))
-      plan_sets = plan_sets(page)
+      plan_sets = {plan_sets(page), AthleteOneRepMax.lookup(context, user_id)}
 
       %{
         kind: "workouts",
@@ -85,7 +85,9 @@ defmodule Palee.Application.GetTrainingHistory do
     booking_ids = MapSet.new(bookings, & &1.booking_id)
 
     {executions, plan_sets} =
-      if readable?, do: class_executions(context, user_id, booking_ids), else: {%{}, %{}}
+      if readable?,
+        do: class_executions(context, user_id, booking_ids),
+        else: {%{}, {%{}, nil}}
 
     workouts = load_workouts(context, Enum.map(bookings, & &1.master_workout_id))
 
@@ -127,7 +129,8 @@ defmodule Palee.Application.GetTrainingHistory do
           Map.put_new(acc, execution.source_reference_id, execution)
         end)
 
-      {executions, executions |> Map.values() |> plan_sets()}
+      {executions,
+       {executions |> Map.values() |> plan_sets(), AthleteOneRepMax.lookup(context, user_id)}}
     end)
   end
 
@@ -207,17 +210,18 @@ defmodule Palee.Application.GetTrainingHistory do
             unit: field(score, :unit)
           }
         end),
-      workload: workload(execution, workout, Map.get(plan_sets, execution.id, []))
+      workload: workload(execution, workout, plan_sets)
     }
   end
 
   # ADR-270: what was done in a structured plan workout: sets, reps, volume
   # and the time domain, from the plan actuals (else the prescription).
-  defp workload(%{status: status} = execution, %{} = workout, plan_sets) do
+  defp workload(%{status: status} = execution, %{} = workout, {plan_sets, one_rep_max}) do
     if to_string(status) == "completed" and PlanPrescriptions.plan_workout?(workout) do
-      PlanPrescriptions.workload(workout, plan_sets,
+      PlanPrescriptions.workload(workout, Map.get(plan_sets, execution.id, []),
         section_scores: execution.section_scores,
-        section_elapsed_ms: Map.get(execution, :section_elapsed_ms)
+        section_elapsed_ms: Map.get(execution, :section_elapsed_ms),
+        one_rep_max: one_rep_max
       )
     end
   end

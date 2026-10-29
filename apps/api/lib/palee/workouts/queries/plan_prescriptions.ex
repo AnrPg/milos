@@ -12,12 +12,26 @@ defmodule Palee.Workouts.Queries.PlanPrescriptions do
     done in, as prescribed.
   """
 
-  alias Palee.Workouts.Domain.{PlanWorkload, StructuredPlan, StructuredPlanWorkout}
+  alias Palee.Workouts.Domain.{
+    PlanAuthoringGuard,
+    PlanWorkload,
+    StructuredPlan,
+    StructuredPlanWorkout
+  }
 
   @doc "Whether a workout (read model or params) is written in the structured WOD editor."
   @spec plan_workout?(term()) :: boolean()
   def plan_workout?(%{} = workout), do: StructuredPlanWorkout.plan?(workout)
   def plan_workout?(_workout), do: false
+
+  @doc """
+  `:ok`, or `{:error, :structured_plan_mode_change}` when saving `params`
+  over the stored workout `current` would drop its plan (`PlanAuthoringGuard`).
+  """
+  defdelegate check_save(current, params), to: PlanAuthoringGuard
+
+  @doc "`:ok`, or the error when a Quick Text publish would replace a plan workout."
+  defdelegate check_quick_text(current), to: PlanAuthoringGuard
 
   @doc "Whether a section carries a plan."
   @spec plan_section?(term()) :: boolean()
@@ -60,6 +74,7 @@ defmodule Palee.Workouts.Queries.PlanPrescriptions do
             section_opts = [
               one_rep_max: Keyword.get(opts, :one_rep_max),
               rounds_done: rounds_done(section, Map.get(scores, id)),
+              partial_reps: partial_reps(section, Map.get(scores, id)),
               elapsed_secs: elapsed_secs(elapsed, id)
             ]
 
@@ -112,6 +127,21 @@ defmodule Palee.Workouts.Queries.PlanPrescriptions do
   end
 
   defp rounds_done(_section, _score), do: nil
+
+  defp partial_reps(section, %{} = score) do
+    if (score_config(section) || %{})["type"] == "rounds_reps",
+      do: PlanWorkload.partial_reps_from_score(field(score, :value)),
+      else: 0
+  end
+
+  defp partial_reps(_section, _score), do: 0
+
+  @doc """
+  The athlete's 1RM lookup from their PRs (`Pantheon` records), for
+  `workload/3`'s `:one_rep_max`: kg one-rep-max PRs matched by name like the
+  web runner does (`PlanWorkload.one_rep_max_lookup/1`).
+  """
+  defdelegate one_rep_max_lookup(prs), to: PlanWorkload
 
   defp elapsed_secs(elapsed, id) when is_map(elapsed) do
     case Map.get(elapsed, id) do

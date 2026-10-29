@@ -87,8 +87,17 @@ defmodule Palee.Workouts.Domain.PlanWorkload do
 
     {source, workloads} =
       case actuals do
-        [] -> {"prescription", Enum.map(exercise_rows, &prescribed_row(&1, clock, opts))}
-        records -> {"actuals", actual_rows(exercise_rows, clock, records, opts)}
+        [] ->
+          partial = partial_occurrences(exercise_rows, clock, opts)
+
+          {"prescription",
+           Enum.map(
+             exercise_rows,
+             &prescribed_row(&1, clock, opts, Map.get(partial, &1.row_id, []))
+           )}
+
+        records ->
+          {"actuals", actual_rows(exercise_rows, clock, records, opts)}
       end
 
     workloads = Enum.reject(workloads, &Decimal.equal?(&1.sets, 0))
@@ -190,6 +199,68 @@ defmodule Palee.Workouts.Domain.PlanWorkload do
 
   def rounds_from_score(_value), do: nil
 
+  @doc "Reps past the full rounds of a rounds + reps score (\"5+3\" gives 3), else 0."
+  @spec partial_reps_from_score(term()) :: non_neg_integer()
+  def partial_reps_from_score(value) when is_binary(value) do
+    case Regex.run(~r/^\s*\d+\s*\+\s*(\d+)\s*$/, value) do
+      [_all, reps] -> String.to_integer(reps)
+      nil -> 0
+    end
+  end
+
+  def partial_reps_from_score(_value), do: 0
+
+  @doc """
+  The athlete's 1RM per exercise from their PRs, as `one_rep_max` takes it
+  (`fn name, exercise_ref -> kg | nil end`), with the web runner's rules
+  (`one-rep-max.ts`): a PR counts when it is in kg and a one-rep max (one
+  rep in its metrics, or "1RM" in its name); names match loosely (case,
+  accents and "1RM" ignored); the best one wins.
+  """
+  @spec one_rep_max_lookup([map()]) :: one_rep_max()
+  def one_rep_max_lookup(prs) do
+    best =
+      prs
+      |> List.wrap()
+      |> Enum.filter(&one_rep_max_pr?/1)
+      |> Enum.reduce(%{}, fn pr, acc ->
+        key = normalize_exercise_name(field(pr, :name))
+        score = to_decimal(field(pr, :current_score))
+
+        if key != "" and score != nil and Decimal.gt?(score, 0),
+          do: Map.update(acc, key, score, &Decimal.max(&1, score)),
+          else: acc
+      end)
+
+    fn name, _exercise_ref ->
+      if is_binary(name), do: Map.get(best, normalize_exercise_name(name))
+    end
+  end
+
+  defp one_rep_max_pr?(pr) when is_map(pr) do
+    metrics = field(pr, :supporting_metrics) || %{}
+    name = field(pr, :name)
+
+    field(pr, :unit) == "kg" and
+      (field(metrics, :reps) == 1 or (is_binary(name) and Regex.match?(~r/\b1\s*rm\b/iu, name)))
+  end
+
+  defp one_rep_max_pr?(_pr), do: false
+
+  @doc "An exercise name as 1RM lookups compare it: no case, accents, \"1RM\" or punctuation."
+  @spec normalize_exercise_name(term()) :: String.t()
+  def normalize_exercise_name(name) when is_binary(name) do
+    name
+    |> :unicode.characters_to_nfd_binary()
+    |> String.replace(~r/\p{M}/u, "")
+    |> String.downcase()
+    |> String.replace(~r/\b1\s*rm\b/u, " ")
+    |> String.replace(~r/[^\p{L}\p{N}]+/u, " ")
+    |> String.trim()
+  end
+
+  def normalize_exercise_name(_name), do: ""
+
   @doc """
   Sums section workloads (as `section/3` returns them) into one total and
   one entry per exercise (same catalog ref, else same name).
@@ -251,11 +322,12 @@ defmodule Palee.Workouts.Domain.PlanWorkload do
 
   # ── prescription ─────────────────────────────────────
 
-  defp prescribed_row(row, clock, opts) do
+  defp prescribed_row(row, clock, opts, extra \\ []) do
     one_rep_max = one_rep_max(row, opts)
 
     row
     |> occurrences(clock, opts)
+    |> Kernel.++(extra)
     |> Enum.reduce(empty(row), fn {set, weight, estimated?}, acc ->
       acc
       |> add_sets(Decimal.mult(weight, dose_sets(set, clock)))
@@ -300,6 +372,58 @@ defmodule Palee.Workouts.Domain.PlanWorkload do
     Enum.flat_map(row.sets, fn set ->
       Enum.map(set.rounds, &{set, round_weight(clock, &1), optional_round?(clock, &1)})
     end)
+  end
+
+  # The reps of an AMRAP score past its full rounds ("5+3": 3 reps) go
+  # through the next round's rows in order, each up to all of its reps.
+  defp partial_occurrences(rows, %{open_ended: true} = clock, opts) do
+    with rounds when is_integer(rounds) and rounds < @max_rounds <-
+           Keyword.get(opts, :rounds_done),
+         reps when is_integer(reps) and reps > 0 <- Keyword.get(opts, :partial_reps) do
+      k = max(clock.blocks, 1)
+      block = rem(rounds, k)
+
+      rows
+      |> Enum.filter(&(&1.block_index == block and not &1.interrupt))
+      |> Enum.reduce_while({reps, %{}}, fn row, {left, acc} ->
+        set = open_set(row, div(rounds, k))
+
+        case set && occurrence_reps(row, set, clock) do
+          %Decimal{} = total ->
+            if Decimal.gt?(total, 0) do
+              take = Decimal.min(Decimal.new(left), total)
+              acc = Map.put(acc, row.row_id, [{set, Decimal.div(take, total), false}])
+              left = left - Decimal.to_integer(Decimal.round(take, 0, :down))
+              if left > 0, do: {:cont, {left, acc}}, else: {:halt, {0, acc}}
+            else
+              {:cont, {left, acc}}
+            end
+
+          _unknown ->
+            {:cont, {left, acc}}
+        end
+      end)
+      |> elem(1)
+    else
+      _none -> %{}
+    end
+  end
+
+  defp partial_occurrences(_rows, _clock, _opts), do: %{}
+
+  # Every rep of one occurrence of a row: its reps, in every part, set and side.
+  defp occurrence_reps(row, set, clock) do
+    case reps_value(set.reps) do
+      {%Decimal{} = reps, _estimated?} ->
+        side = if row.per_side, do: 2, else: 1
+
+        reps
+        |> Decimal.mult(dose_sets(set, clock))
+        |> Decimal.mult(length(parts(row, nil)) * side)
+
+      _unknown ->
+        nil
+    end
   end
 
   # A `sets` flow of "3-4": the 4th set is optional, half a set at the midpoint.

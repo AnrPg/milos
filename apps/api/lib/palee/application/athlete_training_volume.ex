@@ -34,6 +34,7 @@ defmodule Palee.Application.AthleteTrainingVolume do
   """
 
   alias Palee.{Execution, Journal, Organizations, Workouts}
+  alias Palee.Application.AthleteOneRepMax
   alias Palee.Workouts.Queries.PlanPrescriptions
 
   @log_limit 2_000
@@ -99,10 +100,11 @@ defmodule Palee.Application.AthleteTrainingVolume do
       end)
 
     workouts = workouts(executions ++ Enum.filter(logs, &needs_workout?/1))
+    one_rep_max = AthleteOneRepMax.lookup(context, user_id)
 
     %{
       performances:
-        Enum.map(executions, &execution(&1, workouts, Map.get(plan_sets, &1.id, []))) ++
+        Enum.map(executions, &execution(&1, workouts, Map.get(plan_sets, &1.id, []), one_rep_max)) ++
           Enum.map(logs, &log(&1, workouts)),
       felt: felt
     }
@@ -142,8 +144,8 @@ defmodule Palee.Application.AthleteTrainingVolume do
     )
   end
 
-  defp execution(execution, workouts, plan_sets) do
-    workload = plan_workload(execution, workouts, plan_sets)
+  defp execution(execution, workouts, plan_sets, one_rep_max) do
+    workload = plan_workload(execution, workouts, plan_sets, one_rep_max)
 
     %{
       kind: "execution",
@@ -166,21 +168,23 @@ defmodule Palee.Application.AthleteTrainingVolume do
   defp plan_workload(
          %{organization_id: org_id, master_workout_id: workout_id} = execution,
          workouts,
-         plan_sets
+         plan_sets,
+         one_rep_max
        )
        when is_binary(org_id) and is_binary(workout_id) do
     with %{} = workout <- Map.get(workouts, {org_id, workout_id}),
          true <- PlanPrescriptions.plan_workout?(workout) do
       PlanPrescriptions.workload(workout, plan_sets,
         section_scores: Map.get(execution, :section_scores),
-        section_elapsed_ms: Map.get(execution, :section_elapsed_ms)
+        section_elapsed_ms: Map.get(execution, :section_elapsed_ms),
+        one_rep_max: one_rep_max
       )
     else
       _other -> nil
     end
   end
 
-  defp plan_workload(_execution, _workouts, _plan_sets), do: nil
+  defp plan_workload(_execution, _workouts, _plan_sets, _one_rep_max), do: nil
 
   defp plan_exercises(workload) do
     for exercise <- workload.exercises, exercise.sets > 0, is_binary(exercise.name) do

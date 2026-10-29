@@ -2111,6 +2111,18 @@ defmodule PaleeWeb.FallbackController do
     })
   end
 
+  # ADR-270: a legacy editor (Quick Text, the old structured editor) would
+  # replace a structured plan with its materialised rows.
+  def call(conn, {:error, :structured_plan_mode_change}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "structured_plan_mode_change",
+      error:
+        "This workout is written as a structured plan; edit it in the structured editor or switch it to free text there."
+    })
+  end
+
   def call(conn, {:error, :no_sections}) do
     conn
     |> put_status(:unprocessable_entity)
