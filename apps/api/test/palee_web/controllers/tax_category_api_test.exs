@@ -110,7 +110,7 @@ defmodule PaleeWeb.TaxCategoryApiTest do
     assert %{"variant" => %{"tax_category" => "standard", "tax_class" => "standard"}} =
              ctx.owner |> send_json(:patch, variant_path, %{tax_class: "standard"}) |> json_response(200)
 
-    assert %{"variant" => %{"tax_category" => "zero", "tax_class" => nil}} =
+    assert %{"variant" => %{"tax_category" => "zero", "tax_class" => "zero"}} =
              ctx.owner |> send_json(:patch, variant_path, %{tax_category: "zero"}) |> json_response(200)
 
     assert %{"errors" => %{"tax_category" => ["not_available_in_country"]}} =
