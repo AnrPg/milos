@@ -40,11 +40,14 @@ export function useGrid(): GridContextValue {
   return value;
 }
 
-/** `PlanGrid` translations, plus a helper for model messages. */
+const CORE_UNITS = new Set(["per500m", "outOf10", "repsLeft", "zone", "cm", "m", "sec"]);
+
+/** `PlanGrid` and `PlanCore` translations, plus helpers for model messages and unit codes. */
 export function useGridT() {
   const t = useTranslations("PlanGrid");
+  const core = useTranslations("PlanCore");
   const msg = (m: Msg | null | undefined) => (m ? t(m.key, m.values) : "");
-  /** "sec" / "min" unit tokens are words; others ("/10", "cm") are symbols. */
-  const unit = (token: string) => (token === "sec" ? t("unit.sec") : token === "min" ? t("unit.min") : token);
-  return { t, msg, unit };
+  /** Unit codes: the library's (`PlanCore.unit.*`), "min", or a literal ("cal"). */
+  const unit = (token: string) => (CORE_UNITS.has(token) ? core(`unit.${token}`) : token === "min" ? t("unit.min") : token);
+  return { t, core, msg, unit };
 }

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { PlanRow } from "@/lib/structured-plan/types";
 
 import { SAMPLE } from "./fixtures";
-import { occurrences } from "./lib-shim";
+import { occurrences } from "./lib";
 import { blockTitle, cellTestId, compactField, hintFor, parseFieldKey, perSummary, rowCells, tableColumns } from "./model";
 import { addRound, deleteRow, dropMeasure, setStruct, toggleSuperset, togglePerRound } from "./mutations";
 

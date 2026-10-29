@@ -3,7 +3,7 @@
 import type { PlanMeasure, PlanRow, PlanStructureKind } from "@/lib/structured-plan/types";
 
 import { useGrid, type PickerState } from "./context";
-import { MEASURES } from "./lib-shim";
+import { MEASURES } from "./lib";
 import { attr, fieldKey, type MeasureKey } from "./model";
 import * as M from "./mutations";
 

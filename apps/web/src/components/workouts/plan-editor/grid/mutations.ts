@@ -5,7 +5,7 @@
  */
 import type { PlanCell, PlanMeasure, PlanRow, PlanSection, PlanStructureKind } from "@/lib/structured-plan/types";
 
-import { isGroupStructure, occurrences, structOf, structureDefaults, totalRounds, unitKey, unitsOf } from "./lib-shim";
+import { isGroupStructure, occurrences, structOf, structureDefaults, totalRounds, unitKey, unitsOf } from "./lib";
 
 export type ValueKey = keyof PlanCell;
 

@@ -4,7 +4,7 @@ import type { PlanRow, PlanStructure, PlanUnit } from "@/lib/structured-plan/typ
 
 import { useGridActions } from "./actions";
 import { useGrid, useGridT } from "./context";
-import { structOf, unitKey } from "./lib-shim";
+import { structOf, unitKey } from "./lib";
 import { fieldKey, restSuffix } from "./model";
 import { setRowFields, setStructField } from "./mutations";
 import { ValueField } from "./ValueField";
@@ -73,7 +73,7 @@ const STRUCT_FIELDS: Partial<Record<PlanStructure["kind"], FieldDef[]>> = {
 /** The group / structure header: shown only when a unit is more than one plain exercise. */
 export function StructHead({ unit }: { unit: PlanUnit }) {
   const { plan, write } = useGrid();
-  const { t, unit: unitWord } = useGridT();
+  const { t, core, unit: unitWord } = useGridT();
   const act = useGridActions();
   const st = structOf(plan, unit);
   if (unit.rows.length === 1 && st.kind === "single") return null;
@@ -89,12 +89,12 @@ export function StructHead({ unit }: { unit: PlanUnit }) {
         data-key={`st:${key}`}
         onClick={(event) => act.open(first.id, "struct", event.currentTarget, fieldKey.name(first.id))}
       >
-        {t(`struct.${st.kind}`)}
+        {core(`struct.${st.kind}`)}
         <span aria-hidden="true"> ▾</span>
       </button>
       {(STRUCT_FIELDS[st.kind] ?? []).map((f) => {
         const value = values[f.key] ?? "";
-        const label = t(`structField.${f.key}`);
+        const label = core(`structParam.${f.key}`);
         const suffix = f.time ? unitWord(restSuffix(value)) : "";
         return (
           <span key={f.key} className={s.sf}>
@@ -111,7 +111,7 @@ export function StructHead({ unit }: { unit: PlanUnit }) {
           </span>
         );
       })}
-      <span className={s.uhint}>{t(`structHint.${st.kind}`)}</span>
+      <span className={s.uhint}>{core(`structHint.${st.kind}`)}</span>
     </div>
   );
 }

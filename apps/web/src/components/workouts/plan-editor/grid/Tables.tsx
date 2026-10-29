@@ -5,7 +5,7 @@ import type { CSSProperties } from "react";
 import type { PlanRow, PlanSection, PlanUnit } from "@/lib/structured-plan/types";
 
 import { useGrid, useGridT } from "./context";
-import { setsRange, structOf, unitsOf } from "./lib-shim";
+import { setsRange, structOf, unitsOf } from "./lib";
 import {
   attr,
   cellTestId,
@@ -28,10 +28,10 @@ import s from "./grid.module.css";
 
 /** Column / line labels with their unit: "Επαν.", "Φορτίο kg", "RPE /10", "Κράτημα (δευτ.)". */
 export function useLabels() {
-  const { t, unit } = useGridT();
+  const { t, core, unit } = useGridT();
   const measureHead = (k: MeasureKey) => {
     const u = unit(measureUnit(k));
-    const label = t(`measure.${k}`);
+    const label = core(`measure.${k}`);
     return !u ? label : /^\p{L}/u.test(u) ? `${label} (${u})` : `${label} ${u}`;
   };
   const line = (row: PlanRow, k: ColKey, loadUnit: string | null) =>

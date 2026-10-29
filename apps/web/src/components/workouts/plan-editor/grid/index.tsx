@@ -7,7 +7,7 @@ import type { PlanSection } from "@/lib/structured-plan/types";
 import { useGridActions } from "./actions";
 import { GridContext, useGrid, useGridT, type GridContextValue, type PickerState } from "./context";
 import { HintLine } from "./HintLine";
-import { occurrences, setsRange, totalRounds } from "./lib-shim";
+import { occurrences, setsRange, totalRounds } from "./lib";
 import { attr, blockTitle, parseFieldKey, roundWordKey } from "./model";
 import { findRow } from "./mutations";
 import { RowMenu } from "./RowMenu";

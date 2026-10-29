@@ -7,7 +7,7 @@ import type { PlanMeasure, PlanStructureKind } from "@/lib/structured-plan/types
 
 import { useGridActions } from "./actions";
 import { useGrid, useGridT, type PickerState } from "./context";
-import { FLOW_STRUCTS, MEASURE_KEYS, MEASURES, fuzzy, type FuzzyMatch } from "./lib-shim";
+import { MEASURE_KEYS, flowStructs, fuzzy, measureAliases, type FuzzyMatch } from "./lib";
 import { canPerRound, findRow, structureOfRow } from "./mutations";
 import { Highlight } from "./NameCell";
 import s from "./grid.module.css";
@@ -22,7 +22,7 @@ type Item = { id: string; label: string; hint: string; alias?: string; run: () =
  */
 export function RowMenu({ picker, onClose }: { picker: PickerState; onClose: (refocus: boolean) => void }) {
   const { plan } = useGrid();
-  const { t } = useGridT();
+  const { t, core } = useGridT();
   const act = useGridActions();
   const [mode, setMode] = useState(picker.mode);
   const [query, setQuery] = useState("");
@@ -40,10 +40,10 @@ export function RowMenu({ picker, onClose }: { picker: PickerState; onClose: (re
     };
     if (mode === "struct") {
       const current = structureOfRow(plan, row.id)?.kind;
-      return FLOW_STRUCTS[plan.flow].map((k: PlanStructureKind) => ({
+      return flowStructs(plan.flow).map((k: PlanStructureKind) => ({
         id: k,
-        label: t(`struct.${k}`),
-        hint: k === current ? `✓ ${t(`structHint.${k}`)}` : t(`structHint.${k}`),
+        label: core(`struct.${k}`),
+        hint: k === current ? `✓ ${core(`structHint.${k}`)}` : core(`structHint.${k}`),
         run: done(() => act.setStruct(row.id, k)),
       }));
     }
@@ -51,15 +51,15 @@ export function RowMenu({ picker, onClose }: { picker: PickerState; onClose: (re
       const have = new Set(row.extra ?? []);
       return MEASURE_KEYS.filter((k) => !have.has(k)).map((k: PlanMeasure) => ({
         id: k,
-        label: t(`measure.${k}`),
+        label: core(`measure.${k}`),
         hint: t(`measureHint.${k}`),
-        alias: MEASURES[k].aliases,
+        alias: measureAliases(k),
         run: done(() => act.addMeasure(row.id, k)),
       }));
     }
     const ex = row.kind === "ex";
     const list: (Item | null)[] = [
-      ex && FLOW_STRUCTS[plan.flow].length ? { id: "struct", label: t("menu.struct"), hint: `Alt+T · ${t("menu.structHint")}`, run: () => switchTo("struct") } : null,
+      ex && flowStructs(plan.flow).length ? { id: "struct", label: t("menu.struct"), hint: `Alt+T · ${t("menu.structHint")}`, run: () => switchTo("struct") } : null,
       ex ? { id: "measure", label: t("menu.measure"), hint: `Alt+P · ${t("menu.measureHint")}`, run: () => switchTo("measure") } : null,
       ex && canPerRound(plan, at.b)
         ? { id: "perRound", label: row.perRound ? t("menu.sameEachRound") : t("menu.perRound"), hint: "Alt+V", run: done(() => act.togglePerRound(row.id)) }
@@ -71,7 +71,7 @@ export function RowMenu({ picker, onClose }: { picker: PickerState; onClose: (re
       { id: "rest", label: t("menu.restAfter"), hint: "Alt+R", run: done(() => act.addRow({ afterId: row.id }, "rest")) },
       ...(row.extra ?? []).map((k) => ({
         id: `drop-${k}`,
-        label: t("menu.remove", { measure: t(`measure.${k}`) }),
+        label: t("menu.remove", { measure: core(`measure.${k}`) }),
         hint: "",
         run: done(() => act.dropMeasure(row.id, k)),
       })),
