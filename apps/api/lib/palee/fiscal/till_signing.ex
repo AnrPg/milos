@@ -5,8 +5,11 @@ defmodule Palee.Fiscal.TillSigning do
   creation unit in Austria, through the `Fiscal.Ports.CashRegisterSecurity`
   adapter of the organization's connection.
 
-  Issuing a receipt (or a credit note correcting one) in such a country
-  adds a `pending` signature in the same transaction (`enqueue/3`).
+  Issuing a till transaction in such a country (a receipt, an invoice
+  paid at the till in cash or by card, or a credit note correcting one of
+  them; `TillSigningPolicy.required?/3`) adds a `pending` signature in the
+  same transaction (`enqueue/3`). The signature row's kind is `receipt`
+  for all of them: DSFinV-K's process type `Beleg` (`Kassenbeleg-V1`).
   Workers then claim due rows, call the device outside any transaction
   (an uncertain row is only read back), and record the attempt and the
   signature data. The document never changes: its signature lives on the
@@ -46,7 +49,7 @@ defmodule Palee.Fiscal.TillSigning do
   def enqueue(context, document, %DateTime{} = now) do
     with {:ok, profile} <- CountryProfile.fetch(document.country_code),
          device when is_binary(device) <- TillSigningPolicy.device(profile),
-         true <- TillSigningPolicy.required?(profile, document, original_kind(context, document)) do
+         true <- TillSigningPolicy.required?(profile, document, original(context, document)) do
       context
       |> TillSignatureStore.insert_signature(%{
         document_id: document.id,
@@ -65,14 +68,10 @@ defmodule Palee.Fiscal.TillSigning do
     end
   end
 
-  defp original_kind(_context, %{corrects_document_id: nil}), do: nil
+  defp original(_context, %{corrects_document_id: nil}), do: nil
 
-  defp original_kind(context, %{corrects_document_id: id}) do
-    case FiscalStore.get_document(context, id, []) do
-      %{kind: kind} -> kind
-      nil -> nil
-    end
-  end
+  defp original(context, %{corrects_document_id: id}),
+    do: FiscalStore.get_document(context, id, [])
 
   @doc "The signature of each document id that has one."
   def signatures_for(context, document_ids),
