@@ -141,6 +141,30 @@ defmodule Palee.Fiscal.Domain.TillSigningDomainTest do
       refute TillSigningPolicy.required?(%{}, %{kind: "receipt"})
     end
 
+    test "invoices paid at the till and their credit notes are signed, in DE and AT" do
+      for profile <- [%{till_device: :tse}, %{till_device: :rksv}] do
+        for method <- ["cash", "card"] do
+          invoice = %{kind: "invoice", payment_method: method}
+          assert TillSigningPolicy.required?(profile, invoice)
+          assert TillSigningPolicy.required?(profile, %{invoice | kind: "credit_note"}, invoice)
+        end
+
+        for method <- ["bank_transfer", "online", "other", nil] do
+          invoice = %{kind: "invoice", payment_method: method}
+          refute TillSigningPolicy.required?(profile, invoice)
+          refute TillSigningPolicy.required?(profile, %{invoice | kind: "credit_note"}, invoice)
+        end
+
+        receipt = %{kind: "receipt", payment_method: "online"}
+        assert TillSigningPolicy.required?(profile, %{kind: "credit_note"}, receipt)
+      end
+
+      refute TillSigningPolicy.required?(%{till_device: :none}, %{
+               kind: "invoice",
+               payment_method: "cash"
+             })
+    end
+
     test "uncertain is read back, late German receipts fail, the rest is signed" do
       assert TillSigningPolicy.operation(%{@row | status: "uncertain"}, @now, nil) == :lookup
       assert TillSigningPolicy.operation(@row, @now, DateTime.add(@now, -299)) == :sign
