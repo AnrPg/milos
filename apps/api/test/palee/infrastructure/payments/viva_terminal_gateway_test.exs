@@ -71,7 +71,42 @@ defmodule Palee.Infrastructure.Payments.VivaTerminalGatewayTest do
     assert transaction.reference == "pt1.abc.sig"
     assert transaction.created_at == ~U[2027-02-06 10:00:00.12Z]
     assert transaction.card.last4 == "4490"
+    assert transaction.tip_cents == 0
+    assert transaction.surcharge_cents == 0
     refute Map.has_key?(transaction, :method_token)
+  end
+
+  test "ADR-264: the tip and surcharge Viva names are read in cents" do
+    Req.Test.stub(Palee.PaymentsHttp, fn
+      %{host: "demo-accounts.vivapayments.com"} = conn ->
+        token(conn)
+
+      %{request_path: "/checkout/v2/transactions/tx-extras"} = conn ->
+        # Retrieve Transaction: `amount` is everything the card paid.
+        Req.Test.json(conn, %{
+          "statusId" => "F",
+          "amount" => 14.36,
+          "tipAmount" => 2.0,
+          "surchargeAmount" => 0.36,
+          "currencyCode" => "978",
+          "merchantTrns" => "pt1.abc.sig"
+        })
+
+      %{request_path: "/checkout/v2/transactions/tx-null"} = conn ->
+        Req.Test.json(conn, %{
+          "statusId" => "F",
+          "amount" => 12.0,
+          "tipAmount" => nil,
+          "surchargeAmount" => nil,
+          "currencyCode" => "978"
+        })
+    end)
+
+    assert {:ok, %{amount_cents: 1_436, tip_cents: 200, surcharge_cents: 36}} =
+             VivaTerminalGateway.confirm(@account, "tx-extras")
+
+    assert {:ok, %{amount_cents: 1_200, tip_cents: 0, surcharge_cents: 0}} =
+             VivaTerminalGateway.confirm(@account, "tx-null")
   end
 
   test "an unknown transaction and an outage are errors, never a payment" do
