@@ -257,7 +257,9 @@ defmodule PaleeWeb.FallbackController do
       {:unprocessable_entity, "Ask for the package to start now to buy it online"},
     withdrawal_period_over: {:conflict, "The 14 days to withdraw have passed"},
     withdrawal_not_available: {:conflict, "This payment cannot be withdrawn from"},
-    already_withdrawn: {:conflict, "You have already withdrawn from this package"}
+    already_withdrawn: {:conflict, "You have already withdrawn from this package"},
+    # ADR-260: failed charges in the queue.
+    payment_not_retryable: {:conflict, "This charge can no longer be tried again"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@payment_errors, reason) do

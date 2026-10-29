@@ -41,6 +41,8 @@ defmodule Palee.Notifications.Notification do
     :inventory_digest,
     :shop_stock_low,
     :shop_order_placed,
+    :payment_failed,
+    :payment_needs_attention,
     :shop_order_ready,
     :shop_order_reminder,
     :shop_order_cancelled,

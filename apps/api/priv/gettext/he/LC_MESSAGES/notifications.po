@@ -720,3 +720,18 @@ msgstr "חבר בבוקס עוזב"
 
 msgid "%{nickname} is leaving the box. Last day: %{date}."
 msgstr "%{nickname} עוזב/ת את הבוקס. יום אחרון: %{date}."
+
+msgid "Card payment failed"
+msgstr "התשלום בכרטיס נכשל"
+
+msgid "%{amount} for %{what} was declined. We will try again automatically, or you can pay now with another card."
+msgstr "החיוב של %{amount} עבור %{what} נדחה. ננסה שוב באופן אוטומטי, או שאפשר לשלם עכשיו בכרטיס אחר."
+
+msgid "%{amount} for %{what} was declined and will not be tried again. Pay with another card to keep it."
+msgstr "החיוב של %{amount} עבור %{what} נדחה ולא ינוסה שוב. יש לשלם בכרטיס אחר כדי לשמור עליו."
+
+msgid "A card payment needs attention"
+msgstr "תשלום בכרטיס דורש טיפול"
+
+msgid "%{amount} for %{what} failed after every retry."
+msgstr "החיוב של %{amount} עבור %{what} נכשל אחרי כל הניסיונות החוזרים."

@@ -55,6 +55,45 @@ defmodule Palee.Application.Payments.OnlinePayments do
 
   def retry(context, id), do: Payments.refresh(context, id, nil, now())
 
+  # ── Online payment settings and failed charges (ADR-260) ───────────────
+
+  def save_options(context, params) do
+    with {:ok, _account} <-
+           Payments.save_options(context, params, Map.get(context, :user_id), now()) do
+      {:ok, account(context)}
+    end
+  end
+
+  @doc """
+  Οικονομικά › Ουρές: saved-card charges that need a person. A charge for
+  an invoice that has since been paid any other way (desk, transfer) is
+  left out.
+  """
+  def attention(context) do
+    %{payments: payments} = Payments.attention(context, %{limit: 200})
+
+    invoice_ids =
+      for %{purpose_type: "finance_invoice", purpose_id: id} <- payments, uniq: true, do: id
+
+    balances =
+      if invoice_ids == [], do: %{}, else: Finance.invoice_balance_due_map(context, invoice_ids)
+
+    payments =
+      Enum.reject(payments, fn payment ->
+        payment.purpose_type == "finance_invoice" and
+          Map.get(balances, payment.purpose_id, 1) <= 0
+      end)
+
+    %{payments: payments, total: length(payments)}
+  end
+
+  def retry_charge(context, id), do: Payments.retry_charge(context, id, now())
+
+  def dismiss_charge(context, id),
+    do: Payments.dismiss_attention(context, id, Map.get(context, :user_id), now())
+
+  def send_card_link(context, id), do: Payments.send_card_link(context, id, now())
+
   # ── Member ──────────────────────────────────────────────────────────────
 
   @doc "What the member is about to pay and the text they agree to when saving the card."

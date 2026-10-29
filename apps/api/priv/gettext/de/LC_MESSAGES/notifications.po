@@ -720,3 +720,18 @@ msgstr "Ein Box-Mitglied verlässt die Box"
 
 msgid "%{nickname} is leaving the box. Last day: %{date}."
 msgstr "%{nickname} verlässt die Box. Letzter Tag: %{date}."
+
+msgid "Card payment failed"
+msgstr "Kartenzahlung fehlgeschlagen"
+
+msgid "%{amount} for %{what} was declined. We will try again automatically, or you can pay now with another card."
+msgstr "%{amount} für %{what} wurde abgelehnt. Wir versuchen es automatisch erneut, oder du zahlst jetzt mit einer anderen Karte."
+
+msgid "%{amount} for %{what} was declined and will not be tried again. Pay with another card to keep it."
+msgstr "%{amount} für %{what} wurde abgelehnt und wird nicht erneut versucht. Zahle mit einer anderen Karte, um es zu behalten."
+
+msgid "A card payment needs attention"
+msgstr "Eine Kartenzahlung braucht Aufmerksamkeit"
+
+msgid "%{amount} for %{what} failed after every retry."
+msgstr "%{amount} für %{what} ist nach allen Wiederholungen fehlgeschlagen."

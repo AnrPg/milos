@@ -720,3 +720,18 @@ msgstr "أحد أعضاء الصالة يغادر"
 
 msgid "%{nickname} is leaving the box. Last day: %{date}."
 msgstr "%{nickname} يغادر الصالة. آخر يوم: %{date}."
+
+msgid "Card payment failed"
+msgstr "فشل الدفع بالبطاقة"
+
+msgid "%{amount} for %{what} was declined. We will try again automatically, or you can pay now with another card."
+msgstr "تم رفض دفع %{amount} مقابل %{what}. سنعيد المحاولة تلقائيًا، أو يمكنك الدفع الآن ببطاقة أخرى."
+
+msgid "%{amount} for %{what} was declined and will not be tried again. Pay with another card to keep it."
+msgstr "تم رفض دفع %{amount} مقابل %{what} ولن تتم إعادة المحاولة. ادفع ببطاقة أخرى للاحتفاظ به."
+
+msgid "A card payment needs attention"
+msgstr "دفعة بالبطاقة تحتاج إلى متابعة"
+
+msgid "%{amount} for %{what} failed after every retry."
+msgstr "فشل دفع %{amount} مقابل %{what} بعد كل المحاولات."

@@ -39,7 +39,16 @@ defmodule Palee.Application.Payments.OnlineSales do
     context
     |> Finance.list_packages()
     |> Enum.filter(&(&1.active and &1[:sold_online] == true and &1.base_price_cents > 0))
-    |> Enum.filter(&Payments.available?(context, online_purpose(&1)))
+    |> reject_switched_off(context)
+  end
+
+  # ADR-260: a purpose the business switched off is not offered online.
+  # Without a connected provider the page still lists the packages, with
+  # `online_payments: false`.
+  defp reject_switched_off(packages, context) do
+    if Payments.available?(context),
+      do: Enum.filter(packages, &Payments.available?(context, online_purpose(&1))),
+      else: packages
   end
 
   # ADR-260: which «what is paid online» switch covers a package.

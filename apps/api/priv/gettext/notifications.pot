@@ -720,3 +720,18 @@ msgstr ""
 
 msgid "%{nickname} is leaving the box. Last day: %{date}."
 msgstr ""
+
+msgid "Card payment failed"
+msgstr ""
+
+msgid "%{amount} for %{what} was declined. We will try again automatically, or you can pay now with another card."
+msgstr ""
+
+msgid "%{amount} for %{what} was declined and will not be tried again. Pay with another card to keep it."
+msgstr ""
+
+msgid "A card payment needs attention"
+msgstr ""
+
+msgid "%{amount} for %{what} failed after every retry."
+msgstr ""

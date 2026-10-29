@@ -203,12 +203,13 @@ defmodule Palee.Infrastructure.Payments.EctoPaymentStore do
   @impl true
   def list_intents(%{organization_id: organization_id}, filters) do
     query =
-      Intent
+      from(i in Intent, as: :intent)
       |> where([i], i.organization_id == ^organization_id)
       |> filter(:status, filters[:status])
       |> filter(:user_id, filters[:user_id])
       |> filter(:purpose_type, filters[:purpose_type])
       |> filter(:purpose_id, filters[:purpose_id])
+      |> attention(filters[:attention])
 
     %{
       intents:
@@ -221,6 +222,35 @@ defmodule Palee.Infrastructure.Payments.EctoPaymentStore do
       total: Repo.aggregate(query, :count)
     }
   end
+
+  # ADR-260: saved-card charges a person may need to act on: declined and
+  # waiting for a retry, or failed for good, not closed by staff and not
+  # paid since by another online payment for the same purpose.
+  defp attention(query, true) do
+    query
+    |> where([i], i.initiation == "merchant" and is_nil(i.attention_resolved_at))
+    |> where(
+      [i],
+      i.status == "failed" or
+        (i.status == "scheduled" and
+           fragment("COALESCE((?->>'declines')::int, 0) > 0", i.consent))
+    )
+    |> where(
+      [i],
+      not exists(
+        from(paid in Intent,
+          where:
+            paid.organization_id == parent_as(:intent).organization_id and
+              paid.purpose_type == parent_as(:intent).purpose_type and
+              paid.purpose_id == parent_as(:intent).purpose_id and
+              paid.status == "succeeded" and
+              paid.inserted_at > parent_as(:intent).inserted_at
+        )
+      )
+    )
+  end
+
+  defp attention(query, _no), do: query
 
   defp filter(query, _field, nil), do: query
   defp filter(query, field, value), do: where(query, [i], field(i, ^field) == ^value)

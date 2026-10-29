@@ -720,3 +720,18 @@ msgstr "Член на залата напуска"
 
 msgid "%{nickname} is leaving the box. Last day: %{date}."
 msgstr "%{nickname} напуска залата. Последен ден: %{date}."
+
+msgid "Card payment failed"
+msgstr "Плащането с карта е неуспешно"
+
+msgid "%{amount} for %{what} was declined. We will try again automatically, or you can pay now with another card."
+msgstr "Плащането от %{amount} за %{what} беше отказано. Ще опитаме отново автоматично, или можеш да платиш сега с друга карта."
+
+msgid "%{amount} for %{what} was declined and will not be tried again. Pay with another card to keep it."
+msgstr "Плащането от %{amount} за %{what} беше отказано и няма да бъде опитано отново. Плати с друга карта, за да го запазиш."
+
+msgid "A card payment needs attention"
+msgstr "Плащане с карта изисква внимание"
+
+msgid "%{amount} for %{what} failed after every retry."
+msgstr "Плащането от %{amount} за %{what} е неуспешно след всички опити."

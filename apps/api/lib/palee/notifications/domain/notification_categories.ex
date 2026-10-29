@@ -98,7 +98,7 @@ defmodule Palee.Notifications.Domain.NotificationCategories do
         trial_requested trial_booked trial_cancelled season_requested class_workout_missing
         community_group_proposed community_report_created referral_review
         inventory_repair_needed inventory_stock_low inventory_digest
-        shop_stock_low shop_order_placed
+        shop_stock_low shop_order_placed payment_needs_attention
       )
     },
     %{
@@ -107,7 +107,7 @@ defmodule Palee.Notifications.Domain.NotificationCategories do
       locked: true,
       audience: "everyone",
       types: ~w(
-        invoice_issued payment_reminder package_expiring
+        invoice_issued payment_reminder payment_failed package_expiring
         subscription_expiring subscription_grace access_ended
         password_reset_requested password_reset_completed business_demo_idle
         email_key_expiring

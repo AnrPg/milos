@@ -113,4 +113,65 @@ defmodule PaleeWeb.AdminPaymentsController do
       json(conn, %{payment: payment})
     end
   end
+
+  operation(:save_options,
+    summary: "Choose what members pay online and who hears about failed charges",
+    description: "Keys left out keep their value. Every purpose is on by default.",
+    request_body: P.body(P.options_body()),
+    responses: [ok: {"Account", "application/json", P.account_status()}]
+  )
+
+  def save_options(conn, _params) do
+    with {:ok, status} <-
+           OnlinePayments.save_options(conn.assigns.tenant_context, conn.body_params) do
+      json(conn, status)
+    end
+  end
+
+  operation(:attention,
+    summary: "Saved-card charges that need a person (Ουρές)",
+    description:
+      "Declined and waiting for a retry, or failed for good, until staff close them or " <>
+        "the purpose is paid.",
+    responses: [ok: {"Payments", "application/json", P.intent_page()}]
+  )
+
+  def attention(conn, _params),
+    do: json(conn, OnlinePayments.attention(conn.assigns.tenant_context))
+
+  operation(:retry_charge,
+    summary: "Charge the saved card once more now",
+    parameters: [%Parameter{name: :id, in: :path, required: true, schema: P.uuid()}],
+    responses: [ok: {"Payment", "application/json", P.one(:payment, P.intent())}]
+  )
+
+  def retry_charge(conn, %{id: id}) do
+    with {:ok, payment} <- OnlinePayments.retry_charge(conn.assigns.tenant_context, id) do
+      json(conn, %{payment: payment})
+    end
+  end
+
+  operation(:dismiss_charge,
+    summary: "Close a failed charge (e.g. paid at the desk); stops its retries",
+    parameters: [%Parameter{name: :id, in: :path, required: true, schema: P.uuid()}],
+    responses: [ok: {"Payment", "application/json", P.one(:payment, P.intent())}]
+  )
+
+  def dismiss_charge(conn, %{id: id}) do
+    with {:ok, payment} <- OnlinePayments.dismiss_charge(conn.assigns.tenant_context, id) do
+      json(conn, %{payment: payment})
+    end
+  end
+
+  operation(:card_link,
+    summary: "Send the member the link to pay with another card again",
+    parameters: [%Parameter{name: :id, in: :path, required: true, schema: P.uuid()}],
+    responses: [ok: {"Payment", "application/json", P.one(:payment, P.intent())}]
+  )
+
+  def card_link(conn, %{id: id}) do
+    with {:ok, payment} <- OnlinePayments.send_card_link(conn.assigns.tenant_context, id) do
+      json(conn, %{payment: payment})
+    end
+  end
 end

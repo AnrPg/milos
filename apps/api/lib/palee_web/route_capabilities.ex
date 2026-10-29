@@ -244,6 +244,11 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminPaymentsController, :show} => [:view_finance_reports, :manage_billing],
     {W.AdminPaymentsController, :refund} => [:manage_billing],
     {W.AdminPaymentsController, :retry} => [:manage_billing],
+    {W.AdminPaymentsController, :save_options} => [:manage_billing],
+    {W.AdminPaymentsController, :attention} => [:manage_billing, :take_payments],
+    {W.AdminPaymentsController, :retry_charge} => [:manage_billing],
+    {W.AdminPaymentsController, :dismiss_charge} => [:manage_billing, :take_payments],
+    {W.AdminPaymentsController, :card_link} => [:manage_billing, :take_payments],
     # ADR-192: shop reports read like the business statistics; the
     # reconciliation is also a finance check; targets are a setting.
     {W.AdminShopReportController, :reconciliation} => [

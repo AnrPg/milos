@@ -173,6 +173,7 @@ config :palee, :fiscal_authority_gateways, %{
 # ADR-246/247: online payments through the business's own provider account.
 config :palee, :payment_store, Palee.Infrastructure.Payments.EctoPaymentStore
 config :palee, :payment_fulfilment, Palee.Application.Payments.FinanceFulfilment
+config :palee, :payment_notifier, Palee.Application.Payments.FailureNotices
 
 config :palee, :payment_gateways, %{
   "sandbox" => Palee.Infrastructure.Payments.SandboxGateway,

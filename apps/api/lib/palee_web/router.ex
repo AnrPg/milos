@@ -1240,10 +1240,15 @@ defmodule PaleeWeb.Router do
     # ADR-246/247: online payments through the business's provider account.
     get("/payments/account", AdminPaymentsController, :account)
     put("/payments/account", AdminPaymentsController, :save_account)
+    put("/payments/account/options", AdminPaymentsController, :save_options)
+    get("/payments/attention", AdminPaymentsController, :attention)
     get("/payments", AdminPaymentsController, :index)
     get("/payments/:id", AdminPaymentsController, :show)
     post("/payments/:id/refunds", AdminPaymentsController, :refund)
     post("/payments/:id/retry", AdminPaymentsController, :retry)
+    post("/payments/:id/retry-charge", AdminPaymentsController, :retry_charge)
+    post("/payments/:id/dismiss", AdminPaymentsController, :dismiss_charge)
+    post("/payments/:id/card-link", AdminPaymentsController, :card_link)
 
     # ADR-192: shop reports, pricing indicators and revenue reconciliation.
     get("/shop/reports/overview", AdminShopReportController, :overview)

@@ -859,6 +859,19 @@ defmodule Palee.Notifications do
         url: "/admin/shop?tab=orders"
       })
 
+  # ADR-260: a declined saved-card charge; deduplicated per charge attempt.
+  def process_event(type, payload) when type in ["payment_failed", "payment_needs_attention"],
+    do:
+      enqueue_simple(String.to_existing_atom(type), payload, %{
+        payment_id: field(payload, :payment_id),
+        amount_cents: field(payload, :amount_cents),
+        currency: field(payload, :currency),
+        description: field(payload, :description),
+        final: field(payload, :final),
+        dedupe_key: field(payload, :dedupe_key),
+        url: field(payload, :url)
+      })
+
   def process_event("shop_order_ready", payload),
     do:
       enqueue_simple(:shop_order_ready, payload, %{

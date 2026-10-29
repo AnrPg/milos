@@ -1211,6 +1211,38 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("payment_failed", payload, localize) do
+    bindings = payment_bindings(payload)
+
+    body =
+      if payload["final"] in [true, "true"],
+        do:
+          localize.(
+            "%{amount} for %{what} was declined and will not be tried again. Pay with another card to keep it.",
+            bindings
+          ),
+        else:
+          localize.(
+            "%{amount} for %{what} was declined. We will try again automatically, or you can pay now with another card.",
+            bindings
+          )
+
+    %{
+      title: localize.("Card payment failed", %{}),
+      body: body,
+      url: payload["url"] || "/me/payments"
+    }
+  end
+
+  def build("payment_needs_attention", payload, localize) do
+    %{
+      title: localize.("A card payment needs attention", %{}),
+      body:
+        localize.("%{amount} for %{what} failed after every retry.", payment_bindings(payload)),
+      url: payload["url"] || "/admin/finance"
+    }
+  end
+
   def build("shop_order_placed", payload, localize) do
     %{
       title: localize.("New shop order", %{}),
@@ -1369,6 +1401,29 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     do: "/workouts/#{execution_id}/execute"
 
   defp execution_url(_payload), do: "/"
+
+  @currency_symbols %{"EUR" => "€", "GBP" => "£", "USD" => "$", "CHF" => "CHF "}
+
+  defp payment_bindings(payload) do
+    cents =
+      case payload["amount_cents"] do
+        value when is_integer(value) ->
+          value
+
+        value when is_binary(value) ->
+          with({cents, ""} <- Integer.parse(value), do: cents, else: (_ -> 0))
+
+        _missing ->
+          0
+      end
+
+    symbol = Map.get(@currency_symbols, payload["currency"], (payload["currency"] || "") <> " ")
+
+    %{
+      amount: symbol <> :erlang.float_to_binary(cents / 100, decimals: 2),
+      what: payload["description"] || ""
+    }
+  end
 
   defp default_to("", fallback), do: fallback
   defp default_to(value, _fallback), do: value
