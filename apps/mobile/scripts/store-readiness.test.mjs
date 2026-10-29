@@ -105,3 +105,16 @@ test("Android declares the camera the web view uses, without requiring a camera"
   assert.match(manifest, /android\.hardware\.camera" android:required="false"/);
   assert.match(manifest, /android\.permission\.POST_NOTIFICATIONS/);
 });
+
+test("push messages use Palee's icon and a named channel in English and Greek", () => {
+  assert.match(manifest, /default_notification_icon"\s+android:resource="@drawable\/ic_stat_palee"/);
+  assert.match(manifest, /default_notification_channel_id"\s+android:value="@string\/palee_push_channel_id"/);
+  assert.match(read("android/app/src/main/res/values/palee_push.xml"), /palee_push_channel_name">Palee notifications</);
+  assert.match(read("android/app/src/main/res/values-el/palee_push.xml"), /palee_push_channel_name">Ειδοποιήσεις Palee</);
+  assert.match(read("android/app/src/main/java/app/palee/member/MainActivity.java"), /createNotificationChannel/);
+  assert.match(read("ios/App/App/App.entitlements"), /<key>aps-environment<\/key>/);
+});
+
+test("the app's data is not backed up to the cloud", () => {
+  assert.match(manifest, /android:allowBackup="false"/);
+});

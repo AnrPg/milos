@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ADR-256: the notification channel push messages arrive in (shown in Android's app settings). -->
+<resources>
+    <string name="palee_push_channel_id" translatable="false">palee_default</string>
+    <string name="palee_push_channel_name">Palee notifications</string>
+    <string name="palee_push_channel_description">Bookings, messages and news from your box. Choose which ones in Palee › Me › Settings.</string>
+</resources>
