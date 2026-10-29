@@ -2703,6 +2703,20 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: Atom.to_string(reason), error: message})
   end
 
+  # ADR-267: one "Download my data" a day; says when the next one may start.
+  def call(conn, {:error, {:export_rate_limited, %DateTime{} = retry_at}}) do
+    seconds = max(DateTime.diff(retry_at, DateTime.utc_now()), 1)
+
+    conn
+    |> put_resp_header("retry-after", Integer.to_string(seconds))
+    |> put_status(:too_many_requests)
+    |> json(%{
+      code: "export_rate_limited",
+      error: "You can ask for your data once a day",
+      retry_at: DateTime.to_iso8601(retry_at)
+    })
+  end
+
   def call(conn, {:error, :comment_conflict}) do
     conn
     |> put_status(:conflict)

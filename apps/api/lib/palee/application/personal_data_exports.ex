@@ -27,7 +27,7 @@ defmodule Palee.Application.PersonalDataExports do
   @content_type "application/zip"
 
   @doc "Asks for a new export of the signed-in profile's data."
-  def request(%{id: user_id}, now \\ DateTime.utc_now()) do
+  def request(%{user_id: user_id}, now \\ DateTime.utc_now()) do
     with :ok <- PersonalData.can_request?(PersonalData.list_exports(user_id), now),
          {:ok, export} <- insert(user_id, now) do
       :ok = enqueue(user_id, export.id)
@@ -36,7 +36,7 @@ defmodule Palee.Application.PersonalDataExports do
   end
 
   @doc "The profile's requests, newest first, with download links for live files."
-  def list(%{id: user_id}, now \\ DateTime.utc_now()) do
+  def list(%{user_id: user_id}, now \\ DateTime.utc_now()) do
     {:ok, user_id |> PersonalData.list_exports() |> Enum.map(&view(user_id, &1, now))}
   end
 
