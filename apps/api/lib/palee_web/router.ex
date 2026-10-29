@@ -201,6 +201,11 @@ defmodule PaleeWeb.Router do
     plug(PaleeWeb.Plugs.RateLimit, max: 600, interval: 60_000, bucket: "payment-webhook")
   end
 
+  # ADR-261: the payment provider sends the owner back after connecting.
+  pipeline :payment_connect_callback do
+    plug(PaleeWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "payment-connect")
+  end
+
   pipeline :email_unsubscribe do
     plug(PaleeWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "email-unsubscribe")
   end
@@ -374,6 +379,12 @@ defmodule PaleeWeb.Router do
 
     get("/:organization_id/:account_id", PaymentWebhookController, :show)
     post("/:organization_id/:account_id", PaymentWebhookController, :create)
+  end
+
+  scope "/api/payments/connect", PaleeWeb do
+    pipe_through([:payment_connect_callback])
+
+    get("/callback", PaymentConnectController, :callback)
   end
 
   scope "/api/email/unsubscribe", PaleeWeb do
@@ -1268,6 +1279,8 @@ defmodule PaleeWeb.Router do
     get("/payments/account", AdminPaymentsController, :account)
     put("/payments/account", AdminPaymentsController, :save_account)
     put("/payments/account/options", AdminPaymentsController, :save_options)
+    delete("/payments/account", AdminPaymentsController, :disconnect)
+    post("/payments/connect", AdminPaymentsController, :connect)
     get("/payments/attention", AdminPaymentsController, :attention)
     get("/payments", AdminPaymentsController, :index)
     get("/payments/:id", AdminPaymentsController, :show)

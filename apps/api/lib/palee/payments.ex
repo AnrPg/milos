@@ -107,6 +107,91 @@ defmodule Palee.Payments do
     end
   end
 
+  # ── One-button connection (ADR-261) ────────────────────────────────────
+
+  defp connector(provider),
+    do: :palee |> Application.get_env(:payment_connect, %{}) |> Map.get(provider)
+
+  @doc "Providers a business can connect with one button in `environment`."
+  def connect_providers(environment) do
+    Enum.filter(@providers, fn provider ->
+      case connector(provider) do
+        nil -> false
+        module -> module.available?(environment)
+      end
+    end)
+  end
+
+  @doc "The provider page where the owner allows Palee (see `Ports.Connect`)."
+  def connect_url(provider, environment, request) do
+    with :ok <- validate_choice(environment, @environments, :environment),
+         true <- provider in connect_providers(environment) || {:error, :connect_not_available} do
+      connector(provider).authorize_url(environment, request)
+    end
+  end
+
+  @doc """
+  Finishes a one-button connection: the provider's answer becomes the
+  business's account, checked with a harmless call like pasted keys.
+  """
+  def complete_connect(context, provider, environment, params, actor_id, %DateTime{} = now) do
+    with true <-
+           provider in connect_providers(environment) || {:error, :connect_not_available},
+         {:ok, %{connected_account: connected}} <-
+           connector(provider).complete(environment, params),
+         candidate = %{
+           provider: provider,
+           environment: environment,
+           credentials: %{"connected_account" => connected},
+           settings: %{"connection" => "platform"}
+         },
+         :ok <- check_with_provider(gateway(provider), candidate),
+         {:ok, saved} <-
+           PaymentStore.save_account(
+             context,
+             Map.merge(candidate, %{
+               status: "active",
+               last_error: nil,
+               checked_at: now,
+               updated_by_id: actor_id
+             })
+           ) do
+      {:ok, public_account(saved)}
+    end
+  end
+
+  @doc """
+  Stops online payments: the account is disabled (saved cards are no
+  longer charged) and, for a one-button connection, Palee's access at the
+  provider is removed. Reconnecting brings the same saved cards back.
+  """
+  def disconnect(context, actor_id, %DateTime{} = now) do
+    with %{} = account <-
+           PaymentStore.get_account(context) || {:error, :online_payments_unavailable} do
+      case {connector(account.provider), account.credentials} do
+        {module, %{"connected_account" => connected}} when not is_nil(module) ->
+          module.disconnect(account.environment, connected)
+
+        _keys ->
+          :ok
+      end
+      |> case do
+        :ok ->
+          {:ok, saved} =
+            PaymentStore.save_account(context, %{
+              status: "disabled",
+              checked_at: now,
+              updated_by_id: actor_id
+            })
+
+          {:ok, public_account(saved)}
+
+        {:error, _reason} ->
+          {:error, :payment_provider_unavailable}
+      end
+    end
+  end
+
   defp validate_choice(value, allowed, field) do
     if value in allowed, do: :ok, else: {:error, {:invalid_fields, %{field => "invalid"}}}
   end
@@ -201,7 +286,11 @@ defmodule Palee.Payments do
     ])
     |> Map.put(:credentials_set, (account.credentials || %{}) |> Map.keys() |> Enum.sort())
     |> Map.put(:options, AccountOptions.resolve(account[:options] || %{}))
+    |> Map.put(:connection, connection(account))
   end
+
+  defp connection(%{settings: %{"connection" => "platform"}}), do: "platform"
+  defp connection(_account), do: "keys"
 
   defp active_account(context) do
     case PaymentStore.get_account(context) do

@@ -29,9 +29,11 @@ defmodule PaleeWeb.Schemas.Payments do
         checked_at: @time,
         updated_at: @time,
         webhook_url: %Schema{type: :string},
-        options: options()
+        options: options(),
+        connection: %Schema{type: :string, enum: ["keys", "platform"]}
       },
       required: [
+        :connection,
         :credentials_set,
         :environment,
         :id,
@@ -67,6 +69,21 @@ defmodule PaleeWeb.Schemas.Payments do
     }
   end
 
+  def connect_body do
+    %Schema{
+      type: :object,
+      properties: %{
+        provider: %Schema{type: :string, enum: ["viva", "stripe"]},
+        environment: %Schema{type: :string, enum: ["test", "live"], default: "live"}
+      },
+      required: [:provider]
+    }
+  end
+
+  def connect_start do
+    %Schema{type: :object, properties: %{url: %Schema{type: :string}}, required: [:url]}
+  end
+
   def options_body do
     flag = %Schema{type: :boolean}
 
@@ -95,9 +112,14 @@ defmodule PaleeWeb.Schemas.Payments do
       properties: %{
         account: %{account() | nullable: true},
         providers: %Schema{type: :array, items: %Schema{type: :string}},
-        environments: %Schema{type: :array, items: %Schema{type: :string}}
+        environments: %Schema{type: :array, items: %Schema{type: :string}},
+        connect_providers: %Schema{
+          type: :object,
+          description: "Providers that connect with one button, per environment (ADR-261)",
+          additionalProperties: %Schema{type: :array, items: %Schema{type: :string}}
+        }
       },
-      required: [:account, :environments, :providers]
+      required: [:account, :connect_providers, :environments, :providers]
     }
   end
 

@@ -252,6 +252,8 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminPaymentsController, :refund} => [:manage_billing],
     {W.AdminPaymentsController, :retry} => [:manage_billing],
     {W.AdminPaymentsController, :save_options} => [:manage_billing],
+    {W.AdminPaymentsController, :connect} => [:manage_billing],
+    {W.AdminPaymentsController, :disconnect} => [:manage_billing],
     {W.AdminPaymentsController, :attention} => [:manage_billing, :take_payments],
     {W.AdminPaymentsController, :retry_charge} => [:manage_billing],
     {W.AdminPaymentsController, :dismiss_charge} => [:manage_billing, :take_payments],

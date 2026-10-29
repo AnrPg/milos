@@ -47,11 +47,12 @@ defmodule Palee.Infrastructure.Payments.EctoPaymentStore do
 
   @impl true
   def save_account(%{organization_id: organization_id}, attrs) do
+    # Only a given `credentials` is written: a status or options change keeps them.
     attrs =
-      Map.update(attrs, :credentials, nil, fn
-        nil -> nil
-        map when is_map(map) -> Jason.encode!(map)
-      end)
+      case attrs do
+        %{credentials: map} when is_map(map) -> %{attrs | credentials: Jason.encode!(map)}
+        _other -> attrs
+      end
 
     case Repo.one(from a in Account, where: a.organization_id == ^organization_id) do
       nil -> %Account{organization_id: organization_id}

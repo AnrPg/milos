@@ -186,11 +186,16 @@ config :palee, :payment_store, Palee.Infrastructure.Payments.EctoPaymentStore
 config :palee, :payment_fulfilment, Palee.Application.Payments.FinanceFulfilment
 config :palee, :payment_notifier, Palee.Application.Payments.FailureNotices
 
+# ADR-261: one-button connection; platform credentials come from runtime.exs.
+config :palee, :payment_connect, %{"stripe" => Palee.Infrastructure.Payments.StripeConnect}
+config :palee, :stripe_connect, %{}
+
 config :palee, :payment_gateways, %{
   "sandbox" => Palee.Infrastructure.Payments.SandboxGateway,
   "viva" => Palee.Infrastructure.Payments.VivaGateway,
   "stripe" => Palee.Infrastructure.Payments.StripeGateway
 }
+
 # ADR-252: documents and signatures. The evidence store is where an advanced
 # e-signature provider plugs in later.
 config :palee, :documents_store, Palee.Infrastructure.Documents.EctoDocumentStore
@@ -202,6 +207,7 @@ config :palee,
 config :palee,
        :documents_certificate_renderer,
        Palee.Infrastructure.Documents.PdfCertificateRenderer
+
 # ADR-254: CSV imports (upload, dry run, apply, undo).
 config :palee, :import_store, Palee.Infrastructure.Imports.EctoImportStore
 config :palee, :import_clock, Palee.Infrastructure.Imports.SystemClock

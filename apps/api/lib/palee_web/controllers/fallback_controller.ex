@@ -316,7 +316,12 @@ defmodule PaleeWeb.FallbackController do
     withdrawal_not_available: {:conflict, "This payment cannot be withdrawn from"},
     already_withdrawn: {:conflict, "You have already withdrawn from this package"},
     # ADR-260: failed charges in the queue.
-    payment_not_retryable: {:conflict, "This charge can no longer be tried again"}
+    payment_not_retryable: {:conflict, "This charge can no longer be tried again"},
+    # ADR-261: one-button connection.
+    connect_not_available:
+      {:conflict, "This provider cannot be connected with one button yet; use its API keys"},
+    connect_not_configured:
+      {:conflict, "This provider cannot be connected with one button yet; use its API keys"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@payment_errors, reason) do
