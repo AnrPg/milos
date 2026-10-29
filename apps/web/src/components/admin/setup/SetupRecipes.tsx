@@ -15,6 +15,7 @@ import {
 } from "@/api/setup";
 import { LineIcon } from "@/components/admin/imports/ImportIcons";
 import { useSession } from "@/components/session-provider";
+import { BackButton } from "@/components/ui/BackLink";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
@@ -193,9 +194,9 @@ export function SetupRecipes() {
   } else if (step === "preview" && recipe) {
     body = (
       <>
-        <button type="button" className="self-start text-sm font-semibold" style={{ color: "var(--primary)" }} onClick={() => setStep("pick")}>
-          ‹ {t("backToKinds")}
-        </button>
+        <BackButton className="self-start text-sm font-semibold" onClick={() => setStep("pick")}>
+          {t("backToKinds")}
+        </BackButton>
         <h1 className="text-2xl font-semibold tracking-tight md:text-3xl" style={{ color: "var(--text)" }}>
           {t("previewTitle", { name: nameOf(recipe) })}
         </h1>
