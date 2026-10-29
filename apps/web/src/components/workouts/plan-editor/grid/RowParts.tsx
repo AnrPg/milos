@@ -100,7 +100,7 @@ export function StructHead({ unit }: { unit: PlanUnit }) {
           <span key={f.key} className={s.sf}>
             {f.time ? <span>{label}</span> : null}
             <ValueField
-              fieldKey={`s:${key}:${f.key}`}
+              fieldKey={fieldKey.struct(key, f.key)}
               value={value}
               view={{ placeholder: "", display: "", badge: "", error: null, suffix: "" }}
               suffix={suffix}

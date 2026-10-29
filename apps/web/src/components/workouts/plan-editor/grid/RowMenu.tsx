@@ -6,7 +6,7 @@ import { Popover } from "@/components/ui/Popover";
 import type { PlanMeasure, PlanStructureKind } from "@/lib/structured-plan/types";
 
 import { useGridActions } from "./actions";
-import { useGrid, useGridT, type PickerState } from "./context";
+import { SHORTCUT, useGrid, useGridT, type PickerState } from "./context";
 import { MEASURE_KEYS, flowStructs, fuzzy, measureAliases, type FuzzyMatch } from "./lib";
 import { canPerRound, findRow, structureOfRow } from "./mutations";
 import { Highlight } from "./NameCell";
@@ -22,7 +22,7 @@ type Item = { id: string; label: string; hint: string; alias?: string; run: () =
  */
 export function RowMenu({ picker, onClose }: { picker: PickerState; onClose: (refocus: boolean) => void }) {
   const { plan } = useGrid();
-  const { t, core } = useGridT();
+  const { t, core, kbd } = useGridT();
   const act = useGridActions();
   const [mode, setMode] = useState(picker.mode);
   const [query, setQuery] = useState("");
@@ -59,16 +59,16 @@ export function RowMenu({ picker, onClose }: { picker: PickerState; onClose: (re
     }
     const ex = row.kind === "ex";
     const list: (Item | null)[] = [
-      ex && flowStructs(plan.flow).length ? { id: "struct", label: t("menu.struct"), hint: `Alt+T · ${t("menu.structHint")}`, run: () => switchTo("struct") } : null,
-      ex ? { id: "measure", label: t("menu.measure"), hint: `Alt+P · ${t("menu.measureHint")}`, run: () => switchTo("measure") } : null,
+      ex && flowStructs(plan.flow).length ? { id: "struct", label: t("menu.struct"), hint: t("menu.withKey", { key: kbd(SHORTCUT.struct), hint: t("menu.structHint") }), run: () => switchTo("struct") } : null,
+      ex ? { id: "measure", label: t("menu.measure"), hint: t("menu.withKey", { key: kbd(SHORTCUT.measure), hint: t("menu.measureHint") }), run: () => switchTo("measure") } : null,
       ex && canPerRound(plan, at.b)
-        ? { id: "perRound", label: row.perRound ? t("menu.sameEachRound") : t("menu.perRound"), hint: "Alt+V", run: done(() => act.togglePerRound(row.id)) }
+        ? { id: "perRound", label: row.perRound ? t("menu.sameEachRound") : t("menu.perRound"), hint: kbd(SHORTCUT.perRound), run: done(() => act.togglePerRound(row.id)) }
         : null,
-      ex ? { id: "note", label: row.note ? t("menu.note") : t("menu.addNote"), hint: "Alt+N", run: done(() => act.note(row.id)) } : null,
+      ex ? { id: "note", label: row.note ? t("menu.note") : t("menu.addNote"), hint: kbd(SHORTCUT.note), run: done(() => act.note(row.id)) } : null,
       at.i > 0 || row.group
-        ? { id: "superset", label: row.group ? t("menu.unsuperset") : t("menu.superset"), hint: "Alt+G", run: done(() => act.toggleSuperset(row.id)) }
+        ? { id: "superset", label: row.group ? t("menu.unsuperset") : t("menu.superset"), hint: kbd(SHORTCUT.superset), run: done(() => act.toggleSuperset(row.id)) }
         : null,
-      { id: "rest", label: t("menu.restAfter"), hint: "Alt+R", run: done(() => act.addRow({ afterId: row.id }, "rest")) },
+      { id: "rest", label: t("menu.restAfter"), hint: kbd(SHORTCUT.rest), run: done(() => act.addRow({ afterId: row.id }, "rest")) },
       ...(row.extra ?? []).map((k) => ({
         id: `drop-${k}`,
         label: t("menu.remove", { measure: core(`measure.${k}`) }),
@@ -111,6 +111,7 @@ export function RowMenu({ picker, onClose }: { picker: PickerState; onClose: (re
     event.stopPropagation();
   };
 
+  const listId = ["plan-menu", picker.rowId].join("-");
   const title = mode === "struct" ? t("menu.structTitle") : mode === "measure" ? t("menu.measureTitle") : null;
   return (
     <Popover anchorRef={anchorRef} open onClose={() => onClose(true)} role="dialog" ariaLabel={title ?? t("menu.button")} className={s.pop} align="end" minWidth={260} restoreFocus={false}>
@@ -124,20 +125,20 @@ export function RowMenu({ picker, onClose }: { picker: PickerState; onClose: (re
           aria-label={t("menu.filter")}
           role="combobox"
           aria-expanded
-          aria-controls={`plan-menu-${picker.rowId}`}
-          aria-activedescendant={shown[active] ? `plan-menu-${picker.rowId}-${shown[active].id}` : undefined}
+          aria-controls={listId}
+          aria-activedescendant={shown[active] ? optionId(listId, shown[active].id) : undefined}
           onChange={(event) => {
             setQuery(event.target.value);
             setActive(0);
           }}
           onKeyDown={onKeyDown}
         />
-        <div role="listbox" id={`plan-menu-${picker.rowId}`}>
+        <div role="listbox" id={listId}>
           {shown.length ? (
             shown.map((it, i) => (
               <div
                 key={it.id}
-                id={`plan-menu-${picker.rowId}-${it.id}`}
+                id={optionId(listId, it.id)}
                 role="option"
                 aria-selected={i === active}
                 data-item={it.id}
@@ -162,3 +163,5 @@ export function RowMenu({ picker, onClose }: { picker: PickerState; onClose: (re
     </Popover>
   );
 }
+
+const optionId = (listId: string, itemId: string) => [listId, itemId].join("-");

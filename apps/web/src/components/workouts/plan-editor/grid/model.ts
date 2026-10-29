@@ -234,6 +234,8 @@ export const fieldKey = {
   note: (rowId: string) => `r:${rowId}:note`,
   x: (rowId: string, k: MeasureKey) => `r:${rowId}:x:${k}`,
   cell: (rowId: string, col: number, k: ColKey) => `c:${rowId}:${col}:${k}`,
+  /** A structure field (clusters, intra…) of a unit. */
+  struct: (unitKey: string, field: string) => `s:${unitKey}:${field}`,
 };
 
 /** The test id of a value field: column `same` for same-every-round values, else the 0-based set / round. */

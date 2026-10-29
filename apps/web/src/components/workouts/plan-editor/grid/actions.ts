@@ -70,7 +70,7 @@ export function useGridActions() {
       });
       const fields = kind === "cluster" ? "clusters" : kind === "drop" ? "drops" : kind === "restpause" ? "minis" : null;
       if (focusRow) focusKey(fieldKey.name(focusRow));
-      else if (fields && unitKey) focusKey(`s:${unitKey}:${fields}`);
+      else if (fields && unitKey) focusKey(fieldKey.struct(unitKey, fields));
       else focusKey(fieldKey.name(rowId));
     },
     addMeasure(rowId: string, k: PlanMeasure) {

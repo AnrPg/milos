@@ -12292,7 +12292,7 @@
       "nothing": "Τίποτα",
       "nothingHint": "σβήσε ένα γράμμα",
       "struct": "Δομή σετ…",
-      "structHint": "cluster, drop set, complex…",
+      "structHint": "cluster, drop set, complex και άλλες",
       "measure": "Παράμετρος…",
       "measureHint": "ρυθμός, tempo, RPE, ύψος…",
       "perRound": "Τιμές ανά γύρο",
@@ -12306,7 +12306,8 @@
       "delete": "Διαγραφή",
       "deleteHint": "⌫ σε κενό όνομα",
       "structTitle": "Δομή σετ",
-      "measureTitle": "Παράμετρος"
+      "measureTitle": "Παράμετρος",
+      "withKey": "{key} · {hint}"
     },
     "add": {
       "exercise": "+ Άσκηση",

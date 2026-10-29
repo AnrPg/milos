@@ -12306,7 +12306,8 @@
       "delete": "Delete",
       "deleteHint": "⌫ on an empty name",
       "structTitle": "Set structure",
-      "measureTitle": "Parameter"
+      "measureTitle": "Parameter",
+      "withKey": "{key} · {hint}"
     },
     "add": {
       "exercise": "+ Exercise",

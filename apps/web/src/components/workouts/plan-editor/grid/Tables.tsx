@@ -304,7 +304,7 @@ function CompactRow({ row, b, cols, word, occ, grouped }: { row: PlanRow; b: num
         <span key={k} className={s.xv} data-label={t("line.rest")}>
           <ValueField
             fieldKey={fieldKey.dose(row.id)}
-            testId={`plan-cell-${row.id}-same-d`}
+            testId={cellTestId({ kind: "row", rowId: row.id, field: "dose" })}
             value={row.dose}
             view={view}
             suffix={unit(view.suffix)}
@@ -331,7 +331,7 @@ function CompactRow({ row, b, cols, word, occ, grouped }: { row: PlanRow; b: num
       <span key={k} className={s.xv} data-label={label}>
         <ValueField
           fieldKey={fk}
-          testId={`plan-cell-${row.id}-same-${k}`}
+          testId={cellTestId(k === "d" ? { kind: "row", rowId: row.id, field: "dose" } : k === "l" ? { kind: "row", rowId: row.id, field: "load" } : { kind: "x", rowId: row.id, k })}
           value={value}
           view={view}
           errorText={msg(view.error)}
