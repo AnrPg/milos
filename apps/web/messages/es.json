@@ -12125,12 +12125,12 @@
       "chipper": "Chipper",
       "21_15_9": "21-15-9",
       "ladder": "Escalera / pirámide",
-      "kcal_target": "Objetivo de calorías",
+      "calorie_target": "Objetivo de calorías",
       "to_failure": "Hasta el fallo",
       "superset": "Superserie / serie gigante",
       "cluster": "Cluster",
-      "drop": "Drop set",
-      "restpause": "Rest-pause",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
       "interrupt": "Con interrupciones"
     },
     "params": {
@@ -12174,7 +12174,7 @@
     "interruptEvery": "Cada {time}, para y haz",
     "scoreLine": "Puntuación: {score}",
     "score": {
-      "load": "Carga (mejor serie)",
+      "best_load": "Carga (mejor serie)",
       "reps": "Repeticiones",
       "time": "Tiempo",
       "rounds_reps": "Rondas + repeticiones",
@@ -12331,6 +12331,7 @@
       "keyEmptyCell": "celda vacía",
       "keyUnit": "kg o %",
       "keyDeleteRow": "⌫ con el nombre vacío"
-    }
+    },
+    "perSide": "por lado"
   }
 }

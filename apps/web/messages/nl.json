@@ -12125,12 +12125,12 @@
       "chipper": "Chipper",
       "21_15_9": "21-15-9",
       "ladder": "Ladder / piramide",
-      "kcal_target": "Caloriedoel",
+      "calorie_target": "Caloriedoel",
       "to_failure": "Tot falen",
       "superset": "Superset / reuzenset",
       "cluster": "Cluster",
-      "drop": "Dropset",
-      "restpause": "Rest-pause",
+      "drop_set": "Dropset",
+      "rest_pause": "Rest-pause",
       "interrupt": "Met onderbrekingen"
     },
     "params": {
@@ -12174,7 +12174,7 @@
     "interruptEvery": "Elke {time} stop je voor",
     "scoreLine": "Score: {score}",
     "score": {
-      "load": "Gewicht (beste set)",
+      "best_load": "Gewicht (beste set)",
       "reps": "Herhalingen",
       "time": "Tijd",
       "rounds_reps": "Rondes + herhalingen",
@@ -12331,6 +12331,7 @@
       "keyEmptyCell": "leeg veld",
       "keyUnit": "kg of %",
       "keyDeleteRow": "⌫ bij een lege naam"
-    }
+    },
+    "perSide": "per kant"
   }
 }

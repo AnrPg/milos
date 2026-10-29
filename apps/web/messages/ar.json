@@ -12125,12 +12125,12 @@
       "chipper": "Chipper",
       "21_15_9": "21-15-9",
       "ladder": "سلّم / هرم",
-      "kcal_target": "هدف السعرات",
+      "calorie_target": "هدف السعرات",
       "to_failure": "حتى الفشل العضلي",
       "superset": "سوبر سِت / مجموعة عملاقة",
       "cluster": "Cluster",
-      "drop": "دروب سِت",
-      "restpause": "راحة قصيرة (Rest-pause)",
+      "drop_set": "دروب سِت",
+      "rest_pause": "راحة قصيرة (Rest-pause)",
       "interrupt": "مع توقفات"
     },
     "params": {
@@ -12174,7 +12174,7 @@
     "interruptEvery": "كل {time} توقّف من أجل",
     "scoreLine": "النتيجة: {score}",
     "score": {
-      "load": "الوزن (أفضل مجموعة)",
+      "best_load": "الوزن (أفضل مجموعة)",
       "reps": "التكرارات",
       "time": "الوقت",
       "rounds_reps": "جولات + تكرارات",
@@ -12331,6 +12331,7 @@
       "keyEmptyCell": "خانة فارغة",
       "keyUnit": "kg أو %",
       "keyDeleteRow": "⌫ عند اسم فارغ"
-    }
+    },
+    "perSide": "لكل جانب"
   }
 }

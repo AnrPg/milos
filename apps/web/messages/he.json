@@ -12125,12 +12125,12 @@
       "chipper": "Chipper",
       "21_15_9": "21-15-9",
       "ladder": "סולם / פירמידה",
-      "kcal_target": "יעד קלוריות",
+      "calorie_target": "יעד קלוריות",
       "to_failure": "עד כשל",
       "superset": "סופרסט / ג'איינט סט",
       "cluster": "Cluster",
-      "drop": "דרופ סט",
-      "restpause": "רסט-פוז",
+      "drop_set": "דרופ סט",
+      "rest_pause": "רסט-פוז",
       "interrupt": "עם הפסקות"
     },
     "params": {
@@ -12174,7 +12174,7 @@
     "interruptEvery": "כל {time} עוצרים בשביל",
     "scoreLine": "תוצאה: {score}",
     "score": {
-      "load": "משקל (הסט הטוב ביותר)",
+      "best_load": "משקל (הסט הטוב ביותר)",
       "reps": "חזרות",
       "time": "זמן",
       "rounds_reps": "סבבים + חזרות",
@@ -12331,6 +12331,7 @@
       "keyEmptyCell": "תא ריק",
       "keyUnit": "kg או %",
       "keyDeleteRow": "⌫ על שם ריק"
-    }
+    },
+    "perSide": "לכל צד"
   }
 }
