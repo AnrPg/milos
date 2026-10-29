@@ -208,7 +208,7 @@ defmodule Palee.Repo.Migrations.CreateDocuments do
     REFERENCES document_versions (id, organization_id) ON DELETE CASCADE
     """)
 
-    create index(:document_signatures, [:organization_id, :user_id, :template_id, :signed_at])
+    create index(:document_signatures, [:organization_id, :user_id, :template_id, :version_number])
     create index(:document_signatures, [:organization_id, :template_id, :signed_at])
 
     create constraint(:document_signatures, :document_signatures_check,

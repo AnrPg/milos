@@ -288,7 +288,14 @@ defmodule Palee.Infrastructure.Documents.EctoDocumentStore do
       if user_ids == :all, do: query, else: where(query, [s], s.user_id in ^user_ids)
     end)
     |> distinct([s], [s.user_id, s.template_id])
-    |> order_by([s], asc: s.user_id, asc: s.template_id, desc: s.signed_at, desc: s.id)
+    # The signature of the newest version counts (then the latest one).
+    |> order_by([s],
+      asc: s.user_id,
+      asc: s.template_id,
+      desc: s.version_number,
+      desc: s.signed_at,
+      desc: s.id
+    )
     |> Repo.all()
     |> Map.new(fn signature -> {{signature.user_id, signature.template_id}, to_map(signature)} end)
   end
