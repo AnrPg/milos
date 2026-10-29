@@ -7,12 +7,13 @@ defmodule Palee.Fiscal.Domain.BusinessIdentityPolicy do
   (`CountryProfile.missing_fields/2`) so a gym can save a half-filled form.
   """
 
-  alias Palee.Fiscal.Domain.{CountryProfile, TaxId}
+  alias Palee.Fiscal.Domain.{CountryProfile, Iban, TaxId}
 
   @vat_schemes ~w(standard small_business exempt)
   @text_fields ~w(legal_name trade_name tax_office activity_code street building_number
                   postal_code city region email phone)a
   @id_fields ~w(tax_id vat_number registration_number)a
+  @bank_fields ~w(iban qr_iban)a
   @max_text 200
 
   def vat_schemes, do: @vat_schemes
@@ -21,7 +22,7 @@ defmodule Palee.Fiscal.Domain.BusinessIdentityPolicy do
   def fields,
     do:
       [:country_code, :vat_scheme, :document_language, :branch_code, :fiscal_year_start_month] ++
-        @text_fields ++ @id_fields
+        @text_fields ++ @id_fields ++ @bank_fields
 
   @doc """
   `{:ok, attrs}` with normalised values, or `{:error, {:invalid_fields,
@@ -47,6 +48,8 @@ defmodule Palee.Fiscal.Domain.BusinessIdentityPolicy do
         do: check_ids(country, merged, errors),
         else: {%{}, errors}
 
+    {bank, errors} = check_bank(country, merged, errors)
+
     if errors == %{} do
       currency = CountryProfile.fetch!(country).currency
 
@@ -54,6 +57,7 @@ defmodule Palee.Fiscal.Domain.BusinessIdentityPolicy do
        merged
        |> Map.take(fields())
        |> Map.merge(ids)
+       |> Map.merge(bank)
        |> Map.new(fn
          {key, value} when key in @text_fields -> {key, clean(value)}
          other -> other
@@ -144,6 +148,34 @@ defmodule Palee.Fiscal.Domain.BusinessIdentityPolicy do
           end
       end
     end)
+  end
+
+  # ADR-245: a plain IBAN for payment details, and a QR-IBAN (CH/LI only)
+  # for QR-bills with a QR reference. Each must pass the mod-97 check, and
+  # neither may stand in for the other.
+  defp check_bank(country, merged, errors) do
+    Enum.reduce(@bank_fields, {%{}, errors}, fn field, {bank, errors} ->
+      case Iban.normalize(merged[field]) do
+        nil ->
+          {Map.put(bank, field, nil), errors}
+
+        iban ->
+          case bank_error(field, country, iban) do
+            nil -> {Map.put(bank, field, iban), errors}
+            reason -> {bank, Map.put(errors, field, reason)}
+          end
+      end
+    end)
+  end
+
+  defp bank_error(field, country, iban) do
+    cond do
+      not Iban.valid?(iban) -> :invalid_iban
+      field == :iban and Iban.qr_iban?(iban) -> :qr_iban_in_iban_field
+      field == :qr_iban and country not in ["CH", "LI"] -> :qr_iban_country
+      field == :qr_iban and not Iban.qr_iban?(iban) -> :not_a_qr_iban
+      true -> nil
+    end
   end
 
   defp upcase(value) when is_binary(value), do: value |> String.trim() |> String.upcase()

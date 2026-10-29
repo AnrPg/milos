@@ -53,6 +53,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     fiscal_business_identities fiscal_sequences fiscal_documents fiscal_document_lines
     fiscal_journal_heads fiscal_journal_entries fiscal_period_closings
     fiscal_authority_connections fiscal_transmissions fiscal_transmission_attempts
+    fiscal_sales_tax_rates fiscal_export_settings
     review_questionnaires reviews review_answers
     messaging_threads
     messaging_participants messaging_messages seasonal_challenges

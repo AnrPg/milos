@@ -165,6 +165,25 @@ config :palee, :fiscal_authority_gateways, %{
   "production" => Palee.Infrastructure.Fiscal.MyDataGateway
 }
 
+# ADR-244: tax and export settings, and the sales tax calculator (manual
+# rate table now; Stripe Tax or Avalara later behind the same port).
+config :palee, :fiscal_tax_store, Palee.Infrastructure.Fiscal.EctoTaxStore
+
+config :palee,
+       :fiscal_sales_tax_calculator,
+       Palee.Infrastructure.Fiscal.RateTableSalesTaxCalculator
+
+# ADR-245: accounting export formats, by id (the order is the API's order).
+config :palee, :fiscal_accounting_export_formats, [
+  Palee.Infrastructure.Fiscal.Exports.Datev,
+  Palee.Infrastructure.Fiscal.Exports.Xero,
+  Palee.Infrastructure.Fiscal.Exports.QuickBooks,
+  Palee.Infrastructure.Fiscal.Exports.Sage,
+  Palee.Infrastructure.Fiscal.Exports.Bexio,
+  Palee.Infrastructure.Fiscal.Exports.GenericCsv,
+  Palee.Infrastructure.Fiscal.Exports.GenericJson
+]
+
 # ADR-190: the e-shop and Finance's revenue streams.
 config :palee, :shop_store, Palee.Infrastructure.Shop.EctoShopStore
 config :palee, :shop_notifier, Palee.Infrastructure.Shop.NotificationsShopNotifier

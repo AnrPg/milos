@@ -130,7 +130,7 @@ defmodule Palee.Application.Fiscal.FiscalAdmin do
   defp identity_keys,
     do: ~w(legal_name trade_name country_code tax_id vat_number tax_office registration_number
            activity_code vat_scheme street building_number postal_code city region email phone
-           document_language branch_code fiscal_year_start_month)a
+           document_language branch_code fiscal_year_start_month iban qr_iban)a
 
   defp atomize(params, keys) when is_map(params) do
     Enum.reduce(keys, %{}, fn key, acc ->
