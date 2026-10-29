@@ -12090,6 +12090,7 @@
     "back": "Назад",
     "connected": "Свързано с {provider}",
     "connectedHint": "Плащанията отиват направо в твоя собствен акаунт в {provider}",
+    "methodsHint": "PayPal, Klarna, Apple Pay и Google Pay се появяват сами при плащане, щом ги включиш в таблото си в {provider}, където {provider} ги предлага.",
     "testMode": "само тестови плащания",
     "statusActive": "Активно",
     "whatTitle": "Какво се плаща онлайн",

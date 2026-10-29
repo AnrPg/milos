@@ -12090,6 +12090,7 @@
     "back": "חזרה",
     "connected": "מחובר ל-{provider}",
     "connectedHint": "התשלומים עוברים ישירות לחשבון שלך ב-{provider}",
+    "methodsHint": "PayPal, Klarna, Apple Pay ו-Google Pay מופיעים מעצמם בתשלום ברגע שתפעיל אותם בלוח הבקרה של {provider}, היכן ש-{provider} מציעה אותם.",
     "testMode": "תשלומי ניסיון בלבד",
     "statusActive": "פעיל",
     "whatTitle": "מה משולם אונליין",

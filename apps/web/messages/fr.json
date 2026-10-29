@@ -12090,6 +12090,7 @@
     "back": "Retour",
     "connected": "Connecté à {provider}",
     "connectedHint": "Les paiements vont directement sur ton propre compte {provider}",
+    "methodsHint": "PayPal, Klarna, Apple Pay et Google Pay apparaissent d'eux-mêmes au paiement dès que tu les actives dans ton tableau de bord {provider}, là où {provider} les propose.",
     "testMode": "paiements de test uniquement",
     "statusActive": "Actif",
     "whatTitle": "Ce qui se paie en ligne",

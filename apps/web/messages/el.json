@@ -12090,6 +12090,7 @@
     "back": "Πίσω",
     "connected": "Συνδεδεμένο με {provider}",
     "connectedHint": "Οι πληρωμές πάνε κατευθείαν στον λογαριασμό σου στη {provider}",
+    "methodsHint": "Τα PayPal, Klarna, Apple Pay και Google Pay εμφανίζονται μόνα τους στην πληρωμή μόλις τα ενεργοποιήσεις στον πίνακα ελέγχου της {provider}, όπου τα προσφέρει η {provider}.",
     "testMode": "μόνο δοκιμαστικές πληρωμές",
     "statusActive": "Ενεργό",
     "whatTitle": "Τι πληρώνεται online",

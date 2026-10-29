@@ -12090,6 +12090,7 @@
     "back": "Terug",
     "connected": "Gekoppeld met {provider}",
     "connectedHint": "Betalingen gaan rechtstreeks naar je eigen {provider}-account",
+    "methodsHint": "PayPal, Klarna, Apple Pay en Google Pay verschijnen vanzelf bij het betalen zodra je ze inschakelt in je {provider}-dashboard, waar {provider} ze aanbiedt.",
     "testMode": "alleen testbetalingen",
     "statusActive": "Actief",
     "whatTitle": "Wat online betaald wordt",

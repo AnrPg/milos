@@ -12090,6 +12090,7 @@
     "back": "رجوع",
     "connected": "مرتبط مع {provider}",
     "connectedHint": "تذهب المدفوعات مباشرة إلى حسابك الخاص في {provider}",
+    "methodsHint": "تظهر PayPal وKlarna وApple Pay وGoogle Pay تلقائيًا عند الدفع بمجرد تفعيلها في لوحة تحكم {provider}، حيث يوفرها {provider}.",
     "testMode": "مدفوعات تجريبية فقط",
     "statusActive": "نشط",
     "whatTitle": "ما يُدفع عبر الإنترنت",

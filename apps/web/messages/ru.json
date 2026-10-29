@@ -12090,6 +12090,7 @@
     "back": "Назад",
     "connected": "Подключено: {provider}",
     "connectedHint": "Платежи идут прямо на твой собственный счёт в {provider}",
+    "methodsHint": "PayPal, Klarna, Apple Pay и Google Pay сами появляются при оплате, как только ты включишь их в панели {provider}, там, где {provider} их предлагает.",
     "testMode": "только тестовые платежи",
     "statusActive": "Активно",
     "whatTitle": "Что оплачивается онлайн",

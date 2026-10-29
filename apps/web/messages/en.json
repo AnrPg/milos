@@ -12090,6 +12090,7 @@
     "back": "Back",
     "connected": "Connected with {provider}",
     "connectedHint": "Payments go straight to your own {provider} account",
+    "methodsHint": "PayPal, Klarna, Apple Pay and Google Pay appear at checkout on their own once you switch them on in your {provider} dashboard, where {provider} offers them.",
     "testMode": "test payments only",
     "statusActive": "Active",
     "whatTitle": "What is paid online",
