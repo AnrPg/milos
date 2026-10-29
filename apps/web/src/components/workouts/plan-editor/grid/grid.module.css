@@ -1,0 +1,659 @@
+/*
+ * ADR-270 editor grid (approved mockup v20). Theme variables only. The grid
+ * root sets data-layout="phone" below 600px of its own width (measured in JS,
+ * so it follows the editor's column, not the window): every exercise becomes a
+ * card, sets / rounds become rows, measures columns; nothing scrolls sideways.
+ */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  font-size: 0.94rem;
+}
+
+/* ── shared bits ───────────────────────────────────────────────────────── */
+.add {
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px dashed var(--border-strong);
+  background: transparent;
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 0.22rem 0.7rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.add:hover {
+  color: var(--text);
+  border-color: var(--muted);
+}
+.add.wide {
+  width: 100%;
+  justify-content: center;
+  margin-top: 4px;
+}
+.adds {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.kbd {
+  font-family: var(--font-code);
+  font-size: 0.66rem;
+  border: 1px solid var(--border-strong);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  padding: 0 0.3rem;
+  background: var(--panel);
+  color: var(--text);
+  white-space: nowrap;
+}
+.uhint {
+  font-size: 0.76rem;
+  color: var(--muted);
+  margin: 0;
+}
+.lbl {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ── value field: the value, its unit right next to it, the computed value inside ── */
+.vf {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: 2rem;
+  min-width: 2.6rem;
+  max-width: 100%;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0 0.45rem;
+  cursor: text;
+}
+.vf:hover {
+  border-color: var(--border);
+}
+.vf:focus-within {
+  border-color: var(--primary);
+  background: var(--panel);
+}
+.vf[data-bad] {
+  border-color: var(--danger);
+  background: var(--danger-surface);
+}
+.vi {
+  font: inherit;
+  font-size: 0.92rem;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  padding: 0;
+  min-width: 1.5ch;
+  max-width: 100%;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  field-sizing: content;
+}
+.vi::placeholder {
+  color: var(--placeholder);
+}
+.vs {
+  font-size: 0.72rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.vd {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+.vd b {
+  font-weight: 400;
+}
+.vd small {
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: var(--primary);
+  background: var(--selection);
+  border-radius: 4px;
+  padding: 0 4px;
+}
+.vf[data-disp]:not(:focus-within) .vd {
+  display: flex;
+}
+.vf[data-disp]:not(:focus-within) .vi,
+.vf[data-disp]:not(:focus-within) .vs,
+.vf[data-disp]:not(:focus-within) .vi::placeholder {
+  color: transparent;
+}
+
+/* ── exercise name ─────────────────────────────────────────────────────── */
+.nm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+.name {
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0.3rem 0.45rem;
+  flex: 1;
+  min-width: 0;
+}
+.name::placeholder {
+  color: var(--placeholder);
+  font-weight: 500;
+}
+.name:hover {
+  border-color: var(--border);
+}
+.name:focus {
+  border-color: var(--primary);
+  background: var(--panel);
+  outline: none;
+}
+.restLabel {
+  color: var(--muted);
+  font-weight: 600;
+  padding: 0.3rem 0.45rem;
+  line-height: 1.4;
+  border-radius: 8px;
+  outline: none;
+}
+.restLabel:focus-visible {
+  box-shadow: 0 0 0 2px var(--focus-ring);
+}
+.tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-soft);
+  background: var(--panel-muted);
+  border-radius: 6px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+.note {
+  font: inherit;
+  font-size: 0.82rem;
+  color: var(--text-soft);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 0.2rem 0.45rem;
+  width: 100%;
+}
+.note:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+.more {
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: var(--muted);
+  width: 2rem;
+  height: 2rem;
+  cursor: pointer;
+  opacity: 0.35;
+}
+.more:hover,
+.more:focus-visible,
+[data-nav-row]:hover .more,
+[data-nav-row]:focus-within .more {
+  opacity: 1;
+}
+.more:hover,
+.more:focus-visible {
+  border-color: var(--border);
+  color: var(--text);
+}
+@media (hover: none) {
+  .more {
+    opacity: 1;
+  }
+}
+
+/* ── group / structure header ──────────────────────────────────────────── */
+.uhead {
+  display: flex;
+  align-items: center;
+  gap: 6px 10px;
+  flex-wrap: wrap;
+}
+.schip {
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--primary);
+  background: var(--selection);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 1px 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.sf {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+/* ── flows other than Σετ: one CSS-grid table per block ───────────────── */
+.slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+  gap: 8px;
+}
+.slot {
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--block-color, var(--primary));
+  border-radius: 12px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.lane {
+  border: 1px dashed var(--heat);
+  border-radius: 12px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.lane .lbl {
+  color: var(--heat);
+}
+.xt {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) repeat(var(--cols), minmax(5rem, max-content)) 2.2rem;
+  column-gap: 4px;
+  align-items: stretch;
+  grid-auto-flow: dense;
+}
+.xh,
+.xr,
+.xgroup {
+  display: contents;
+}
+.xh > span {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 6px 4px;
+  text-align: center;
+  white-space: nowrap;
+  align-self: end;
+}
+.xh > span:first-child {
+  text-align: start;
+  padding-inline-start: 0.5rem;
+}
+.xr > * {
+  min-height: 2.4rem;
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  min-width: 0;
+}
+.xr:focus-within > * {
+  background: var(--selection);
+}
+.xr[data-grouped] > .xn {
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+.xv {
+  justify-content: center;
+}
+.xv[data-empty] {
+  visibility: hidden;
+}
+.xm {
+  justify-content: center;
+}
+.xg,
+.xnote,
+.xp {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+.xg {
+  padding: 8px 0 2px;
+  border-top: 1px solid var(--border);
+}
+.xnote {
+  padding: 0 0 6px 0.5rem;
+}
+.xp {
+  padding: 2px 0 10px 0.5rem;
+  display: flex;
+}
+.sumv {
+  font: inherit;
+  font-size: 0.86rem;
+  background: none;
+  border: 0;
+  color: var(--text-soft);
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+  padding: 0 0.4rem;
+  white-space: nowrap;
+}
+
+/* ── tables (Σετ grid, per-round panel) ───────────────────────────────── */
+.gblock {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-inline-start: 3px solid var(--block-color, var(--primary));
+  padding-inline-start: 6px;
+}
+.blockTitle {
+  padding-inline-start: 4px;
+}
+.gridwrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.gridwrap.mini {
+  align-self: flex-start;
+  max-width: 100%;
+}
+.grid {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: max-content;
+}
+.mini .grid {
+  width: auto;
+}
+.grid th {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--muted);
+  text-align: center;
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.grid th:first-child {
+  text-align: start;
+  padding-inline-start: 10px;
+}
+.grid th[data-optional] {
+  color: var(--placeholder);
+}
+.grid td {
+  padding: 2px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.mini .grid td {
+  border-bottom: 0;
+}
+.grid tr:last-child td {
+  border-bottom: 0;
+}
+.grid tr[data-nav-row]:focus-within {
+  background: var(--selection);
+}
+.first {
+  min-width: 13rem;
+  padding: 2px 6px 2px 8px !important;
+  position: sticky;
+  inset-inline-start: 0;
+  background: var(--panel);
+  z-index: 1;
+}
+.grid tr:focus-within .first {
+  background: var(--selection);
+}
+.grid tr[data-grouped] .first {
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+.grp td {
+  padding: 8px 8px 2px !important;
+  border-bottom: 0 !important;
+}
+.fx {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.fname {
+  flex: 1;
+  min-width: 7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.labs {
+  display: flex;
+  flex-direction: column;
+}
+.labs > div {
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 0.72rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+td.labs {
+  padding: 2px 8px 2px 4px;
+}
+.c {
+  display: flex;
+  flex-direction: column;
+  width: 6.4rem;
+  margin-inline: auto;
+}
+.c .vf {
+  width: 100%;
+}
+.moreCell {
+  width: 2.4rem;
+  padding: 2px 4px !important;
+}
+.setno {
+  width: 2.2rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  vertical-align: middle !important;
+}
+.tall .grid {
+  width: 100%;
+  min-width: 0;
+}
+.tall td {
+  padding: 1px 2px;
+  vertical-align: middle;
+}
+.tall .vf {
+  width: 100%;
+  min-width: 0;
+}
+
+/* ── phone cards (Σετ) ─────────────────────────────────────────────────── */
+.scards {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.scard {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0 8px;
+  border-top: 1px solid var(--border);
+  min-width: 0;
+}
+.scard[data-grouped] {
+  box-shadow: inset 3px 0 0 var(--primary);
+  padding-inline-start: 6px;
+}
+.scardHead {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.scardHead > :first-child {
+  flex: 1;
+}
+.scard .gridwrap {
+  overflow: visible;
+}
+
+/* ── hint line ─────────────────────────────────────────────────────────── */
+.hint {
+  font-size: 0.78rem;
+  color: var(--muted);
+  min-height: 1.2em;
+  overflow-wrap: anywhere;
+}
+.hint code {
+  font-family: var(--font-code);
+  font-size: 0.76rem;
+  background: var(--panel-muted);
+  padding: 0 0.25rem;
+  border-radius: 4px;
+}
+.mean {
+  color: var(--text);
+  font-weight: 600;
+}
+.err {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+/* ── pickers (row menu, structure, measure, exercise names) ───────────── */
+.pop {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  padding: 4px 0;
+  min-width: 15rem;
+}
+.popFilter {
+  font: inherit;
+  font-size: 0.85rem;
+  width: calc(100% - 12px);
+  margin: 2px 6px 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
+  background: var(--bg);
+  color: var(--text);
+}
+.popFilter:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.popTitle {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 4px 12px 2px;
+}
+.opt {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 7px 12px;
+  font-size: 0.88rem;
+  cursor: pointer;
+  color: var(--text);
+}
+.opt[aria-selected="true"] {
+  background: var(--selection);
+}
+.opt small {
+  color: var(--muted);
+  font-size: 0.74rem;
+  text-align: end;
+}
+
+/* ── phone ─────────────────────────────────────────────────────────────── */
+.root[data-layout="phone"] .xt {
+  grid-template-columns: 1fr 2.2rem;
+}
+.root[data-layout="phone"] .xh {
+  display: none;
+}
+.root[data-layout="phone"] .xr > * {
+  border-top: 0;
+  min-height: 2.2rem;
+}
+.root[data-layout="phone"] .xn {
+  grid-column: 1;
+  border-top: 1px solid var(--border);
+}
+.root[data-layout="phone"] .xm {
+  grid-column: 2;
+  border-top: 1px solid var(--border);
+}
+.root[data-layout="phone"] .xv {
+  grid-column: 1 / -1;
+  justify-content: space-between;
+  padding-inline-start: 0.5rem;
+}
+.root[data-layout="phone"] .xv::before {
+  content: attr(data-label);
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+.root[data-layout="phone"] .xv[data-empty],
+.root[data-layout="phone"] .xr[data-per] .xv {
+  display: none;
+}
+.root[data-layout="phone"] .xp {
+  padding-inline-start: 0;
+}
+.root[data-layout="phone"] .slot,
+.root[data-layout="phone"] .lane {
+  padding: 6px 8px;
+}

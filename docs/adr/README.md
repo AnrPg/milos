@@ -227,3 +227,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-230 | Day WODs: one WOD for a whole day, inherited by its classes (all or chosen class types), overridable per class | Accepted |
 | ADR-231 | The profile's «Πολυμέσα» grid: photos and videos from posts, same visibility as posts | Accepted |
 | ADR-232 | Staff book or move a member into a class: one transaction, no late charge, server-listed choices | Accepted |
+| ADR-270 | Structured WOD plan: flow, set structure and add-ons (presets as shortcuts), values stored as typed in `workout_sections.plan` | Accepted |

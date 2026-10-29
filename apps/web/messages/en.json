@@ -12327,7 +12327,354 @@
       "too_many_rows": "At most 60 exercises",
       "too_many_cells": "At most 30 sets",
       "too_long": "At most 200 characters",
-      "note_too_long": "At most 2000 characters"
+      "note_too_long": "At most 2000 characters",
+      "wrong_unit": "Not a load unit: write kg or %",
+      "no_base": "Nothing before it to change: write a number first",
+      "bad_shape": "This value has the wrong form"
+    },
+    "ambiguous": {
+      "rangeOrList": "range {range}, the athlete picks · for {count} sets write {write}",
+      "listOrLadder": "{list}, then the last one repeats · to keep climbing write {write}",
+      "windows": "{count} AMRAP windows: {list} · for one AMRAP write {write}",
+      "clock": "read as {reading} · for the other unit write {write}"
+    }
+  },
+  "PlanEditor": {
+    "label": "Structured WOD editor",
+    "title": "WOD title",
+    "titlePlaceholder": "WOD title",
+    "wodNote": "Note for the whole WOD (optional)",
+    "addSection": "+ Section",
+    "newSection": "New section",
+    "sectionName": "Name (optional)",
+    "deleteSection": "Delete section",
+    "noExercises": "No exercises yet",
+    "presetChip": "Preset",
+    "steps": "Steps",
+    "step": {
+      "flow": "Flow",
+      "time": "Time",
+      "exercises": "Exercises",
+      "score": "Score"
+    },
+    "back": "Back",
+    "next": "Next →",
+    "finish": "Finish section",
+    "pickHelp": "Type to search,",
+    "flowInput": "Section flow",
+    "flowPlaceholder": "How does the clock run? e.g. emom, sets, or a preset: tabata",
+    "flowsHeading": "Flow",
+    "presetsHeading": "Presets",
+    "presetsSub": "shortcuts: they pick a flow and fill in values, everything can change afterwards",
+    "presetIs": "{preset} = {flow}",
+    "noMatch": "Nothing by that name. Try another word.",
+    "recipe": {
+      "intervals": "{work} / {off} × {rounds}",
+      "intervalsHr": "{work} / heart rate × {rounds}",
+      "amrap": "{dur}′",
+      "slots": "{count} alternating intervals",
+      "reps": "reps {reps}",
+      "interrupt": "interrupt every 2:00",
+      "hr": "rest until heart rate falls"
+    },
+    "example": {
+      "times": "minutes · e.g. 12, or 3-3-3-4 for windows",
+      "timeMin": "minutes · or 1:30, 90s",
+      "timeSmart": "e.g. 30s, 1:30, 2′",
+      "range": "e.g. 4 or 3-4",
+      "count": "a whole number"
+    },
+    "reading": "= {text}",
+    "readingWindows": "= {count} windows: {list}",
+    "unit": {
+      "rounds": "rounds",
+      "times": "times",
+      "sets": "sets",
+      "hrTarget": "bpm",
+      "min": "minutes",
+      "sec": "sec",
+      "clock": "m:ss"
+    },
+    "addMod": "+ {label}",
+    "removeMod": "× {label}",
+    "removeModTitle": "Remove",
+    "timeline": "Timeline",
+    "timelineInterrupt": "Interrupt every {every}",
+    "timelineSlot": "Interval {n}",
+    "timelineWork": "Work",
+    "timelineRest": "Rest",
+    "score": "Score",
+    "scoreHelp": "The usual one is already picked. ← → to change.",
+    "sectionNote": "Note for the section (optional)",
+    "levelNotes": "Notes per level",
+    "levelNote": "Note for {level} (optional)",
+    "perRoundOnce": "This happens once: add more rounds in step 2",
+    "deleted": "Deleted · {undo} to undo",
+    "status": {
+      "undone": "Undone",
+      "redone": "Redone"
+    },
+    "hint": {
+      "label": "Keyboard",
+      "section": "section",
+      "open": "open",
+      "newSection": "new section",
+      "all": "all",
+      "type": "type",
+      "search": "search",
+      "choose": "choose",
+      "continue": "continue",
+      "close": "close",
+      "nextField": "next field",
+      "nextStep": "next step",
+      "back": "back",
+      "newExercise": "new exercise",
+      "actions": "actions",
+      "differentRound": "different round",
+      "score": "score"
+    },
+    "sheet": {
+      "title": "Shortcuts",
+      "groupSection": "Section",
+      "groupExercises": "Exercises",
+      "groupGeneral": "General",
+      "newSection": "New section",
+      "steps": "Next / previous step",
+      "jumpStep": "Go to step",
+      "close": "Close the section into one line",
+      "cards": "On closed sections: choose and open",
+      "moveSection": "Move the section",
+      "newExercise": "New exercise",
+      "actions": "Row actions (the ⋯ menu)",
+      "superset": "Superset with the row above",
+      "structure": "Set structure: cluster, drop set, complex…",
+      "measure": "Measure: pace, tempo, RPE, height, per side…",
+      "perRound": "Values per round (AMRAP, For Time, EMOM)",
+      "rest": "Rest inside the set",
+      "differentRound": "Different round, set or interval (alternating)",
+      "note": "Note",
+      "emptyCell": "Same as the previous set",
+      "plus": "A value that changes every set",
+      "spread": "A value spread to the last set",
+      "unit": "Once per row",
+      "deleteRow": "Delete",
+      "move": "Move between fields",
+      "undo": "Undo",
+      "redo": "Redo",
+      "sheet": "This list",
+      "keyEmptyCell": "empty cell",
+      "keyUnit": "kg or %",
+      "keyDeleteRow": "⌫ on an empty name"
+    },
+    "perSide": "per side"
+  },
+  "PlanGrid": {
+    "head": {
+      "exercise": "Exercise",
+      "amrap": "↻ Round, again and again until time runs out",
+      "emomEvery": "Every {every}",
+      "emom": "Every slot",
+      "intervals": "In each work interval ({work})",
+      "rounds": "↻ Round × {rounds}",
+      "once": "In order, once"
+    },
+    "round": {
+      "set": "Set {list}",
+      "round": "Round {list}",
+      "slot": "Slot {list}",
+      "minute": "Minute {list}",
+      "slotAt": "Slot {list} · {at}"
+    },
+    "col": {
+      "d": "Reps",
+      "l": "Load"
+    },
+    "line": {
+      "d": "Reps",
+      "rest": "Time",
+      "l": "Load",
+      "lUnit": "Load {unit}"
+    },
+    "measure": {
+      "pace": "Pace",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "HR zone",
+      "height": "Height / target",
+      "dist": "Distance",
+      "hold": "Hold",
+      "side": "Per side"
+    },
+    "measureHint": {
+      "pace": "split time · e.g. 2:00/500m",
+      "tempo": "lowering, pause, lifting, pause · e.g. 31X1",
+      "rpe": "how hard, 1–10 · e.g. 8",
+      "rir": "reps left in reserve · e.g. 2",
+      "zone": "heart-rate zone · e.g. 2",
+      "height": "box, target · e.g. 60 cm",
+      "dist": "e.g. 400 m",
+      "hold": "isometric hold · e.g. 3 s",
+      "side": "no value: a tag next to the name"
+    },
+    "tag": {
+      "side": "per side"
+    },
+    "unit": {
+      "sec": "s",
+      "min": "min"
+    },
+    "struct": {
+      "single": "Single",
+      "superset": "Superset",
+      "complex": "Complex",
+      "cluster": "Cluster",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
+    },
+    "structHint": {
+      "single": "one exercise, as it is",
+      "superset": "every exercise, then the next set",
+      "complex": "every exercise without putting the bar down",
+      "cluster": "the set breaks into pieces with a short pause",
+      "drop": "lower the weight and keep going",
+      "restpause": "to failure, pause, again"
+    },
+    "structField": {
+      "clusters": "pieces",
+      "intra": "pause",
+      "drops": "drops",
+      "dropby": "each time",
+      "minis": "mini sets"
+    },
+    "structChip": "Set structure (Alt+T)",
+    "rest": "Rest",
+    "name": {
+      "placeholder": "Exercise",
+      "inWod": "in this WOD",
+      "suggestions": "Exercise suggestions"
+    },
+    "note": {
+      "placeholder": "Note for the exercise"
+    },
+    "menu": {
+      "button": "Exercise actions",
+      "title": "Actions (Alt+M)",
+      "filter": "Type to filter",
+      "nothing": "Nothing matches",
+      "nothingHint": "delete a letter",
+      "struct": "Set structure…",
+      "structHint": "cluster, drop set, complex…",
+      "measure": "Parameter…",
+      "measureHint": "pace, tempo, RPE, height…",
+      "perRound": "Values per round",
+      "sameEachRound": "Same values every round",
+      "note": "Note",
+      "addNote": "Add a note",
+      "superset": "Superset with the row above",
+      "unsuperset": "Out of the superset",
+      "restAfter": "Rest after",
+      "remove": "Remove: {measure}",
+      "delete": "Delete",
+      "deleteHint": "⌫ on an empty name",
+      "structTitle": "Set structure",
+      "measureTitle": "Parameter",
+      "withKey": "{key} · {hint}"
+    },
+    "add": {
+      "exercise": "+ Exercise",
+      "exerciseHere": "+ Exercise in this box",
+      "exerciseSets": "+ Exercise in these sets",
+      "exerciseInterrupt": "+ Exercise in the interruption",
+      "round": {
+        "set": "+ different set",
+        "round": "+ different round",
+        "slot": "+ different slot"
+      }
+    },
+    "how": {
+      "alternate": "The boxes alternate: {cycle}, {cycle} …",
+      "own": {
+        "set": "Each set has its own exercises, in order.",
+        "round": "Each round has its own exercises, in order.",
+        "slot": "Each slot has its own exercises, in order."
+      },
+      "emomOne": "Everything in the box happens in the same slot.",
+      "amrapMax": "For “as many as you can in the time left”, write max in the reps of the last exercise.",
+      "optionalSets": "* if they can: the sets are {sets}."
+    },
+    "optionalSet": "If they can (the sets are {sets})",
+    "interrupt": {
+      "title": "Interruption · every {every} stop and do"
+    },
+    "aria": {
+      "reps": "Reps or quantity",
+      "load": "Load",
+      "rest": "Rest",
+      "cell": "{column} {n}: {what}"
+    },
+    "error": {
+      "dose": "Can't read this: e.g. 10, 8-12, 5-10-15…, max, 400 m, 60s",
+      "tempo": "Tempo in 4 marks, e.g. 31X1",
+      "number": "A number, +x or a→b",
+      "numberExample": "A number, e.g. {example}",
+      "max": "At most {max}",
+      "loadUnitCompact": "Write kg or %, e.g. 60kg or 70%",
+      "loadMissingUnit": "Write kg or % in one set of the row; the others take it from there",
+      "loadMixedUnits": "Same unit on the whole row: {unit}"
+    },
+    "mean": {
+      "equals": "= {value}",
+      "max": "as many as possible",
+      "maxCal": "as many calories as possible",
+      "maxM": "as many metres as possible",
+      "sets": "{sets} sets",
+      "ladder": "per {word}: {list}, then {step} every {word}",
+      "perRound": "per {word}: {list}",
+      "range": "range {range}, the athlete decides",
+      "rangeSide": "range {range}, the athlete decides · per side",
+      "reps": "{value} reps",
+      "repsSide": "{value} reps · per side",
+      "amount": "{value}",
+      "amountSide": "{value} · per side",
+      "bw": "bodyweight",
+      "kg": "{value} kg",
+      "pct": "{value}% of 1RM",
+      "words": "as text for the athlete",
+      "tempo": "↓{down} lowering · {bottom} at the bottom · ↑{up} lifting · {top} at the top (seconds, X = explosive)",
+      "equalsUnit": "= {value} {unit}"
+    },
+    "word": {
+      "set": "set",
+      "round": "round",
+      "slot": "slot"
+    },
+    "tip": {
+      "range": "range",
+      "ladder": "goes up every round",
+      "max": "as many as they can",
+      "emptyCode": "empty",
+      "asBefore": "same as the one before",
+      "kg": "kilos",
+      "pct": "of 1RM",
+      "heavyCode": "heavy",
+      "words": "in words",
+      "plusEach": "goes up every time",
+      "spread": "up to the last one",
+      "unitCode": "kg or %",
+      "unitOnce": "once per row",
+      "changeEach": "changes every time",
+      "tempo": "seconds lowering · pause at the bottom · lifting (X = explosive) · pause at the top",
+      "seconds": "seconds",
+      "minSec": "minutes:seconds",
+      "minutes": "minutes, up to 10",
+      "afterLastCode": "after the last round",
+      "afterLast": "same value, or the same change if you write +x"
+    },
+    "colWord": {
+      "set": "Set",
+      "round": "Round",
+      "slot": "Slot"
     }
   },
   "PlanRun": {
@@ -12419,6 +12766,109 @@
       "within": "in",
       "from": "from",
       "zone": "zone"
+    }
+  },
+  "PlanView": {
+    "label": "Structured workout",
+    "untitledSection": "Section {letter}",
+    "empty": "Nothing written yet.",
+    "flow": {
+      "sets": "Sets",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Intervals",
+      "rest": "Rest"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "hrr": "Heart rate recovery (HRR)",
+      "death_by": "Death by",
+      "even_odd": "Alternating (odd / even)",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "ladder": "Ladder / pyramid",
+      "calorie_target": "Calorie target",
+      "to_failure": "To failure",
+      "superset": "Superset / giant set",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "interrupt": "With interruptions"
+    },
+    "params": {
+      "sets": "{sets} sets",
+      "rest": "{time} rest",
+      "rounds": "{rounds} rounds",
+      "cap": "cap {time}",
+      "windows": "{count} windows: {times}",
+      "restBetween": "{time} rest between",
+      "every": "every {time}",
+      "times": "× {count}",
+      "untilFailure": "until you can't keep up",
+      "intervals": "{rounds} × {work} work / {off} rest",
+      "intervalsHr": "{rounds} × {work} work, rest until heart rate falls to {bpm}"
+    },
+    "roundWord": {
+      "set": "Set {numbers}",
+      "round": "Round {numbers}",
+      "interval": "Interval {numbers}",
+      "minute": "Minute {numbers}"
+    },
+    "struct": {
+      "superset": "Superset",
+      "complex": "Complex",
+      "cluster": "Cluster · {clusters} parts · {intra} pause",
+      "drop": "Drop set · {drops} drops of {dropby}",
+      "restpause": "Rest-pause · {minis} mini sets · {intra} pause"
+    },
+    "perSide": "per side",
+    "rest": "Rest",
+    "measure": {
+      "pace": "Pace {value}",
+      "tempo": "Tempo {value}",
+      "rpe": "RPE {value}",
+      "rir": "RIR {value}",
+      "zone": "Zone {value}",
+      "height": "Height {value}",
+      "dist": "Distance {value}",
+      "hold": "Hold {value}"
+    },
+    "interruptEvery": "Every {time}, stop for",
+    "scoreLine": "Score: {score}",
+    "score": {
+      "best_load": "Load (best set)",
+      "reps": "Reps",
+      "time": "Time",
+      "rounds_reps": "Rounds + reps",
+      "done": "Completed",
+      "total_reps": "Reps (total)",
+      "lowest_round": "Lowest round",
+      "distance": "Distance"
+    },
+    "levelNotes": "Notes per level",
+    "sectionNote": "Section note",
+    "exerciseCount": "{count, plural, one {# exercise} other {# exercises}}",
+    "authoring": {
+      "label": "How this workout is written",
+      "freeText": "Free text",
+      "structured": "Structured",
+      "toStructuredTitle": "Switch to structured?",
+      "toStructuredBody": "The structured plan starts empty. Your text stays as the note of the first section, so nothing is lost.",
+      "toTextTitle": "Switch to free text?",
+      "toTextBody": "The plan becomes text you can keep editing. Flows, per-set values and structures are written out as text and are no longer structured.",
+      "confirm": "Switch",
+      "cancel": "Cancel",
+      "switchFailed": "The workout could not be saved before switching. Try again.",
+      "switching": "Saving…"
+    },
+    "editor": {
+      "planEmpty": "Add at least one exercise or a rest before publishing.",
+      "fixProblems": "Some values do not read: fix the rows marked in red.",
+      "sectionCount": "{count, plural, one {# section} other {# sections}}"
     }
   }
 }

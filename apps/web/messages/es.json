@@ -12102,6 +12102,445 @@
     "rowButtonLabel": "Registrar un pago de {name}",
     "panelButton": "+ Registrar pago"
   },
+  "PlanView": {
+    "label": "Entrenamiento estructurado",
+    "untitledSection": "Sección {letter}",
+    "empty": "Todavía no hay nada escrito.",
+    "flow": {
+      "sets": "Series",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Intervalos",
+      "rest": "Descanso"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "hrr": "Recuperación del pulso (HRR)",
+      "death_by": "Death by",
+      "even_odd": "Alterno (impar / par)",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "ladder": "Escalera / pirámide",
+      "calorie_target": "Objetivo de calorías",
+      "to_failure": "Hasta el fallo",
+      "superset": "Superserie / serie gigante",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "interrupt": "Con interrupciones"
+    },
+    "params": {
+      "sets": "{sets} series",
+      "rest": "{time} de descanso",
+      "rounds": "{rounds} rondas",
+      "cap": "límite {time}",
+      "windows": "{count} ventanas: {times}",
+      "restBetween": "{time} de descanso entre ellas",
+      "every": "cada {time}",
+      "times": "× {count}",
+      "untilFailure": "hasta que no llegues a tiempo",
+      "intervals": "{rounds} × {work} de trabajo / {off} de descanso",
+      "intervalsHr": "{rounds} × {work} de trabajo, descanso hasta que el pulso baje a {bpm}"
+    },
+    "roundWord": {
+      "set": "Serie {numbers}",
+      "round": "Ronda {numbers}",
+      "interval": "Intervalo {numbers}",
+      "minute": "Minuto {numbers}"
+    },
+    "struct": {
+      "superset": "Superserie",
+      "complex": "Complejo",
+      "cluster": "Cluster · {clusters} partes · {intra} de pausa",
+      "drop": "Serie descendente · {drops} bajadas de {dropby}",
+      "restpause": "Descanso-pausa · {minis} miniseries · {intra} de pausa"
+    },
+    "perSide": "por lado",
+    "rest": "Descanso",
+    "measure": {
+      "pace": "Ritmo {value}",
+      "tempo": "Tempo {value}",
+      "rpe": "RPE {value}",
+      "rir": "RIR {value}",
+      "zone": "Zona de pulso {value}",
+      "height": "Altura {value}",
+      "dist": "Distancia {value}",
+      "hold": "Mantener {value}"
+    },
+    "interruptEvery": "Cada {time}, para para",
+    "scoreLine": "Puntuación: {score}",
+    "score": {
+      "best_load": "Carga (mejor serie)",
+      "reps": "Repeticiones",
+      "time": "Tiempo",
+      "rounds_reps": "Rondas + reps",
+      "done": "Completado",
+      "total_reps": "Repeticiones (total)",
+      "lowest_round": "Ronda más baja",
+      "distance": "Distancia"
+    },
+    "levelNotes": "Notas por nivel",
+    "sectionNote": "Nota de la sección",
+    "exerciseCount": "{count, plural, one {# ejercicio} other {# ejercicios}}",
+    "authoring": {
+      "label": "Cómo se escribe este entrenamiento",
+      "freeText": "Texto libre",
+      "structured": "Estructurado",
+      "toStructuredTitle": "¿Cambiar a estructurado?",
+      "toStructuredBody": "El plan estructurado empieza vacío. Tu texto queda como nota de la primera sección, así no se pierde nada.",
+      "toTextTitle": "¿Cambiar a texto libre?",
+      "toTextBody": "El plan se convierte en texto que puedes seguir editando. Los flujos, los valores por serie y las estructuras se escriben como texto y dejan de estar estructurados.",
+      "confirm": "Cambiar",
+      "cancel": "Cancelar",
+      "switchFailed": "No se pudo guardar el entrenamiento antes de cambiar. Inténtalo de nuevo.",
+      "switching": "Guardando…"
+    },
+    "editor": {
+      "planEmpty": "Añade al menos un ejercicio o un descanso antes de publicar.",
+      "fixProblems": "Algunos valores no se entienden: corrige las filas marcadas en rojo.",
+      "sectionCount": "{count, plural, one {# sección} other {# secciones}}"
+    }
+  },
+  "PlanEditor": {
+    "label": "Editor de WOD estructurado",
+    "title": "Título del WOD",
+    "titlePlaceholder": "Título del WOD",
+    "wodNote": "Nota para todo el WOD (opcional)",
+    "addSection": "+ Parte",
+    "newSection": "Nueva parte",
+    "sectionName": "Nombre (opcional)",
+    "deleteSection": "Eliminar parte",
+    "noExercises": "Aún no hay ejercicios",
+    "presetChip": "Plantilla",
+    "steps": "Pasos",
+    "step": {
+      "flow": "Flujo",
+      "time": "Tiempo",
+      "exercises": "Ejercicios",
+      "score": "Puntuación"
+    },
+    "back": "Atrás",
+    "next": "Siguiente →",
+    "finish": "Terminar parte",
+    "pickHelp": "Escribe para buscar,",
+    "flowInput": "Flujo de la parte",
+    "flowPlaceholder": "¿Cómo corre el reloj? p. ej. emom, series o una plantilla: tabata",
+    "flowsHeading": "Flujo",
+    "presetsHeading": "Plantillas",
+    "presetsSub": "atajos: eligen un flujo y rellenan valores, luego puedes cambiarlo todo",
+    "presetIs": "{preset} = {flow}",
+    "noMatch": "Nada con ese nombre. Prueba otra palabra.",
+    "recipe": {
+      "intervals": "{work} / {off} × {rounds}",
+      "intervalsHr": "{work} / pulso × {rounds}",
+      "amrap": "{dur}′",
+      "slots": "{count} intervalos alternos",
+      "reps": "repeticiones {reps}",
+      "interrupt": "interrupción cada 2:00",
+      "hr": "descanso hasta que baje el pulso"
+    },
+    "example": {
+      "times": "minutos · p. ej. 12, o 3-3-3-4 para ventanas",
+      "timeMin": "minutos · o 1:30, 90s",
+      "timeSmart": "p. ej. 30s, 1:30, 2′",
+      "range": "p. ej. 4 o 3-4",
+      "count": "un número entero"
+    },
+    "reading": "= {text}",
+    "readingWindows": "= {count} ventanas: {list}",
+    "unit": {
+      "rounds": "rondas",
+      "times": "veces",
+      "sets": "series",
+      "hrTarget": "ppm",
+      "min": "minutos",
+      "sec": "s",
+      "clock": "m:ss"
+    },
+    "addMod": "+ {label}",
+    "removeMod": "× {label}",
+    "removeModTitle": "Quitar",
+    "timeline": "Cronología",
+    "timelineInterrupt": "Interrupción cada {every}",
+    "timelineSlot": "Intervalo {n}",
+    "timelineWork": "Trabajo",
+    "timelineRest": "Descanso",
+    "score": "Puntuación",
+    "scoreHelp": "Lo habitual ya está elegido. ← → para cambiar.",
+    "sectionNote": "Nota para la parte (opcional)",
+    "levelNotes": "Notas por nivel",
+    "levelNote": "Nota para {level} (opcional)",
+    "perRoundOnce": "Esto pasa una vez: añade más rondas en el paso 2",
+    "deleted": "Eliminado · {undo} para deshacer",
+    "status": {
+      "undone": "Deshecho",
+      "redone": "Rehecho"
+    },
+    "hint": {
+      "label": "Teclado",
+      "section": "parte",
+      "open": "abrir",
+      "newSection": "nueva parte",
+      "all": "todo",
+      "type": "escribir",
+      "search": "buscar",
+      "choose": "elegir",
+      "continue": "seguir",
+      "close": "cerrar",
+      "nextField": "campo siguiente",
+      "nextStep": "paso siguiente",
+      "back": "atrás",
+      "newExercise": "nuevo ejercicio",
+      "actions": "acciones",
+      "differentRound": "ronda diferente",
+      "score": "puntuación"
+    },
+    "sheet": {
+      "title": "Atajos",
+      "groupSection": "Parte",
+      "groupExercises": "Ejercicios",
+      "groupGeneral": "General",
+      "newSection": "Nueva parte",
+      "steps": "Paso siguiente / anterior",
+      "jumpStep": "Ir al paso",
+      "close": "Cerrar la parte en una línea",
+      "cards": "En partes cerradas: elegir y abrir",
+      "moveSection": "Mover la parte",
+      "newExercise": "Nuevo ejercicio",
+      "actions": "Acciones de fila (el menú ⋯)",
+      "superset": "Superserie con la fila de arriba",
+      "structure": "Estructura de la serie: cluster, drop set, complex…",
+      "measure": "Medida: ritmo, tempo, RPE, altura, por lado…",
+      "perRound": "Valores por ronda (AMRAP, For Time, EMOM)",
+      "rest": "Descanso dentro de la serie",
+      "differentRound": "Ronda, serie o intervalo diferente (alternos)",
+      "note": "Nota",
+      "emptyCell": "Igual que la serie anterior",
+      "plus": "Un valor que cambia en cada serie",
+      "spread": "Un valor repartido hasta la última serie",
+      "unit": "Una vez por fila",
+      "deleteRow": "Eliminar",
+      "move": "Moverte entre campos",
+      "undo": "Deshacer",
+      "redo": "Rehacer",
+      "sheet": "Esta lista",
+      "keyEmptyCell": "celda vacía",
+      "keyUnit": "kg o %",
+      "keyDeleteRow": "⌫ con el nombre vacío"
+    },
+    "perSide": "por lado"
+  },
+  "PlanGrid": {
+    "head": {
+      "exercise": "Ejercicio",
+      "amrap": "↻ Ronda, una y otra vez hasta que se acabe el tiempo",
+      "emomEvery": "Cada {every}",
+      "emom": "Cada intervalo",
+      "intervals": "En cada intervalo de trabajo ({work})",
+      "rounds": "↻ Ronda × {rounds}",
+      "once": "En orden, una vez"
+    },
+    "round": {
+      "set": "Serie {list}",
+      "round": "Ronda {list}",
+      "slot": "Intervalo {list}",
+      "minute": "Minuto {list}",
+      "slotAt": "Intervalo {list} · {at}"
+    },
+    "col": {
+      "d": "Reps",
+      "l": "Carga"
+    },
+    "line": {
+      "d": "Reps",
+      "rest": "Tiempo",
+      "l": "Carga",
+      "lUnit": "Carga {unit}"
+    },
+    "measure": {
+      "pace": "Ritmo",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "Zona de pulso",
+      "height": "Altura / objetivo",
+      "dist": "Distancia",
+      "hold": "Mantener",
+      "side": "Por lado"
+    },
+    "measureHint": {
+      "pace": "tiempo parcial · p. ej. 2:00/500m",
+      "tempo": "bajada, pausa, subida, pausa · p. ej. 31X1",
+      "rpe": "cuánto cuesta, 1–10 · p. ej. 8",
+      "rir": "repeticiones en reserva · p. ej. 2",
+      "zone": "zona de frecuencia cardíaca · p. ej. 2",
+      "height": "cajón, objetivo · p. ej. 60 cm",
+      "dist": "p. ej. 400 m",
+      "hold": "isométrico · p. ej. 3 s",
+      "side": "sin valor: una etiqueta junto al nombre"
+    },
+    "tag": {
+      "side": "por lado"
+    },
+    "unit": {
+      "sec": "s",
+      "min": "min"
+    },
+    "struct": {
+      "single": "Simple",
+      "superset": "Superserie",
+      "complex": "Complex",
+      "cluster": "Cluster",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
+    },
+    "structHint": {
+      "single": "un ejercicio, tal cual",
+      "superset": "todos los ejercicios, luego la siguiente serie",
+      "complex": "todos los ejercicios sin soltar la barra",
+      "cluster": "la serie se divide en bloques con una pausa corta",
+      "drop": "bajas el peso y sigues",
+      "restpause": "hasta el fallo, pausa, otra vez"
+    },
+    "structField": {
+      "clusters": "bloques",
+      "intra": "pausa",
+      "drops": "bajadas",
+      "dropby": "cada vez",
+      "minis": "miniseries"
+    },
+    "structChip": "Estructura de la serie (Alt+T)",
+    "rest": "Descanso",
+    "name": {
+      "placeholder": "Ejercicio",
+      "inWod": "en este WOD",
+      "suggestions": "Sugerencias de ejercicios"
+    },
+    "note": {
+      "placeholder": "Nota para el ejercicio"
+    },
+    "menu": {
+      "button": "Acciones del ejercicio",
+      "title": "Acciones (Alt+M)",
+      "filter": "Escribe para filtrar",
+      "nothing": "No hay coincidencias",
+      "nothingHint": "borra una letra",
+      "struct": "Estructura de la serie…",
+      "structHint": "p. ej. cluster, drop set, complex…",
+      "measure": "Medida…",
+      "measureHint": "ritmo, tempo, RPE, altura…",
+      "perRound": "Valores por ronda",
+      "sameEachRound": "Mismos valores en cada ronda",
+      "note": "Nota",
+      "addNote": "Añadir una nota",
+      "superset": "Superserie con la fila de arriba",
+      "unsuperset": "Fuera de la superserie",
+      "restAfter": "Descanso después",
+      "remove": "Quitar: {measure}",
+      "delete": "Eliminar",
+      "deleteHint": "⌫ con el nombre vacío",
+      "structTitle": "Estructura de la serie",
+      "measureTitle": "Medida"
+    },
+    "add": {
+      "exercise": "+ Ejercicio",
+      "exerciseHere": "+ Ejercicio en este bloque",
+      "exerciseSets": "+ Ejercicio en estas series",
+      "exerciseInterrupt": "+ Ejercicio en la interrupción",
+      "round": {
+        "set": "+ serie diferente",
+        "round": "+ ronda diferente",
+        "slot": "+ intervalo diferente"
+      }
+    },
+    "how": {
+      "alternate": "Los bloques se alternan: {cycle}, {cycle} …",
+      "own": {
+        "set": "Cada serie tiene sus propios ejercicios, en orden.",
+        "round": "Cada ronda tiene sus propios ejercicios, en orden.",
+        "slot": "Cada intervalo tiene sus propios ejercicios, en orden."
+      },
+      "emomOne": "Todo lo del bloque se hace en el mismo intervalo.",
+      "amrapMax": "Para «todas las que puedas en el tiempo que queda», escribe max en las repeticiones del último ejercicio.",
+      "optionalSets": "* si puede: las series son {sets}."
+    },
+    "optionalSet": "Si puede (las series son {sets})",
+    "interrupt": {
+      "title": "Interrupción · cada {every} para y haz"
+    },
+    "aria": {
+      "reps": "Repeticiones o cantidad",
+      "load": "Carga",
+      "rest": "Descanso",
+      "cell": "{column} {n}: {what}"
+    },
+    "error": {
+      "dose": "No se entiende: p. ej. 10, 8-12, 5-10-15…, max, 400 m, 60s",
+      "tempo": "Tempo con 4 marcas, p. ej. 31X1",
+      "number": "Un número, +x o a→b",
+      "numberExample": "Un número, p. ej. {example}",
+      "max": "Como máximo {max}",
+      "loadUnitCompact": "Escribe kg o %, p. ej. 60kg o 70%",
+      "loadMissingUnit": "Escribe kg o % en una serie de la fila; las demás lo toman de ahí",
+      "loadMixedUnits": "Misma unidad en toda la fila: {unit}"
+    },
+    "mean": {
+      "equals": "= {value}",
+      "max": "todas las que puedas",
+      "maxCal": "todas las calorías que puedas",
+      "maxM": "todos los metros que puedas",
+      "sets": "{sets} series",
+      "ladder": "por {word}: {list}, luego {step} en cada {word}",
+      "perRound": "por {word}: {list}",
+      "range": "rango {range}, decide el atleta",
+      "rangeSide": "rango {range}, decide el atleta · por lado",
+      "reps": "{value} repeticiones",
+      "repsSide": "{value} repeticiones · por lado",
+      "amount": "{value}",
+      "amountSide": "{value} · por lado",
+      "bw": "peso corporal",
+      "kg": "{value} kg",
+      "pct": "{value} % del 1RM",
+      "words": "como texto para el atleta",
+      "tempo": "↓{down} bajada · {bottom} abajo · ↑{up} subida · {top} arriba (segundos, X = explosivo)"
+    },
+    "word": {
+      "set": "serie",
+      "round": "ronda",
+      "slot": "intervalo"
+    },
+    "tip": {
+      "range": "rango",
+      "ladder": "sube cada ronda",
+      "max": "todas las que pueda",
+      "emptyCode": "vacío",
+      "asBefore": "igual que el anterior",
+      "kg": "kilos",
+      "pct": "del 1RM",
+      "heavyCode": "pesado",
+      "words": "con palabras",
+      "plusEach": "sube cada vez",
+      "spread": "hasta el último",
+      "unitCode": "kg o %",
+      "unitOnce": "una vez por fila",
+      "changeEach": "cambia cada vez",
+      "tempo": "segundos de bajada · pausa abajo · subida (X = explosivo) · pausa arriba",
+      "seconds": "segundos",
+      "minSec": "minutos:segundos",
+      "minutes": "minutos, hasta 10",
+      "afterLastCode": "después de la última ronda",
+      "afterLast": "el mismo valor, o el mismo cambio si escribes +x"
+    },
+    "colWord": {
+      "set": "Serie",
+      "round": "Ronda",
+      "slot": "Intervalo"
+    }
+  },
   "PlanCore": {
     "flow": {
       "sets": "Series",
@@ -12327,7 +12766,16 @@
       "too_many_rows": "Como máximo 60 ejercicios",
       "too_many_cells": "Como máximo 30 series",
       "too_long": "Como máximo 200 caracteres",
-      "note_too_long": "Como máximo 2000 caracteres"
+      "note_too_long": "Como máximo 2000 caracteres",
+      "wrong_unit": "No es una unidad de carga: escribe kg o %",
+      "no_base": "No hay nada antes que cambiar: escribe primero un número",
+      "bad_shape": "Este valor no tiene la forma correcta"
+    },
+    "ambiguous": {
+      "rangeOrList": "rango {range}, elige el atleta · para {count} series escribe {write}",
+      "listOrLadder": "{list}, luego se repite el último · para seguir subiendo escribe {write}",
+      "windows": "{count} ventanas AMRAP: {list} · para un solo AMRAP escribe {write}",
+      "clock": "se lee {reading} · para la otra unidad escribe {write}"
     }
   },
   "PlanRun": {

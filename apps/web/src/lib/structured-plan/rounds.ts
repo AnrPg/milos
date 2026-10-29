@@ -7,7 +7,7 @@
  * (sets, rounds, EMOM minutes, intervals). AMRAP has no last round.
  */
 import { FLOWS, STRUCTS } from "./catalog";
-import { mmss, parseClock, type PlanText, type RoundWord } from "./parse";
+import { mmss, parseClock, parseCount, parseCountRange, type PlanText, type RoundWord } from "./parse";
 import type { PlanRow, PlanSection, PlanStructure, PlanUnit } from "./types";
 
 /** Most columns a block shows (sets / rounds) and most blocks a section has. */
@@ -41,22 +41,20 @@ export function structOf(section: Pick<PlanSection, "structs">, unit: PlanUnit):
 
 /** A parameter as a time in seconds (cap and dur read bare numbers as minutes), or null. */
 export function paramSecs(section: Pick<PlanSection, "params">, key: keyof PlanSection["params"]): number | null {
-  const v = section.params[key];
-  if (!v) return null;
+  const v = section.params?.[key];
+  if (typeof v !== "string" || !v.trim()) return null;
   const secs = parseClock(v, key === "cap" || key === "dur" ? "min" : "smart");
   return typeof secs === "number" && secs > 0 ? secs : null;
 }
 
 /** A parameter as a positive whole number, or null. */
 export function paramCount(section: Pick<PlanSection, "params">, key: keyof PlanSection["params"]): number | null {
-  const v = (section.params[key] || "").trim();
-  return /^\d+$/.test(v) && +v > 0 ? +v : null;
+  return parseCount(section.params?.[key]);
 }
 
-/** Sets of a `sets` flow: "4" → 4–4, "3-4" → 3–4 (sets past `min` are "if they can"). Unreadable → 1–1. */
+/** Sets of a `sets` flow: "4" → 4–4, "3-4" / "3 ή 4" → 3–4 (sets past `min` are "if they can"). Unreadable → 1–1. */
 export function setsRange(section: Pick<PlanSection, "params">): { min: number; max: number } {
-  const m = /^(\d+)(?:\s*-\s*(\d+))?$/.exec((section.params.sets || "").trim());
-  return m ? { min: +m[1], max: +(m[2] || m[1]) } : { min: 1, max: 1 };
+  return parseCountRange(section.params?.sets) ?? { min: 1, max: 1 };
 }
 
 /**
@@ -77,6 +75,7 @@ function writtenColumns(section: Pick<PlanSection, "flow">, list: PlanRow[]): nu
   let filled = 0;
   for (const r of list) {
     if (!grid && !r.perRound) continue;
+    if (!Array.isArray(r.cells)) continue;
     r.cells.forEach((c, i) => {
       if (c && Object.values(c).some((v) => String(v ?? "").trim())) filled = Math.max(filled, i + 1);
     });

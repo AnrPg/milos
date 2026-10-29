@@ -1,7 +1,28 @@
 /**
  * ADR-270: parsers for every value a coach types in the structured WOD
  * editor (port of `docs/product/mockups/structured-wod-parsers.js` and the
- * mockup's in-page helpers). Pure: no DOM, no React, no translated text.
+ * mockup's in-page helpers, hardened). Pure: no DOM, no React, no
+ * translated text. The full notation is in
+ * `docs/product/structured-wod-notation.md`; in short:
+ *
+ * Normalisation (`normText`, before any rule): trimmed, lower case, Greek
+ * accents removed, spaces collapsed; every dash (‐ ‒ – — ― −) is "-";
+ * minute marks ' ’ ‘ ′ are "′"; second marks " “ ” ″ '' ′′ are "″";
+ * "..." is "…"; "->" and "=>" are "→".
+ *
+ * Numbers: whole or decimal with "." ("22.5"), or "," followed by exactly
+ * one digit ("22,5"); "m:ss" is a time.
+ *
+ * Ambiguity rules (the reading wins; `ambiguous` names the other one):
+ *  - two ascending values joined by "-" ("10-12") are a range the athlete
+ *    picks from; for two sets write "10, 12";
+ *  - descending or equal values ("12-10-8-8", "21-15-9", "8-8") are a list,
+ *    one per set / round, the last repeating;
+ *  - three or more values rising by the same step ("5-10-15") are a list;
+ *    to keep climbing after the last, write "5-10-15…";
+ *  - AMRAP durations are windows: "3-3-3-4" four windows, "12-15" two;
+ *  - a bare time in a "smart" field is minutes up to 10 and seconds above,
+ *    and all bare parts of one field share the unit ("5-15" = 5″–15″).
  *
  * Words a coach reads (captions, hints) are returned as i18n keys under the
  * `PlanCore` namespace with their values (`PlanText`); errors are stable
@@ -21,6 +42,8 @@ export const PLAN_ERROR_CODES = [
   "bad_dose",
   "missing_unit",
   "mixed_unit",
+  "wrong_unit",
+  "no_base",
   "bad_tempo",
   "bad_measure_value",
   "rpe_over_max",
@@ -35,6 +58,7 @@ export const PLAN_ERROR_CODES = [
   "mod_not_allowed",
   "unknown_score",
   "bad_version",
+  "bad_shape",
   "bad_row_kind",
   "duplicate_id",
   "blocks_not_allowed",
@@ -46,14 +70,69 @@ export const PLAN_ERROR_CODES = [
 ] as const;
 export type PlanErrorCode = (typeof PLAN_ERROR_CODES)[number];
 
+/**
+ * A reading that could have meant something else: `alt` names the other
+ * reading, `write` is how to type it, `hint` the line the UI shows
+ * (`PlanCore.ambiguous.*`), e.g. «εύρος 10–12 · για 2 σετ γράψε 10, 12».
+ */
+export type Ambiguity = { alt: "list" | "ladder" | "range" | "seconds" | "minutes"; write: string; hint: PlanText };
+
+// ── normalisation ──────────────────────────────────────────────────────────
+
+/**
+ * The form every rule reads: trimmed, lower case, accents removed, spaces
+ * collapsed, look-alike characters unified (dashes, primes, quotes,
+ * ellipsis, arrows). Final sigma stays. Never throws.
+ */
+export function normText(text: unknown): string {
+  if (typeof text !== "string") return "";
+  return text
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[‐-―−﹘﹣－]/g, "-")
+    .replace(/(?:''|′′|[“”„"])/g, "″")
+    .replace(/[’‘'`´]/g, "′")
+    .replace(/\.\.\./g, "…")
+    .replace(/\s*(?:->|=>)\s*/g, "→")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** "22,5" → "22.5" (a comma followed by exactly one digit is a decimal point). */
+const decimalComma = (v: string) => v.replace(/(\d),(\d)(?!\d)/g, "$1.$2");
+
+/** `normText` plus the decimal comma rule ("22,5" → "22.5"). */
+export const decimalCommaNorm = (text: unknown): string => decimalComma(normText(text));
+
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+/** An alternation of words, longest first, as a regex source. */
+const alt = (words: string[]) => [...words].sort((a, b) => b.length - a.length).map(escapeRe).join("|");
+
+/** Unit words (normalised: lower case, no accents). */
+export const UNIT_WORDS = {
+  secs: ["s", "sec", "secs", "second", "seconds", "″", "δ", "δευτ", "δευτ.", "δευτερολεπτο", "δευτερολεπτα"],
+  mins: ["min", "mins", "minute", "minutes", "′", "λ", "λ.", "λεπτ", "λεπτ.", "λεπτο", "λεπτα"],
+  reps: ["reps", "rep", "r", "επαναληψεις", "επαναληψη", "επαν", "επαν.", "επ", "επ."],
+  kcal: ["cal", "cals", "kcal", "calories", "θερμιδες", "θερμ", "θερμ."],
+  m: ["m", "meters", "metres", "μ", "μ.", "μετρα"],
+  km: ["km", "χλμ", "χλμ."],
+  kg: ["kg", "kgs", "kgr", "κιλα", "κιλο", "κ", "κ."],
+  pct: ["%"],
+} as const;
+
+const SEC_RE = alt([...UNIT_WORDS.secs]);
+const MIN_RE = alt([...UNIT_WORDS.mins]);
+const KG_RE = alt([...UNIT_WORDS.kg]);
+
 // ── clock formatting ───────────────────────────────────────────────────────
 
 /** "1:30" from 90 seconds, "45″" below a minute (the mockup's `clock`). */
 export const clock = (secs: number): string =>
-  secs >= 60 ? `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}` : `${secs}″`;
+  secs >= 60 ? `${Math.floor(secs / 60)}:${String(Math.round(secs % 60)).padStart(2, "0")}` : `${numStr(secs)}″`;
 
 /** Always "m:ss" ("0:45", "2:30"). */
-export const mmss = (secs: number): string => `${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, "0")}`;
+export const mmss = (secs: number): string => `${Math.floor(secs / 60)}:${String(Math.round(secs % 60)).padStart(2, "0")}`;
 
 /** A number with at most two decimals, no trailing zeros ("22.5", "60"). */
 export const numStr = (n: number): string => String(Math.round(n * 100) / 100);
@@ -64,7 +143,7 @@ export const numStr = (n: number): string => String(Math.round(n * 100) / 100);
  */
 export function human(secs: number): PlanText {
   const min = Math.floor(secs / 60);
-  const sec = secs % 60;
+  const sec = Math.round(secs % 60);
   if (!min) return { key: "PlanCore.human.sec", values: { sec } };
   if (!sec) return { key: "PlanCore.human.min", values: { min } };
   return { key: "PlanCore.human.minSec", values: { min, sec } };
@@ -72,42 +151,78 @@ export function human(secs: number): PlanText {
 
 // ── time fields ────────────────────────────────────────────────────────────
 
+const CLOCK_MSS = /^(\d+):([0-5]\d)$/;
+
+/** One duration in normalised text, with how a bare number was read (at most `MAX_NUMBER` seconds). */
+function readClock(v: string, dflt: "min" | "smart"): { secs: number; assumed: "min" | "sec" | null } | "bad" {
+  const r = readClockRaw(v, dflt);
+  return r !== "bad" && r.secs > MAX_NUMBER ? "bad" : r;
+}
+
+function readClockRaw(v: string, dflt: "min" | "smart"): { secs: number; assumed: "min" | "sec" | null } | "bad" {
+  let m = CLOCK_MSS.exec(v);
+  if (m) return { secs: +m[1] * 60 + +m[2], assumed: null };
+  m = new RegExp(`^(\\d+)\\s*(?:${MIN_RE})\\s*(\\d+)\\s*(?:${SEC_RE})?$`).exec(v);
+  if (m && +m[2] < 60) return { secs: +m[1] * 60 + +m[2], assumed: null };
+  m = new RegExp(`^(\\d+(?:\\.\\d+)?)\\s*(?:${SEC_RE})$`).exec(v);
+  if (m) return { secs: Math.round(+m[1]), assumed: null };
+  m = new RegExp(`^(\\d+(?:\\.\\d+)?)\\s*(?:${MIN_RE})$`).exec(v);
+  if (m) return { secs: Math.round(+m[1] * 60), assumed: null };
+  m = /^(\d+)$/.exec(v);
+  if (m) return dflt === "min" || +m[1] <= 10 ? { secs: +m[1] * 60, assumed: "min" } : { secs: +m[1], assumed: "sec" };
+  return "bad";
+}
+
 /**
- * Reads one duration in seconds: "1:30", "90s", "90″", "2′", "2min", "2λ".
- * A bare number means minutes with `"min"`; with `"smart"` it means minutes
- * up to 10 and seconds above ("rest 2" vs "rest 90"). Empty → `null`,
+ * Reads one duration in seconds: "1:30", "90s", "90″", "90 δευτ.", "2′",
+ * "2min", "2 λεπτά", "1.5 min", "2′30″". A bare number means minutes with
+ * `"min"`; with `"smart"` it means minutes up to 10 and seconds above
+ * ("rest 2" vs "rest 90"). "m:ss" needs seconds below 60. Empty → `null`,
  * unreadable → `"bad"`.
  */
 export function parseClock(text: string, dflt: "min" | "smart" = "min"): number | null | "bad" {
-  const v = text.trim().toLowerCase();
+  const v = decimalComma(normText(text));
   if (!v) return null;
-  let m = /^(\d+):(\d{2})$/.exec(v);
-  if (m) return +m[1] * 60 + +m[2];
-  m = /^(\d+)\s*(s|sec|″|"|δ)$/.exec(v);
-  if (m) return +m[1];
-  m = /^(\d+)\s*(min|'|′|λ|λεπτά)$/.exec(v);
-  if (m) return +m[1] * 60;
-  m = /^(\d+)$/.exec(v);
-  if (m) return dflt === "min" || +m[1] <= 10 ? +m[1] * 60 : +m[1];
-  return "bad";
+  const r = readClock(v, dflt);
+  return r === "bad" ? "bad" : r.secs;
+}
+
+/**
+ * How a bare number in a time field was read, with the other reading
+ * (`PlanCore.ambiguous.clock` {reading, write}): "10" in a smart field is
+ * 10 minutes, "write 10″ for seconds". Null when the unit is written.
+ */
+export function clockAmbiguity(text: string, dflt: "min" | "smart" = "min"): Ambiguity | null {
+  const v = normText(text);
+  const r = v ? readClock(v, dflt) : "bad";
+  if (r === "bad" || !r.assumed) return null;
+  const n = +v;
+  return r.assumed === "min"
+    ? { alt: "seconds", write: `${n}″`, hint: { key: "PlanCore.ambiguous.clock", values: { reading: clock(r.secs), write: `${n}″` } } }
+    : { alt: "minutes", write: `${n}′`, hint: { key: "PlanCore.ambiguous.clock", values: { reading: clock(r.secs), write: `${n}′` } } };
 }
 
 export type ParsedTimes = { range: boolean; secs: number[] };
 
 /**
- * Several durations: AMRAP windows "3-3-3-4" / "3'-3'-3'-4'", or a range
- * "90-120″" (two ascending values without a comma). A trailing unit applies
- * to every bare number. Every part must be a positive duration.
+ * Several durations: AMRAP windows "3-3-3-4" / "3′-3′-3′-4′" / "3, 3, 3, 4"
+ * / "3/3/3/4", or a range "90-120″" (two ascending values joined by "-").
+ * A trailing unit applies to every bare part; with `"smart"`, bare parts
+ * share one unit (seconds if any is above 10). Every part must be positive.
  */
 export function parseTimes(text: string, dflt: "min" | "smart" = "min"): ParsedTimes | null | "bad" {
-  const v = text.trim().toLowerCase();
+  const v = decimalComma(normText(text));
   if (!v) return null;
-  const um = /\s*(s|sec|″|"|δ|min|'|′|λ)$/.exec(v);
-  const parts = v.split(/\s*[-–,]\s*/).map((p) => (um && /^\d+$/.test(p) ? p + um[1] : p));
-  const secs = parts.map((p) => parseClock(p, dflt));
-  if (secs.some((x) => x === "bad" || x === null || x <= 0)) return "bad";
-  const nums = secs as number[];
-  const range = nums.length === 2 && !v.includes(",") && nums[0] < nums[1];
+  const um = new RegExp(`\\s*(${SEC_RE}|${MIN_RE})$`).exec(v);
+  const raw = v.split(/\s*[-,/]\s*/);
+  if (raw.some((p) => !p)) return "bad";
+  const bare = raw.filter((p) => /^\d+$/.test(p)).map(Number);
+  const shared = !um && dflt === "smart" && bare.length > 1 ? (bare.some((n) => n > 10) ? "″" : "′") : null;
+  const parts = raw.map((p) => (/^\d+$/.test(p) ? p + (um ? um[1] : shared ?? "") : p));
+  const secs = parts.map((p) => readClock(p, dflt));
+  if (secs.some((x) => x === "bad" || x.secs <= 0)) return "bad";
+  const nums = secs.map((x) => (x as { secs: number }).secs);
+  const range = nums.length === 2 && !/[,/]/.test(v) && nums[0] < nums[1];
   return { range, secs: nums };
 }
 
@@ -115,51 +230,104 @@ export function parseTimes(text: string, dflt: "min" | "smart" = "min"): ParsedT
 export const showTimes = (p: ParsedTimes | null | "bad"): string =>
   !p || p === "bad" ? "" : p.range ? `${clock(p.secs[0])}–${clock(p.secs[1])}` : p.secs.map(clock).join(" · ");
 
-// ── dose notation ──────────────────────────────────────────────────────────
+/** Largest number any value may hold (reps, metres, seconds, kg); above it the text does not read. */
+export const MAX_NUMBER = 1_000_000_000;
+/** Largest count (rounds, times, sets, structure counts), so clocks and tables stay finite. */
+export const MAX_COUNT = 999;
+
+/**
+ * A whole positive count ("8") up to `MAX_COUNT`, or null. Spaces are ignored.
+ */
+export function parseCount(text: unknown): number | null {
+  const v = normText(text);
+  return /^\d+$/.test(v) && +v > 0 && +v <= MAX_COUNT ? +v : null;
+}
+
+/**
+ * A count or a count range: "4", "3-4", "3 ή 4", "3 or 4", "3/4" (sets past
+ * `min` are "if they can"). Null when unreadable or not ascending.
+ */
+export function parseCountRange(text: unknown): { min: number; max: number } | null {
+  const m = /^(\d+)(?:\s*(?:-|\/|η|or|εως|to)\s*(\d+))?$/.exec(normText(text));
+  if (!m) return null;
+  const min = +m[1];
+  const max = +(m[2] || m[1]);
+  return min > 0 && max >= min && max <= MAX_COUNT ? { min, max } : null;
+}
+
+// ── number lists ───────────────────────────────────────────────────────────
 
 /** One value or a range the athlete picks from ("8-10"). */
 export type NumEntry = { min: number; max: number };
-/** Values per set; `cont` = the last step keeps going ("5-10-15…"). */
-export type ParsedNums = { entries: NumEntry[]; cont: boolean };
+/**
+ * Values per set; `cont` = the last step keeps going ("5-10-15…").
+ * `ambiguous`: "10-12" read as a range could be two sets (`list`); a
+ * rising list "5-10-15" could be meant to keep climbing (`ladder`).
+ */
+export type ParsedNums = { entries: NumEntry[]; cont: boolean; ambiguous?: "list" | "ladder" };
 
-const NUM = "(\\d+(?:\\.\\d+)?(?::\\d{2})?)";
+const NUM = "(\\d+(?:\\.\\d+)?(?::[0-5]\\d)?)";
 const toNum = (t: string): number => {
   if (!t.includes(":")) return +t;
   const [a, b] = t.split(":");
   return +a * 60 + +b;
 };
+const RANGE_WORDS = "εως|ως|to|~";
 
 /**
- * A list of numbers: "12-10-8-8" (per set), "8-12" (two ascending = range),
- * "8-10, 6-8" (commas separate sets, dashes inside are ranges), "8 έως 12",
- * "5-10-15…" / "5-10-15+" (keeps going).
+ * A list of numbers (normalised text): "12-10-8-8" (per set), "8-12" (two
+ * ascending = range), "8-10, 6-8" (commas separate sets, dashes inside are
+ * ranges), "8 έως 12" / "8 to 12" (range), "5-10-15…" / "5-10-15+" (keeps
+ * going).
  */
 export function parseNums(text: string): ParsedNums | "bad" {
-  let v = text;
+  let v = normText(text);
   let cont = false;
-  if (/(…|\.\.\.|\+)$/.test(v)) {
+  if (/(…|\+)$/.test(v)) {
     cont = true;
-    v = v.replace(/(…|\.\.\.|\+)$/, "").trim();
+    v = v.replace(/(…|\+)$/, "").trim();
   }
-  const words = new RegExp(`^${NUM}\\s*(?:έως|εως|to|~)\\s*${NUM}$`).exec(v);
-  if (words) return { entries: [{ min: toNum(words[1]), max: toNum(words[2]) }], cont: false };
+  if (!v) return "bad";
+  const words = new RegExp(`^${NUM}\\s*(?:${RANGE_WORDS})\\s*${NUM}$`).exec(v);
+  if (words) {
+    const a = toNum(words[1]);
+    const b = toNum(words[2]);
+    return a <= b && b <= MAX_NUMBER && !cont ? { entries: [{ min: a, max: b }], cont: false } : "bad";
+  }
   if (v.includes(",")) {
-    const one = new RegExp(`^${NUM}(?:\\s*(?:[-–]|έως|εως|to)\\s*${NUM})?$`);
+    const one = new RegExp(`^${NUM}(?:\\s*(?:-|${RANGE_WORDS})\\s*${NUM})?$`);
     const sets = v.split(/\s*,\s*/).map((p) => {
       const r = one.exec(p);
       return r ? { min: toNum(r[1]), max: toNum(r[2] || r[1]) } : null;
     });
-    if (sets.some((e) => !e || e.max < e.min) || (cont && sets.length < 2)) return "bad";
+    if (sets.some((e) => !e || e.max < e.min || e.max > MAX_NUMBER) || (cont && sets.length < 2)) return "bad";
     return { entries: sets as NumEntry[], cont };
   }
-  const parts = v.split(/\s*[-–,]\s*/);
+  const parts = v.split(/\s*-\s*/);
   const whole = new RegExp(`^${NUM}$`);
   if (!parts.every((p) => whole.test(p))) return "bad";
   const nums = parts.map(toNum);
   if (cont && nums.length < 2) return "bad";
-  if (nums.length === 2 && nums[0] < nums[1] && !cont) return { entries: [{ min: nums[0], max: nums[1] }], cont };
-  return { entries: nums.map((n) => ({ min: n, max: n })), cont };
+  if (nums.some((n) => n > MAX_NUMBER)) return "bad";
+  if (nums.length === 2 && nums[0] < nums[1] && !cont) return { entries: [{ min: nums[0], max: nums[1] }], cont, ambiguous: "list" };
+  const out: ParsedNums = { entries: nums.map((n) => ({ min: n, max: n })), cont };
+  if (!cont && nums.length >= 3) {
+    const step = nums[1] - nums[0];
+    if (step > 0 && nums.every((n, i) => i === 0 || n - nums[i - 1] === step)) out.ambiguous = "ladder";
+  }
+  return out;
 }
+
+/**
+ * Strips a unit written after every number ("30s-45s", "60kg-70kg",
+ * "3′-3′") down to one at the end, so the list rules apply. `unitRe` is
+ * the trailing unit's own text (escaped), already removed from the end.
+ */
+function stripRepeatedUnit(v: string, unitRe: string): string {
+  return v.replace(new RegExp(`(\\d)\\s*(?:${unitRe})(?=\\s*(?:-|,|${RANGE_WORDS}|$))`, "g"), "$1");
+}
+
+// ── dose notation ──────────────────────────────────────────────────────────
 
 /** What a dose counts. */
 export type DoseUnit = "reps" | "kcal" | "m" | "secs";
@@ -172,21 +340,65 @@ export type ParsedDose = {
   /** "/side", "each side", "ανά πλευρά". */
   perSide: boolean;
   cont: boolean;
-  /** "max", "60s max cal": as many as possible, optionally within a time (seconds). */
+  /** "max", "60s max cal", "max cal σε 1:00": as many as possible, optionally within a time (seconds). */
   max: { within: number | null } | null;
+  /** The other reading of "10-12" (two sets) or "5-10-15" (keep climbing). */
+  ambiguous?: Ambiguity;
 };
 
-const SIDE =
-  /\s*(\/\s*(side|πλευρά|πλευρα|πλ\.?|χέρι|χερι|πόδι|ποδι)|(on\s+)?each(\s+(side|arm|leg))?|for each arm|ανά πλευρά|ανα πλευρα|ανά χέρι|ανα χερι|ανά πόδι|ανα ποδι)$/;
-const UNIT = /\s*(reps|r|επ\.?|cal|kcal|θερμ\.?|km|m|sec|s|″|"|δ|min|'|′|λ)$/;
+const SIDE = new RegExp(
+  `\\s*(?:\\/\\s*(?:side|leg|arm|πλευρα|πλ\\.?|χερι|ποδι)|(?:on\\s+)?each(?:\\s+(?:side|arm|leg))?|for each (?:side|arm|leg)|per (?:side|arm|leg)|e\\/s|ανα (?:πλευρα|χερι|ποδι))$`,
+);
+const DOSE_UNITS: [string[], DoseUnit, number][] = [
+  [[...UNIT_WORDS.reps], "reps", 1],
+  [[...UNIT_WORDS.kcal], "kcal", 1],
+  [[...UNIT_WORDS.km], "m", 1000],
+  [[...UNIT_WORDS.m], "m", 1],
+  [[...UNIT_WORDS.secs], "secs", 1],
+  [[...UNIT_WORDS.mins], "secs", 60],
+];
+const DOSE_UNIT_RE = alt(DOSE_UNITS.flatMap(([w]) => w));
+const doseUnitOf = (word: string): [DoseUnit, number] => {
+  const hit = DOSE_UNITS.find(([w]) => (w as string[]).includes(word));
+  return hit ? [hit[1], hit[2]] : ["reps", 1];
+};
+const MAX_UNIT: Record<string, DoseUnit> = Object.fromEntries([
+  ...UNIT_WORDS.reps.map((w) => [w, "reps"]),
+  ...UNIT_WORDS.kcal.map((w) => [w, "kcal"]),
+  ...UNIT_WORDS.m.map((w) => [w, "m"]),
+]);
+
+/** The canonical way to write entries ("10, 12", "60 kg, 70 kg", "30″, 45″"). */
+const writeList = (es: NumEntry[], unit: DoseUnit | "kg" | "pct") => es.map((e) => showOne(e.min, unit)).join(", ");
+const writeLadder = (es: NumEntry[], unit: DoseUnit | "kg" | "pct") => `${es.map((e) => numStr(e.min)).join("-")}…${unitSuffix(unit)}`;
+const unitSuffix = (unit: DoseUnit | "kg" | "pct") =>
+  unit === "kcal" ? " cal" : unit === "m" ? " m" : unit === "secs" ? "″" : unit === "kg" ? " kg" : unit === "pct" ? "%" : "";
+
+function ambiguityOf(n: ParsedNums, unit: DoseUnit | "kg" | "pct"): Ambiguity | undefined {
+  if (n.ambiguous === "list") {
+    const e = n.entries[0];
+    const pair = [
+      { min: e.min, max: e.min },
+      { min: e.max, max: e.max },
+    ];
+    const write = writeList(pair, unit);
+    return { alt: "list", write, hint: { key: "PlanCore.ambiguous.rangeOrList", values: { range: showEntry(e, unit), count: 2, write } } };
+  }
+  if (n.ambiguous === "ladder") {
+    const write = writeLadder(n.entries, unit);
+    return { alt: "ladder", write, hint: { key: "PlanCore.ambiguous.listOrLadder", values: { list: n.entries.map((e) => showOne(e.min, unit)).join(" · "), write } } };
+  }
+  return undefined;
+}
 
 /**
- * Reps or quantity: "10", "4×10", "12-10-8-8", "8-10", "3-4×12-15",
- * "5-10-15…", "30s", "1:00", "500m", "2km", "15 cal", "max", "60s max cal",
- * "8-10 each side". Empty → `null`, unreadable → `"bad"`.
+ * Reps or quantity: "10", "4×10", "4 x 10", "12-10-8-8", "8-10", "8 έως 12",
+ * "3-4×12-15", "5-10-15…", "30s", "30-45s", "1:00", "500m", "2km",
+ * "15 cal", "max", "max reps", "max cal", "60s max cal", "max cal σε 1:00",
+ * "8-10 each side", "8 ανά πόδι". Empty → `null`, unreadable → `"bad"`.
  */
 export function parseDose(text: string): ParsedDose | null | "bad" {
-  let v = text.trim().toLowerCase().replace(/\s+/g, " ");
+  let v = decimalComma(normText(text));
   if (!v) return null;
   const out: ParsedDose = { sets: null, entries: null, unit: "reps", perSide: false, cont: false, max: null };
   const sm = SIDE.exec(v);
@@ -194,79 +406,99 @@ export function parseDose(text: string): ParsedDose | null | "bad" {
     out.perSide = true;
     v = v.slice(0, sm.index).trim();
   }
-  const sx = /^(\d+)(?:\s*-\s*(\d+))?\s*(?:sets?|σετ)?\s*[x×χ]\s*(.*)$/.exec(v);
+  // "4x10", "4 χ 10", "3-4 sets x 12": the x must be followed by a value (so "2 χλμ" stays 2 km)
+  const sx = /^(\d+)(?:\s*-\s*(\d+))?\s*(?:sets?|σετ)?\s*[x×χ*]\s*(?=$|\d|max|amrap|μεγιστ)(.*)$/.exec(v);
   if (sx) {
     out.sets = { min: +sx[1], max: +(sx[2] || sx[1]) };
     v = sx[3].trim();
-    if (!out.sets.min || out.sets.max < out.sets.min) return "bad";
+    if (!out.sets.min || out.sets.max < out.sets.min || out.sets.max > MAX_COUNT) return "bad";
     if (!v) return out;
   }
-  const mx = /^(?:(\S+)\s+)?(max|μέγιστ\S*)\s*(reps|cal|m)?$/.exec(v);
+  const mx = new RegExp(`^(?:(\\S+)\\s+)?(?:max|amrap|μεγιστ\\S*)(?:\\s*(${alt(Object.keys(MAX_UNIT))}))?(?:\\s+(?:in|σε)\\s+(\\S+))?$`).exec(v);
   if (mx) {
-    const within = mx[1] ? parseClock(mx[1], "smart") : null;
-    if (within === "bad") return "bad";
+    if (mx[1] && mx[3]) return "bad";
+    const t = mx[1] || mx[3];
+    const within = t ? parseClock(t, "smart") : null;
+    if (within === "bad" || within === 0) return "bad";
     out.max = { within };
-    out.unit = mx[3] === "cal" ? "kcal" : mx[3] === "m" ? "m" : "reps";
+    out.unit = mx[2] ? MAX_UNIT[mx[2]] : "reps";
     return out;
   }
-  const um = UNIT.exec(v);
+  const um = new RegExp(`\\s*(${DOSE_UNIT_RE})$`).exec(v);
   let scale = 1;
   if (um) {
-    const u = um[1];
-    v = v.slice(0, um.index).trim();
-    if (["cal", "kcal", "θερμ", "θερμ."].includes(u)) out.unit = "kcal";
-    else if (u === "m") out.unit = "m";
-    else if (u === "km") {
-      out.unit = "m";
-      scale = 1000;
-    } else if (["sec", "s", "″", '"', "δ"].includes(u)) out.unit = "secs";
-    else if (["min", "'", "′", "λ"].includes(u)) {
-      out.unit = "secs";
-      scale = 60;
-    }
+    const [unit, s] = doseUnitOf(um[1]);
+    out.unit = unit;
+    scale = s;
+    v = stripRepeatedUnit(v.slice(0, um.index).trim(), escapeRe(um[1]));
   }
-  if (v.includes(":")) out.unit = "secs";
+  if (v.includes(":")) {
+    if (um && out.unit !== "secs") return "bad";
+    out.unit = "secs";
+    scale = 1;
+  }
   const p = parseNums(v);
   if (p === "bad") return "bad";
   out.entries = p.entries.map((e) => ({ min: e.min * scale, max: e.max * scale }));
   out.cont = p.cont;
-  if (out.entries.some((e) => e.min <= 0)) return "bad";
+  if (out.entries.some((e) => e.min <= 0 || e.max > MAX_NUMBER)) return "bad";
   if (out.sets && (out.entries.length > 1 || out.cont)) return "bad";
+  // with sets written ("4x8-10") a dash can only be a range
+  const amb = out.sets ? undefined : ambiguityOf({ ...p, entries: out.entries }, out.unit);
+  if (amb) out.ambiguous = amb;
   return out;
 }
+
+// ── load notation ──────────────────────────────────────────────────────────
 
 export type ParsedLoad =
   | { kind: "bw" }
   | { kind: "rpe"; min: number; max: number }
   | { kind: "zone"; zone: number }
   | { kind: "pace"; per: string; secs: number }
-  | { kind: "kg" | "pct"; entries: NumEntry[]; up: boolean }
+  | { kind: "kg" | "pct"; entries: NumEntry[]; up: boolean; ambiguous?: Ambiguity }
+  /** A number with a unit that is not a load ("60 km", "20 reps"). */
+  | { kind: "wrong"; text: string }
   | { kind: "text"; text: string };
 
+const LOAD_UNIT_RE = `${KG_RE}|%`;
+const NOT_LOAD_UNIT = new RegExp(`^[+-]?\\d+(?:\\.\\d+)?\\s*(?:${alt([...UNIT_WORDS.km, ...UNIT_WORDS.m, ...UNIT_WORDS.kcal, ...UNIT_WORDS.reps, ...UNIT_WORDS.secs, ...UNIT_WORDS.mins])})$`);
+/** Normalised load text: decimal comma, "@70%", "70% 1RM" / "του 1RM" / "of 1RM". */
+const normLoadText = (text: string) =>
+  decimalComma(normText(text))
+    .replace(/^@\s*/, "")
+    .replace(/%\s*(?:(?:του|of)\s*)?1\s*rm$/, "%");
+
 /**
- * Load or intensity, as written in one field: "60kg", "70%", "60-70%",
- * "60%+" / "60%↑" (start there and build up), "bw", "rpe 8", "z2",
- * "2:00/500m". Never fails: anything else is the coach's words ("βαρύ").
+ * Load or intensity, as written in one field: "60kg", "60 κιλά", "22,5kg",
+ * "70%", "70% 1RM", "60-70%", "60%+" / "60%↑" (start there and build up),
+ * "bw", "rpe 8", "@8", "z2", "2:00/500m". A number with a unit that is not
+ * a load ("60 km") is `wrong`. Anything else is the coach's words ("βαρύ").
  */
 export function parseLoad(text: string): ParsedLoad | null {
-  let v = text.trim().toLowerCase().replace(/\s+/g, " ");
+  let v = normLoadText(text);
   if (!v) return null;
-  if (["bw", "σβ", "body", "bodyweight", "σωματικό βάρος"].includes(v)) return { kind: "bw" };
-  let m = /^rpe\s*(\d+(?:\.\d)?)(?:\s*-\s*(\d+(?:\.\d)?))?$/.exec(v);
+  if (["bw", "σβ", "body", "bodyweight", "body weight", "σωματικο βαρος", "βαρος σωματος"].includes(v)) return { kind: "bw" };
+  let m = /^(?:rpe\s*|@\s*)(\d+(?:\.\d)?)(?:\s*-\s*(\d+(?:\.\d)?))?$/.exec(text.trim().startsWith("@") ? `@${v}` : v);
   if (m) return { kind: "rpe", min: +m[1], max: +(m[2] || m[1]) };
-  m = /^(?:z|zone|ζώνη|ζωνη)\s*([1-5])$/.exec(v);
+  m = /^(?:z|zone|ζωνη)\s*([1-5])$/.exec(v);
   if (m) return { kind: "zone", zone: +m[1] };
-  m = /^(\d+:\d{2})\s*\/\s*(500m|500|km|100m|mi)$/.exec(v);
-  if (m) return { kind: "pace", per: m[2] === "500" ? "500m" : m[2], secs: toNum(m[1]) };
+  m = /^(\d+:[0-5]\d)\s*\/\s*(500m|500|1km|km|100m|mi)$/.exec(v);
+  if (m) return { kind: "pace", per: m[2] === "500" ? "500m" : m[2] === "1km" ? "km" : m[2], secs: toNum(m[1]) };
+  if (NOT_LOAD_UNIT.test(v)) return { kind: "wrong", text: text.trim() };
   let up = false;
   if (/(\+|↑)$/.test(v)) {
     up = true;
     v = v.slice(0, -1).trim();
   }
-  const um = /\s*(kg|κιλά|κιλα|%)$/.exec(v);
+  const um = new RegExp(`\\s*(${LOAD_UNIT_RE})$`).exec(v);
   if (um) {
-    const n = parseNums(v.slice(0, um.index).trim().replace(/(\d),(\d)$/, "$1.$2"));
-    if (n !== "bad" && !n.cont) return { kind: um[1] === "%" ? "pct" : "kg", entries: n.entries, up };
+    const kind = um[1] === "%" ? "pct" : "kg";
+    const n = parseNums(stripRepeatedUnit(v.slice(0, um.index).trim(), escapeRe(um[1])));
+    if (n !== "bad" && !n.cont) {
+      const amb = up ? undefined : ambiguityOf(n, kind);
+      return amb ? { kind, entries: n.entries, up, ambiguous: amb } : { kind, entries: n.entries, up };
+    }
   }
   return { kind: "text", text: text.trim() };
 }
@@ -307,7 +539,26 @@ export function showEntry(e: NumEntry | null, unit: ShowUnit): string {
   if (e.min === e.max) return showOne(e.min, unit);
   return unit === "reps"
     ? `${numStr(e.min)}–${numStr(e.max)}`
-    : `${showOne(e.min, unit).replace(/ ?(kg|cal|m|km|%|″)$/, "")}–${showOne(e.max, unit)}`;
+    : `${showOne(e.min, unit).replace(/ ?(kg|cal|km|m|%|″)$/, "")}–${showOne(e.max, unit)}`;
+}
+
+/** The canonical text of a dose (`parseDose(showDose(d))` reads the same). */
+export function showDose(d: ParsedDose): string {
+  const side = d.perSide ? " each side" : "";
+  const sets = d.sets ? `${d.sets.min === d.sets.max ? d.sets.min : `${d.sets.min}-${d.sets.max}`}x` : "";
+  if (d.max) {
+    const unit = d.unit === "kcal" ? " cal" : d.unit === "m" ? " m" : "";
+    return `${sets}${d.max.within ? `${d.max.within}s ` : ""}max${unit}${side}`;
+  }
+  if (!d.entries) return `${sets}${side}`;
+  // full precision: the canonical text must read back exactly
+  const one = (e: NumEntry) => (e.min === e.max ? String(e.min) : `${e.min}-${e.max}`);
+  const es = d.entries;
+  // "-" joins a list, except when it would read as a range: ranges inside, or two rising values
+  const dash = es.length > 1 && es.every((e) => e.min === e.max) && !(es.length === 2 && es[0].min < es[1].min);
+  const body = es.map(one).join(dash ? "-" : ", ");
+  const suffix = d.unit === "kcal" ? " cal" : d.unit === "m" ? " m" : d.unit === "secs" ? "s" : "";
+  return `${sets}${body}${d.cont ? "…" : ""}${suffix}${side}`;
 }
 
 /**
@@ -342,6 +593,7 @@ export function showLoadAt(l: ParsedLoad | null, i: number, words: ShowWords = S
     case "bw":
       return "BW";
     case "text":
+    case "wrong":
       return l.text;
     case "zone":
       return `${words.zone} ${l.zone}`;
@@ -358,7 +610,8 @@ export function showLoadAt(l: ParsedLoad | null, i: number, words: ShowWords = S
 
 /**
  * The meaning of a dose, as parts the UI translates and joins with " · ":
- * keys `PlanCore.caption.*`. `word` names one column ("set", "round",
+ * keys `PlanCore.caption.*`, then the ambiguity hint if any
+ * (`PlanCore.ambiguous.*`). `word` names one column ("set", "round",
  * "interval"). Unreadable → `[{ key: "PlanCore.caption.badDose" }]`.
  */
 export function doseCaption(d: ParsedDose | null | "bad", word: RoundWord): PlanText[] {
@@ -394,10 +647,11 @@ export function doseCaption(d: ParsedDose | null | "bad", word: RoundWord): Plan
     else out.push({ key: "PlanCore.caption.value", values: { value: showEntry(e, d.unit) } });
   }
   if (d.perSide) out.push({ key: "PlanCore.caption.perSide" });
+  if (d.ambiguous) out.push(d.ambiguous.hint);
   return out;
 }
 
-/** The meaning of a load field: keys `PlanCore.loadCaption.*`. */
+/** The meaning of a load field: keys `PlanCore.loadCaption.*` (the ambiguity hint is `l.ambiguous.hint`). */
 export function loadCaption(l: ParsedLoad | null): PlanText | null {
   if (!l) return null;
   switch (l.kind) {
@@ -405,6 +659,8 @@ export function loadCaption(l: ParsedLoad | null): PlanText | null {
       return { key: "PlanCore.loadCaption.bw" };
     case "text":
       return { key: "PlanCore.loadCaption.text" };
+    case "wrong":
+      return { key: "PlanCore.error.wrong_unit" };
     case "zone":
       return { key: "PlanCore.loadCaption.zone", values: { zone: l.zone } };
     case "rpe":
@@ -428,15 +684,26 @@ export function loadCaption(l: ParsedLoad | null): PlanText | null {
 // ── values per set / round ─────────────────────────────────────────────────
 
 type CellKey = keyof PlanCell;
-const cellText = (row: Pick<PlanRow, "cells">, i: number, key: CellKey): string => row.cells[i]?.[key] ?? "";
+/** One cell value as typed ("" for missing cells, non-strings, junk). */
+const cellText = (row: Pick<PlanRow, "cells">, i: number, key: CellKey): string => {
+  const cells: unknown = row?.cells;
+  if (!Array.isArray(cells)) return "";
+  const c: unknown = cells[i];
+  if (!c || typeof c !== "object") return "";
+  const v = (c as Record<string, unknown>)[key];
+  return typeof v === "string" ? v : "";
+};
 
-/** A relative value (computed from the column before): "+5", "-0:05", "60→80", "60 ως 80". */
-export const isRelative = (t: string): boolean => /^[+-]|→|->|ως|έως/.test(t.trim());
+/** A relative value (computed from the column before): "+5", "-0:05", "60→80", "60->80", "60 ως 80". */
+export const isRelative = (t: string): boolean => {
+  const v = normText(t);
+  return /^[+-]/.test(v) || /→|(?:^|\s|\d)(?:ως|εως)(?:\s|\d|$)/.test(v);
+};
 
 /** Text measures (tempo) only repeat: an empty column is the one before. */
 export function repeatText(row: Pick<PlanRow, "cells">, key: CellKey, n: number): string[] {
   const out: string[] = [];
-  for (let i = 0; i < n; i++) out.push(cellText(row, i, key) || out[i - 1] || "");
+  for (let i = 0; i < n; i++) out.push(cellText(row, i, key).trim() || out[i - 1] || "");
   return out;
 }
 
@@ -445,97 +712,168 @@ export const repeatDose = (row: Pick<PlanRow, "cells">, n: number): string[] => 
 
 export type LoadUnit = "kg" | "%";
 export type SetLoads = {
-  /** Shown value per column ("65 kg", "70%", the coach's words, or "" when unknown). */
+  /** Shown value per column ("65 kg", "70%", "60–70%", the coach's words, or "" when unknown). */
   values: string[];
-  /** Error code per column (`missing_unit`, `mixed_unit`) or null. */
+  /** Error code per column (`missing_unit`, `mixed_unit`, `wrong_unit`, `no_base`) or null. */
   errors: (PlanErrorCode | null)[];
   /** The row's unit, written once in any column. */
   unit: LoadUnit | null;
 };
 
-const LOAD_NUM = /^([+-]?\d+(?:\.\d+)?)\s*(%|kg)?(?:\s*(?:→|->|ως|έως)\s*(\d+(?:\.\d+)?)\s*(%|kg)?)?$/;
-const normLoad = (t: string) =>
-  t.trim().toLowerCase().replace(",", ".").replace(/κιλ[άα]?/, "kg");
+/** One load cell, read. */
+type LoadToken =
+  | { t: "empty" }
+  | { t: "abs"; n: number; unit: LoadUnit | null }
+  | { t: "delta"; n: number; unit: LoadUnit | null }
+  | { t: "up"; n: number; unit: LoadUnit | null }
+  | { t: "spread"; a: number; b: number; unit: LoadUnit | null }
+  | { t: "range"; a: number; b: number; unit: LoadUnit | null }
+  | { t: "wrong" }
+  | { t: "words"; text: string };
+
+const LN = "(\\d+(?:\\.\\d+)?)";
+const LU = `\\s*(${LOAD_UNIT_RE})?`;
+const unitOfLoad = (u: string | undefined): LoadUnit | null => (!u ? null : u === "%" ? "%" : "kg");
+
+function readLoadCell(raw: string): LoadToken {
+  const tok = readLoadCellRaw(raw);
+  // numbers past MAX_NUMBER do not read: they are the coach's words
+  const nums = "n" in tok ? [tok.n] : "a" in tok ? [tok.a, tok.b] : [];
+  return nums.some((n) => Math.abs(n) > MAX_NUMBER) ? { t: "words", text: raw.trim() } : tok;
+}
+
+function readLoadCellRaw(raw: string): LoadToken {
+  const v = normLoadText(raw);
+  if (!v) return { t: "empty" };
+  let m = new RegExp(`^([+-])${LN}${LU}$`).exec(v);
+  if (m) return { t: "delta", n: (m[1] === "-" ? -1 : 1) * +m[2], unit: unitOfLoad(m[3]) };
+  m = new RegExp(`^${LN}${LU}$`).exec(v);
+  if (m) return { t: "abs", n: +m[1], unit: unitOfLoad(m[2]) };
+  m = new RegExp(`^${LN}${LU}\\s*(?:\\+|↑)$`).exec(v);
+  if (m) return { t: "up", n: +m[1], unit: unitOfLoad(m[2]) };
+  m = new RegExp(`^${LN}${LU}\\s*(?:→|ως|εως)\\s*${LN}${LU}$`).exec(v);
+  if (m) {
+    const a = unitOfLoad(m[2]);
+    const b = unitOfLoad(m[4]);
+    return a && b && a !== b ? { t: "wrong" } : { t: "spread", a: +m[1], b: +m[3], unit: b || a };
+  }
+  m = new RegExp(`^${LN}${LU}\\s*-\\s*${LN}${LU}$`).exec(v);
+  if (m && +m[1] < +m[3]) {
+    const a = unitOfLoad(m[2]);
+    const b = unitOfLoad(m[4]);
+    return a && b && a !== b ? { t: "wrong" } : { t: "range", a: +m[1], b: +m[3], unit: b || a };
+  }
+  if (NOT_LOAD_UNIT.test(v)) return { t: "wrong" };
+  return { t: "words", text: raw.trim() };
+}
 
 /**
  * Loads of one row over `n` columns. The unit (kg or %) is written once per
- * row; bare numbers ("70", "+5", "60→80") inherit it. A row of numbers with
- * no unit anywhere → `missing_unit`; kg and % mixed → `mixed_unit`. Empty =
- * as before (or keeps adding the last `+x`, or keeps spreading `a→b` to the
- * last column). Words ("βαρύ", "με βάρος") pass through.
+ * row; bare numbers ("70", "+5", "60→80", "60-70") inherit it. Errors:
+ * numbers with no unit anywhere in the row → `missing_unit`; kg and % mixed
+ * → `mixed_unit`; a unit that is not a load ("60 km") → `wrong_unit`; a
+ * change ("+5") with nothing before it to change → `no_base`. Empty = as
+ * before (or keeps adding the last `+x`, or keeps spreading `a→b` to the
+ * last column). "60-70" is a range for the athlete in that column; "60%+"
+ * / "60%↑" starts there and builds up (the columns after it show "↑ 60%"
+ * until another value). Words
+ * ("βαρύ", "με βάρος") pass through and reset the progression.
  */
 export function setLoads(row: Pick<PlanRow, "cells">, n: number): SetLoads {
   const values: string[] = [];
   const errors: (PlanErrorCode | null)[] = [];
+  const tokens = Array.from({ length: Math.max(0, n) }, (_, i) => readLoadCell(cellText(row, i, "l")));
+  const stated = tokens.map((t) => ("unit" in t ? t.unit : null));
+  const unit = stated.find((u): u is LoadUnit => Boolean(u)) ?? null;
+  const fmt = (v: number) => `${Math.round(v * 100) / 100}${unit === "%" ? "%" : " kg"}`;
   let prev: number | null = null;
   let delta: number | null = null;
   let spread: { a: number; b: number; i: number } | null = null;
-  const raw = (i: number) => normLoad(cellText(row, i, "l"));
-  const stated = Array.from({ length: n }, (_, i) => {
-    const m = LOAD_NUM.exec(raw(i));
-    return m ? ((m[4] || m[2] || null) as LoadUnit | null) : null;
-  });
-  const unit = stated.find((u): u is LoadUnit => Boolean(u)) ?? null;
-  const fmt = (v: number) => `${Math.round(v * 10) / 10}${unit === "%" ? "%" : " kg"}`;
-  for (let i = 0; i < n; i++) {
-    const t = raw(i);
-    const m = t ? LOAD_NUM.exec(t) : null;
+  let rising = false;
+  tokens.forEach((tok, i) => {
     errors.push(null);
-    if (!t) {
-      if (spread) prev = spread.a + ((spread.b - spread.a) * (i - spread.i)) / Math.max(1, n - 1 - spread.i);
-      else if (delta != null && prev != null) prev += delta;
-      values.push(prev != null && unit ? fmt(prev) : values[i - 1] || "");
-      continue;
-    }
-    if (!m) {
-      prev = null;
-      delta = null;
-      spread = null;
-      values.push(cellText(row, i, "l").trim());
-      continue;
-    }
-    if (!unit) {
-      errors[i] = "missing_unit";
+    // a refused column is skipped: the columns after it continue from the last good one
+    const fail = (code: PlanErrorCode) => {
+      errors[i] = code;
       values.push("");
-      continue;
+    };
+    if (tok.t !== "empty") rising = false;
+    switch (tok.t) {
+      case "empty":
+        if (rising && prev != null && unit) {
+          values.push(`↑ ${fmt(prev)}`);
+          return;
+        }
+        if (spread) prev = spread.a + ((spread.b - spread.a) * (i - spread.i)) / Math.max(1, n - 1 - spread.i);
+        else if (delta != null && prev != null) prev += delta;
+        values.push(prev != null && unit ? fmt(prev) : values[i - 1] || "");
+        return;
+      case "words":
+        prev = null;
+        delta = null;
+        spread = null;
+        values.push(tok.text);
+        return;
+      case "wrong":
+        fail("wrong_unit");
+        return;
     }
-    if (stated[i] && stated[i] !== unit) {
-      errors[i] = "mixed_unit";
-      values.push("");
-      continue;
-    }
-    const relative = /^[+-]/.test(m[1]);
-    if (relative && prev != null && !m[3]) {
-      delta = +m[1];
+    if (!unit) return fail("missing_unit");
+    if (tok.unit && tok.unit !== unit) return fail("mixed_unit");
+    if (tok.t === "delta") {
+      if (prev == null) return fail("no_base");
+      delta = tok.n;
       spread = null;
       prev += delta;
       values.push(fmt(prev));
-      continue;
-    }
-    if (m[3]) {
-      prev = Math.abs(+m[1]);
-      spread = { a: prev, b: +m[3], i };
+    } else if (tok.t === "spread") {
+      prev = tok.a;
+      spread = { a: tok.a, b: tok.b, i };
       delta = null;
       values.push(fmt(prev));
-      continue;
+    } else if (tok.t === "up") {
+      prev = tok.n;
+      delta = null;
+      spread = null;
+      rising = true;
+      values.push(fmt(prev));
+    } else if (tok.t === "range") {
+      prev = null;
+      delta = null;
+      spread = null;
+      values.push(`${numStr(tok.a)}–${fmt(tok.b)}`);
+    } else {
+      prev = tok.n;
+      delta = null;
+      spread = null;
+      values.push(fmt(prev));
     }
-    prev = Math.abs(+m[1]);
-    delta = null;
-    spread = null;
-    values.push(fmt(prev));
-  }
+  });
   return { values, errors, unit };
+}
+
+/** One measure cell, read: absolute, change, spread, range or text. */
+function readMeasureCell(raw: string, isClock: boolean) {
+  const v = decimalComma(normText(raw)).replace(/^z(?:one)?\s*(?=\d)/, "");
+  const N = isClock ? "(\\d+(?::[0-5]\\d)?(?:\\.\\d+)?)" : "(\\d+(?:\\.\\d+)?)";
+  const toN = (t: string) => (isClock && t.includes(":") ? t.split(":").reduce((a, x) => a * 60 + +x, 0) : +t);
+  let m: RegExpExecArray | null;
+  if (!v) return { t: "empty" as const };
+  if ((m = new RegExp(`^([+-])${N}$`).exec(v))) return { t: "delta" as const, n: (m[1] === "-" ? -1 : 1) * toN(m[2]) };
+  if ((m = new RegExp(`^${N}\\s*(?:→|ως|εως)\\s*${N}(.*)$`).exec(v))) return { t: "spread" as const, a: toN(m[1]), b: toN(m[2]), suffix: m[3] };
+  if ((m = new RegExp(`^${N}\\s*-\\s*${N}(.*)$`).exec(v))) return { t: "text" as const, text: raw.trim(), numeric: true };
+  if ((m = new RegExp(`^${N}(.*)$`).exec(v))) return { t: "abs" as const, n: toN(m[1]), suffix: m[2] };
+  return { t: "text" as const, text: raw.trim(), numeric: false };
 }
 
 /**
  * Any numeric measure over `n` columns, with the same rules as load: empty
  * repeats (or keeps adding the last `+x`), `+x`/`-x` changes, `a→b` spreads
  * to the last column. With `isClock`, "m:ss" values count in seconds
- * (pace, hold). Text it cannot read passes through.
+ * (pace, hold). A range ("7-8") and text repeat as typed and reset the
+ * progression; a change with nothing before it shows as typed.
  */
 export function progress(row: Pick<PlanRow, "cells">, measure: CellKey, n: number, isClock = false): string[] {
-  const toN = (t: string) =>
-    isClock && /^\d+:\d\d$/.test(t) ? t.split(":").reduce((a, x) => a * 60 + +x, 0) : +t;
   const fmtN = (v: number) =>
     isClock && v >= 60 ? `${Math.floor(v / 60)}:${String(Math.round(v % 60)).padStart(2, "0")}` : `${Math.round(v * 10) / 10}`;
   const out: string[] = [];
@@ -544,49 +882,62 @@ export function progress(row: Pick<PlanRow, "cells">, measure: CellKey, n: numbe
   let spread: { a: number; b: number; i: number } | null = null;
   let suffix = "";
   for (let i = 0; i < n; i++) {
-    const t = cellText(row, i, measure).trim().replace(",", ".");
-    let m: RegExpExecArray | null;
-    if (!t) {
+    const raw = cellText(row, i, measure);
+    const tok = readMeasureCell(raw, isClock);
+    if (tok.t === "empty") {
       if (spread) prev = spread.a + ((spread.b - spread.a) * (i - spread.i)) / Math.max(1, n - 1 - spread.i);
       else if (delta != null && prev != null) prev += delta;
       out.push(prev != null ? fmtN(prev) + suffix : out[i - 1] || "");
-      continue;
-    }
-    if ((m = /^([+-])(\d+(?::\d\d)?(?:\.\d+)?)$/.exec(t)) && prev != null) {
-      delta = (m[1] === "-" ? -1 : 1) * toN(m[2]);
+    } else if (tok.t === "delta" && prev != null) {
+      delta = tok.n;
       spread = null;
       prev += delta;
       out.push(fmtN(prev) + suffix);
-      continue;
-    }
-    if ((m = /^(\d+(?::\d\d)?(?:\.\d+)?)\s*(?:→|->)\s*(\d+(?::\d\d)?(?:\.\d+)?)(.*)$/.exec(t))) {
-      prev = toN(m[1]);
-      spread = { a: prev, b: toN(m[2]), i };
+    } else if (tok.t === "spread") {
+      prev = tok.a;
+      spread = { a: tok.a, b: tok.b, i };
       delta = null;
-      suffix = m[3];
+      suffix = tok.suffix;
       out.push(fmtN(prev) + suffix);
-      continue;
-    }
-    if ((m = /^(\d+(?::\d\d)?(?:\.\d+)?)(.*)$/.exec(t))) {
-      prev = toN(m[1]);
-      suffix = m[2];
+    } else if (tok.t === "abs") {
+      prev = tok.n;
+      suffix = tok.suffix;
       delta = null;
       spread = null;
-      out.push(t);
-      continue;
+      out.push(raw.trim());
+    } else {
+      prev = null;
+      delta = null;
+      spread = null;
+      out.push(raw.trim());
     }
-    prev = null;
-    delta = null;
-    spread = null;
-    out.push(t);
   }
   return out;
 }
 
+/**
+ * Errors of a numeric measure's cells: `no_base` for a change ("+1") with
+ * no number before it (first column, or after a range / text).
+ */
+export function measureCellErrors(row: Pick<PlanRow, "cells">, measure: CellKey, n: number, isClock = false): (PlanErrorCode | null)[] {
+  let base = false;
+  return Array.from({ length: Math.max(0, n) }, (_, i) => {
+    const tok = readMeasureCell(cellText(row, i, measure), isClock);
+    if (tok.t === "empty") return null;
+    if (tok.t === "delta") return base ? null : "no_base";
+    base = tok.t === "abs" || tok.t === "spread";
+    return null;
+  });
+}
+
 // ── tempo ──────────────────────────────────────────────────────────────────
 
-/** Four marks: seconds down · pause at the bottom · up (X = explosive) · pause at the top. */
-export const TEMPO = /^([0-9xX])-?([0-9xX])-?([0-9xX])-?([0-9xX])$/;
+/**
+ * Four marks: seconds down · pause at the bottom · up (X = explosive) ·
+ * pause at the top. Marks may be separated by "-", ".", "/" or a space.
+ * X is Latin x or Greek χ, any case (read on normalised text).
+ */
+export const TEMPO = /^([0-9xχ])[-./ ]?([0-9xχ])[-./ ]?([0-9xχ])[-./ ]?([0-9xχ])$/;
 
 /** One tempo mark: seconds, or "X" (explosive). */
 export type TempoMark = number | "X";
@@ -594,16 +945,22 @@ export type TempoParts = { down: TempoMark; bottom: TempoMark; up: TempoMark; to
 
 /** "31X1" → { down: 3, bottom: 1, up: "X", top: 1 }; anything else → null. */
 export function tempoParts(text: string): TempoParts | null {
-  const m = TEMPO.exec(text.trim());
+  const m = TEMPO.exec(normText(text));
   if (!m) return null;
-  const mark = (c: string): TempoMark => (/x/i.test(c) ? "X" : +c);
+  const mark = (c: string): TempoMark => (/[xχ]/.test(c) ? "X" : +c);
   return { down: mark(m[1]), bottom: mark(m[2]), up: mark(m[3]), top: mark(m[4]) };
 }
 
 /** "31X1" → "↓3 ·1 ↑X ·1" (the WOD text view). */
 export const tempoShort = (text: string): string | null => {
-  const m = TEMPO.exec(text.trim());
-  return m ? `↓${m[1].toUpperCase()} ·${m[2].toUpperCase()} ↑${m[3].toUpperCase()} ·${m[4].toUpperCase()}` : null;
+  const p = tempoParts(text);
+  return p ? `↓${p.down} ·${p.bottom} ↑${p.up} ·${p.top}` : null;
+};
+
+/** The canonical tempo text ("31X1"). */
+export const tempoCanonical = (text: string): string | null => {
+  const p = tempoParts(text);
+  return p ? `${p.down}${p.bottom}${p.up}${p.top}` : null;
 };
 
 /**

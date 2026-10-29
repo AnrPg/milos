@@ -12327,7 +12327,354 @@
       "too_many_rows": "Το πολύ 60 ασκήσεις",
       "too_many_cells": "Το πολύ 30 σετ",
       "too_long": "Το πολύ 200 χαρακτήρες",
-      "note_too_long": "Το πολύ 2000 χαρακτήρες"
+      "note_too_long": "Το πολύ 2000 χαρακτήρες",
+      "wrong_unit": "Δεν είναι μονάδα φορτίου: γράψε kg ή %",
+      "no_base": "Δεν υπάρχει προηγούμενη τιμή να αλλάξει: γράψε πρώτα αριθμό",
+      "bad_shape": "Αυτή η τιμή δεν έχει σωστή μορφή"
+    },
+    "ambiguous": {
+      "rangeOrList": "εύρος {range} · για {count} σετ γράψε {write}",
+      "listOrLadder": "{list}, μετά μένει το τελευταίο · για να συνεχίσει να ανεβαίνει γράψε {write}",
+      "windows": "{count} παράθυρα AMRAP: {list} · για ένα AMRAP γράψε {write}",
+      "clock": "διαβάζεται {reading} · για την άλλη μονάδα γράψε {write}"
+    }
+  },
+  "PlanEditor": {
+    "label": "Επεξεργασία δομημένου WOD",
+    "title": "Τίτλος WOD",
+    "titlePlaceholder": "Τίτλος WOD",
+    "wodNote": "Σημείωση για όλο το WOD (προαιρετική)",
+    "addSection": "+ Ενότητα",
+    "newSection": "Νέα ενότητα",
+    "sectionName": "Όνομα (προαιρετικό)",
+    "deleteSection": "Διαγραφή ενότητας",
+    "noExercises": "Χωρίς ασκήσεις ακόμα",
+    "presetChip": "Έτοιμο στήσιμο",
+    "steps": "Βήματα",
+    "step": {
+      "flow": "Ροή",
+      "time": "Χρόνος",
+      "exercises": "Ασκήσεις",
+      "score": "Σκορ"
+    },
+    "back": "Πίσω",
+    "next": "Επόμενο →",
+    "finish": "Τέλος ενότητας",
+    "pickHelp": "Γράψε για αναζήτηση,",
+    "flowInput": "Ροή ενότητας",
+    "flowPlaceholder": "Πώς τρέχει το ρολόι; π.χ. emom, σετ, ή έτοιμο: tabata",
+    "flowsHeading": "Ροή",
+    "presetsHeading": "Έτοιμα στησίματα",
+    "presetsSub": "συντομεύσεις: διαλέγουν ροή και συμπληρώνουν τιμές, όλα αλλάζουν μετά",
+    "presetIs": "{preset} = {flow}",
+    "noMatch": "Τίποτα με αυτό το όνομα. Δοκίμασε άλλη λέξη.",
+    "recipe": {
+      "intervals": "{work} / {off} × {rounds}",
+      "intervalsHr": "{work} / παλμοί × {rounds}",
+      "amrap": "{dur}′",
+      "slots": "{count} διαστήματα εναλλάξ",
+      "reps": "επαναλήψεις {reps}",
+      "interrupt": "διακοπή κάθε 2:00",
+      "hr": "ξεκούραση ως τους παλμούς"
+    },
+    "example": {
+      "times": "λεπτά · π.χ. 12, ή 3-3-3-4 για παράθυρα",
+      "timeMin": "λεπτά · ή 1:30, 90s",
+      "timeSmart": "π.χ. 30s, 1:30, 2′",
+      "range": "π.χ. 4 ή 3-4",
+      "count": "ακέραιος αριθμός"
+    },
+    "reading": "= {text}",
+    "readingWindows": "= {count} παράθυρα: {list}",
+    "unit": {
+      "rounds": "γύροι",
+      "times": "φορές",
+      "sets": "σετ",
+      "hrTarget": "bpm",
+      "min": "λεπτά",
+      "sec": "δευτ.",
+      "clock": "λ:δδ"
+    },
+    "addMod": "+ {label}",
+    "removeMod": "× {label}",
+    "removeModTitle": "Αφαίρεση",
+    "timeline": "Χρονοδιάγραμμα",
+    "timelineInterrupt": "Διακοπή κάθε {every}",
+    "timelineSlot": "Διάστημα {n}",
+    "timelineWork": "Δουλειά",
+    "timelineRest": "Ξεκούραση",
+    "score": "Σκορ",
+    "scoreHelp": "Το πιο συνηθισμένο είναι ήδη επιλεγμένο. ← → για αλλαγή.",
+    "sectionNote": "Σημείωση για την ενότητα (προαιρετική)",
+    "levelNotes": "Σημειώσεις ανά επίπεδο",
+    "levelNote": "Σημείωση για {level} (προαιρετική)",
+    "perRoundOnce": "Γίνεται μία φορά: βάλε περισσότερους γύρους στο βήμα 2",
+    "deleted": "Διαγράφηκε · {undo} για αναίρεση",
+    "status": {
+      "undone": "Αναιρέθηκε",
+      "redone": "Επαναλήφθηκε"
+    },
+    "hint": {
+      "label": "Πληκτρολόγιο",
+      "section": "ενότητα",
+      "open": "άνοιγμα",
+      "newSection": "νέα ενότητα",
+      "all": "όλες",
+      "type": "γράψε",
+      "search": "αναζήτηση",
+      "choose": "επιλογή",
+      "continue": "συνέχεια",
+      "close": "κλείσιμο",
+      "nextField": "επόμενο πεδίο",
+      "nextStep": "επόμενο βήμα",
+      "back": "πίσω",
+      "newExercise": "νέα άσκηση",
+      "actions": "ενέργειες",
+      "differentRound": "διαφορετικός γύρος",
+      "score": "σκορ"
+    },
+    "sheet": {
+      "title": "Συντομεύσεις",
+      "groupSection": "Ενότητα",
+      "groupExercises": "Ασκήσεις",
+      "groupGeneral": "Γενικά",
+      "newSection": "Νέα ενότητα",
+      "steps": "Επόμενο / προηγούμενο βήμα",
+      "jumpStep": "Πήγαινε σε βήμα",
+      "close": "Κλείσε την ενότητα σε μία γραμμή",
+      "cards": "Σε κλειστές ενότητες: διάλεξε και άνοιξε",
+      "moveSection": "Μετακίνηση ενότητας",
+      "newExercise": "Νέα άσκηση",
+      "actions": "Ενέργειες γραμμής (το μενού ⋯)",
+      "superset": "Superset με την από πάνω",
+      "structure": "Δομή του σετ: cluster, drop set, complex…",
+      "measure": "Παράμετρος: ρυθμός, tempo, RPE, ύψος, ανά πλευρά…",
+      "perRound": "Τιμές ανά γύρο (AMRAP, For Time, EMOM)",
+      "rest": "Ξεκούραση μέσα στο σετ",
+      "differentRound": "Διαφορετικός γύρος, σετ ή διάστημα (εναλλάξ)",
+      "note": "Σημείωση",
+      "emptyCell": "Όπως το προηγούμενο σετ",
+      "plus": "Τιμή που αλλάζει κάθε σετ",
+      "spread": "Τιμή μοιρασμένη ως το τελευταίο σετ",
+      "unit": "Μία φορά στη γραμμή",
+      "deleteRow": "Διαγραφή",
+      "move": "Κίνηση ανάμεσα σε πεδία",
+      "undo": "Αναίρεση",
+      "redo": "Επανάληψη",
+      "sheet": "Αυτή η λίστα",
+      "keyEmptyCell": "κενό κελί",
+      "keyUnit": "kg ή %",
+      "keyDeleteRow": "⌫ σε κενό όνομα"
+    },
+    "perSide": "ανά πλευρά"
+  },
+  "PlanGrid": {
+    "head": {
+      "exercise": "Άσκηση",
+      "amrap": "↻ Γύρος, ξανά και ξανά ως το τέλος του χρόνου",
+      "emomEvery": "Κάθε {every}",
+      "emom": "Κάθε διάστημα",
+      "intervals": "Σε κάθε διάστημα δουλειάς ({work})",
+      "rounds": "↻ Γύρος × {rounds}",
+      "once": "Με τη σειρά, μία φορά"
+    },
+    "round": {
+      "set": "Σετ {list}",
+      "round": "Γύρος {list}",
+      "slot": "Διάστημα {list}",
+      "minute": "Λεπτό {list}",
+      "slotAt": "Διάστημα {list} · {at}"
+    },
+    "col": {
+      "d": "Επαναλήψεις",
+      "l": "Φορτίο"
+    },
+    "line": {
+      "d": "Επαν.",
+      "rest": "Χρόνος",
+      "l": "Φορτίο",
+      "lUnit": "Φορτίο {unit}"
+    },
+    "measure": {
+      "pace": "Ρυθμός",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "Ζώνη παλμών",
+      "height": "Ύψος / στόχος",
+      "dist": "Απόσταση",
+      "hold": "Κράτημα",
+      "side": "Ανά πλευρά"
+    },
+    "measureHint": {
+      "pace": "χρόνος ανά διάστημα · π.χ. 2:00/500m",
+      "tempo": "κατέβασμα, παύση, ανέβασμα, παύση · π.χ. 31X1",
+      "rpe": "πόσο δύσκολο, 1–10 · π.χ. 8",
+      "rir": "επαναλήψεις στην άκρη · π.χ. 2",
+      "zone": "ζώνη παλμών · π.χ. 2",
+      "height": "κουτί, στόχος · π.χ. 60 cm",
+      "dist": "π.χ. 400 m",
+      "hold": "ισομετρικό κράτημα · π.χ. 3 δευτ.",
+      "side": "χωρίς τιμή: ετικέτα δίπλα στο όνομα"
+    },
+    "tag": {
+      "side": "ανά πλευρά"
+    },
+    "unit": {
+      "sec": "δευτ.",
+      "min": "λεπτά"
+    },
+    "struct": {
+      "single": "Απλό",
+      "superset": "Superset",
+      "complex": "Complex",
+      "cluster": "Cluster",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
+    },
+    "structHint": {
+      "single": "μία άσκηση, όπως είναι",
+      "superset": "όλες οι ασκήσεις, μετά το επόμενο σετ",
+      "complex": "όλες χωρίς να αφήσεις τη μπάρα",
+      "cluster": "το σετ σπάει σε κομμάτια με μικρή παύση",
+      "drop": "μειώνεις το βάρος και συνεχίζεις",
+      "restpause": "μέχρι αποτυχία, παύση, ξανά"
+    },
+    "structField": {
+      "clusters": "κομμάτια",
+      "intra": "παύση",
+      "drops": "μειώσεις",
+      "dropby": "κάθε φορά",
+      "minis": "μίνι σετ"
+    },
+    "structChip": "Δομή σετ (Alt+T)",
+    "rest": "Ξεκούραση",
+    "name": {
+      "placeholder": "Άσκηση",
+      "inWod": "σε αυτό το WOD",
+      "suggestions": "Προτάσεις ασκήσεων"
+    },
+    "note": {
+      "placeholder": "Σημείωση για την άσκηση"
+    },
+    "menu": {
+      "button": "Ενέργειες άσκησης",
+      "title": "Ενέργειες (Alt+M)",
+      "filter": "Γράψε για φιλτράρισμα",
+      "nothing": "Τίποτα",
+      "nothingHint": "σβήσε ένα γράμμα",
+      "struct": "Δομή σετ…",
+      "structHint": "cluster, drop set, complex…",
+      "measure": "Παράμετρος…",
+      "measureHint": "ρυθμός, tempo, RPE, ύψος…",
+      "perRound": "Τιμές ανά γύρο",
+      "sameEachRound": "Ίδιες τιμές σε κάθε γύρο",
+      "note": "Σημείωση",
+      "addNote": "Προσθήκη σημείωσης",
+      "superset": "Superset με την από πάνω",
+      "unsuperset": "Εκτός superset",
+      "restAfter": "Ξεκούραση μετά",
+      "remove": "Αφαίρεση: {measure}",
+      "delete": "Διαγραφή",
+      "deleteHint": "⌫ σε κενό όνομα",
+      "structTitle": "Δομή σετ",
+      "measureTitle": "Παράμετρος",
+      "withKey": "{key} · {hint}"
+    },
+    "add": {
+      "exercise": "+ Άσκηση",
+      "exerciseHere": "+ Άσκηση σε αυτό το κουτί",
+      "exerciseSets": "+ Άσκηση σε αυτά τα σετ",
+      "exerciseInterrupt": "+ Άσκηση στη διακοπή",
+      "round": {
+        "set": "+ διαφορετικό σετ",
+        "round": "+ διαφορετικός γύρος",
+        "slot": "+ διαφορετικό διάστημα"
+      }
+    },
+    "how": {
+      "alternate": "Τα κουτιά εναλλάσσονται: {cycle}, {cycle} …",
+      "own": {
+        "set": "Κάθε σετ έχει τις δικές του ασκήσεις, με τη σειρά.",
+        "round": "Κάθε γύρος έχει τις δικές του ασκήσεις, με τη σειρά.",
+        "slot": "Κάθε διάστημα έχει τις δικές του ασκήσεις, με τη σειρά."
+      },
+      "emomOne": "Ό,τι είναι στο κουτί γίνεται στο ίδιο διάστημα.",
+      "amrapMax": "Για «όσες προλάβεις στον χρόνο που μένει» γράψε max στις επαναλήψεις της τελευταίας άσκησης.",
+      "optionalSets": "* αν αντέχει: τα σετ είναι {sets}."
+    },
+    "optionalSet": "Αν αντέχει (τα σετ είναι {sets})",
+    "interrupt": {
+      "title": "Διακοπή · κάθε {every} σταματάς και κάνεις"
+    },
+    "aria": {
+      "reps": "Επαναλήψεις ή ποσότητα",
+      "load": "Φορτίο",
+      "rest": "Ξεκούραση",
+      "cell": "{column} {n}: {what}"
+    },
+    "error": {
+      "dose": "Δεν διαβάζεται: π.χ. 10, 8-12, 5-10-15…, max, 400 m, 60s",
+      "tempo": "Tempo σε 4 σημάδια, π.χ. 31X1",
+      "number": "Αριθμός, +x ή a→b",
+      "numberExample": "Αριθμός, π.χ. {example}",
+      "max": "Έως {max}",
+      "loadUnitCompact": "Γράψε kg ή %, π.χ. 60kg ή 70%",
+      "loadMissingUnit": "Γράψε kg ή % σε ένα σετ της γραμμής· τα υπόλοιπα το παίρνουν από εκεί",
+      "loadMixedUnits": "Ίδια μονάδα σε όλη τη γραμμή: {unit}"
+    },
+    "mean": {
+      "equals": "= {value}",
+      "max": "όσες περισσότερες",
+      "maxCal": "όσες περισσότερες θερμίδες",
+      "maxM": "όσα περισσότερα μέτρα",
+      "sets": "{sets} σετ",
+      "ladder": "ανά {word}: {list}, μετά {step} κάθε {word}",
+      "perRound": "ανά {word}: {list}",
+      "range": "εύρος {range}, το αποφασίζει ο αθλητής",
+      "rangeSide": "εύρος {range}, το αποφασίζει ο αθλητής · ανά πλευρά",
+      "reps": "{value} επαναλήψεις",
+      "repsSide": "{value} επαναλήψεις · ανά πλευρά",
+      "amount": "{value}",
+      "amountSide": "{value} · ανά πλευρά",
+      "bw": "σωματικό βάρος",
+      "kg": "{value} kg",
+      "pct": "{value}% του 1RM",
+      "words": "ως κείμενο για τον αθλητή",
+      "tempo": "↓{down} κατέβασμα · {bottom} κάτω · ↑{up} ανέβασμα · {top} πάνω (δευτ., X = εκρηκτικά)",
+      "equalsUnit": "= {value} {unit}"
+    },
+    "word": {
+      "set": "σετ",
+      "round": "γύρο",
+      "slot": "διάστημα"
+    },
+    "tip": {
+      "range": "εύρος",
+      "ladder": "ανεβαίνει κάθε γύρο",
+      "max": "όσες αντέξει",
+      "emptyCode": "κενό",
+      "asBefore": "όπως το προηγούμενο",
+      "kg": "κιλά",
+      "pct": "του 1RM",
+      "heavyCode": "βαρύ",
+      "words": "με λόγια",
+      "plusEach": "ανεβαίνει κάθε φορά",
+      "spread": "ως το τελευταίο",
+      "unitCode": "kg ή %",
+      "unitOnce": "μία φορά στη γραμμή",
+      "changeEach": "αλλάζει κάθε φορά",
+      "tempo": "δευτ. κατέβασμα · παύση κάτω · ανέβασμα (X = εκρηκτικά) · παύση πάνω",
+      "seconds": "δευτερόλεπτα",
+      "minSec": "λεπτά:δευτερόλεπτα",
+      "minutes": "λεπτά, ως 10",
+      "afterLastCode": "μετά τον τελευταίο γύρο",
+      "afterLast": "ίδια τιμή, ή η ίδια αλλαγή αν γράψεις +x"
+    },
+    "colWord": {
+      "set": "Σετ",
+      "round": "Γύρος",
+      "slot": "Διάστημα"
     }
   },
   "PlanRun": {
@@ -12419,6 +12766,109 @@
       "within": "σε",
       "from": "από",
       "zone": "ζώνη"
+    }
+  },
+  "PlanView": {
+    "label": "Δομημένη προπόνηση",
+    "untitledSection": "Ενότητα {letter}",
+    "empty": "Δεν έχει γραφτεί τίποτα ακόμα.",
+    "flow": {
+      "sets": "Σετ",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Intervals",
+      "rest": "Ξεκούραση"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "hrr": "Ανάκαμψη παλμών (HRR)",
+      "death_by": "Death by",
+      "even_odd": "Εναλλάξ (μονά / ζυγά)",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "ladder": "Σκάλα / πυραμίδα",
+      "calorie_target": "Στόχος θερμίδων",
+      "to_failure": "Μέχρι αποτυχία",
+      "superset": "Superset / γιγάντιο σετ",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "interrupt": "Με διακοπή"
+    },
+    "params": {
+      "sets": "{sets} σετ",
+      "rest": "{time} ξεκούραση",
+      "rounds": "{rounds} γύροι",
+      "cap": "όριο {time}",
+      "windows": "{count} παράθυρα: {times}",
+      "restBetween": "{time} ξεκούραση ανάμεσα",
+      "every": "κάθε {time}",
+      "times": "× {count}",
+      "untilFailure": "μέχρι να μην προλαβαίνεις",
+      "intervals": "{rounds} × {work} δουλειά / {off} ξεκούραση",
+      "intervalsHr": "{rounds} × {work} δουλειά, ξεκούραση μέχρι οι παλμοί να πέσουν στους {bpm}"
+    },
+    "roundWord": {
+      "set": "Σετ {numbers}",
+      "round": "Γύρος {numbers}",
+      "interval": "Διάστημα {numbers}",
+      "minute": "Λεπτό {numbers}"
+    },
+    "struct": {
+      "superset": "Superset",
+      "complex": "Complex",
+      "cluster": "Cluster · {clusters} κομμάτια · {intra} παύση",
+      "drop": "Drop set · {drops} μειώσεις, {dropby} κάθε φορά",
+      "restpause": "Rest-pause · {minis} μίνι σετ · {intra} παύση"
+    },
+    "perSide": "ανά πλευρά",
+    "rest": "Ξεκούραση",
+    "measure": {
+      "pace": "Ρυθμός {value}",
+      "tempo": "Tempo {value}",
+      "rpe": "RPE {value}",
+      "rir": "RIR {value}",
+      "zone": "Ζώνη παλμών {value}",
+      "height": "Ύψος {value}",
+      "dist": "Απόσταση {value}",
+      "hold": "Κράτημα {value}"
+    },
+    "interruptEvery": "Κάθε {time} σταματάς για",
+    "scoreLine": "Σκορ: {score}",
+    "score": {
+      "best_load": "Φορτίο (καλύτερο σετ)",
+      "reps": "Επαναλήψεις",
+      "time": "Χρόνος",
+      "rounds_reps": "Γύροι + επαναλήψεις",
+      "done": "Ολοκληρώθηκε",
+      "total_reps": "Επαναλήψεις (σύνολο)",
+      "lowest_round": "Χαμηλότερος γύρος",
+      "distance": "Απόσταση"
+    },
+    "levelNotes": "Σημειώσεις ανά επίπεδο",
+    "sectionNote": "Σημείωση ενότητας",
+    "exerciseCount": "{count, plural, one {# άσκηση} other {# ασκήσεις}}",
+    "authoring": {
+      "label": "Πώς γράφεται η προπόνηση",
+      "freeText": "Ελεύθερο κείμενο",
+      "structured": "Δομημένο",
+      "toStructuredTitle": "Αλλαγή σε δομημένο;",
+      "toStructuredBody": "Το δομημένο πρόγραμμα ξεκινά άδειο. Το κείμενό σου μένει ως σημείωση της πρώτης ενότητας, ώστε να μη χαθεί τίποτα.",
+      "toTextTitle": "Αλλαγή σε ελεύθερο κείμενο;",
+      "toTextBody": "Το πρόγραμμα γίνεται κείμενο που μπορείς να συνεχίσεις να γράφεις. Ροές, τιμές ανά σετ και δομές γράφονται ως κείμενο και δεν μένουν δομημένα.",
+      "confirm": "Αλλαγή",
+      "cancel": "Άκυρο",
+      "switchFailed": "Η προπόνηση δεν αποθηκεύτηκε πριν την αλλαγή. Δοκίμασε ξανά.",
+      "switching": "Αποθήκευση…"
+    },
+    "editor": {
+      "planEmpty": "Πρόσθεσε τουλάχιστον μία άσκηση ή μία ξεκούραση πριν τη δημοσίευση.",
+      "fixProblems": "Κάποιες τιμές δεν διαβάζονται: διόρθωσε τις γραμμές με κόκκινο.",
+      "sectionCount": "{count, plural, one {# ενότητα} other {# ενότητες}}"
     }
   }
 }

@@ -12102,6 +12102,445 @@
     "rowButtonLabel": "רישום תשלום מ-{name}",
     "panelButton": "+ רישום תשלום"
   },
+  "PlanView": {
+    "label": "אימון מובנה",
+    "untitledSection": "חלק {letter}",
+    "empty": "עוד לא נכתב כלום.",
+    "flow": {
+      "sets": "סטים",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "אינטרוולים",
+      "rest": "מנוחה"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "hrr": "התאוששות דופק (HRR)",
+      "death_by": "Death by",
+      "even_odd": "לסירוגין (אי-זוגי / זוגי)",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "ladder": "סולם / פירמידה",
+      "calorie_target": "יעד קלוריות",
+      "to_failure": "עד כשל",
+      "superset": "סופרסט / סט ענק",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "interrupt": "עם הפסקות"
+    },
+    "params": {
+      "sets": "{sets} סטים",
+      "rest": "{time} מנוחה",
+      "rounds": "{rounds} סבבים",
+      "cap": "מגבלה {time}",
+      "windows": "{count} חלונות: {times}",
+      "restBetween": "{time} מנוחה ביניהם",
+      "every": "כל {time}",
+      "times": "× {count}",
+      "untilFailure": "עד שלא מספיקים",
+      "intervals": "{rounds} × {work} עבודה / {off} מנוחה",
+      "intervalsHr": "{rounds} × {work} עבודה, מנוחה עד שהדופק יורד ל־{bpm}"
+    },
+    "roundWord": {
+      "set": "סט {numbers}",
+      "round": "סבב {numbers}",
+      "interval": "מקטע {numbers}",
+      "minute": "דקה {numbers}"
+    },
+    "struct": {
+      "superset": "סופרסט",
+      "complex": "קומפלקס",
+      "cluster": "קלאסטר · {clusters} חלקים · {intra} הפסקה",
+      "drop": "סט יורד · {drops} הורדות של {dropby}",
+      "restpause": "מנוחה-הפסקה · {minis} מיני סטים · {intra} הפסקה"
+    },
+    "perSide": "לכל צד",
+    "rest": "מנוחה",
+    "measure": {
+      "pace": "קצב {value}",
+      "tempo": "טמפו ביצוע {value}",
+      "rpe": "RPE {value}",
+      "rir": "RIR {value}",
+      "zone": "אזור דופק {value}",
+      "height": "גובה {value}",
+      "dist": "מרחק {value}",
+      "hold": "החזקה {value}"
+    },
+    "interruptEvery": "כל {time} עוצרים בשביל",
+    "scoreLine": "תוצאה: {score}",
+    "score": {
+      "best_load": "משקל (הסט הטוב)",
+      "reps": "חזרות",
+      "time": "זמן",
+      "rounds_reps": "סבבים + חזרות",
+      "done": "הושלם",
+      "total_reps": "חזרות (סה״כ)",
+      "lowest_round": "הסבב החלש",
+      "distance": "מרחק"
+    },
+    "levelNotes": "הערות לפי רמה",
+    "sectionNote": "הערה לחלק",
+    "exerciseCount": "{count, plural, one {תרגיל אחד} other {# תרגילים}}",
+    "authoring": {
+      "label": "איך האימון הזה כתוב",
+      "freeText": "טקסט חופשי",
+      "structured": "מובנה",
+      "toStructuredTitle": "לעבור למובנה?",
+      "toStructuredBody": "התוכנית המובנית מתחילה ריקה. הטקסט שלך נשאר כהערה של החלק הראשון, כך ששום דבר לא הולך לאיבוד.",
+      "toTextTitle": "לעבור לטקסט חופשי?",
+      "toTextBody": "התוכנית הופכת לטקסט שאפשר להמשיך לערוך. מבנים, ערכים לכל סט ותבניות נכתבים כטקסט ואינם מובנים עוד.",
+      "confirm": "מעבר",
+      "cancel": "ביטול",
+      "switchFailed": "לא ניתן היה לשמור את האימון לפני המעבר. נסה שוב.",
+      "switching": "שומר…"
+    },
+    "editor": {
+      "planEmpty": "יש להוסיף לפחות תרגיל אחד או מנוחה לפני הפרסום.",
+      "fixProblems": "חלק מהערכים לא נקראים: תקן את השורות המסומנות באדום.",
+      "sectionCount": "{count, plural, one {חלק אחד} other {# חלקים}}"
+    }
+  },
+  "PlanEditor": {
+    "label": "עורך WOD מובנה",
+    "title": "כותרת ה-WOD",
+    "titlePlaceholder": "כותרת ה-WOD",
+    "wodNote": "הערה לכל ה-WOD (לא חובה)",
+    "addSection": "+ חלק",
+    "newSection": "חלק חדש",
+    "sectionName": "שם (לא חובה)",
+    "deleteSection": "מחיקת החלק",
+    "noExercises": "עדיין אין תרגילים",
+    "presetChip": "תבנית",
+    "steps": "צעדים",
+    "step": {
+      "flow": "מהלך",
+      "time": "זמן",
+      "exercises": "תרגילים",
+      "score": "תוצאה"
+    },
+    "back": "חזרה",
+    "next": "הבא ←",
+    "finish": "סיום החלק",
+    "pickHelp": "הקלד כדי לחפש,",
+    "flowInput": "מהלך החלק",
+    "flowPlaceholder": "איך השעון רץ? למשל emom, סטים או תבנית: tabata",
+    "flowsHeading": "מהלך",
+    "presetsHeading": "תבניות",
+    "presetsSub": "קיצורים: הם בוחרים מהלך וממלאים ערכים, ואפשר לשנות הכול אחר כך",
+    "presetIs": "{preset} = {flow}",
+    "noMatch": "אין כלום בשם הזה. נסה מילה אחרת.",
+    "recipe": {
+      "intervals": "{work} / {off} × {rounds}",
+      "intervalsHr": "{work} / דופק × {rounds}",
+      "amrap": "{dur}′",
+      "slots": "{count} אינטרוולים לסירוגין",
+      "reps": "חזרות {reps}",
+      "interrupt": "הפסקה כל 2:00",
+      "hr": "מנוחה עד שהדופק יורד"
+    },
+    "example": {
+      "times": "דקות · למשל 12, או 3-3-3-4 לחלונות",
+      "timeMin": "דקות · או 1:30, 90s",
+      "timeSmart": "למשל 30s, 1:30, 2′",
+      "range": "למשל 4 או 3-4",
+      "count": "מספר שלם"
+    },
+    "reading": "= {text}",
+    "readingWindows": "= {count} חלונות: {list}",
+    "unit": {
+      "rounds": "סבבים",
+      "times": "פעמים",
+      "sets": "סטים",
+      "hrTarget": "פעימות/דקה",
+      "min": "דקות",
+      "sec": "שנ׳",
+      "clock": "ד:שש"
+    },
+    "addMod": "+ {label}",
+    "removeMod": "× {label}",
+    "removeModTitle": "הסרה",
+    "timeline": "ציר זמן",
+    "timelineInterrupt": "הפסקה כל {every}",
+    "timelineSlot": "אינטרוול {n}",
+    "timelineWork": "עבודה",
+    "timelineRest": "מנוחה",
+    "score": "תוצאה",
+    "scoreHelp": "הרגיל כבר נבחר. ← → לשינוי.",
+    "sectionNote": "הערה לחלק (לא חובה)",
+    "levelNotes": "הערות לפי רמה",
+    "levelNote": "הערה ל{level} (לא חובה)",
+    "perRoundOnce": "זה קורה פעם אחת: הוסף סבבים בצעד 2",
+    "deleted": "נמחק · {undo} לביטול",
+    "status": {
+      "undone": "בוטל",
+      "redone": "בוצע מחדש"
+    },
+    "hint": {
+      "label": "מקלדת",
+      "section": "חלק",
+      "open": "פתיחה",
+      "newSection": "חלק חדש",
+      "all": "הכול",
+      "type": "הקלדה",
+      "search": "חיפוש",
+      "choose": "בחירה",
+      "continue": "המשך",
+      "close": "סגירה",
+      "nextField": "השדה הבא",
+      "nextStep": "הצעד הבא",
+      "back": "חזרה",
+      "newExercise": "תרגיל חדש",
+      "actions": "פעולות",
+      "differentRound": "סבב שונה",
+      "score": "תוצאה"
+    },
+    "sheet": {
+      "title": "קיצורי מקלדת",
+      "groupSection": "חלק",
+      "groupExercises": "תרגילים",
+      "groupGeneral": "כללי",
+      "newSection": "חלק חדש",
+      "steps": "הצעד הבא / הקודם",
+      "jumpStep": "מעבר לצעד",
+      "close": "סגירת החלק לשורה אחת",
+      "cards": "בחלקים סגורים: בחירה ופתיחה",
+      "moveSection": "הזזת החלק",
+      "newExercise": "תרגיל חדש",
+      "actions": "פעולות שורה (תפריט ⋯)",
+      "superset": "סופרסט עם השורה שמעל",
+      "structure": "מבנה הסט: קלאסטר, דרופ סט, קומפלקס…",
+      "measure": "מדד: קצב, טמפו, RPE, גובה, לכל צד…",
+      "perRound": "ערכים לכל סבב (AMRAP, For Time, EMOM)",
+      "rest": "מנוחה בתוך הסט",
+      "differentRound": "סבב, סט או אינטרוול שונה (לסירוגין)",
+      "note": "הערה",
+      "emptyCell": "כמו הסט הקודם",
+      "plus": "ערך שמשתנה בכל סט",
+      "spread": "ערך שמתפרס עד הסט האחרון",
+      "unit": "פעם אחת בשורה",
+      "deleteRow": "מחיקה",
+      "move": "מעבר בין שדות",
+      "undo": "ביטול",
+      "redo": "ביצוע מחדש",
+      "sheet": "הרשימה הזו",
+      "keyEmptyCell": "תא ריק",
+      "keyUnit": "kg או %",
+      "keyDeleteRow": "⌫ על שם ריק"
+    },
+    "perSide": "לכל צד"
+  },
+  "PlanGrid": {
+    "head": {
+      "exercise": "תרגיל",
+      "amrap": "↻ סבב, שוב ושוב עד שנגמר הזמן",
+      "emomEvery": "כל {every}",
+      "emom": "כל אינטרוול",
+      "intervals": "בכל אינטרוול עבודה ({work})",
+      "rounds": "↻ סבב × {rounds}",
+      "once": "לפי הסדר, פעם אחת"
+    },
+    "round": {
+      "set": "סט {list}",
+      "round": "סבב {list}",
+      "slot": "אינטרוול {list}",
+      "minute": "דקה {list}",
+      "slotAt": "אינטרוול {list} · {at}"
+    },
+    "col": {
+      "d": "חזרות",
+      "l": "משקל"
+    },
+    "line": {
+      "d": "חזרות",
+      "rest": "זמן",
+      "l": "משקל",
+      "lUnit": "משקל {unit}"
+    },
+    "measure": {
+      "pace": "קצב",
+      "tempo": "טמפו",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "אזור דופק",
+      "height": "גובה / יעד",
+      "dist": "מרחק",
+      "hold": "החזקה",
+      "side": "לכל צד"
+    },
+    "measureHint": {
+      "pace": "זמן ביניים · למשל 2:00/500m",
+      "tempo": "הורדה, עצירה, הרמה, עצירה · למשל 31X1",
+      "rpe": "כמה קשה, 1–10 · למשל 8",
+      "rir": "חזרות ברזרבה · למשל 2",
+      "zone": "אזור דופק · למשל 2",
+      "height": "קופסה, יעד · למשל 60 cm",
+      "dist": "למשל 400 m",
+      "hold": "החזקה איזומטרית · למשל 3 שנ׳",
+      "side": "בלי ערך: תגית ליד השם"
+    },
+    "tag": {
+      "side": "לכל צד"
+    },
+    "unit": {
+      "sec": "שנ׳",
+      "min": "דק׳"
+    },
+    "struct": {
+      "single": "בודד",
+      "superset": "סופרסט",
+      "complex": "קומפלקס",
+      "cluster": "קלאסטר",
+      "drop": "דרופ סט",
+      "restpause": "רסט-פוז"
+    },
+    "structHint": {
+      "single": "תרגיל אחד, כמו שהוא",
+      "superset": "כל התרגילים, ואז הסט הבא",
+      "complex": "כל התרגילים בלי להניח את המוט",
+      "cluster": "הסט מתחלק לחלקים עם עצירה קצרה",
+      "drop": "מורידים משקל וממשיכים",
+      "restpause": "עד כשל, עצירה, שוב"
+    },
+    "structField": {
+      "clusters": "חלקים",
+      "intra": "עצירה",
+      "drops": "הורדות",
+      "dropby": "בכל פעם",
+      "minis": "מיני סטים"
+    },
+    "structChip": "מבנה הסט (Alt+T)",
+    "rest": "מנוחה",
+    "name": {
+      "placeholder": "תרגיל",
+      "inWod": "ב-WOD הזה",
+      "suggestions": "הצעות לתרגילים"
+    },
+    "note": {
+      "placeholder": "הערה לתרגיל"
+    },
+    "menu": {
+      "button": "פעולות לתרגיל",
+      "title": "פעולות (Alt+M)",
+      "filter": "הקלד כדי לסנן",
+      "nothing": "אין התאמות",
+      "nothingHint": "מחק אות אחת",
+      "struct": "מבנה הסט…",
+      "structHint": "קלאסטר, דרופ סט, קומפלקס…",
+      "measure": "מדד…",
+      "measureHint": "קצב, טמפו, RPE, גובה…",
+      "perRound": "ערכים לכל סבב",
+      "sameEachRound": "אותם ערכים בכל סבב",
+      "note": "הערה",
+      "addNote": "הוספת הערה",
+      "superset": "סופרסט עם השורה שמעל",
+      "unsuperset": "הוצאה מהסופרסט",
+      "restAfter": "מנוחה אחרי",
+      "remove": "הסרה: {measure}",
+      "delete": "מחיקה",
+      "deleteHint": "⌫ על שם ריק",
+      "structTitle": "מבנה הסט",
+      "measureTitle": "מדד"
+    },
+    "add": {
+      "exercise": "+ תרגיל",
+      "exerciseHere": "+ תרגיל בקופסה הזו",
+      "exerciseSets": "+ תרגיל בסטים האלה",
+      "exerciseInterrupt": "+ תרגיל בהפסקה",
+      "round": {
+        "set": "+ סט שונה",
+        "round": "+ סבב שונה",
+        "slot": "+ אינטרוול שונה"
+      }
+    },
+    "how": {
+      "alternate": "הקופסאות מתחלפות: {cycle}, {cycle} …",
+      "own": {
+        "set": "לכל סט התרגילים שלו, לפי הסדר.",
+        "round": "לכל סבב התרגילים שלו, לפי הסדר.",
+        "slot": "לכל אינטרוול התרגילים שלו, לפי הסדר."
+      },
+      "emomOne": "כל מה שבקופסה קורה באותו אינטרוול.",
+      "amrapMax": "בשביל \"כמה שמספיקים בזמן שנשאר\" כתוב max בחזרות של התרגיל האחרון.",
+      "optionalSets": "* אם אפשר: הסטים הם {sets}."
+    },
+    "optionalSet": "אם אפשר (הסטים הם {sets})",
+    "interrupt": {
+      "title": "הפסקה · כל {every} עוצרים ועושים"
+    },
+    "aria": {
+      "reps": "חזרות או כמות",
+      "load": "משקל",
+      "rest": "מנוחה",
+      "cell": "{column} {n}: {what}"
+    },
+    "error": {
+      "dose": "לא קריא: למשל 10, 8-12, 5-10-15…, max, 400 m, 60s",
+      "tempo": "טמפו ב-4 סימנים, למשל 31X1",
+      "number": "מספר, +x או a→b",
+      "numberExample": "מספר, למשל {example}",
+      "max": "לכל היותר {max}",
+      "loadUnitCompact": "כתוב kg או %, למשל 60kg או 70%",
+      "loadMissingUnit": "כתוב kg או % בסט אחד של השורה; השאר לוקחים משם",
+      "loadMixedUnits": "אותה יחידה בכל השורה: {unit}"
+    },
+    "mean": {
+      "equals": "= {value}",
+      "max": "כמה שיותר",
+      "maxCal": "כמה שיותר קלוריות",
+      "maxM": "כמה שיותר מטרים",
+      "sets": "{sets} סטים",
+      "ladder": "לכל {word}: {list}, ואז {step} בכל {word}",
+      "perRound": "לכל {word}: {list}",
+      "range": "טווח {range}, המתאמן מחליט",
+      "rangeSide": "טווח {range}, המתאמן מחליט · לכל צד",
+      "reps": "{value} חזרות",
+      "repsSide": "{value} חזרות · לכל צד",
+      "amount": "{value}",
+      "amountSide": "{value} · לכל צד",
+      "bw": "משקל גוף",
+      "kg": "{value} kg",
+      "pct": "{value}% מ-1RM",
+      "words": "כטקסט למתאמן",
+      "tempo": "↓{down} הורדה · {bottom} למטה · ↑{up} הרמה · {top} למעלה (שניות, X = מתפרץ)"
+    },
+    "word": {
+      "set": "סט",
+      "round": "סבב",
+      "slot": "אינטרוול"
+    },
+    "tip": {
+      "range": "טווח",
+      "ladder": "עולה בכל סבב",
+      "max": "כמה שהוא מסוגל",
+      "emptyCode": "ריק",
+      "asBefore": "כמו הקודם",
+      "kg": "קילו",
+      "pct": "מ-1RM",
+      "heavyCode": "כבד",
+      "words": "במילים",
+      "plusEach": "עולה בכל פעם",
+      "spread": "עד האחרון",
+      "unitCode": "kg או %",
+      "unitOnce": "פעם אחת בשורה",
+      "changeEach": "משתנה בכל פעם",
+      "tempo": "שניות הורדה · עצירה למטה · הרמה (X = מתפרץ) · עצירה למעלה",
+      "seconds": "שניות",
+      "minSec": "דקות:שניות",
+      "minutes": "דקות, עד 10",
+      "afterLastCode": "אחרי הסבב האחרון",
+      "afterLast": "אותו ערך, או אותו שינוי אם כותבים +x"
+    },
+    "colWord": {
+      "set": "סט",
+      "round": "סבב",
+      "slot": "אינטרוול"
+    }
+  },
   "PlanCore": {
     "flow": {
       "sets": "סטים",
@@ -12327,7 +12766,16 @@
       "too_many_rows": "לכל היותר 60 תרגילים",
       "too_many_cells": "לכל היותר 30 סטים",
       "too_long": "לכל היותר 200 תווים",
-      "note_too_long": "לכל היותר 2000 תווים"
+      "note_too_long": "לכל היותר 2000 תווים",
+      "wrong_unit": "זו לא יחידת משקל: כתוב kg או %",
+      "no_base": "אין ערך קודם לשנות: כתוב קודם מספר",
+      "bad_shape": "לערך הזה צורה שגויה"
+    },
+    "ambiguous": {
+      "rangeOrList": "טווח {range}, הספורטאי בוחר · ל-{count} סטים כתוב {write}",
+      "listOrLadder": "{list}, ואז האחרון חוזר · כדי להמשיך לעלות כתוב {write}",
+      "windows": "{count} חלונות AMRAP: {list} · ל-AMRAP אחד כתוב {write}",
+      "clock": "נקרא {reading} · ליחידה האחרת כתוב {write}"
     }
   },
   "PlanRun": {
