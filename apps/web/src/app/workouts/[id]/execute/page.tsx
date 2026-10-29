@@ -9,6 +9,8 @@ import { useParams, useRouter } from "next/navigation";
 import { fetchExecution, fetchTimerSequence } from "@/api/executions";
 import { AuthGuard } from "@/components/auth-guard";
 import { ExecutionMode } from "@/components/workouts/execution/ExecutionMode";
+import { PlanExecutionMode } from "@/components/workouts/execution/plan/PlanExecutionMode";
+import { usesPlanRunner } from "@/components/workouts/execution/plan/plan-workout";
 import { useSession } from "@/components/session-provider";
 import { storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
 import { useExecutionStore } from "@/stores/execution";
@@ -30,6 +32,8 @@ function ExecutePageContent() {
   const [recoveryState, setRecoveryState] = useState<"loading" | "done">(
     hasReadyStore ? "done" : "loading",
   );
+  // ADR-270: a workout written in the structured editor runs in the plan runner.
+  const [planRun, setPlanRun] = useState(false);
 
   useEffect(() => {
     if (!executionId) {
@@ -48,6 +52,13 @@ function ExecutePageContent() {
 
         if (!execution.master_workout_id) {
           router.replace("/workouts");
+          return;
+        }
+
+        if (usesPlanRunner(execution.workout)) {
+          if (cancelled) return;
+          setPlanRun(true);
+          setRecoveryState("done");
           return;
         }
 
@@ -109,6 +120,8 @@ function ExecutePageContent() {
     router,
     tokens?.access_token,
   ]);
+
+  if (planRun) return <PlanExecutionMode executionId={executionId} />;
 
   if (!hasReadyStore && recoveryState === "loading") {
     return (
