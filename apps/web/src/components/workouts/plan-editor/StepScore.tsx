@@ -11,8 +11,10 @@ import { useKeyText } from "./plan-text";
 /** A scale level of the workout (e.g. `{ key: "rx", label: "Rx" }`), for per-level notes. */
 export type PlanLevel = { key: string; label: string };
 
-export const noteFieldClass = "w-full rounded-lg border px-2.5 py-1.5 text-sm outline-none focus:border-[var(--primary)]";
-export const noteFieldStyle = { background: "var(--control-bg)", borderColor: "var(--control-border)", color: "var(--text)" } as const;
+// The border colour lives in the class, not the inline style, so the focus colour can win over it.
+export const noteFieldClass =
+  "w-full rounded-lg border border-[var(--control-border)] px-2.5 py-1.5 text-sm outline-none focus:border-[var(--primary)] focus:shadow-[0_0_0_1px_var(--primary)]";
+export const noteFieldStyle = { background: "var(--control-bg)", color: "var(--text)" } as const;
 
 /**
  * Step Σκορ: the flow's score (the usual one already chosen; ← → change it),

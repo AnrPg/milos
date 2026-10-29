@@ -69,8 +69,8 @@ function ParamField({ section, def }: { section: PlanEditorSection; def: ParamDe
           autoComplete="off"
           placeholder={def.kind === "time" || def.kind === "times" ? t("unit.clock") : ""}
           onChange={(e) => setParam(section.id, def.key, e.target.value)}
-          className={`${def.kind === "times" ? "w-36" : "w-24"} rounded-lg border px-2.5 py-1.5 text-base font-bold outline-none focus:border-[var(--primary)]`}
-          style={{ background: "var(--control-bg)", borderColor: bad ? "var(--danger)" : "var(--control-border)", color: "var(--text)" }}
+          className={`${def.kind === "times" ? "w-36" : "w-24"} rounded-lg border px-2.5 py-1.5 text-base font-bold outline-none ${bad ? "border-[var(--danger)] focus:shadow-[0_0_0_1px_var(--danger)]" : "border-[var(--control-border)] focus:border-[var(--primary)] focus:shadow-[0_0_0_1px_var(--primary)]"}`}
+          style={{ background: "var(--control-bg)", color: "var(--text)" }}
         />
         {unit ? <span className="text-sm font-normal" aria-hidden="true" style={{ color: "var(--muted)" }}>{t(`unit.${unit}`)}</span> : null}
       </span>

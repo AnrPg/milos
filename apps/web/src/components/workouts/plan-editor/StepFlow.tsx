@@ -129,8 +129,8 @@ export function StepFlow({ section }: { section: PlanEditorSection }) {
           setPick(null);
         }}
         onKeyDown={onKeyDown}
-        className="w-full rounded-xl border px-3 py-2.5 text-base outline-none focus:border-[var(--primary)]"
-        style={{ background: "var(--control-bg)", borderColor: "var(--control-border)", color: "var(--text)" }}
+        className="w-full text-ellipsis rounded-xl border border-[var(--control-border)] px-3 py-2.5 text-base outline-none focus:border-[var(--primary)] focus:shadow-[0_0_0_1px_var(--primary)]"
+        style={{ background: "var(--control-bg)", color: "var(--text)" }}
       />
       <div id={listId} role="listbox" aria-label={t("flowInput")} className="flex flex-col gap-3">
         {flows.length ? (
