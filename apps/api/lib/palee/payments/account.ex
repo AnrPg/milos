@@ -14,7 +14,8 @@ defmodule Palee.Payments.Account do
   @primary_key {:id, :binary_id, autogenerate: true}
 
   @fields ~w(provider environment status settings options credentials last_error checked_at
-             updated_by_id)a
+             updated_by_id packages_opened_at packages_opened_count
+             packages_notice_dismissed_at)a
 
   schema "payment_accounts" do
     field :organization_id, :binary_id, read_after_writes: true
@@ -27,6 +28,10 @@ defmodule Palee.Payments.Account do
     field :last_error, :string
     field :checked_at, :utc_datetime_usec
     field :updated_by_id, :binary_id
+    # ADR-271: the one time connecting opened the paid packages for online sale.
+    field :packages_opened_at, :utc_datetime_usec
+    field :packages_opened_count, :integer
+    field :packages_notice_dismissed_at, :utc_datetime_usec
 
     timestamps(type: :utc_datetime_usec)
   end

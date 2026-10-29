@@ -218,6 +218,21 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   @impl true
+  def open_packages_online(ids) do
+    {count, _rows} =
+      MembershipPackage
+      |> tenant_scope()
+      |> where(
+        [package],
+        package.id in ^ids and is_nil(package.sold_online_chosen_at) and
+          package.sold_online == false
+      )
+      |> Repo.update_all(set: [sold_online: true, updated_at: DateTime.utc_now()])
+
+    count
+  end
+
+  @impl true
   def get_package(id) do
     case tenant_scope(MembershipPackage) |> where([package], package.id == ^id) |> Repo.one() do
       nil -> nil
@@ -6042,6 +6057,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       tax_category: package.tax_category,
       exemption_reason: package.exemption_reason,
       sold_online: package.sold_online,
+      sold_online_chosen_at: package.sold_online_chosen_at,
       inserted_at: package.inserted_at,
       updated_at: package.updated_at
     }

@@ -12951,7 +12951,10 @@
       "payments": "Online πληρωμές",
       "paymentsHint": "Ένα κουμπί, με Viva",
       "import": "Φέρε τα μέλη σου",
-      "importHint": "Εισαγωγή από Wodify, PushPress, Excel…"
+      "importHint": "Εισαγωγή από Wodify, PushPress, Excel…",
+      "soldOnline": "Τι πωλείται online",
+      "soldOnlineHint": "Σελίδα πακέτων · {count} από {total} πακέτα συνδρομής",
+      "soldOnlineLater": "Μετά τις online πληρωμές, τα πακέτα συνδρομής με τιμή πωλούνται online μόνα τους"
     },
     "errors": {
       "recipe_owner_only": "Τη συνταγή την εφαρμόζει μόνο ο ιδιοκτήτης.",
@@ -13461,5 +13464,33 @@
     "tipsUnattributed": "Χωρίς απόδοση",
     "tipsPayments": "{count, plural, one {# πληρωμή} other {# πληρωμές}}",
     "tipsTotal": "Σύνολο"
+  },
+  "SoldOnline": {
+    "sale": "Πώληση",
+    "title": "Πωλείται online",
+    "subtitle": "Στη Σελίδα πακέτων και στο app",
+    "saved": "Αποθηκεύτηκε",
+    "badge": "Online",
+    "badgeHidden": "Online · δεν φαίνεται",
+    "deskOnly": "Μόνο στην υποδοχή",
+    "hint_visible": "Στη Σελίδα πακέτων και στο app του μέλους box. Η απόδειξη βγαίνει μόνη της.",
+    "hint_off": "Πωλείται μόνο στην υποδοχή.",
+    "hint_free": "Τα δωρεάν πακέτα συνδρομής δεν πωλούνται online.",
+    "hint_inactive": "Ανενεργό πακέτο συνδρομής: δεν πωλείται.",
+    "hint_purpose_off": "Δεν φαίνεται ακόμη: αυτό το είδος πακέτου είναι κλειστό στο «Τι πληρώνεται online».",
+    "fix_purpose_off": "Άνοιξέ το",
+    "hint_no_provider": "Φαίνεται στη Σελίδα πακέτων. Η αγορά ανοίγει μόλις συνδέσεις online πληρωμές.",
+    "fix_no_provider": "Ρυθμίσεις › Πληρωμές",
+    "listCount": "Πωλούνται online: {count} από {total}",
+    "viewSalesPage": "Δες τη Σελίδα πακέτων",
+    "noticeOpened": "{count, plural, one {Το # πακέτο συνδρομής σου πωλείται τώρα online.} other {Τα # πακέτα συνδρομής σου πωλούνται τώρα online.}}",
+    "noticeChange": "Αλλαγή",
+    "noticeClose": "Κλείσιμο",
+    "payCount": "Πωλούνται online: {count} από {total} πακέτα συνδρομής",
+    "payCountHint": "Τα υπόλοιπα πωλούνται μόνο στην υποδοχή.",
+    "payAll": "Όλα τα πακέτα συνδρομής με τιμή πωλούνται και online.",
+    "payNone": "Κανένα πακέτο συνδρομής δεν πωλείται online",
+    "payNoneHint": "Τα μέλη box δεν έχουν τι να αγοράσουν. Άνοιξε το «Πωλείται online» στα πακέτα που θέλεις.",
+    "packagesLink": "Πακέτα συνδρομής"
   }
 }

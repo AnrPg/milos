@@ -187,6 +187,35 @@ defmodule PaleeWeb.AdminFinanceController do
     # ADR-248: members can buy it online (public box page and the app).
     sold_online: %Schema{type: :boolean}
   }
+  # ADR-271: a staff package row with whether members see and buy it online.
+  @package_row %Schema{
+    type: :object,
+    additionalProperties: true,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      sold_online: %Schema{type: :boolean},
+      online_visibility: %Schema{
+        type: :string,
+        enum: Palee.Payments.package_visibilities(),
+        description:
+          "ADR-271: `visible` (listed and bought online); otherwise why not: `inactive`, " <>
+            "`free` (price 0), `off` (front desk only), `purpose_off` (its purpose is off in " <>
+            "«Τι πληρώνεται online»), `no_provider` (listed, bought once online payments connect)"
+      }
+    },
+    required: [:id, :online_visibility, :sold_online]
+  }
+  @package_response %Schema{
+    type: :object,
+    properties: %{package: @package_row},
+    required: [:package]
+  }
+  @packages_response %Schema{
+    type: :object,
+    additionalProperties: true,
+    properties: %{packages: %Schema{type: :array, items: @package_row}},
+    required: [:packages]
+  }
   @create_package_request_body %RequestBody{
     required: true,
     content: %{
@@ -702,7 +731,7 @@ defmodule PaleeWeb.AdminFinanceController do
   operation(:packages,
     summary: "List membership packages",
     parameters: [@location_ids_parameter],
-    responses: [ok: {"Membership packages", "application/json", @list_response}]
+    responses: [ok: {"Membership packages", "application/json", @packages_response}]
   )
 
   def packages(conn, params) do
@@ -738,7 +767,7 @@ defmodule PaleeWeb.AdminFinanceController do
   operation(:package,
     summary: "Fetch a membership package",
     parameters: [@id_parameter],
-    responses: [ok: {"Membership package", "application/json", @open_object}]
+    responses: [ok: {"Membership package", "application/json", @package_response}]
   )
 
   def package(conn, params) do
@@ -750,7 +779,7 @@ defmodule PaleeWeb.AdminFinanceController do
   operation(:create_package,
     summary: "Create a membership package",
     request_body: @create_package_request_body,
-    responses: [created: {"Membership package", "application/json", @open_object}]
+    responses: [created: {"Membership package", "application/json", @package_response}]
   )
 
   def create_package(conn, params) do
@@ -766,7 +795,7 @@ defmodule PaleeWeb.AdminFinanceController do
     summary: "Update a membership package",
     parameters: [@id_parameter],
     request_body: @update_package_request_body,
-    responses: [ok: {"Membership package", "application/json", @open_object}]
+    responses: [ok: {"Membership package", "application/json", @package_response}]
   )
 
   def update_package(conn, params) do

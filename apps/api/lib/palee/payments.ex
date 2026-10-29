@@ -38,13 +38,11 @@ defmodule Palee.Payments do
   def account(context), do: context |> PaymentStore.get_account() |> public_account()
 
   @doc "Whether the business can take online payments now."
-  def available?(context) do
-    case PaymentStore.get_account(context) do
-      %{status: "active", provider: "sandbox"} -> sandbox_enabled?()
-      %{status: "active"} -> true
-      _other -> false
-    end
-  end
+  def available?(context), do: context |> PaymentStore.get_account() |> active?()
+
+  defp active?(%{status: "active", provider: "sandbox"}), do: sandbox_enabled?()
+  defp active?(%{status: "active"}), do: true
+  defp active?(_account), do: false
 
   @doc "The provider members pay through now (`viva`, `stripe`, `sandbox`), or nil."
   def provider(context) do
@@ -62,6 +60,56 @@ defmodule Palee.Payments do
 
       _other ->
         false
+    end
+  end
+
+  @doc "ADR-271: the values of a package's `online_visibility`."
+  def package_visibilities, do: Palee.Payments.Domain.PackageSale.visibilities()
+
+  @doc """
+  ADR-271: what `PackageSale` needs to know about the business's online
+  payments, read once: `%{available: boolean, options: map}`.
+  """
+  def package_offer(context) do
+    account = PaymentStore.get_account(context)
+    %{available: active?(account), options: (account && account.options) || %{}}
+  end
+
+  @doc """
+  ADR-271: claims the one time connecting opens the paid packages for online
+  sale. `{:ok, :claimed}` the first time, `{:ok, :done}` afterwards.
+  """
+  def claim_packages_opening(context, %DateTime{} = now) do
+    case PaymentStore.get_account(context) do
+      %{packages_opened_at: nil} ->
+        with {:ok, _account} <-
+               PaymentStore.save_account(context, %{packages_opened_at: now}),
+             do: {:ok, :claimed}
+
+      %{} ->
+        {:ok, :done}
+
+      nil ->
+        {:error, :online_payments_unavailable}
+    end
+  end
+
+  @doc "ADR-271: how many packages the opening switched on, for the owner's notice."
+  def record_packages_opened(context, count) when is_integer(count) and count >= 0 do
+    with {:ok, _account} <- PaymentStore.save_account(context, %{packages_opened_count: count}),
+         do: :ok
+  end
+
+  @doc "ADR-271: the owner read «Τα N πακέτα σου πωλούνται τώρα online»."
+  def dismiss_packages_notice(context, %DateTime{} = now) do
+    case PaymentStore.get_account(context) do
+      %{} ->
+        with {:ok, saved} <-
+               PaymentStore.save_account(context, %{packages_notice_dismissed_at: now}),
+             do: {:ok, public_account(saved)}
+
+      nil ->
+        {:error, :online_payments_unavailable}
     end
   end
 
@@ -292,7 +340,17 @@ defmodule Palee.Payments do
     |> Map.put(:credentials_set, (account.credentials || %{}) |> Map.keys() |> Enum.sort())
     |> Map.put(:options, AccountOptions.resolve(account[:options] || %{}))
     |> Map.put(:connection, connection(account))
+    |> Map.put(:packages_notice, packages_notice(account))
   end
+
+  # ADR-271: «Τα N πακέτα σου πωλούνται τώρα online» until the owner closes it.
+  defp packages_notice(
+         %{packages_opened_at: %DateTime{} = at, packages_notice_dismissed_at: nil} = account
+       )
+       when is_integer(account.packages_opened_count) and account.packages_opened_count > 0,
+       do: %{count: account.packages_opened_count, opened_at: at}
+
+  defp packages_notice(_account), do: nil
 
   defp connection(%{settings: %{"connection" => "platform"}}), do: "platform"
   defp connection(_account), do: "keys"

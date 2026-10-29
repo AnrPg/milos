@@ -276,6 +276,8 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminPaymentsController, :refund} => [:manage_billing],
     {W.AdminPaymentsController, :retry} => [:manage_billing],
     {W.AdminPaymentsController, :save_options} => [:manage_billing],
+    # ADR-271: «Τα N πακέτα σου πωλούνται τώρα online» closed.
+    {W.AdminPaymentsController, :dismiss_packages_notice} => [:manage_billing],
     {W.AdminPaymentsController, :connect} => [:manage_billing],
     {W.AdminPaymentsController, :disconnect} => [:manage_billing],
     {W.AdminPaymentsController, :attention} => [:manage_billing, :take_payments],

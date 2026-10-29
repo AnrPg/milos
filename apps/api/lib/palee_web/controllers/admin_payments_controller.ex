@@ -42,6 +42,18 @@ defmodule PaleeWeb.AdminPaymentsController do
     end
   end
 
+  operation(:dismiss_packages_notice,
+    summary: "Close the notice that connecting put the paid packages on sale online",
+    description: "ADR-271: the notice shows once, after the first connection.",
+    responses: [ok: {"Account", "application/json", P.account_status()}]
+  )
+
+  def dismiss_packages_notice(conn, _params) do
+    with {:ok, status} <- OnlinePayments.dismiss_packages_notice(conn.assigns.tenant_context) do
+      json(conn, status)
+    end
+  end
+
   operation(:index,
     summary: "Online payments, newest first",
     parameters: [

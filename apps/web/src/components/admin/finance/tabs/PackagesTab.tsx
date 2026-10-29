@@ -25,6 +25,11 @@ import type { FacilityLocation } from "@/api/facility";
 import { BranchCoverageBadge } from "@/components/admin/BranchFilter";
 import type { LocationScope } from "@/lib/location-scope";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { SoldOnlineBadge } from "@/components/admin/finance/packages/SoldOnlineBadge";
+import { salesPageHref, soldOnlineCount } from "@/components/admin/finance/packages/sold-online";
+import { useOrganizationSlug } from "@/lib/organization-slug";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -104,6 +109,8 @@ export function PackagesTab({ locationIds }: { locationIds?: string } = {}) {
           <PackageRows packages={activePackages} locations={locations} onOpen={(id) => setParam("package", id)} />
         )}
       </div>
+
+      {activePackages.length > 0 ? <SoldOnlineSummary packages={activePackages} /> : null}
 
       {inactivePackages.length > 0 ? (
         <details className="overflow-hidden rounded-2xl" style={{ border: "1px solid var(--border)" }}>
@@ -204,6 +211,7 @@ function PackageRows({
       </div>
       <div className="flex items-center gap-4">
         <BranchCoverageBadge target={packageCoverage(pkg)} locations={locations} />
+        <SoldOnlineBadge pkg={pkg} />
         <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
           {money(uiLocale, pkg.base_price_cents)}
         </span>
@@ -214,4 +222,26 @@ function PackageRows({
       </div>
     </button>
   ));
+}
+
+/** «Πωλούνται online: N από M · Δες τη Σελίδα πακέτων ›» under the list (ADR-271). */
+function SoldOnlineSummary({ packages }: { packages: FinanceRecord[] }) {
+  const t = useTranslations("SoldOnline");
+  const slug = useOrganizationSlug();
+  const { count, total } = soldOnlineCount(packages);
+  const href = salesPageHref(slug);
+  if (total === 0) return null;
+  return (
+    <p className="flex flex-wrap items-center gap-1 px-2 text-xs" style={{ color: "var(--dim)" }} data-testid="sold-online-summary">
+      <span>{t("listCount", { count, total })}</span>
+      {href ? (
+        <>
+          <span aria-hidden="true">·</span>
+          <Link href={href} className="font-semibold underline" style={{ color: "var(--primary)" }}>
+            {t("viewSalesPage")} ›
+          </Link>
+        </>
+      ) : null}
+    </p>
+  );
 }

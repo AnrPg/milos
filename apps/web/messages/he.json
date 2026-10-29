@@ -12951,7 +12951,10 @@
       "payments": "תשלומים אונליין",
       "paymentsHint": "כפתור אחד, עם Viva",
       "import": "הבא את החברים שלך",
-      "importHint": "ייבוא מ-Wodify, PushPress, Excel…"
+      "importHint": "ייבוא מ-Wodify, PushPress, Excel…",
+      "soldOnline": "מה נמכר אונליין",
+      "soldOnlineHint": "דף המכירה · {count} מתוך {total} חבילות מנוי",
+      "soldOnlineLater": "אחרי חיבור תשלומים אונליין, חבילות מנוי בתשלום עולות למכירה אונליין לבד"
     },
     "errors": {
       "recipe_owner_only": "רק הבעלים מחיל מתכון.",
@@ -13461,5 +13464,33 @@
     "tipsUnattributed": "לא שויכו",
     "tipsPayments": "{count, plural, one {תשלום אחד} other {# תשלומים}}",
     "tipsTotal": "סה\"כ"
+  },
+  "SoldOnline": {
+    "sale": "מכירה",
+    "title": "נמכר אונליין",
+    "subtitle": "בדף המכירה ובאפליקציה",
+    "saved": "נשמר",
+    "badge": "Online",
+    "badgeHidden": "Online · לא מוצג",
+    "deskOnly": "רק בקבלה",
+    "hint_visible": "בדף המכירה ובאפליקציה של חבר הבוקס. הקבלה מופקת לבד.",
+    "hint_off": "נמכר רק בקבלה.",
+    "hint_free": "חבילות מנוי חינמיות לא נמכרות אונליין.",
+    "hint_inactive": "חבילת מנוי לא פעילה: לא במכירה.",
+    "hint_purpose_off": "עדיין לא מוצג: סוג החבילה הזה כבוי ב„מה משולם אונליין”.",
+    "fix_purpose_off": "הפעל",
+    "hint_no_provider": "מוצג בדף המכירה. הרכישה נפתחת ברגע שתחבר תשלומים אונליין.",
+    "fix_no_provider": "הגדרות › תשלומים",
+    "listCount": "נמכרות אונליין: {count} מתוך {total}",
+    "viewSalesPage": "לדף המכירה",
+    "noticeOpened": "{count, plural, one {חבילת מנוי אחת שלך נמכרת עכשיו אונליין.} other {# מחבילות המנוי שלך נמכרות עכשיו אונליין.}}",
+    "noticeChange": "שינוי",
+    "noticeClose": "סגירה",
+    "payCount": "נמכרות אונליין: {count} מתוך {total} חבילות מנוי",
+    "payCountHint": "השאר נמכרות רק בקבלה.",
+    "payAll": "כל חבילות המנוי בתשלום נמכרות גם אונליין.",
+    "payNone": "אף חבילת מנוי לא נמכרת אונליין",
+    "payNoneHint": "לחברי הבוקס אין מה לקנות. הפעל „נמכר אונליין” בחבילות שאתה רוצה.",
+    "packagesLink": "חבילות מנוי"
   }
 }

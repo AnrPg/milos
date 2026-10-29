@@ -17,6 +17,7 @@ const api = vi.hoisted(() => ({
   savePaymentOptions: vi.fn(),
   savePaymentAccount: vi.fn(),
   disconnectPaymentAccount: vi.fn(),
+  dismissPackagesNotice: vi.fn(),
 }));
 const settings = vi.hoisted(() => ({
   fetchAdminSettings: vi.fn(async () => ({ finance: { subscription_grace_days: 7 } })),
@@ -32,6 +33,7 @@ vi.mock("next/navigation", () => ({
 }));
 vi.mock("@/api/online-payments", async (original) => ({ ...(await original<object>()), ...api }));
 vi.mock("@/api/settings", async (original) => ({ ...(await original<object>()), ...settings }));
+vi.mock("@/lib/organization-slug", () => ({ useOrganizationSlug: () => "kypseli", adminHref: (href: string) => href }));
 
 import { OnlinePaymentsSettings, onlineSentence } from "./OnlinePaymentsSettings";
 
@@ -212,5 +214,43 @@ describe("onlineSentence", () => {
     expect(
       onlineSentence({ packages: false, autopay: false, drop_in: false, shop: false, personal_training: false }, t, "en"),
     ).toBe("Box members pay for nothing online. Renewals need a payment of their own.");
+  });
+});
+
+describe("OnlinePaymentsSettings · sold online (ADR-271)", () => {
+  beforeEach(() => {
+    nav.params = "tab=payments";
+    Object.values(api).forEach((mock) => mock.mockReset());
+  });
+
+  it("tells the owner once how many packages connecting put on sale, and closes the notice", async () => {
+    const opened = { ...ACCOUNT, packages_notice: { count: 3, opened_at: "2027-03-10T09:00:00Z" } };
+    api.fetchPaymentAccount.mockResolvedValue({ ...status(opened), online_sales: { sold_online: 3, packages: 4 } });
+    api.dismissPackagesNotice.mockResolvedValue({ ...status(ACCOUNT), online_sales: { sold_online: 3, packages: 4 } });
+    wrap("el");
+
+    const notice = await screen.findByTestId("packages-opened-notice");
+    expect(notice).toHaveTextContent("Τα 3 πακέτα συνδρομής σου πωλούνται τώρα online.");
+    expect(within(notice).getByRole("link", { name: "Αλλαγή" })).toHaveAttribute("href", "/admin/finance?tab=packages");
+
+    fireEvent.click(within(notice).getByRole("button", { name: "Κλείσιμο" }));
+    await waitFor(() => expect(api.dismissPackagesNotice).toHaveBeenCalledWith("token"));
+    await waitFor(() => expect(screen.queryByTestId("packages-opened-notice")).toBeNull());
+  });
+
+  it("shows N of M sold online with a link to the list, and warns when none is", async () => {
+    api.fetchPaymentAccount.mockResolvedValue({ ...status(ACCOUNT), online_sales: { sold_online: 1, packages: 4 } });
+    const first = wrap("el");
+
+    const nudge = await screen.findByTestId("sold-online-nudge");
+    expect(nudge).toHaveTextContent("Πωλούνται online: 1 από 4 πακέτα συνδρομής");
+    expect(nudge).toHaveTextContent("Τα υπόλοιπα πωλούνται μόνο στην υποδοχή.");
+    expect(within(nudge).getByRole("link", { name: /Πακέτα συνδρομής/ })).toHaveAttribute("href", "/admin/finance?tab=packages");
+    first.unmount();
+
+    api.fetchPaymentAccount.mockResolvedValue({ ...status(ACCOUNT), online_sales: { sold_online: 0, packages: 4 } });
+    wrap("en");
+    expect(await screen.findByText("No subscription package is sold online")).toBeVisible();
+    expect(screen.queryByTestId("packages-opened-notice")).toBeNull();
   });
 });

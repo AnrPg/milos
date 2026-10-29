@@ -171803,6 +171803,44 @@
               "application/json": {
                 "schema": {
                   "additionalProperties": true,
+                  "properties": {
+                    "packages": {
+                      "items": {
+                        "additionalProperties": true,
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "online_visibility": {
+                            "description": "ADR-271: `visible` (listed and bought online); otherwise why not: `inactive`, `free` (price 0), `off` (front desk only), `purpose_off` (its purpose is off in «Τι πληρώνεται online»), `no_provider` (listed, bought once online payments connect)",
+                            "enum": [
+                              "visible",
+                              "free",
+                              "off",
+                              "purpose_off",
+                              "no_provider",
+                              "inactive"
+                            ],
+                            "type": "string"
+                          },
+                          "sold_online": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "online_visibility",
+                          "sold_online"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "packages"
+                  ],
                   "type": "object"
                 }
               }
@@ -172429,7 +172467,41 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
+                  "properties": {
+                    "package": {
+                      "additionalProperties": true,
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "online_visibility": {
+                          "description": "ADR-271: `visible` (listed and bought online); otherwise why not: `inactive`, `free` (price 0), `off` (front desk only), `purpose_off` (its purpose is off in «Τι πληρώνεται online»), `no_provider` (listed, bought once online payments connect)",
+                          "enum": [
+                            "visible",
+                            "free",
+                            "off",
+                            "purpose_off",
+                            "no_provider",
+                            "inactive"
+                          ],
+                          "type": "string"
+                        },
+                        "sold_online": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "online_visibility",
+                        "sold_online"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "package"
+                  ],
                   "type": "object"
                 }
               }
@@ -172468,7 +172540,41 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
+                  "properties": {
+                    "package": {
+                      "additionalProperties": true,
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "online_visibility": {
+                          "description": "ADR-271: `visible` (listed and bought online); otherwise why not: `inactive`, `free` (price 0), `off` (front desk only), `purpose_off` (its purpose is off in «Τι πληρώνεται online»), `no_provider` (listed, bought once online payments connect)",
+                          "enum": [
+                            "visible",
+                            "free",
+                            "off",
+                            "purpose_off",
+                            "no_provider",
+                            "inactive"
+                          ],
+                          "type": "string"
+                        },
+                        "sold_online": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "online_visibility",
+                        "sold_online"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "package"
+                  ],
                   "type": "object"
                 }
               }
@@ -173101,7 +173207,41 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "additionalProperties": true,
+                  "properties": {
+                    "package": {
+                      "additionalProperties": true,
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "online_visibility": {
+                          "description": "ADR-271: `visible` (listed and bought online); otherwise why not: `inactive`, `free` (price 0), `off` (front desk only), `purpose_off` (its purpose is off in «Τι πληρώνεται online»), `no_provider` (listed, bought once online payments connect)",
+                          "enum": [
+                            "visible",
+                            "free",
+                            "off",
+                            "purpose_off",
+                            "no_provider",
+                            "inactive"
+                          ],
+                          "type": "string"
+                        },
+                        "sold_online": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "online_visibility",
+                        "sold_online"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "package"
+                  ],
                   "type": "object"
                 }
               }
@@ -188223,6 +188363,24 @@
                           ],
                           "type": "object"
                         },
+                        "packages_notice": {
+                          "description": "ADR-271: connecting put `count` paid packages on sale online; shown until the owner closes it",
+                          "nullable": true,
+                          "properties": {
+                            "count": {
+                              "type": "integer"
+                            },
+                            "opened_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "count",
+                            "opened_at"
+                          ],
+                          "type": "object"
+                        },
                         "provider": {
                           "enum": [
                             "sandbox",
@@ -188255,6 +188413,7 @@
                         "environment",
                         "id",
                         "options",
+                        "packages_notice",
                         "provider",
                         "settings",
                         "status",
@@ -188278,6 +188437,22 @@
                       },
                       "type": "array"
                     },
+                    "online_sales": {
+                      "description": "ADR-271: of the active paid packages (`packages`), how many are sold online",
+                      "properties": {
+                        "packages": {
+                          "type": "integer"
+                        },
+                        "sold_online": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "packages",
+                        "sold_online"
+                      ],
+                      "type": "object"
+                    },
                     "providers": {
                       "items": {
                         "type": "string"
@@ -188289,6 +188464,7 @@
                     "account",
                     "connect_providers",
                     "environments",
+                    "online_sales",
                     "providers"
                   ],
                   "type": "object"
@@ -188397,6 +188573,24 @@
                           ],
                           "type": "object"
                         },
+                        "packages_notice": {
+                          "description": "ADR-271: connecting put `count` paid packages on sale online; shown until the owner closes it",
+                          "nullable": true,
+                          "properties": {
+                            "count": {
+                              "type": "integer"
+                            },
+                            "opened_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "count",
+                            "opened_at"
+                          ],
+                          "type": "object"
+                        },
                         "provider": {
                           "enum": [
                             "sandbox",
@@ -188429,6 +188623,7 @@
                         "environment",
                         "id",
                         "options",
+                        "packages_notice",
                         "provider",
                         "settings",
                         "status",
@@ -188452,6 +188647,22 @@
                       },
                       "type": "array"
                     },
+                    "online_sales": {
+                      "description": "ADR-271: of the active paid packages (`packages`), how many are sold online",
+                      "properties": {
+                        "packages": {
+                          "type": "integer"
+                        },
+                        "sold_online": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "packages",
+                        "sold_online"
+                      ],
+                      "type": "object"
+                    },
                     "providers": {
                       "items": {
                         "type": "string"
@@ -188463,6 +188674,7 @@
                     "account",
                     "connect_providers",
                     "environments",
+                    "online_sales",
                     "providers"
                   ],
                   "type": "object"
@@ -188641,6 +188853,24 @@
                           ],
                           "type": "object"
                         },
+                        "packages_notice": {
+                          "description": "ADR-271: connecting put `count` paid packages on sale online; shown until the owner closes it",
+                          "nullable": true,
+                          "properties": {
+                            "count": {
+                              "type": "integer"
+                            },
+                            "opened_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "count",
+                            "opened_at"
+                          ],
+                          "type": "object"
+                        },
                         "provider": {
                           "enum": [
                             "sandbox",
@@ -188673,6 +188903,7 @@
                         "environment",
                         "id",
                         "options",
+                        "packages_notice",
                         "provider",
                         "settings",
                         "status",
@@ -188696,6 +188927,22 @@
                       },
                       "type": "array"
                     },
+                    "online_sales": {
+                      "description": "ADR-271: of the active paid packages (`packages`), how many are sold online",
+                      "properties": {
+                        "packages": {
+                          "type": "integer"
+                        },
+                        "sold_online": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "packages",
+                        "sold_online"
+                      ],
+                      "type": "object"
+                    },
                     "providers": {
                       "items": {
                         "type": "string"
@@ -188707,6 +188954,7 @@
                     "account",
                     "connect_providers",
                     "environments",
+                    "online_sales",
                     "providers"
                   ],
                   "type": "object"
@@ -188856,6 +189104,24 @@
                           ],
                           "type": "object"
                         },
+                        "packages_notice": {
+                          "description": "ADR-271: connecting put `count` paid packages on sale online; shown until the owner closes it",
+                          "nullable": true,
+                          "properties": {
+                            "count": {
+                              "type": "integer"
+                            },
+                            "opened_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "count",
+                            "opened_at"
+                          ],
+                          "type": "object"
+                        },
                         "provider": {
                           "enum": [
                             "sandbox",
@@ -188888,6 +189154,7 @@
                         "environment",
                         "id",
                         "options",
+                        "packages_notice",
                         "provider",
                         "settings",
                         "status",
@@ -188911,6 +189178,22 @@
                       },
                       "type": "array"
                     },
+                    "online_sales": {
+                      "description": "ADR-271: of the active paid packages (`packages`), how many are sold online",
+                      "properties": {
+                        "packages": {
+                          "type": "integer"
+                        },
+                        "sold_online": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "packages",
+                        "sold_online"
+                      ],
+                      "type": "object"
+                    },
                     "providers": {
                       "items": {
                         "type": "string"
@@ -188922,6 +189205,7 @@
                     "account",
                     "connect_providers",
                     "environments",
+                    "online_sales",
                     "providers"
                   ],
                   "type": "object"
@@ -188937,6 +189221,219 @@
           }
         ],
         "summary": "Choose what members pay online and who hears about failed charges",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/payments/account/packages-notice": {
+      "delete": {
+        "callbacks": {},
+        "description": "ADR-271: the notice shows once, after the first connection.",
+        "operationId": "PaleeWeb.AdminPaymentsController.dismiss_packages_notice",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "account": {
+                      "nullable": true,
+                      "properties": {
+                        "checked_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "connection": {
+                          "enum": [
+                            "keys",
+                            "platform"
+                          ],
+                          "type": "string"
+                        },
+                        "credentials_set": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "environment": {
+                          "enum": [
+                            "test",
+                            "live"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "options": {
+                          "properties": {
+                            "notify_member": {
+                              "type": "boolean"
+                            },
+                            "notify_staff": {
+                              "type": "boolean"
+                            },
+                            "purposes": {
+                              "properties": {
+                                "autopay": {
+                                  "type": "boolean"
+                                },
+                                "drop_in": {
+                                  "type": "boolean"
+                                },
+                                "packages": {
+                                  "type": "boolean"
+                                },
+                                "personal_training": {
+                                  "type": "boolean"
+                                },
+                                "shop": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "autopay",
+                                "drop_in",
+                                "packages",
+                                "personal_training",
+                                "shop"
+                              ],
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "notify_member",
+                            "notify_staff",
+                            "purposes"
+                          ],
+                          "type": "object"
+                        },
+                        "packages_notice": {
+                          "description": "ADR-271: connecting put `count` paid packages on sale online; shown until the owner closes it",
+                          "nullable": true,
+                          "properties": {
+                            "count": {
+                              "type": "integer"
+                            },
+                            "opened_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "count",
+                            "opened_at"
+                          ],
+                          "type": "object"
+                        },
+                        "provider": {
+                          "enum": [
+                            "sandbox",
+                            "viva",
+                            "stripe"
+                          ],
+                          "type": "string"
+                        },
+                        "settings": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "webhook_url": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "connection",
+                        "credentials_set",
+                        "environment",
+                        "id",
+                        "options",
+                        "packages_notice",
+                        "provider",
+                        "settings",
+                        "status",
+                        "webhook_url"
+                      ],
+                      "type": "object"
+                    },
+                    "connect_providers": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "description": "Providers that connect with one button, per environment (ADR-261)",
+                      "type": "object"
+                    },
+                    "environments": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "online_sales": {
+                      "description": "ADR-271: of the active paid packages (`packages`), how many are sold online",
+                      "properties": {
+                        "packages": {
+                          "type": "integer"
+                        },
+                        "sold_online": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "packages",
+                        "sold_online"
+                      ],
+                      "type": "object"
+                    },
+                    "providers": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "account",
+                    "connect_providers",
+                    "environments",
+                    "online_sales",
+                    "providers"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Account"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Close the notice that connecting put the paid packages on sale online",
         "tags": [
           "Payments"
         ]

@@ -42,7 +42,12 @@ export type PaymentAccount = {
   options: PaymentOptions;
   /** "platform": connected with one button (ADR-261); "keys": pasted API keys (ADR-246). */
   connection: "keys" | "platform";
+  /** ADR-271: connecting put `count` paid packages on sale online; null once the owner closed it. */
+  packages_notice?: { count: number; opened_at: string } | null;
 };
+
+/** ADR-271: of the active paid subscription packages (`packages`), how many are sold online. */
+export type OnlineSalesSummary = { sold_online: number; packages: number };
 
 export type PaymentAccountStatus = {
   account: PaymentAccount | null;
@@ -50,6 +55,7 @@ export type PaymentAccountStatus = {
   environments: string[];
   /** Providers that connect with one button, per environment (ADR-261). */
   connect_providers: Record<string, string[]>;
+  online_sales?: OnlineSalesSummary;
 };
 
 export type FailedCharge = {
@@ -126,6 +132,11 @@ export function savePaymentOptions(token: string, update: PaymentOptionsUpdate) 
 
 export function disconnectPaymentAccount(token: string) {
   return apiRequest<PaymentAccountStatus>("/admin/payments/account", { method: "DELETE", token });
+}
+
+/** ADR-271: the owner closed «Τα N πακέτα σου πωλούνται τώρα online». */
+export function dismissPackagesNotice(token: string) {
+  return apiRequest<PaymentAccountStatus>("/admin/payments/account/packages-notice", { method: "DELETE", token });
 }
 
 export function fetchFailedCharges(token: string) {

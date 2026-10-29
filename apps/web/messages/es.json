@@ -12951,7 +12951,10 @@
       "payments": "Pagos online",
       "paymentsHint": "Un botón, con Viva",
       "import": "Trae a tus miembros",
-      "importHint": "Importar desde Wodify, PushPress, Excel…"
+      "importHint": "Importar desde Wodify, PushPress, Excel…",
+      "soldOnline": "Qué se vende online",
+      "soldOnlineHint": "Página de venta · {count} de {total} paquetes de suscripción",
+      "soldOnlineLater": "Tras conectar los pagos online, los paquetes de suscripción de pago se ponen a la venta online solos"
     },
     "errors": {
       "recipe_owner_only": "Solo el propietario aplica una receta.",
@@ -13461,5 +13464,33 @@
     "tipsUnattributed": "Sin asignar",
     "tipsPayments": "{count, plural, one {# pago} other {# pagos}}",
     "tipsTotal": "Total"
+  },
+  "SoldOnline": {
+    "sale": "Venta",
+    "title": "Se vende online",
+    "subtitle": "En la página de venta y en la app",
+    "saved": "Guardado",
+    "badge": "Online",
+    "badgeHidden": "Online · no visible",
+    "deskOnly": "Solo en recepción",
+    "hint_visible": "En la página de venta y en la app del socio del box. El recibo se emite solo.",
+    "hint_off": "Se vende solo en recepción.",
+    "hint_free": "Los paquetes de suscripción gratuitos no se venden online.",
+    "hint_inactive": "Paquete de suscripción inactivo: no está a la venta.",
+    "hint_purpose_off": "Aún no se ve: este tipo de paquete está desactivado en «Qué se paga online».",
+    "fix_purpose_off": "Activarlo",
+    "hint_no_provider": "Se ve en la página de venta. La compra se abre en cuanto conectes los pagos online.",
+    "fix_no_provider": "Ajustes › Pagos",
+    "listCount": "Se venden online: {count} de {total}",
+    "viewSalesPage": "Ver la página de venta",
+    "noticeOpened": "{count, plural, one {# de tus paquetes de suscripción ya se vende online.} other {# de tus paquetes de suscripción ya se venden online.}}",
+    "noticeChange": "Cambiar",
+    "noticeClose": "Cerrar",
+    "payCount": "Se venden online: {count} de {total} paquetes de suscripción",
+    "payCountHint": "Los demás se venden solo en recepción.",
+    "payAll": "Todos los paquetes de suscripción de pago se venden también online.",
+    "payNone": "Ningún paquete de suscripción se vende online",
+    "payNoneHint": "Los socios del box no tienen nada que comprar. Activa «Se vende online» en los paquetes que quieras.",
+    "packagesLink": "Paquetes de suscripción"
   }
 }

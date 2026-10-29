@@ -12951,7 +12951,10 @@
       "payments": "Online-Zahlungen",
       "paymentsHint": "Ein Knopf, mit Viva",
       "import": "Hol deine Mitglieder",
-      "importHint": "Import aus Wodify, PushPress, Excel…"
+      "importHint": "Import aus Wodify, PushPress, Excel…",
+      "soldOnline": "Was online verkauft wird",
+      "soldOnlineHint": "Verkaufsseite · {count} von {total} Abo-Paketen",
+      "soldOnlineLater": "Nach dem Verbinden der Online-Zahlungen gehen kostenpflichtige Abo-Pakete von selbst online in den Verkauf"
     },
     "errors": {
       "recipe_owner_only": "Nur der Inhaber wendet ein Rezept an.",
@@ -13461,5 +13464,33 @@
     "tipsUnattributed": "Nicht zugeordnet",
     "tipsPayments": "{count, plural, one {# Zahlung} other {# Zahlungen}}",
     "tipsTotal": "Summe"
+  },
+  "SoldOnline": {
+    "sale": "Verkauf",
+    "title": "Online verkauft",
+    "subtitle": "Auf der Verkaufsseite und in der App",
+    "saved": "Gespeichert",
+    "badge": "Online",
+    "badgeHidden": "Online · nicht sichtbar",
+    "deskOnly": "Nur am Empfang",
+    "hint_visible": "Auf der Verkaufsseite und in der App des Box-Mitglieds. Der Beleg entsteht von selbst.",
+    "hint_off": "Wird nur am Empfang verkauft.",
+    "hint_free": "Kostenlose Abo-Pakete werden nicht online verkauft.",
+    "hint_inactive": "Inaktives Abo-Paket: wird nicht verkauft.",
+    "hint_purpose_off": "Noch nicht sichtbar: Diese Art von Paket ist unter „Was online bezahlt wird“ ausgeschaltet.",
+    "fix_purpose_off": "Einschalten",
+    "hint_no_provider": "Auf der Verkaufsseite sichtbar. Kaufen geht, sobald du Online-Zahlungen verbindest.",
+    "fix_no_provider": "Einstellungen › Zahlungen",
+    "listCount": "Online verkauft: {count} von {total}",
+    "viewSalesPage": "Verkaufsseite ansehen",
+    "noticeOpened": "{count, plural, one {# deiner Abo-Pakete wird jetzt online verkauft.} other {# deiner Abo-Pakete werden jetzt online verkauft.}}",
+    "noticeChange": "Ändern",
+    "noticeClose": "Schließen",
+    "payCount": "Online verkauft: {count} von {total} Abo-Paketen",
+    "payCountHint": "Die übrigen gibt es nur am Empfang.",
+    "payAll": "Alle kostenpflichtigen Abo-Pakete werden auch online verkauft.",
+    "payNone": "Kein Abo-Paket wird online verkauft",
+    "payNoneHint": "Box-Mitglieder können nichts kaufen. Schalte „Online verkauft“ bei den gewünschten Paketen ein.",
+    "packagesLink": "Abo-Pakete"
   }
 }

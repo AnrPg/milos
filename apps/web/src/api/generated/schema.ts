@@ -8071,6 +8071,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/payments/account/packages-notice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Close the notice that connecting put the paid packages on sale online
+         * @description ADR-271: the notice shows once, after the first connection.
+         */
+        delete: operations["PaleeWeb.AdminPaymentsController.dismiss_packages_notice"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/payments/attention": {
         parameters: {
             query?: never;
@@ -75697,6 +75717,19 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        packages: ({
+                            /** Format: uuid */
+                            id: string;
+                            /**
+                             * @description ADR-271: `visible` (listed and bought online); otherwise why not: `inactive`, `free` (price 0), `off` (front desk only), `purpose_off` (its purpose is off in «Τι πληρώνεται online»), `no_provider` (listed, bought once online payments connect)
+                             * @enum {string}
+                             */
+                            online_visibility: "visible" | "free" | "off" | "purpose_off" | "no_provider" | "inactive";
+                            sold_online: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                    } & {
                         [key: string]: unknown;
                     };
                 };
@@ -75846,7 +75879,18 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        package: {
+                            /** Format: uuid */
+                            id: string;
+                            /**
+                             * @description ADR-271: `visible` (listed and bought online); otherwise why not: `inactive`, `free` (price 0), `off` (front desk only), `purpose_off` (its purpose is off in «Τι πληρώνεται online»), `no_provider` (listed, bought once online payments connect)
+                             * @enum {string}
+                             */
+                            online_visibility: "visible" | "free" | "off" | "purpose_off" | "no_provider" | "inactive";
+                            sold_online: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        };
                     };
                 };
             };
@@ -75870,7 +75914,18 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        package: {
+                            /** Format: uuid */
+                            id: string;
+                            /**
+                             * @description ADR-271: `visible` (listed and bought online); otherwise why not: `inactive`, `free` (price 0), `off` (front desk only), `purpose_off` (its purpose is off in «Τι πληρώνεται online»), `no_provider` (listed, bought once online payments connect)
+                             * @enum {string}
+                             */
+                            online_visibility: "visible" | "free" | "off" | "purpose_off" | "no_provider" | "inactive";
+                            sold_online: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        };
                     };
                 };
             };
@@ -76021,7 +76076,18 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        package: {
+                            /** Format: uuid */
+                            id: string;
+                            /**
+                             * @description ADR-271: `visible` (listed and bought online); otherwise why not: `inactive`, `free` (price 0), `off` (front desk only), `purpose_off` (its purpose is off in «Τι πληρώνεται online»), `no_provider` (listed, bought once online payments connect)
+                             * @enum {string}
+                             */
+                            online_visibility: "visible" | "free" | "off" | "purpose_off" | "no_provider" | "inactive";
+                            sold_online: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        };
                     };
                 };
             };
@@ -81278,6 +81344,12 @@ export interface operations {
                                     shop: boolean;
                                 };
                             };
+                            /** @description ADR-271: connecting put `count` paid packages on sale online; shown until the owner closes it */
+                            packages_notice: {
+                                count: number;
+                                /** Format: date-time */
+                                opened_at: string;
+                            } | null;
                             /** @enum {string} */
                             provider: "sandbox" | "viva" | "stripe";
                             settings: {
@@ -81293,6 +81365,11 @@ export interface operations {
                             [key: string]: string[];
                         };
                         environments: string[];
+                        /** @description ADR-271: of the active paid packages (`packages`), how many are sold online */
+                        online_sales: {
+                            packages: number;
+                            sold_online: number;
+                        };
                         providers: string[];
                     };
                 };
@@ -81357,6 +81434,12 @@ export interface operations {
                                     shop: boolean;
                                 };
                             };
+                            /** @description ADR-271: connecting put `count` paid packages on sale online; shown until the owner closes it */
+                            packages_notice: {
+                                count: number;
+                                /** Format: date-time */
+                                opened_at: string;
+                            } | null;
                             /** @enum {string} */
                             provider: "sandbox" | "viva" | "stripe";
                             settings: {
@@ -81372,6 +81455,11 @@ export interface operations {
                             [key: string]: string[];
                         };
                         environments: string[];
+                        /** @description ADR-271: of the active paid packages (`packages`), how many are sold online */
+                        online_sales: {
+                            packages: number;
+                            sold_online: number;
+                        };
                         providers: string[];
                     };
                 };
@@ -81416,6 +81504,12 @@ export interface operations {
                                     shop: boolean;
                                 };
                             };
+                            /** @description ADR-271: connecting put `count` paid packages on sale online; shown until the owner closes it */
+                            packages_notice: {
+                                count: number;
+                                /** Format: date-time */
+                                opened_at: string;
+                            } | null;
                             /** @enum {string} */
                             provider: "sandbox" | "viva" | "stripe";
                             settings: {
@@ -81431,6 +81525,11 @@ export interface operations {
                             [key: string]: string[];
                         };
                         environments: string[];
+                        /** @description ADR-271: of the active paid packages (`packages`), how many are sold online */
+                        online_sales: {
+                            packages: number;
+                            sold_online: number;
+                        };
                         providers: string[];
                     };
                 };
@@ -81489,6 +81588,12 @@ export interface operations {
                                     shop: boolean;
                                 };
                             };
+                            /** @description ADR-271: connecting put `count` paid packages on sale online; shown until the owner closes it */
+                            packages_notice: {
+                                count: number;
+                                /** Format: date-time */
+                                opened_at: string;
+                            } | null;
                             /** @enum {string} */
                             provider: "sandbox" | "viva" | "stripe";
                             settings: {
@@ -81504,6 +81609,81 @@ export interface operations {
                             [key: string]: string[];
                         };
                         environments: string[];
+                        /** @description ADR-271: of the active paid packages (`packages`), how many are sold online */
+                        online_sales: {
+                            packages: number;
+                            sold_online: number;
+                        };
+                        providers: string[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.dismiss_packages_notice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Account */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        account: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            connection: "keys" | "platform";
+                            credentials_set: string[];
+                            /** @enum {string} */
+                            environment: "test" | "live";
+                            /** Format: uuid */
+                            id: string;
+                            last_error?: string | null;
+                            options: {
+                                notify_member: boolean;
+                                notify_staff: boolean;
+                                purposes: {
+                                    autopay: boolean;
+                                    drop_in: boolean;
+                                    packages: boolean;
+                                    personal_training: boolean;
+                                    shop: boolean;
+                                };
+                            };
+                            /** @description ADR-271: connecting put `count` paid packages on sale online; shown until the owner closes it */
+                            packages_notice: {
+                                count: number;
+                                /** Format: date-time */
+                                opened_at: string;
+                            } | null;
+                            /** @enum {string} */
+                            provider: "sandbox" | "viva" | "stripe";
+                            settings: {
+                                [key: string]: string;
+                            };
+                            status: string;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            webhook_url: string;
+                        } | null;
+                        /** @description Providers that connect with one button, per environment (ADR-261) */
+                        connect_providers: {
+                            [key: string]: string[];
+                        };
+                        environments: string[];
+                        /** @description ADR-271: of the active paid packages (`packages`), how many are sold online */
+                        online_sales: {
+                            packages: number;
+                            sold_online: number;
+                        };
                         providers: string[];
                     };
                 };
