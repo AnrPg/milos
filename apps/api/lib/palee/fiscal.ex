@@ -283,18 +283,19 @@ defmodule Palee.Fiscal do
              subject_id: id,
              actor_id: actor_id,
              occurred_at: issued_at,
-             payload: %{
-               kind: document.kind,
-               number: number,
-               issue_date: document.issue_date,
-               currency: document.currency,
-               net_cents: document.net_cents,
-               tax_cents: document.tax_cents,
-               gross_cents: document.gross_cents,
-               corrects_document_id: document.corrects_document_id,
-               content_hash: content_hash
-             }
-             |> put_present(:credit_reason, Map.get(document, :credit_reason))
+             payload:
+               %{
+                 kind: document.kind,
+                 number: number,
+                 issue_date: document.issue_date,
+                 currency: document.currency,
+                 net_cents: document.net_cents,
+                 tax_cents: document.tax_cents,
+                 gross_cents: document.gross_cents,
+                 corrects_document_id: document.corrects_document_id,
+                 content_hash: content_hash
+               }
+               |> put_present(:credit_reason, Map.get(document, :credit_reason))
            }) do
       with {:ok, saved} <-
              FiscalStore.insert_document(
@@ -386,19 +387,19 @@ defmodule Palee.Fiscal do
 
   defp record_document_emailed(context, document, sent, actor_id, now) do
     append(context, %{
-        event_type: "document_emailed",
-        subject_type: "fiscal_document",
-        subject_id: document.id,
-        actor_id: actor_id,
-        occurred_at: now,
-        payload: %{
-          number: document.number,
-          recipient: sent.recipient,
-          recipient_digest: sent.recipient_digest,
-          email_message_id: sent.message_id,
-          language: sent.language
-        }
-      })
+      event_type: "document_emailed",
+      subject_type: "fiscal_document",
+      subject_id: document.id,
+      actor_id: actor_id,
+      occurred_at: now,
+      payload: %{
+        number: document.number,
+        recipient: sent.recipient,
+        recipient_digest: sent.recipient_digest,
+        email_message_id: sent.message_id,
+        language: sent.language
+      }
+    })
   end
 
   # ── Journal ─────────────────────────────────────────────────────────────

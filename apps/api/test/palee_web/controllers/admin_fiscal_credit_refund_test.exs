@@ -98,7 +98,9 @@ defmodule PaleeWeb.AdminFiscalCreditRefundTest do
     paid = pay_online(conn, ctx)
     assert paid["fulfilment_status"] == "done"
 
-    receipt = Fiscal.document_by_key(ctx.context, "finance-payment:" <> paid["finance_payment_id"])
+    receipt =
+      Fiscal.document_by_key(ctx.context, "finance-payment:" <> paid["finance_payment_id"])
+
     assert receipt.gross_cents == 6_000
     path = admin_path(ctx, "/fiscal/documents/#{receipt.id}")
 
@@ -154,8 +156,12 @@ defmodule PaleeWeb.AdminFiscalCreditRefundTest do
       )
 
     path = admin_path(ctx, "/fiscal/documents/#{cash.id}")
-    assert conn |> as(ctx.admin) |> get(path) |> json_response(200)
-    |> get_in(["document", "refund_option"]) == nil
+
+    assert conn
+           |> as(ctx.admin)
+           |> get(path)
+           |> json_response(200)
+           |> get_in(["document", "refund_option"]) == nil
 
     assert %{"code" => "refund_not_available"} =
              conn

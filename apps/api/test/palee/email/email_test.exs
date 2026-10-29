@@ -57,7 +57,8 @@ defmodule Palee.EmailTest do
       assert [%Swoosh.Attachment{filename: "R-000001.pdf", data: ^pdf}] = sent.attachments
     end)
 
-    assert %{encrypted_body: nil, status: "sent"} = Palee.Repo.get!(Palee.Email.Message, message.id)
+    assert %{encrypted_body: nil, status: "sent"} =
+             Palee.Repo.get!(Palee.Email.Message, message.id)
   end
 
   test "an idempotency key enqueues once and lists by prefix" do

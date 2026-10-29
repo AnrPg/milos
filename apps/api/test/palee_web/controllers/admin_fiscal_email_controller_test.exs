@@ -30,7 +30,9 @@ defmodule PaleeWeb.AdminFiscalEmailControllerTest do
     coach = user_fixture(%{nickname: "mail_coach"})
 
     {:ok, organization} =
-      Organizations.create_organization(%{name: "Mail Fiscal #{System.unique_integer([:positive])}"})
+      Organizations.create_organization(%{
+        name: "Mail Fiscal #{System.unique_integer([:positive])}"
+      })
 
     for {user, role} <- [{admin, :owner}, {coach, :coach}] do
       {:ok, _} =

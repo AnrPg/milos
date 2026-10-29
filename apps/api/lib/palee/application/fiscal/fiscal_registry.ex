@@ -23,7 +23,8 @@ defmodule Palee.Application.Fiscal.FiscalRegistry do
 
   @doc "`{:ok, %{business: business}}` or `{:error, reason}` (see `Fiscal.Registry.lookup/3`)."
   def lookup(context, tax_id, now \\ DateTime.utc_now()) do
-    with {:ok, business} <- Registry.lookup(context, tax_id, Organizations.local_date(context, now)) do
+    with {:ok, business} <-
+           Registry.lookup(context, tax_id, Organizations.local_date(context, now)) do
       {:ok, %{business: business}}
     end
   end

@@ -95,8 +95,7 @@ defmodule Palee.Application.Fiscal.CreditRefunds do
   defp fiscal_credit(lines, reason) when is_list(lines),
     do: %{
       "reason" => reason,
-      "lines" =>
-        Enum.map(lines, &%{"position" => &1.position, "quantity" => &1.quantity})
+      "lines" => Enum.map(lines, &%{"position" => &1.position, "quantity" => &1.quantity})
     }
 
   defp fiscal_credit(_all, reason), do: %{"reason" => reason}

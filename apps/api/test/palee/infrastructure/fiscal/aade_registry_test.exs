@@ -128,7 +128,11 @@ defmodule Palee.Infrastructure.Fiscal.AadeRegistryTest do
     stub(200, @found)
     flush_requests()
 
-    assert AadeRegistry.lookup(%{@connection | subscription_key: nil}, "090000045", ~D[2027-02-21]) ==
+    assert AadeRegistry.lookup(
+             %{@connection | subscription_key: nil},
+             "090000045",
+             ~D[2027-02-21]
+           ) ==
              {:error, :credentials_rejected}
 
     refute_received {:request, _conn, _body}

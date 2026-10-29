@@ -49,10 +49,14 @@ defmodule PaleeWeb.AdminFiscalRegistryControllerTest do
 
   test "the check digit is verified before anything else", ctx do
     assert %{"code" => "invalid_tax_id"} =
-             ctx.owner |> get_json("#{ctx.base}/registry/businesses/090000046") |> json_response(422)
+             ctx.owner
+             |> get_json("#{ctx.base}/registry/businesses/090000046")
+             |> json_response(422)
 
     assert %{"code" => "registry_not_connected"} =
-             ctx.owner |> get_json("#{ctx.base}/registry/businesses/090000045") |> json_response(409)
+             ctx.owner
+             |> get_json("#{ctx.base}/registry/businesses/090000045")
+             |> json_response(409)
   end
 
   test "the sandbox answers without credentials", ctx do
@@ -77,10 +81,14 @@ defmodule PaleeWeb.AdminFiscalRegistryControllerTest do
              |> json_response(200)
 
     assert %{"code" => "registry_not_found"} =
-             ctx.owner |> get_json("#{ctx.base}/registry/businesses/100060000") |> json_response(404)
+             ctx.owner
+             |> get_json("#{ctx.base}/registry/businesses/100060000")
+             |> json_response(404)
 
     # Coaches cannot look up or connect.
-    assert ctx.coach |> get_json("#{ctx.base}/registry/businesses/090000045") |> json_response(403)
+    assert ctx.coach
+           |> get_json("#{ctx.base}/registry/businesses/090000045")
+           |> json_response(403)
   end
 
   test "production credentials are stored encrypted and never returned", ctx do
@@ -133,7 +141,9 @@ defmodule PaleeWeb.AdminFiscalRegistryControllerTest do
     end)
 
     assert %{"code" => "registry_credentials_rejected"} =
-             ctx.owner |> get_json("#{ctx.base}/registry/businesses/090000045") |> json_response(409)
+             ctx.owner
+             |> get_json("#{ctx.base}/registry/businesses/090000045")
+             |> json_response(409)
 
     assert %{"connection" => %{"status" => "invalid"}} =
              ctx.owner |> get_json("#{ctx.base}/registry-connection") |> json_response(200)

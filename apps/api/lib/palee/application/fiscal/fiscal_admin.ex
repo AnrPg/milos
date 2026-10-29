@@ -7,6 +7,7 @@ defmodule Palee.Application.Fiscal.FiscalAdmin do
   """
 
   alias Palee.{Fiscal, Organizations}
+
   alias Palee.Application.Fiscal.{
     CreditRefunds,
     FiscalEInvoicing,

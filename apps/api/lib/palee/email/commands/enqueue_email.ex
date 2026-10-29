@@ -213,10 +213,14 @@ defmodule Palee.Email.Commands.EnqueueEmail do
       end)
 
     cond do
-      not valid? -> {:error, :invalid_attachment}
+      not valid? ->
+        {:error, :invalid_attachment}
+
       Enum.sum(Enum.map(attachments, &byte_size(&1.data))) > @max_attachment_bytes ->
         {:error, :attachment_too_large}
-      true -> :ok
+
+      true ->
+        :ok
     end
   end
 

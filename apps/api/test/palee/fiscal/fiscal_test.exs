@@ -166,7 +166,12 @@ defmodule Palee.FiscalTest do
                )
 
       assert {:ok, preview} =
-               Fiscal.credit_preview(context, doc.id, [%{position: 2, quantity: 2}], ~D[2027-02-02])
+               Fiscal.credit_preview(
+                 context,
+                 doc.id,
+                 [%{position: 2, quantity: 2}],
+                 ~D[2027-02-02]
+               )
 
       assert preview.gross_cents == 3000
 

@@ -110,7 +110,8 @@ defmodule PaleeWeb.AdminFiscalController do
     request_body: F.body(F.credit_body()),
     responses: [
       created: {"Credit note", "application/json", F.credit_result()},
-      ok: {"The credit note of an earlier identical request", "application/json", F.credit_result()}
+      ok:
+        {"The credit note of an earlier identical request", "application/json", F.credit_result()}
     ]
   )
 

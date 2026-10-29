@@ -289,7 +289,11 @@ defmodule Palee.Fiscal.Domain.UblInvoiceTest do
     assert [_one] = PeppolBisRules.all(root, "cbc:Note")
     assert PeppolBisRules.text(root, "cbc:Note") =~ ~r/:/
 
-    assert UblInvoice.credit_note_text(%{kind: "credit_note", credit_reason: "other", language: "de"}) ==
+    assert UblInvoice.credit_note_text(%{
+             kind: "credit_note",
+             credit_reason: "other",
+             language: "de"
+           }) ==
              "Gutschrift"
 
     assert UblInvoice.credit_note_text(%{
