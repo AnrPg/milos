@@ -16,6 +16,7 @@ vi.mock("@/api/box-screens", async (original) => ({
   pairBoxScreen: (code: string) => pairBoxScreen(code),
 }));
 vi.mock("./useBoxScreen", () => ({
+  useHydrated: () => true,
   useBoxScreenTimer: () => ({ payload: null, position: null }),
   useBoxScreenToday: () => ({ today: null, error: null, token: "display", now: Date.now() }),
 }));

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { ApiError } from "@/api/client";
 import {
@@ -47,6 +47,7 @@ import { classesOnScreen, untilFromTime } from "@/lib/box-screen";
 import { fieldBorder, invalidFieldProps } from "@/lib/form-errors";
 import { adminHref, useOrganizationSlug, useOrganizationTimeZone } from "@/lib/organization-slug";
 import { FRESHNESS } from "@/lib/query-policy";
+import { useHydrated, useNow } from "@/components/box-screen/useBoxScreen";
 import { addDaysToKey, dateKeyInZone, formatInZone, startOfDayInZone } from "@/lib/zoned-time";
 
 // Ρυθμίσεις › Οθόνες box (ADR-253, mockup s8 with the owner's override):
@@ -175,7 +176,8 @@ function ScreenCard({
   const unpin = useMutation({ mutationFn: () => unpinBoxScreen(token, screen.id), onSuccess: refresh });
   const remove = useMutation({ mutationFn: () => deleteBoxScreen(token, screen.id), onSuccess: refresh });
 
-  const pending = !screen.paired && screen.pairing_expires_at && Date.parse(screen.pairing_expires_at) > Date.now();
+  const now = useNow(PENDING_POLL_MS);
+  const pending = !screen.paired && screen.pairing_expires_at && Date.parse(screen.pairing_expires_at) > now;
   const override = screen.override;
   const viewName = (view: BoxScreenOverrideView) => t(`view.${view}`);
   const changedBy = screen.focus_changed?.by?.name;
@@ -349,8 +351,7 @@ function AddScreenDialog({
 
 function PairingCodeDialog({ pairing, paired, onClose }: { pairing: BoxScreenPairingCode; paired: boolean; onClose: () => void }) {
   const t = useTranslations("BoxScreens");
-  const [host, setHost] = useState("palee.app");
-  useEffect(() => setHost(window.location.host), []);
+  const host = useHydrated() ? window.location.host : "palee.app";
 
   return (
     <Dialog
@@ -448,7 +449,8 @@ function ChooseViewDialog({
   const [slotId, setSlotId] = useState<string>(screen.override?.slot_id ?? "");
   const [until, setUntil] = useState<string>(screen.override?.until ? formatInZone(screen.override.until, zone, "en-GB", { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }) : "");
 
-  const day = dateKeyInZone(Date.now(), zone);
+  const now = useNow(60_000);
+  const day = dateKeyInZone(now, zone);
   const classes = useQuery({
     queryKey: ["admin", "box-screens", "today-classes", day],
     enabled: view === "class",

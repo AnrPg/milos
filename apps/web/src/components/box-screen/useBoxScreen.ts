@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
 
 import type { ClassTimerPayload } from "@/api/class-timers";
 import {
@@ -19,6 +19,26 @@ import { FRESHNESS, REALTIME_FALLBACK_REFETCH_MS } from "@/lib/query-policy";
 const TODAY_KEY = ["box-screen", "today"] as const;
 const DAY_MS = 86_400_000;
 
+const noSubscription = () => () => undefined;
+
+/** False on the server and during hydration, true after: device-only reads wait for it. */
+export function useHydrated() {
+  return useSyncExternalStore(noSubscription, () => true, () => false);
+}
+
+/** This device's clock, ticking every `intervalMs` (paused with `intervalMs` null). */
+export function useNow(intervalMs: number | null) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (intervalMs === null) return;
+    const interval = window.setInterval(() => setNow(Date.now()), intervalMs);
+    return () => window.clearInterval(interval);
+  }, [intervalMs]);
+  return now;
+}
+
+type TodayResult = { day: Awaited<ReturnType<typeof fetchBoxScreenToday>>; offsetMs: number };
+
 /**
  * The paired TV's day (ADR-253): `/today`, read again on every refresh hint
  * and override on `box_screen:<box>`, at the moment the automatic focus can
@@ -27,23 +47,19 @@ const DAY_MS = 86_400_000;
  */
 export function useBoxScreenToday(pairing: BoxScreenPairing, onUnpaired: () => void) {
   const queryClient = useQueryClient();
-  const [token, setToken] = useState(pairing.token);
-  const [expiresAt, setExpiresAt] = useState(pairing.expires_at);
+  const [credentials, setCredentials] = useState({ token: pairing.token, expiresAt: pairing.expires_at });
   const [connected, setConnected] = useState(false);
-  const [offsetMs, setOffsetMs] = useState(0);
-  const [now, setNow] = useState(() => Date.now());
-  const key = [...TODAY_KEY, pairing.screen.id] as const;
+  const token = credentials.token;
 
-  const today = useQuery({
-    queryKey: key,
+  const today = useQuery<TodayResult>({
+    queryKey: [...TODAY_KEY, pairing.screen.id],
     staleTime: FRESHNESS.pushed,
     refetchInterval: connected ? false : REALTIME_FALLBACK_REFETCH_MS,
     retry: (count, error) => !isScreenTokenRejected(error) && count < 2,
     queryFn: async () => {
       const sentAt = Date.now();
-      const next = await fetchBoxScreenToday(token);
-      setOffsetMs(clockOffsetMs(next.server_now, sentAt, Date.now()));
-      return next;
+      const day = await fetchBoxScreenToday(token);
+      return { day, offsetMs: clockOffsetMs(day.server_now, sentAt, Date.now()) };
     },
   });
 
@@ -52,7 +68,6 @@ export function useBoxScreenToday(pairing: BoxScreenPairing, onUnpaired: () => v
 
   useEffect(() => {
     if (isScreenTokenRejected(today.error)) {
-      storePairing(null);
       queryClient.removeQueries({ queryKey: TODAY_KEY });
       onUnpaired();
     }
@@ -62,24 +77,24 @@ export function useBoxScreenToday(pairing: BoxScreenPairing, onUnpaired: () => v
   useEffect(() => {
     let stopped = false;
     const check = async () => {
-      if (!tokenNeedsRenewal(expiresAt, Date.now())) return;
+      if (!tokenNeedsRenewal(credentials.expiresAt, Date.now())) return;
       try {
-        const renewed = await renewBoxScreenToken(token);
+        const renewed = await renewBoxScreenToken(credentials.token);
         if (stopped) return;
         storePairing({ ...pairing, token: renewed.token, expires_at: renewed.expires_at });
-        setExpiresAt(renewed.expires_at);
-        setToken(renewed.token);
+        setCredentials({ token: renewed.token, expiresAt: renewed.expires_at });
       } catch (error) {
         if (isScreenTokenRejected(error)) onUnpaired();
       }
     };
-    void check();
+    const first = window.setTimeout(() => void check(), 0);
     const interval = window.setInterval(() => void check(), DAY_MS);
     return () => {
       stopped = true;
+      window.clearTimeout(first);
       window.clearInterval(interval);
     };
-  }, [expiresAt, onUnpaired, pairing, token]);
+  }, [credentials, onUnpaired, pairing]);
 
   // Refresh hints and this screen's overrides.
   useEffect(() => {
@@ -107,13 +122,11 @@ export function useBoxScreenToday(pairing: BoxScreenPairing, onUnpaired: () => v
   }, [pairing.box.id, reload, token]);
 
   // The clock on the wall, on the server's time.
-  useEffect(() => {
-    const interval = window.setInterval(() => setNow(Date.now()), 1000);
-    return () => window.clearInterval(interval);
-  }, []);
+  const offsetMs = today.data?.offsetMs ?? 0;
+  const now = useNow(1000) + offsetMs;
 
   // Read /today again when a class starts or ends, its results window closes or a pin runs out.
-  const changeAt = today.data ? nextChangeAt(today.data, Date.now() + offsetMs) : null;
+  const changeAt = today.data ? nextChangeAt(today.data.day, now) : null;
   useEffect(() => {
     if (changeAt === null) return;
     const wait = Math.max(1000, changeAt - (Date.now() + offsetMs) + 1500);
@@ -121,57 +134,49 @@ export function useBoxScreenToday(pairing: BoxScreenPairing, onUnpaired: () => v
     return () => window.clearTimeout(timeout);
   }, [changeAt, offsetMs, reload]);
 
-  return { today: today.data ?? null, error: today.error, token, now: now + offsetMs };
+  return { today: today.data?.day ?? null, error: today.error, token, now };
 }
+
+type TimerResult = { payload: ClassTimerPayload; offsetMs: number };
 
 /** A class's timer on the TV: loaded, then followed on `class_timer:<slot>`. */
 export function useBoxScreenTimer(token: string, slotId: string | null) {
-  const [payload, setPayload] = useState<ClassTimerPayload | null>(null);
-  const [offsetMs, setOffsetMs] = useState(0);
-  const [now, setNow] = useState(() => Date.now());
-  const latest = useRef<ClassTimerPayload | null>(null);
-
-  const adopt = useCallback((next: ClassTimerPayload) => {
-    if (latest.current && next.timer.lock_version < latest.current.timer.lock_version) return;
-    latest.current = next;
-    setPayload(next);
-  }, []);
-
-  const load = useCallback(async () => {
-    if (!slotId) return;
-    const sentAt = Date.now();
-    try {
-      const next = await fetchBoxScreenTimer(token, slotId);
-      setOffsetMs(clockOffsetMs(next.server_now, sentAt, Date.now()));
-      latest.current = null;
-      adopt(next);
-    } catch {
-      // The class shows without a timer.
-    }
-  }, [adopt, slotId, token]);
+  const queryClient = useQueryClient();
+  const key = ["box-screen", "timer", slotId] as const;
+  const timer = useQuery<TimerResult>({
+    queryKey: key,
+    enabled: Boolean(slotId),
+    staleTime: FRESHNESS.pushed,
+    retry: false,
+    queryFn: async () => {
+      const sentAt = Date.now();
+      const payload = await fetchBoxScreenTimer(token, slotId!);
+      return { payload, offsetMs: clockOffsetMs(payload.server_now, sentAt, Date.now()) };
+    },
+  });
+  const refetch = timer.refetch;
 
   useEffect(() => {
-    latest.current = null;
-    setPayload(null);
     if (!slotId) return;
+    const timerKey = ["box-screen", "timer", slotId] as const;
     return subscribeScreenTopic(
       token,
       `class_timer:${slotId}`,
-      { "class_timer:updated": (next) => adopt(next as ClassTimerPayload) },
-      { onJoin: () => void load() },
+      {
+        "class_timer:updated": (pushed) =>
+          queryClient.setQueryData<TimerResult>(timerKey, (current) => {
+            const next = pushed as ClassTimerPayload;
+            // Ignore pushes older than what is already shown.
+            if (current && next.timer.lock_version < current.payload.timer.lock_version) return current;
+            return { payload: next, offsetMs: current?.offsetMs ?? 0 };
+          }),
+      },
+      { onJoin: () => void refetch() },
     );
-  }, [adopt, load, slotId, token]);
+  }, [queryClient, refetch, slotId, token]);
 
-  useEffect(() => {
-    void load();
-  }, [load]);
-
-  useEffect(() => {
-    if (!slotId) return;
-    const interval = window.setInterval(() => setNow(Date.now()), 250);
-    return () => window.clearInterval(interval);
-  }, [slotId]);
-
-  const position = payload ? classTimerPosition(payload.segments, payload.timer, now + offsetMs) : null;
-  return { payload, position };
+  const now = useNow(slotId ? 250 : null);
+  const data = slotId ? timer.data ?? null : null;
+  const position = data ? classTimerPosition(data.payload.segments, data.payload.timer, now + data.offsetMs) : null;
+  return { payload: data?.payload ?? null, position };
 }

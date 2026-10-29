@@ -31,7 +31,7 @@ import {
 } from "@/lib/box-screen";
 import { formatInZone } from "@/lib/zoned-time";
 
-import { useBoxScreenTimer, useBoxScreenToday } from "./useBoxScreen";
+import { useBoxScreenTimer, useBoxScreenToday, useHydrated } from "./useBoxScreen";
 
 // Mockup s8, option A («Ακολουθεί το τμήμα»): one thing at a time, large
 // enough to read from the bar, changing by itself with the class. Every
@@ -41,12 +41,11 @@ const NEW_SCORE_MS = 30_000;
 
 /** palee.app/tv: pairs this TV with a code, then shows the box's day. */
 export function BoxScreenTv() {
-  const [pairing, setPairing] = useState<BoxScreenPairing | null | undefined>(undefined);
+  // undefined: not chosen on this page yet, so the device's stored pairing (read once hydrated).
+  const [chosen, setPairing] = useState<BoxScreenPairing | null | undefined>(undefined);
   const [lostPairing, setLostPairing] = useState(false);
-
-  useEffect(() => {
-    setPairing(readStoredPairing());
-  }, []);
+  const hydrated = useHydrated();
+  const pairing = chosen !== undefined ? chosen : hydrated ? readStoredPairing() : undefined;
   useScreenWakeLock(Boolean(pairing));
 
   const unpair = useCallback(() => {
@@ -83,9 +82,7 @@ function PairingView({ lost, onPaired }: { lost: boolean; onPaired: (pairing: Bo
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [host, setHost] = useState("palee.app");
-
-  useEffect(() => setHost(window.location.host), []);
+  const host = useHydrated() ? window.location.host : "palee.app";
 
   async function submit(event: FormEvent) {
     event.preventDefault();
