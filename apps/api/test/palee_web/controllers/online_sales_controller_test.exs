@@ -97,6 +97,12 @@ defmodule PaleeWeb.OnlineSalesControllerTest do
   end
 
   test "a package not sold online cannot be bought", %{conn: conn} = ctx do
+    # ADR-271: the owner's «off» survives the automatic opening on connect.
+    conn
+    |> put_bearer_token(ctx.owner)
+    |> patch(admin_path(ctx, "/finance/packages/#{ctx.hidden.id}"), %{sold_online: false})
+    |> json_response(200)
+
     connect_sandbox(conn, ctx)
 
     conn
