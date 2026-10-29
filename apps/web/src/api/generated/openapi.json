@@ -17396,13 +17396,19 @@
       "BoxScreenToday": {
         "properties": {
           "box": {
+            "description": "The box; `id` is the topic of `box_screen:<id>` on `/box_screen_socket`",
             "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
               "name": {
                 "nullable": true,
                 "type": "string"
               }
             },
             "required": [
+              "id",
               "name"
             ],
             "type": "object"
@@ -91479,12 +91485,18 @@
                 "schema": {
                   "properties": {
                     "box": {
+                      "description": "The box; `id` is the topic of `box_screen:<id>` on `/box_screen_socket`",
                       "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
                         "name": {
                           "type": "string"
                         }
                       },
                       "required": [
+                        "id",
                         "name"
                       ],
                       "type": "object"
@@ -91571,13 +91583,19 @@
                 "schema": {
                   "properties": {
                     "box": {
+                      "description": "The box; `id` is the topic of `box_screen:<id>` on `/box_screen_socket`",
                       "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
                         "name": {
                           "nullable": true,
                           "type": "string"
                         }
                       },
                       "required": [
+                        "id",
                         "name"
                       ],
                       "type": "object"

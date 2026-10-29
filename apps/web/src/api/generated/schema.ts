@@ -20599,7 +20599,10 @@ export interface components {
         };
         /** BoxScreenToday */
         BoxScreenToday: {
+            /** @description The box; `id` is the topic of `box_screen:<id>` on `/box_screen_socket` */
             box: {
+                /** Format: uuid */
+                id: string;
                 name: string | null;
             };
             classes: {
@@ -44589,7 +44592,10 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description The box; `id` is the topic of `box_screen:<id>` on `/box_screen_socket` */
                         box: {
+                            /** Format: uuid */
+                            id: string;
                             name: string;
                         };
                         /** Format: date-time */
@@ -44633,7 +44639,10 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description The box; `id` is the topic of `box_screen:<id>` on `/box_screen_socket` */
                         box: {
+                            /** Format: uuid */
+                            id: string;
                             name: string | null;
                         };
                         classes: {
