@@ -74,10 +74,9 @@ test.describe("Settings › class booking defaults", () => {
     await page.goto("/admin/settings");
     const section = page.getByTestId("class-booking-defaults");
     await expect(section).toBeVisible();
-    await expect(section.getByText("Time to answer a booking request")).toBeVisible();
-    await expect(section.getByText(/If nobody on staff answers a request within this time/)).toBeVisible();
-    await expect(section.getByText("Bookings open (days before the class)")).toBeVisible();
     await expect(section.getByText(/A member who cancels later than this still uses the visit/)).toBeVisible();
+    // ADR-255: the approval wait and the booking window sit under «Advanced», closed.
+    await expect(section.getByText("Time to answer a booking request")).toHaveCount(0);
 
     // 720 stored minutes read as 12 hours 0 minutes.
     await expect(page.getByTestId("class-default-late-cancellation-hours")).toHaveValue("12");
@@ -85,15 +84,19 @@ test.describe("Settings › class booking defaults", () => {
     await page.getByTestId("class-default-late-cancellation-hours").fill("1");
     await page.getByTestId("class-default-late-cancellation-minutes").fill("30");
     await page.getByTestId("class-default-late-cancellation-minutes").blur();
+    await section.getByRole("button", { name: "Save" }).click();
+    await expect.poll(() => sent.at(-1)).toEqual({ default_capacity: 12, default_auto_approve: false, default_cancellation_cutoff_minutes: 90 });
 
+    await page.getByTestId("advanced-settings").getByRole("button", { name: /Advanced/ }).click();
+    const advanced = page.getByTestId("class-booking-defaults-advanced");
+    await expect(advanced.getByText("Time to answer a booking request")).toBeVisible();
+    await expect(advanced.getByText(/If nobody on staff answers a request within this time/)).toBeVisible();
+    await expect(advanced.getByText("Bookings open (days before the class)")).toBeVisible();
     await page.getByTestId("class-default-approval-wait-no-limit").check();
     await expect(page.getByTestId("class-default-approval-wait-hours")).toBeDisabled();
-
-    await section.getByRole("button", { name: "Save" }).click();
-    await expect.poll(() => sent.at(-1)).toMatchObject({
-      default_booking_timeout_minutes: null,
-      default_cancellation_cutoff_minutes: 90,
-    });
+    await advanced.getByRole("button", { name: "Save" }).click();
+    await expect.poll(() => sent.at(-1)).toMatchObject({ default_booking_timeout_minutes: null });
+    expect(sent.at(-1)).not.toHaveProperty("default_cancellation_cutoff_minutes");
   });
 });
 

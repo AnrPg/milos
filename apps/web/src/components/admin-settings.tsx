@@ -63,6 +63,20 @@ function partShows(levels: SettingLevels, part: Part) {
   return (key: string) => (part === "basic" ? levels.basic(key) : levels.advanced(key));
 }
 
+/**
+ * The basic and the advanced part of one area are two forms over the same
+ * settings. When the other part saves, take the new server values but keep
+ * what was typed here and not saved yet.
+ */
+export function mergeServerForm<F extends Record<string, unknown>>(form: F, lastServer: F | null, next: F): F {
+  if (!lastServer) return next;
+  const merged = { ...next };
+  for (const key of Object.keys(next) as Array<keyof F>) {
+    if (JSON.stringify(form[key]) !== JSON.stringify(lastServer[key])) merged[key] = form[key];
+  }
+  return merged;
+}
+
 // ── Shared sub-components ────────────────────────────────────────────────────
 
 function SaveBar({
@@ -273,19 +287,27 @@ export function GamificationSection({ token, part = "basic" }: { token: string; 
     queryFn: () => fetchAdminSettings(token),
   });
 
+  const lastServer = useRef<GamificationFormState | null>(null);
   useEffect(() => {
     if (!settingsQuery.data?.gamification) return;
     const next = formFromSettings(settingsQuery.data.gamification);
-    queueMicrotask(() => { setForm(next); setInitialized(true); });
+    queueMicrotask(() => {
+      setForm((current) => mergeServerForm(current, lastServer.current, next));
+      lastServer.current = next;
+      setInitialized(true);
+    });
   }, [settingsQuery.data]);
 
+  // Each part saves only the settings it shows.
   const saveMutation = useMutation({
     mutationFn: () =>
       updateAdminSettings(token, {
         gamification: {
-          streak_shields: Number(form.streakShields),
-          streak_shield_reset_day: form.streakShieldResetDay.trim() ? Number(form.streakShieldResetDay) : null,
-          leaderboard_enabled: form.leaderboardEnabled,
+          ...(show("gamification.streak_shields") ? { streak_shields: Number(form.streakShields) } : {}),
+          ...(show("gamification.streak_shield_reset_day")
+            ? { streak_shield_reset_day: form.streakShieldResetDay.trim() ? Number(form.streakShieldResetDay) : null }
+            : {}),
+          ...(show("gamification.leaderboard_enabled") ? { leaderboard_enabled: form.leaderboardEnabled } : {}),
         },
       }),
     onSuccess: (data) => {
@@ -1065,20 +1087,26 @@ export function SchedulingDefaultsSection({ token, part = "basic" }: { token: st
   const settingsQuery = useQuery({ queryKey: ["admin", "settings"], queryFn: () => fetchAdminSettings(token) });
   const [form, setForm] = useState<SchedulingForm>({ capacity: 12, timeout: 60, autoApprove: false, windowDays: null, cutoffMinutes: null });
 
+  const lastServer = useRef<SchedulingForm | null>(null);
   useEffect(() => {
     const value = settingsQuery.data?.scheduling;
     if (value) {
-      queueMicrotask(() => setForm(schedulingFormFromSettings(value)));
+      const next = schedulingFormFromSettings(value);
+      queueMicrotask(() => {
+        setForm((current) => mergeServerForm(current, lastServer.current, next));
+        lastServer.current = next;
+      });
     }
   }, [settingsQuery.data?.scheduling]);
 
+  // Each part saves only the settings it shows.
   const save = useMutation({
     mutationFn: () => updateAdminSettings(token, { scheduling: {
-      default_capacity: form.capacity,
-      default_booking_timeout_minutes: form.timeout,
-      default_auto_approve: form.autoApprove,
-      default_booking_window_days: form.windowDays,
-      default_cancellation_cutoff_minutes: form.cutoffMinutes,
+      ...(show("scheduling.default_capacity") ? { default_capacity: form.capacity } : {}),
+      ...(show("scheduling.default_booking_timeout_minutes") ? { default_booking_timeout_minutes: form.timeout } : {}),
+      ...(show("scheduling.default_auto_approve") ? { default_auto_approve: form.autoApprove } : {}),
+      ...(show("scheduling.default_booking_window_days") ? { default_booking_window_days: form.windowDays } : {}),
+      ...(show("scheduling.default_cancellation_cutoff_minutes") ? { default_cancellation_cutoff_minutes: form.cutoffMinutes } : {}),
     } }),
     onSuccess: (data) => queryClient.setQueryData(["admin", "settings"], data),
   });
@@ -1286,7 +1314,7 @@ export function AdminSettingsHub() {
                   content: (
                     <>
                       <GamificationSection token={token} part="advanced" />
-                      <div>
+                      <div id="level-taxonomy">
                         <p className="mb-2 text-sm font-semibold" style={{ color: "var(--text)" }}>{i18n("levelTaxonomyd6fdd60")}</p>
                         <LevelTaxonomySection token={token} />
                       </div>
