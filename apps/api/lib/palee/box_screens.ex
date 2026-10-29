@@ -9,14 +9,21 @@ defmodule Palee.BoxScreens do
     * the TV pairs with the code once and then shows the day with a display
       token that names the box, the screen and the screen's token version;
     * staff may pin what a screen shows (an override) and return it to
-      automatic.
+      automatic; a class's coach may do so for their own class today
+      (`ClassScreenPolicy`).
 
   BoxScreens owns only its table; what a screen shows (classes, WODs,
   leaderboards, timers) is gathered by `Palee.Application.BoxScreens.*`.
   """
 
   alias Palee.BoxScreens.BoxScreenStore
-  alias Palee.BoxScreens.Domain.{Focus, PairingCode, ScreenPolicy, TenantDataPolicy}
+  alias Palee.BoxScreens.Domain.{
+    ClassScreenPolicy,
+    Focus,
+    PairingCode,
+    ScreenPolicy,
+    TenantDataPolicy
+  }
 
   @doc "The configured clock (`BoxScreens.Ports.Clock`)."
   def clock, do: Application.fetch_env!(:palee, :box_screen_clock)
@@ -146,6 +153,16 @@ defmodule Palee.BoxScreens do
   defdelegate max_screens(), to: ScreenPolicy
   defdelegate in_scope?(scope, location_id), to: ScreenPolicy
   defdelegate override_views(), to: ScreenPolicy
+
+  # ── One class, from its timer remote (ADR-253 update 2026-10-29) ───────
+
+  defdelegate class_screens(actor, class, screens, today), to: ClassScreenPolicy, as: :screens
+  defdelegate class_views(actor), to: ClassScreenPolicy, as: :views
+  defdelegate may_pin_class?(actor, class, screen, view, today), to: ClassScreenPolicy, as: :may_pin?
+
+  defdelegate may_clear_class?(actor, class, screen, override, today),
+    to: ClassScreenPolicy,
+    as: :may_clear?
 
   # ── Tenant data (ADR-117) ───────────────────────────────────────────────
 
