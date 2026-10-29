@@ -48,7 +48,7 @@ defmodule Palee.Workouts.Domain.StructuredPlanWorkoutTest do
     [bench] = StructuredPlanWorkout.exercises(Enum.at(program(), 15))
     second = Enum.at(bench["set_prescriptions"], 1)
     refute Map.has_key?(second, "load_value")
-    assert second["metadata"]["load_decimal"] == 66.7
+    assert second["metadata"]["load_decimal"] == 66.67
 
     [knee | _rest] = StructuredPlanWorkout.exercises(Enum.at(program(), 1))
     assert %{"reps_min" => 12, "reps_max" => 15} = hd(knee["set_prescriptions"])["metadata"]
