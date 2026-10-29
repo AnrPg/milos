@@ -21,6 +21,7 @@
 		A1730000000000000000000B /* PaleeWidgetsPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1730000000000000000000A /* PaleeWidgetsPlugin.swift */; };
 		A1730000000000000000000D /* PaleeGeofencePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1730000000000000000000C /* PaleeGeofencePlugin.swift */; };
 		A1730000000000000000000F /* PaleeNfcPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1730000000000000000000E /* PaleeNfcPlugin.swift */; };
+		A17300000000000000000011 /* PaleeVivaTerminalPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A17300000000000000000010 /* PaleeVivaTerminalPlugin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,7 @@
 		A1730000000000000000000A /* PaleeWidgetsPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaleeWidgetsPlugin.swift; sourceTree = "<group>"; };
 		A1730000000000000000000C /* PaleeGeofencePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaleeGeofencePlugin.swift; sourceTree = "<group>"; };
 		A1730000000000000000000E /* PaleeNfcPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaleeNfcPlugin.swift; sourceTree = "<group>"; };
+		A17300000000000000000010 /* PaleeVivaTerminalPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaleeVivaTerminalPlugin.swift; sourceTree = "<group>"; };
 		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -82,6 +84,7 @@
 				A1730000000000000000000A /* PaleeWidgetsPlugin.swift */,
 				A1730000000000000000000C /* PaleeGeofencePlugin.swift */,
 				A1730000000000000000000E /* PaleeNfcPlugin.swift */,
+				A17300000000000000000010 /* PaleeVivaTerminalPlugin.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
@@ -180,6 +183,7 @@
 				A1730000000000000000000B /* PaleeWidgetsPlugin.swift in Sources */,
 				A1730000000000000000000D /* PaleeGeofencePlugin.swift in Sources */,
 				A1730000000000000000000F /* PaleeNfcPlugin.swift in Sources */,
+				A17300000000000000000011 /* PaleeVivaTerminalPlugin.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

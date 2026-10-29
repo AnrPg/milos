@@ -76,6 +76,22 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<!-- ADR-249: Tap to Pay through the «Viva.com Terminal» app and its answer. -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>vivapayclient</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>app.palee.terminal-result</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>palee-terminal</string>
+			</array>
+		</dict>
+	</array>
     <!-- palee:app-links begin -->
     <key>WKAppBoundDomains</key>
     <array>

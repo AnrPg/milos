@@ -11,5 +11,7 @@ class PaleeBridgeViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(PaleeWidgetsPlugin())
         bridge?.registerPluginInstance(PaleeGeofencePlugin())
         bridge?.registerPluginInstance(PaleeNfcPlugin())
+        // ADR-249: Tap to Pay through the Viva.com Terminal app.
+        bridge?.registerPluginInstance(PaleeVivaTerminalPlugin())
     }
 }
