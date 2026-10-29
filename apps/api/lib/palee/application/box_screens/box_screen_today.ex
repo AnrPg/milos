@@ -37,7 +37,7 @@ defmodule Palee.Application.BoxScreens.BoxScreenToday do
     {hidden, names} = people(people_ids)
 
     %{
-      box: %{name: box_name(context)},
+      box: %{id: context.organization_id, name: box_name(context)},
       screen: %{id: screen.id, name: screen.name, branch: branch(context, screen.location_id)},
       date: day.date,
       time_zone: day.zone,

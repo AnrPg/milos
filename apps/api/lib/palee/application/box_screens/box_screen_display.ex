@@ -33,7 +33,7 @@ defmodule Palee.Application.BoxScreens.BoxScreenDisplay do
        |> DisplayToken.issue(now)
        |> Map.merge(%{
          screen: %{id: screen.id, name: screen.name},
-         box: %{name: context.organization.name}
+         box: %{id: organization_id, name: context.organization.name}
        })}
     else
       _invalid -> {:error, :invalid_pairing_code}
