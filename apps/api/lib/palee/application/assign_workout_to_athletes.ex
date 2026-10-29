@@ -12,6 +12,7 @@ defmodule Palee.Application.AssignWorkoutToAthletes do
 
   alias Palee.Application.{
     AssignWorkout,
+    AuthorizeProgramming,
     FileWorkoutCopy,
     ListAthletes,
     WorkoutLibraryFolders
@@ -22,7 +23,9 @@ defmodule Palee.Application.AssignWorkoutToAthletes do
     athlete_ids = value(params, :athlete_ids)
 
     with false <- class_variant?(params),
-         {:ok, athletes} <- tenant_athletes(context, athlete_ids) do
+         {:ok, athletes} <- tenant_athletes(context, athlete_ids),
+         # ADR-225: before any copy is filed, so a refusal leaves no orphan.
+         :ok <- AuthorizeProgramming.call(context, Enum.map(athletes, & &1.id)) do
       assign_each(context, params, workout_id, athletes)
     else
       true ->

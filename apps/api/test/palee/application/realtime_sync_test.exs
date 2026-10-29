@@ -58,6 +58,7 @@ defmodule Palee.Application.RealtimeSyncTest do
     workout = workout_fixture(admin)
     context = legacy_tenant_context!(admin, :owner)
     add_legacy_membership!(athlete, :athlete)
+    programming_grant_fixture(context, athlete)
 
     assert {:ok, assignment} =
              AssignWorkout.call(context, %{

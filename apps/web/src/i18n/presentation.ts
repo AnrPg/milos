@@ -379,7 +379,7 @@ const API_ERROR_KEYS: Record<string, string> = {
   left_by_staff: "apiErrorLeftByStaff",
   invalid_leaving_on: "apiErrorInvalidLeavingOn",
   invalid_athletes: "apiErrorInvalidAthletes",
-  member_programming_not_entitled: "apiErrorMemberProgrammingNotEntitled",
+  programming_not_in_package: "apiErrorProgrammingNotInPackage",
   class_variant_requires_single_member: "apiErrorClassVariantRequiresSingleMember",
   slot_not_booked_by_member: "apiErrorSlotNotBookedByMember",
   // ADR-201: a coach with scope own programming someone who is not their client.

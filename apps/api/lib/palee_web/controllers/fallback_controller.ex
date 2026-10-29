@@ -1999,15 +1999,14 @@ defmodule PaleeWeb.FallbackController do
     })
   end
 
-  # ADR-125: personal member programming needs an explicit package grant.
-  def call(conn, {:error, :member_programming_not_entitled, details}) do
+  # ADR-225: programming a person needs online programming or personal
+  # training in their package.
+  def call(conn, {:error, :programming_not_in_package, details}) do
     conn
     |> put_status(:forbidden)
     |> json(%{
-      code: "member_programming_not_entitled",
-      error:
-        "The member's package does not include personal programming " <>
-          "(personal_programming channel and execute_assigned_workouts capability)",
+      code: "programming_not_in_package",
+      error: "The person's package includes neither online programming nor personal training",
       params: details
     })
   end

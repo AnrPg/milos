@@ -44,7 +44,7 @@ export function inheritedFrom(rule: DayWorkout, slots: ScheduleSlot[]) {
   return slots.filter((slot) => slot.day_workout_id === rule.id);
 }
 
-/** What a rule covers, in words: «Όλα τα μαθήματα», «CrossFit», «CrossFit · Βόρειο». */
+/** What a rule covers, in words: «Όλα τα τμήματα», «CrossFit», «CrossFit · Βόρειο». */
 export function dayWorkoutScope(
   rule: Pick<DayWorkout, "class_type_id" | "location_id">,
   names: { allClasses: string; classType: (id: string) => string | undefined; location: (id: string) => string | undefined },

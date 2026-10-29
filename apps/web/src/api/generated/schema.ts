@@ -4587,7 +4587,7 @@ export interface paths {
         put?: never;
         /**
          * Assign a published workout to one or more athletes or members
-         * @description ADR-125: `athlete_ids` holds assignee user ids - active athletes or members of the organization (the field name is kept for compatibility). Members require a package with the personal_programming channel and execute_assigned_workouts capability (403 `member_programming_not_entitled`). `source_slot_id` makes the assignment one member's version of a class they booked (exactly one member; 422 `class_variant_requires_single_member` / `slot_not_booked_by_member`).
+         * @description ADR-125: `athlete_ids` holds assignee user ids - active athletes or members of the organization (the field name is kept for compatibility). Every assignee needs a package with online programming or personal training, ADR-225 (403 `programming_not_in_package`). `source_slot_id` makes the assignment one member's version of a class they booked (exactly one member; 422 `class_variant_requires_single_member` / `slot_not_booked_by_member`).
          */
         post: operations["PaleeWeb.AdminAssignedWorkoutController.create"];
         delete?: never;
@@ -7940,7 +7940,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get the common role-aware admin user profile shell */
+        /**
+         * Get the common role-aware admin user profile shell
+         * @description `programming` (clients only, else null): `{allowed, grant, reason}` says whether a WOD can be assigned to the person: their subscription package needs online programming (`online_programming`) or personal training (`personal_training`), ADR-225.
+         */
         get: operations["PaleeWeb.AdminUserController.show"];
         put?: never;
         post?: never;
@@ -8201,7 +8204,7 @@ export interface paths {
         put?: never;
         /**
          * Copy or save a workout and associate it with this user's assignment, class variant or booked class
-         * @description Athletes receive a personal assignment. Members follow `mode` (ADR-125). Without folder_id, copies are filed automatically (ADR-136): athletes in their folder, class workouts in the class-day folder, member variations in the member's variations folder. Member assignment modes fail with 403 `member_programming_not_entitled` when the member's package lacks the personal_programming channel or execute_assigned_workouts capability.
+         * @description Athletes receive a personal assignment. Members follow `mode` (ADR-125). Without folder_id, copies are filed automatically (ADR-136): athletes in their folder, class workouts in the class-day folder, member variations in the member's variations folder. Athletes, and members in the personal and class_variant modes, need a package with online programming or personal training (ADR-225); otherwise 403 `programming_not_in_package`.
          */
         post: operations["PaleeWeb.AdminUserController.program_workout"];
         delete?: never;

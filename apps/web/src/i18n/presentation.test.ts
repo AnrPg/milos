@@ -92,7 +92,7 @@ describe("localizeError", () => {
     ["finance_allowance_not_included", "apiErrorSelfFinanceAllowanceNotIncluded"],
     ["finance_allowance_exhausted", "apiErrorSelfFinanceAllowanceExhausted"],
     ["invalid_athletes", "apiErrorInvalidAthletes"],
-    ["member_programming_not_entitled", "apiErrorMemberProgrammingNotEntitled"],
+    ["programming_not_in_package", "apiErrorProgrammingNotInPackage"],
     ["class_variant_requires_single_member", "apiErrorClassVariantRequiresSingleMember"],
     ["slot_not_booked_by_member", "apiErrorSlotNotBookedByMember"],
     ["slot_not_found", "apiErrorSlotNotFound"],

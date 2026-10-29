@@ -18,13 +18,15 @@ defmodule Palee.Application.ProgramUserWorkout do
   class variants in `Variations for member/<nickname>` (still hidden from the
   shared library, ADR-125).
 
-  The two member assignment modes require the explicit personal-programming
-  grant, checked before the library copy is made so a denial leaves no orphan.
+  Athletes and the two member assignment modes need online programming or
+  personal training in the package (ADR-225), checked before the library
+  copy is made so a denial leaves no orphan. Changing a booked class's WOD
+  (`class_workout`) programs the class, not the person, and is not checked.
   """
 
   alias Palee.Application.{
     AssignWorkout,
-    AuthorizeMemberProgramming,
+    AuthorizeProgramming,
     DuplicateWorkout,
     FileWorkoutCopy,
     WorkoutLibraryFolders
@@ -56,14 +58,16 @@ defmodule Palee.Application.ProgramUserWorkout do
 
   defp programming_mode(_role, _params), do: {:error, :unsupported_role}
 
-  defp validate_target(_context, :athlete, _user, _params), do: :ok
+  # ADR-225: checked before the library copy is made, so a refusal leaves no orphan.
+  defp validate_target(context, :athlete, %{id: athlete_id}, _params),
+    do: AuthorizeProgramming.call(context, [athlete_id])
 
   defp validate_target(context, :personal, %{id: member_id}, _params),
-    do: AuthorizeMemberProgramming.call(context, [member_id])
+    do: AuthorizeProgramming.call(context, [member_id])
 
   defp validate_target(context, :class_variant, %{id: member_id} = user, params) do
     with :ok <- validate_booked_slot(context, user, params) do
-      AuthorizeMemberProgramming.call(context, [member_id])
+      AuthorizeProgramming.call(context, [member_id])
     end
   end
 

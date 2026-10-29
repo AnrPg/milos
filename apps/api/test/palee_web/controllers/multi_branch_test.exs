@@ -228,6 +228,7 @@ defmodule PaleeWeb.MultiBranchTest do
 
     test "a coaching assignment stays inside the coach's branches", ctx do
       athlete = member(ctx.organization, :athlete)
+      programming_grant_fixture(ctx.organization.id, athlete)
 
       conn =
         api(ctx.manager)

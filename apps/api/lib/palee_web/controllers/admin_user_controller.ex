@@ -422,6 +422,10 @@ defmodule PaleeWeb.AdminUserController do
 
   operation(:show,
     summary: "Get the common role-aware admin user profile shell",
+    description:
+      "`programming` (clients only, else null): `{allowed, grant, reason}` says whether a WOD " <>
+        "can be assigned to the person: their subscription package needs online programming " <>
+        "(`online_programming`) or personal training (`personal_training`), ADR-225.",
     parameters: [
       %Parameter{
         name: :id,
@@ -480,8 +484,8 @@ defmodule PaleeWeb.AdminUserController do
         "Without folder_id, copies are filed automatically (ADR-136): athletes in their " <>
         "folder, class workouts in the class-day folder, member variations in the " <>
         "member's variations folder. " <>
-        "Member assignment modes fail with 403 `member_programming_not_entitled` when the " <>
-        "member's package lacks the personal_programming channel or execute_assigned_workouts capability.",
+        "Athletes, and members in the personal and class_variant modes, need a package with " <>
+        "online programming or personal training (ADR-225); otherwise 403 `programming_not_in_package`.",
     parameters: [@id_parameter],
     request_body: @program_body,
     responses: [created: {"Programming result", "application/json", @summary_object}]
