@@ -13,9 +13,10 @@ defmodule Palee.Fiscal.Domain.ConnectionCheckPolicy do
       register or System Palee uses;
     * `{:invalid, code}` – a definite refusal: the connection is marked
       `invalid` until a check passes or it is saved again;
-    * `{:unreachable, code}` – the provider could not be asked (network,
-      outage, AADE's quota): the connection keeps its status and is
-      checked again sooner.
+    * `{:unreachable, code}` – the connection could not be checked (network,
+      outage, AADE's quota, or the business's own ΑΦΜ missing or unknown to
+      the registry, which says nothing about the credentials): the
+      connection keeps its status and is checked again sooner.
 
   `code` is a stable error code (`error_codes/0`) the screens turn into a
   plain message in the viewer's language; free text from a provider is
@@ -78,13 +79,15 @@ defmodule Palee.Fiscal.Domain.ConnectionCheckPolicy do
   def classify(:unit_not_found), do: {:invalid, "unit_not_found"}
   def classify(:unit_not_ready), do: {:invalid, "unit_not_ready"}
   def classify(:system_not_found), do: {:invalid, "system_not_found"}
-  def classify(:tax_id_missing), do: {:invalid, "tax_id_missing"}
   def classify(:siren_missing), do: {:invalid, "siren_missing"}
   def classify(:provisioning_failed), do: {:invalid, "provisioning_failed"}
   def classify(:provider_retired), do: {:invalid, "provider_retired"}
-  # The registry answering "no such ΑΦΜ" for the business's own ΑΦΜ: the
-  # ΑΦΜ in Στοιχεία τιμολόγησης must be checked, not the credentials.
-  def classify(:not_found), do: {:invalid, "tax_id_not_found"}
+  # The registry check needs the business's own ΑΦΜ; without it, or when
+  # AADE does not know it, the credentials are neither confirmed nor refused
+  # (look-ups of other ΑΦΜ keep working): the ΑΦΜ in Στοιχεία τιμολόγησης
+  # must be checked.
+  def classify(:tax_id_missing), do: {:unreachable, "tax_id_missing"}
+  def classify(:not_found), do: {:unreachable, "tax_id_not_found"}
   def classify(:limit_reached), do: {:unreachable, "limit_reached"}
 
   def classify({:rejected, [%{code: code} | _rest]}) when code in ["system_not_found"],

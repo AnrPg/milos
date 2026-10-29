@@ -106,7 +106,13 @@ defmodule PaleeWeb.AdminFiscalComplianceControllerTest do
 
       assert Map.keys(errors) |> Enum.sort() == ["api_key", "api_secret", "legal_entity_id"]
 
-      assert %{"connection" => connection} =
+      # ADR-273: the save is checked right away; fiskaly not answering
+      # leaves the connection as saved.
+      Req.Test.stub(Palee.FiscalHttp, fn conn ->
+        conn |> Plug.Conn.put_status(503) |> Req.Test.json(%{})
+      end)
+
+      assert %{"connection" => connection, "check" => %{"result" => "unreachable"}} =
                ctx.owner
                |> send_json(:put, path, %{
                  "environment" => "test",
@@ -122,8 +128,12 @@ defmodule PaleeWeb.AdminFiscalComplianceControllerTest do
                "has_api_key" => true,
                "has_api_secret" => true,
                "credentials_source" => "own",
-               "webhook_url" => url
+               "status" => "active",
+               "error_code" => "unreachable"
              } = connection
+
+      # fiskaly sends no webhooks: the secret URL is no longer handed out.
+      refute Map.has_key?(connection, "webhook_url")
 
       refute inspect(connection) =~ "fk-secret"
       refute ctx.accountant |> get_json(path) |> json_response(200) |> inspect() =~ "fk-secret"
@@ -174,17 +184,10 @@ defmodule PaleeWeb.AdminFiscalComplianceControllerTest do
       assert ctx.desk |> send_json(:post, retry, %{}) |> json_response(403)
       assert ctx.coach |> get_json("#{ctx.admin}/fiscal/einvoices") |> json_response(403)
 
-      # The webhook: a wrong token is not found; the right one is a hint.
-      %URI{path: webhook} = URI.parse(url)
-
+      # The webhook: a wrong token is not found (the right one: EInvoicingTest).
       assert ctx.conn
              |> send_json(:post, "/api/webhooks/peppol/#{ctx.organization.id}/wrong", %{})
              |> json_response(404)
-
-      assert %{"ok" => true} =
-               ctx.conn
-               |> send_json(:post, webhook, %{"guid" => row["provider_submission_id"]})
-               |> json_response(200)
     end
   end
 

@@ -53,8 +53,10 @@ defmodule PaleeWeb.Schemas.FiscalConnections do
           type: :string,
           enum: ["ok", "invalid", "unreachable"],
           description:
-            "`invalid`: refused (the connection is marked invalid); `unreachable`: the " <>
-              "provider could not be asked, nothing changed and it is checked again soon."
+            "`invalid`: refused (the connection is marked invalid); `unreachable`: it " <>
+              "could not be checked (provider down, AADE quota, or the business's own ΑΦΜ " <>
+              "missing or unknown to the registry; see `error_code`), nothing changed and " <>
+              "it is checked again soon."
         },
         error_code: error_code(),
         detail: %Schema{
