@@ -14,6 +14,7 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
     Workouts.AssignedWorkout,
     Workouts.AssignedWorkoutAthlete,
     Workouts.Domain.AssignmentAudiencePolicy,
+    Workouts.Domain.PlanAuthoringGuard,
     Workouts.Domain.SectionedText,
     Workouts.Domain.StructuredPlan.Prescription,
     Workouts.Domain.StructuredPlanWorkout,
@@ -82,7 +83,10 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
         {:error, :not_found}
 
       workout ->
-        with :ok <- validate_expected_revision(workout, params) do
+        # ADR-270: checked against the stored row before its mode and draft
+        # data are replaced, so a later publish still sees the plan.
+        with :ok <- validate_expected_revision(workout, params),
+             :ok <- PlanAuthoringGuard.check_draft_save(workout, params) do
           draft_data =
             params
             |> Map.get(:draft_data, Map.get(params, "draft_data", params))
