@@ -108,3 +108,7 @@ config :palee, :garmin_client, Palee.FakeGarminClient
 # ADR-242: a fixed test key for the fiscal journal (never used outside tests).
 config :palee, Palee.Infrastructure.Fiscal.Ed25519JournalSigner,
   signing_key: "test-1:" <> Base.encode64(:binary.copy(<<7>>, 32))
+
+# ADR-246: the sandbox payment provider and stubbed provider HTTP in tests.
+config :palee, :payments_sandbox, true
+config :palee, :payments_http, req_options: [plug: {Req.Test, Palee.PaymentsHttp}]

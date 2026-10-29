@@ -22,6 +22,10 @@ defmodule Palee.Finance.Domain.ReceivedPaymentTest do
     assert ReceivedPayment.validate(%{ok | "payment_method" => "crypto"}) ==
              {:error, :invalid_payment_method}
 
+    # ADR-246: Palee records provider-confirmed money as "online"; the desk never offers it.
+    assert ReceivedPayment.validate(%{ok | "payment_method" => "online"}) == :ok
+    refute "online" in ReceivedPayment.methods()
+
     for amount <- [0, -5, "x", nil, 1.5] do
       assert ReceivedPayment.validate(%{ok | "amount_cents" => amount}) ==
                {:error, :invalid_payment_amount}

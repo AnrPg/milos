@@ -501,10 +501,11 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
              "payment_method" => params["payment_method"],
              "payment_status" => "paid",
              "notes" => params["notes"],
-             "params" => %{
-               "idempotency_key" => params["idempotency_key"],
-               "created_by_id" => params["created_by_id"]
-             }
+             "params" =>
+               online_reference(params, %{
+                 "idempotency_key" => params["idempotency_key"],
+                 "created_by_id" => params["created_by_id"]
+               })
            }) do
       {:ok, received_payment_result(Repo.get!(MembershipPayment, payment.id))}
     end
@@ -513,6 +514,17 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   defp receive_into(document, membership_id, params) do
     create_paid_document(membership_id, document, params)
   end
+
+  # ADR-246: an online payment keeps the provider's references with it.
+  defp online_reference(%{"payment_method" => "online"} = params, stored) do
+    Map.merge(stored, %{
+      "payment_intent_id" => params["payment_intent_id"],
+      "provider" => params["provider"],
+      "provider_transaction_id" => params["provider_transaction_id"]
+    })
+  end
+
+  defp online_reference(_params, stored), do: stored
 
   defp payment_by_idempotency_key(membership_id, key) do
     MembershipPayment
@@ -606,11 +618,12 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
                "payment_method" => params["payment_method"] || "cash",
                "payment_status" => "paid",
                "notes" => params["notes"],
-               "params" => %{
-                 "document_kind" => kind,
-                 "idempotency_key" => params["idempotency_key"],
-                 "created_by_id" => params["created_by_id"]
-               }
+               "params" =>
+                 online_reference(params, %{
+                   "document_kind" => kind,
+                   "idempotency_key" => params["idempotency_key"],
+                   "created_by_id" => params["created_by_id"]
+                 })
              }) do
         received_payment_result(Repo.get!(MembershipPayment, payment.id))
       else

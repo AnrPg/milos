@@ -13,7 +13,27 @@ defmodule Palee.Application.ReceiveFinancePayment do
   mode would take money from anyone but one of its mock people.
   """
   def call(context, user_id, admin_id, params) do
-    with :ok <- GoLive.check_payment(context, user_id), do: call(user_id, admin_id, params)
+    with :ok <- desk_method(params),
+         :ok <- GoLive.check_payment(context, user_id),
+         do: call(user_id, admin_id, params)
+  end
+
+  @doc """
+  ADR-246: records money a payment provider confirmed (an online payment
+  of an invoice). Idempotent through the payment's `idempotency_key`.
+  """
+  def record_online(context, user_id, params) do
+    with :ok <- GoLive.check_payment(context, user_id) do
+      Finance.with_tenant_context(context, fn ->
+        call(user_id, nil, Map.put(params, "payment_method", "online"))
+      end)
+    end
+  end
+
+  # Staff never record an "online" payment by hand.
+  defp desk_method(params) do
+    method = params["payment_method"] || params[:payment_method]
+    if method == "online", do: {:error, :invalid_payment_method}, else: :ok
   end
 
   def call(user_id, admin_id, params) do

@@ -82,3 +82,6 @@ config :palee, Palee.Infrastructure.Fiscal.Ed25519JournalSigner,
       "FISCAL_JOURNAL_SIGNING_KEY",
       "dev-1:" <> Base.encode64(:binary.copy(<<1>>, 32))
     )
+
+# ADR-246: the sandbox payment provider (never enabled in prod).
+config :palee, :payments_sandbox, true
