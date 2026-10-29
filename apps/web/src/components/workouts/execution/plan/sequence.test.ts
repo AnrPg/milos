@@ -220,6 +220,13 @@ describe("buildSequence: EMOM", () => {
   });
 });
 
+describe("buildSequence: EMOM params", () => {
+  it("does not invent a slot length when every is unreadable", () => {
+    const seq = buildSequence(section("emom", { every: "", times: "3" }, [[ex("Burpee", { dose: "10" })]]));
+    expect(seq.phases.map((p) => p.secs)).toEqual([null, null, null]);
+  });
+});
+
 describe("buildSequence: intervals", () => {
   it("work / off / rounds, no rest after the last round", () => {
     const seq = buildSequence(section("intervals", { work: "20″", off: "10″", rounds: "3" }, [[ex("Air Squat", { dose: "max" })]]));

@@ -185,7 +185,7 @@ export type PlanSetActual = {
   exercise_ref: string | null;
   /** Block (kind of round) of the row; -1 for interrupt rows. */
   block_index: number;
-  /** 1-based set / round / slot / interval number. */
+  /** 1-based set / round / slot / interval number; for interrupt rows, which interruption. */
   round_index: number;
   /** 0-based part of a cluster / drop / rest-pause set; 0 otherwise. */
   part_index: number;
@@ -195,9 +195,12 @@ export type PlanSetActual = {
   /** The prescription as shown ("8–12", "max", "400 m", "70%", "βαρύ"). */
   prescribed_reps_text: string;
   prescribed_load_text: string;
-  /** Numeric prescription: plain reps / calories, load in kg (decimal). */
+  /** Numeric prescription: plain reps / calories, load in kg (decimal; from % × 1RM when known). */
   prescribed_reps: number | null;
   prescribed_load_kg: number | null;
+  /** A load prescribed as % of 1RM, and the 1RM (kg) used to compute `prescribed_load_kg`, when known. */
+  prescribed_load_pct: number | null;
+  one_rep_max_kg: number | null;
   actual_reps: number | null;
   actual_load_kg: number | null;
   /** The athlete typed a value for this set (otherwise actual = prescribed). */

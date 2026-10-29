@@ -15,6 +15,7 @@ const api = vi.hoisted(() => ({
   save: vi.fn(),
   push: vi.fn(),
   wizard: vi.fn(),
+  listPRs: vi.fn(),
 }));
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push: api.push, replace: vi.fn(), back: vi.fn() }) }));
@@ -27,6 +28,7 @@ vi.mock("@/api/executions", async (importOriginal) => ({
   completeExecution: api.completeExecution,
 }));
 vi.mock("@/api/workouts", () => ({ fetchWorkout: api.fetchWorkout }));
+vi.mock("@/api/gamification", () => ({ listPRs: api.listPRs }));
 vi.mock("../FinishWizard", () => ({
   FinishWizard: (props: { scores: unknown[]; segments: unknown[]; onConfirm: (s: unknown[], f: unknown) => void }) => {
     api.wizard(props);
@@ -76,6 +78,8 @@ describe("PlanExecutionMode", () => {
       ],
     });
     api.completeExecution.mockResolvedValue({});
+    api.listPRs.mockResolvedValue([]);
+    window.localStorage.clear();
     api.save.mockImplementation(async (draft: { id: string; change: unknown }) => ({ comment: { id: draft.id, change: draft.change }, synced: true }));
   });
 
@@ -97,7 +101,7 @@ describe("PlanExecutionMode", () => {
         entry_kind: "execution",
         entry_id: "exe-1",
         change: expect.objectContaining({
-          patch_id: "plan:a:Burpee-row:0:1:0:reps",
+          patch_id: "plan:a:Burpee-row:0:1:0:0:reps",
           type: "reps_changed",
           actual_value: 8,
           canonical_value: 10,
@@ -138,6 +142,44 @@ describe("PlanExecutionMode", () => {
       }),
     );
     expect(api.push).toHaveBeenCalledWith("/");
+  });
+
+  it("resumes after a reload where the athlete was, and forgets the run once completed", async () => {
+    const view = () =>
+      render(
+        <NextIntlClientProvider locale="en" messages={en}>
+          <PlanExecutionMode executionId="exe-1" />
+        </NextIntlClientProvider>,
+      );
+    const first = view();
+    expect(await screen.findByText("Section 1 of 2")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("plan-run-next"));
+    fireEvent.change(screen.getByLabelText("Reps done"), { target: { value: "9" } });
+    await act(async () => {
+      fireEvent.click(screen.getByTestId("plan-run-next"));
+    });
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: "1:00" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    expect(screen.getByText("Section 2 of 2")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("plan-run-next"));
+    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent("Squat");
+    first.unmount();
+
+    view();
+    expect(await screen.findByText("Section 2 of 2")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent("Squat");
+    fireEvent.click(screen.getByTestId("plan-run-next"));
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    expect(api.wizard).toHaveBeenLastCalledWith(expect.objectContaining({ scores: [expect.objectContaining({ section_id: "a", value: "1:00" })] }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "wizard" }));
+    });
+    expect(api.completeExecution).toHaveBeenCalledWith(
+      "token",
+      "exe-1",
+      expect.objectContaining({ plan_actuals: expect.arrayContaining([expect.objectContaining({ section_id: "a", actual_reps: 9 })]) }),
+    );
+    expect(window.localStorage.getItem("palee:plan-run:exe-1")).toBeNull();
   });
 
   it("says when there is nothing to run", async () => {
