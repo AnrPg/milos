@@ -203,3 +203,248 @@ xcodebuild -exportArchive -archivePath build/Palee.xcarchive \
 Πηγές: https://developer.apple.com/documentation/xcode/distributing-your-app-for-beta-testing-and-releases και `man xcodebuild`.
 
 ---
+
+## 4. Android
+
+### 4.1 Πού είναι το `keytool`
+
+Το `keytool` έρχεται με τη Java. Το Android Studio έχει δική του Java μέσα (JBR):
+
+| Σύστημα | Διαδρομή |
+|---|---|
+| macOS | `/Applications/Android Studio.app/Contents/jbr/Contents/Home/bin/keytool` |
+| Windows | `C:\Program Files\Android\Android Studio\jbr\bin\keytool.exe` |
+| Linux | `<φάκελος του Android Studio>/jbr/bin/keytool` |
+
+Έλεγχος: τρέξε τη διαδρομή με `-help`. Αν βγάλει λίστα εντολών (`-genkeypair`, `-list` …), είναι εντάξει. Για να μη γράφεις όλη τη διαδρομή κάθε φορά, στο macOS: `export PATH="/Applications/Android Studio.app/Contents/jbr/Contents/Home/bin:$PATH"` (ισχύει ως το κλείσιμο του τερματικού).
+
+### 4.2 Φτιάξε το keystore με το κλειδί ανεβάσματος (upload key)
+
+Φτιάξε πρώτα έναν φάκελο **έξω** από το repo, π.χ. `~/palee-signing`, ώστε το αρχείο να μην μπει ποτέ κατά λάθος στο git.
+
+```sh
+mkdir -p ~/palee-signing
+cd ~/palee-signing
+keytool -genkeypair -v \
+  -keystore palee-upload.jks \
+  -storetype PKCS12 \
+  -alias palee-upload \
+  -keyalg RSA \
+  -keysize 2048 \
+  -validity 10000 \
+  -dname "CN=Palee, O=<Επωνυμία εταιρείας ή ονοματεπώνυμο>, C=GR"
+```
+
+Τι σημαίνει κάθε κομμάτι:
+
+| Επιλογή | Τι κάνει | Default αν τη παραλείψεις | Γιατί αυτή η τιμή |
+|---|---|---|---|
+| `-genkeypair` | Φτιάχνει νέο ζευγάρι κλειδιών και αυτο-υπογεγραμμένο πιστοποιητικό | (είναι η εντολή) | |
+| `-v` | Γράφει περισσότερες λεπτομέρειες για ό,τι κάνει | σιωπηλό | για να δεις τι έγινε |
+| `-keystore palee-upload.jks` | Σε ποιο αρχείο μπαίνει το κλειδί (το φτιάχνει αν δεν υπάρχει) | `.keystore` στον φάκελο χρήστη | ένα αρχείο μόνο για το Palee |
+| `-storetype PKCS12` | Μορφή του αρχείου | `PKCS12` (Java 9 και νεότερη) | το γράφουμε για σιγουριά: είναι το τυπικό format |
+| `-alias palee-upload` | Το όνομα του κλειδιού μέσα στο αρχείο | `mykey` | θα το ξαναγράψεις στο `keystore.properties` |
+| `-keyalg RSA` | Αλγόριθμος | στις νεότερες Java δεν υπάρχει default και η εντολή σταματά με σφάλμα· στις παλιές ήταν DSA, που δεν θέλουμε | RSA είναι αυτό που προτείνει η Google |
+| `-keysize 2048` | Μέγεθος κλειδιού σε bits | για RSA 2048 ή 3072, ανάλογα με την έκδοση Java | 2048 είναι το ελάχιστο που δέχεται η Google, και αρκεί |
+| `-validity 10000` | Πόσες ημέρες ισχύει το πιστοποιητικό | 90 ημέρες | η Google θέλει να ισχύει τουλάχιστον ως τις 22/10/2033· 10000 ημέρες ≈ 27 χρόνια |
+| `-dname "…"` | Ποιος είσαι: `CN` όνομα, `O` οργανισμός, `C` χώρα (2 γράμματα) | αν λείπει, σε ρωτά ένα ένα | δεν φαίνεται στους χρήστες· γράψε αληθινά στοιχεία |
+
+Τι θα σε ρωτήσει:
+
+1. `Enter keystore password:` και `Re-enter new password:`. Ο κωδικός του αρχείου. **Φτιάξ' τον με τον password manager** (τουλάχιστον 20 τυχαίοι χαρακτήρες, χωρίς κενά). Δεν φαίνεται όσο γράφεις: είναι φυσιολογικό.
+2. Στο `PKCS12` ο κωδικός του κλειδιού είναι **ο ίδιος** με του αρχείου, άρα δεν θα σε ρωτήσει δεύτερο. (Αν δεις `Enter key password for <palee-upload>`, πάτα Enter για να κρατήσει τον ίδιο.)
+
+Τι βγάζει: `Generating 2,048 bit RSA key pair and self-signed certificate (SHA384withRSA) with a validity of 10,000 days for: CN=Palee, …` και `[Storing palee-upload.jks]`. Το αρχείο `palee-upload.jks` είναι πλέον στον φάκελο.
+
+Αν θες να γράψεις τους κωδικούς στην ίδια την εντολή (π.χ. σε script), υπάρχουν `-storepass <κωδικός>` και `-keypass <κωδικός>`. **Μην** το κάνεις στο χέρι: ο κωδικός μένει στο ιστορικό του τερματικού.
+
+Πηγή: https://developer.android.com/studio/publish/app-signing#generate-key και https://docs.oracle.com/en/java/javase/21/docs/specs/man/keytool.html
+
+### 4.3 Δες τι έφτιαξες και πάρε το αποτύπωμα SHA-256
+
+```sh
+keytool -list -v -keystore ~/palee-signing/palee-upload.jks -alias palee-upload
+```
+
+- `-list`: δείχνει τι έχει το keystore.
+- `-v`: με λεπτομέρειες (χωρίς αυτό δείχνει μόνο το alias και ένα αποτύπωμα).
+- `-keystore`: ποιο αρχείο. Default: `.keystore` στον φάκελο χρήστη.
+- `-alias`: μόνο αυτό το κλειδί. Χωρίς αυτό δείχνει όλα.
+- Σε ρωτά τον κωδικό του αρχείου.
+- **Τι βγάζει:** `Alias name: palee-upload`, `Valid from: … until: …`, και κάτω από `Certificate fingerprints:` μια γραμμή `SHA256: 3A:9F:…:C2`. Αυτό είναι το **αποτύπωμα του upload key**. Κράτησέ το (δεν είναι μυστικό).
+
+### 4.4 Πες στο Gradle πού είναι το κλειδί
+
+1. Αντίγραψε το `apps/mobile/android/keystore.properties.example` σε `apps/mobile/android/keystore.properties`. Το νέο αρχείο **δεν** μπαίνει στο git (είναι στο `.gitignore`).
+2. Συμπλήρωσε:
+
+```properties
+storeFile=/Users/<εσύ>/palee-signing/palee-upload.jks
+storePassword=<ο κωδικός του αρχείου>
+keyAlias=palee-upload
+keyPassword=<ο ίδιος κωδικός>
+```
+
+- `storeFile`: πλήρης διαδρομή του `.jks` (ή σχετική με το `android/app/`). Στα Windows γράψε `C:/Users/<εσύ>/palee-signing/palee-upload.jks` με κανονικές καθέτους.
+- `storePassword` / `keyPassword`: οι κωδικοί. Με `PKCS12` είναι ίδιοι.
+- `keyAlias`: το `-alias` του §4.2.
+
+Το `android/app/build.gradle` (ADR-256) διαβάζει αυτό το αρχείο. Αν υπάρχει, κάθε release build υπογράφεται με το upload key. Αν λείπει, το release build βγαίνει ανυπόγραφο και το Play το απορρίπτει.
+
+### 4.5 Χτίσε το AAB
+
+```sh
+cd apps/mobile
+npm run sync:android
+cd android
+./gradlew bundleRelease
+```
+
+- `npm run sync:android`: γράφει έκδοση, build και links στο project Android και αντιγράφει τα plugins (`configure.mjs` + `cap sync android`).
+- `./gradlew`: το Gradle του project (κατεβαίνει μόνο του την πρώτη φορά). Στα Windows: `gradlew.bat bundleRelease`.
+- `bundleRelease`: φτιάχνει **AAB** τύπου release, υπογεγραμμένο με το `keystore.properties`. (Το `assembleRelease` φτιάχνει APK, που **δεν** το θέλει το Play.)
+- **Τι βγάζει:** `BUILD SUCCESSFUL in …` και το αρχείο `apps/mobile/android/app/build/outputs/bundle/release/app-release.aab`.
+- Έλεγχος ότι υπογράφηκε: `keytool -printcert -jarfile app/build/outputs/bundle/release/app-release.aab`. Πρέπει να δείξει `SHA256:` ίδιο με το §4.3.
+
+Εναλλακτικά από το Android Studio: `npx cap open android` › **Build › Generate Signed App Bundle or APK** › **Android App Bundle** › διάλεξε το `.jks`, το alias και τους κωδικούς › **release** › Create.
+
+### 4.6 Firebase (push στο Android)
+
+1. https://console.firebase.google.com › **Add project** › `Palee` (Google Analytics: **όχι**, δεν το χρησιμοποιούμε).
+2. Στην αρχική του project › εικονίδιο Android › **Android package name:** `app.palee.member` › Register app.
+3. **Download google-services.json** › βάλ' το στο `apps/mobile/android/app/google-services.json`. **Ποτέ στο git** (είναι στο `.gitignore`). Φύλαξε αντίγραφο στον password manager.
+4. Project settings (γρανάζι) › **Service accounts** › **Generate new private key** › κατεβαίνει ένα JSON. Αυτό είναι **μυστικό**: μπαίνει στο secret `FCM_SERVICE_ACCOUNT_JSON` της παραγωγής και στον password manager, πουθενά αλλού.
+
+### 4.7 Η εφαρμογή στο Play Console και Play App Signing
+
+1. https://play.google.com/console › **Create app**. App name `Palee`, default language Greek, **App**, **Free**, αποδέχεσαι τις δηλώσεις › Create app.
+2. **Test and release › Testing › Internal testing** › Create new release.
+3. Στο **App integrity / Play App Signing** επιλέγεις **Use Google-generated key** (προτείνεται: η Google κρατά το app signing key).
+4. Ανεβάζεις το `app-release.aab` του §4.5. Το Play κρατά το πιστοποιητικό του upload key από αυτό το πρώτο ανέβασμα: από εδώ και πέρα δέχεται μόνο AAB υπογεγραμμένα με το ίδιο κλειδί.
+5. **Release name:** `3.0.0 (1)`, **Release notes** από το `store-listing.md`. Save › Review › Start rollout to Internal testing.
+6. **Test and release › Setup › App integrity › App signing**: εδώ βλέπεις **δύο** αποτυπώματα SHA-256: του **App signing key certificate** (της Google) και του **Upload key certificate** (το δικό σου, ίδιο με το §4.3). Αντίγραψε και τα δύο για το §5.
+
+Πηγή: https://support.google.com/googleplay/android-developer/answer/9842756
+
+---
+
+## 5. Τα στοιχεία που πάνε στον server
+
+Ο server του `palee.app` σερβίρει δύο αρχεία που λένε στα κινητά «αυτά τα links ανήκουν στην εφαρμογή Palee»:
+
+- `https://palee.app/.well-known/apple-app-site-association` (iOS)
+- `https://palee.app/.well-known/assetlinks.json` (Android)
+
+Τα φτιάχνει μόνος του από αυτές τις μεταβλητές (secrets της παραγωγής, βλ. `.env.example`):
+
+| Μεταβλητή | Τιμή | Από πού |
+|---|---|---|
+| `APPLE_TEAM_ID` | π.χ. `A1B2C3D4E5` | §3.1 |
+| `IOS_BUNDLE_ID` | `app.palee.member` (default, μπορείς να την παραλείψεις) | |
+| `ANDROID_PACKAGE_NAME` | `app.palee.member` (default) | |
+| `ANDROID_SHA256_CERT_FINGERPRINTS` | τα δύο αποτυπώματα του §4.7 βήμα 6, χωρισμένα με κόμμα | Play Console › App integrity |
+
+Ως ασφάλεια, ο server **αγνοεί** τιμές που δεν έχουν τη σωστή μορφή (Team ID 10 γράμματα/ψηφία, αποτύπωμα 32 ζευγάρια με `:`), όπως τα placeholders του `.env.example`. Τότε απαντά 404 αντί για λάθος αρχείο.
+
+Μετά την αλλαγή των secrets κάνεις restart τον web server (`docker compose up -d web` ή όπως γίνεται το deploy). Δεν χρειάζεται νέο build: οι τιμές διαβάζονται σε κάθε αίτημα.
+
+---
+
+## 6. Έλεγχος ότι τα links ανοίγουν την εφαρμογή
+
+### 6.1 Ο server
+
+```sh
+curl -sS https://palee.app/.well-known/apple-app-site-association
+curl -sS https://palee.app/.well-known/assetlinks.json
+```
+
+- `curl`: κατεβάζει μια σελίδα και τη γράφει στο τερματικό.
+- `-s` (silent): χωρίς μπάρα προόδου. `-S` (show-error): αλλά δείξε σφάλματα. Χωρίς αυτά βλέπεις και την πρόοδο.
+- **Τι πρέπει να δεις:** στο πρώτο ένα JSON με `"appIDs":["A1B2C3D4E5.app.palee.member"]` και components με `/c/*`, `/join/*`, `/pay/return*`. Στο δεύτερο ένα JSON με `"package_name":"app.palee.member"` και τα δύο αποτυπώματα. Αν δεις `Not found`, οι μεταβλητές του §5 λείπουν ή έχουν λάθος μορφή.
+- Έλεγχος της Google: https://developers.google.com/digital-asset-links/tools/generator (Test statement, με `palee.app`, `app.palee.member` και ένα αποτύπωμα).
+
+### 6.2 Android, σε κινητό με την εφαρμογή εγκατεστημένη από το Play (Internal testing)
+
+```sh
+adb shell pm get-app-links app.palee.member
+```
+
+- `adb`: το εργαλείο του Android SDK για συνδεδεμένα κινητά (USB debugging ανοιχτό). Βρίσκεται στο `<Android SDK>/platform-tools/`.
+- `shell pm get-app-links <package>`: δείχνει αν το Android επιβεβαίωσε τα links.
+- **Τι πρέπει να δεις:** `palee.app: verified`. Αν δεις `none` ή `1024`, ξανατρέξε τον έλεγχο με `adb shell pm verify-app-links --re-verify app.palee.member`, περίμενε λίγα δευτερόλεπτα και ξαναδές.
+
+### 6.3 iOS
+
+Στο iPhone με την εφαρμογή από το TestFlight, γράψε στις Σημειώσεις `https://palee.app/join/test`, πάτα παρατεταμένα το link: πρέπει να βλέπεις «Άνοιγμα στο Palee». Το iOS κατεβάζει το αρχείο της Apple μέσω του CDN της Apple, οπότε μια αλλαγή μπορεί να θέλει έως 24 ώρες. Στο Mac, `sudo swcutil dl -d palee.app` δείχνει τι βλέπει το CDN (`sudo`: ζητά τον κωδικό του Mac).
+
+Πηγές: https://developer.apple.com/documentation/xcode/supporting-associated-domains και https://developer.android.com/training/app-links/verify-android-applinks
+
+---
+
+## 7. Αριθμοί έκδοσης και build
+
+Δύο αριθμοί, στο `apps/mobile/config/release.json`:
+
+- **`version`** (`3.0.0`): αυτό που βλέπουν οι χρήστες στα stores. Ακολουθεί την έκδοση του Palee. Αλλάζει όταν βγάζεις νέα έκδοση.
+- **`build`** (`1`): αυξάνεται **σε κάθε ανέβασμα**, ακόμη κι αν η έκδοση μένει ίδια (π.χ. 3.0.0 build 1, μετά απόρριψη 3.0.0 build 2). Η Apple δεν δέχεται δεύτερο build με ίδιο αριθμό στην ίδια έκδοση. Η Google δεν δέχεται `versionCode` ίσο ή μικρότερο από κάποιο που ανέβηκε ποτέ.
+
+Πώς τον αλλάζεις:
+
+- Μόνιμα: άλλαξε το `build` στο `release.json`, commit, και τρέξε `npm run configure` (γράφει στο `build.gradle` και στο Xcode project).
+- Για ένα μόνο build: `PALEE_BUILD_NUMBER=2 npm run sync`.
+
+Το `configure` σταματά με σφάλμα αν η έκδοση δεν είναι της μορφής `X.Y.Z` ή αν το build δεν είναι ακέραιος από 1 έως 2 100 000 000 (όριο της Google).
+
+---
+
+## 8. Ασφαλής φύλαξη
+
+### 8.1 Τι κρατάς και πού
+
+| Τι | Μυστικό; | Πού |
+|---|---|---|
+| `palee-upload.jks` και ο κωδικός του | **Ναι** | password manager (αρχείο + κωδικός) **και** ένα δεύτερο αντίγραφο εκτός σπιτιού (π.χ. κρυπτογραφημένο USB σε άλλο μέρος) |
+| `AuthKey_<KEYID>.p8` (APNs) | **Ναι** | password manager και secrets παραγωγής |
+| JSON του Firebase service account | **Ναι** | password manager και secrets παραγωγής |
+| `google-services.json` | Όχι πολύ (περιέχει δημόσια ids), αλλά δεν μπαίνει στο git | password manager |
+| Κωδικοί λογαριασμών Apple και Google | **Ναι**, με έλεγχο δύο βημάτων | password manager |
+| Team ID, Key ID, αποτυπώματα SHA-256 | Όχι | password manager για ευκολία |
+| Κωδικοί λογαριασμών review (`review-member@…`) | Ναι | password manager· αλλάζουν μετά από κάθε έγκριση |
+
+Κανόνες:
+- **Ποτέ** σε git, email, chat, Google Drive χωρίς κρυπτογράφηση, ή screenshot.
+- Το repo έχει ήδη στο `.gitignore`: `*.jks`, `*.keystore`, `*.p8`, `*.p12`, `android/keystore.properties`, `google-services.json`. Πριν από κάθε commit, `git status`: αν δεις κάποιο από αυτά, σταμάτα.
+
+### 8.2 Αν χαθεί ή διαρρεύσει
+
+- **Upload key (Android):** Play Console › App integrity › App signing › **Request upload key reset**. Φτιάχνεις νέο με το §4.2, εξάγεις το πιστοποιητικό με `keytool -export -rfc -keystore palee-upload.jks -alias palee-upload -file upload_certificate.pem` (`-export`: εξάγει μόνο το δημόσιο πιστοποιητικό· `-rfc`: σε μορφή κειμένου PEM, default είναι δυαδική· `-file`: πού το γράφει, default η οθόνη) και το ανεβάζεις. Η Google το ενεργοποιεί σε λίγες ημέρες. Μετά ενημερώνεις το `ANDROID_SHA256_CERT_FINGERPRINTS`.
+- **Κλειδί APNs:** στη σελίδα Keys το κάνεις **Revoke**, φτιάχνεις νέο (§3.3) και αλλάζεις τα secrets.
+- **Πιστοποιητικό Apple Distribution:** Certificates › Revoke, και το Xcode φτιάχνει νέο μόνο του. Οι εφαρμογές που έχουν ήδη κατέβει **δεν** επηρεάζονται.
+- **Κωδικός λογαριασμού:** αλλάζεις αμέσως και ελέγχεις τα μέλη της ομάδας (Users and Access).
+
+### 8.3 Χτίσιμο iOS από δεύτερο Mac
+
+Είτε συνδέεσαι με τον ίδιο λογαριασμό στο Xcode και αφήνεις να φτιάξει δεύτερο πιστοποιητικό (επιτρέπονται λίγα ταυτόχρονα), είτε εξάγεις το υπάρχον: **Keychain Access** › My Certificates › δεξί κλικ στο «Apple Distribution: …» › Export › `.p12` με κωδικό, και το εισάγεις στον άλλον Mac. Το `.p12` περιέχει το ιδιωτικό κλειδί: φυλάγεται όπως το `.jks`.
+
+---
+
+## 9. Πού ψάχνεις όταν κάτι δεν πάει καλά
+
+| Πρόβλημα | Πού κοιτάς |
+|---|---|
+| «No signing certificate» ή «Provisioning profile doesn't include …» στο Xcode | §3.2 (δυνατότητες στο App ID) και §3.5 (Team). https://developer.apple.com/help/account/ |
+| Το build δεν εμφανίζεται στο App Store Connect | Email από την Apple με το πρόβλημα (συχνά: build number ξανά, ή λείπει κείμενο άδειας). App Store Connect › TestFlight › Build Activity |
+| «You uploaded an APK or Android App Bundle that was signed in debug mode» | Λείπει το `keystore.properties` (§4.4) |
+| «Version code 1 has already been used» | §7: ανέβασε τον αριθμό build |
+| «Your Android App Bundle is signed with the wrong key» | Υπέγραψες με άλλο κλειδί από το upload key (§4.3, σύγκρινε το SHA-256) |
+| Τα links ανοίγουν τον browser αντί για την εφαρμογή | §6 |
+| Δεν έρχονται push | iOS: §3.3 και `PALEE_APS_ENVIRONMENT=production` για TestFlight/App Store. Android: §4.6 |
+| Εντολή που δεν καταλαβαίνεις | `keytool -<εντολή> -help` (π.χ. `keytool -genkeypair -help`), `xcodebuild -help`, `man security`, `./gradlew help --task bundleRelease` |
+
+Επίσημη τεκμηρίωση:
+- Apple, Distribution: https://developer.apple.com/documentation/xcode/distribution
+- Apple, App Store Connect help: https://developer.apple.com/help/app-store-connect/
+- Android, Sign your app: https://developer.android.com/studio/publish/app-signing
+- Google Play Console help: https://support.google.com/googleplay/android-developer/
+- Capacitor, deploying: https://capacitorjs.com/docs/ios/deploying-to-app-store και https://capacitorjs.com/docs/android/deploying-to-google-play
