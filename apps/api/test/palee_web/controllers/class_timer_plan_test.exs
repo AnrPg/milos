@@ -28,7 +28,12 @@ defmodule PaleeWeb.ClassTimerPlanTest do
         authoring_mode: "structured_plan",
         sections: [
           %{name: "Engine", order: 1, plan: Enum.at(program(), 7)},
-          %{name: "EMOM", order: 2, plan: section("emom", %{"every" => "1:00", "times" => "10"}, [[ex("e", "Burpee", "10")]])}
+          %{
+            name: "EMOM",
+            order: 2,
+            plan:
+              section("emom", %{"every" => "1:00", "times" => "10"}, [[ex("e", "Burpee", "10")]])
+          }
         ]
       })
 
@@ -45,10 +50,17 @@ defmodule PaleeWeb.ClassTimerPlanTest do
              %{"kind" => "interval_cycle", "duration_seconds" => 60, "total_rounds" => 10}
            ] = payload["segments"]
 
-    assert %{"authoring_mode" => "structured_plan", "body" => %{"kind" => "plan", "sections" => [engine, _emom]}} =
+    assert %{
+             "authoring_mode" => "structured_plan",
+             "body" => %{"kind" => "plan", "sections" => [engine, _emom]}
+           } =
              payload["workout"]
 
-    assert %{"name" => "Engine", "plan" => %{"flow" => "for_time"}, "prescription" => %{"clock" => _}} =
+    assert %{
+             "name" => "Engine",
+             "plan" => %{"flow" => "for_time"},
+             "prescription" => %{"clock" => _}
+           } =
              engine
   end
 end

@@ -45,7 +45,9 @@ defmodule Palee.Infrastructure.Execution.EctoExecutionStore do
           |> Repo.update()
           |> case do
             {:ok, updated} ->
-              updated |> normalize() |> Map.put(:plan_sets, json_sets(insert_plan_sets(Repo, updated, plan_sets)))
+              updated
+              |> normalize()
+              |> Map.put(:plan_sets, json_sets(insert_plan_sets(Repo, updated, plan_sets)))
 
             {:error, %Ecto.Changeset{} = changeset} ->
               Repo.rollback(changeset)

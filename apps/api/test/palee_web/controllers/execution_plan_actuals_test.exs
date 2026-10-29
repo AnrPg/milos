@@ -27,7 +27,10 @@ defmodule PaleeWeb.ExecutionPlanActualsTest do
       end
 
     membership_role = if role == :admin, do: :owner, else: :member
-    {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(user, membership_role)
+
+    {:ok, _membership} =
+      Organizations.ensure_legacy_membership_for_migration(user, membership_role)
+
     user
   end
 
@@ -168,7 +171,12 @@ defmodule PaleeWeb.ExecutionPlanActualsTest do
     assert section_id == strength["id"]
     assert %{"round_index" => 2, "actual_load_kg" => 65, "logged" => false} = second
 
-    assert %{"interrupt" => true, "block_index" => -1, "round_index" => 2, "one_rep_max_kg" => nil} =
+    assert %{
+             "interrupt" => true,
+             "block_index" => -1,
+             "round_index" => 2,
+             "one_rep_max_kg" => nil
+           } =
              burpee
 
     read =
