@@ -28,6 +28,12 @@ defmodule Palee.Fiscal.Domain.TillSigningPolicy do
   until fiskaly answers (fiskaly SIGN AT asks the till to queue them); they
   are printed with "Sicherheitseinrichtung ausgefallen" meanwhile.
 
+  In France (fiskaly SIGN FR, ADR-266) receipts also stay queued until
+  fiskaly answers; one sent `outage_seconds/0` or more after its issue is
+  flagged `offline` (fiskaly records it as issued during an outage). The
+  receipt itself is already secured by Palee's own journal (ADR-242) the
+  moment it is issued.
+
   Waiting for a connection is a deferral and costs no attempt.
   """
 
@@ -45,10 +51,17 @@ defmodule Palee.Fiscal.Domain.TillSigningPolicy do
   def claim_timeout_seconds, do: @claim_timeout_seconds
   def outage_seconds, do: @outage_seconds
 
-  @doc "`\"tse\"`, `\"rksv\"` or nil: the device of a country profile."
+  @doc "`\"tse\"`, `\"rksv\"`, `\"sign_fr\"` or nil: the device of a country profile."
   def device(%{till_device: :tse}), do: "tse"
   def device(%{till_device: :rksv}), do: "rksv"
+  def device(%{till_device: :sign_fr}), do: "sign_fr"
   def device(_profile), do: nil
+
+  @doc "True when a receipt is sent after the outage window (France: flagged offline)."
+  def offline?(%DateTime{} = now, %DateTime{} = issued_at),
+    do: DateTime.diff(now, issued_at, :second) >= @outage_seconds
+
+  def offline?(_now, _issued_at), do: false
 
   @doc """
   True when the document must be signed: its country has a till device

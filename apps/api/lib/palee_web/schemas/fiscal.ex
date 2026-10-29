@@ -25,7 +25,7 @@ defmodule PaleeWeb.Schemas.Fiscal do
         tax_system: %Schema{type: :string, enum: ["vat", "sales_tax"]},
         authority: %Schema{type: :string, enum: ["mydata", "none"]},
         register: %Schema{type: :string, enum: ["nf525", "standard"]},
-        till_device: %Schema{type: :string, enum: ["tse", "rksv", "none"]},
+        till_device: %Schema{type: :string, enum: ["tse", "rksv", "sign_fr", "none"]},
         einvoicing: %Schema{type: :array, items: %Schema{type: :string}},
         required_fields: %Schema{type: :array, items: %Schema{type: :string}},
         tax_office: %Schema{type: :boolean},
