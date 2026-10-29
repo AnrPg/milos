@@ -17,7 +17,7 @@ vi.mock("@/components/session-provider", () => ({
 }));
 vi.mock("@/lib/organization-slug", () => ({ useOrganizationSlug: () => null, adminHref: (href: string) => href }));
 vi.mock("@/components/referrals/QrCode", () => ({
-  QrCode: ({ value, label }: { value: string; label: string }) => <img alt={label} data-value={value} />,
+  QrCode: ({ value, label }: { value: string; label: string }) => <span role="img" aria-label={label} data-value={value} />,
 }));
 
 import { CollectResult } from "./CollectResult";
@@ -101,7 +101,7 @@ describe("CollectResult", () => {
   it("shows a walk-in the receipt QR by default and emails it to the address typed", async () => {
     api.emailTerminalReceipt.mockResolvedValue({ email: { id: "e-1" } });
     wrap(payment());
-    expect(screen.getByAltText("Receipt QR code").getAttribute("data-value")).toBe("https://palee.app/api/public/receipts/token");
+    expect(screen.getByRole("img", { name: "Receipt QR code" }).getAttribute("data-value")).toBe("https://palee.app/api/public/receipts/token");
     fireEvent.click(screen.getByTestId("collect-send-email"));
     fireEvent.click(screen.getByTestId("collect-email-send"));
     expect(await screen.findByText("Enter a valid email.")).toBeTruthy();

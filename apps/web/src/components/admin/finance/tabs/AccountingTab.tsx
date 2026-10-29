@@ -17,6 +17,7 @@ import {
   unmatchReconciliationRecord,
   type ReconciliationRecord,
 } from "@/api/finance-accounting";
+import { TipsSummaryCard } from "@/components/admin/collect/TipsSummaryCard";
 import { RefundReceiptDocumentDialog } from "@/components/finance/RefundReceiptDocumentDialog";
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
@@ -77,6 +78,8 @@ function Notice({ tone, children }: { tone: "error" | "info"; children: ReactNod
 export function AccountingTab({ locationIds }: { locationIds?: string } = {}) {
   return (
     <div className="space-y-6">
+      {/* ADR-272: Tap to Pay tips, the staff's and not revenue. */}
+      <TipsSummaryCard />
       <RefundReceiptsSection locationIds={locationIds} />
       <ReconciliationSection />
       <ExportsSection />
