@@ -38,6 +38,8 @@ test("on a 390px phone every exercise is a card, sets are rows, nothing scrolls 
   await cellInput(page, first, 1, "l").fill("+2.5");
   await cellInput(page, first, 2, "l").fill("27.5");
 
+  // Tapped straight from a focused value field: the tap must not be lost to
+  // the layout moving when the field loses focus.
   await page.getByTestId("plan-add-exercise").click();
   await expect(rows(page)).toHaveCount(2);
   const [, second] = await rowIds(page);
