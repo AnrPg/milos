@@ -1,5 +1,8 @@
 defmodule Palee.Workouts.Ports.WorkoutStore do
-  @callback create_workout(binary(), map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
+  @callback create_workout(binary(), map()) ::
+              {:ok, map()}
+              | {:error, Ecto.Changeset.t()}
+              | {:error, :no_sections | {:invalid_plan_sections, [map()]}}
   @callback create_draft(binary()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback update_draft(binary(), map()) ::
               {:ok, map()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}

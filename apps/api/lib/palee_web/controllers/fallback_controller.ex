@@ -2099,6 +2099,18 @@ defmodule PaleeWeb.FallbackController do
     })
   end
 
+  # ADR-270: which plan values stop a structured plan workout from saving,
+  # each with its section (from 1), the path inside the plan and a code.
+  def call(conn, {:error, {:invalid_plan_sections, problems}}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_plan_sections",
+      error: "Some values of the workout plan do not read",
+      details: %{sections: problems}
+    })
+  end
+
   def call(conn, {:error, :no_sections}) do
     conn
     |> put_status(:unprocessable_entity)
