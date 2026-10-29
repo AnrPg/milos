@@ -82,7 +82,9 @@ defmodule Palee.Execution.Domain.PlanTimer do
 
   defp timing(%{flow: "intervals", work_secs: work} = clock) when is_integer(work) do
     pattern = Enum.filter([work, clock.off_secs], &positive/1)
-    windows = clock.rounds && clock.rounds * length(pattern)
+    # The block ends with the last work window, no off after it, like the
+    # web runner and `PlanWorkload`: (work + off) × rounds − off.
+    windows = clock.rounds && clock.rounds * length(pattern) - (length(pattern) - 1)
     timer(:interval_cycle, work, windows, clock, %{interval_pattern_seconds: pattern})
   end
 
