@@ -58,7 +58,9 @@ defmodule Palee.Payments.Domain.TerminalPolicyTest do
       assert TerminalPolicy.validate_new(request(%{idempotency_key: "short"})) ==
                {:error, :idempotency_key_required}
 
-      assert TerminalPolicy.validate_new(request(%{user_id: nil, purpose_type: "finance_invoice"})) ==
+      assert TerminalPolicy.validate_new(
+               request(%{user_id: nil, purpose_type: "finance_invoice"})
+             ) ==
                {:error, :terminal_member_required}
 
       assert TerminalPolicy.validate_new(
@@ -194,7 +196,8 @@ defmodule Palee.Payments.Domain.TerminalPolicyTest do
         card: %{brand: "VISA", last4: "1234"}
       }
 
-      changes = TerminalPolicy.confirm_outcome(ctx.intent, {:ok, transaction}, ctx.reference, @now)
+      changes =
+        TerminalPolicy.confirm_outcome(ctx.intent, {:ok, transaction}, ctx.reference, @now)
 
       assert changes.status == "succeeded"
       assert changes.provider_ref == "tx-1"
@@ -337,7 +340,8 @@ defmodule Palee.Payments.Domain.TerminalPolicyTest do
           reference: ctx.reference
         })
 
-      changes = TerminalPolicy.confirm_outcome(ctx.intent, {:ok, transaction}, ctx.reference, @now)
+      changes =
+        TerminalPolicy.confirm_outcome(ctx.intent, {:ok, transaction}, ctx.reference, @now)
 
       assert changes.status == "succeeded"
       assert changes.tip_cents == 500

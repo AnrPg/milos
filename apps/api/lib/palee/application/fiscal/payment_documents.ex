@@ -108,7 +108,11 @@ defmodule Palee.Application.Fiscal.PaymentDocuments do
   defp with_surcharge(lines, %{surcharge_cents: cents} = received)
        when is_integer(cents) and cents > 0 do
     with {:ok, surcharge} <-
-           SaleLines.follow_sale(lines, cents, received[:surcharge_description] || "Card surcharge") do
+           SaleLines.follow_sale(
+             lines,
+             cents,
+             received[:surcharge_description] || "Card surcharge"
+           ) do
       {:ok, lines ++ surcharge}
     end
   end

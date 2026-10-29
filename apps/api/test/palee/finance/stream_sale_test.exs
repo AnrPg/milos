@@ -88,6 +88,8 @@ defmodule Palee.Finance.StreamSaleTest do
              Finance.record_stream_sale(context, membership_sale)
 
     assert {"is invalid", _detail} = changeset.errors[:membership_id]
-    assert Finance.revenue_lineage(context, "walk_in_sale", sale["payment"]["source_id"]).payments == []
+
+    assert Finance.revenue_lineage(context, "walk_in_sale", sale["payment"]["source_id"]).payments ==
+             []
   end
 end

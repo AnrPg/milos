@@ -392,7 +392,11 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
     stub_viva(%{"tx-late" => viva_paid(cancelled)})
 
     conn
-    |> result(ctx, %{reference: another["reference"], status: "success", transaction_id: "tx-late"})
+    |> result(ctx, %{
+      reference: another["reference"],
+      status: "success",
+      transaction_id: "tx-late"
+    })
     |> json_response(409)
     |> then(&assert(&1["code"] == "terminal_transaction_used"))
 
@@ -423,7 +427,11 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
 
     pending =
       conn
-      |> result(ctx, %{reference: payment["reference"], status: "success", transaction_id: "tx-slow"})
+      |> result(ctx, %{
+        reference: payment["reference"],
+        status: "success",
+        transaction_id: "tx-slow"
+      })
       |> json_response(200)
       |> Map.fetch!("payment")
 
@@ -579,7 +587,8 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
     |> then(&assert(&1["code"] == "payment_not_cancellable"))
   end
 
-  test "a package sold at the desk is assigned with its card_terminal money", %{conn: conn} = ctx do
+  test "a package sold at the desk is assigned with its card_terminal money",
+       %{conn: conn} = ctx do
     connect_sandbox(conn, ctx)
 
     {:ok, package} =
@@ -859,7 +868,11 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
 
     paid =
       conn
-      |> result(ctx, %{reference: payment["reference"], status: "success", transaction_id: "tx-extras"})
+      |> result(ctx, %{
+        reference: payment["reference"],
+        status: "success",
+        transaction_id: "tx-extras"
+      })
       |> json_response(200)
       |> Map.fetch!("payment")
 

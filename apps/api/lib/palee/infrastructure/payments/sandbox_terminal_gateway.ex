@@ -77,7 +77,9 @@ defmodule Palee.Infrastructure.Payments.SandboxTerminalGateway do
 
   def confirm(_account, _transaction_id), do: {:error, {:invalid, :unknown_transaction}}
 
-  defp sandbox_extras([tip, surcharge]), do: {String.to_integer(tip), String.to_integer(surcharge)}
+  defp sandbox_extras([tip, surcharge]),
+    do: {String.to_integer(tip), String.to_integer(surcharge)}
+
   defp sandbox_extras(_none), do: {0, 0}
 
   @impl true

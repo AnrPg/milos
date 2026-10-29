@@ -27,8 +27,7 @@ defmodule PaleeWeb.Schemas.TerminalPayments do
         user_id: %{
           P.uuid()
           | nullable: true,
-            description:
-              "The member; none for a walk-in (a shop order or a free sale, ADR-264)."
+            description: "The member; none for a walk-in (a shop order or a free sale, ADR-264)."
         },
         amount_cents: %Schema{type: :integer, minimum: 1, maximum: 10_000_000},
         description: %Schema{type: :string, maxLength: 120, nullable: true},

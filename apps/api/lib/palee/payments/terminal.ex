@@ -273,6 +273,7 @@ defmodule Palee.Payments.Terminal do
          %{initiation: "terminal", provider: "sandbox"} = intent <-
            PaymentStore.get_intent(context, intent_id) || {:error, :not_found} do
       reference = TerminalPolicy.reference(intent, key())
+
       {:ok, reference,
        gateway("sandbox").complete(reference, outcome, intent.amount_cents, extras)}
     else

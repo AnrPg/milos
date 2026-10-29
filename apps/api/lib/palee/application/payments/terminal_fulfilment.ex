@@ -173,7 +173,11 @@ defmodule Palee.Application.Payments.TerminalFulfilment do
   defp paid_on(context, intent), do: context |> paid_on_date(intent) |> Date.to_iso8601()
 
   defp paid_on_date(context, intent),
-    do: Organizations.local_today(context.organization_id, intent.succeeded_at || DateTime.utc_now())
+    do:
+      Organizations.local_today(
+        context.organization_id,
+        intent.succeeded_at || DateTime.utc_now()
+      )
 
   @doc "Money given back for a terminal payment: a Finance reversal (the shop records its own)."
   def reverse(_context, %{finance_payment_id: nil}, _refund), do: {:ok, %{}}
