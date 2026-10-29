@@ -118,6 +118,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     perks/perk_store
     shop/shop_report_store
     fiscal/fiscal_store
+    fiscal/transmission_store
   )
 
   defp tenant_scope_violations do

@@ -38,6 +38,7 @@ defmodule Palee.MixProject do
         :logger,
         :runtime_tools,
         :os_mon,
+        :xmerl,
         :opentelemetry_exporter,
         :opentelemetry
       ]

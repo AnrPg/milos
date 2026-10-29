@@ -6,13 +6,16 @@ defmodule Palee.Infrastructure.Fiscal.EctoFiscalStore do
   import Ecto.Query
 
   alias Palee.Fiscal.{
+    AuthorityConnection,
     BusinessIdentity,
     Document,
     DocumentLine,
     JournalEntry,
     JournalHead,
     PeriodClosingRecord,
-    Sequence
+    Sequence,
+    Transmission,
+    TransmissionAttempt
   }
 
   alias Palee.Fiscal.Domain.JournalChain
@@ -384,6 +387,9 @@ defmodule Palee.Infrastructure.Fiscal.EctoFiscalStore do
 
       Map.new(
         [
+          {"fiscal_transmission_attempts", TransmissionAttempt},
+          {"fiscal_transmissions", Transmission},
+          {"fiscal_authority_connections", AuthorityConnection},
           {"fiscal_period_closings", PeriodClosingRecord},
           {"fiscal_document_lines", DocumentLine},
           {"fiscal_documents", Document},

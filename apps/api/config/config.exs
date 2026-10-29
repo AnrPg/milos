@@ -66,7 +66,9 @@ config :palee, Oban,
        # ADR-211: self-service account deletions whose grace is over.
        {"19 * * * *", Palee.Workers.ExecuteAccountDeletionsJob},
        # ADR-242: fiscal day/month/year closings on each gym's own clock.
-       {"20 * * * *", Palee.Workers.CloseFiscalPeriodsJob}
+       {"20 * * * *", Palee.Workers.CloseFiscalPeriodsJob},
+       # ADR-243: retries and deferred reports to the tax authority.
+       {"*/5 * * * *", Palee.Workers.TransmitFiscalDocumentsJob}
      ]}
   ],
   queues: [
@@ -78,7 +80,9 @@ config :palee, Oban,
     media: 2,
     # ADR-203: outbox delivery. Two at a time keeps the daily budget close
     # to exact (each job counts today's sent mail before it sends).
-    email: 2
+    email: 2,
+    # ADR-243: reports to the tax authority (one HTTP call per document).
+    fiscal: 2
   ]
 
 config :palee, Palee.Infrastructure.Auth.Guardian,
@@ -152,6 +156,14 @@ config :palee, :space_store, Palee.Infrastructure.Spaces.EctoSpaceStore
 # ADR-240–242: Fiscal (legal identity, documents, inalterable journal).
 config :palee, :fiscal_store, Palee.Infrastructure.Fiscal.EctoFiscalStore
 config :palee, :fiscal_journal_signer, Palee.Infrastructure.Fiscal.Ed25519JournalSigner
+config :palee, :fiscal_transmission_store, Palee.Infrastructure.Fiscal.EctoTransmissionStore
+
+# ADR-243: the gateway that reports documents, per connection environment.
+config :palee, :fiscal_authority_gateways, %{
+  "sandbox" => Palee.Infrastructure.Fiscal.SandboxAuthorityGateway,
+  "test" => Palee.Infrastructure.Fiscal.MyDataGateway,
+  "production" => Palee.Infrastructure.Fiscal.MyDataGateway
+}
 
 # ADR-190: the e-shop and Finance's revenue streams.
 config :palee, :shop_store, Palee.Infrastructure.Shop.EctoShopStore

@@ -217,7 +217,9 @@ defmodule PaleeWeb.FallbackController do
     invalid_date_range:
       {:unprocessable_entity, "Choose a start and an end date (up to 10 years)"},
     journal_signing_unavailable:
-      {:service_unavailable, "Fiscal documents are paused: the journal signing key is missing"}
+      {:service_unavailable, "Fiscal documents are paused: the journal signing key is missing"},
+    not_retryable:
+      {:conflict, "Only a refused or failed report can be sent again; this one is on its way"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@fiscal_errors, reason) do

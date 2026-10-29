@@ -1,8 +1,10 @@
-# ADR-157: tests of the real media adapters run where the tools are installed.
+# ADR-157, ADR-243: tests that need external tools run where they are installed.
 missing_tools =
   [
     imagemagick: System.find_executable("magick") || System.find_executable("convert"),
-    ffmpeg: System.find_executable("ffmpeg") && System.find_executable("ffprobe")
+    ffmpeg: System.find_executable("ffmpeg") && System.find_executable("ffprobe"),
+    # ADR-243: myDATA XML is validated against AADE's XSDs.
+    xmllint: System.find_executable("xmllint")
   ]
   |> Enum.filter(fn {_tag, path} -> is_nil(path) end)
   |> Enum.map(&elem(&1, 0))

@@ -52,6 +52,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     shop_variant_price_changes shop_pricing_targets
     fiscal_business_identities fiscal_sequences fiscal_documents fiscal_document_lines
     fiscal_journal_heads fiscal_journal_entries fiscal_period_closings
+    fiscal_authority_connections fiscal_transmissions fiscal_transmission_attempts
     review_questionnaires reviews review_answers
     messaging_threads
     messaging_participants messaging_messages seasonal_challenges

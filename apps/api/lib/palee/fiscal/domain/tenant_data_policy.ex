@@ -16,8 +16,11 @@ defmodule Palee.Fiscal.Domain.TenantDataPolicy do
             disposition: :retain,
             retain_years: 10,
             basis:
-              "Fiscal documents, their lines, the inalterable journal and period closings are tax records (NF525, GoBD, Greek and Swiss record-keeping rules); they are archived and kept for 10 years, the longest minimum of any supported country.",
+              "Fiscal documents, their lines, their reports to the tax authority, the inalterable journal and period closings are tax records (NF525, GoBD, Greek and Swiss record-keeping rules); they are archived and kept for 10 years, the longest minimum of any supported country.",
             tables: [
+              %{table: "fiscal_transmission_attempts"},
+              %{table: "fiscal_transmissions"},
+              %{table: "fiscal_authority_connections"},
               %{table: "fiscal_period_closings"},
               %{table: "fiscal_document_lines"},
               %{table: "fiscal_documents"},

@@ -168487,6 +168487,215 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/fiscal/authority-connection": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalReportingController.connection",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "connection": {
+                      "description": "The myDATA connection; the subscription key is never returned.",
+                      "nullable": true,
+                      "properties": {
+                        "authority": {
+                          "enum": [
+                            "mydata"
+                          ],
+                          "type": "string"
+                        },
+                        "environment": {
+                          "enum": [
+                            "sandbox",
+                            "test",
+                            "production"
+                          ],
+                          "type": "string"
+                        },
+                        "has_subscription_key": {
+                          "type": "boolean"
+                        },
+                        "last_error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "invalid"
+                          ],
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "authority",
+                        "environment",
+                        "has_subscription_key",
+                        "status"
+                      ],
+                      "type": "object"
+                    },
+                    "environments": {
+                      "items": {
+                        "enum": [
+                          "sandbox",
+                          "test",
+                          "production"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "connection",
+                    "environments"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Connection"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The myDATA connection (environment and user; never the key)",
+        "tags": [
+          "Fiscal"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "description": "`test` and `production` need the business's myDATA user and subscription key; a saved key is kept when none is sent. Documents waiting for a connection are sent right after.",
+        "operationId": "PaleeWeb.AdminFiscalReportingController.save_connection",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "environment": {
+                    "enum": [
+                      "sandbox",
+                      "test",
+                      "production"
+                    ],
+                    "type": "string"
+                  },
+                  "subscription_key": {
+                    "description": "Leave out to keep the saved key.",
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "user_id": {
+                    "maxLength": 100,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "environment"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "connection": {
+                      "description": "The myDATA connection; the subscription key is never returned.",
+                      "properties": {
+                        "authority": {
+                          "enum": [
+                            "mydata"
+                          ],
+                          "type": "string"
+                        },
+                        "environment": {
+                          "enum": [
+                            "sandbox",
+                            "test",
+                            "production"
+                          ],
+                          "type": "string"
+                        },
+                        "has_subscription_key": {
+                          "type": "boolean"
+                        },
+                        "last_error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "invalid"
+                          ],
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "authority",
+                        "environment",
+                        "has_subscription_key",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "connection"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Connection"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Connect to myDATA: sandbox, AADE test or production with the business's credentials",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/fiscal/closings": {
       "get": {
         "callbacks": {},
@@ -168987,6 +169196,93 @@
                           },
                           "tax_cents": {
                             "type": "integer"
+                          },
+                          "transmission": {
+                            "description": "The document's report to the tax authority (ADR-243).",
+                            "nullable": true,
+                            "properties": {
+                              "accepted_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "attempts": {
+                                "type": "integer"
+                              },
+                              "authentication_code": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "authority": {
+                                "enum": [
+                                  "mydata"
+                                ],
+                                "type": "string"
+                              },
+                              "document_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "environment": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "inserted_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "last_error_code": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "last_error_message": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "mark": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "next_attempt_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "qr_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "pending",
+                                  "sending",
+                                  "accepted",
+                                  "rejected",
+                                  "failed"
+                                ],
+                                "type": "string"
+                              },
+                              "uid": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "updated_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "attempts",
+                              "authority",
+                              "document_id",
+                              "id",
+                              "status"
+                            ],
+                            "type": "object"
                           }
                         },
                         "required": [
@@ -169255,6 +169551,93 @@
                               },
                               "tax_cents": {
                                 "type": "integer"
+                              },
+                              "transmission": {
+                                "description": "The document's report to the tax authority (ADR-243).",
+                                "nullable": true,
+                                "properties": {
+                                  "accepted_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "attempts": {
+                                    "type": "integer"
+                                  },
+                                  "authentication_code": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "authority": {
+                                    "enum": [
+                                      "mydata"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "document_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "environment": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "inserted_at": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                  },
+                                  "last_error_code": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "last_error_message": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "mark": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "next_attempt_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "qr_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "status": {
+                                    "enum": [
+                                      "pending",
+                                      "sending",
+                                      "accepted",
+                                      "rejected",
+                                      "failed"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "uid": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "updated_at": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "attempts",
+                                  "authority",
+                                  "document_id",
+                                  "id",
+                                  "status"
+                                ],
+                                "type": "object"
                               }
                             },
                             "required": [
@@ -169439,6 +169822,93 @@
                         },
                         "tax_cents": {
                           "type": "integer"
+                        },
+                        "transmission": {
+                          "description": "The document's report to the tax authority (ADR-243).",
+                          "nullable": true,
+                          "properties": {
+                            "accepted_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "attempts": {
+                              "type": "integer"
+                            },
+                            "authentication_code": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "authority": {
+                              "enum": [
+                                "mydata"
+                              ],
+                              "type": "string"
+                            },
+                            "document_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "environment": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "inserted_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "last_error_code": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "last_error_message": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "mark": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "next_attempt_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "qr_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "sending",
+                                "accepted",
+                                "rejected",
+                                "failed"
+                              ],
+                              "type": "string"
+                            },
+                            "uid": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "attempts",
+                            "authority",
+                            "document_id",
+                            "id",
+                            "status"
+                          ],
+                          "type": "object"
                         }
                       },
                       "required": [
@@ -169725,6 +170195,93 @@
                         },
                         "tax_cents": {
                           "type": "integer"
+                        },
+                        "transmission": {
+                          "description": "The document's report to the tax authority (ADR-243).",
+                          "nullable": true,
+                          "properties": {
+                            "accepted_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "attempts": {
+                              "type": "integer"
+                            },
+                            "authentication_code": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "authority": {
+                              "enum": [
+                                "mydata"
+                              ],
+                              "type": "string"
+                            },
+                            "document_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "environment": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "inserted_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "last_error_code": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "last_error_message": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "mark": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "next_attempt_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "qr_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "sending",
+                                "accepted",
+                                "rejected",
+                                "failed"
+                              ],
+                              "type": "string"
+                            },
+                            "uid": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "attempts",
+                            "authority",
+                            "document_id",
+                            "id",
+                            "status"
+                          ],
+                          "type": "object"
                         }
                       },
                       "required": [
@@ -169940,6 +170497,93 @@
                         },
                         "tax_cents": {
                           "type": "integer"
+                        },
+                        "transmission": {
+                          "description": "The document's report to the tax authority (ADR-243).",
+                          "nullable": true,
+                          "properties": {
+                            "accepted_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "attempts": {
+                              "type": "integer"
+                            },
+                            "authentication_code": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "authority": {
+                              "enum": [
+                                "mydata"
+                              ],
+                              "type": "string"
+                            },
+                            "document_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "environment": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "inserted_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "last_error_code": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "last_error_message": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "mark": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "next_attempt_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "qr_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "sending",
+                                "accepted",
+                                "rejected",
+                                "failed"
+                              ],
+                              "type": "string"
+                            },
+                            "uid": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "updated_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "attempts",
+                            "authority",
+                            "document_id",
+                            "id",
+                            "status"
+                          ],
+                          "type": "object"
                         }
                       },
                       "required": [
@@ -169981,6 +170625,135 @@
           }
         ],
         "summary": "Issue a credit note for a document (all that is left, or chosen quantities)",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/transmission/retry": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalReportingController.retry",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "transmission": {
+                      "description": "The document's report to the tax authority (ADR-243).",
+                      "properties": {
+                        "accepted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attempts": {
+                          "type": "integer"
+                        },
+                        "authentication_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "authority": {
+                          "enum": [
+                            "mydata"
+                          ],
+                          "type": "string"
+                        },
+                        "document_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "environment": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "last_error_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "last_error_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "mark": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "qr_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "sending",
+                            "accepted",
+                            "rejected",
+                            "failed"
+                          ],
+                          "type": "string"
+                        },
+                        "uid": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "attempts",
+                        "authority",
+                        "document_id",
+                        "id",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "transmission"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Transmission"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Send a refused or failed document to the tax authority again",
         "tags": [
           "Fiscal"
         ]
@@ -170646,6 +171419,174 @@
           }
         ],
         "summary": "Recompute the journal's hash chain and signatures",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/transmissions": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalReportingController.transmissions",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "enum": [
+                "pending",
+                "sending",
+                "accepted",
+                "rejected",
+                "failed"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 200,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "counts": {
+                      "additionalProperties": {
+                        "type": "integer"
+                      },
+                      "type": "object"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "transmissions": {
+                      "items": {
+                        "description": "The document's report to the tax authority (ADR-243).",
+                        "properties": {
+                          "accepted_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "attempts": {
+                            "type": "integer"
+                          },
+                          "authentication_code": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "authority": {
+                            "enum": [
+                              "mydata"
+                            ],
+                            "type": "string"
+                          },
+                          "document_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "environment": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "last_error_code": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "last_error_message": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "mark": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "next_attempt_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "qr_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "sending",
+                              "accepted",
+                              "rejected",
+                              "failed"
+                            ],
+                            "type": "string"
+                          },
+                          "uid": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "attempts",
+                          "authority",
+                          "document_id",
+                          "id",
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "counts",
+                    "total",
+                    "transmissions"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Transmissions"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Reports to the tax authority, newest first, with counts per status",
         "tags": [
           "Fiscal"
         ]

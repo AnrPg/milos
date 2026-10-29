@@ -1157,6 +1157,17 @@ defmodule PaleeWeb.Router do
     get("/fiscal/journal/verification", AdminFiscalController, :verify_journal)
     get("/fiscal/closings", AdminFiscalController, :closings)
     get("/fiscal/archive", AdminFiscalController, :archive)
+    # ADR-243: reporting to the tax authority (myDATA).
+    get("/fiscal/authority-connection", AdminFiscalReportingController, :connection)
+    put("/fiscal/authority-connection", AdminFiscalReportingController, :save_connection)
+    get("/fiscal/transmissions", AdminFiscalReportingController, :transmissions)
+
+    post(
+      "/fiscal/documents/:id/transmission/retry",
+      AdminFiscalReportingController,
+      :retry
+    )
+
     # ADR-192: shop reports, pricing indicators and revenue reconciliation.
     get("/shop/reports/overview", AdminShopReportController, :overview)
     get("/shop/reports/sales", AdminShopReportController, :sales)

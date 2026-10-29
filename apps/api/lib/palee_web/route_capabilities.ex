@@ -231,6 +231,10 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminFiscalController, :verify_journal} => [:manage_billing],
     {W.AdminFiscalController, :closings} => [:view_finance_reports],
     {W.AdminFiscalController, :archive} => [:manage_billing],
+    {W.AdminFiscalReportingController, :connection} => [:view_finance_reports],
+    {W.AdminFiscalReportingController, :save_connection} => [:manage_billing],
+    {W.AdminFiscalReportingController, :transmissions} => [:view_finance_reports],
+    {W.AdminFiscalReportingController, :retry} => [:manage_billing],
     # ADR-192: shop reports read like the business statistics; the
     # reconciliation is also a finance check; targets are a setting.
     {W.AdminShopReportController, :reconciliation} => [

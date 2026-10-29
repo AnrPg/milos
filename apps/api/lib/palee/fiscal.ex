@@ -24,7 +24,7 @@ defmodule Palee.Fiscal do
     VatRates
   }
 
-  alias Palee.Fiscal.FiscalStore
+  alias Palee.Fiscal.{FiscalStore, Reporting}
 
   @verify_batch 1_000
 
@@ -247,11 +247,15 @@ defmodule Palee.Fiscal do
                content_hash: content_hash
              }
            }) do
-      FiscalStore.insert_document(
-        context,
-        Map.merge(document, %{content_hash: content_hash, journal_position: entry.position}),
-        lines
-      )
+      with {:ok, saved} <-
+             FiscalStore.insert_document(
+               context,
+               Map.merge(document, %{content_hash: content_hash, journal_position: entry.position}),
+               lines
+             ),
+           :ok <- Reporting.enqueue(context, saved, issued_at) do
+        {:ok, saved}
+      end
     end
   end
 
@@ -290,8 +294,9 @@ defmodule Palee.Fiscal do
 
   # ── Journal ─────────────────────────────────────────────────────────────
 
+  @doc false
   # Appends one signed entry; must run inside `FiscalStore.transaction/2`.
-  defp append(context, attrs) do
+  def append(context, attrs) do
     head = FiscalStore.lock_journal_head(context)
 
     with {:ok, entry} <-

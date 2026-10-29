@@ -104,3 +104,4 @@ ANR (29/10, 10:47 Ελλάδα): «begin these and then the rest of phase 0».
 |---|---|---|
 | Σχέδιο | Γράφτηκε | — |
 | V3-M1 | Backend έτοιμο (ADR-240–242, 9 endpoints, 53 tests). Οθόνες μετά τα mockups | draft PR |
+| V3-M2 | Backend έτοιμο (ADR-243): outbox, Sandbox και ΑΑΔΕ ERP, αντιστοίχιση 11.x/1.x/2.x/5.1 με έλεγχο XSD v2.0.1, 4 endpoints, job κάθε 5′. Λείπουν: πάροχος (απόφαση ANR), υπογραφή POS (M4/M6), οθόνη | draft PR |

@@ -6617,6 +6617,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/fiscal/authority-connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The myDATA connection (environment and user; never the key) */
+        get: operations["PaleeWeb.AdminFiscalReportingController.connection"];
+        /**
+         * Connect to myDATA: sandbox, AADE test or production with the business's credentials
+         * @description `test` and `production` need the business's myDATA user and subscription key; a saved key is kept when none is sent. Documents waiting for a connection are sent right after.
+         */
+        put: operations["PaleeWeb.AdminFiscalReportingController.save_connection"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/fiscal/closings": {
         parameters: {
             query?: never;
@@ -6705,6 +6726,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/transmission/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send a refused or failed document to the tax authority again */
+        post: operations["PaleeWeb.AdminFiscalReportingController.retry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/fiscal/identity": {
         parameters: {
             query?: never;
@@ -6735,6 +6773,23 @@ export interface paths {
         };
         /** Recompute the journal's hash chain and signatures */
         get: operations["PaleeWeb.AdminFiscalController.verify_journal"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/transmissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Reports to the tax authority, newest first, with counts per status */
+        get: operations["PaleeWeb.AdminFiscalReportingController.transmissions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -72430,6 +72485,87 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminFiscalReportingController.connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The myDATA connection; the subscription key is never returned. */
+                        connection: {
+                            /** @enum {string} */
+                            authority: "mydata";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            has_subscription_key: boolean;
+                            last_error?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            user_id?: string | null;
+                        } | null;
+                        environments: ("sandbox" | "test" | "production")[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalReportingController.save_connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    environment: "sandbox" | "test" | "production";
+                    /** @description Leave out to keep the saved key. */
+                    subscription_key?: string | null;
+                    user_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The myDATA connection; the subscription key is never returned. */
+                        connection: {
+                            /** @enum {string} */
+                            authority: "mydata";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            has_subscription_key: boolean;
+                            last_error?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminFiscalController.closings": {
         parameters: {
             query?: {
@@ -72590,6 +72726,33 @@ export interface operations {
                                 tax_cents: number;
                             }[];
                             tax_cents: number;
+                            /** @description The document's report to the tax authority (ADR-243). */
+                            transmission?: {
+                                /** Format: date-time */
+                                accepted_at?: string | null;
+                                attempts: number;
+                                authentication_code?: string | null;
+                                /** @enum {string} */
+                                authority: "mydata";
+                                /** Format: uuid */
+                                document_id: string;
+                                environment?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                mark?: string | null;
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                qr_url?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "accepted" | "rejected" | "failed";
+                                uid?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
                         }[];
                         total: number;
                     };
@@ -72678,6 +72841,33 @@ export interface operations {
                                     tax_cents: number;
                                 }[];
                                 tax_cents: number;
+                                /** @description The document's report to the tax authority (ADR-243). */
+                                transmission?: {
+                                    /** Format: date-time */
+                                    accepted_at?: string | null;
+                                    attempts: number;
+                                    authentication_code?: string | null;
+                                    /** @enum {string} */
+                                    authority: "mydata";
+                                    /** Format: uuid */
+                                    document_id: string;
+                                    environment?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    /** Format: date-time */
+                                    inserted_at?: string;
+                                    last_error_code?: string | null;
+                                    last_error_message?: string | null;
+                                    mark?: string | null;
+                                    /** Format: date-time */
+                                    next_attempt_at?: string | null;
+                                    qr_url?: string | null;
+                                    /** @enum {string} */
+                                    status: "pending" | "sending" | "accepted" | "rejected" | "failed";
+                                    uid?: string | null;
+                                    /** Format: date-time */
+                                    updated_at?: string;
+                                } | null;
                             }[];
                             currency: string;
                             gross_cents: number;
@@ -72726,6 +72916,33 @@ export interface operations {
                                 tax_cents: number;
                             }[];
                             tax_cents: number;
+                            /** @description The document's report to the tax authority (ADR-243). */
+                            transmission?: {
+                                /** Format: date-time */
+                                accepted_at?: string | null;
+                                attempts: number;
+                                authentication_code?: string | null;
+                                /** @enum {string} */
+                                authority: "mydata";
+                                /** Format: uuid */
+                                document_id: string;
+                                environment?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                mark?: string | null;
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                qr_url?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "accepted" | "rejected" | "failed";
+                                uid?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
                         };
                     };
                 };
@@ -72815,6 +73032,33 @@ export interface operations {
                                 tax_cents: number;
                             }[];
                             tax_cents: number;
+                            /** @description The document's report to the tax authority (ADR-243). */
+                            transmission?: {
+                                /** Format: date-time */
+                                accepted_at?: string | null;
+                                attempts: number;
+                                authentication_code?: string | null;
+                                /** @enum {string} */
+                                authority: "mydata";
+                                /** Format: uuid */
+                                document_id: string;
+                                environment?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                mark?: string | null;
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                qr_url?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "accepted" | "rejected" | "failed";
+                                uid?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
                         };
                     };
                 };
@@ -72881,6 +73125,83 @@ export interface operations {
                                 tax_cents: number;
                             }[];
                             tax_cents: number;
+                            /** @description The document's report to the tax authority (ADR-243). */
+                            transmission?: {
+                                /** Format: date-time */
+                                accepted_at?: string | null;
+                                attempts: number;
+                                authentication_code?: string | null;
+                                /** @enum {string} */
+                                authority: "mydata";
+                                /** Format: uuid */
+                                document_id: string;
+                                environment?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                mark?: string | null;
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                qr_url?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "accepted" | "rejected" | "failed";
+                                uid?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalReportingController.retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Transmission */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The document's report to the tax authority (ADR-243). */
+                        transmission: {
+                            /** Format: date-time */
+                            accepted_at?: string | null;
+                            attempts: number;
+                            authentication_code?: string | null;
+                            /** @enum {string} */
+                            authority: "mydata";
+                            /** Format: uuid */
+                            document_id: string;
+                            environment?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            mark?: string | null;
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            qr_url?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "accepted" | "rejected" | "failed";
+                            uid?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
                         };
                     };
                 };
@@ -73071,6 +73392,61 @@ export interface operations {
                             reason?: string;
                             valid: boolean;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalReportingController.transmissions": {
+        parameters: {
+            query?: {
+                status?: "pending" | "sending" | "accepted" | "rejected" | "failed";
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Transmissions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        counts: {
+                            [key: string]: number;
+                        };
+                        total: number;
+                        transmissions: {
+                            /** Format: date-time */
+                            accepted_at?: string | null;
+                            attempts: number;
+                            authentication_code?: string | null;
+                            /** @enum {string} */
+                            authority: "mydata";
+                            /** Format: uuid */
+                            document_id: string;
+                            environment?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            mark?: string | null;
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            qr_url?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "accepted" | "rejected" | "failed";
+                            uid?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
                     };
                 };
             };

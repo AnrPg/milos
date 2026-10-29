@@ -1,5 +1,5 @@
 defmodule PaleeWeb.Schemas.Fiscal do
-  @moduledoc "OpenAPI schemas of the Fiscal context (ADR-240–242)."
+  @moduledoc "OpenAPI schemas of the Fiscal context (ADR-240–243)."
 
   alias OpenApiSpex.{MediaType, RequestBody, Schema}
 
@@ -195,7 +195,8 @@ defmodule PaleeWeb.Schemas.Fiscal do
         source_id: %Schema{@uuid | nullable: true},
         content_hash: %Schema{type: :string},
         journal_position: %Schema{type: :integer},
-        lines: %Schema{type: :array, items: line()}
+        lines: %Schema{type: :array, items: line()},
+        transmission: %Schema{transmission() | nullable: true}
       },
       required: [
         :content_hash,
@@ -297,6 +298,94 @@ defmodule PaleeWeb.Schemas.Fiscal do
         :period_start,
         :totals
       ]
+    }
+  end
+
+  @transmission_statuses ["pending", "sending", "accepted", "rejected", "failed"]
+
+  def transmission do
+    %Schema{
+      type: :object,
+      description: "The document's report to the tax authority (ADR-243).",
+      properties: %{
+        id: @uuid,
+        document_id: @uuid,
+        authority: %Schema{type: :string, enum: ["mydata"]},
+        status: %Schema{type: :string, enum: @transmission_statuses},
+        attempts: %Schema{type: :integer},
+        next_attempt_at: %Schema{@time | nullable: true},
+        environment: %Schema{type: :string, nullable: true},
+        mark: %Schema{type: :string, nullable: true},
+        uid: %Schema{type: :string, nullable: true},
+        authentication_code: %Schema{type: :string, nullable: true},
+        qr_url: %Schema{type: :string, nullable: true},
+        accepted_at: %Schema{@time | nullable: true},
+        last_error_code: %Schema{type: :string, nullable: true},
+        last_error_message: %Schema{type: :string, nullable: true},
+        inserted_at: @time,
+        updated_at: @time
+      },
+      required: [:attempts, :authority, :document_id, :id, :status]
+    }
+  end
+
+  def transmission_page do
+    %Schema{
+      type: :object,
+      properties: %{
+        transmissions: %Schema{type: :array, items: transmission()},
+        total: %Schema{type: :integer},
+        counts: %Schema{type: :object, additionalProperties: %Schema{type: :integer}}
+      },
+      required: [:counts, :total, :transmissions]
+    }
+  end
+
+  @environments ["sandbox", "test", "production"]
+
+  def connection do
+    %Schema{
+      type: :object,
+      description: "The myDATA connection; the subscription key is never returned.",
+      properties: %{
+        authority: %Schema{type: :string, enum: ["mydata"]},
+        environment: %Schema{type: :string, enum: @environments},
+        user_id: %Schema{type: :string, nullable: true},
+        has_subscription_key: %Schema{type: :boolean},
+        status: %Schema{type: :string, enum: ["active", "invalid"]},
+        last_error: %Schema{type: :string, nullable: true},
+        updated_at: @time
+      },
+      required: [:authority, :environment, :has_subscription_key, :status]
+    }
+  end
+
+  def connection_status do
+    %Schema{
+      type: :object,
+      properties: %{
+        connection: %Schema{connection() | nullable: true},
+        environments: %Schema{type: :array, items: %Schema{type: :string, enum: @environments}}
+      },
+      required: [:connection, :environments]
+    }
+  end
+
+  def connection_body do
+    %Schema{
+      type: :object,
+      additionalProperties: false,
+      properties: %{
+        environment: %Schema{type: :string, enum: @environments},
+        user_id: %Schema{type: :string, nullable: true, maxLength: 100},
+        subscription_key: %Schema{
+          type: :string,
+          nullable: true,
+          maxLength: 200,
+          description: "Leave out to keep the saved key."
+        }
+      },
+      required: [:environment]
     }
   end
 end

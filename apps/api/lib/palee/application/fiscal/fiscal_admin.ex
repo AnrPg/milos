@@ -7,6 +7,7 @@ defmodule Palee.Application.Fiscal.FiscalAdmin do
   """
 
   alias Palee.{Fiscal, Organizations}
+  alias Palee.Application.Fiscal.FiscalReporting
 
   @doc "Supported countries and their requirements."
   def countries, do: %{countries: Fiscal.countries(), vat_schemes: Fiscal.vat_schemes()}
@@ -23,7 +24,7 @@ defmodule Palee.Application.Fiscal.FiscalAdmin do
     )
   end
 
-  @doc "Documents, newest first, with `total` for paging."
+  @doc "Documents, newest first, with `total` for paging and each one's report state."
   def list_documents(context, params) do
     filters =
       params
@@ -32,7 +33,14 @@ defmodule Palee.Application.Fiscal.FiscalAdmin do
       |> Map.update(:to, nil, &date/1)
       |> Map.reject(fn {_key, value} -> is_nil(value) end)
 
-    Fiscal.list_documents(context, filters)
+    page = Fiscal.list_documents(context, filters)
+    transmissions = FiscalReporting.for_documents(context, Enum.map(page.documents, & &1.id))
+
+    %{
+      page
+      | documents:
+          Enum.map(page.documents, &Map.put(&1, :transmission, Map.get(transmissions, &1.id)))
+    }
   end
 
   @doc "A document with its lines and the credit notes against it."
@@ -42,7 +50,13 @@ defmodule Palee.Application.Fiscal.FiscalAdmin do
         {:error, :not_found}
 
       document ->
-        {:ok, Map.put(document, :credit_notes, Fiscal.credit_notes(context, document.id))}
+        {:ok,
+         document
+         |> Map.put(:credit_notes, Fiscal.credit_notes(context, document.id))
+         |> Map.put(
+           :transmission,
+           context |> FiscalReporting.for_documents([document.id]) |> Map.get(document.id)
+         )}
     end
   end
 
@@ -64,8 +78,8 @@ defmodule Palee.Application.Fiscal.FiscalAdmin do
 
     with key when is_binary(key) and key != "" <-
            params[:idempotency_key] || {:error, :idempotency_key_required} do
-      Fiscal.credit(
-        context,
+      context
+      |> Fiscal.credit(
         id,
         requested,
         Organizations.local_date(context, now),
@@ -73,6 +87,10 @@ defmodule Palee.Application.Fiscal.FiscalAdmin do
         Map.get(context, :user_id),
         now
       )
+      |> tap(fn
+        {:ok, _note, :issued} -> FiscalReporting.schedule(context)
+        _other -> :ok
+      end)
     end
   end
 

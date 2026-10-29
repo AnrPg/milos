@@ -228,3 +228,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-240 | Fiscal context, business legal identity and country profiles (GR, CY, DE, AT, CH, LI, LU, FR, BE, MC, GB, US) | Accepted |
 | ADR-241 | Immutable fiscal documents, gapless series, VAT by rate group, credit notes only | Accepted |
 | ADR-242 | Inalterable fiscal journal: hash chain, Ed25519 signatures, period closings, audit archive | Accepted |
+| ADR-243 | Reporting fiscal documents to myDATA: outbox, sandbox and AADE gateways, document mapping | Accepted |
