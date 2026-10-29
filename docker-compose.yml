@@ -31,6 +31,12 @@ services:
       REDIS_URL: redis://redis:6379
       SECRET_KEY_BASE: ${SECRET_KEY_BASE:?set SECRET_KEY_BASE in your environment or .env}
       MIX_ENV: prod
+      # ADR-261: Palee's Stripe Connect platform. Empty = boxes paste their
+      # own keys under «Προχωρημένα».
+      STRIPE_CONNECT_CLIENT_ID_TEST: ${STRIPE_CONNECT_CLIENT_ID_TEST:-}
+      STRIPE_PLATFORM_SECRET_KEY_TEST: ${STRIPE_PLATFORM_SECRET_KEY_TEST:-}
+      STRIPE_CONNECT_CLIENT_ID_LIVE: ${STRIPE_CONNECT_CLIENT_ID_LIVE:-}
+      STRIPE_PLATFORM_SECRET_KEY_LIVE: ${STRIPE_PLATFORM_SECRET_KEY_LIVE:-}
       # Observability (ADR-116). All empty by default = no trace export and no
       # metrics listener. See ops/observability/README.md to enable.
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
