@@ -299,8 +299,8 @@ defmodule Palee.Fiscal.Domain.DocumentTemplatesTest do
       assert view.title == "Invoice"
       assert {"UID", "CHE-109.322.551"} in view.seller.ids
 
-      assert view.breakdown == [["8.1 %", "185.01 CHF", "14.99 CHF", "200.00 CHF"]] or
-               hd(view.breakdown) |> hd() =~ "8.1"
+      assert [[rate, "185.01 CHF", "14.99 CHF", "200.00 CHF"]] = view.breakdown
+      assert rate =~ "8.1"
 
       assert %{rows: [{"IBAN", "CH56 0483 5012 3456 7800 9"}]} = view.bank
       assert %{reference_type: "QRR", headings: %{}} = view.qr_bill
