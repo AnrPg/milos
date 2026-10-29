@@ -192,6 +192,7 @@ defmodule Palee.Application.Payments.OnlinePayments do
       {:ok,
        %{
          available: Payments.available?(context),
+         provider: Payments.provider(context),
          amount_cents: invoice.balance_due_cents,
          currency: invoice.currency,
          consent_text: Consent.text(language(language), terms),
@@ -232,6 +233,8 @@ defmodule Palee.Application.Payments.OnlinePayments do
             language: language
           },
           consent_terms: consent_terms(context, invoice, language),
+          # The payer chose to pay what falls due with the saved card.
+          metadata: if(save? and params[:autopay] == true, do: %{"autopay" => true}, else: %{}),
           idempotency_key: params[:idempotency_key],
           created_by_id: context.user_id
         },

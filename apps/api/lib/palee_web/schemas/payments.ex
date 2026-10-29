@@ -284,10 +284,22 @@ defmodule PaleeWeb.Schemas.Payments do
         available: %Schema{type: :boolean},
         amount_cents: @int,
         currency: %Schema{type: :string},
+        provider: %Schema{
+          type: :string,
+          nullable: true,
+          description: "The provider members pay through, or null when online payment is off"
+        },
         consent_text: %Schema{type: :string},
         consent_version: %Schema{type: :string}
       },
-      required: [:amount_cents, :available, :consent_text, :consent_version, :currency]
+      required: [
+        :amount_cents,
+        :available,
+        :consent_text,
+        :consent_version,
+        :currency,
+        :provider
+      ]
     }
   end
 
@@ -298,6 +310,10 @@ defmodule PaleeWeb.Schemas.Payments do
         idempotency_key: %Schema{type: :string, minLength: 8, maxLength: 200},
         save_card: %Schema{type: :boolean},
         consent_accepted: %Schema{type: :boolean},
+        autopay: %Schema{
+          type: :boolean,
+          description: "With save_card: pay what falls due with this card"
+        },
         language: %Schema{type: :string, enum: ["el", "en"]}
       },
       required: [:idempotency_key]
@@ -347,9 +363,23 @@ defmodule PaleeWeb.Schemas.Payments do
         package_type: %Schema{type: :string},
         billing_period: %Schema{type: :string},
         base_price_cents: @int,
-        currency: %Schema{type: :string}
+        currency: %Schema{type: :string},
+        services: %Schema{
+          type: :object,
+          description:
+            "The package's in-person services (ADR-256): the store apps sell only packages with one",
+          additionalProperties: true
+        }
       },
-      required: [:base_price_cents, :billing_period, :currency, :id, :name, :package_type]
+      required: [
+        :base_price_cents,
+        :billing_period,
+        :currency,
+        :id,
+        :name,
+        :package_type,
+        :services
+      ]
     }
   end
 
@@ -359,9 +389,14 @@ defmodule PaleeWeb.Schemas.Payments do
       properties: %{
         packages: %Schema{type: :array, items: public_package()},
         online_payments: %Schema{type: :boolean},
+        provider: %Schema{
+          type: :string,
+          nullable: true,
+          description: "The provider members pay through, or null when online payment is off"
+        },
         withdrawal_days: %{@int | nullable: true}
       },
-      required: [:online_payments, :packages, :withdrawal_days]
+      required: [:online_payments, :packages, :provider, :withdrawal_days]
     }
   end
 
@@ -371,6 +406,11 @@ defmodule PaleeWeb.Schemas.Payments do
       properties: %{
         package: public_package(),
         available: %Schema{type: :boolean},
+        provider: %Schema{
+          type: :string,
+          nullable: true,
+          description: "The provider members pay through, or null when online payment is off"
+        },
         withdrawal_days: %{@int | nullable: true},
         start_now_text: @text,
         consent_text: %Schema{type: :string},
@@ -381,6 +421,7 @@ defmodule PaleeWeb.Schemas.Payments do
         :consent_text,
         :consent_version,
         :package,
+        :provider,
         :start_now_text,
         :withdrawal_days
       ]
@@ -395,6 +436,10 @@ defmodule PaleeWeb.Schemas.Payments do
         save_card: %Schema{type: :boolean},
         consent_accepted: %Schema{type: :boolean},
         start_now: %Schema{type: :boolean},
+        autopay: %Schema{
+          type: :boolean,
+          description: "With save_card: pay what falls due with this card"
+        },
         language: %Schema{type: :string, enum: ["el", "en"]},
         book_slot_id: @uuid
       },
