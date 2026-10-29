@@ -12293,32 +12293,6 @@
       "qr_iban_country": "Eine QR-IBAN gibt es nur in der Schweiz und in Liechtenstein.",
       "not_a_qr_iban": "Das ist eine normale IBAN, keine QR-IBAN. Die QR-IBAN erhältst du separat von deiner Bank."
     },
-    "next": {
-      "noneTitle": "Kein weiterer Schritt nötig",
-      "noneHint": "{country} verlangt keine Übermittlung an eine Steuerbehörde.",
-      "mydataTitle": "Verbindung mit myDATA",
-      "mydataActive": "Aktiv ({environment}). Jeder Beleg wird an die AADE übermittelt.",
-      "mydataInvalid": "Die AADE hat die Zugangsdaten nicht akzeptiert. Die Belege warten und werden übermittelt, sobald das behoben ist.",
-      "mydataNone": "Noch nicht verbunden. Belege werden normal ausgestellt und nach der Verbindung an die AADE übermittelt.",
-      "connected": "Verbunden",
-      "needsCheck": "Prüfung nötig",
-      "notConnected": "Nicht verbunden",
-      "later": "Nächster Schritt, später: {step}",
-      "soon": "Bald",
-      "tseTitle": "Technische Sicherheitseinrichtung (TSE)",
-      "tseHint": "Nur für Zahlungen an der Kasse nötig. Wir verbinden sie in einem späteren Schritt mit fiskaly.",
-      "rksvTitle": "Sicherheitseinrichtung (RKSV)",
-      "rksvHint": "Nur für Zahlungen an der Kasse nötig. Wir verbinden sie in einem späteren Schritt.",
-      "signFrTitle": "Sicherheitseinrichtung der Kasse (fiskaly SIGN FR)",
-      "signFrHint": "Nur für Zahlungen an der Kasse nötig. Wir verbinden sie in einem späteren Schritt mit fiskaly. Das unveränderbare Register ist bereits aktiv.",
-      "nf525Title": "NF525-Bescheinigung",
-      "nf525Hint": "Das unveränderbare Register ist bereits aktiv. Die Herstellerbescheinigung stellt Palee bereit."
-    },
-    "environment": {
-      "sandbox": "Sandbox",
-      "test": "Test",
-      "production": "Produktion"
-    },
     "registry": {
       "lookup": "Aus der Steuernummer (ΑΦΜ) ausfüllen",
       "looking": "Abfrage bei der AADE…",
@@ -12344,7 +12318,6 @@
     "managedByPaleeHint": "Du siehst den Status und kannst „Verbindungstest“ starten. Für Änderungen schreib dem Palee-Team.",
     "loadFailed": "Die Verbindungen wurden nicht geladen. Versuch es gleich noch einmal.",
     "registryName": "AADE-Register",
-    "aade": "AADE",
     "description": {
       "mydata": "Jeder Beleg wird an die AADE übermittelt",
       "registry": "Für „Aus der Steuernummer ausfüllen“ · optional",

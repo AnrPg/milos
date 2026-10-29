@@ -12293,32 +12293,6 @@
       "qr_iban_country": "A QR-IBAN is used only in Switzerland and Liechtenstein.",
       "not_a_qr_iban": "This is a plain IBAN, not a QR-IBAN. Your bank gives you the QR-IBAN separately."
     },
-    "next": {
-      "noneTitle": "No further step needed",
-      "noneHint": "{country} does not ask for documents to be sent to a tax authority.",
-      "mydataTitle": "Connection with myDATA",
-      "mydataActive": "Active ({environment}). Every document is sent to AADE.",
-      "mydataInvalid": "AADE did not accept the connection details. Documents wait and are sent once this is fixed.",
-      "mydataNone": "Not connected yet. Documents are issued normally and are sent to AADE once connected.",
-      "connected": "Connected",
-      "needsCheck": "Needs a check",
-      "notConnected": "Not connected",
-      "later": "Next step, later: {step}",
-      "soon": "Soon",
-      "tseTitle": "Till security device (TSE)",
-      "tseHint": "Needed only for payments at the till. We connect it with fiskaly in a later step.",
-      "rksvTitle": "Till security device (RKSV)",
-      "rksvHint": "Needed only for payments at the till. We connect it in a later step.",
-      "signFrTitle": "Till security device (fiskaly SIGN FR)",
-      "signFrHint": "Needed only for payments at the till. We connect it with fiskaly in a later step. The inalterable register is already active.",
-      "nf525Title": "NF525 attestation",
-      "nf525Hint": "The inalterable register is already active. Palee provides the publisher's attestation."
-    },
-    "environment": {
-      "sandbox": "sandbox",
-      "test": "test",
-      "production": "production"
-    },
     "registry": {
       "lookup": "Fill in from the tax ID",
       "looking": "Looking it up at AADE…",
@@ -12344,7 +12318,6 @@
     "managedByPaleeHint": "You can see its status and run “Connection test”. To change it, write to the Palee team.",
     "loadFailed": "The connections did not load. Try again in a moment.",
     "registryName": "AADE registry",
-    "aade": "AADE",
     "description": {
       "mydata": "Every document is reported to AADE",
       "registry": "For “Fill in from the tax ID” · optional",

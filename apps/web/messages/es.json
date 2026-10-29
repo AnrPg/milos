@@ -12293,32 +12293,6 @@
       "qr_iban_country": "El QR-IBAN solo se usa en Suiza y Liechtenstein.",
       "not_a_qr_iban": "Esto es un IBAN normal, no un QR-IBAN. Tu banco te da el QR-IBAN por separado."
     },
-    "next": {
-      "noneTitle": "No hace falta ningún otro paso",
-      "noneHint": "{country} no exige enviar los documentos a una autoridad fiscal.",
-      "mydataTitle": "Conexión con myDATA",
-      "mydataActive": "Activa ({environment}). Cada documento se envía a la AADE.",
-      "mydataInvalid": "La AADE no aceptó los datos de conexión. Los documentos esperan y se envían en cuanto se corrija.",
-      "mydataNone": "Aún sin conectar. Los documentos se emiten con normalidad y se envían a la AADE en cuanto se conecte.",
-      "connected": "Conectado",
-      "needsCheck": "Hay que revisarla",
-      "notConnected": "Sin conectar",
-      "later": "Siguiente paso, más adelante: {step}",
-      "soon": "Pronto",
-      "tseTitle": "Dispositivo de seguridad de caja (TSE)",
-      "tseHint": "Solo hace falta para los cobros en caja. Lo conectamos con fiskaly en un paso posterior.",
-      "rksvTitle": "Dispositivo de seguridad de caja (RKSV)",
-      "rksvHint": "Solo hace falta para los cobros en caja. Lo conectamos en un paso posterior.",
-      "signFrTitle": "Dispositivo de seguridad de caja (fiskaly SIGN FR)",
-      "signFrHint": "Solo hace falta para los cobros en caja. Lo conectamos con fiskaly en un paso posterior. El registro inalterable ya está activo.",
-      "nf525Title": "Certificación NF525",
-      "nf525Hint": "El registro inalterable ya está activo. Palee aporta la certificación del editor."
-    },
-    "environment": {
-      "sandbox": "entorno de pruebas",
-      "test": "prueba",
-      "production": "producción"
-    },
     "registry": {
       "lookup": "Rellenar desde el número fiscal (ΑΦΜ)",
       "looking": "Consultando a la AADE…",
@@ -12344,7 +12318,6 @@
     "managedByPaleeHint": "Ves su estado y puedes pulsar «Prueba de conexión». Para cambiarla, escribe al equipo de Palee.",
     "loadFailed": "Las conexiones no se cargaron. Inténtalo de nuevo en un momento.",
     "registryName": "Registro de la AADE",
-    "aade": "AADE",
     "description": {
       "mydata": "Cada documento se envía a la AADE",
       "registry": "Para «Rellenar desde el NIF» · opcional",

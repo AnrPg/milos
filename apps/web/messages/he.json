@@ -12293,32 +12293,6 @@
       "qr_iban_country": "QR-IBAN קיים רק בשווייץ ובליכטנשטיין.",
       "not_a_qr_iban": "זהו IBAN רגיל ולא QR-IBAN. הבנק נותן את ה-QR-IBAN בנפרד."
     },
-    "next": {
-      "noneTitle": "לא נדרש שלב נוסף",
-      "noneHint": "המדינה «{country}» לא דורשת לשלוח מסמכים לרשות מס.",
-      "mydataTitle": "חיבור ל-myDATA",
-      "mydataActive": "פעיל ({environment}). כל מסמך נשלח ל-AADE.",
-      "mydataInvalid": "‏AADE לא קיבלה את פרטי החיבור. המסמכים ממתינים וישלחו ברגע שזה יתוקן.",
-      "mydataNone": "עדיין לא מחובר. המסמכים מונפקים כרגיל ונשלחים ל-AADE ברגע שיתחבר.",
-      "connected": "מחובר",
-      "needsCheck": "דורש בדיקה",
-      "notConnected": "לא מחובר",
-      "later": "השלב הבא, בהמשך: {step}",
-      "soon": "בקרוב",
-      "tseTitle": "התקן אבטחה לקופה (TSE)",
-      "tseHint": "נדרש רק לתשלומים בקופה. נחבר אותו דרך fiskaly בשלב מאוחר יותר.",
-      "rksvTitle": "התקן אבטחה לקופה (RKSV)",
-      "rksvHint": "נדרש רק לתשלומים בקופה. נחבר אותו בשלב מאוחר יותר.",
-      "signFrTitle": "התקן אבטחה לקופה (fiskaly SIGN FR)",
-      "signFrHint": "נדרש רק לתשלומים בקופה. נחבר אותו דרך fiskaly בשלב מאוחר יותר. היומן הבלתי ניתן לשינוי כבר פעיל.",
-      "nf525Title": "אישור NF525",
-      "nf525Hint": "היומן הבלתי ניתן לשינוי כבר פעיל. את אישור המפרסם מספקת Palee."
-    },
-    "environment": {
-      "sandbox": "סביבת ניסוי",
-      "test": "בדיקה",
-      "production": "סביבת ייצור"
-    },
     "registry": {
       "lookup": "מילוי ממספר המס (ΑΦΜ)",
       "looking": "מחפש ב-AADE…",
@@ -12344,7 +12318,6 @@
     "managedByPaleeHint": "אפשר לראות את המצב וללחוץ «בדיקת חיבור». לשינויים, כתוב לצוות Palee.",
     "loadFailed": "החיבורים לא נטענו. נסה שוב בעוד רגע.",
     "registryName": "מרשם AADE",
-    "aade": "AADE",
     "description": {
       "mydata": "כל מסמך מדווח ל-AADE",
       "registry": "עבור «מילוי לפי מספר העוסק» · לא חובה",

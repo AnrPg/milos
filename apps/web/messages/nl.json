@@ -12293,32 +12293,6 @@
       "qr_iban_country": "Een QR-IBAN bestaat alleen in Zwitserland en Liechtenstein.",
       "not_a_qr_iban": "Dit is een gewone IBAN, geen QR-IBAN. Je bank geeft je de QR-IBAN apart."
     },
-    "next": {
-      "noneTitle": "Geen volgende stap nodig",
-      "noneHint": "{country} vraagt niet om documenten door te sturen naar een belastingdienst.",
-      "mydataTitle": "Koppeling met myDATA",
-      "mydataActive": "Actief ({environment}). Elk document wordt naar de AADE gestuurd.",
-      "mydataInvalid": "De AADE heeft de koppelgegevens niet aanvaard. De documenten wachten en worden verstuurd zodra dit is opgelost.",
-      "mydataNone": "Nog niet gekoppeld. Documenten worden gewoon uitgegeven en naar de AADE gestuurd zodra de koppeling er is.",
-      "connected": "Gekoppeld",
-      "needsCheck": "Controle nodig",
-      "notConnected": "Niet gekoppeld",
-      "later": "Volgende stap, later: {step}",
-      "soon": "Binnenkort",
-      "tseTitle": "Kassabeveiligingsapparaat (TSE)",
-      "tseHint": "Alleen nodig voor betalingen aan de kassa. We koppelen het in een latere stap met fiskaly.",
-      "rksvTitle": "Kassabeveiligingsapparaat (RKSV)",
-      "rksvHint": "Alleen nodig voor betalingen aan de kassa. We koppelen het in een latere stap.",
-      "signFrTitle": "Kassabeveiligingsapparaat (fiskaly SIGN FR)",
-      "signFrHint": "Alleen nodig voor betalingen aan de kassa. We koppelen het in een latere stap met fiskaly. Het onveranderbare register is al actief.",
-      "nf525Title": "NF525-verklaring",
-      "nf525Hint": "Het onveranderbare register is al actief. Palee levert de verklaring van de uitgever."
-    },
-    "environment": {
-      "sandbox": "sandbox",
-      "test": "test",
-      "production": "productie"
-    },
     "registry": {
       "lookup": "Invullen vanuit het fiscaal nummer (ΑΦΜ)",
       "looking": "Opzoeken bij de AADE…",
@@ -12344,7 +12318,6 @@
     "managedByPaleeHint": "Je ziet de status en kunt „Verbindingstest” starten. Voor wijzigingen schrijf je het Palee-team.",
     "loadFailed": "De koppelingen zijn niet geladen. Probeer het zo opnieuw.",
     "registryName": "AADE-register",
-    "aade": "AADE",
     "description": {
       "mydata": "Elk document wordt aan de AADE gemeld",
       "registry": "Voor „Invullen vanuit het fiscaal nummer” · optioneel",

@@ -12293,32 +12293,6 @@
       "qr_iban_country": "O QR-IBAN só é usado na Suíça e no Listenstaine.",
       "not_a_qr_iban": "Isto é um IBAN normal, não um QR-IBAN. O banco dá-te o QR-IBAN em separado."
     },
-    "next": {
-      "noneTitle": "Não é preciso mais nenhum passo",
-      "noneHint": "{country} não exige o envio dos documentos a uma autoridade fiscal.",
-      "mydataTitle": "Ligação ao myDATA",
-      "mydataActive": "Ativa ({environment}). Cada documento é enviado à AADE.",
-      "mydataInvalid": "A AADE não aceitou os dados de ligação. Os documentos aguardam e são enviados assim que isto for corrigido.",
-      "mydataNone": "Ainda sem ligação. Os documentos são emitidos normalmente e enviados à AADE assim que houver ligação.",
-      "connected": "Ligado",
-      "needsCheck": "Precisa de verificação",
-      "notConnected": "Sem ligação",
-      "later": "Próximo passo, mais tarde: {step}",
-      "soon": "Em breve",
-      "tseTitle": "Dispositivo de segurança da caixa (TSE)",
-      "tseHint": "Só é preciso para pagamentos na caixa. Ligamo-lo ao fiskaly num passo posterior.",
-      "rksvTitle": "Dispositivo de segurança da caixa (RKSV)",
-      "rksvHint": "Só é preciso para pagamentos na caixa. Ligamo-lo num passo posterior.",
-      "signFrTitle": "Dispositivo de segurança da caixa (fiskaly SIGN FR)",
-      "signFrHint": "Só é preciso para pagamentos na caixa. Ligamo-lo ao fiskaly num passo posterior. O registo inalterável já está ativo.",
-      "nf525Title": "Certificação NF525",
-      "nf525Hint": "O registo inalterável já está ativo. A Palee fornece a certificação do editor."
-    },
-    "environment": {
-      "sandbox": "ambiente de testes",
-      "test": "teste",
-      "production": "produção"
-    },
     "registry": {
       "lookup": "Preencher a partir do NIF (ΑΦΜ)",
       "looking": "A consultar a AADE…",
@@ -12344,7 +12318,6 @@
     "managedByPaleeHint": "Vês o estado e podes carregar em «Teste de ligação». Para alterar, escreve à equipa Palee.",
     "loadFailed": "As ligações não carregaram. Tenta de novo daqui a pouco.",
     "registryName": "Registo da AADE",
-    "aade": "AADE",
     "description": {
       "mydata": "Cada documento é comunicado à AADE",
       "registry": "Para «Preencher a partir do NIF» · opcional",

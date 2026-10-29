@@ -39,7 +39,7 @@ const api = vi.hoisted(() => ({
   fetchFiscalIdentity: vi.fn(),
   fetchFiscalCountries: vi.fn(),
   saveFiscalIdentity: vi.fn(),
-  fetchAuthorityConnection: vi.fn(),
+  fetchFiscalConnections: vi.fn(),
   lookupRegistryBusiness: vi.fn(),
 }));
 
@@ -66,7 +66,7 @@ describe("FiscalIdentitySettings", () => {
   beforeEach(() => {
     Object.values(api).forEach((mock) => mock.mockReset());
     api.fetchFiscalCountries.mockResolvedValue({ countries: [CY, GR], vat_schemes: ["standard", "small_business", "exempt"] });
-    api.fetchAuthorityConnection.mockResolvedValue({ connection: null, environments: ["sandbox", "test", "production"] });
+    api.fetchFiscalConnections.mockResolvedValue({ country: null, kinds: [], managed_by: "owner", connections: {} });
   });
 
   it("starts with the country and keeps the other rows locked until it is chosen", async () => {
@@ -200,31 +200,37 @@ describe("FiscalIdentitySettings", () => {
     expect(api.saveFiscalIdentity.mock.calls[0][1]).toMatchObject({ vat_scheme: "standard", vat_number: "EL801234567", branch_code: 0 });
   });
 
-  it("says when the details are complete and shows the myDATA connection", async () => {
+  it("says when the details are complete and shows the country's connections (ADR-273)", async () => {
     api.fetchFiscalIdentity.mockResolvedValue({
       identity: identity({ legal_name: "ΚΥΨΕΛΗ ΑΘΛΗΤΙΚΗ Ι.Κ.Ε.", tax_id: "801234567", tax_office: "Ζ΄ Αθηνών", street: "Φωκίωνος Νέγρη 12", postal_code: "11361", city: "Αθήνα" }),
       profile: GR,
       missing: [],
       complete: true,
     });
-    api.fetchAuthorityConnection.mockResolvedValue({
-      connection: { authority: "mydata", environment: "production", status: "active", has_subscription_key: true },
-      environments: ["sandbox", "test", "production"],
+    api.fetchFiscalConnections.mockResolvedValue({
+      country: "GR",
+      kinds: ["mydata", "registry"],
+      managed_by: "owner",
+      connections: {
+        mydata: { authority: "mydata", environment: "production", status: "active", has_subscription_key: true, updated_by_platform: false },
+        registry: null,
+      },
     });
     wrap();
 
     expect(await screen.findByTestId("fiscal-identity-ready")).toHaveTextContent(en.FiscalIdentity.ready);
     expect(screen.getByRole("img", { name: "100% complete" })).toBeInTheDocument();
     expect(screen.getByTestId("fiscal-row-business")).toHaveTextContent("ΚΥΨΕΛΗ ΑΘΛΗΤΙΚΗ Ι.Κ.Ε. · 801234567 · Ζ΄ Αθηνών");
-    expect(await screen.findByTestId("fiscal-mydata-status")).toHaveTextContent(en.FiscalIdentity.next.connected);
-    expect(screen.getByTestId("fiscal-next-step")).toHaveTextContent("Active (production)");
+    expect(await screen.findByTestId("fiscal-connection-mydata-status")).toHaveTextContent(en.FiscalConnections.status.active);
+    expect(screen.getByTestId("fiscal-connection-registry-status")).toHaveTextContent(en.FiscalConnections.status.none);
+    expect(screen.getByTestId("fiscal-connections")).toHaveTextContent("myDATA");
   });
 
-  it("says a country without a tax authority needs no further step", async () => {
+  it("says a country without a tax authority needs no connection", async () => {
     api.fetchFiscalIdentity.mockResolvedValue({ identity: identity({ country_code: "CY", legal_name: "Kypseli Ltd" }), profile: CY, missing: [], complete: true });
+    api.fetchFiscalConnections.mockResolvedValue({ country: "CY", kinds: [], managed_by: "owner", connections: {} });
     wrap();
 
-    expect(await screen.findByTestId("fiscal-next-step")).toHaveTextContent(en.FiscalIdentity.next.noneTitle);
-    expect(api.fetchAuthorityConnection).not.toHaveBeenCalled();
+    expect(await screen.findByTestId("fiscal-connections-none")).toHaveTextContent(en.FiscalConnections.noneTitle);
   });
 });

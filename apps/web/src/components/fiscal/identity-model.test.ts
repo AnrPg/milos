@@ -8,7 +8,6 @@ import {
   isValidAfm,
   groupOfMissing,
   localTerm,
-  nextStep,
   progress,
   summaryValues,
 } from "./identity-model";
@@ -81,14 +80,6 @@ describe("summary and next step", () => {
       "801234567",
       "Ζ΄ Αθηνών",
     ]);
-  });
-
-  it("names the step the country's law asks for next", () => {
-    expect(nextStep({ authority: "mydata", till_device: "none", register: "standard" })).toBe("mydata");
-    expect(nextStep({ authority: "none", till_device: "tse", register: "standard" })).toBe("tse");
-    expect(nextStep({ authority: "none", till_device: "none", register: "nf525" })).toBe("nf525");
-    expect(nextStep({ authority: "none", till_device: "sign_fr", register: "nf525" })).toBe("signFr");
-    expect(nextStep({ authority: "none", till_device: "none", register: "standard" })).toBe("none");
   });
 
   it("knows the local names of the fields", () => {

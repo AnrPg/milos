@@ -140,18 +140,6 @@ export function summaryValues(fields: FieldDef[], draft: Draft): string[] {
     .slice(0, 3);
 }
 
-/** The next step after the details, by what the country's law asks. */
-export type NextStep = "mydata" | "tse" | "rksv" | "signFr" | "nf525" | "none";
-
-export function nextStep(profile: Pick<CountryProfile, "authority" | "till_device" | "register">): NextStep {
-  if (profile.authority === "mydata") return "mydata";
-  if (profile.till_device === "tse") return "tse";
-  if (profile.till_device === "rksv") return "rksv";
-  if (profile.till_device === "sign_fr") return "signFr";
-  if (profile.register === "nf525") return "nf525";
-  return "none";
-}
-
 /** The country's own name for a field, printed after the translated label. */
 const LOCAL_TERMS: Partial<Record<string, Partial<Record<FieldKey, string>>>> = {
   GR: { tax_id: "ΑΦΜ", tax_office: "ΔΟΥ", registration_number: "ΓΕΜΗ", activity_code: "ΚΑΔ" },

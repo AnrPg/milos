@@ -12293,32 +12293,6 @@
       "qr_iban_country": "Il QR-IBAN si usa solo in Svizzera e nel Liechtenstein.",
       "not_a_qr_iban": "Questo è un IBAN normale, non un QR-IBAN. La banca ti fornisce il QR-IBAN a parte."
     },
-    "next": {
-      "noneTitle": "Nessun altro passaggio necessario",
-      "noneHint": "{country} non richiede la trasmissione a un'autorità fiscale.",
-      "mydataTitle": "Collegamento con myDATA",
-      "mydataActive": "Attivo ({environment}). Ogni documento viene trasmesso all'AADE.",
-      "mydataInvalid": "L'AADE non ha accettato i dati di collegamento. I documenti restano in attesa e vengono trasmessi appena è risolto.",
-      "mydataNone": "Non ancora collegato. I documenti vengono emessi normalmente e trasmessi all'AADE appena collegato.",
-      "connected": "Collegato",
-      "needsCheck": "Da controllare",
-      "notConnected": "Non collegato",
-      "later": "Prossimo passaggio, più avanti: {step}",
-      "soon": "Presto",
-      "tseTitle": "Dispositivo di sicurezza di cassa (TSE)",
-      "tseHint": "Serve solo per i pagamenti in cassa. Lo colleghiamo con fiskaly in un passaggio successivo.",
-      "rksvTitle": "Dispositivo di sicurezza di cassa (RKSV)",
-      "rksvHint": "Serve solo per i pagamenti in cassa. Lo colleghiamo in un passaggio successivo.",
-      "signFrTitle": "Dispositivo di sicurezza di cassa (fiskaly SIGN FR)",
-      "signFrHint": "Serve solo per i pagamenti in cassa. Lo colleghiamo con fiskaly in un passaggio successivo. Il registro inalterabile è già attivo.",
-      "nf525Title": "Attestazione NF525",
-      "nf525Hint": "Il registro inalterabile è già attivo. L'attestazione dell'editore la fornisce Palee."
-    },
-    "environment": {
-      "sandbox": "sandbox",
-      "test": "test",
-      "production": "produzione"
-    },
     "registry": {
       "lookup": "Compila dal codice fiscale (ΑΦΜ)",
       "looking": "Ricerca presso l'AADE…",
@@ -12344,7 +12318,6 @@
     "managedByPaleeHint": "Vedi lo stato e puoi avviare «Test di connessione». Per modificarla, scrivi al team Palee.",
     "loadFailed": "Le connessioni non sono state caricate. Riprova tra poco.",
     "registryName": "Registro AADE",
-    "aade": "AADE",
     "description": {
       "mydata": "Ogni documento viene trasmesso all’AADE",
       "registry": "Per «Compila dal codice fiscale» · facoltativo",

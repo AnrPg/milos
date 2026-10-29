@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl";
 import { useState, type FormEvent, type ReactNode } from "react";
 
 import {
-  fetchAuthorityConnection,
   fetchFiscalCountries,
   fetchFiscalIdentity,
   lookupRegistryBusiness,
@@ -34,7 +33,6 @@ import {
   GROUPS,
   isValidAfm,
   localTerm,
-  nextStep,
   progress,
   summaryValues,
   VAT_SCHEMES,
@@ -52,14 +50,13 @@ import {
   ghostButtonStyle,
   hintStyle,
   Icon,
-  Pill,
   primaryButtonStyle,
   Ring,
 } from "./fiscal-ui";
+import { FiscalConnectionsCard } from "./FiscalConnections";
 
 export const FISCAL_IDENTITY_KEY = ["admin", "fiscal", "identity"] as const;
 const COUNTRIES_KEY = ["admin", "fiscal", "countries"] as const;
-const CONNECTION_KEY = ["admin", "fiscal", "authority-connection"] as const;
 
 type Panel = "country" | GroupKey | null;
 
@@ -177,7 +174,7 @@ function Checklist({ token, status, profiles }: { token: string; status: Identit
         </p>
       </Card>
 
-      {status.complete && profile ? <NextStepCard token={token} profile={profile} /> : null}
+      {country ? <FiscalConnectionsCard token={token} countryName={countryName(locale, country)} /> : null}
 
       {panel === "country" ? (
         <CountryPanel token={token} current={country} profiles={profiles} onClose={() => setPanel(null)} />
@@ -633,72 +630,4 @@ const REASONS = [
 
 function reasonText(t: Translate, reason: string): string | null {
   return (REASONS as readonly string[]).includes(reason) ? t(`reason.${reason as (typeof REASONS)[number]}`) : null;
-}
-
-function NextStepCard({ token, profile }: { token: string; profile: CountryProfile }) {
-  const t = useTranslations("FiscalIdentity");
-  const locale = useUiLocale();
-  const step = nextStep(profile);
-  const connection = useQuery({
-    queryKey: CONNECTION_KEY,
-    enabled: Boolean(token) && step === "mydata",
-    staleTime: FRESHNESS.reference,
-    queryFn: () => fetchAuthorityConnection(token),
-  });
-
-  if (step === "none") {
-    return (
-      <Card testId="fiscal-next-step">
-        <div className="flex items-center gap-3">
-          <span style={{ color: "var(--success)" }}><Icon name="check" size={20} /></span>
-          <div className="min-w-0 flex-1">
-            <b style={{ color: "var(--text)" }}>{t("next.noneTitle")}</b>
-            <p className="text-sm" style={hintStyle}>{t("next.noneHint", { country: countryName(locale, profile.country) })}</p>
-          </div>
-        </div>
-      </Card>
-    );
-  }
-
-  if (step === "mydata") {
-    const current = connection.data?.connection ?? null;
-    const state = connection.isPending ? null : !current ? "none" : current.status === "active" ? "active" : "invalid";
-    return (
-      <Card testId="fiscal-next-step">
-        <div className="flex items-center gap-3">
-          <span style={{ color: "var(--primary)" }}><Icon name="link" size={20} /></span>
-          <div className="min-w-0 flex-1">
-            <b style={{ color: "var(--text)" }}>{t("next.mydataTitle")}</b>
-            <p className="text-sm" style={hintStyle}>
-              {state === "active" && current
-                ? t("next.mydataActive", { environment: t(`environment.${current.environment}`) })
-                : state === "invalid"
-                  ? t("next.mydataInvalid")
-                  : t("next.mydataNone")}
-            </p>
-          </div>
-          {state === "active" ? (
-            <Pill tone="ok" testId="fiscal-mydata-status"><Icon name="check" size={11} />{t("next.connected")}</Pill>
-          ) : state === "invalid" ? (
-            <Pill tone="bad" testId="fiscal-mydata-status">{t("next.needsCheck")}</Pill>
-          ) : state === "none" ? (
-            <Pill testId="fiscal-mydata-status">{t("next.notConnected")}</Pill>
-          ) : null}
-        </div>
-      </Card>
-    );
-  }
-
-  return (
-    <Card testId="fiscal-next-step">
-      <div className="flex items-center gap-3">
-        <span style={{ color: "var(--primary)" }}><Icon name="link" size={20} /></span>
-        <div className="min-w-0 flex-1">
-          <b style={{ color: "var(--text)" }}>{t("next.later", { step: t(`next.${step}Title`) })}</b>
-          <p className="text-sm" style={hintStyle}>{t(`next.${step}Hint`)}</p>
-        </div>
-        <Pill>{t("next.soon")}</Pill>
-      </div>
-    </Card>
-  );
 }
