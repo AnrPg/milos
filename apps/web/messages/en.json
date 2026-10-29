@@ -12101,5 +12101,233 @@
     "rowButton": "+ Payment",
     "rowButtonLabel": "Record a payment from {name}",
     "panelButton": "+ Record payment"
+  },
+  "PlanCore": {
+    "flow": {
+      "sets": "Sets",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Intervals",
+      "rest": "Rest"
+    },
+    "flowHint": {
+      "sets": "no clock: sets with rest between",
+      "for_time": "finish as fast as you can",
+      "amrap": "as many rounds as you can in a set time",
+      "emom": "start again every X minutes",
+      "intervals": "work and rest at a steady rhythm",
+      "rest": "a pause between sections"
+    },
+    "param": {
+      "sets": "Sets",
+      "rest": "Rest",
+      "restBetween": "Rest between",
+      "restWindows": "Rest between windows",
+      "rounds": "Rounds",
+      "cap": "Time cap",
+      "dur": "Duration",
+      "every": "Every",
+      "times": "Times",
+      "work": "Work",
+      "off": "Rest",
+      "intEvery": "Interrupt every",
+      "hrTarget": "Rest until"
+    },
+    "struct": {
+      "single": "Single",
+      "cluster": "Cluster",
+      "drop": "Drop set",
+      "restpause": "Rest-pause",
+      "superset": "Superset",
+      "complex": "Complex"
+    },
+    "structHint": {
+      "single": "one exercise, as it is",
+      "cluster": "the set breaks into pieces with a short pause",
+      "drop": "lower the weight and keep going",
+      "restpause": "to failure, pause, again",
+      "superset": "every exercise, then the next set",
+      "complex": "all of them without putting the bar down"
+    },
+    "structParam": {
+      "clusters": "pieces",
+      "intra": "pause",
+      "drops": "drops",
+      "dropby": "each time",
+      "minis": "mini sets"
+    },
+    "mod": {
+      "interrupt": "Interrupt every…",
+      "hr": "Rest until heart rate falls"
+    },
+    "modHint": {
+      "interrupt": "every X minutes you stop for another exercise",
+      "hr": "rest ends at X beats per minute"
+    },
+    "measure": {
+      "pace": "Pace",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "Heart rate zone",
+      "height": "Height / target",
+      "dist": "Distance",
+      "hold": "Hold",
+      "side": "Per side"
+    },
+    "measureHint": {
+      "tempo": "seconds down, pause, up (X = explosive), pause"
+    },
+    "unit": {
+      "per500m": "/500m",
+      "outOf10": "/10",
+      "repsLeft": "reps left",
+      "zone": "zone",
+      "cm": "cm",
+      "m": "m",
+      "sec": "s"
+    },
+    "score": {
+      "none": "No score",
+      "best_load": "Load (best set)",
+      "reps": "Reps",
+      "time": "Time",
+      "rounds_reps": "Rounds + reps",
+      "done": "Completed",
+      "total_reps": "Reps (total)",
+      "lowest_round": "Lowest round",
+      "distance": "Distance"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "death_by": "Death by",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "hrr": "Heart rate recovery (HRR)",
+      "even_odd": "Alternating (odd / even)",
+      "ladder": "Ladder / pyramid",
+      "calorie_target": "Calorie target",
+      "to_failure": "To failure",
+      "superset": "Superset / giant set",
+      "interrupt": "With interruptions"
+    },
+    "roundWord": {
+      "set": "Set",
+      "interval": "Interval",
+      "round": "Round"
+    },
+    "block": {
+      "one": "{word, select, set {Set} interval {Interval} other {Round}} {n}",
+      "list": "{word, select, set {Set} interval {Interval} other {Round}} {list}",
+      "slot": "{word, select, set {Set} interval {Interval} other {Round}} {list} · {at}",
+      "minute": "Minute {list}"
+    },
+    "caption": {
+      "sets": "{count} sets",
+      "setsRange": "{min} or {max} sets",
+      "max": "{unit, select, kcal {as many calories as possible} m {as many metres as possible} other {as many as possible}}",
+      "maxWithin": "{unit, select, kcal {as many calories as possible} m {as many metres as possible} other {as many as possible}} in {within}",
+      "setList": "{count} sets: {list}",
+      "perList": "per {word, select, set {set} interval {interval} other {round}}: {list}",
+      "cont": "then {step} every {word, select, set {set} interval {interval} other {round}}",
+      "range": "range {range}, the athlete decides",
+      "reps": "{count, plural, one {# rep} other {# reps}}",
+      "value": "{value}",
+      "perSide": "per side",
+      "badDose": "e.g. 10, 4×10, 12-10-8-8, 8-10, 3-4×12-15, 5-10-15…, 30s, 500m, max"
+    },
+    "loadCaption": {
+      "bw": "body weight",
+      "text": "as words for the athlete",
+      "zone": "heart rate zone {zone}",
+      "rpe": "how hard (1–10)",
+      "pace": "pace {pace} per {per}",
+      "perSet": "per set: {list}{kind, select, pct { of 1RM} other {}}",
+      "buildUp": "starts at {value}{kind, select, pct { of 1RM} other {}} and builds up",
+      "range": "range {value}{kind, select, pct { of 1RM} other {}}, the athlete picks",
+      "value": "{value}{kind, select, pct { of 1RM} other {}}"
+    },
+    "show": {
+      "perSide": "/side",
+      "within": "in",
+      "from": "from",
+      "zone": "zone"
+    },
+    "tempo": {
+      "down": "↓{secs}″",
+      "downExplosive": "↓explosive",
+      "bottom": "bottom {secs}″",
+      "bottomExplosive": "bottom: no pause",
+      "up": "↑{secs}″",
+      "upExplosive": "↑explosive",
+      "top": "top {secs}″",
+      "topExplosive": "top: no pause"
+    },
+    "human": {
+      "min": "{min} min",
+      "sec": "{sec} s",
+      "minSec": "{min} min {sec} s"
+    },
+    "describe": {
+      "emom": "Every {every}, {times} times: {total} in total.",
+      "emomOpen": "Every {every}, until you can't finish in time.",
+      "amrapWindows": "{count} AMRAP windows ({list}).",
+      "amrapWindowsRest": "{count} AMRAP windows ({list}), {rest} rest between.",
+      "amrap": "As many rounds as you can in {dur}.",
+      "forTime": "{rounds, plural, one {Once} other {# rounds}}, as fast as possible.",
+      "forTimeCap": "{rounds, plural, one {Once} other {# rounds}}, as fast as possible, cap {cap}.",
+      "intervals": "{rounds} rounds: {work} work, {off} rest.",
+      "intervalsHr": "{rounds} rounds: {work} work, rest until your heart rate falls to {hr}.",
+      "sets": "{sets} sets.",
+      "setsRest": "{sets} sets, {rest} rest between.",
+      "rest": "Rest {dur}.",
+      "interrupt": "Every {every} stop for the interruption, then carry on where you left off."
+    },
+    "summary": {
+      "emom": "every {every} × {times}",
+      "emomOpen": "every {every}",
+      "sets": "{sets} sets",
+      "windows": "{count} windows",
+      "dur": "{dur}",
+      "rounds": "{rounds} rounds",
+      "intervals": "{rounds} × {work}/{off}",
+      "intervalsHr": "{rounds} × {work}/heart rate",
+      "interrupt": "interruption every {every}",
+      "perSide": "(per side)"
+    },
+    "error": {
+      "bad_dose": "Can't read this: e.g. 10, 8-12, max, 400 m",
+      "missing_unit": "Write kg or % in one set of the row; the others take it from there",
+      "mixed_unit": "Same unit across the row: kg or %",
+      "bad_tempo": "Tempo in 4 marks, e.g. 31X1",
+      "bad_measure_value": "A number, +x or a→b",
+      "rpe_over_max": "RPE goes up to 10",
+      "bad_param": "Can't read this value",
+      "unknown_param": "Not a setting of this flow",
+      "unknown_flow": "Unknown flow",
+      "unknown_measure": "Unknown measure",
+      "duplicate_measure": "This measure is there twice",
+      "unknown_struct": "Unknown set structure",
+      "struct_not_allowed": "This set structure doesn't fit this flow",
+      "bad_struct_param": "Can't read this value",
+      "mod_not_allowed": "This add-on doesn't fit this flow",
+      "unknown_score": "Pick a score for this flow",
+      "bad_version": "Unsupported plan version",
+      "bad_row_kind": "Unknown row",
+      "duplicate_id": "Duplicate row",
+      "blocks_not_allowed": "Rest has no exercises",
+      "too_many_blocks": "At most 12 different rounds",
+      "too_many_rows": "At most 60 exercises",
+      "too_many_cells": "At most 30 sets",
+      "too_long": "At most 200 characters",
+      "note_too_long": "At most 2000 characters"
+    }
   }
 }
