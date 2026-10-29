@@ -43,14 +43,15 @@ describe("settingLevels (ADR-255)", () => {
     expect(levels.ready).toBe(true);
   });
 
-  it("before the catalog arrives, the settings' own list decides and nothing is basic without it", () => {
-    const fromList = settingLevels(undefined, ["gamification.streak_shields"]);
-    expect(fromList.basic("scheduling.default_capacity")).toBe(true);
-    expect(fromList.advanced("gamification.streak_shields")).toBe(true);
-    expect(fromList.ready).toBe(false);
-
-    const nothing = settingLevels(undefined, undefined);
-    expect(nothing.basic("scheduling.default_capacity")).toBe(false);
+  it("before the catalog arrives, the verdicts the app ships decide", () => {
+    const levels = settingLevels(undefined, undefined);
+    expect(levels.basic("scheduling.default_capacity")).toBe(true);
+    expect(levels.advanced("gamification.streak_shields")).toBe(true);
+    expect(levels.hidden("provider.kind")).toBe(true);
+    expect(levels.hidden("check_in.door_rotation_seconds")).toBe(true);
+    expect(levels.ready).toBe(false);
+    // The box's own list still moves a basic setting under «Advanced».
+    expect(settingLevels(undefined, ["scheduling.default_capacity"]).basic("scheduling.default_capacity")).toBe(false);
   });
 });
 
