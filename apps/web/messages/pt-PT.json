@@ -12947,7 +12947,10 @@
       "payments": "Pagamentos online",
       "paymentsHint": "Um botão, com Viva",
       "import": "Traz os teus membros",
-      "importHint": "Importar de Wodify, PushPress, Excel…"
+      "importHint": "Importar de Wodify, PushPress, Excel…",
+      "soldOnline": "O que se vende online",
+      "soldOnlineHint": "Página de venda · {count} de {total} pacotes de subscrição",
+      "soldOnlineLater": "Depois de ligares os pagamentos online, os pacotes de subscrição pagos ficam à venda online sozinhos"
     },
     "errors": {
       "recipe_owner_only": "Só o proprietário aplica uma receita.",
@@ -13339,5 +13342,33 @@
       "changesTitle": "Alterações",
       "changesBody": "Se alterarmos estes termos de forma relevante, avisamos-te na app antes de a alteração se aplicar."
     }
+  },
+  "SoldOnline": {
+    "sale": "Venda",
+    "title": "Vendido online",
+    "subtitle": "Na página de venda e na app",
+    "saved": "Guardado",
+    "badge": "Online",
+    "badgeHidden": "Online · não visível",
+    "deskOnly": "Só na receção",
+    "hint_visible": "Na página de venda e na app do membro da box. O recibo é emitido sozinho.",
+    "hint_off": "Vende-se só na receção.",
+    "hint_free": "Os pacotes de subscrição gratuitos não se vendem online.",
+    "hint_inactive": "Pacote de subscrição inativo: não está à venda.",
+    "hint_purpose_off": "Ainda não visível: este tipo de pacote está desligado em «O que se paga online».",
+    "fix_purpose_off": "Liga-o",
+    "hint_no_provider": "Visível na página de venda. A compra abre assim que ligares os pagamentos online.",
+    "fix_no_provider": "Definições › Pagamentos",
+    "listCount": "Vendidos online: {count} de {total}",
+    "viewSalesPage": "Ver a página de venda",
+    "noticeOpened": "{count, plural, one {# dos teus pacotes de subscrição já é vendido online.} other {# dos teus pacotes de subscrição já são vendidos online.}}",
+    "noticeChange": "Alterar",
+    "noticeClose": "Fechar",
+    "payCount": "Vendidos online: {count} de {total} pacotes de subscrição",
+    "payCountHint": "Os restantes vendem-se só na receção.",
+    "payAll": "Todos os pacotes de subscrição pagos são também vendidos online.",
+    "payNone": "Nenhum pacote de subscrição é vendido online",
+    "payNoneHint": "Os membros da box não têm nada para comprar. Liga «Vendido online» nos pacotes que quiseres.",
+    "packagesLink": "Pacotes de subscrição"
   }
 }

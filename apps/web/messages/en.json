@@ -12947,7 +12947,10 @@
       "payments": "Online payments",
       "paymentsHint": "One button, with Viva",
       "import": "Bring your members",
-      "importHint": "Import from Wodify, PushPress, Excel…"
+      "importHint": "Import from Wodify, PushPress, Excel…",
+      "soldOnline": "What is sold online",
+      "soldOnlineHint": "Sales page · {count} of {total} subscription packages",
+      "soldOnlineLater": "Once online payments are connected, paid subscription packages go on sale online by themselves"
     },
     "errors": {
       "recipe_owner_only": "Only the owner applies a recipe.",
@@ -13339,5 +13342,33 @@
       "changesTitle": "Changes",
       "changesBody": "If we change these terms in a way that matters, we tell you in the app before the change applies."
     }
+  },
+  "SoldOnline": {
+    "sale": "Selling",
+    "title": "Sold online",
+    "subtitle": "On the sales page and in the app",
+    "saved": "Saved",
+    "badge": "Online",
+    "badgeHidden": "Online · not visible",
+    "deskOnly": "Front desk only",
+    "hint_visible": "On the sales page and in the box member's app. The receipt is issued automatically.",
+    "hint_off": "Sold only at the front desk.",
+    "hint_free": "Free subscription packages are not sold online.",
+    "hint_inactive": "Inactive subscription package: not on sale.",
+    "hint_purpose_off": "Not visible yet: this kind of package is off in “What is paid online”.",
+    "fix_purpose_off": "Turn it on",
+    "hint_no_provider": "Shown on the sales page. Buying opens once you connect online payments.",
+    "fix_no_provider": "Settings › Payments",
+    "listCount": "Sold online: {count} of {total}",
+    "viewSalesPage": "See the sales page",
+    "noticeOpened": "{count, plural, one {# of your subscription packages is now sold online.} other {# of your subscription packages are now sold online.}}",
+    "noticeChange": "Change",
+    "noticeClose": "Close",
+    "payCount": "Sold online: {count} of {total} subscription packages",
+    "payCountHint": "The rest are sold only at the front desk.",
+    "payAll": "Every paid subscription package is also sold online.",
+    "payNone": "No subscription package is sold online",
+    "payNoneHint": "Box members have nothing to buy. Turn on “Sold online” in the packages you want.",
+    "packagesLink": "Subscription packages"
   }
 }

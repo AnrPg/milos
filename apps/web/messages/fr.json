@@ -12947,7 +12947,10 @@
       "payments": "Paiements en ligne",
       "paymentsHint": "Un bouton, avec Viva",
       "import": "Fais venir tes membres",
-      "importHint": "Import depuis Wodify, PushPress, Excel…"
+      "importHint": "Import depuis Wodify, PushPress, Excel…",
+      "soldOnline": "Ce qui est vendu en ligne",
+      "soldOnlineHint": "Page de vente · {count} forfaits d'abonnement sur {total}",
+      "soldOnlineLater": "Une fois les paiements en ligne connectés, les forfaits d'abonnement payants sont mis en vente en ligne tout seuls"
     },
     "errors": {
       "recipe_owner_only": "Seul le propriétaire applique une recette.",
@@ -13339,5 +13342,33 @@
       "changesTitle": "Modifications",
       "changesBody": "Si nous modifions ces conditions de manière importante, nous te prévenons dans l’application avant que le changement s’applique."
     }
+  },
+  "SoldOnline": {
+    "sale": "Vente",
+    "title": "Vendu en ligne",
+    "subtitle": "Sur la page de vente et dans l'app",
+    "saved": "Enregistré",
+    "badge": "Online",
+    "badgeHidden": "Online · non visible",
+    "deskOnly": "Uniquement à l'accueil",
+    "hint_visible": "Sur la page de vente et dans l'app du membre du box. Le reçu est émis tout seul.",
+    "hint_off": "Vendu uniquement à l'accueil.",
+    "hint_free": "Les forfaits d'abonnement gratuits ne sont pas vendus en ligne.",
+    "hint_inactive": "Forfait d'abonnement inactif : pas en vente.",
+    "hint_purpose_off": "Pas encore visible : ce type de forfait est désactivé dans « Ce qui se paie en ligne ».",
+    "fix_purpose_off": "L'activer",
+    "hint_no_provider": "Visible sur la page de vente. L'achat s'ouvre dès que tu connectes les paiements en ligne.",
+    "fix_no_provider": "Paramètres › Paiements",
+    "listCount": "Vendus en ligne : {count} sur {total}",
+    "viewSalesPage": "Voir la page de vente",
+    "noticeOpened": "{count, plural, one {# de tes forfaits d'abonnement est maintenant vendu en ligne.} other {# de tes forfaits d'abonnement sont maintenant vendus en ligne.}}",
+    "noticeChange": "Modifier",
+    "noticeClose": "Fermer",
+    "payCount": "Vendus en ligne : {count} forfaits d'abonnement sur {total}",
+    "payCountHint": "Les autres ne se vendent qu'à l'accueil.",
+    "payAll": "Tous les forfaits d'abonnement payants sont aussi vendus en ligne.",
+    "payNone": "Aucun forfait d'abonnement n'est vendu en ligne",
+    "payNoneHint": "Les membres du box n'ont rien à acheter. Active « Vendu en ligne » sur les forfaits voulus.",
+    "packagesLink": "Forfaits d'abonnement"
   }
 }

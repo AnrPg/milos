@@ -12947,7 +12947,10 @@
       "payments": "Online betalingen",
       "paymentsHint": "Eén knop, met Viva",
       "import": "Haal je leden binnen",
-      "importHint": "Importeren uit Wodify, PushPress, Excel…"
+      "importHint": "Importeren uit Wodify, PushPress, Excel…",
+      "soldOnline": "Wat online verkocht wordt",
+      "soldOnlineHint": "Verkooppagina · {count} van {total} abonnementspakketten",
+      "soldOnlineLater": "Na het koppelen van online betalingen gaan betaalde abonnementspakketten vanzelf online in de verkoop"
     },
     "errors": {
       "recipe_owner_only": "Alleen de eigenaar past een recept toe.",
@@ -13339,5 +13342,33 @@
       "changesTitle": "Wijzigingen",
       "changesBody": "Als we deze voorwaarden op een belangrijke manier wijzigen, laten we het je in de app weten voordat de wijziging ingaat."
     }
+  },
+  "SoldOnline": {
+    "sale": "Verkoop",
+    "title": "Online verkocht",
+    "subtitle": "Op de verkooppagina en in de app",
+    "saved": "Opgeslagen",
+    "badge": "Online",
+    "badgeHidden": "Online · niet zichtbaar",
+    "deskOnly": "Alleen bij de balie",
+    "hint_visible": "Op de verkooppagina en in de app van het boxlid. De bon wordt vanzelf aangemaakt.",
+    "hint_off": "Wordt alleen bij de balie verkocht.",
+    "hint_free": "Gratis abonnementspakketten worden niet online verkocht.",
+    "hint_inactive": "Inactief abonnementspakket: niet te koop.",
+    "hint_purpose_off": "Nog niet zichtbaar: dit soort pakket staat uit bij „Wat online betaald wordt”.",
+    "fix_purpose_off": "Zet het aan",
+    "hint_no_provider": "Zichtbaar op de verkooppagina. Kopen kan zodra je online betalingen koppelt.",
+    "fix_no_provider": "Instellingen › Betalingen",
+    "listCount": "Online verkocht: {count} van {total}",
+    "viewSalesPage": "Bekijk de verkooppagina",
+    "noticeOpened": "{count, plural, one {# van je abonnementspakketten wordt nu online verkocht.} other {# van je abonnementspakketten worden nu online verkocht.}}",
+    "noticeChange": "Wijzigen",
+    "noticeClose": "Sluiten",
+    "payCount": "Online verkocht: {count} van {total} abonnementspakketten",
+    "payCountHint": "De rest wordt alleen bij de balie verkocht.",
+    "payAll": "Alle betaalde abonnementspakketten worden ook online verkocht.",
+    "payNone": "Geen enkel abonnementspakket wordt online verkocht",
+    "payNoneHint": "Boxleden kunnen niets kopen. Zet „Online verkocht” aan bij de pakketten die je wilt.",
+    "packagesLink": "Abonnementspakketten"
   }
 }

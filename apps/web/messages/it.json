@@ -12947,7 +12947,10 @@
       "payments": "Pagamenti online",
       "paymentsHint": "Un pulsante, con Viva",
       "import": "Porta i tuoi membri",
-      "importHint": "Importa da Wodify, PushPress, Excel…"
+      "importHint": "Importa da Wodify, PushPress, Excel…",
+      "soldOnline": "Cosa si vende online",
+      "soldOnlineHint": "Pagina di vendita · {count} pacchetti di abbonamento su {total}",
+      "soldOnlineLater": "Dopo aver collegato i pagamenti online, i pacchetti di abbonamento a pagamento vanno in vendita online da soli"
     },
     "errors": {
       "recipe_owner_only": "Solo il proprietario applica una ricetta.",
@@ -13339,5 +13342,33 @@
       "changesTitle": "Modifiche",
       "changesBody": "Se modifichiamo questi termini in modo rilevante, te lo diciamo nell’app prima che la modifica si applichi."
     }
+  },
+  "SoldOnline": {
+    "sale": "Vendita",
+    "title": "Venduto online",
+    "subtitle": "Nella pagina di vendita e nell'app",
+    "saved": "Salvato",
+    "badge": "Online",
+    "badgeHidden": "Online · non visibile",
+    "deskOnly": "Solo alla reception",
+    "hint_visible": "Nella pagina di vendita e nell'app del socio del box. La ricevuta viene emessa da sola.",
+    "hint_off": "Si vende solo alla reception.",
+    "hint_free": "I pacchetti di abbonamento gratuiti non si vendono online.",
+    "hint_inactive": "Pacchetto di abbonamento inattivo: non in vendita.",
+    "hint_purpose_off": "Non ancora visibile: questo tipo di pacchetto è spento in «Cosa si paga online».",
+    "fix_purpose_off": "Attivalo",
+    "hint_no_provider": "Visibile nella pagina di vendita. L'acquisto si apre appena colleghi i pagamenti online.",
+    "fix_no_provider": "Impostazioni › Pagamenti",
+    "listCount": "Venduti online: {count} su {total}",
+    "viewSalesPage": "Vedi la pagina di vendita",
+    "noticeOpened": "{count, plural, one {# dei tuoi pacchetti di abbonamento ora è venduto online.} other {# dei tuoi pacchetti di abbonamento ora sono venduti online.}}",
+    "noticeChange": "Modifica",
+    "noticeClose": "Chiudi",
+    "payCount": "Venduti online: {count} pacchetti di abbonamento su {total}",
+    "payCountHint": "Gli altri si vendono solo alla reception.",
+    "payAll": "Tutti i pacchetti di abbonamento a pagamento sono venduti anche online.",
+    "payNone": "Nessun pacchetto di abbonamento è venduto online",
+    "payNoneHint": "I soci del box non hanno nulla da comprare. Attiva «Venduto online» nei pacchetti che vuoi.",
+    "packagesLink": "Pacchetti di abbonamento"
   }
 }
