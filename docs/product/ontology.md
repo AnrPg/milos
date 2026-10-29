@@ -244,6 +244,7 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 | Recurring class | Επαναλαμβανόμενο τμήμα | `class_series` | A class that repeats on a pattern (formerly "series"). The form's start time is "Class start time" / «Ώρα έναρξης τμήματος». | Season. |
 | Trial class | Δοκιμαστικό τμήμα | `trials` | A newcomer's free class. Short form «Δοκιμαστικό». A trial period of a plan is «Δοκιμαστική περίοδος». | Guest. |
 | Day WOD | WOD ημέρας | `day_workouts` | The WOD set for a whole date: every class (τμήμα) of that day, or only chosen class types (and, with branches, one branch), takes it unless the class has its own WOD. (ADR-230) | A class's own WOD (an override); «WOD σήμερα» (the club channel). |
+| Workout type | Τύπος προπόνησης | `master_workouts.type`, `WorkoutType` | The kind of training a WOD is (CrossFit, Πυγμαχία, Χορός …): one fixed list for the platform, grouped in families (Λειτουργική & CrossFit, Δύναμη, Γυμναστική & σωματικό βάρος, Αντοχή, Σώμα & νους, Μαχητικά αθλήματα, Χορός, Υπαίθριο, Αποκατάσταση) that stats, badges and colours read. The box chooses which ones its editors offer (Ρυθμίσεις › Τύποι προπόνησης). (ADR-275) | Class type (Τύπος τμήματος): the box's own list for its timetable, bookings and credits. |
 
 ### 4.5 Relations between people
 

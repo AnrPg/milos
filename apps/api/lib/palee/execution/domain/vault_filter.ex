@@ -11,7 +11,7 @@ defmodule Palee.Execution.Domain.VaultFilter do
   alias Palee.Identity.Domain.FilterFields
 
   @version 1
-  @disciplines ~w(crossfit strength gymnastics aerobics flexibility recovery)
+  @disciplines Palee.Workouts.Domain.WorkoutType.keys()
 
   defstruct version: @version,
             disciplines: [],

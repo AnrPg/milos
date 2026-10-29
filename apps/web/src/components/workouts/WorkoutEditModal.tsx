@@ -89,11 +89,12 @@ export function WorkoutEditModal({
   }
 
   const isContextual = context.kind === "assignment" || context.kind === "slot";
-  const sourceLabel =
+  // Whole sentences per context: joined fragments lose their spacing and word order.
+  const duplicateLabel =
     context.kind === "assignment"
-      ? i18n("thisAssignmentOnly07f1bdc")
+      ? i18n("duplicateAndEditAssignmentOnly")
       : context.kind === "slot"
-        ? i18n("thisClassOnly936c54b")
+        ? i18n("duplicateAndEditClassOnly")
         : null;
 
   return (
@@ -120,7 +121,7 @@ export function WorkoutEditModal({
                 >
                   {busy === "duplicate"
                     ? i18n("duplicating7d74a9e")
-                    : i18n("duplicateAndEditFora53d360") + (sourceLabel)}
+                    : duplicateLabel}
                 </button>
                 <button
                   className="rounded-full px-4 py-3 text-sm font-semibold disabled:opacity-50"

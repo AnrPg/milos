@@ -15,6 +15,8 @@ import { resolveWorkoutIcon } from "@/components/workouts/library/library-folder
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { semanticLabel } from "@/i18n/presentation";
+import { useWorkoutTypeLabels, workoutTypeOptionGroups } from "@/components/workouts/WorkoutTypeSelect";
+import { offeredWorkoutTypeGroups } from "@/lib/workout-types";
 import { useUiTranslations } from "@/i18n/ui";
 import { SPARK_CREATE_STYLE } from "@/lib/spark";
 
@@ -35,7 +37,6 @@ import { SPARK_CREATE_STYLE } from "@/lib/spark";
  * A centred dialog on wider screens, a tall bottom sheet on phones.
  */
 
-const WORKOUT_TYPES = ["crossfit", "strength", "gymnastics", "aerobics", "flexibility", "recovery"] as const;
 const SEARCH_DELAY_MS = 250;
 
 export const workoutChoiceKey = (id: string) => ["workout-choice", id] as const;
@@ -267,6 +268,7 @@ function WodPickerDialog({
 }) {
   const t = useTranslations("Schedule");
   const i18n = useUiTranslations();
+  const typeLabels = useWorkoutTypeLabels();
   const locale = useLocale();
   const listId = useId();
   const [query, setQuery] = useState("");
@@ -369,9 +371,7 @@ function WodPickerDialog({
                 <span>{t("wodPickerType")}</span>
                 <Select className="w-full rounded-xl px-3 py-2 text-sm" value={type} onValueChange={(next) => { setType(next); setActive(0); }}>
                   <option value="">{t("wodPickerAny")}</option>
-                  {WORKOUT_TYPES.map((item) => (
-                    <option key={item} value={item}>{semanticLabel(item, i18n)}</option>
-                  ))}
+                  {workoutTypeOptionGroups(offeredWorkoutTypeGroups(null), typeLabels)}
                 </Select>
               </label>
               <label className="space-y-1 text-xs font-semibold" style={{ color: "var(--muted)" }}>

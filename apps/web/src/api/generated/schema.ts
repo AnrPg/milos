@@ -8554,7 +8554,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** What the workout editor may offer in this gym (ADR-180) */
+        /** What the workout editor may offer in this gym (ADR-180, ADR-275) */
         get: operations["PaleeWeb.AdminWorkoutFreeTextController.authoring_settings"];
         put?: never;
         post?: never;
@@ -40085,6 +40085,8 @@ export interface components {
         WorkoutAuthoringSettings: {
             /** @description Off: no assistant; workouts are written in text sections with a timer each */
             wod_assistant_enabled: boolean;
+            /** @description ADR-275: the workout kinds this gym's editors offer, in catalogue order */
+            workout_types: string[];
         };
         /** WorkoutBody */
         WorkoutBody: {
@@ -63971,7 +63973,7 @@ export interface operations {
                     } | {
                         count: number;
                         /** @enum {string} */
-                        type_filter: "crossfit" | "strength" | "gymnastics" | "aerobics" | "flexibility" | "recovery";
+                        type_filter: "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "gymnastics" | "calisthenics" | "aerobics" | "running" | "cycling" | "indoor_cycling" | "rowing" | "swimming" | "endurance" | "yoga" | "pilates" | "barre" | "flexibility" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "outdoor_training" | "climbing_bouldering" | "recovery";
                     } | {
                         count: number;
                         increment_per_completion: number;
@@ -64101,7 +64103,7 @@ export interface operations {
                     } | {
                         count: number;
                         /** @enum {string} */
-                        type_filter: "crossfit" | "strength" | "gymnastics" | "aerobics" | "flexibility" | "recovery";
+                        type_filter: "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "gymnastics" | "calisthenics" | "aerobics" | "running" | "cycling" | "indoor_cycling" | "rowing" | "swimming" | "endurance" | "yoga" | "pilates" | "barre" | "flexibility" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "outdoor_training" | "climbing_bouldering" | "recovery";
                     } | {
                         count: number;
                         increment_per_completion: number;
@@ -79117,6 +79119,8 @@ export interface operations {
                             wod_assistant_enabled: boolean;
                             /** @description ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own */
                             wod_goals_visible_by_default: boolean;
+                            /** @description ADR-275: the workout kinds the gym's editors offer, in catalogue order; null offers every kind */
+                            workout_types: ("crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "gymnastics" | "calisthenics" | "aerobics" | "running" | "cycling" | "indoor_cycling" | "rowing" | "swimming" | "endurance" | "yoga" | "pilates" | "barre" | "flexibility" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "outdoor_training" | "climbing_bouldering" | "recovery")[] | null;
                         };
                     };
                 };
@@ -79169,6 +79173,8 @@ export interface operations {
                         wod_assistant_enabled?: boolean;
                         /** @description ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own */
                         wod_goals_visible_by_default?: boolean;
+                        /** @description ADR-275: the workout kinds the gym's editors offer, in catalogue order; null offers every kind */
+                        workout_types?: ("crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "gymnastics" | "calisthenics" | "aerobics" | "running" | "cycling" | "indoor_cycling" | "rowing" | "swimming" | "endurance" | "yoga" | "pilates" | "barre" | "flexibility" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "outdoor_training" | "climbing_bouldering" | "recovery")[] | null;
                     };
                 };
             };
@@ -79244,6 +79250,8 @@ export interface operations {
                             wod_assistant_enabled: boolean;
                             /** @description ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own */
                             wod_goals_visible_by_default: boolean;
+                            /** @description ADR-275: the workout kinds the gym's editors offer, in catalogue order; null offers every kind */
+                            workout_types: ("crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "gymnastics" | "calisthenics" | "aerobics" | "running" | "cycling" | "indoor_cycling" | "rowing" | "swimming" | "endurance" | "yoga" | "pilates" | "barre" | "flexibility" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "outdoor_training" | "climbing_bouldering" | "recovery")[] | null;
                         };
                     };
                 };
@@ -82967,6 +82975,8 @@ export interface operations {
                     "application/json": {
                         /** @description Off: no assistant; workouts are written in text sections with a timer each */
                         wod_assistant_enabled: boolean;
+                        /** @description ADR-275: the workout kinds this gym's editors offer, in catalogue order */
+                        workout_types: string[];
                     };
                 };
             };
@@ -85885,7 +85895,7 @@ export interface operations {
                     tags?: string[];
                     title?: string | null;
                     /** @enum {string|null} */
-                    type?: "crossfit" | "strength" | "gymnastics" | "aerobics" | "flexibility" | "recovery" | null;
+                    type?: "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "gymnastics" | "calisthenics" | "aerobics" | "running" | "cycling" | "indoor_cycling" | "rowing" | "swimming" | "endurance" | "yoga" | "pilates" | "barre" | "flexibility" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "outdoor_training" | "climbing_bouldering" | "recovery" | null;
                     workout_metadata?: {
                         [key: string]: unknown;
                     };
@@ -87407,7 +87417,7 @@ export interface operations {
                     tags?: string[];
                     title?: string | null;
                     /** @enum {string|null} */
-                    type?: "crossfit" | "strength" | "gymnastics" | "aerobics" | "flexibility" | "recovery" | null;
+                    type?: "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "gymnastics" | "calisthenics" | "aerobics" | "running" | "cycling" | "indoor_cycling" | "rowing" | "swimming" | "endurance" | "yoga" | "pilates" | "barre" | "flexibility" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "outdoor_training" | "climbing_bouldering" | "recovery" | null;
                     workout_metadata?: {
                         [key: string]: unknown;
                     };
