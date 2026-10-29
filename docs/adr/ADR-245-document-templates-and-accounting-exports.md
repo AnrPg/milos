@@ -135,8 +135,10 @@ the domain.
     https://github.com/frappe/erpnext/blob/version-13/erpnext/regional/germany/utils/datev/datev_constants.py;
     header field order discussed at
     https://www.datev-community.de/t5/Betriebliches-Rechnungswesen/Sachkonto-als-Ascii-ausgeben/m-p/366618
-  - Xero sales invoice import: https://central.xero.com/s/article/Import-customer-invoices
-    (column list cross-checked with https://syslumelab.com/guides/xero-sales-invoice-import-csv)
+  - Xero sales invoice import (template columns, credit notes as negative
+    unit amounts): https://syslumelab.com/guides/xero-sales-invoice-import-csv
+    and https://entryrocket.com/guides/xero-csv-import-guide (secondary
+    sources; Xero's own template is downloaded from its import screen)
   - QuickBooks Online invoice import:
     https://quickbooks.intuit.com/learn-support/en-us/help-article/import-export-data-files/import-multiple-invoices/L7E9Xrd8l_US_en_US
   - Sage 50 audit trail import fields:
