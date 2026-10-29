@@ -7,7 +7,8 @@ defmodule Palee.Fiscal.Domain.EInvoicePolicy do
 
     * `pending` – waiting for its next attempt (`next_attempt_at`);
     * `sending` – claimed by a worker that submits it; a claim older than
-      `claim_timeout_seconds/0` is taken over;
+      `claim_timeout_seconds/0` becomes `uncertain` (the worker may have
+      sent it before it died);
     * `submitted` – the access point took it (`provider_submission_id`);
       its delivery is polled with backoff (a webhook only makes the next
       poll due now);

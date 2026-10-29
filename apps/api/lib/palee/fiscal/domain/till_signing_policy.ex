@@ -8,7 +8,7 @@ defmodule Palee.Fiscal.Domain.TillSigningPolicy do
 
     * `pending` – waiting for its next attempt;
     * `sending` – claimed by a worker; a claim older than
-      `claim_timeout_seconds/0` is taken over;
+      `claim_timeout_seconds/0` becomes `uncertain` and is read back;
     * `signed` – the device signed it; final;
     * `uncertain` – the request may have reached the device but no answer
       came. The next attempt only **reads** the transaction back
