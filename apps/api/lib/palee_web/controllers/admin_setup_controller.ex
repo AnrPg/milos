@@ -83,7 +83,9 @@ defmodule PaleeWeb.AdminSetupController do
       "Creates the recipe's subscription packages and class types that are missing and sets its " <>
         "settings through the same services as the settings screens, in one transaction, then " <>
         "records which recipe was applied, when and by whom. Documents are listed in `manual`. " <>
-        "`prices` (optional) are the owner's own prices for the recipe's packages, by code.",
+        "`prices` (optional) are the owner's own prices for the recipe's packages, by code. " <>
+        "`mode`: `all` changes every setting; `defaults_only` keeps the settings the owner " <>
+        "already changed (the preview marks them `owner_changed`).",
     parameters: [@key],
     request_body: S.apply_body(),
     responses: [
@@ -96,10 +98,13 @@ defmodule PaleeWeb.AdminSetupController do
   )
 
   def apply_recipe(conn, %{key: key}) do
-    prices = conn.body_params |> body_field(:prices)
+    options = %{
+      prices: body_field(conn.body_params, :prices),
+      mode: body_field(conn.body_params, :mode)
+    }
 
     with {:ok, result} <-
-           SetupRecipes.apply_recipe_with_prices(conn.assigns.tenant_context, key, prices) do
+           SetupRecipes.apply_recipe_with(conn.assigns.tenant_context, key, options) do
       json(conn, result)
     end
   end

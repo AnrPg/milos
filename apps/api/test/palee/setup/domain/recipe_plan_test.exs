@@ -175,4 +175,44 @@ defmodule Palee.Setup.Domain.RecipePlanTest do
 
     assert "class_type.wod" in plan.unchanged
   end
+
+  describe "the owner's own values (product decision 2026-10-29)" do
+    test "a setting no longer at its catalog default is marked owner_changed" do
+      # Capacity 12 and auto approve false are the catalog defaults; 20 is the owner's.
+      fresh = RecipePlan.build(@recipe, @fresh)
+      refute Enum.find(fresh.changes, &(&1.key == "scheduling.default_capacity")).owner_changed
+
+      chosen = put_in(@fresh, [:settings, "scheduling.default_capacity"], 20)
+      plan = RecipePlan.build(@recipe, chosen)
+      capacity = Enum.find(plan.changes, &(&1.key == "scheduling.default_capacity"))
+      assert %{from: 20, to: 16, owner_changed: true} = capacity
+      assert plan.kept == []
+    end
+
+    test "a value the snapshot does not know is not the owner's" do
+      unknown = %{@fresh | settings: Map.delete(@fresh.settings, "scheduling.default_capacity")}
+      plan = RecipePlan.build(@recipe, unknown)
+      refute Enum.find(plan.changes, &(&1.key == "scheduling.default_capacity")).owner_changed
+    end
+
+    test "defaults_only keeps the owner's values and applies the rest" do
+      chosen = put_in(@fresh, [:settings, "scheduling.default_capacity"], 20)
+      plan = chosen |> then(&RecipePlan.build(@recipe, &1)) |> RecipePlan.for_mode(:defaults_only)
+
+      refute "scheduling.default_capacity" in keys(plan.changes)
+      assert "scheduling.default_auto_approve" in keys(plan.changes)
+      assert plan.kept == ["scheduling.default_capacity"]
+
+      all = chosen |> then(&RecipePlan.build(@recipe, &1)) |> RecipePlan.for_mode(:all)
+      assert "scheduling.default_capacity" in keys(all.changes)
+    end
+
+    test "modes by name" do
+      assert {:ok, :all} = RecipePlan.mode(nil)
+      assert {:ok, :all} = RecipePlan.mode("all")
+      assert {:ok, :defaults_only} = RecipePlan.mode("defaults_only")
+      assert {:error, :invalid_recipe_mode} = RecipePlan.mode("some")
+      assert {:error, :invalid_recipe_mode} = RecipePlan.mode(3)
+    end
+  end
 end

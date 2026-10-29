@@ -107,6 +107,49 @@ defmodule PaleeWeb.AdminSetupControllerTest do
              |> json_response(422)
   end
 
+  test "the preview marks the owner's own values; defaults_only keeps them", %{
+    owner: owner,
+    base: base
+  } do
+    owner
+    |> recycle()
+    |> put_req_header("content-type", "application/json")
+    |> patch(base <> "/settings", Jason.encode!(%{scheduling: %{default_capacity: 20}}))
+    |> json_response(200)
+
+    preview =
+      owner
+      |> recycle()
+      |> post_json(base <> "/setup/recipes/crossfit_box/preview")
+      |> json_response(200)
+
+    capacity = Enum.find(preview["changes"], &(&1["key"] == "scheduling.default_capacity"))
+    assert %{"from" => 20, "to" => 16, "owner_changed" => true} = capacity
+    assert preview["kept"] == []
+
+    applied =
+      owner
+      |> recycle()
+      |> put_req_header("content-type", "application/json")
+      |> post(
+        base <> "/setup/recipes/crossfit_box/apply",
+        Jason.encode!(%{mode: "defaults_only"})
+      )
+      |> json_response(200)
+
+    assert applied["plan"]["kept"] == ["scheduling.default_capacity"]
+    refute Enum.any?(applied["plan"]["changes"], &(&1["key"] == "scheduling.default_capacity"))
+
+    settings = owner |> recycle() |> get(base <> "/settings") |> json_response(200)
+    assert settings["scheduling"]["default_capacity"] == 20
+
+    assert owner
+           |> recycle()
+           |> put_req_header("content-type", "application/json")
+           |> post(base <> "/setup/recipes/crossfit_box/apply", Jason.encode!(%{mode: "some"}))
+           |> json_response(422)
+  end
+
   test "only the owner applies; a coach cannot see recipes", %{
     admin: admin,
     coach: coach,

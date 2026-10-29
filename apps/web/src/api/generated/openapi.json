@@ -198487,6 +198487,10 @@
                                   "nullable": true,
                                   "type": "string"
                                 },
+                                "owner_changed": {
+                                  "description": "The current value is the owner's own choice, not the default",
+                                  "type": "boolean"
+                                },
                                 "to": {
                                   "description": "A setting value: boolean, number, text, list or null",
                                   "nullable": true
@@ -198546,6 +198550,10 @@
                                 "name": {
                                   "nullable": true,
                                   "type": "string"
+                                },
+                                "owner_changed": {
+                                  "description": "The current value is the owner's own choice, not the default",
+                                  "type": "boolean"
                                 },
                                 "to": {
                                   "description": "A setting value: boolean, number, text, list or null",
@@ -198773,7 +198781,7 @@
     "/api/org/{organization_slug}/admin/setup/recipes/{key}/apply": {
       "post": {
         "callbacks": {},
-        "description": "Creates the recipe's subscription packages and class types that are missing and sets its settings through the same services as the settings screens, in one transaction, then records which recipe was applied, when and by whom. Documents are listed in `manual`. `prices` (optional) are the owner's own prices for the recipe's packages, by code.",
+        "description": "Creates the recipe's subscription packages and class types that are missing and sets its settings through the same services as the settings screens, in one transaction, then records which recipe was applied, when and by whom. Documents are listed in `manual`. `prices` (optional) are the owner's own prices for the recipe's packages, by code. `mode`: `all` changes every setting; `defaults_only` keeps the settings the owner already changed (the preview marks them `owner_changed`).",
         "operationId": "PaleeWeb.AdminSetupController.apply_recipe",
         "parameters": [
           {
@@ -198791,6 +198799,14 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "mode": {
+                    "description": "all (default): change every setting; defaults_only: keep the ones the owner changed",
+                    "enum": [
+                      "all",
+                      "defaults_only"
+                    ],
+                    "type": "string"
+                  },
                   "prices": {
                     "additionalProperties": {
                       "maximum": 10000000,
@@ -198867,6 +198883,10 @@
                                 "nullable": true,
                                 "type": "string"
                               },
+                              "owner_changed": {
+                                "description": "The current value is the owner's own choice, not the default",
+                                "type": "boolean"
+                              },
                               "to": {
                                 "description": "A setting value: boolean, number, text, list or null",
                                 "nullable": true
@@ -198926,6 +198946,10 @@
                               "name": {
                                 "nullable": true,
                                 "type": "string"
+                              },
+                              "owner_changed": {
+                                "description": "The current value is the owner's own choice, not the default",
+                                "type": "boolean"
                               },
                               "to": {
                                 "description": "A setting value: boolean, number, text, list or null",
@@ -199009,6 +199033,10 @@
                                 "nullable": true,
                                 "type": "string"
                               },
+                              "owner_changed": {
+                                "description": "The current value is the owner's own choice, not the default",
+                                "type": "boolean"
+                              },
                               "to": {
                                 "description": "A setting value: boolean, number, text, list or null",
                                 "nullable": true
@@ -199024,6 +199052,13 @@
                               "to"
                             ],
                             "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "kept": {
+                          "description": "Settings left at the owner's own value (mode defaults_only)",
+                          "items": {
+                            "type": "string"
                           },
                           "type": "array"
                         },
@@ -199065,6 +199100,10 @@
                                 "nullable": true,
                                 "type": "string"
                               },
+                              "owner_changed": {
+                                "description": "The current value is the owner's own choice, not the default",
+                                "type": "boolean"
+                              },
                               "to": {
                                 "description": "A setting value: boolean, number, text, list or null",
                                 "nullable": true
@@ -199102,6 +199141,7 @@
                       "required": [
                         "change_count",
                         "changes",
+                        "kept",
                         "manual",
                         "name",
                         "recipe",
@@ -199272,6 +199312,10 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "owner_changed": {
+                            "description": "The current value is the owner's own choice, not the default",
+                            "type": "boolean"
+                          },
                           "to": {
                             "description": "A setting value: boolean, number, text, list or null",
                             "nullable": true
@@ -199287,6 +199331,13 @@
                           "to"
                         ],
                         "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "kept": {
+                      "description": "Settings left at the owner's own value (mode defaults_only)",
+                      "items": {
+                        "type": "string"
                       },
                       "type": "array"
                     },
@@ -199328,6 +199379,10 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "owner_changed": {
+                            "description": "The current value is the owner's own choice, not the default",
+                            "type": "boolean"
+                          },
                           "to": {
                             "description": "A setting value: boolean, number, text, list or null",
                             "nullable": true
@@ -199365,6 +199420,7 @@
                   "required": [
                     "change_count",
                     "changes",
+                    "kept",
                     "manual",
                     "name",
                     "recipe",

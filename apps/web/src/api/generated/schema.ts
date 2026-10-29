@@ -8842,7 +8842,7 @@ export interface paths {
         put?: never;
         /**
          * Apply a recipe (owner only); applying it again changes nothing
-         * @description Creates the recipe's subscription packages and class types that are missing and sets its settings through the same services as the settings screens, in one transaction, then records which recipe was applied, when and by whom. Documents are listed in `manual`. `prices` (optional) are the owner's own prices for the recipe's packages, by code.
+         * @description Creates the recipe's subscription packages and class types that are missing and sets its settings through the same services as the settings screens, in one transaction, then records which recipe was applied, when and by whom. Documents are listed in `manual`. `prices` (optional) are the owner's own prices for the recipe's packages, by code. `mode`: `all` changes every setting; `defaults_only` keeps the settings the owner already changed (the preview marks them `owner_changed`).
          */
         post: operations["PaleeWeb.AdminSetupController.apply_recipe"];
         delete?: never;
@@ -84725,6 +84725,8 @@ export interface operations {
                                 from: unknown;
                                 key: string;
                                 name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
                                 /** @description A setting value: boolean, number, text, list or null */
                                 to: unknown;
                             }[];
@@ -84740,6 +84742,8 @@ export interface operations {
                                 from: unknown;
                                 key: string;
                                 name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
                                 /** @description A setting value: boolean, number, text, list or null */
                                 to: unknown;
                             }[];
@@ -84804,6 +84808,11 @@ export interface operations {
         requestBody?: {
             content: {
                 "application/json": {
+                    /**
+                     * @description all (default): change every setting; defaults_only: keep the ones the owner changed
+                     * @enum {string}
+                     */
+                    mode?: "all" | "defaults_only";
                     /** @description The owner's prices for the recipe's packages: package code => cents */
                     prices?: {
                         [key: string]: number;
@@ -84836,6 +84845,8 @@ export interface operations {
                                 from: unknown;
                                 key: string;
                                 name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
                                 /** @description A setting value: boolean, number, text, list or null */
                                 to: unknown;
                             }[];
@@ -84851,6 +84862,8 @@ export interface operations {
                                 from: unknown;
                                 key: string;
                                 name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
                                 /** @description A setting value: boolean, number, text, list or null */
                                 to: unknown;
                             }[];
@@ -84870,9 +84883,13 @@ export interface operations {
                                 from: unknown;
                                 key: string;
                                 name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
                                 /** @description A setting value: boolean, number, text, list or null */
                                 to: unknown;
                             }[];
+                            /** @description Settings left at the owner's own value (mode defaults_only) */
+                            kept: string[];
                             manual: {
                                 /** @enum {string} */
                                 action: "add" | "create" | "manual" | "set";
@@ -84883,6 +84900,8 @@ export interface operations {
                                 from: unknown;
                                 key: string;
                                 name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
                                 /** @description A setting value: boolean, number, text, list or null */
                                 to: unknown;
                             }[];
@@ -84964,9 +84983,13 @@ export interface operations {
                             from: unknown;
                             key: string;
                             name: string | null;
+                            /** @description The current value is the owner's own choice, not the default */
+                            owner_changed?: boolean;
                             /** @description A setting value: boolean, number, text, list or null */
                             to: unknown;
                         }[];
+                        /** @description Settings left at the owner's own value (mode defaults_only) */
+                        kept: string[];
                         manual: {
                             /** @enum {string} */
                             action: "add" | "create" | "manual" | "set";
@@ -84977,6 +85000,8 @@ export interface operations {
                             from: unknown;
                             key: string;
                             name: string | null;
+                            /** @description The current value is the owner's own choice, not the default */
+                            owner_changed?: boolean;
                             /** @description A setting value: boolean, number, text, list or null */
                             to: unknown;
                         }[];
