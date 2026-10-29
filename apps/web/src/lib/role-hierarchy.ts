@@ -1,16 +1,18 @@
 import { ALL_ROLES, type RoleName } from "@/api/roles";
 
 // The role hierarchy (ADR-099, ADR-219), mirroring MembershipPolicy on the
-// API: owner › admin › staff › clients. Roles of one tier are peers.
+// API: owner › admin › staff › clients › guests (ADR-272). Roles of one tier
+// are peers.
 const TIERS: Record<RoleName, number> = {
-  owner: 4,
-  admin: 3,
-  coach: 2,
-  front_desk: 2,
-  accountant: 2,
-  janitor: 2,
-  member: 1,
-  athlete: 1,
+  owner: 5,
+  admin: 4,
+  coach: 3,
+  front_desk: 3,
+  accountant: 3,
+  janitor: 3,
+  member: 2,
+  athlete: 2,
+  guest: 1,
 };
 
 export function roleTier(role: string): number {
@@ -36,10 +38,13 @@ export function canManageMember(actorRoles: readonly string[], targetRoles: read
   );
 }
 
-/** Roles someone may add or drop on themselves: those below their top role. */
+/**
+ * Roles someone may add or drop on themselves: those below their top role.
+ * Nobody makes themselves a guest (staff do, ADR-272).
+ */
 export function selfAssignableRoles(ownRoles: readonly string[]): RoleName[] {
   const top = topTier(ownRoles);
-  return ALL_ROLES.filter((role) => roleTier(role) < top);
+  return ALL_ROLES.filter((role) => role !== "guest" && roleTier(role) < top);
 }
 
 /** The roles `actorRoles` may toggle on someone holding `targetRoles`. */

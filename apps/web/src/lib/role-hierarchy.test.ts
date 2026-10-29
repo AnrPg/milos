@@ -7,6 +7,8 @@ describe("role hierarchy", () => {
   it("ranks owner over admin over staff over clients", () => {
     expect(topTier(["member", "admin"])).toBeGreaterThan(topTier(["coach", "janitor"]));
     expect(topTier(["owner"])).toBeGreaterThan(topTier(["admin"]));
+    expect(topTier(["guest"])).toBeLessThan(topTier(["member"]));
+    expect(topTier(["guest"])).toBeGreaterThan(topTier([]));
     expect(topTier([])).toBe(0);
   });
 
@@ -23,6 +25,7 @@ describe("role hierarchy", () => {
     expect(selfAssignableRoles(["admin", "coach"])).toEqual(["coach", "front_desk", "accountant", "janitor", "member", "athlete"]);
     expect(selfAssignableRoles(["coach"])).toEqual(["member", "athlete"]);
     expect(selfAssignableRoles(["member"])).toEqual([]);
+    expect(selfAssignableRoles(["guest"])).toEqual([]);
   });
 
   it("gives nothing to edit on a fellow admin or an owner", () => {

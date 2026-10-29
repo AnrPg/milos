@@ -502,6 +502,7 @@ const ROLE_KEYS: Record<string, string> = {
   janitor: "roleJanitor",
   member: "roleMember",
   athlete: "roleAthlete",
+  guest: "roleGuest",
 };
 
 export function roleLabel(value: unknown, translate: UiTranslator): string {
