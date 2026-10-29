@@ -42,7 +42,13 @@ defmodule Palee.BoxScreens.Domain.ClassScreenPolicyTest do
     assert Policy.may_pin?(@coach, %{@class | date: Date.add(@today, 1)}, @room, "timer", @today) ==
              {:error, :forbidden}
 
-    assert Policy.may_pin?(@coach, %{@class | cancelled_at: ~U[2027-02-08 09:00:00Z]}, @room, "timer", @today) ==
+    assert Policy.may_pin?(
+             @coach,
+             %{@class | cancelled_at: ~U[2027-02-08 09:00:00Z]},
+             @room,
+             "timer",
+             @today
+           ) ==
              {:error, :forbidden}
 
     assert Policy.may_pin?(@coach, @class, @elsewhere, "timer", @today) == {:error, :forbidden}
@@ -65,7 +71,12 @@ defmodule Palee.BoxScreens.Domain.ClassScreenPolicyTest do
   test "screen managers keep their rights within their branches, any view" do
     assert Policy.views(@manager) == ~w(wod timer leaderboard bookings class)
     assert Policy.may_pin?(@manager, @class, @elsewhere, "bookings", @today) == :ok
-    assert Policy.screens(@manager, @class, [@room, @whole, @elsewhere], @today) == [@room, @whole]
+
+    assert Policy.screens(@manager, @class, [@room, @whole, @elsewhere], @today) == [
+             @room,
+             @whole
+           ]
+
     assert Policy.may_clear?(@manager, @class, @room, %{slot_id: nil}, @today) == :ok
 
     branch_manager = %{@manager | scope: ["branch-a"]}

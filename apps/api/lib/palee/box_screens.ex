@@ -17,6 +17,7 @@ defmodule Palee.BoxScreens do
   """
 
   alias Palee.BoxScreens.BoxScreenStore
+
   alias Palee.BoxScreens.Domain.{
     ClassScreenPolicy,
     Focus,
@@ -158,8 +159,14 @@ defmodule Palee.BoxScreens do
 
   defdelegate class_screens(actor, class, screens, today), to: ClassScreenPolicy, as: :screens
   defdelegate class_views(actor), to: ClassScreenPolicy, as: :views
-  defdelegate coaches_class_today?(actor, class, today), to: ClassScreenPolicy, as: :coaches_today?
-  defdelegate may_pin_class?(actor, class, screen, view, today), to: ClassScreenPolicy, as: :may_pin?
+
+  defdelegate coaches_class_today?(actor, class, today),
+    to: ClassScreenPolicy,
+    as: :coaches_today?
+
+  defdelegate may_pin_class?(actor, class, screen, view, today),
+    to: ClassScreenPolicy,
+    as: :may_pin?
 
   defdelegate may_clear_class?(actor, class, screen, override, today),
     to: ClassScreenPolicy,

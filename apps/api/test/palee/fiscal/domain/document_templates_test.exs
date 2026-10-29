@@ -420,7 +420,8 @@ defmodule Palee.Fiscal.Domain.DocumentTemplatesTest do
     @tse_signature %{
       device: "tse",
       status: "signed",
-      qr_code_data: "V0;PALEE-1;Kassenbeleg-V1;Beleg^200.00_0.00_0.00_0.00_0.00^200.00:Unbar;7;12",
+      qr_code_data:
+        "V0;PALEE-1;Kassenbeleg-V1;Beleg^200.00_0.00_0.00_0.00_0.00^200.00:Unbar;7;12",
       print: [
         %{label: "TSE-Seriennummer", value: "SANDBOX-TSE-1"},
         %{label: "Transaktionsnummer", value: "7"},

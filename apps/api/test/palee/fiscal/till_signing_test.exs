@@ -165,10 +165,16 @@ defmodule Palee.Fiscal.TillSigningTest do
       }
 
       cash = issue(context, owner, "k-cash", %{kind: "invoice", buyer: buyer})
-      card = issue(context, owner, "k-card", %{kind: "invoice", payment_method: "card", buyer: buyer})
+
+      card =
+        issue(context, owner, "k-card", %{kind: "invoice", payment_method: "card", buyer: buyer})
 
       online =
-        issue(context, owner, "k-online", %{kind: "invoice", payment_method: "online", buyer: buyer})
+        issue(context, owner, "k-online", %{
+          kind: "invoice",
+          payment_method: "online",
+          buyer: buyer
+        })
 
       assert %{device: "tse", kind: "receipt", status: "pending"} = signature(context, cash)
       assert %{device: "tse", kind: "receipt"} = signature(context, card)
@@ -399,7 +405,8 @@ defmodule Palee.Fiscal.TillSigningTest do
         country_code: "AT"
       }
 
-      card = issue(context, owner, "k-card", %{kind: "invoice", payment_method: "card", buyer: buyer})
+      card =
+        issue(context, owner, "k-card", %{kind: "invoice", payment_method: "card", buyer: buyer})
 
       transfer =
         issue(context, owner, "k-transfer", %{

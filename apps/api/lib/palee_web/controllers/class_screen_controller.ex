@@ -73,8 +73,8 @@ defmodule PaleeWeb.ClassScreenController do
     parameters: [@slot, @screen],
     responses: [
       ok: {"Box screen", "application/json", S.screen_response()},
-      forbidden: {"Not this class's coach, or another choice is pinned", "application/json",
-       S.error()},
+      forbidden:
+        {"Not this class's coach, or another choice is pinned", "application/json", S.error()},
       not_found: {"No such class or screen", "application/json", S.error()}
     ]
   )

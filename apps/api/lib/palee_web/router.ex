@@ -778,6 +778,7 @@ defmodule PaleeWeb.Router do
 
     get("/class-timers/:slot_id", ClassTimerController, :show)
     post("/class-timers/:slot_id/commands", ClassTimerController, :command)
+
     # ADR-253 update 2026-10-29: «Στην οθόνη», the class's coach pins it on a box screen.
     get("/class-timers/:slot_id/screens", ClassScreenController, :index)
 
