@@ -1,5 +1,7 @@
+import type { CommunityPost } from "@/api/community";
 import type { FollowGroups, FollowStatus, PeopleRelation, PersonProfile } from "@/api/social";
 import { PEOPLE_SEARCH_MIN } from "@/api/social";
+import { formatDuration } from "@/lib/post-media";
 
 /**
  * Pure rules for ADR-193's social web UI: the counts line, the Connections
@@ -69,6 +71,50 @@ export function postsLockKey(profile: Pick<PersonProfile, "is_me" | "my_status" 
   if (profile.is_me || profile.my_status === "active") return null;
   if (profile.my_status === "requested") return "lockedRequested";
   return profile.private ? "lockedPrivate" : "lockedFollow";
+}
+
+export const PERSON_TABS = ["posts", "media", "prs", "clubs"] as const;
+export type PersonTab = (typeof PERSON_TABS)[number];
+
+/** An unknown or missing `?tab=` opens the posts, the first tab. */
+export function personTab(requested: string | null | undefined): PersonTab {
+  return PERSON_TABS.includes(requested as PersonTab) ? (requested as PersonTab) : "posts";
+}
+
+export type MediaTile = {
+  /** The square's picture: the first photo's (or the video's poster) smallest rendition. */
+  src: string | null;
+  /** The blurred 16 px preview shown while the picture loads. */
+  placeholder: string | null;
+  alt: string;
+  /** `album` is several photos; a video shows its length. */
+  kind: "photo" | "album" | "video";
+  count: number;
+  duration: string | null;
+  /** Only its author sees a post whose media still process (ADR-157). */
+  processing: boolean;
+};
+
+/**
+ * ADR-231: one square of the profile's «Πολυμέσα» grid, Instagram-like: the
+ * post's first photo or the video's poster, with a corner mark for a video
+ * (and its length) or for several photos.
+ */
+export function mediaTile(post: Pick<CommunityPost, "media" | "media_status">): MediaTile | null {
+  const media = post.media ?? [];
+  const first = media[0];
+  if (!first) return null;
+  const ready = first.status === "ready";
+  const video = first.kind === "video";
+  return {
+    src: ready ? (first.thumb_url ?? first.feed_url ?? null) : null,
+    placeholder: first.placeholder ?? null,
+    alt: first.alt_text ?? "",
+    kind: video ? "video" : media.length > 1 ? "album" : "photo",
+    count: media.length,
+    duration: video && first.duration_ms ? formatDuration(first.duration_ms) : null,
+    processing: post.media_status !== "ready" || !ready,
+  };
 }
 
 // Follow notifications (ADR-142, ADR-193 §2).

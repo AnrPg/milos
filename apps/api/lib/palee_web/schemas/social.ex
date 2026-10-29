@@ -273,6 +273,10 @@ defmodule PaleeWeb.Schemas.Social do
       type: :object,
       properties: %{
         posts_count: %Schema{type: :integer},
+        media_count: %Schema{
+          type: :integer,
+          description: "ADR-231: your posts with photos or a video"
+        },
         followers_count: %Schema{type: :integer},
         following_count: %Schema{type: :integer},
         requests_count: %Schema{type: :integer},
@@ -288,6 +292,7 @@ defmodule PaleeWeb.Schemas.Social do
         :follow_groups,
         :followers_count,
         :following_count,
+        :media_count,
         :member_visibility,
         :posts_count,
         :privacy,

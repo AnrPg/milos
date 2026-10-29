@@ -18,7 +18,7 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 
 /**
  * Εγώ (brief §6.1, §7.11, mockup «me/meLinks»): who I am to others (the
- * profile with «Αναρτήσεις · PRs · Clubs» tabs, `MeProfile`), then the fixed
+ * profile with «Αναρτήσεις · Πολυμέσα · PRs · Clubs» tabs, `MeProfile`), then the fixed
  * list, in the mockup's order: Φέρε φίλο · Buddy · Τα box και τα clubs μου ·
  * Κοινοποίηση & ορατότητα · Συνδεδεμένες συσκευές · Πληρωμές & αποδείξεις ·
  * Ρυθμίσεις · Βοήθεια & ξενάγηση · (staff) Διαχείριση. Everything else has a
@@ -70,7 +70,7 @@ export function MeHub() {
         </div>
       </HubCard>
 
-      <MeProfile postsCount={summary.data?.posts_count ?? 0} />
+      <MeProfile postsCount={summary.data?.posts_count ?? 0} mediaCount={summary.data?.media_count ?? 0} />
 
       {/* ADR-187: the profile switch (also a long press on the avatar tab). */}
       {(currentUser?.profile_count ?? 1) > 1 ? (

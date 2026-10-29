@@ -127,6 +127,11 @@ export function fetchPersonPosts(token: string, id: string, cursor: string | nul
   return apiRequest<PersonPostsPage>(paged(`/people/${id}/posts`, cursor), { token });
 }
 
+/** ADR-231: the «Πολυμέσα» grid, their posts with photos or a video, by the same audience rules. */
+export function fetchPersonMedia(token: string, id: string, cursor: string | null = null) {
+  return apiRequest<PersonPostsPage>(paged(`/people/${id}/media`, cursor), { token });
+}
+
 export async function createProfilePost(token: string, body: ProfilePostCreate) {
   const data = await apiRequest<{ post: CommunityPost }>("/profile-posts", { method: "POST", token, body });
   return data.post;

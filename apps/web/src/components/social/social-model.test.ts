@@ -7,6 +7,8 @@ import {
   connectionsTab,
   countsParts,
   isPeopleSearch,
+  mediaTile,
+  personTab,
   postsLockKey,
   relationKey,
   socialNotificationText,
@@ -76,6 +78,46 @@ describe("posts lock", () => {
     expect(postsLockKey({ is_me: false, my_status: "none", private: true })).toBe("lockedPrivate");
     expect(postsLockKey({ is_me: false, my_status: "none", private: false })).toBe("lockedFollow");
     expect(postsLockKey({ is_me: false, my_status: "requested", private: true })).toBe("lockedRequested");
+  });
+});
+
+describe("person tabs", () => {
+  it("opens the posts unless a known tab is asked for", () => {
+    expect(personTab("media")).toBe("media");
+    expect(personTab("reels")).toBe("posts");
+    expect(personTab(null)).toBe("posts");
+  });
+});
+
+describe("media grid tile (ADR-231)", () => {
+  const photo = (id: string, extra: Record<string, unknown> = {}) => ({
+    id,
+    kind: "image" as const,
+    status: "ready" as const,
+    thumb_url: `https://cdn/${id}/thumb.webp`,
+    feed_url: `https://cdn/${id}/feed.webp`,
+    placeholder: "data:image/webp;base64,AA",
+    alt_text: `Alt ${id}`,
+    ...extra,
+  });
+
+  it("shows nothing for a post without media", () => {
+    expect(mediaTile({ media: [], media_status: "ready" })).toBeNull();
+  });
+
+  it("uses the first photo's thumbnail and marks several photos as an album", () => {
+    expect(mediaTile({ media: [photo("a")], media_status: "ready" })).toMatchObject({ src: "https://cdn/a/thumb.webp", alt: "Alt a", kind: "photo", count: 1, processing: false });
+    expect(mediaTile({ media: [photo("a"), photo("b")], media_status: "ready" })).toMatchObject({ kind: "album", count: 2 });
+    expect(mediaTile({ media: [photo("a", { thumb_url: null })], media_status: "ready" })?.src).toBe("https://cdn/a/feed.webp");
+  });
+
+  it("shows a video's poster and its length", () => {
+    const video = photo("v", { kind: "video", duration_ms: 75_000, video_url: "https://cdn/v.mp4" });
+    expect(mediaTile({ media: [video], media_status: "ready" })).toMatchObject({ kind: "video", duration: "1:15", src: "https://cdn/v/thumb.webp" });
+  });
+
+  it("marks media that still process (its author's own grid)", () => {
+    expect(mediaTile({ media: [photo("a", { status: "processing", thumb_url: null, feed_url: null })], media_status: "processing" })).toMatchObject({ src: null, processing: true });
   });
 });
 
