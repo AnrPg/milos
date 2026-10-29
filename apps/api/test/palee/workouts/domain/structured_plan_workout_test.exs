@@ -134,8 +134,8 @@ defmodule Palee.Workouts.Domain.StructuredPlanWorkoutTest do
     }
 
     assert {:ok, %{sections: [a, b]}} = StructuredPlanWorkout.prepare(params)
-    assert [%{"name" => "Back Squat"}] = a["exercises"]
-    assert a["plan"]["flow"] == "sets"
+    assert [%{name: "Back Squat", sets: 4}] = a.exercises
+    assert a.plan["flow"] == "sets"
     assert length(b["exercises"]) == 3
 
     assert {:ok, %{"sections" => [_one]}} =
