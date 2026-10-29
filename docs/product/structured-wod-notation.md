@@ -157,5 +157,8 @@ Each is optional, up to 2000 characters. Names and values are up to 200 characte
 ## 9. Bounds and shape
 
 At most 12 blocks (different rounds), 60 rows per block or interruption, and 30 columns per row.
+Counts (rounds, times, sets, structure counts) are at most 999. Every number is at most
+1 000 000 000. A larger number does not read: it is `bad_dose` / `bad_param`, and in a load it
+counts as the coach's words.
 The API refuses JSON in the wrong shape (a number where text belongs, a cell that is not an
 object, an unknown cell key) with `bad_shape` at its path. A `null` cell is an empty column.

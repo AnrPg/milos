@@ -173,3 +173,10 @@ describe("validateSection on junk (never throws)", () => {
     expect(codes(section("sets", { sets: "3 ή 4", rest: "90-120″" }, [[newRow()]]))).toEqual([]);
   });
 });
+
+describe("bounds found by fuzzing", () => {
+  it("refuses counts above 999 (a 1e11-minute EMOM ran out of memory drawing its timeline)", () => {
+    expect(codes(section("emom", { every: "1″", times: "99999999999" }, [[newRow()]]))).toEqual(["params.times:bad_param"]);
+    expect(codes(section("for_time", { rounds: "999" }, [[newRow()]]))).toEqual([]);
+  });
+});
