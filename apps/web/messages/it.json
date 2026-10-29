@@ -12330,6 +12330,109 @@
       "note_too_long": "Al massimo 2000 caratteri"
     }
   },
+  "PlanView": {
+    "label": "Allenamento strutturato",
+    "untitledSection": "Sezione {letter}",
+    "empty": "Non c'è ancora niente di scritto.",
+    "flow": {
+      "sets": "Serie",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Intervalli",
+      "rest": "Recupero"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "death_by": "Death by",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "hrr": "Recupero cardiaco (HRR)",
+      "even_odd": "Alternato (dispari / pari)",
+      "ladder": "Scala / piramide",
+      "calorie_target": "Obiettivo calorie",
+      "to_failure": "Fino al cedimento",
+      "superset": "Superserie / serie gigante",
+      "interrupt": "Con interruzioni"
+    },
+    "params": {
+      "sets": "{sets} serie",
+      "rest": "{time} di recupero",
+      "rounds": "{rounds} giri",
+      "cap": "limite {time}",
+      "windows": "{count} finestre: {times}",
+      "restBetween": "{time} di recupero tra una e l'altra",
+      "every": "ogni {time}",
+      "times": "× {count}",
+      "untilFailure": "finché non riesci a stare al passo",
+      "intervals": "{rounds} × {work} di lavoro / {off} di recupero",
+      "intervalsHr": "{rounds} × {work} di lavoro, recupero finché il battito scende a {bpm}"
+    },
+    "roundWord": {
+      "set": "Serie {numbers}",
+      "round": "Giro {numbers}",
+      "interval": "Intervallo {numbers}",
+      "minute": "Minuto {numbers}"
+    },
+    "struct": {
+      "superset": "Superserie",
+      "complex": "Complesso",
+      "cluster": "Cluster · {clusters} parti · {intra} di pausa",
+      "drop": "Serie a scalare · {drops} riduzioni di {dropby}",
+      "restpause": "Rest-pause · {minis} miniserie · {intra} di pausa"
+    },
+    "perSide": "per lato",
+    "rest": "Recupero",
+    "measure": {
+      "pace": "Passo {value}",
+      "tempo": "Tempo esecutivo {value}",
+      "rpe": "RPE {value}",
+      "rir": "RIR {value}",
+      "zone": "Zona cardiaca {value}",
+      "height": "Altezza {value}",
+      "dist": "Distanza {value}",
+      "hold": "Tenuta {value}"
+    },
+    "interruptEvery": "Ogni {time}, fermati per",
+    "scoreLine": "Punteggio: {score}",
+    "score": {
+      "best_load": "Carico (serie migliore)",
+      "reps": "Ripetizioni",
+      "time": "Tempo",
+      "rounds_reps": "Giri + rip.",
+      "done": "Completato",
+      "total_reps": "Ripetizioni (totale)",
+      "lowest_round": "Giro più basso",
+      "distance": "Distanza"
+    },
+    "levelNotes": "Note per livello",
+    "sectionNote": "Nota della sezione",
+    "exerciseCount": "{count, plural, one {# esercizio} other {# esercizi}}",
+    "authoring": {
+      "label": "Come è scritto questo allenamento",
+      "freeText": "Testo libero",
+      "structured": "Strutturato",
+      "toStructuredTitle": "Passare a strutturato?",
+      "toStructuredBody": "Il piano strutturato parte vuoto. Il tuo testo resta come nota della prima sezione, così non si perde nulla.",
+      "toTextTitle": "Passare a testo libero?",
+      "toTextBody": "Il piano diventa testo che puoi continuare a modificare. Flussi, valori per serie e strutture vengono scritti come testo e non sono più strutturati.",
+      "confirm": "Cambia",
+      "cancel": "Annulla",
+      "switchFailed": "Non è stato possibile salvare l'allenamento prima del cambio. Riprova.",
+      "switching": "Salvataggio…"
+    },
+    "editor": {
+      "planEmpty": "Aggiungi almeno un esercizio o un recupero prima di pubblicare.",
+      "fixProblems": "Alcuni valori non si leggono: correggi le righe segnate in rosso.",
+      "sectionCount": "{count, plural, one {# sezione} other {# sezioni}}"
+    }
+  },
   "PlanRun": {
     "start": "Inizia",
     "next": "Avanti",

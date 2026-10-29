@@ -12327,7 +12327,7 @@
       "nothing": "Τίποτα",
       "nothingHint": "σβήσε ένα γράμμα",
       "struct": "Δομή σετ…",
-      "structHint": "cluster, drop set, complex και άλλες",
+      "structHint": "cluster, drop set, complex…",
       "measure": "Παράμετρος…",
       "measureHint": "ρυθμός, tempo, RPE, ύψος…",
       "perRound": "Τιμές ανά γύρο",
@@ -12465,11 +12465,14 @@
       "ladder": "Σκάλα / πυραμίδα",
       "kcal_target": "Στόχος θερμίδων",
       "to_failure": "Μέχρι αποτυχία",
-      "superset": "Superset / giant set",
+      "superset": "Superset / γιγάντιο σετ",
       "cluster": "Cluster",
       "drop": "Drop set",
       "restpause": "Rest-pause",
-      "interrupt": "Με διακοπή"
+      "interrupt": "Με διακοπή",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "calorie_target": "Στόχος θερμίδων"
     },
     "params": {
       "sets": "{sets} σετ",
@@ -12519,7 +12522,8 @@
       "done": "Ολοκληρώθηκε",
       "total_reps": "Επαναλήψεις (σύνολο)",
       "lowest_round": "Χαμηλότερος γύρος",
-      "distance": "Απόσταση"
+      "distance": "Απόσταση",
+      "best_load": "Φορτίο (καλύτερο σετ)"
     },
     "levelNotes": "Σημειώσεις ανά επίπεδο",
     "sectionNote": "Σημείωση ενότητας",

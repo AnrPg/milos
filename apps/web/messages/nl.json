@@ -12330,6 +12330,109 @@
       "note_too_long": "Maximaal 2000 tekens"
     }
   },
+  "PlanView": {
+    "label": "Gestructureerde training",
+    "untitledSection": "Onderdeel {letter}",
+    "empty": "Nog niets geschreven.",
+    "flow": {
+      "sets": "Sets",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Intervallen",
+      "rest": "Rust"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "death_by": "Death by",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "hrr": "Hartslagherstel (HRR)",
+      "even_odd": "Afwisselend (oneven / even)",
+      "ladder": "Ladder / piramide",
+      "calorie_target": "Caloriedoel",
+      "to_failure": "Tot falen",
+      "superset": "Superset / reuzenset",
+      "interrupt": "Met onderbrekingen"
+    },
+    "params": {
+      "sets": "{sets} sets",
+      "rest": "{time} rust",
+      "rounds": "{rounds} rondes",
+      "cap": "limiet {time}",
+      "windows": "{count} blokken: {times}",
+      "restBetween": "{time} rust ertussen",
+      "every": "elke {time}",
+      "times": "× {count}",
+      "untilFailure": "tot je het niet meer bijhoudt",
+      "intervals": "{rounds} × {work} werk / {off} rust",
+      "intervalsHr": "{rounds} × {work} werk, rust tot je hartslag daalt naar {bpm}"
+    },
+    "roundWord": {
+      "set": "Set {numbers}",
+      "round": "Ronde {numbers}",
+      "interval": "Interval {numbers}",
+      "minute": "Minuut {numbers}"
+    },
+    "struct": {
+      "superset": "Superset",
+      "complex": "Complex",
+      "cluster": "Cluster · {clusters} delen · {intra} pauze",
+      "drop": "Dropset · {drops} keer {dropby} minder",
+      "restpause": "Rust-pauze · {minis} minisets · {intra} pauze"
+    },
+    "perSide": "per kant",
+    "rest": "Rust",
+    "measure": {
+      "pace": "Tempo per afstand {value}",
+      "tempo": "Uitvoeringstempo {value}",
+      "rpe": "RPE {value}",
+      "rir": "RIR {value}",
+      "zone": "Hartslagzone {value}",
+      "height": "Hoogte {value}",
+      "dist": "Afstand {value}",
+      "hold": "Vasthouden {value}"
+    },
+    "interruptEvery": "Elke {time} stop je voor",
+    "scoreLine": "Score: {score}",
+    "score": {
+      "best_load": "Gewicht (beste set)",
+      "reps": "Herhalingen",
+      "time": "Tijd",
+      "rounds_reps": "Rondes + herh.",
+      "done": "Voltooid",
+      "total_reps": "Herhalingen (totaal)",
+      "lowest_round": "Laagste ronde",
+      "distance": "Afstand"
+    },
+    "levelNotes": "Notities per niveau",
+    "sectionNote": "Notitie bij het onderdeel",
+    "exerciseCount": "{count, plural, one {# oefening} other {# oefeningen}}",
+    "authoring": {
+      "label": "Hoe deze training geschreven is",
+      "freeText": "Vrije tekst",
+      "structured": "Gestructureerd",
+      "toStructuredTitle": "Overschakelen naar gestructureerd?",
+      "toStructuredBody": "Het gestructureerde plan begint leeg. Je tekst blijft staan als notitie bij het eerste onderdeel, er gaat niets verloren.",
+      "toTextTitle": "Overschakelen naar vrije tekst?",
+      "toTextBody": "Het plan wordt tekst die je verder kunt bewerken. Verlopen, waarden per set en structuren worden als tekst uitgeschreven en zijn niet langer gestructureerd.",
+      "confirm": "Overschakelen",
+      "cancel": "Annuleren",
+      "switchFailed": "De training kon niet worden opgeslagen voor het overschakelen. Probeer het opnieuw.",
+      "switching": "Opslaan…"
+    },
+    "editor": {
+      "planEmpty": "Voeg minstens één oefening of rust toe voordat je publiceert.",
+      "fixProblems": "Sommige waarden zijn niet leesbaar: verbeter de rood gemarkeerde rijen.",
+      "sectionCount": "{count, plural, one {# onderdeel} other {# onderdelen}}"
+    }
+  },
   "PlanRun": {
     "start": "Start",
     "next": "Volgende",

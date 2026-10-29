@@ -12330,6 +12330,109 @@
       "note_too_long": "Como máximo 2000 caracteres"
     }
   },
+  "PlanView": {
+    "label": "Entrenamiento estructurado",
+    "untitledSection": "Sección {letter}",
+    "empty": "Todavía no hay nada escrito.",
+    "flow": {
+      "sets": "Series",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Intervalos",
+      "rest": "Descanso"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "death_by": "Death by",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "hrr": "Recuperación del pulso (HRR)",
+      "even_odd": "Alterno (impar / par)",
+      "ladder": "Escalera / pirámide",
+      "calorie_target": "Objetivo de calorías",
+      "to_failure": "Hasta el fallo",
+      "superset": "Superserie / serie gigante",
+      "interrupt": "Con interrupciones"
+    },
+    "params": {
+      "sets": "{sets} series",
+      "rest": "{time} de descanso",
+      "rounds": "{rounds} rondas",
+      "cap": "límite {time}",
+      "windows": "{count} ventanas: {times}",
+      "restBetween": "{time} de descanso entre ellas",
+      "every": "cada {time}",
+      "times": "× {count}",
+      "untilFailure": "hasta que no llegues a tiempo",
+      "intervals": "{rounds} × {work} de trabajo / {off} de descanso",
+      "intervalsHr": "{rounds} × {work} de trabajo, descanso hasta que el pulso baje a {bpm}"
+    },
+    "roundWord": {
+      "set": "Serie {numbers}",
+      "round": "Ronda {numbers}",
+      "interval": "Intervalo {numbers}",
+      "minute": "Minuto {numbers}"
+    },
+    "struct": {
+      "superset": "Superserie",
+      "complex": "Complejo",
+      "cluster": "Cluster · {clusters} partes · {intra} de pausa",
+      "drop": "Serie descendente · {drops} bajadas de {dropby}",
+      "restpause": "Descanso-pausa · {minis} miniseries · {intra} de pausa"
+    },
+    "perSide": "por lado",
+    "rest": "Descanso",
+    "measure": {
+      "pace": "Ritmo {value}",
+      "tempo": "Tempo {value}",
+      "rpe": "RPE {value}",
+      "rir": "RIR {value}",
+      "zone": "Zona de pulso {value}",
+      "height": "Altura {value}",
+      "dist": "Distancia {value}",
+      "hold": "Mantener {value}"
+    },
+    "interruptEvery": "Cada {time}, para para",
+    "scoreLine": "Puntuación: {score}",
+    "score": {
+      "best_load": "Carga (mejor serie)",
+      "reps": "Repeticiones",
+      "time": "Tiempo",
+      "rounds_reps": "Rondas + reps",
+      "done": "Completado",
+      "total_reps": "Repeticiones (total)",
+      "lowest_round": "Ronda más baja",
+      "distance": "Distancia"
+    },
+    "levelNotes": "Notas por nivel",
+    "sectionNote": "Nota de la sección",
+    "exerciseCount": "{count, plural, one {# ejercicio} other {# ejercicios}}",
+    "authoring": {
+      "label": "Cómo se escribe este entrenamiento",
+      "freeText": "Texto libre",
+      "structured": "Estructurado",
+      "toStructuredTitle": "¿Cambiar a estructurado?",
+      "toStructuredBody": "El plan estructurado empieza vacío. Tu texto queda como nota de la primera sección, así no se pierde nada.",
+      "toTextTitle": "¿Cambiar a texto libre?",
+      "toTextBody": "El plan se convierte en texto que puedes seguir editando. Los flujos, los valores por serie y las estructuras se escriben como texto y dejan de estar estructurados.",
+      "confirm": "Cambiar",
+      "cancel": "Cancelar",
+      "switchFailed": "No se pudo guardar el entrenamiento antes de cambiar. Inténtalo de nuevo.",
+      "switching": "Guardando…"
+    },
+    "editor": {
+      "planEmpty": "Añade al menos un ejercicio o un descanso antes de publicar.",
+      "fixProblems": "Algunos valores no se entienden: corrige las filas marcadas en rojo.",
+      "sectionCount": "{count, plural, one {# sección} other {# secciones}}"
+    }
+  },
   "PlanRun": {
     "start": "Empezar",
     "next": "Siguiente",

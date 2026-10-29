@@ -1,6 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
+import { backSquat } from "./plan-view/plan-fixtures";
 import { WorkoutPreviewDetail } from "./WorkoutPreviewDetail";
 
 vi.mock("next-intl", () => ({
@@ -144,5 +145,37 @@ describe("WorkoutPreviewDetail composition groups", () => {
     expect(within(group).getAllByText("Superset")).toHaveLength(1);
     expect(within(group).getByText("Squat")).toBeInTheDocument();
     expect(within(group).getByText("Pull-up")).toBeInTheDocument();
+  });
+
+  it("shows a structured plan workout as its plan, not as its derived exercises", () => {
+    render(
+      <WorkoutPreviewDetail
+        authoringMode="structured_plan"
+        sections={[{
+          id: "section-1",
+          name: "Strength",
+          plan: backSquat(),
+          exercises: [{ id: "derived", name: "Derived squat row", sets: 4, prescription_value: 12, prescription_unit: "reps" }],
+        }]}
+      />,
+    );
+
+    const view = screen.getByTestId("plan-view");
+    expect(within(view).getByText("Strength")).toBeInTheDocument();
+    expect(within(view).getByText("Back Squat")).toBeInTheDocument();
+    expect(within(view).getByTestId("plan-view-values")).toHaveTextContent("12-10-8-8 @ 60-65-70-75%");
+    expect(screen.queryByText("Derived squat row")).not.toBeInTheDocument();
+  });
+
+  it("falls back to the derived exercises when a plan workout carries no readable plan", () => {
+    render(
+      <WorkoutPreviewDetail
+        authoringMode="structured_plan"
+        sections={[{ id: "section-1", name: "Strength", plan: { v: 99 }, exercises: [{ id: "derived", name: "Derived squat row" }] }]}
+      />,
+    );
+
+    expect(screen.queryByTestId("plan-view")).not.toBeInTheDocument();
+    expect(screen.getByText("Derived squat row")).toBeInTheDocument();
   });
 });

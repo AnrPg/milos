@@ -12330,6 +12330,109 @@
       "note_too_long": "Höchstens 2000 Zeichen"
     }
   },
+  "PlanView": {
+    "label": "Strukturiertes Training",
+    "untitledSection": "Abschnitt {letter}",
+    "empty": "Noch nichts geschrieben.",
+    "flow": {
+      "sets": "Sätze",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Intervalle",
+      "rest": "Pause"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "death_by": "Death by",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "hrr": "Pulserholung (HRR)",
+      "even_odd": "Abwechselnd (ungerade / gerade)",
+      "ladder": "Leiter / Pyramide",
+      "calorie_target": "Kalorienziel",
+      "to_failure": "Bis zum Versagen",
+      "superset": "Supersatz / Riesensatz",
+      "interrupt": "Mit Unterbrechung"
+    },
+    "params": {
+      "sets": "{sets} Sätze",
+      "rest": "{time} Pause",
+      "rounds": "{rounds} Runden",
+      "cap": "Zeitlimit {time}",
+      "windows": "{count} Zeitfenster: {times}",
+      "restBetween": "{time} Pause dazwischen",
+      "every": "alle {time}",
+      "times": "× {count}",
+      "untilFailure": "bis du nicht mehr mitkommst",
+      "intervals": "{rounds} × {work} Arbeit / {off} Pause",
+      "intervalsHr": "{rounds} × {work} Arbeit, Pause bis der Puls auf {bpm} fällt"
+    },
+    "roundWord": {
+      "set": "Satz {numbers}",
+      "round": "Runde {numbers}",
+      "interval": "Intervall {numbers}",
+      "minute": "Minute {numbers}"
+    },
+    "struct": {
+      "superset": "Supersatz",
+      "complex": "Komplex",
+      "cluster": "Cluster · {clusters} Teile · {intra} Pause",
+      "drop": "Dropsatz · {drops} Reduktionen um {dropby}",
+      "restpause": "Rest-Pause · {minis} Mini-Sätze · {intra} Pause"
+    },
+    "perSide": "pro Seite",
+    "rest": "Pause",
+    "measure": {
+      "pace": "Tempo pro Strecke {value}",
+      "tempo": "Bewegungstempo {value}",
+      "rpe": "RPE {value}",
+      "rir": "RIR {value}",
+      "zone": "Pulszone {value}",
+      "height": "Höhe {value}",
+      "dist": "Distanz {value}",
+      "hold": "Halten {value}"
+    },
+    "interruptEvery": "Alle {time} unterbrechen für",
+    "scoreLine": "Wertung: {score}",
+    "score": {
+      "best_load": "Gewicht (bester Satz)",
+      "reps": "Wiederholungen",
+      "time": "Zeit",
+      "rounds_reps": "Runden + Wdh.",
+      "done": "Geschafft",
+      "total_reps": "Wiederholungen (gesamt)",
+      "lowest_round": "Schwächste Runde",
+      "distance": "Distanz"
+    },
+    "levelNotes": "Hinweise pro Stufe",
+    "sectionNote": "Hinweis zum Abschnitt",
+    "exerciseCount": "{count, plural, one {# Übung} other {# Übungen}}",
+    "authoring": {
+      "label": "Wie dieses Training geschrieben wird",
+      "freeText": "Freier Text",
+      "structured": "Strukturiert",
+      "toStructuredTitle": "Zu strukturiert wechseln?",
+      "toStructuredBody": "Der strukturierte Plan beginnt leer. Dein Text bleibt als Notiz des ersten Abschnitts erhalten, es geht nichts verloren.",
+      "toTextTitle": "Zu freiem Text wechseln?",
+      "toTextBody": "Der Plan wird zu Text, den du weiter bearbeiten kannst. Abläufe, Werte pro Satz und Strukturen werden als Text ausgeschrieben und sind nicht mehr strukturiert.",
+      "confirm": "Wechseln",
+      "cancel": "Abbrechen",
+      "switchFailed": "Das Training konnte vor dem Wechsel nicht gespeichert werden. Versuch es noch einmal.",
+      "switching": "Wird gespeichert…"
+    },
+    "editor": {
+      "planEmpty": "Füge vor dem Veröffentlichen mindestens eine Übung oder eine Pause hinzu.",
+      "fixProblems": "Einige Werte sind nicht lesbar: Korrigiere die rot markierten Zeilen.",
+      "sectionCount": "{count, plural, one {# Abschnitt} other {# Abschnitte}}"
+    }
+  },
   "PlanRun": {
     "start": "Start",
     "next": "Weiter",
