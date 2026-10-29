@@ -19,6 +19,12 @@ defmodule Palee.Fiscal.Ports.EInvoiceStore do
   @callback save_connection(context(), network :: String.t(), map()) ::
               {:ok, map()} | {:error, term()}
   @callback set_connection_status(context(), String.t(), String.t(), String.t() | nil) :: :ok
+  @doc """
+  Records a connection check (ADR-273): any of `status`, `last_error`,
+  `error_code`, `checked_at`, `next_check_at`, `check_failures`. Leaves
+  `updated_at` alone (it says when the connection was saved).
+  """
+  @callback update_connection_check(context(), String.t(), map()) :: :ok
 
   @callback insert_submission(context(), map()) :: {:ok, map()} | {:error, term()}
   @callback get_submission(context(), id()) :: map() | nil

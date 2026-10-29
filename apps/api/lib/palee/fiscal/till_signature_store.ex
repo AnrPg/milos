@@ -22,6 +22,10 @@ defmodule Palee.Fiscal.TillSignatureStore do
     do: tenant_call(context, :set_connection_status, [device, status, error])
 
   @impl true
+  def update_connection_check(context, device, attrs),
+    do: tenant_call(context, :update_connection_check, [device, attrs])
+
+  @impl true
   def insert_signature(context, attrs), do: tenant_call(context, :insert_signature, [attrs])
   @impl true
   def get_signature(context, id), do: tenant_call(context, :get_signature, [id])

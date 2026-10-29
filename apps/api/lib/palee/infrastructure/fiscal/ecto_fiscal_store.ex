@@ -8,6 +8,7 @@ defmodule Palee.Infrastructure.Fiscal.EctoFiscalStore do
   alias Palee.Fiscal.{
     AuthorityConnection,
     BusinessIdentity,
+    ConnectionSetting,
     Document,
     DocumentLine,
     ExportSetting,
@@ -65,6 +66,35 @@ defmodule Palee.Infrastructure.Fiscal.EctoFiscalStore do
     identity
     |> Map.take([:id, :organization_id, :inserted_at, :updated_at | BusinessIdentity.fields()])
   end
+
+  # ── Who manages the connections (ADR-273) ─────────────────────────────────
+
+  @impl true
+  def get_connection_setting(%{organization_id: organization_id}) do
+    ConnectionSetting
+    |> where([s], s.organization_id == ^organization_id)
+    |> Repo.one()
+    |> setting_map()
+  end
+
+  @impl true
+  def save_connection_setting(%{organization_id: organization_id}, attrs) do
+    case Repo.one(from s in ConnectionSetting, where: s.organization_id == ^organization_id) do
+      nil -> %ConnectionSetting{organization_id: organization_id}
+      setting -> setting
+    end
+    |> ConnectionSetting.changeset(attrs)
+    |> Repo.insert_or_update()
+    |> case do
+      {:ok, setting} -> {:ok, setting_map(setting)}
+      error -> error
+    end
+  end
+
+  defp setting_map(nil), do: nil
+
+  defp setting_map(%ConnectionSetting{} = setting),
+    do: Map.take(setting, [:managed_by, :updated_by_id, :updated_at])
 
   # ── Journal ───────────────────────────────────────────────────────────────
 

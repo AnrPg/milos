@@ -18,6 +18,8 @@ defmodule Palee.Fiscal.Ports.TransmissionStore do
   @callback save_connection(context(), authority :: String.t(), map()) ::
               {:ok, map()} | {:error, term()}
   @callback set_connection_status(context(), String.t(), String.t(), String.t() | nil) :: :ok
+  @doc "Records a connection check (ADR-273); see `EInvoiceStore.update_connection_check/3`."
+  @callback update_connection_check(context(), String.t(), map()) :: :ok
 
   # Transmissions
   @callback insert_transmission(context(), map()) :: {:ok, map()} | {:error, term()}

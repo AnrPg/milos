@@ -16,7 +16,8 @@ defmodule Palee.Fiscal.TillConnection do
 
   @fields ~w(device provider environment api_key api_secret admin_pin unit_id register_id
              unit_serial register_serial public_key provisioned_at status last_error
-             updated_by_id)a
+             updated_by_id error_code checked_at next_check_at check_failures
+             updated_by_platform)a
 
   schema "fiscal_till_connections" do
     field :organization_id, :binary_id, read_after_writes: true
@@ -35,6 +36,12 @@ defmodule Palee.Fiscal.TillConnection do
     field :status, :string, default: "provisioning"
     field :last_error, :string
     field :updated_by_id, :binary_id
+    # ADR-273: the last «Δοκιμή σύνδεσης».
+    field :error_code, :string
+    field :checked_at, :utc_datetime_usec
+    field :next_check_at, :utc_datetime_usec
+    field :check_failures, :integer, default: 0
+    field :updated_by_platform, :boolean, default: false
 
     timestamps(type: :utc_datetime_usec)
   end

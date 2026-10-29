@@ -18,6 +18,8 @@ defmodule Palee.Fiscal.Ports.TillSignatureStore do
   @callback save_connection(context(), device :: String.t(), map()) ::
               {:ok, map()} | {:error, term()}
   @callback set_connection_status(context(), String.t(), String.t(), String.t() | nil) :: :ok
+  @doc "Records a connection check (ADR-273); see `EInvoiceStore.update_connection_check/3`."
+  @callback update_connection_check(context(), String.t(), map()) :: :ok
 
   @callback insert_signature(context(), map()) :: {:ok, map()} | {:error, term()}
   @callback get_signature(context(), id()) :: map() | nil

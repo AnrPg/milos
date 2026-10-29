@@ -22,6 +22,10 @@ defmodule Palee.Fiscal.EInvoiceStore do
     do: tenant_call(context, :set_connection_status, [network, status, error])
 
   @impl true
+  def update_connection_check(context, network, attrs),
+    do: tenant_call(context, :update_connection_check, [network, attrs])
+
+  @impl true
   def insert_submission(context, attrs), do: tenant_call(context, :insert_submission, [attrs])
   @impl true
   def get_submission(context, id), do: tenant_call(context, :get_submission, [id])

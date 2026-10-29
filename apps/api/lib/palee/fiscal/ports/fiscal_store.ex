@@ -22,6 +22,11 @@ defmodule Palee.Fiscal.Ports.FiscalStore do
   @callback get_identity(context()) :: map() | nil
   @callback save_identity(context(), map()) :: result(map())
 
+  # Who manages the connections (ADR-273)
+  @doc "`%{managed_by, updated_by_id, updated_at}` or nil (no row: the owner)."
+  @callback get_connection_setting(context()) :: map() | nil
+  @callback save_connection_setting(context(), map()) :: result(map())
+
   # Journal
   @doc "Locks and returns the journal head `%{position, hash}` (creating it at position 0)."
   @callback lock_journal_head(context()) :: %{position: non_neg_integer(), hash: String.t()}

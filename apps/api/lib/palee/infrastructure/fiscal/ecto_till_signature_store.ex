@@ -7,6 +7,7 @@ defmodule Palee.Infrastructure.Fiscal.EctoTillSignatureStore do
 
   alias Palee.Fiscal.{TillConnection, TillSignature, TillSignatureAttempt}
   alias Palee.Fiscal.Domain.TillSigningPolicy
+  alias Palee.Infrastructure.Fiscal.ConnectionCheckFields
   alias Palee.Repo
 
   @max_page 200
@@ -43,6 +44,15 @@ defmodule Palee.Infrastructure.Fiscal.EctoTillSignatureStore do
     TillConnection
     |> where([c], c.organization_id == ^organization_id and c.device == ^device)
     |> Repo.update_all(set: [status: status, last_error: error, updated_at: DateTime.utc_now()])
+
+    :ok
+  end
+
+  @impl true
+  def update_connection_check(%{organization_id: organization_id}, device, attrs) do
+    TillConnection
+    |> where([c], c.organization_id == ^organization_id and c.device == ^device)
+    |> Repo.update_all(set: ConnectionCheckFields.set(attrs))
 
     :ok
   end

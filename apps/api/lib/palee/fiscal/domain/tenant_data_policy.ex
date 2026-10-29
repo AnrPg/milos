@@ -28,6 +28,7 @@ defmodule Palee.Fiscal.Domain.TenantDataPolicy do
             basis:
               "Fiscal documents, their lines, their reports to the tax authority, their Peppol submissions and TSE/RKSV signatures, the sales tax rates and accounting export settings they were computed and exported with, the inalterable journal and period closings are tax records (NF525, GoBD, Greek and Swiss record-keeping rules); they are archived and kept for 10 years, the longest minimum of any supported country.",
             tables: [
+              %{table: "fiscal_connection_settings"},
               %{table: "fiscal_export_settings"},
               %{table: "fiscal_sales_tax_rates"},
               %{table: "fiscal_till_signature_attempts"},
