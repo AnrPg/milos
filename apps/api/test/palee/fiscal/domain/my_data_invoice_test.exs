@@ -179,6 +179,13 @@ defmodule Palee.Fiscal.Domain.MyDataInvoiceTest do
     details = get(tree, ["paymentMethods", "paymentMethodDetails"])
     assert get(details, ["transactionId"]) == "tx-1"
     assert get(details, ["ProvidersSignature", "SigningAuthor"]) == "viva"
+    assert get(details, ["tipAmount"]) == nil
+
+    # ADR-264: a card tip goes with the payment, outside the document's amount.
+    {:ok, tree} = MyDataInvoice.build(document(), payment: Map.put(pos, :tip_cents, 250))
+    details = get(tree, ["paymentMethods", "paymentMethodDetails"])
+    assert get(details, ["tipAmount"]) == "2.50"
+    assert get(details, ["amount"]) == get(tree, ["invoiceSummary", "totalGrossValue"])
 
     for {method, type} <- [{"cash", "3"}, {"bank_transfer", "1"}, {nil, "5"}] do
       {:ok, tree} = MyDataInvoice.build(document(%{payment_method: method}), payment: pos)
