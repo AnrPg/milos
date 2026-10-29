@@ -28,6 +28,8 @@ import { LeaveProviderCard, RenewalSwitch } from "./RenewalAndLeaving";
 import { Detail, Empty, Row } from "./parts";
 import { TransactionsSegment } from "./TransactionsSegment";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { PayOpenInvoice } from "@/components/payments/PayOpenInvoice";
+import { PaymentFocusCard, SavedCardsCard } from "@/components/payments/MemberPayments";
 
 /**
  * Εγώ › Πληρωμές (vision §6.3, §7.11): per gym or coach the person is a
@@ -74,6 +76,8 @@ export function BillingPage() {
     providers[0] ??
     null;
   const tab = billingTab(searchParams.get("tab"));
+  // ADR-260: a failed-charge notification or a receipt link opens one payment.
+  const focusedPayment = searchParams.get("payment");
 
   function setParam(key: "box" | "tab", value: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -107,6 +111,10 @@ export function BillingPage() {
             </option>
           ))}
         </Select>
+      ) : null}
+
+      {focusedPayment && providers.length > 0 ? (
+        <PaymentFocusCard paymentId={focusedPayment} providers={providers} preferred={requested ?? current?.slug ?? null} />
       ) : null}
 
       {billing.isPending ? (
@@ -238,7 +246,7 @@ function Summary({ provider, entitlement }: { provider: BillingProvider; entitle
           <p className="text-xl font-extrabold tabular-nums" style={{ color: due ? "var(--warning)" : "var(--text)" }}>
             {formatMinorUnits(locale, provider.outstanding_cents, currency)}
           </p>
-          {due ? <p className="text-xs" style={{ color: "var(--text-soft)" }}>{t("payAtBox")}</p> : null}
+          {due ? <PayOpenInvoice provider={provider} fallback={<p className="text-xs" style={{ color: "var(--text-soft)" }}>{t("payAtBox")}</p>} /> : null}
         </div>
         {provider.credit_balance_cents > 0 ? (
           <div className="min-w-0 text-end">
@@ -298,6 +306,7 @@ function MembershipSegment({
       )}
       <AccessNotice entitlement={entitlement} />
       <EntitlementCard entitlement={entitlement} />
+      <SavedCardsCard slug={provider.slug} />
       {past.length > 0 ? (
         <HubCard eyebrow={t("historyTitle")}>
           <ul className="flex flex-col">
