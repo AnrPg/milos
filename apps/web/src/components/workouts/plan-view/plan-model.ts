@@ -1,17 +1,27 @@
-import type { PlanCell, PlanFlow, PlanMeasure, PlanRow, PlanSection, PlanStructure, PlanUnit } from "@/lib/structured-plan/types";
-
 import {
-  CLOCK_MEASURES,
+  FLOW_KEYS,
+  MEASURES,
+  measureUnit,
   occurrences,
+  PRESETS,
   progress,
   repeatText,
+  roundWord,
   setLoads,
   structOf,
-  TEXT_MEASURES,
   totalRounds,
   unitsOf,
-  writtenColumns,
-} from "./plan-values";
+  type MeasureUnit,
+  type PlanCell,
+  type PlanFlow,
+  type PlanMeasure,
+  type PlanRow,
+  type PlanSection,
+  type PlanStructure,
+  type PlanUnit,
+} from "@/lib/structured-plan";
+
+import { writtenColumns } from "./plan-values";
 
 /**
  * ADR-270: what the read-only WOD view shows for one plan section, in the
@@ -50,27 +60,8 @@ export type PlanViewSection = {
   levelNotes: Array<{ level: string; label: string; note: string }>;
 };
 
-export const PLAN_FLOWS: PlanFlow[] = ["sets", "for_time", "amrap", "emom", "intervals", "rest"];
-const PRESET_KEYS = new Set([
-  "tabata",
-  "billat",
-  "hrr",
-  "death_by",
-  "even_odd",
-  "complex_emom",
-  "edt",
-  "chipper",
-  "21_15_9",
-  "ladder",
-  "kcal_target",
-  "to_failure",
-  "superset",
-  "cluster",
-  "drop",
-  "restpause",
-  "interrupt",
-]);
-const SCORE_KEYS = new Set(["load", "reps", "time", "rounds_reps", "done", "total_reps", "lowest_round", "distance"]);
+const PRESET_KEYS = new Set<string>(PRESETS.map((preset) => preset.key));
+const SCORE_KEYS = new Set(["best_load", "reps", "time", "rounds_reps", "done", "total_reps", "lowest_round", "distance"]);
 
 // ── time ───────────────────────────────────────────────────────────────
 
@@ -182,23 +173,20 @@ function loadText(columns: Columns): string {
   return compactValues(loads.values, columns.open && keepsChanging((count) => setLoads(row, count).values, n));
 }
 
-const MEASURE_UNIT: Partial<Record<PlanMeasure, (value: string) => string>> = {
-  pace: (value) => (/\/|km/.test(value) ? "" : "/500m"),
-  height: (value) => (/cm|m|″|'/.test(value) ? "" : " cm"),
-  dist: (value) => (/m/.test(value) ? "" : " m"),
-  hold: (value) => (/[s″:]/.test(value) ? "" : "″"),
-};
+/** Units written after a measure's value; the others are in its label («RPE 8», «Ζώνη παλμών 2»). */
+const UNIT_SYMBOL: Partial<Record<MeasureUnit, string>> = { per500m: "/500m", cm: " cm", m: " m", sec: "″" };
 
 function measureTexts(columns: Columns, t: Translate): string[] {
   const { row, n } = columns;
   return (row.extra ?? [])
     .filter((key): key is Exclude<PlanMeasure, "side"> => key !== "side")
     .flatMap((key) => {
-      const values = TEXT_MEASURES.has(key) ? repeatText(row, key, n) : progress(row, key, n, CLOCK_MEASURES.has(key));
+      const values = MEASURES[key].text ? repeatText(row, key, n) : progress(row, key, n, MEASURES[key].clock);
       const shown = key === "tempo" ? values.map(tempoShort) : key === "zone" ? values.map((value) => value.replace(/^(z|zone|ζώνη|ζωνη)\s*/i, "")) : values;
       const compact = compactValues(shown);
       if (!compact) return [];
-      return [t(`measure.${key}`, { value: compact + (MEASURE_UNIT[key]?.(compact) ?? "") })];
+      const unit = measureUnit(key, compact);
+      return [t(`measure.${key}`, { value: compact + (unit ? (UNIT_SYMBOL[unit] ?? "") : "") })];
     });
 }
 
@@ -255,16 +243,7 @@ export function blockLabel(section: PlanSection, block: number, t: Translate): s
   if (section.blocks.length < 2) return null;
   const { list, open } = occurrences(section, block);
   const every = section.flow === "emom" ? parseClock(section.params.every, "smart") : null;
-  const word =
-    section.flow === "sets"
-      ? "set"
-      : section.flow === "emom"
-        ? every === 60
-          ? "minute"
-          : "interval"
-        : section.flow === "intervals"
-          ? "interval"
-          : "round";
+  const word = every === 60 ? "minute" : roundWord(section);
   const total = totalRounds(section);
   if (section.blocks.length >= total && list.length === 1) return t(`roundWord.${word}`, { numbers: String(list[0]) });
   const numbers = list.slice(0, 3).join(", ") + (open || list.length > 3 ? ", …" : "");
@@ -320,7 +299,7 @@ export function paramsLine(section: PlanSection, t: Translate): string {
 const levelLabelOf = (key: string, labels?: Record<string, string>) => labels?.[key] ?? (key ? key[0]!.toUpperCase() + key.slice(1) : key);
 
 export function buildPlanView(plan: PlanSection, t: Translate, levelLabels?: Record<string, string>): PlanViewSection {
-  const flow = PLAN_FLOWS.includes(plan.flow) ? plan.flow : "sets";
+  const flow: PlanFlow = FLOW_KEYS.includes(plan.flow) ? plan.flow : "sets";
   const preset = plan.preset && PRESET_KEYS.has(plan.preset) ? t(`preset.${plan.preset}`) : null;
   const blocks =
     flow === "rest"
