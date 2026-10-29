@@ -7,7 +7,7 @@ defmodule Palee.Application.Fiscal.FiscalAdmin do
   """
 
   alias Palee.{Fiscal, Organizations}
-  alias Palee.Application.Fiscal.FiscalReporting
+  alias Palee.Application.Fiscal.{FiscalEInvoicing, FiscalReporting, FiscalTillSigning}
 
   @doc "Supported countries and their requirements."
   def countries, do: %{countries: Fiscal.countries(), vat_schemes: Fiscal.vat_schemes()}
@@ -34,12 +34,20 @@ defmodule Palee.Application.Fiscal.FiscalAdmin do
       |> Map.reject(fn {_key, value} -> is_nil(value) end)
 
     page = Fiscal.list_documents(context, filters)
-    transmissions = FiscalReporting.for_documents(context, Enum.map(page.documents, & &1.id))
+    ids = Enum.map(page.documents, & &1.id)
+    transmissions = FiscalReporting.for_documents(context, ids)
+    submissions = FiscalEInvoicing.for_documents(context, ids)
+    signatures = FiscalTillSigning.for_documents(context, ids)
 
     %{
       page
       | documents:
-          Enum.map(page.documents, &Map.put(&1, :transmission, Map.get(transmissions, &1.id)))
+          Enum.map(page.documents, fn document ->
+            document
+            |> Map.put(:transmission, Map.get(transmissions, document.id))
+            |> Map.put(:einvoice, Map.get(submissions, document.id))
+            |> Map.put(:till_signature, Map.get(signatures, document.id))
+          end)
     }
   end
 
@@ -56,6 +64,14 @@ defmodule Palee.Application.Fiscal.FiscalAdmin do
          |> Map.put(
            :transmission,
            context |> FiscalReporting.for_documents([document.id]) |> Map.get(document.id)
+         )
+         |> Map.put(
+           :einvoice,
+           context |> FiscalEInvoicing.for_documents([document.id]) |> Map.get(document.id)
+         )
+         |> Map.put(
+           :till_signature,
+           context |> FiscalTillSigning.for_documents([document.id]) |> Map.get(document.id)
          )}
     end
   end
@@ -88,7 +104,11 @@ defmodule Palee.Application.Fiscal.FiscalAdmin do
         now
       )
       |> tap(fn
-        {:ok, _note, :issued} -> FiscalReporting.schedule(context)
+        {:ok, _note, :issued} ->
+          FiscalReporting.schedule(context)
+          FiscalEInvoicing.schedule(context)
+          FiscalTillSigning.schedule(context)
+
         _other -> :ok
       end)
     end
