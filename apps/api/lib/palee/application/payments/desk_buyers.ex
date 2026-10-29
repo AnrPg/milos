@@ -233,7 +233,7 @@ defmodule Palee.Application.Payments.DeskBuyers do
           {:ok, guest_payload(context, account, new?, false)}
 
         roles != [] ->
-          {:error, :staff_member}
+          {:error, :guest_is_staff}
 
         true ->
           with {:ok, _membership} <-
@@ -275,13 +275,13 @@ defmodule Palee.Application.Payments.DeskBuyers do
     email = email |> String.trim() |> String.downcase()
 
     cond do
-      name == "" -> {:error, :name_required}
-      not email?(email) -> {:error, :invalid_email}
+      name == "" -> {:error, :guest_name_required}
+      not email?(email) -> {:error, :guest_email_invalid}
       true -> existing_or_new(context, name, email)
     end
   end
 
-  defp account(_context, _params), do: {:error, :name_required}
+  defp account(_context, _params), do: {:error, :guest_name_required}
 
   # An email that already has a Palee account is that person.
   defp existing_or_new(context, name, email) do

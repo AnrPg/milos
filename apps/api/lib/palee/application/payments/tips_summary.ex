@@ -77,8 +77,8 @@ defmodule Palee.Application.Payments.TipsSummary do
 
     with {:ok, from} <- date(params[:from], Date.beginning_of_month(today)),
          {:ok, to} <- date(params[:to], today),
-         true <- Date.compare(from, to) != :gt || {:error, :invalid_period},
-         true <- Date.diff(to, from) < @max_days || {:error, :invalid_period} do
+         true <- Date.compare(from, to) != :gt || {:error, :tips_period_invalid},
+         true <- Date.diff(to, from) < @max_days || {:error, :tips_period_invalid} do
       {:ok, from, to}
     end
   end
@@ -89,7 +89,7 @@ defmodule Palee.Application.Payments.TipsSummary do
   defp date(text, _default) when is_binary(text) do
     case Date.from_iso8601(text) do
       {:ok, date} -> {:ok, date}
-      _invalid -> {:error, :invalid_period}
+      _invalid -> {:error, :tips_period_invalid}
     end
   end
 

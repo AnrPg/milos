@@ -300,7 +300,7 @@ defmodule Palee.Application.Payments.TerminalPayments do
   end
 
   defp document_id(%{fiscal_document_id: id}) when is_binary(id), do: {:ok, id}
-  defp document_id(_payment), do: {:error, :no_document}
+  defp document_id(_payment), do: {:error, :terminal_no_receipt}
 
   defp receipt_address(to, user_id) do
     cond do

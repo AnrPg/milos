@@ -5,6 +5,8 @@ defmodule PaleeWeb.AdminTerminalPaymentsController do
   returned (confirmed with the provider before anything is recorded),
   follow it and give up on it. ADR-264: a walk-in may pay a free sale; a
   tip and a card surcharge the provider confirmed are shown apart.
+  ADR-272: availability says why not, the payment carries its receipt and
+  whose tip it is, and the receipt can be emailed from the result screen.
   """
 
   use PaleeWeb, :controller
@@ -12,6 +14,7 @@ defmodule PaleeWeb.AdminTerminalPaymentsController do
 
   alias OpenApiSpex.Parameter
   alias Palee.Application.Payments.TerminalPayments
+  alias PaleeWeb.Schemas.FiscalTax, as: FT
   alias PaleeWeb.Schemas.Payments, as: P
   alias PaleeWeb.Schemas.TerminalPayments, as: T
 
@@ -87,6 +90,28 @@ defmodule PaleeWeb.AdminTerminalPaymentsController do
   def cancel(conn, %{id: id}) do
     with {:ok, payment} <- TerminalPayments.cancel(conn.assigns.tenant_context, id) do
       json(conn, %{payment: payment})
+    end
+  end
+
+  operation(:receipt_email,
+    summary: "Email the receipt of a Tap to Pay payment (ADR-272)",
+    description:
+      "«Αποστολή με email» on the result screen, through the document email of ADR-265. " <>
+        "A walk-in's needs `to`; a member's goes to their account email when `to` is left out.",
+    parameters: [%Parameter{name: :id, in: :path, required: true, schema: P.uuid()}],
+    request_body: P.body(T.receipt_email_body()),
+    responses: [
+      accepted: {"Queued", "application/json", FT.document_email()},
+      ok: {"The email of an earlier identical request", "application/json", FT.document_email()}
+    ]
+  )
+
+  def receipt_email(conn, %{id: id}) do
+    with {:ok, email, mode} <-
+           TerminalPayments.email_receipt(conn.assigns.tenant_context, id, conn.body_params) do
+      conn
+      |> put_status(if(mode == :replayed, do: :ok, else: :accepted))
+      |> json(%{email: email})
     end
   end
 
