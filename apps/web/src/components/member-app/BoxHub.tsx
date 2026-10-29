@@ -8,6 +8,7 @@ import { entitledFeatures } from "@/components/client/entitlement";
 import { useClientEntitlement } from "@/components/client/use-client-entitlement";
 import { aroundKindHref } from "@/components/around/around";
 import { AnnouncementsCard } from "@/components/community/AnnouncementsCard";
+import { DocumentsBoxCard, DocumentsButton } from "@/components/documents/DocumentsBoxCard";
 import { gymClubFor } from "@/components/community/community";
 import { useMyClubs } from "@/components/community/use-community";
 import { AccessNotice, EntitlementCard } from "@/components/finance/MembershipEntitlement";
@@ -60,6 +61,8 @@ export function BoxHub() {
   return (
     <HubPage title={<ProviderTitle title={title} />}>
       <TodayAcrossCard />
+      {/* ADR-252 (mockup s7 B): only while a mandatory document or the health certificate is missing. */}
+      <DocumentsBoxCard />
       {layout === "coach" ? (
         <>
           <BoxToday nextSession={<NextCoachSession />} />
@@ -90,6 +93,7 @@ export function BoxHub() {
           {membership ? (
             <HubButton href={`/me/referrals?box=${encodeURIComponent(membership.organization.slug)}`}>{t("membershipReferral")}</HubButton>
           ) : null}
+          <DocumentsButton />
         </div>
       </HubCard>
 
