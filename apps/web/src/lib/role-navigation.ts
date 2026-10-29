@@ -98,9 +98,9 @@ export function staffNavItems(membership: MembershipLike | null | undefined): Na
   // Shop proposal §2 (A): the front desk prepares orders and sells without Finance access.
   if (has("manage_shop") || has("sell_shop")) items.push({ id: "shop", href: "/admin/shop", labelKey: "shop", match: ["/admin/shop"], scoped: true });
   if (users) {
-    items.push({ id: "users", href: "/admin/users", labelKey: "users", match: ["/admin/users"], scoped: true });
+    items.push({ id: "users", href: "/admin/users", labelKey: "users", match: ["/admin/users", "/admin/documents"], scoped: true });
   } else if (!coaching && (has("view_directory") || has("view_billing_contacts"))) {
-    items.push({ id: "clients", href: "/admin/users", labelKey: "clients", match: ["/admin/users"], scoped: true });
+    items.push({ id: "clients", href: "/admin/users", labelKey: "clients", match: ["/admin/users", "/admin/documents"], scoped: true });
   }
   if (!users && has("view_finance_reports")) {
     items.push({ id: "reports", href: "/admin/metrics/finance", labelKey: "reports", match: ["/admin/metrics/finance"], scoped: true });
