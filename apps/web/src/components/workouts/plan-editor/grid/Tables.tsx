@@ -188,7 +188,7 @@ export function SetTable({ rows, b, occ, title }: { rows: PlanRow[]; b: number; 
 
   const n = occ.length;
   return (
-    <div className={s.gridwrap} data-testid={`plan-block-${b}`}>
+    <div className={`${s.gridwrap} ${s.sets}`} style={{ "--cols": n } as CSSProperties} data-testid={`plan-block-${b}`}>
       <table className={s.grid}>
         <thead>
           <tr>

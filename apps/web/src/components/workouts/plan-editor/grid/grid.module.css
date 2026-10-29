@@ -205,6 +205,11 @@
   border-radius: 8px;
   padding: 0.2rem 0.45rem;
   width: 100%;
+  display: block;
+  line-height: 1.35;
+  resize: none;
+  overflow-wrap: anywhere;
+  field-sizing: content;
 }
 .note:focus {
   border-color: var(--primary);
@@ -437,7 +442,8 @@
   padding: 2px 6px 2px 8px !important;
   position: sticky;
   inset-inline-start: 0;
-  background: var(--panel);
+  /* the open section's own surface, so the pinned column does not read as a separate panel in dark mode */
+  background: var(--card);
   z-index: 1;
 }
 .grid tr:focus-within .first {
@@ -486,6 +492,22 @@ td.labs {
 }
 .c .vf {
   width: 100%;
+}
+/*
+ * The Σετ table fits its column: set columns share what the name column and
+ * the ⋯ column leave (up to 6.4rem each, down to 4.4rem); only past that,
+ * e.g. ten sets on a narrow screen, does the table scroll, with the name
+ * column pinned.
+ */
+.sets {
+  container-type: inline-size;
+}
+.sets .c {
+  width: clamp(4.4rem, calc((100cqi - 16.75rem) / var(--cols, 4) - 0.25rem), 6.4rem);
+}
+/* The name and its note take the column's width, never set it (a long note wraps). */
+.sets .fname {
+  contain: inline-size;
 }
 .moreCell {
   width: 2.4rem;

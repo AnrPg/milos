@@ -339,13 +339,13 @@ function GridKeys({ picker, rootRef, children }: { picker: PickerState | null; r
 }
 
 /** The field in the row above / below that sits in the same column (or its first field). */
-export function neighbourField(root: HTMLElement | null, from: HTMLElement, key: string, dir: -1 | 1): HTMLInputElement | null {
+export function neighbourField(root: HTMLElement | null, from: HTMLElement, key: string, dir: -1 | 1): HTMLInputElement | HTMLTextAreaElement | null {
   if (!root) return null;
   const rows = [...root.querySelectorAll<HTMLElement>("[data-nav-row]")];
   const cur = from.closest<HTMLElement>("[data-nav-row]");
   const next = cur ? rows[rows.indexOf(cur) + dir] : null;
   if (!next) return null;
-  const inputs = [...next.querySelectorAll<HTMLInputElement>("input[data-key]")];
+  const inputs = [...next.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("input[data-key], textarea[data-key]")];
   const here = columnOf(key);
   return (
     inputs.find((x) => { const c = columnOf(x.dataset.key); return c.k === here.k && c.col === here.col; }) ??
