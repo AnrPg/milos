@@ -3,6 +3,7 @@ defmodule Palee.Finance.Ports.FinanceStore do
   @callback update_package(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback retire_package(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback list_packages() :: [map()]
+  @callback open_packages_online([Ecto.UUID.t()]) :: non_neg_integer()
   @callback get_package(Ecto.UUID.t()) :: map() | nil
   @callback upsert_membership(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback get_member_profile(Ecto.UUID.t()) :: map() | nil

@@ -19,7 +19,7 @@ defmodule Palee.Application.Payments.OnlineSales do
   alias Palee.Application.{PublicBox, PublicURL, SubmitBooking}
   alias Palee.Application.Shop.Checkout
   alias Palee.{Finance, Fiscal, Identity, Organizations, Payments, Shop}
-  alias Palee.Payments.Domain.{Consent, Withdrawal}
+  alias Palee.Payments.Domain.{Consent, PackageSale, Withdrawal}
 
   # ── Packages ────────────────────────────────────────────────────────────
 
@@ -37,25 +37,87 @@ defmodule Palee.Application.Payments.OnlineSales do
   end
 
   defp sold_online(context) do
+    offer = Payments.package_offer(context)
+
     context
     |> Finance.list_packages()
-    |> Enum.filter(&(&1.active and &1[:sold_online] == true and &1.base_price_cents > 0))
-    |> reject_switched_off(context)
+    |> Enum.filter(&PackageSale.listed?(&1, offer))
   end
 
-  # ADR-260: a purpose the business switched off is not offered online.
-  # Without a connected provider the page still lists the packages, with
-  # `online_payments: false`.
-  defp reject_switched_off(packages, context) do
-    if Payments.available?(context),
-      do: Enum.filter(packages, &Payments.available?(context, online_purpose(&1))),
-      else: packages
+  defp online_purpose(package), do: PackageSale.purpose(package)
+
+  # ── «Πωλείται online» for staff (ADR-271) ───────────────────────────────
+
+  @doc """
+  Adds `online_visibility` to staff package rows: whether members see and buy
+  the package online, and if not, why (`PackageSale.visibility/2`).
+  """
+  def with_visibility(context, packages) when is_list(packages) do
+    offer = Payments.package_offer(context)
+    Enum.map(packages, &put_visibility(&1, offer))
   end
 
-  # ADR-260: which «what is paid online» switch covers a package.
-  defp online_purpose(%{package_type: "pt_pack"}), do: "personal_training"
-  defp online_purpose(%{package_type: type}) when type in ["drop_in", "trial"], do: "drop_in"
-  defp online_purpose(_package), do: "packages"
+  def with_visibility(context, %{} = package),
+    do: put_visibility(package, Payments.package_offer(context))
+
+  defp put_visibility(package, offer),
+    do: Map.put(package, :online_visibility, PackageSale.visibility(package, offer))
+
+  @doc """
+  Staff params for a package: a `sold_online` given by a person is the
+  owner's choice, which Palee never overrides.
+  """
+  def owner_choice(params, %DateTime{} = now) when is_map(params) do
+    if Map.has_key?(params, "sold_online") or Map.has_key?(params, :sold_online),
+      do: Map.put(params, key_like(params, "sold_online_chosen_at"), now),
+      else: params
+  end
+
+  defp key_like(params, key) do
+    if Enum.any?(Map.keys(params), &is_atom/1), do: String.to_existing_atom(key), else: key
+  end
+
+  @doc """
+  ADR-271: a paid package created while online payments work starts sold
+  online, unless the person creating it chose.
+  """
+  def default_on_create(context, %{} = package) do
+    if PackageSale.default_on?(package, Payments.package_offer(context)) do
+      Finance.open_packages_online(context, [package.id])
+      Finance.get_package(context, package.id) || package
+    else
+      package
+    end
+  end
+
+  @doc """
+  ADR-271: the first time the business connects online payments, every
+  active paid package whose purpose is paid online and whose owner never
+  chose becomes sold online. Runs once per business; the count is kept for
+  the owner's notice. Returns the number of packages now sold online.
+  """
+  def open_on_connect(context, %DateTime{} = now) do
+    with {:ok, :claimed} <- Payments.claim_packages_opening(context, now) do
+      offer = Payments.package_offer(context)
+      opened = context |> Finance.list_packages() |> Enum.filter(&PackageSale.opens?(&1, offer))
+      Finance.open_packages_online(context, Enum.map(opened, & &1.id))
+      :ok = Payments.record_packages_opened(context, length(opened))
+      {:ok, length(opened)}
+    else
+      {:ok, :done} -> {:ok, 0}
+      error -> error
+    end
+  end
+
+  @doc "«N από M πακέτα συνδρομής πωλούνται online»: active paid packages only."
+  def summary(context) do
+    paid =
+      context
+      |> Finance.list_packages()
+      |> Enum.filter(&(&1.active == true and &1.base_price_cents > 0))
+
+    %{sold_online: Enum.count(paid, &(&1[:sold_online] == true)), packages: length(paid)}
+  end
 
   # ADR-256: the store apps sell only packages with something used in
   # person; `services` carries the contract fields that decide it.

@@ -6,7 +6,7 @@ defmodule Palee.Application.Payments.OnlinePayments do
   later invoices, and manage their saved cards.
   """
 
-  alias Palee.Application.Payments.Webhooks
+  alias Palee.Application.Payments.{OnlineSales, Webhooks}
   alias Palee.Application.{PublicURL, SignedToken}
   alias Palee.Identity
   alias Palee.Organizations
@@ -29,7 +29,8 @@ defmodule Palee.Application.Payments.OnlinePayments do
           Map.put(account, :webhook_url, Webhooks.url(context.organization_id, account.id)),
       providers: providers(),
       environments: Payments.environments(),
-      connect_providers: Map.new(Payments.environments(), &{&1, Payments.connect_providers(&1)})
+      connect_providers: Map.new(Payments.environments(), &{&1, Payments.connect_providers(&1)}),
+      online_sales: OnlineSales.summary(context)
     }
   end
 
@@ -42,6 +43,19 @@ defmodule Palee.Application.Payments.OnlinePayments do
   def save_account(context, params) do
     with {:ok, _account} <-
            Payments.save_account(context, params, Map.get(context, :user_id), now()) do
+      open_packages(context)
+      {:ok, account(context)}
+    end
+  end
+
+  # ADR-271: connecting (keys or one button) opens the paid packages once.
+  defp open_packages(context) do
+    if Payments.available?(context), do: OnlineSales.open_on_connect(context, now())
+  end
+
+  @doc "ADR-271: the owner closed «Τα N πακέτα σου πωλούνται τώρα online»."
+  def dismiss_packages_notice(context) do
+    with {:ok, _account} <- Payments.dismiss_packages_notice(context, now()) do
       {:ok, account(context)}
     end
   end
@@ -103,7 +117,11 @@ defmodule Palee.Application.Payments.OnlinePayments do
            {:ok, context} <- Organizations.resolve_tenant_context_by_id(user, organization_id),
            true <-
              TenantAuthorization.can?(context, :manage_billing) || {:error, :forbidden} do
-        Payments.complete_connect(context, provider, environment, params, user.id, now())
+        with {:ok, account} <-
+               Payments.complete_connect(context, provider, environment, params, user.id, now()) do
+          open_packages(context)
+          {:ok, account}
+        end
       end
 
     code =

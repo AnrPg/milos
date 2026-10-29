@@ -19,6 +19,8 @@ defmodule Palee.Finance.FinanceStore do
   @impl true
   def list_packages, do: adapter().list_packages()
   @impl true
+  def open_packages_online(ids), do: adapter().open_packages_online(ids)
+  @impl true
   def get_package(id), do: adapter().get_package(id)
   @impl true
   def upsert_membership(user_id, params), do: adapter().upsert_membership(user_id, params)

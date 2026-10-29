@@ -25,6 +25,8 @@ defmodule Palee.Finance.MembershipPackage do
     field :exemption_reason, :string
     # ADR-248: members can buy it themselves, online.
     field :sold_online, :boolean, default: false
+    # ADR-271: when the owner switched it on or off (Palee never overrides it).
+    field :sold_online_chosen_at, :utc_datetime_usec
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -44,7 +46,8 @@ defmodule Palee.Finance.MembershipPackage do
       :active,
       :tax_category,
       :exemption_reason,
-      :sold_online
+      :sold_online,
+      :sold_online_chosen_at
     ])
     |> update_change(:code, &PackageCode.normalize/1)
     |> validate_required([:name, :package_type, :billing_period])

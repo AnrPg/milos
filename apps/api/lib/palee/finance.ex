@@ -91,6 +91,15 @@ defmodule Palee.Finance do
   def package_quota_periods, do: Palee.Finance.Domain.PackageCatalog.quota_periods()
   def get_package_catalog(context), do: scoped(context, fn -> get_package_catalog() end)
   def get_package(context, id), do: scoped(context, fn -> get_package(id) end)
+
+  @doc """
+  ADR-271: switches «Πωλείται online» on for these packages, skipping any
+  whose owner already chose. Returns how many changed.
+  """
+  def open_packages_online(_context, []), do: 0
+
+  def open_packages_online(context, ids),
+    do: scoped(context, fn -> FinanceStore.open_packages_online(ids) end)
   defdelegate upsert_membership(user_id, params), to: UpsertMembership, as: :call
 
   def upsert_membership(context, user_id, params),
