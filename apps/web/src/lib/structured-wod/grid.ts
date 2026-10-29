@@ -1,5 +1,5 @@
 /**
- * ADR-231: ↑ and ↓ move between the rows of the structured editor the way
+ * ADR-270: ↑ and ↓ move between the rows of the structured editor the way
  * they do in a spreadsheet: same column in the row above or below, across
  * section boundaries (a section's own row counts as a row). A row without
  * that column gets the nearest one by position, so the caret never jumps to

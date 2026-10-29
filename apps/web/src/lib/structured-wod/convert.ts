@@ -14,7 +14,7 @@ import {
 import { formatLoad, formatPrescription } from "./quantity";
 
 /**
- * ADR-231: switching a workout between text and structured never loses what
+ * ADR-270: switching a workout between text and structured never loses what
  * was written. Structured → text writes each section as lines a coach would
  * put on the whiteboard («3 × 10 Back Squat @ 70%») with its timer; text →
  * structured (without the assistant) keeps each text section's title and

@@ -1,0 +1,1495 @@
+<title>Δομημένο WOD</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Commissioner:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Brief on top, then the WOD editor: sections are cards; the open one shows the format-specific steps. Frost / Graphite palette. */
+:root{
+  --bg:#F4F5F7;--panel:#FFFFFF;--muted-bg:#ECEEF2;--border:#DFE2E8;--border-strong:#A2A8B3;
+  --text:#17181C;--soft:#3A3D45;--muted:#5E6470;--placeholder:#8A909B;
+  --primary:#2F5BFF;--spark:#C8FF4D;--danger:#E0203F;--heat:#E0203F;--calm:#1E9E6A;
+  --sel:color-mix(in srgb,var(--primary) 9%,transparent);
+  --font:"Commissioner",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#17181C;--panel:#1D1F24;--muted-bg:#131418;--border:#2C2F37;--border-strong:#4A4F5A;
+  --text:#F4F5F7;--soft:#C9CCD3;--muted:#9AA0AB;--placeholder:#6B717C;
+  --primary:#5B7CFF;--spark:#E4FF6E;--danger:#FF4D6A;--heat:#FF4D6A;--calm:#3CC48C;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17181C;--panel:#1D1F24;--muted-bg:#131418;--border:#2C2F37;--border-strong:#4A4F5A;
+  --text:#F4F5F7;--soft:#C9CCD3;--muted:#9AA0AB;--placeholder:#6B717C;
+  --primary:#5B7CFF;--spark:#E4FF6E;--danger:#FF4D6A;--heat:#FF4D6A;--calm:#3CC48C;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:15px;line-height:1.45;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1{font-size:1.55rem;margin:0;font-weight:800;text-wrap:balance}
+h2{font-size:1rem;margin:0;font-weight:700}
+p{margin:0;max-width:72ch;color:var(--soft)}
+a{color:var(--primary)}
+code{font-family:var(--mono);font-size:.85em;background:var(--muted-bg);padding:0 .25rem;border-radius:4px}
+kbd{font-family:var(--mono);font-size:.72rem;border:1px solid var(--border-strong);border-bottom-width:2px;border-radius:5px;padding:0 .3rem;background:var(--panel);color:var(--text);white-space:nowrap}
+:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.brief{display:grid;gap:10px}
+.alts{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:10px}
+.alt{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:12px 14px;display:grid;gap:4px;font-size:.88rem;color:var(--soft)}
+.alt b{color:var(--text);font-size:.95rem}
+.alt.rec{border-color:var(--primary)}
+.alt .tag{font-size:.7rem;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.08em}
+.levels{margin:0;padding-inline-start:1.3rem;display:grid;gap:4px;color:var(--soft);max-width:80ch}
+.map summary{cursor:pointer;color:var(--primary);font-weight:700;font-size:.9rem}
+.map table{border-collapse:collapse;font-size:.84rem;margin-top:8px;width:100%;max-width:44rem}
+.map th,.map td{text-align:start;padding:3px 8px;border-bottom:1px solid var(--border);color:var(--soft)}
+.map th{color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+.asks{display:grid;gap:6px;margin:0;padding-inline-start:1.2rem;color:var(--soft)}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:999px;padding:2px;background:var(--panel);flex-wrap:wrap}
+.seg button{font:inherit;font-size:.8rem;font-weight:700;border:0;background:transparent;color:var(--muted);border-radius:999px;padding:.25rem .7rem;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--text);color:var(--bg)}
+.switch{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:.85rem;color:var(--muted)}
+
+.editor{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:14px 16px 10px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cell{font:inherit;color:var(--text);background:transparent;border:1px solid transparent;border-radius:8px;padding:.3rem .45rem;min-width:0}
+.cell::placeholder{color:var(--placeholder)}
+.cell:hover{border-color:var(--border)}
+.cell:focus{border-color:var(--primary);background:var(--panel);outline:none}
+.cell.bad{border-color:var(--danger)}
+.title-in{font-size:1.15rem;font-weight:800;flex:1 1 12rem}
+.status{font-size:.78rem;color:var(--muted)}
+.publish{font:inherit;font-weight:800;font-size:.88rem;border:0;border-radius:999px;padding:.48rem 1rem;background:var(--spark);color:#17181C;cursor:pointer}
+.note{font-size:.82rem;color:var(--soft);width:100%}
+.note:placeholder-shown{opacity:0}
+.note:placeholder-shown:focus,.quiet:hover .note:placeholder-shown,.quiet:focus-within .note:placeholder-shown{opacity:1}
+
+/* collapsed section card */
+.card{border:1px solid var(--border);border-radius:14px;display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;background:var(--panel);text-align:start;font:inherit;color:inherit;width:100%}
+.card:hover{border-color:var(--border-strong)}
+.letter{font-weight:800;font-size:.8rem;width:1.6rem;height:1.6rem;border-radius:8px;display:grid;place-items:center;background:var(--text);color:var(--bg);flex-shrink:0}
+.card .fmt{font-weight:800;color:var(--primary)}
+.card .what{color:var(--soft);font-size:.88rem;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card .params{color:var(--muted);font-size:.82rem;white-space:nowrap}
+.pchip.mini{font-size:.72rem;padding:0 8px;color:var(--muted);cursor:inherit;white-space:nowrap}
+@media (max-width:600px){.card{flex-wrap:wrap}.card .what{flex-basis:100%;order:5}}
+
+/* open section */
+.open{border:1.5px solid var(--primary);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:12px;background:var(--panel)}
+.open-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.steps{display:flex;gap:2px;flex-wrap:wrap;margin-inline-start:auto}
+.steps button{font:inherit;font-size:.78rem;font-weight:700;border:0;background:transparent;color:var(--muted);padding:.2rem .5rem;border-radius:999px;cursor:pointer}
+.steps button[aria-current="step"]{background:var(--sel);color:var(--primary)}
+.steps button:disabled{opacity:.45;cursor:default}
+.stepnav{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.78rem;color:var(--muted);flex-wrap:wrap}
+.btn{font:inherit;font-size:.84rem;font-weight:700;border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:999px;padding:.35rem .9rem;cursor:pointer}
+.btn.primary{background:var(--text);color:var(--bg);border-color:var(--text)}
+.add{font:inherit;font-size:.8rem;font-weight:600;border:1px dashed var(--border-strong);background:transparent;color:var(--muted);border-radius:999px;padding:.22rem .7rem;cursor:pointer}
+.adds{display:flex;gap:6px;flex-wrap:wrap}
+
+/* step 1: structure picker */
+.picker input{font:inherit;font-size:1rem;width:100%;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text);padding:.6rem .8rem}
+.picker input:focus{outline:none;border-color:var(--primary)}
+.fam{font-size:.68rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:800;margin:10px 4px 2px}
+.opts{display:grid;grid-template-columns:repeat(auto-fill,minmax(14rem,1fr));gap:2px 8px}
+.opt{display:flex;flex-direction:column;padding:6px 10px;border-radius:10px;cursor:pointer}
+.opt b{font-size:.92rem}
+.opt span{font-size:.76rem;color:var(--muted)}
+.opt[aria-selected="true"]{background:var(--sel)}
+.opt[aria-selected="true"] b{color:var(--primary)}
+mark{background:color-mix(in srgb,var(--spark) 70%,transparent);color:inherit;border-radius:3px;padding:0 1px}
+
+/* step 2: timer */
+.params-form{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+.pf{display:flex;flex-direction:column;gap:2px;font-size:.74rem;font-weight:700;color:var(--muted)}
+.pf .cell{border-color:var(--border);font-size:1.05rem;font-weight:700;width:7rem;font-variant-numeric:tabular-nums}
+.pf .sub{font-weight:500}
+.sentence{font-size:.9rem;color:var(--soft)}
+.choice{display:inline-flex;border:1px solid var(--border);border-radius:10px;padding:2px}
+.choice button{font:inherit;font-size:.86rem;font-weight:700;border:0;background:transparent;color:var(--muted);padding:.3rem .65rem;border-radius:8px;cursor:pointer}
+.choice button[aria-pressed="true"]{background:var(--text);color:var(--bg)}
+.timeline{width:100%;height:30px;display:block}
+.tl-legend{display:flex;gap:12px;font-size:.72rem;color:var(--muted);flex-wrap:wrap}
+.tl-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:4px;vertical-align:-1px}
+
+/* step 3: exercises */
+.list{display:flex;flex-direction:column;gap:2px}
+.row{display:flex;align-items:flex-start;gap:4px;border-radius:10px;flex-wrap:wrap;min-width:0}
+.lane,.slot,.loop{min-width:0}
+.row:focus-within{background:var(--sel)}
+.row .name{flex:1 1 9rem;font-weight:600}
+.qwrap{display:flex;flex-direction:column;min-width:0}
+.qwrap .cell{text-align:center;font-variant-numeric:tabular-nums}
+.dose{width:7.5rem}.load{width:7rem}
+.cap{font-size:.7rem;color:var(--muted);text-align:center;line-height:1.2;max-width:8rem}
+.row:not(:focus-within) .cap{display:none}
+.rest-label{color:var(--muted);font-weight:600;padding:.3rem .45rem;flex:1 1 9rem}
+.lbl{font-size:.7rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.loop{border:1px solid var(--border);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:4px}
+.loop-head{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.cashout{border-top:1px dashed var(--border);padding-top:6px;margin-top:4px}
+.slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,22rem),1fr));gap:8px}
+.slot{border:1px solid var(--border);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:4px;border-top:4px solid var(--c)}
+.lanes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,27rem),1fr));gap:10px}
+.lane{border:1px solid var(--border);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:4px}
+.lane.int{border:1px dashed var(--heat)}
+.lane.int .lbl{color:var(--heat)}
+.rungs{display:flex;gap:4px;flex-wrap:wrap;font-size:.78rem;color:var(--muted)}
+.rungs span{border:1px solid var(--border);border-radius:6px;padding:0 .35rem;font-variant-numeric:tabular-nums}
+/* set grid */
+.gridwrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px}
+.gblock{display:flex;flex-direction:column;gap:4px;border-inline-start:3px solid var(--c);padding-inline-start:6px}
+.gridwrap.strip{align-self:flex-start;max-width:100%;margin-inline-start:.45rem}
+.gridwrap.strip td{border-bottom:0}
+.gridwrap.strip th{min-width:6.6rem}
+.gridwrap.strip caption{text-align:start;padding:4px 8px 0;caption-side:top}
+table.grid{border-collapse:collapse;width:100%;min-width:max-content}
+.grid th{font-size:.7rem;font-weight:800;color:var(--muted);text-align:center;padding:6px 4px;border-bottom:1px solid var(--border);white-space:nowrap}
+.grid th:first-child{text-align:start;padding-inline-start:10px}
+.grid th.opt-set{color:var(--placeholder)}
+.grid td{padding:2px;border-bottom:1px solid var(--border);vertical-align:top}
+.grid tr:last-child td{border-bottom:0}
+.grid td.first{padding-inline-start:6px;min-width:12rem}
+.grid tr.in-group td.first{box-shadow:inset 3px 0 0 var(--primary)}
+.schip{font:inherit;font-size:.68rem;font-weight:800;letter-spacing:.04em;color:var(--primary);background:var(--sel);border:1px solid transparent;border-radius:999px;padding:1px 8px;cursor:pointer;white-space:nowrap}
+.schip:focus-visible{outline:2px solid var(--primary);outline-offset:1px}
+.schip.plain{background:none;color:var(--placeholder);font-weight:600;opacity:0}
+tr:hover .schip.plain,tr:focus-within .schip.plain,.unit:hover .schip.plain,.unit:focus-within .schip.plain,.schip.plain:focus{opacity:1}
+.uhead{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-height:0}
+.namechip{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.rtools{display:none;gap:4px}
+.rtools .add{font-size:.72rem;padding:1px 8px}
+.rtools .add kbd{font-size:.62rem}
+tr:focus-within .rtools,.quiet:focus-within .rtools{display:inline-flex}
+@media (hover:none){.rtools{display:inline-flex}}
+.xtag{font:inherit;font-size:.7rem;font-weight:700;color:var(--soft);background:var(--muted-bg);border:0;border-radius:6px;padding:1px 6px;cursor:pointer}
+.cell.x{width:5.2rem;font-size:.85rem}
+.rounds{display:grid;grid-template-columns:repeat(auto-fill,minmax(6.5rem,1fr));gap:4px 8px;padding-inline-start:.45rem}
+.rc{display:flex;flex-direction:column;gap:2px;min-width:0}
+.rh{font-size:.66rem;font-weight:800;letter-spacing:.06em;color:var(--muted);text-transform:uppercase}
+.unit{display:flex;flex-direction:column;gap:2px;min-width:0}
+.unit.grouped{border-inline-start:3px solid var(--primary);padding-inline-start:6px;border-radius:2px}
+.unit.shaped:not(.grouped){border-inline-start:3px dashed var(--primary);padding-inline-start:6px}
+.uhint{font-size:.74rem;color:var(--muted)}
+.sf{display:inline-flex;align-items:center;gap:4px}
+.cell.tiny{width:3.2rem}
+.opt.flow{border:1px solid var(--border);background:var(--panel)}
+.opt.flow b{font-size:1rem}
+.opt.flow[aria-selected="true"]{border-color:var(--primary)}
+.opts.flows{gap:6px}
+.presetbox{margin-top:14px;background:var(--muted-bg);border-radius:12px;padding:8px 10px 10px;display:flex;flex-direction:column;gap:6px}
+.pb-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.pb-head .fam{margin:0}
+.pb-sub{font-size:.76rem;color:var(--muted)}
+.pchips{display:flex;flex-wrap:wrap;gap:6px}
+.pb-row{display:grid;grid-template-columns:6.5rem 1fr;gap:8px;align-items:baseline}
+@media (max-width:600px){.pb-row{grid-template-columns:1fr;gap:2px}}
+.pchip{display:inline-flex;max-width:100%;border:1px dashed var(--border-strong);border-radius:999px;padding:2px 11px;cursor:pointer;font-size:.82rem;background:transparent}
+.pchip b{font-weight:700;font-size:.84rem}
+.pflow{font-size:.68rem;font-weight:800;color:var(--primary);text-transform:uppercase;letter-spacing:.05em}
+.precipe{font-size:.78rem;color:var(--muted);min-height:1.2em}
+.pchip[aria-selected="true"]{background:var(--panel);border-style:solid;border-color:var(--primary)}
+.grid .c,.rounds .c{display:flex;flex-direction:column;width:6.2rem;max-width:100%}
+.rounds .c .l{font-size:.8rem;color:var(--soft)}
+.c .uw{display:flex;justify-content:center;align-items:center;gap:2px;border:1px solid transparent;border-radius:8px}
+.c .uw:focus-within{border-color:var(--primary);background:var(--panel)}
+.c .uw .cell.x{field-sizing:content;width:auto;min-width:3ch;max-width:4.4rem;padding-inline:0;border:0;background:transparent}
+.c .uw .u{font-size:.62rem}
+.grid td .c{margin-inline:auto}
+.gridwrap.strip .grid{width:auto}
+.c .cell.x{width:100%;font-size:.78rem;text-align:center}
+.rounds .c .cell,.grid .c .cell{text-align:center;font-variant-numeric:tabular-nums;padding:.2rem .3rem}
+.grid .c .l{font-size:.8rem;color:var(--soft)}
+.grid .c .cell.inherit::placeholder{color:var(--placeholder)}
+.grid tr:focus-within{background:var(--sel)}
+.uw{display:inline-flex;align-items:center;gap:4px}
+.u{font-size:.72rem;color:var(--muted);white-space:nowrap}
+.pf .u{font-size:.8rem;font-weight:600}
+.grid .thu,.rounds .thu{font-size:.62rem;font-weight:600;color:var(--placeholder)}
+.gridhint{font-size:.78rem;color:var(--muted);min-height:1.2em}
+.gridhint code{font-size:.78rem}
+.grid .calc{font-size:.68rem;color:var(--muted);text-align:center;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:6.2rem}
+.grid .calc.err{color:var(--danger);font-weight:600;max-width:6.2rem}
+.restline td.first{color:var(--muted);font-weight:600;padding:.4rem .7rem}
+/* step 4 */
+.scorepick{display:flex;flex-direction:column;gap:6px}
+
+.hint{display:flex;gap:14px;flex-wrap:wrap;padding-top:8px;border-top:1px solid var(--border);font-size:.76rem;color:var(--muted)}
+.sugg{position:absolute;z-index:40;background:var(--panel);border:1px solid var(--border);border-radius:12px;box-shadow:0 12px 32px rgb(0 0 0 / .18);min-width:15rem;padding:4px 0}
+.sugg .o{display:flex;justify-content:space-between;gap:12px;padding:7px 12px;font-size:.88rem;cursor:pointer}
+.sugg .o[aria-selected="true"]{background:var(--sel)}
+.sugg .o small{color:var(--muted)}
+.scrim{position:fixed;inset:0;background:rgb(23 24 28 / .45);display:flex;align-items:flex-start;justify-content:center;padding:12vh 16px 16px;z-index:50}
+.sheet{background:var(--panel);border:1px solid var(--border);border-radius:16px;width:min(560px,100%);max-height:76vh;overflow:auto;box-shadow:0 30px 90px rgb(0 0 0 / .3)}
+.sheet h4{margin:12px 16px 4px;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.keys{display:grid;grid-template-columns:1fr auto;gap:6px 16px;padding:4px 16px 14px;font-size:.88rem}
+.toast{position:fixed;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:.5rem .9rem;border-radius:999px;font-size:.85rem;z-index:60}
+@media (max-width:700px){.row{flex-wrap:wrap}.row .name{flex-basis:100%}.steps{margin-inline-start:0}}
+
+/* ── exercise tables (v4 layout) ── */
+.stack{display:flex;flex-direction:column;gap:8px;min-width:0}
+.vf{position:relative;display:flex;align-items:center;justify-content:center;gap:3px;height:2rem;min-width:0;max-width:100%;border:1px solid transparent;border-radius:8px;padding:0 .45rem;cursor:text}
+.vf:hover{border-color:var(--border)}
+.vf:focus-within{border-color:var(--primary);background:var(--panel)}
+.vf.bad{border-color:var(--danger);background:color-mix(in srgb,var(--danger) 9%,transparent)}
+.vi{font:inherit;font-size:.92rem;border:0;background:transparent;color:var(--text);padding:0;min-width:1.5ch;max-width:100%;text-align:center;font-variant-numeric:tabular-nums;outline:none;field-sizing:content}
+@supports not (field-sizing:content){.vi{width:100%}}
+.vi::placeholder{color:var(--placeholder)}
+.vs{font-size:.72rem;color:var(--muted);white-space:nowrap}
+.vd{position:absolute;inset:0;display:none;align-items:center;justify-content:center;gap:5px;pointer-events:none;font-variant-numeric:tabular-nums;font-size:.92rem}
+.vd b{font-weight:400}
+.vd small{font-size:.62rem;font-weight:800;color:var(--primary);background:var(--sel);border-radius:4px;padding:0 4px}
+.vf.has-disp:not(:focus-within) .vd{display:flex}
+.vf.has-disp:not(:focus-within) .vi,.vf.has-disp:not(:focus-within) .vs{color:transparent}
+.vf.has-disp:not(:focus-within) .vi::placeholder{color:transparent}
+.xtw{container-type:inline-size;min-width:0}
+.xt{display:grid;grid-template-columns:minmax(8rem,1fr) repeat(var(--cols),minmax(5rem,max-content)) 2.2rem;column-gap:4px;align-items:stretch;grid-auto-flow:dense}
+.xh{display:contents}
+.xh span{font-size:.66rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding:0 6px 4px;text-align:center;white-space:nowrap;align-self:end}
+.xh span:first-child{text-align:start;padding-inline-start:.5rem}
+.xr,.xgroup{display:contents}
+.xr>*{min-height:2.4rem;display:flex;align-items:center;border-top:1px solid var(--border);min-width:0}
+.xv{justify-content:center}
+.xr:focus-within>*{background:var(--sel)}
+.xr.in-group>.xn{box-shadow:inset 3px 0 0 var(--primary)}
+.xg,.xnote,.xp{grid-column:1/-1;min-width:0}
+.xg{padding:8px 0 2px;border-top:1px solid var(--border)}
+.xnote{padding:0 0 6px .5rem}
+.xp{padding:2px 0 10px .5rem;display:flex}
+.xn .nm{display:flex;align-items:center;gap:6px;width:100%;min-width:0}
+.xn .cell.name{flex:1;font-weight:600;min-width:0}
+.xr.rest .rest-label{padding-inline-start:.5rem}
+.more{font:inherit;font-size:1rem;line-height:1;background:none;border:1px solid transparent;border-radius:8px;color:var(--muted);width:2rem;height:2rem;cursor:pointer;opacity:.3}
+.xr:hover .more,.xr:focus-within .more,tr:hover .more,tr:focus-within .more,.more:focus{opacity:1}
+.more:hover,.more:focus-visible{border-color:var(--border);color:var(--text)}
+.sumv{font:inherit;font-size:.86rem;background:none;border:0;color:var(--soft);cursor:pointer;font-variant-numeric:tabular-nums;padding:0 .4rem;white-space:nowrap}
+.xtag{font-size:.68rem;font-weight:700;color:var(--soft);background:var(--muted-bg);border-radius:6px;padding:1px 6px;white-space:nowrap}
+@container (max-width:520px){
+  .xt{grid-template-columns:1fr 2.2rem}
+  .xh{display:none}
+  .xr>*{border-top:0;min-height:2.2rem}
+  .xn{grid-column:1;border-top:1px solid var(--border)!important}
+  .xm{grid-column:2;border-top:1px solid var(--border)!important;justify-content:center}
+  .xv{grid-column:1/-1;justify-content:space-between;padding-inline-start:.5rem}
+  .xv::before{content:attr(data-label);font-size:.76rem;color:var(--muted)}
+  .xv.empty,.xr.per .xv{display:none}
+}
+.grid td.first{min-width:12rem;padding:2px 6px 2px 8px;position:sticky;inset-inline-start:0;background:var(--panel);z-index:1}
+.grid tr:focus-within td.first{background:var(--sel)}
+.fx{display:flex;gap:8px;align-items:flex-start}
+.fname{flex:1;min-width:7rem;display:flex;flex-direction:column;gap:2px}
+.fname .cell.name{font-weight:600}
+.fname .rest-label,.xn .rest-label{flex:none;padding:.3rem .45rem;line-height:1.4}
+.grid .restline td.first{padding:2px 6px 2px 8px}
+.labs{display:flex;flex-direction:column}
+.labs>div{height:2rem;display:flex;align-items:center;justify-content:flex-end;font-size:.72rem;color:var(--muted);white-space:nowrap}
+td.labs{padding:2px 8px 2px 4px;vertical-align:top}
+.grid .c{display:flex;flex-direction:column;width:6.4rem;margin-inline:auto}
+.grid tr.grp td{padding:8px 8px 2px;border-bottom:0}
+.grid td.more-c{width:2.4rem;padding:2px 4px}
+.grid th.more-h{width:2.4rem}
+.gridwrap.mini{align-self:flex-start;max-width:100%}
+.gridwrap.mini .grid{width:auto}
+.gridwrap.mini td{border-bottom:0}
+.gridwrap.tall .grid{width:100%}
+.gridwrap.tall th{font-size:.64rem}
+.gridwrap.tall td{padding:1px 2px}
+.gridwrap.tall .vf{width:100%}
+.gridwrap.tall td{vertical-align:middle}
+.setno{width:2.2rem;text-align:center;color:var(--muted);font-size:.78rem;font-weight:700;font-variant-numeric:tabular-nums}
+.scards{display:flex;flex-direction:column;gap:2px}
+.scard{display:flex;flex-direction:column;gap:2px;padding:4px 0 8px;border-top:1px solid var(--border)}
+.scard .xr{display:flex;align-items:center}
+.scard .xr>*{border-top:0;min-height:2.2rem}
+.scard .xn{flex:1}
+.scard.in-group{box-shadow:inset 3px 0 0 var(--primary);padding-inline-start:6px}
+.scard .gridwrap.mini{overflow-x:auto}
+.gridhint .mean{color:var(--text);font-weight:600}
+.gridhint .err{color:var(--danger);font-weight:600}
+</style>
+
+<div class="wrap">
+  <section class="brief">
+    <h1>Δομημένο WOD, έκδοση 3: τρεις προσεγγίσεις</h1>
+    <p>Μια ενότητα στήνεται σε τρία επίπεδα, που δεν ανακατεύονται ποτέ:</p>
+    <ol class="levels">
+      <li><b>Ροή</b>: πώς τρέχει το ρολόι όλης της ενότητας. Σετ (χωρίς ρολόι), For Time, AMRAP, EMOM, Intervals, Ξεκούραση. Μόνο έξι.</li>
+      <li><b>Δομή σετ ή γύρου</b>: τι γίνεται μέσα σε κάθε σετ, γύρο ή διάστημα. Απλό, Superset, Complex, Cluster, Drop set, Rest-pause. Μπαίνει πάνω στην ίδια την άσκηση ή ομάδα ασκήσεων με το <kbd>Alt+T</kbd>, οπότε ένα AMRAP μπορεί να έχει μέσα ένα superset και μετά μια απλή άσκηση.</li>
+      <li><b>Τιμές κάθε άσκησης</b>, σε κάθε ροή: επαναλήψεις και φορτίο, και όποια άλλη παράμετρο χρειαστείς με <kbd>Alt+P</kbd> (ρυθμός, tempo, RPE, RIR, ζώνη παλμών, ύψος, απόσταση, κράτημα, ανά πλευρά). Στα Σετ κάθε τιμή αλλάζει ανά σετ. Σε AMRAP, For Time, EMOM και Intervals το ίδιο γίνεται ανά γύρο με <kbd>Alt+V</kbd>. Παντού ισχύει η ίδια πρόοδος: κενό = όπως πριν, <code>+5</code> ανεβαίνει κάθε φορά, <code>60→80</code> ως το τέλος, και η μονάδα (kg ή %) γράφεται μία φορά στη γραμμή.</li>
+      <li><b>Διαφορετικοί γύροι</b>, σε κάθε ροή: με <kbd>Alt+S</kbd> προσθέτεις κουτί με άλλες ασκήσεις. Τα κουτιά εναλλάσσονται (γύροι 1, 3, 5… και 2, 4, 6…). Με τόσα κουτιά όσοι οι γύροι, κάθε γύρος είναι μοναδικός. Στα Σετ κάθε κουτί έχει τον δικό του πίνακα με τα δικά του σετ.</li>
+      <li><b>Προσθήκες</b> πάνω στη ροή: «διακοπή κάθε Χ λεπτά» και «ξεκούραση μέχρι να πέσουν οι παλμοί».</li>
+    </ol>
+    <p>Οι σκάλες, οι πυραμίδες, το «όσες προλάβεις στον χρόνο που μένει» και το «μέχρι αποτυχία» δεν είναι μορφές. Γράφονται στις επαναλήψεις (<code>2-4-6…</code>, <code>max</code>). Τα γνωστά ονόματα (Tabata, Death by, EDT…) μένουν στη λίστα ως συντομεύσεις που γεμίζουν τα τρία επίπεδα για σένα. Όπου γράφεις κείμενο εμφανίζονται προτάσεις που αντέχουν και τα ορθογραφικά (δοκίμασε <code>emon</code>, <code>bak sq</code>, <code>tabta</code>).</p>
+    <details class="map"><summary>Πού πήγε καθεμία από τις 19 μορφές της εφαρμογής</summary>
+      <table><thead><tr><th>Σημερινή μορφή</th><th>Ροή</th><th>Πώς γράφεται</th></tr></thead><tbody><tr><td>Χωρίς χρόνο (untimed)</td><td>Σετ</td><td>—</td></tr><tr><td>For Time</td><td>For Time</td><td>—</td></tr><tr><td>Μέχρι αποτυχία</td><td>Σετ</td><td>επαναλήψεις <code>max</code></td></tr><tr><td>Στόχος θερμίδων</td><td>For Time</td><td>επαναλήψεις <code>100 cal</code></td></tr><tr><td>EMOM</td><td>EMOM</td><td>—</td></tr><tr><td>Complex EMOM</td><td>EMOM</td><td>3 διαστήματα</td></tr><tr><td>Even / odd</td><td>EMOM</td><td>2 διαστήματα</td></tr><tr><td>Billat</td><td>Intervals</td><td>30″ / 30″</td></tr><tr><td>AMRAP</td><td>AMRAP</td><td>—</td></tr><tr><td>EDT</td><td>AMRAP</td><td>δομή Superset</td></tr><tr><td>Death by</td><td>EMOM</td><td>επαναλήψεις <code>1-2-3…</code></td></tr><tr><td>Tabata</td><td>Intervals</td><td>20″ / 10″ × 8</td></tr><tr><td>Custom HIIT</td><td>Intervals</td><td>—</td></tr><tr><td>Cluster</td><td>(οποιαδήποτε)</td><td>δομή Cluster σε ένα σετ</td></tr><tr><td>HRR</td><td>Intervals</td><td>προσθήκη: ξεκούραση μέχρι παλμούς</td></tr><tr><td>Σκάλα ↑</td><td>For Time / AMRAP</td><td>επαναλήψεις <code>2-4-6…</code></td></tr><tr><td>Σκάλα ↓</td><td>For Time</td><td>επαναλήψεις <code>10-8-6…</code></td></tr><tr><td>Πυραμίδα</td><td>For Time</td><td>επαναλήψεις <code>2-4-6-4-2</code></td></tr><tr><td>Ξεκούραση</td><td>Ξεκούραση</td><td>—</td></tr><tr><td>νέο: Με διακοπή</td><td>Σετ / For Time / AMRAP</td><td>προσθήκη: διακοπή κάθε Χ</td></tr></tbody></table>
+    </details>
+    <div class="alts">
+      <div class="alt rec"><span class="tag">Προτείνω</span><b>Α · Wizard ανά ενότητα</b><span>Η ιδέα σου: 1 Ροή → 2 Χρόνος → 3 Ασκήσεις → 4 Σκορ. Κάθε βήμα δείχνει μόνο ό,τι χρειάζεται η μορφή. Όταν τελειώσεις, η ενότητα κλείνει σε μία γραμμή.</span></div>
+      <div class="alt"><b>Β · Μία φόρμα που αλλάζει σχήμα</b><span>Ίδιες διατάξεις, χωρίς βήματα: διαλέγεις μορφή στην κεφαλίδα και από κάτω εμφανίζονται μαζί χρόνος, ασκήσεις και σκορ. Λιγότερα πατήματα, περισσότερα στην οθόνη.</span></div>
+      <div class="alt"><b>Γ · Γραφή σαν πίνακας</b><span>Η έκδοση 2: γράφεις όπως στον πίνακα του box (<code>12-10-8-8</code>) και η μορφή βγαίνει από αυτό. Η πιο γρήγορη για έμπειρους, η λιγότερο καθοδηγητική. <a href="grammi.html">Άνοιξέ τη</a></span></div>
+    </div>
+    <h2>Τι χρειάζομαι από σένα</h2>
+    <ul class="asks">
+      <li>Ποια από τις τρεις; Μπορούμε και να τις συνδυάσουμε, π.χ. Α για τη δομή και στο βήμα 3 η γραφή του Γ μέσα στα κελιά.</li>
+      <li>Σου φαίνεται σωστή η διάκριση ροή / δομή σετ / προσθήκες; Θα έβαζες κάτι σε άλλο επίπεδο;</li>
+      <li>Σε ποια μορφή η διάταξη του βήματος 3 δεν είναι αυτή που θα περίμενες;</li>
+    </ul>
+  </section>
+
+  <div class="switch">Προσέγγιση:
+    <div class="seg" role="group" aria-label="Προσέγγιση" id="alt-switch">
+      <button data-alt="A" aria-pressed="true">Α · Wizard</button>
+      <button data-alt="B" aria-pressed="false">Β · Μία φόρμα</button>
+    </div>
+    <a href="grammi.html">Γ · Γραφή σαν πίνακας →</a>
+  </div>
+
+  <div class="editor" id="editor">
+    <div class="bar">
+      <input class="cell title-in" id="title" data-k="w:title" placeholder="Τίτλος WOD" aria-label="Τίτλος WOD">
+      <span class="status" id="status">Αποθηκεύτηκε</span>
+      <button class="publish" id="publish">Δημοσίευση</button>
+    </div>
+    <div class="quiet"><input class="cell note" data-k="w:note" id="wodnote" placeholder="Σημείωση για όλο το WOD (προαιρετική)" aria-label="Σημείωση WOD"></div>
+    <div id="sections" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div class="adds"><button class="add" id="add-section" data-k="w:addsec">+ Ενότητα <kbd>Shift+Enter</kbd></button></div>
+    <div class="hint" id="hint"></div>
+  </div>
+</div>
+<div id="layer"></div>
+
+<script>
+(() => {
+const mac = /mac|iphone|ipad/i.test(navigator.platform || "");
+const MOD = mac ? "⌘" : "Ctrl";
+let uid = 1; const id = () => "x" + (uid++);
+const fold = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+const clock = s => s >= 60 ? `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}` : `${s}″`;
+const mmss = s => `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`;
+const numStr = n => String(Math.round(n * 100) / 100);
+
+// ── time fields ──────────────────────────────────────
+// A bare number means minutes ("min") or, with "smart", minutes up to 10 and seconds above ("rest 2" vs "rest 90").
+function parseClock(t, dflt = "min") {
+  const v = t.trim().toLowerCase(); if (!v) return null;
+  let m = /^(\d+):(\d{2})$/.exec(v); if (m) return +m[1]*60 + +m[2];
+  m = /^(\d+)\s*(s|sec|″|"|δ)$/.exec(v); if (m) return +m[1];
+  m = /^(\d+)\s*(min|'|′|λ|λεπτά)$/.exec(v); if (m) return +m[1]*60;
+  m = /^(\d+)$/.exec(v); if (m) return dflt === "min" || +m[1] <= 10 ? +m[1]*60 : +m[1];
+  return "bad";
+}
+// "3-3-3-4", "3'-3'-3'-4'", "90-120″" (two ascending = range)
+function parseTimes(t, dflt = "min") {
+  let v = t.trim().toLowerCase(); if (!v) return null;
+  const um = /\s*(s|sec|″|"|δ|min|'|′|λ)$/.exec(v);
+  const parts = v.split(/\s*[-–,]\s*/).map(p => um && /^\d+$/.test(p) ? p + um[1] : p);
+  const secs = parts.map(p => parseClock(p, dflt));
+  if (secs.some(x => x === "bad" || x === null || x <= 0)) return "bad";
+  const range = secs.length === 2 && !v.includes(",") && secs[0] < secs[1];
+  return { range, secs };
+}
+const showTimes = p => !p || p === "bad" ? "" : p.range ? `${clock(p.secs[0])}–${clock(p.secs[1])}` : p.secs.map(clock).join(" · ");
+
+// ── dose notation ────────────────────────────────────
+const NUM = "(\\d+(?:\\.\\d+)?(?::\\d{2})?)";
+const toNum = t => t.includes(":") ? (() => { const [a, b] = t.split(":"); return +a*60 + +b; })() : +t;
+function parseNums(v) {
+  let cont = false;
+  if (/(…|\.\.\.|\+)$/.test(v)) { cont = true; v = v.replace(/(…|\.\.\.|\+)$/, "").trim(); }
+  const words = new RegExp(`^${NUM}\\s*(?:έως|εως|to|~)\\s*${NUM}$`).exec(v);
+  if (words) return { entries: [{ min: toNum(words[1]), max: toNum(words[2]) }], cont: false };
+  if (v.includes(",")) {
+    // "8-10, 6-8, 4-6": commas separate sets, a dash inside a set is a range
+    const sets = v.split(/\s*,\s*/).map(p => { const r = new RegExp(`^${NUM}(?:\\s*(?:[-–]|έως|εως|to)\\s*${NUM})?$`).exec(p); return r && { min: toNum(r[1]), max: toNum(r[2] || r[1]) }; });
+    if (sets.some(e => !e || e.max < e.min) || (cont && sets.length < 2)) return "bad";
+    return { entries: sets, cont };
+  }
+  const parts = v.split(/\s*[-–,]\s*/);
+  if (!parts.every(p => new RegExp(`^${NUM}$`).test(p))) return "bad";
+  const nums = parts.map(toNum);
+  if (cont && nums.length < 2) return "bad";
+  if (nums.length === 2 && !v.includes(",") && nums[0] < nums[1] && !cont) return { entries: [{ min: nums[0], max: nums[1] }], cont };
+  return { entries: nums.map(n => ({ min: n, max: n })), cont };
+}
+const SIDE = /\s*(\/\s*(side|πλευρά|πλευρα|πλ\.?|χέρι|χερι|πόδι|ποδι)|(on\s+)?each(\s+(side|arm|leg))?|for each arm|ανά πλευρά|ανα πλευρα|ανά χέρι|ανα χερι|ανά πόδι|ανα ποδι)$/;
+const UNIT = /\s*(reps|r|επ\.?|cal|kcal|θερμ\.?|km|m|sec|s|″|"|δ|min|'|′|λ)$/;
+function parseDose(text) {
+  let v = text.trim().toLowerCase().replace(/\s+/g, " ");
+  if (!v) return null;
+  const out = { sets: null, entries: null, unit: "reps", perSide: false, cont: false, max: null };
+  const sm = SIDE.exec(v); if (sm) { out.perSide = true; v = v.slice(0, sm.index).trim(); }
+  const sx = /^(\d+)(?:\s*-\s*(\d+))?\s*(?:sets?|σετ)?\s*[x×χ]\s*(.*)$/.exec(v);
+  if (sx) { out.sets = { min: +sx[1], max: +(sx[2] || sx[1]) }; v = sx[3].trim(); if (!out.sets.min || out.sets.max < out.sets.min) return "bad"; if (!v) return out; }
+  const mx = /^(?:(\S+)\s+)?(max|μέγιστ\S*)\s*(reps|cal|m)?$/.exec(v);
+  if (mx) { const within = mx[1] ? parseClock(mx[1], "smart") : null; if (within === "bad") return "bad"; out.max = { within }; out.unit = mx[3] === "cal" ? "kcal" : mx[3] === "m" ? "m" : "reps"; return out; }
+  const um = UNIT.exec(v);
+  let scale = 1;
+  if (um) { const u = um[1]; v = v.slice(0, um.index).trim();
+    if (["cal", "kcal", "θερμ", "θερμ."].includes(u)) out.unit = "kcal";
+    else if (u === "m") out.unit = "m";
+    else if (u === "km") { out.unit = "m"; scale = 1000; }
+    else if (["sec", "s", "″", '"', "δ"].includes(u)) out.unit = "secs";
+    else if (["min", "'", "′", "λ"].includes(u)) { out.unit = "secs"; scale = 60; }
+  }
+  if (v.includes(":")) out.unit = "secs";
+  const p = parseNums(v); if (p === "bad") return "bad";
+  out.entries = p.entries.map(e => ({ min: e.min * scale, max: e.max * scale })); out.cont = p.cont;
+  if (out.entries.some(e => e.min <= 0)) return "bad";
+  if (out.sets && (out.entries.length > 1 || out.cont)) return "bad";
+  return out;
+}
+// Load or intensity never fails: anything unrecognised is kept as the coach's words.
+function parseLoad(text) {
+  let v = text.trim().toLowerCase().replace(/\s+/g, " ");
+  if (!v) return null;
+  if (["bw", "σβ", "body", "bodyweight", "σωματικό βάρος"].includes(v)) return { kind: "bw" };
+  let m = /^rpe\s*(\d+(?:\.\d)?)(?:\s*-\s*(\d+(?:\.\d)?))?$/.exec(v); if (m) return { kind: "rpe", min: +m[1], max: +(m[2] || m[1]) };
+  m = /^(?:z|zone|ζώνη|ζωνη)\s*([1-5])$/.exec(v); if (m) return { kind: "zone", zone: +m[1] };
+  m = /^(\d+:\d{2})\s*\/\s*(500m|500|km|100m|mi)$/.exec(v); if (m) return { kind: "pace", per: m[2] === "500" ? "500m" : m[2], secs: toNum(m[1]) };
+  let up = false;
+  if (/(\+|↑)$/.test(v)) { up = true; v = v.slice(0, -1).trim(); }
+  const um = /\s*(kg|κιλά|κιλα|%)$/.exec(v);
+  if (um) { const n = parseNums(v.slice(0, um.index).trim().replace(/(\d),(\d)$/, "$1.$2")); if (n !== "bad" && !n.cont) return { kind: um[1] === "%" ? "pct" : "kg", entries: n.entries, up }; }
+  return { kind: "text", text: text.trim() };
+}
+const setCountOf = d => !d || d === "bad" ? 1 : d.sets ? d.sets.max : d.entries ? (d.cont ? d.entries.length : d.entries.length) : 1;
+const loadCount = l => l && l.entries ? l.entries.length : 1;
+function entryAt(d, i) { if (!d || d === "bad" || !d.entries) return null; const es = d.entries; if (es.length === 1) return es[0]; if (i < es.length) return es[i]; if (d.cont) { const step = es.at(-1).min - es.at(-2).min; const n = es.at(-1).min + step * (i - es.length + 1); return { min: n, max: n }; } return es.at(-1); }
+function showOne(n, unit) { return unit === "secs" ? clock(n) : unit === "kcal" ? `${numStr(n)} cal` : unit === "m" ? (n >= 1000 && n % 100 === 0 ? `${numStr(n/1000)} km` : `${numStr(n)} m`) : unit === "kg" ? `${numStr(n)} kg` : unit === "pct" ? `${numStr(n)}%` : numStr(n); }
+function showEntry(e, unit) { if (!e) return ""; if (e.min === e.max) return showOne(e.min, unit); return unit === "reps" ? `${numStr(e.min)}–${numStr(e.max)}` : `${showOne(e.min, unit).replace(/ ?(kg|cal|m|km|%|″)$/, "")}–${showOne(e.max, unit)}`; }
+function showDoseAt(d, i) {
+  if (!d || d === "bad") return "";
+  if (d.max) return `max${d.unit === "kcal" ? " cal" : d.unit === "m" ? " m" : ""}${d.max.within ? " σε " + clock(d.max.within) : ""}`;
+  const e = entryAt(d, i); return e ? showEntry(e, d.unit) + (d.perSide ? "/πλευρά" : "") : "";
+}
+function showLoadAt(l, i) {
+  if (!l) return "";
+  if (l.kind === "bw") return "BW"; if (l.kind === "text") return l.text; if (l.kind === "zone") return `ζώνη ${l.zone}`;
+  if (l.kind === "rpe") return l.min === l.max ? `RPE ${l.min}` : `RPE ${l.min}–${l.max}`;
+  if (l.kind === "pace") return `${clock(l.secs)}/${l.per}`;
+  const e = l.entries.length === 1 ? l.entries[0] : l.entries[i] || l.entries.at(-1);
+  return l.up && l.entries.length === 1 && i > 0 ? `↑ από ${showEntry(e, l.kind)}` : showEntry(e, l.kind);
+}
+function doseCaption(d, word) {
+  if (!d) return "";
+  if (d === "bad") return "π.χ. 10, 4×10, 12-10-8-8, 8-10, 3-4×12-15, 5-10-15…, 30s, 500m, max";
+  const side = d.perSide ? " · ανά πλευρά" : "";
+  const sets = d.sets ? `${d.sets.min === d.sets.max ? d.sets.min : d.sets.min + " ή " + d.sets.max} σετ` : "";
+  if (d.max) return [sets, `όσες περισσότερες${d.unit === "kcal" ? " θερμίδες" : d.unit === "m" ? " μέτρα" : ""}${d.max.within ? " σε " + clock(d.max.within) : ""}`].filter(Boolean).join(" · ") + side;
+  if (!d.entries) return sets;
+  if (d.entries.length > 1) {
+    const list = d.entries.map(e => showEntry(e, d.unit)).join(" · ");
+    const cont = d.cont ? `, μετά ${entryAt(d, d.entries.length).min - d.entries.at(-1).min > 0 ? "+" : ""}${numStr(entryAt(d, d.entries.length).min - d.entries.at(-1).min)} κάθε ${word}` : "";
+    return (word === "σετ" && !d.cont ? `${d.entries.length} σετ: ` : `ανά ${word}: `) + list + cont + side;
+  }
+  const e = d.entries[0];
+  const body = e.min !== e.max ? `εύρος ${showEntry(e, d.unit)}, το αποφασίζει ο αθλητής` : showEntry(e, d.unit) + (d.unit === "reps" ? " επαναλήψεις" : "");
+  return [sets, body].filter(Boolean).join(" · ") + side;
+}
+function loadCaption(l) {
+  if (!l) return "";
+  if (l.kind === "bw") return "σωματικό βάρος"; if (l.kind === "text") return "ως κείμενο για τον αθλητή"; if (l.kind === "zone") return `ζώνη παλμών ${l.zone}`;
+  if (l.kind === "rpe") return "πόσο δύσκολο (1–10)"; if (l.kind === "pace") return `ρυθμός ${clock(l.secs)} ανά ${l.per}`;
+  const what = l.kind === "pct" ? " του 1RM" : "";
+  if (l.entries.length > 1) return `ανά σετ: ${l.entries.map(e => showEntry(e, l.kind)).join(" · ")}${what}`;
+  const e = l.entries[0];
+  if (l.up) return `ξεκινά από ${showEntry(e, l.kind)}${what} και ανεβαίνει`;
+  return e.min !== e.max ? `εύρος ${showEntry(e, l.kind)}${what}, διαλέγει ο αθλητής` : showEntry(e, l.kind) + what;
+}
+
+
+
+// ── fuzzy search (prefix, inside a word, subsequence, one or two typos) ──
+function editDistance(a, b) {
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) {
+    d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+    if (i > 1 && j > 1 && a[i-1] === b[j-2] && a[i-2] === b[j-1]) d[i][j] = Math.min(d[i][j], d[i-2][j-2] + 1);
+  }
+  return d[a.length][b.length];
+}
+// Returns { score, marks: [[start, end]] } or null. Every query word must match some word of the text.
+function fuzzy(query, text) {
+  const q = fold(query).split(/[\s\-/]+/).filter(Boolean); if (!q.length) return { score: 0, marks: [] };
+  const t = fold(text); const words = []; t.replace(/[^\s\-/(),·]+/g, (w, at) => { words.push({ w, at }); return w; });
+  let score = 0; const marks = [];
+  for (const qw of q) {
+    let best = null;
+    for (const { w, at } of words) {
+      let s = null, m = null;
+      if (w.startsWith(qw)) { s = 10 + (w === qw ? 3 : 0); m = [at, at + qw.length]; }
+      else if (w.includes(qw) && qw.length > 1) { s = 6; const i = w.indexOf(qw); m = [at + i, at + i + qw.length]; }
+      else if (qw.length >= 3) { const allow = qw.length >= 7 ? 2 : 1; const dist = Math.min(editDistance(qw, w.slice(0, qw.length)), editDistance(qw, w)); if (dist <= allow) { s = 4 - dist; m = [at, at + Math.min(w.length, qw.length)]; } }
+      if (s != null && (!best || s > best.s)) best = { s, m };
+    }
+    if (!best) return null;
+    score += best.s; marks.push(best.m);
+  }
+  return { score, marks };
+}
+function highlight(text, marks) {
+  const frag = document.createDocumentFragment(); let at = 0;
+  for (const [a, b] of [...marks].sort((x, y) => x[0] - y[0])) { if (a < at) continue; frag.append(text.slice(at, a)); const m = document.createElement("mark"); m.textContent = text.slice(a, b); frag.append(m); at = b; }
+  frag.append(text.slice(at)); return frag;
+}
+
+// ── three levels: 1 flow (how the clock runs), 2 set/round structure, 3 add-ons ─────
+// Field kinds: count, time, times (several durations), range (3-4).
+const FMT = {
+  sets:      { label: "Σετ", hint: "χωρίς ρολόι: σετ με ξεκούραση ανάμεσα", alias: "untimed strength sets δύναμη υπερτροφία χωρις χρονο", layout: "grid", fields: [["sets", "Σετ", "range", "4"], ["rest", "Ξεκούραση ανάμεσα", "time", "90″"]], score: ["Χωρίς σκορ", "Φορτίο (καλύτερο σετ)", "Επαναλήψεις"], structs: ["single", "superset", "complex", "cluster", "drop", "restpause"], mods: ["interrupt"] },
+  for_time:  { label: "For Time", hint: "τελειώνεις όσο πιο γρήγορα", alias: "for time rft rounds για χρονο", layout: "loop", fields: [["rounds", "Γύροι", "count", "1"], ["cap", "Όριο χρόνου", "time", ""]], score: ["Χρόνος", "Γύροι + επαναλήψεις"], structs: ["single", "superset", "complex"], mods: ["interrupt"] },
+  amrap:     { label: "AMRAP", hint: "όσοι γύροι προλάβεις σε χρόνο", alias: "amrap as many rounds", layout: "loop", fields: [["dur", "Διάρκεια", "times", "12"], ["rest", "Ξεκούραση ανάμεσα σε παράθυρα", "time", ""]], score: ["Γύροι + επαναλήψεις", "Επαναλήψεις"], structs: ["single", "superset", "complex"], mods: ["interrupt"] },
+  emom:      { label: "EMOM", hint: "κάθε Χ λεπτά ξεκινάς ξανά", alias: "emom e2mom every minute otm κάθε λεπτό", layout: "slots", fields: [["every", "Κάθε", "time", "1:00"], ["times", "Φορές", "count", "10"]], score: ["Χωρίς σκορ", "Ολοκληρώθηκε", "Επαναλήψεις"], structs: ["single", "superset", "complex", "cluster"], mods: [] },
+  intervals: { label: "Intervals", hint: "δουλειά και ξεκούραση με σταθερό ρυθμό", alias: "intervals hiit custom διαλειμματικη", layout: "strip", fields: [["work", "Δουλειά", "time", "20″"], ["off", "Ξεκούραση", "time", "10″"], ["rounds", "Γύροι", "count", "8"]], score: ["Επαναλήψεις (σύνολο)", "Χαμηλότερος γύρος", "Απόσταση"], structs: ["single", "superset", "complex"], mods: ["hr"] },
+  rest:      { label: "Ξεκούραση", hint: "παύση ανάμεσα σε ενότητες", alias: "rest ξεκουραση διαλειμμα", layout: "none", fields: [["dur", "Διάρκεια", "time", "2:00"]], score: ["Χωρίς σκορ"], structs: [], mods: [] },
+};
+const FMT_KEYS = Object.keys(FMT);
+// Level 2: what happens inside one set or round, per exercise (single) or per group of exercises done together.
+const STRUCTS = {
+  single:    { label: "Απλό", hint: "μία άσκηση, όπως είναι", group: false },
+  cluster:   { label: "Cluster", hint: "το σετ σπάει σε κομμάτια με μικρή παύση", group: false, fields: [["clusters", "κομμάτια", "count", "3"], ["intra", "παύση", "time", "15″"]] },
+  drop:      { label: "Drop set", hint: "μειώνεις το βάρος και συνεχίζεις", group: false, fields: [["drops", "μειώσεις", "count", "2"], ["dropby", "κάθε φορά", "text", "-20%"]] },
+  restpause: { label: "Rest-pause", hint: "μέχρι αποτυχία, παύση, ξανά", group: false, fields: [["minis", "μίνι σετ", "count", "3"], ["intra", "παύση", "time", "15″"]] },
+  superset:  { label: "Superset", hint: "όλες οι ασκήσεις, μετά το επόμενο σετ", group: true },
+  complex:   { label: "Complex", hint: "όλες χωρίς να αφήσεις τη μπάρα", group: true },
+};
+// Level 3: optional add-ons on top of a flow.
+const MODS = {
+  interrupt: { label: "Διακοπή κάθε…", hint: "κάθε Χ λεπτά σταματάς για άλλη άσκηση" },
+  hr:        { label: "Ξεκούραση μέχρι να πέσουν οι παλμοί", hint: "η ξεκούραση τελειώνει στους Χ παλμούς" },
+};
+// Known setups are shortcuts: a flow plus a structure, add-on or progression already filled in.
+const PRESETS = [
+  { label: "Tabata", alias: "tabata 20 10", flow: "intervals", p: { work: "20″", off: "10″", rounds: "8" } },
+  { label: "Billat", alias: "billat 30 30", flow: "intervals", p: { work: "30″", off: "30″", rounds: "10" }, score: "Απόσταση" },
+  { label: "Ανάκαμψη παλμών (HRR)", alias: "hrr heart rate recovery παλμοι", flow: "intervals", p: { work: "3:00", off: "", rounds: "3" }, mods: { hr: true } },
+  { label: "Death by", alias: "death by deathby θανατος", flow: "emom", p: { every: "1:00", times: "" }, reps: "1-2-3…", score: "Γύροι + επαναλήψεις" },
+  { label: "Εναλλάξ (μονά / ζυγά)", alias: "even odd μονα ζυγα alternating εναλλαξ", flow: "emom", slots: 2 },
+  { label: "Complex EMOM", alias: "complex emom πολλαπλα διαστηματα", flow: "emom", slots: 3 },
+  { label: "EDT", alias: "edt escalating density", flow: "amrap", p: { dur: "15" }, struct: "superset", score: "Επαναλήψεις" },
+  { label: "Chipper", alias: "chipper", flow: "for_time" },
+  { label: "21-15-9", alias: "21 15 9 fran couplet", flow: "for_time", reps: "21-15-9" },
+  { label: "Σκάλα / πυραμίδα", alias: "ladder pyramid ascending descending σκαλα πυραμιδα", flow: "for_time", reps: "2-4-6…" },
+  { label: "Στόχος θερμίδων", alias: "kcal calories target θερμιδες", flow: "for_time", reps: "100 cal" },
+  { label: "Μέχρι αποτυχία", alias: "train to exhaustion failure αποτυχια", flow: "sets", reps: "max" },
+  { label: "Superset / giant set", alias: "superset giant set", flow: "sets", struct: "superset" },
+  { label: "Cluster", alias: "cluster", flow: "sets", struct: "cluster" },
+  { label: "Drop set", alias: "drop set dropset", flow: "sets", struct: "drop" },
+  { label: "Rest-pause", alias: "rest pause myo reps", flow: "sets", struct: "restpause" },
+  { label: "Με διακοπή", alias: "interrupt every διακοπη παρεμβολη", flow: "for_time", mods: { interrupt: true } },
+];
+const STEPS = ["Ροή", "Χρόνος", "Ασκήσεις", "Σκορ"];
+const hasTimeStep = f => FMT[f].fields.length > 0;
+const hasExercises = f => FMT[f].layout !== "none";
+const structDefaults = kind => ({ kind, ...Object.fromEntries((STRUCTS[kind].fields || []).map(f => [f[0], f[3]])) });
+// Execution units: one exercise, or the consecutive rows of a group done together.
+function unitsOf(list) { const out = []; for (const r of list) { const last = out.at(-1); if (r.group && last && last.group === r.group) last.rows.push(r); else out.push({ group: r.group, rows: [r] }); } return out; }
+const unitKey = u => u.group || u.rows[0].id;
+function structOf(s, u) { const st = s.structs?.[unitKey(u)]; const isGroup = u.rows.length > 1; if (st && STRUCTS[st.kind].group === isGroup) return st; return { kind: isGroup ? "superset" : "single" }; }
+
+// ── sample: the coach's own file ─────────────────────
+const ex = (name, dose = "", load = "", more = {}) => ({ id: id(), kind: "ex", name, dose, load, note: "", group: null, cells: [], ...more });
+const restRow = (dose, more = {}) => ({ id: id(), kind: "rest", name: "", dose, load: "", note: "", group: null, cells: [], ...more });
+const cells = (...pairs) => pairs.map(([d, l = ""]) => ({ d, l }));
+const S = (fmt, p, blocks, more = {}) => ({ id: id(), fmt, p: { ...Object.fromEntries(FMT[fmt].fields.map(f => [f[0], f[3]])), ...p }, blocks, score: FMT[fmt].score[0], note: "", name: "", mods: {}, intr: [], structs: {}, preset: null, ...more });
+function sample() {
+  const g1 = id(), g2 = id(), g3 = id(), sq = ex("Back Squat", "", "", { note: "Έλεγχος στο κατέβασμα, με ζώνη", cells: cells(["3", "80%"]) });
+  return { title: "Από το αρχείο σου", note: "", sections: [
+    S("sets", { sets: "4", rest: "2:00" }, [[ex("Back Squat", "", "", { note: "Έλεγχος στο κατέβασμα, με ζώνη", cells: [{ d: "12", l: "60%", tempo: "31X1" }, ...cells(["10", "+5"], ["8"], ["8"])], extra: ["tempo"] })]], { name: "Δευτέρα A" }),
+    S("sets", { sets: "3-4", rest: "90″" }, [[ex("Knee Extension", "", "", { group: g1, cells: cells(["12-15"]) }), ex("Standing Calf Raise", "", "", { group: g1, cells: cells(["15"]) }), ex("Cyclist Squat", "", "", { group: g1, note: "Φτέρνες ψηλά", cells: cells(["20"]) })]], { name: "Δευτέρα C" }),
+    S("sets", { sets: "4", rest: "3:00" }, [[ex("Ring Dip", "", "", { group: g2, cells: cells(["7", "με βάρος"]) }), restRow("", { group: g2, cells: cells(["30″"]) }), ex("Strict HSPU", "", "", { group: g2, cells: cells(["10"]) }), restRow("", { group: g2, cells: cells(["30″"]) }), ex("Echo Bike", "", "", { group: g2, cells: cells(["60s max cal"]) })]], { name: "Σάββατο 1η B" }),
+    S("sets", { sets: "5", rest: "2:30" }, [[sq]], { name: "Παράδειγμα cluster", structs: { [sq.id]: { kind: "cluster", clusters: "3", intra: "15″" } } }),
+    S("emom", { every: "2:30", times: "4" }, [[ex("Front Squat", "7", "", { group: g3, note: "Ίδια κιλά με το top set της δεκάρας" }), ex("Dual DB Push Press", "8-12", "βαρύ", { group: g3 })]], { name: "Σάββατο 1η A" }),
+    S("emom", { every: "1:00", times: "8" }, [[ex("Wall Ball", "20")], [ex("Burpee to Target", "12")]], { name: "Σάββατο 1η C", preset: "Εναλλάξ (μονά / ζυγά)" }),
+    S("amrap", { dur: "7" }, [[ex("Butterfly Pull-up", "15"), ex("Power Snatch", "", "", { perRound: true, cells: cells(["5", "40kg"], ["10", "+5kg"], ["15"]) })]], { name: "Σάββατο 2η C" }),
+    S("for_time", {}, [[ex("Thruster", "75")]], { name: "Σάββατο 4η A", mods: { interrupt: true }, p: { rounds: "1", cap: "", intEvery: "2:00" }, intr: [ex("Burpee over Bar", "10")], preset: "Με διακοπή" }),
+    S("for_time", { rounds: "4", cap: "20" }, [[ex("Row", "500 m"), ex("Burpee", "15")], [ex("Run", "400 m"), ex("Wall Ball", "20")]], { name: "Παράδειγμα: διαφορετικοί γύροι" }),
+    S("amrap", { dur: "3-3-3-4", rest: "1:00" }, [[ex("Echo Bike", "15 cal"), ex("Wall Ball", "25"), ex("Clean & Jerk", "max", "60kg")]], { name: "Σάββατο 4η B" }),
+  ]};
+}
+let state = { alt: "A", openId: null, step: 0, query: "", pick: 0, ...sample() };
+state.openId = state.sections[0].id; state.step = 2;
+
+// ── history / save ───────────────────────────────────
+let past = [], future = [], lastTyping = 0, saveTimer = null;
+const snap = () => JSON.stringify({ title: state.title, note: state.note, sections: state.sections, openId: state.openId, step: state.step });
+function commit(fn) { past.push(snap()); future = []; fn(); saved(); render(); }
+function typing(fn) { const now = Date.now(); if (now - lastTyping > 800) { past.push(snap()); future = []; } lastTyping = now; fn(); saved(); }
+function saved() { const st = document.getElementById("status"); st.textContent = "Αποθήκευση…"; clearTimeout(saveTimer); saveTimer = setTimeout(() => { st.textContent = "Αποθηκεύτηκε"; }, 450); }
+function toast(t) { document.querySelectorAll(".toast").forEach(x => x.remove()); const el = document.createElement("div"); el.className = "toast"; el.textContent = t; document.body.append(el); setTimeout(() => el.remove(), 1900); }
+
+const h = (tag, attrs = {}, ...kids) => { const el = document.createElement(tag); for (const [k, v] of Object.entries(attrs)) { if (k.startsWith("on")) el.addEventListener(k.slice(2), v); else if (v !== false && v != null) el.setAttribute(k, v === true ? "" : v); } for (const c of kids.flat()) if (c != null && c !== false) el.append(c); return el; };
+const letter = i => String.fromCharCode(65 + i);
+const secById = sid => state.sections.find(s => s.id === sid);
+const field = (s, key) => FMT[s.fmt].fields.find(f => f[0] === key);
+const pTime = (s, key) => { const v = s.p[key]; if (!v) return null; return parseClock(v, key === "cap" || key === "dur" || key === "effort" ? "min" : "smart"); };
+const pCount = (s, key) => { const v = (s.p[key] || "").trim(); return /^\d+$/.test(v) && +v > 0 ? +v : null; };
+const setsRange = s => { const m = /^(\d+)(?:\s*-\s*(\d+))?$/.exec((s.p.sets || "").trim()); return m ? { min: +m[1], max: +(m[2] || m[1]) } : { min: 1, max: 1 }; };
+
+// one-line summary for a closed section
+function summary(s) {
+  const P = [];
+  if (s.fmt === "emom") P.push(`κάθε ${s.p.every || "?"}${s.p.times ? " × " + s.p.times : ""}`);
+  else if (s.fmt === "sets") P.push(`${s.p.sets || "?"} σετ`);
+  else if (s.fmt === "amrap") { const w = parseTimes(s.p.dur || "", "min"); if (w && w !== "bad") P.push(w.secs.length > 1 ? `${w.secs.length} παράθυρα` : clock(w.secs[0])); }
+  else if (s.fmt === "for_time" && pCount(s, "rounds") > 1) P.push(`${s.p.rounds} γύροι`);
+  else if (s.fmt === "intervals") P.push(`${s.p.rounds} × ${s.p.work}/${s.p.off || "παλμοί"}`);
+  else if (s.fmt === "rest") P.push(s.p.dur);
+  if (s.mods?.interrupt) P.push(`διακοπή κάθε ${s.p.intEvery || "?"}`);
+  const names = s.blocks.map(b => b.filter(r => r.kind === "ex" && r.name).map(r => r.name + (extrasOf(r).includes("side") ? " (ανά πλευρά)" : "")).join(" + ")).filter(Boolean);
+  return { params: P.join(" · "), what: names.join(" / ") };
+}
+
+// ── rendering ────────────────────────────────────────
+const root = document.getElementById("sections");
+function render() {
+  const active = document.activeElement?.dataset?.k;
+  closeSugg();
+  document.getElementById("title").value = state.title;
+  document.getElementById("wodnote").value = state.note;
+  root.replaceChildren(...state.sections.map((s, i) => s.id === state.openId ? openSection(s, i) : card(s, i)));
+  document.querySelectorAll("#alt-switch button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.alt === state.alt)));
+  drawHint();
+  const target = pending || active; const fresh = Boolean(pending); pending = null;
+  if (target) { const el = document.querySelector(`[data-k="${CSS.escape(target)}"]`); if (el) { el.focus(); if (fresh && el.select) el.select(); } }
+}
+let pending = null;
+function card(s, i) {
+  const sm = summary(s);
+  return h("button", { class: "card", "data-k": `card:${s.id}`, onclick: () => openSec(s.id) },
+    h("span", { class: "letter" }, letter(i)), h("span", { class: "fmt" }, FMT[s.fmt].label), s.preset && s.preset !== FMT[s.fmt].label ? h("span", { class: "pchip mini", title: "Έτοιμο στήσιμο" }, s.preset) : null, s.name ? h("b", { style: "font-size:.85rem" }, s.name) : null,
+    h("span", { class: "what" }, sm.what), h("span", { class: "params" }, sm.params));
+}
+function openSec(sid, step) {
+  const s = secById(sid); state.openId = sid;
+  state.step = step ?? (s.blocks.flat().length ? 2 : hasTimeStep(s.fmt) ? 1 : 2);
+  if (state.alt === "B" && state.step === 0) state.step = 1;
+  state.query = ""; state.pick = 0;
+  pending = firstFocus(s); render();
+}
+function firstFocus(s) {
+  if (state.step === 0) return `pick:${s.id}`;
+  if (state.alt === "A" && state.step === 1) return `p:${s.id}:${FMT[s.fmt].fields[0]?.[0]}`;
+  if (state.alt === "A" && state.step === 3) return `score:${s.id}`;
+  const r = s.blocks.flat()[0];
+  return r ? `r:${r.id}:name` : `p:${s.id}:${FMT[s.fmt].fields[0]?.[0]}`;
+}
+function openSection(s, i) {
+  const f = FMT[s.fmt];
+  const name = h("input", { class: "cell", "data-k": `sname:${s.id}`, value: s.name, placeholder: "Όνομα (προαιρετικό)", style: "font-weight:700;flex:1 1 8rem" });
+  name.addEventListener("input", () => typing(() => { s.name = name.value; }));
+  const head = h("div", { class: "open-head" }, h("span", { class: "letter" }, letter(i)));
+  if (state.alt === "A") {
+    head.append(h("b", { style: "color:var(--primary)" }, state.step === 0 ? "Νέα ενότητα" : f.label), name);
+    const nav = h("nav", { class: "steps", "aria-label": "Βήματα" });
+    STEPS.forEach((t, k) => {
+      const disabled = (k === 1 && !hasTimeStep(s.fmt)) || (k === 2 && !hasExercises(s.fmt));
+      nav.append(h("button", { "aria-current": k === state.step ? "step" : null, disabled, title: `Alt+${k + 1}`, onclick: () => goStep(s, k) }, `${k + 1} ${t}`));
+    });
+    head.append(nav);
+  } else head.append(formatCombo(s), name, h("button", { class: "add", style: "margin-inline-start:auto", onclick: () => close(), title: "Esc" }, "Κλείσιμο"));
+  const box = h("section", { class: "open", "data-sec": s.id }, head);
+  if (state.alt === "A") {
+    if (state.step === 0) box.append(stepPick(s));
+    if (state.step === 1) box.append(stepTimer(s));
+    if (state.step === 2) box.append(stepExercises(s));
+    if (state.step === 3) box.append(stepScore(s));
+    const last = state.step === 3;
+    box.append(h("div", { class: "stepnav" },
+      h("span", {}, state.step > 0 ? h("button", { class: "btn", onclick: () => goStep(s, prevStep(s)) }, "← Πίσω") : null, " ", h("kbd", {}, "Alt+←"), " ", h("kbd", {}, "Alt+→")),
+      state.step === 0 ? h("span", {}, "Γράψε για αναζήτηση, ", h("kbd", {}, "↑ ↓"), " ", h("kbd", {}, "Enter")) :
+      h("button", { class: "btn primary", onclick: () => last ? close() : goStep(s, nextStep(s)) }, last ? "Τέλος ενότητας" : "Επόμενο →")));
+  } else {
+    if (hasTimeStep(s.fmt)) box.append(stepTimer(s));
+    if (hasExercises(s.fmt)) box.append(stepExercises(s));
+    box.append(h("div", { class: "quiet" }, scoreLine(s), noteInput(s, `snote:${s.id}`, "Σημείωση για την ενότητα (προαιρετική)")));
+  }
+  return box;
+}
+const nextStep = s => { let k = state.step + 1; if (k === 1 && !hasTimeStep(s.fmt)) k++; if (k === 2 && !hasExercises(s.fmt)) k++; return Math.min(k, 3); };
+const prevStep = s => { let k = state.step - 1; if (k === 2 && !hasExercises(s.fmt)) k--; if (k === 1 && !hasTimeStep(s.fmt)) k--; return Math.max(k, 0); };
+function goStep(s, k) { state.step = k; state.query = ""; state.pick = 0; pending = firstFocus(s); render(); }
+function close() { const sid = state.openId, s = secById(sid); state.openId = null; if (s && !s.blocks.flat().length && state.step === 0) { const i = state.sections.indexOf(s); state.sections.splice(i, 1); const n = state.sections[i - 1] || state.sections[0]; pending = n ? `card:${n.id}` : null; } else pending = `card:${sid}`; render(); }
+
+// step 1: pick the flow; known setups (Tabata, Cluster, Death by…) are shortcuts into a flow
+// What a preset fills in, in the coach's words: flow, then the values it sets for you.
+function presetRecipe(pr) {
+  const p = pr.p || {}, out = [];
+  if (pr.flow === "intervals") out.push(`${p.work} / ${p.off || "παλμοί"} × ${p.rounds}`);
+  if (pr.flow === "amrap" && p.dur) out.push(`${p.dur}′`);
+  if (pr.slots) out.push(`${pr.slots} διαστήματα εναλλάξ`);
+  if (pr.struct && STRUCTS[pr.struct].label !== pr.label) out.push(STRUCTS[pr.struct].label);
+  if (pr.reps) out.push(`επαναλήψεις ${pr.reps}`);
+  if (pr.mods?.interrupt) out.push("διακοπή κάθε 2:00");
+  if (pr.mods?.hr) out.push("ξεκούραση ως τους παλμούς");
+  return out.join(" · ");
+}
+function ranked(q) {
+  const items = [
+    ...FMT_KEYS.map(k => ({ type: "flow", k, label: FMT[k].label, hint: FMT[k].hint, alias: FMT[k].alias })),
+    ...PRESETS.map((pr, i) => ({ type: "preset", k: i, label: pr.label, flow: FMT[pr.flow].label, hint: presetRecipe(pr), alias: pr.alias })),
+  ];
+  if (!q) return items.map(it => ({ ...it, marks: [], onLabel: true, score: 0 }));
+  return items.map(it => { const a = fuzzy(q, it.label), b = fuzzy(q, `${it.alias} ${it.hint} ${it.flow || ""}`); const best = a && (!b || a.score >= b.score) ? { ...a, onLabel: true } : b ? { ...b, onLabel: false, score: b.score - 1 } : null; return best && { ...it, ...best, score: best.score + (it.type === "flow" ? 1 : 0) }; })
+    .filter(Boolean).sort((x, y) => y.score - x.score);
+}
+// Two levels, two looks: flows are the choice; ready-made setups sit apart as shortcuts that pre-fill a flow.
+function stepPick(s) {
+  const inp = h("input", { "data-k": `pick:${s.id}`, value: state.query, placeholder: "Πώς τρέχει το ρολόι; π.χ. emom, σετ, ή έτοιμο: tabata", "aria-label": "Ροή ενότητας", role: "combobox", "aria-expanded": "true", autocomplete: "off" });
+  const list = h("div", { role: "listbox" });
+  let order = [];
+  const draw = () => {
+    const items = ranked(state.query);
+    const flows = items.filter(x => x.type === "flow"), presets = items.filter(x => x.type === "preset");
+    order = [...flows, ...presets];
+    state.pick = Math.min(state.pick, Math.max(order.length - 1, 0));
+    const mark = it => { const b = h("b", {}); b.append(it.onLabel ? highlight(it.label, it.marks) : it.label); return b; };
+    const sel = it => String(order.indexOf(it) === state.pick);
+    const pickIt = it => e => { e.preventDefault(); pickItem(s, it); };
+    const out = [];
+    if (flows.length) out.push(h("div", { class: "fam" }, "Ροή"),
+      h("div", { class: "opts flows" }, ...flows.map(it => h("div", { class: "opt flow", role: "option", "aria-selected": sel(it), onmousedown: pickIt(it) }, mark(it), h("span", {}, it.hint)))));
+    if (presets.length) {
+      // grouped under the flow they fill in, so the box reads as "shortcuts into a flow", never as more flows
+      const byFlow = FMT_KEYS.map(k => [k, presets.filter(it => PRESETS[it.k].flow === k)]).filter(([, xs]) => xs.length);
+      order = [...flows, ...byFlow.flatMap(([, xs]) => xs)];
+      const cur = order[state.pick]?.type === "preset" ? order[state.pick] : null;
+      out.push(h("div", { class: "presetbox" },
+        h("div", { class: "pb-head" }, h("span", { class: "fam" }, "Έτοιμα στησίματα"), h("span", { class: "pb-sub" }, "συντομεύσεις: διαλέγουν ροή και συμπληρώνουν τιμές, όλα αλλάζουν μετά")),
+        ...byFlow.map(([k, xs]) => h("div", { class: "pb-row" }, h("span", { class: "pflow" }, FMT[k].label), h("div", { class: "pchips" }, ...xs.map(it => h("div", { class: "pchip", role: "option", "aria-selected": sel(it), title: it.hint, onmousedown: pickIt(it) }, mark(it)))))),
+        h("div", { class: "precipe", "aria-live": "polite" }, cur ? `${cur.label} = ${FMT[PRESETS[cur.k].flow].label}${cur.hint ? " · " + cur.hint : ""}` : "")));
+    }
+    if (!order.length) out.push(h("p", { style: "padding:8px" }, "Τίποτα με αυτό το όνομα. Δοκίμασε άλλη λέξη."));
+    list.replaceChildren(...out);
+  };
+  // typing pre-selects the best match wherever it sits
+  inp.addEventListener("input", () => { state.query = inp.value; state.pick = 0; draw(); const best = ranked(state.query)[0]; state.pick = Math.max(0, order.findIndex(x => x.type === best?.type && x.k === best?.k)); draw(); });
+  inp.addEventListener("keydown", e => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); state.pick = (state.pick + (e.key === "ArrowDown" ? 1 : -1) + order.length) % order.length; draw(); }
+    else if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); e.stopPropagation(); if (order[state.pick]) pickItem(s, order[state.pick]); }
+  });
+  draw();
+  return h("div", { class: "picker" }, inp, list);
+}
+const pickItem = (s, it) => it.type === "flow" ? choose(s, it.k) : choose(s, PRESETS[it.k].flow, PRESETS[it.k]);
+function choose(s, fmt, preset = null) {
+  commit(() => {
+    const old = FMT[s.fmt].layout, keep = s.blocks.map(b => b.filter(r => r.kind !== "rest" || FMT[fmt].layout === "grid")).filter(b => b.length);
+    s.fmt = fmt; s.p = { ...Object.fromEntries(FMT[fmt].fields.map(f => [f[0], f[3]])), ...(preset?.p || {}) };
+    s.score = preset?.score || FMT[fmt].score[0]; s.preset = preset?.label || null; s.structs ||= {};
+    s.mods = Object.fromEntries(Object.entries(preset?.mods || {}).filter(([m]) => FMT[fmt].mods.includes(m)));
+    if (s.mods.interrupt) { s.p.intEvery ||= "2:00"; if (!s.intr?.length) s.intr = [ex("")]; } else s.intr = [];
+    const L = FMT[fmt].layout;
+    s.blocks = L === "none" ? [] : keep.length ? keep : [[ex("")]];
+    if (L === "slots" && preset?.slots) while (s.blocks.length < preset.slots) s.blocks.push([ex("")]);
+    if (L === "grid" && old !== "grid") s.blocks.flat().forEach(r => { if (!r.perRound) r.cells = r.dose || r.load || r.x ? [{ d: r.dose, l: r.load, ...(r.x || {}) }] : []; r.perRound = false; });
+    if (L !== "grid" && old === "grid") s.blocks.flat().forEach(r => { const c = r.cells[0] || {}; r.dose = c.d || ""; r.load = c.l || ""; r.x = Object.fromEntries(extrasOf(r).map(k => [k, c[k] || ""])); r.perRound = r.cells.length > 1; });
+    const main = s.blocks[0];
+    if (preset?.struct && main) {
+      if (STRUCTS[preset.struct].group) { while (main.length < 2) main.push(ex("")); const g = main[0].group || id(); main.slice(0, 2).forEach(r => { r.group = g; }); s.structs[g] = structDefaults(preset.struct); }
+      else s.structs[main[0].id] = structDefaults(preset.struct);
+    }
+    if (preset?.reps && main?.[0]) { if (L === "grid") (main[0].cells[0] ||= { d: "", l: "" }).d = preset.reps; else main[0].dose = preset.reps; }
+    state.step = hasTimeStep(fmt) ? 1 : hasExercises(fmt) ? 2 : 3;
+  });
+  pending = firstFocus(s); render();
+}
+// Alternative B: the flow is chosen in the header with the same fuzzy list
+function formatCombo(s) {
+  const inp = h("input", { class: "cell", "data-k": `fmt:${s.id}`, value: FMT[s.fmt].label, "aria-label": "Ροή", role: "combobox", autocomplete: "off", style: "font-weight:800;color:var(--primary);width:9rem" });
+  inp.addEventListener("focus", () => { inp.select(); suggestFormats(inp, s, ""); });
+  inp.addEventListener("input", () => suggestFormats(inp, s, inp.value));
+  inp.addEventListener("blur", () => setTimeout(() => { if (sugg?.input === inp) closeSugg(); inp.value = FMT[s.fmt].label; }, 120));
+  return inp;
+}
+function suggestFormats(inp, s, q) {
+  showSugg(inp, ranked(q).slice(0, 10).map(it => ({ label: it.label, marks: it.onLabel ? it.marks : [], hint: it.hint, it })), x => { pickItem(s, x.it); state.step = 1; pending = `p:${s.id}:${FMT[s.fmt].fields[0]?.[0] || ""}`; render(); });
+}
+
+// step 2: only this format's fields, a sentence and a timeline
+// step 2: only this flow's fields, its optional add-ons, a sentence and a timeline
+const MOD_FIELDS = { interrupt: [["intEvery", "Διακοπή κάθε", "time", "2:00"]], hr: [["hrTarget", "Ξεκούραση μέχρι", "count", "120"]] };
+const UNITS = { rounds: "γύροι", times: "φορές", sets: "σετ", hrTarget: "bpm" };
+function paramField(s, key, label, kind, refresh) {
+  const inp = h("input", { class: "cell", "data-k": `p:${s.id}:${key}`, value: s.p[key] || "", placeholder: kind === "time" || kind === "times" ? "λ:δδ" : "", "aria-label": label, autocomplete: "off", style: kind === "times" ? "width:9rem" : null });
+  const dflt = key === "cap" || key === "dur" ? "min" : "smart";
+  const example = kind === "times" ? "λεπτά · π.χ. 12, ή 3-3-3-4 για παράθυρα" : kind === "time" ? (dflt === "min" ? "λεπτά · ή 1:30, 90s" : "π.χ. 30s, 1:30, 2′") : kind === "range" ? "π.χ. 4 ή 3-4" : "";
+  const sub = h("span", { class: "sub" });
+  // Time fields always say how the number was read, so the unit is never a guess.
+  const check = () => {
+    const v = inp.value.trim();
+    const parsed = !v ? null : kind === "time" ? parseClock(v, dflt) : kind === "times" ? parseTimes(v, "min") : null;
+    const bad = v && (kind === "count" ? !/^\d+$/.test(v) : kind === "range" ? !/^\d+(\s*-\s*\d+)?$/.test(v) : parsed === "bad");
+    inp.classList.toggle("bad", Boolean(bad));
+    sub.textContent = !v || bad ? example : kind === "time" ? `= ${human(parsed)}` : kind === "times" ? (parsed.secs.length > 1 ? `= ${parsed.secs.length} παράθυρα: ${parsed.secs.map(human).join(", ")}` : `= ${human(parsed.secs[0])}`) : example;
+  };
+  inp.addEventListener("input", () => { check(); typing(() => { s.p[key] = inp.value; }); refresh(); });
+  check();
+  const unitFn = kind === "count" || kind === "range" ? () => UNITS[key] || "" : () => { const v = inp.value.trim(); if (!v) return dflt === "min" ? "λεπτά" : "λ:δδ"; if (/[:s″"′'λδ]|min/.test(v)) return ""; return kind === "times" || dflt === "min" || +v.split(/[-,]/)[0] <= 10 ? "λεπτά" : "δευτ."; };
+  return h("label", { class: "pf" }, label, withUnit(inp, unitFn), sub);
+}
+function stepTimer(s) {
+  const f = FMT[s.fmt];
+  const form = h("div", { class: "params-form" });
+  const sentence = h("div", { class: "sentence" }), tl = h("div");
+  const refresh = () => { sentence.textContent = describe(s); tl.replaceChildren(timeline(s)); };
+  for (const [key, label, kind] of f.fields) form.append(paramField(s, key, label, kind, refresh));
+  // level 3: add-ons, one quiet button each until switched on
+  const adds = h("div", { class: "adds" });
+  for (const m of f.mods) {
+    if (s.mods?.[m]) {
+      for (const [key, label, kind, dv] of MOD_FIELDS[m]) { s.p[key] ??= dv; form.append(paramField(s, key, label, kind, refresh)); }
+      form.append(h("button", { class: "add", title: "Αφαίρεση", onclick: () => commit(() => { delete s.mods[m]; if (m === "interrupt") s.intr = []; }) }, `× ${MODS[m].label.replace("…", "")}`));
+    } else adds.append(h("button", { class: "add", title: MODS[m].hint, onclick: () => { commit(() => { s.mods = { ...s.mods, [m]: true }; for (const [key, , , dv] of MOD_FIELDS[m]) s.p[key] ??= dv; if (m === "interrupt" && !s.intr?.length) s.intr = [ex("")]; }); pending = `p:${s.id}:${MOD_FIELDS[m][0][0]}`; render(); } }, `+ ${MODS[m].label}`));
+  }
+  refresh();
+  return h("div", { style: "display:flex;flex-direction:column;gap:10px" }, form, adds.children.length ? adds : null, sentence, tl);
+}
+function human(secs) { const m = Math.floor(secs / 60), r = secs % 60; return [m ? `${m} ${m === 1 ? "λεπτό" : "λεπτά"}` : "", r ? `${r} δευτ.` : ""].filter(Boolean).join(" ") || "0 δευτ."; }
+function describe(s) {
+  const p = s.p; let t = "";
+  switch (s.fmt) {
+    case "emom": { const e = pTime(s, "every"), n = pCount(s, "times"); t = e && e !== "bad" ? `Κάθε ${clock(e)}${n ? `, ${n} φορές: ${clock(e * n)} συνολικά` : ", μέχρι να μην προλαβαίνεις"}.` : ""; break; }
+    case "amrap": { const w = parseTimes(p.dur || "", "min"); if (w && w !== "bad") t = w.secs.length > 1 ? `${w.secs.length} παράθυρα AMRAP (${w.secs.map(clock).join(", ")})${p.rest ? `, ${p.rest} ξεκούραση ανάμεσα` : ""}.` : `Όσοι γύροι προλάβεις σε ${clock(w.secs[0])}.`; break; }
+    case "for_time": t = `${pCount(s, "rounds") > 1 ? p.rounds + " γύροι" : "Μία φορά"}, όσο πιο γρήγορα${p.cap ? `, όριο ${p.cap}` : ""}.`; break;
+    case "intervals": t = `${p.rounds} γύροι: ${p.work} δουλειά, ${s.mods?.hr ? `ξεκούραση μέχρι οι παλμοί να πέσουν στους ${p.hrTarget || "?"}` : `${p.off} ξεκούραση`}.`; break;
+    case "sets": t = `${p.sets || "?"} σετ${p.rest ? `, ${p.rest} ξεκούραση ανάμεσα` : ""}.`; break;
+  }
+  if (s.mods?.interrupt) t += ` Κάθε ${p.intEvery || "?"} σταματάς για την παρεμβολή και μετά συνεχίζεις από εκεί που σταμάτησες.`;
+  return t;
+}
+// timeline: coloured bars so the coach sees the shape of the clock
+function timeline(s) {
+  const segs = [];
+  const C = ["var(--primary)", "var(--calm)", "var(--heat)", "var(--border-strong)"];
+  if (s.fmt === "emom") { const e = pTime(s, "every"), n = pCount(s, "times") || 10, k = Math.max(1, s.blocks.length); if (e > 0) for (let i = 0; i < n; i++) segs.push([e, C[i % k % 3]]); }
+  else if (s.fmt === "amrap") { const w = parseTimes(s.p.dur || "", "min"), r = s.p.rest ? parseClock(s.p.rest, "smart") : 0; if (w && w !== "bad") w.secs.forEach((x, i) => { if (i && r > 0) segs.push([r, "var(--muted-bg)"]); segs.push([x, C[0]]); }); }
+  else if (s.fmt === "intervals") { const a = pTime(s, "work"), b = pTime(s, "off") || (s.mods?.hr ? 60 : 0), n = pCount(s, "rounds"); if (a > 0 && n) for (let i = 0; i < n; i++) { segs.push([a, C[i % Math.max(1, s.blocks.length) % 3]]); if (b > 0) segs.push([b, "var(--muted-bg)"]); } }
+  else if (s.fmt === "for_time" && s.mods?.interrupt) { const cap = s.p.cap ? parseClock(s.p.cap, "min") : 0; segs.push([cap > 0 ? cap : 12 * 60, C[0]]); }
+  if (!segs.length) return document.createTextNode("");
+  const total = segs.reduce((a, x) => a + x[0], 0);
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(NS, "svg"); svg.setAttribute("class", "timeline"); svg.setAttribute("viewBox", "0 0 1000 30"); svg.setAttribute("preserveAspectRatio", "none"); svg.setAttribute("role", "img"); svg.setAttribute("aria-label", "Χρονοδιάγραμμα");
+  const rect = (x, w, col, y = 4, hgt = 22) => { const r = document.createElementNS(NS, "rect"); r.setAttribute("x", x); r.setAttribute("y", y); r.setAttribute("width", Math.max(w, 1)); r.setAttribute("height", hgt); r.setAttribute("rx", 3); r.setAttribute("fill", col); svg.append(r); };
+  let x = 0; for (const [len, col] of segs) { const w = len / total * 1000; rect(x + 1, w - 2, col); x += w; }
+  const ie = s.mods?.interrupt ? parseClock(s.p.intEvery || "", "smart") : 0;
+  if (ie > 0) for (let t = ie; t < total; t += ie) rect(t / total * 1000 - 3, 6, C[2], 0, 30);
+  const legend = h("div", { class: "tl-legend" }, h("span", {}, "0:00"), h("span", { style: "margin-inline-start:auto" }, clock(total)));
+  if ((s.fmt === "emom" || s.fmt === "intervals") && s.blocks.length > 1) legend.prepend(...s.blocks.map((b, i) => h("span", {}, h("i", { style: `background:${C[i % 3]}` }), `Διάστημα ${i + 1}`)));
+  if (ie > 0) legend.prepend(h("span", {}, h("i", { style: `background:${C[2]}` }), `Διακοπή κάθε ${clock(ie)}`));
+  return h("div", {}, svg, legend);
+}
+
+function noteInput(obj, k, ph) { const n = h("input", { class: "cell note", "data-k": k, value: obj.note || "", placeholder: ph, "aria-label": ph }); n.addEventListener("input", () => typing(() => { obj.note = n.value; })); return n; }
+function caption(inp, parse, cap, unitOf) { const c = h("div", { class: "cap" }); const holder = unitOf ? withUnit(inp, () => unitOf(parse(inp.value), inp.value)) : inp; const upd = () => { const v = parse(inp.value); inp.classList.toggle("bad", v === "bad"); c.textContent = cap(v); }; inp.addEventListener("input", upd); upd(); return h("div", { class: "qwrap" }, holder, c); }
+// Every field shows its unit next to the value (an input adornment); it disappears only when the value already says it.
+function withUnit(inp, unitOf) { const u = h("span", { class: "u", "aria-hidden": "true" }); const upd = () => { u.textContent = unitOf() || ""; }; inp.addEventListener("input", upd); upd(); return h("span", { class: "uw" }, inp, u); }
+const says = (text, re) => re.test(text.toLowerCase());
+function doseUnit(d, text) {
+  if (!text.trim()) return ""; // the placeholder already says it
+  if (!d || d === "bad") return "επαν.";
+  if (d.max) return d.unit === "kcal" ? (says(text, /cal/) ? "" : "cal") : d.unit === "m" ? "" : "επαν.";
+  if (d.unit === "reps") return "επαν.";
+  if (d.unit === "kcal") return says(text, /cal|θερμ/) ? "" : "cal";
+  if (d.unit === "m") return says(text, /m/) ? "" : "m";
+  if (d.unit === "secs") return says(text, /:|s|″|"|min|′|'/) ? "" : "δευτ.";
+  return "";
+}
+function loadUnit(l, text) { if (!l) return ""; if (l.kind === "kg") return says(text, /kg|κιλ/) ? "" : "kg"; if (l.kind === "pct") return "του 1RM"; return ""; }
+function nameInput(s, r) {
+  const inp = h("input", { class: "cell name", "data-k": `r:${r.id}:name`, value: r.name, placeholder: "Άσκηση", "aria-label": "Άσκηση", autocomplete: "off", role: "combobox" });
+  inp.addEventListener("input", () => { typing(() => { r.name = inp.value; }); suggestExercises(inp, r); });
+  inp.addEventListener("blur", () => setTimeout(() => { if (sugg?.input === inp) closeSugg(); }, 120));
+  return inp;
+}
+// ── more than reps and load: optional measures per exercise (Alt+P), each with its unit ──
+const MEASURES = {
+  pace:   { label: "Ρυθμός", alias: "pace split ρυθμος τρεξιμο κωπηλατικη ποδηλατο", ph: "2:00", unit: v => /\/|km|m\b/.test(v) ? "" : "/500m", clock: true },
+  tempo:  { label: "Tempo", alias: "tempo τεμπο ταχυτητα εκτελεσης κατεβασμα ανεβασμα", ph: "31X1", unit: () => "", text: true, hint: "ρυθμός εκτέλεσης: δευτ. κατέβασμα, παύση, ανέβασμα, παύση" },
+  rpe:    { label: "RPE", alias: "rpe ενταση ποσο βαρυ", ph: "8", unit: () => "/10", max: 10 },
+  rir:    { label: "RIR", alias: "rir reps in reserve επαναληψεις στην ακρη", ph: "2", unit: () => "επαν. ακόμα" },
+  zone:   { label: "Ζώνη παλμών", alias: "zone heart rate ζωνη παλμοι z2", ph: "2", unit: v => /z/i.test(v) ? "" : "ζώνη" },
+  height: { label: "Ύψος / στόχος", alias: "height target box wall ball υψος στοχος κουτι", ph: "60", unit: v => /cm|m|″|'/.test(v) ? "" : "cm" },
+  dist:   { label: "Απόσταση", alias: "distance meters αποσταση μετρα", ph: "400", unit: v => /m/.test(v) ? "" : "m" },
+  hold:   { label: "Κράτημα", alias: "hold isometric pause κρατημα παυση", ph: "3", unit: v => /[s″:]/.test(v) ? "" : "δευτ.", clock: true },
+  side:   { label: "Ανά πλευρά", alias: "per side each side unilateral πλευρα χερι ποδι", flag: true },
+};
+const extrasOf = r => (r.extra || []).filter(k => MEASURES[k]);
+function addMeasure(s, r, anchor) {
+  const all = Object.entries(MEASURES).filter(([k]) => !extrasOf(r).includes(k)).map(([k, m]) => ({ k, label: m.label, hint: m.flag ? "χωρίς τιμή" : `${m.hint ? m.hint + " · " : ""}π.χ. ${m.ph}${m.unit(m.ph)}`, alias: m.alias }));
+  const open = q => {
+    const items = q ? all.map(it => { const a = fuzzy(q, it.label), b = fuzzy(q, it.alias); const m = a || b; return m && { ...it, marks: a?.marks || [], score: (a ? 1 : 0) + m.score }; }).filter(Boolean).sort((x, y) => y.score - x.score) : all.map(it => ({ ...it, marks: [] }));
+    showSugg(anchor, items.length ? items : [{ label: "Τίποτα", hint: "σβήσε ένα γράμμα", k: null, marks: [] }], it => {
+      if (!it.k) return;
+      commit(() => { r.extra = [...extrasOf(r), it.k]; });
+      const L = FMT[s.fmt].layout === "grid" || r.perRound;
+      pending = MEASURES[it.k].flag ? `r:${r.id}:name` : L ? `c:${r.id}:0:${it.k}` : `r:${r.id}:x:${it.k}`; render();
+    });
+    sugg.q = q; sugg.retype = open;
+  };
+  open("");
+}
+// Generic progression for any numeric measure, same rules as load: empty repeats (or keeps adding), +x adds, a→b spreads.
+function progress(r, key, n, clockish) {
+  const toN = t => clockish && /^\d+:\d\d$/.test(t) ? t.split(":").reduce((a, x) => a * 60 + +x, 0) : +t;
+  const fmtN = v => clockish && v >= 60 ? `${Math.floor(v / 60)}:${String(Math.round(v % 60)).padStart(2, "0")}` : `${Math.round(v * 10) / 10}`;
+  const out = []; let prev = null, delta = null, spread = null, suffix = "";
+  for (let i = 0; i < n; i++) {
+    const t = (r.cells[i]?.[key] || "").trim().replace(",", "."); let m;
+    if (!t) { if (spread) prev = spread.a + (spread.b - spread.a) * (i - spread.i) / Math.max(1, n - 1 - spread.i); else if (delta != null && prev != null) prev += delta; out.push(prev != null ? fmtN(prev) + suffix : out[i - 1] || ""); continue; }
+    if ((m = /^([+-])(\d+(?::\d\d)?(?:\.\d+)?)$/.exec(t)) && prev != null) { delta = (m[1] === "-" ? -1 : 1) * toN(m[2]); spread = null; prev += delta; out.push(fmtN(prev) + suffix); continue; }
+    if ((m = /^(\d+(?::\d\d)?(?:\.\d+)?)\s*(?:→|->)\s*(\d+(?::\d\d)?(?:\.\d+)?)(.*)$/.exec(t))) { prev = toN(m[1]); spread = { a: prev, b: toN(m[2]), i }; delta = null; suffix = m[3]; out.push(fmtN(prev) + suffix); continue; }
+    if ((m = /^(\d+(?::\d\d)?(?:\.\d+)?)(.*)$/.exec(t))) { prev = toN(m[1]); suffix = m[2]; delta = null; spread = null; out.push(t); continue; }
+    prev = null; delta = null; spread = null; out.push(t);
+  }
+  return out;
+}
+// Different rounds, the same way in every flow: each block is one kind of round (or set, or interval),
+// and the rounds cycle through the blocks: 1, 3, 5 … / 2, 4, 6 … With as many blocks as rounds, every round is its own.
+function totalRounds(s) {
+  if (s.fmt === "sets") return setsRange(s).max;
+  if (s.fmt === "emom") return pCount(s, "times") || 10;
+  if (s.fmt === "amrap") return Infinity;
+  return pCount(s, "rounds") || 1;
+}
+function occurrences(s, b) {
+  const k = Math.max(1, s.blocks.length), T = totalRounds(s), open = T === Infinity, list = [];
+  // AMRAP has no last round: show the rounds the coach wrote plus one empty column for the next one.
+  const filled = open ? Math.max(0, ...(s.blocks[b] || []).map(r => r.cells.reduce((a, c, i) => c && Object.values(c).some(v => String(v || "").trim()) ? i + 1 : a, 0))) : 0;
+  for (let i = b; (open ? list.length < Math.max(2, filled + 1) : i < T) && list.length < 12; i += k) list.push(i + 1);
+  return { list, open };
+}
+const roundWord = s => s.fmt === "sets" ? "Σετ" : s.fmt === "emom" || s.fmt === "intervals" ? "Διάστημα" : "Γύρος";
+const newRoundLabel = s => s.fmt === "sets" ? "διαφορετικό σετ" : s.fmt === "emom" || s.fmt === "intervals" ? "διαφορετικό διάστημα" : "διαφορετικός γύρος";
+function blockLabel(s, b) {
+  const { list, open } = occurrences(s, b), k = s.blocks.length, T = totalRounds(s);
+  if (k >= T && list.length === 1) return `${roundWord(s)} ${list[0]}`;
+  if (s.fmt === "emom") { const e = pTime(s, "every"); if (e > 0 && e !== 60) return `${roundWord(s)} ${list.slice(0, 2).join(", ")}, … · ${list.slice(0, 2).map(n => mmss(e * (n - 1))).join(", ")}, …`; if (e === 60) return `Λεπτό ${list.slice(0, 3).join(", ")}${list.length > 3 || open ? ", …" : ""}`; }
+  return `${roundWord(s)} ${list.slice(0, 3).join(", ")}${open || list.length > 3 ? ", …" : ""}`;
+}
+function addRound(s) {
+  const r = ex("");
+  commit(() => {
+    s.blocks.push([r]);
+    const k = s.blocks.length;
+    // a new kind of round needs a round to happen in
+    if (totalRounds(s) < k) { if (s.fmt === "sets") s.p.sets = String(k); else if (s.fmt === "emom") s.p.times = String(k); else s.p.rounds = String(k); }
+  });
+  pending = `r:${r.id}:name`; render(); toast(`Νέο κουτί: ${blockLabel(s, s.blocks.length - 1)}`);
+}
+const blockOf = r => findRow(r.id)?.b ?? 0;
+const canPerRound = (s, b) => FMT[s.fmt].layout !== "grid" && b >= 0 && occurrences(s, b).list.length > 1;
+function togglePerRound(s, r) {
+  if (!canPerRound(s, blockOf(r))) { toast("Γίνεται μία φορά: βάλε περισσότερους γύρους στο βήμα 2"); return; }
+  commit(() => {
+    if (r.perRound) { const c = r.cells[0] || {}; r.dose = c.d || ""; r.load = c.l || ""; for (const k of extrasOf(r)) (r.x ||= {})[k] = c[k] || ""; r.perRound = false; }
+    else { r.cells = [{ d: r.dose, l: r.load, ...(r.x || {}) }]; r.perRound = true; }
+  });
+  pending = r.perRound ? `c:${r.id}:1:${r.load ? "l" : "d"}` : `r:${r.id}:dose`; render();
+  toast(r.perRound ? "Τιμές ανά γύρο: κενό = όπως πριν, +5 = ανεβαίνει" : "Ίδιες τιμές σε κάθε γύρο");
+}
+const BLOCK_C = ["var(--primary)", "var(--calm)", "var(--heat)"];
+// Progressive load: "+5%" or "+2.5kg" adds to the set before (and keeps adding in the empty sets after it);
+// "60→80%" spreads evenly from this set to the last. An empty set repeats the one before.
+const sameLoad = (a, b) => a.replace(/\s/g, "").toLowerCase() === b.replace(/\s/g, "").toLowerCase();
+// The unit is written once per row: bare numbers ("70", "+5", "60→80") take the unit any other set of the row states.
+// A row of bare numbers with no unit anywhere is an error, and so is a row that mixes kg and %.
+function setLoads(r, n) {
+  const out = []; out.errors = {}; let prev = null, delta = null, spread = null;
+  const raw = i => (r.cells[i]?.l || "").trim().toLowerCase().replace(",", ".").replace(/κιλ[άα]?/, "kg");
+  const NUM = /^([+-]?\d+(?:\.\d+)?)\s*(%|kg)?(?:\s*(?:→|->|ως|έως)\s*(\d+(?:\.\d+)?)\s*(%|kg)?)?$/;
+  const stated = Array.from({ length: n }, (_, i) => { const m = NUM.exec(raw(i)); return m ? m[4] || m[2] || null : null; });
+  const unit = stated.find(Boolean) || null;
+  const fmt = v => `${Math.round(v * 10) / 10}${unit === "%" ? "%" : " kg"}`;
+  for (let i = 0; i < n; i++) {
+    const t = raw(i), m = t && NUM.exec(t);
+    if (!t) { if (spread) prev = spread.a + (spread.b - spread.a) * (i - spread.i) / Math.max(1, n - 1 - spread.i); else if (delta != null && prev != null) prev += delta; out.push(prev != null && unit ? fmt(prev) : (out[i - 1] || "")); continue; }
+    if (!m) { prev = null; delta = null; spread = null; out.push(r.cells[i].l); continue; } // words: "βαρύ", "με βάρος"
+    if (!unit) { out.errors[i] = "λείπει kg ή %"; out.push(""); continue; }
+    if (stated[i] && stated[i] !== unit) { out.errors[i] = `όλη η γραμμή σε ${unit === "%" ? "%" : "kg"}`; out.push(""); continue; }
+    const relative = /^[+-]/.test(m[1]);
+    if (relative && prev != null && !m[3]) { delta = +m[1]; spread = null; prev += delta; out.push(fmt(prev)); continue; }
+    if (m[3]) { prev = Math.abs(+m[1]); spread = { a: prev, b: +m[3], i }; delta = null; out.push(fmt(prev)); continue; }
+    prev = Math.abs(+m[1]); delta = null; spread = null; out.push(fmt(prev));
+  }
+  out.unit = unit;
+  return out;
+}
+// Tempo: four marks, seconds down · pause at the bottom · up (X = explosive) · pause at the top
+const TEMPO = /^([0-9xX])-?([0-9xX])-?([0-9xX])-?([0-9xX])$/;
+const tempoText = t => { const m = TEMPO.exec(t.trim()); if (!m) return null; const s = c => /x/i.test(c) ? "εκρηκτικά" : `${c}″`; return `↓${s(m[1])} · κάτω ${s(m[2])} · ↑${s(m[3])} · πάνω ${s(m[4])}`; };
+const tempoShort = t => { const m = TEMPO.exec(t.trim()); return m ? `↓${m[1]} ·${m[2]} ↑${m[3].toUpperCase()} ·${m[4]}` : null; };
+function stepExercises(s) {
+  const L = FMT[s.fmt].layout;
+  const main = L === "grid" ? setGrid(s) : roundsView(s);
+  return s.mods?.interrupt ? h("div", { style: "display:flex;flex-direction:column;gap:10px" }, main, interruptLane(s)) : main;
+}
+// The structure chip: quiet for a plain exercise, labelled for anything else. Alt+T opens the same list.
+function structChip(s, u, b) {
+  const st = structOf(s, u), plain = st.kind === "single";
+  return h("button", { class: "schip" + (plain ? " plain" : ""), "data-k": `st:${unitKey(u)}`, title: "Δομή του σετ (Alt+T)", onclick: e => pickStruct(s, u, b, e.currentTarget) }, plain ? "δομή" : STRUCTS[st.kind].label, h("span", { "aria-hidden": "true" }, " ▾"));
+}
+function structFields(s, u) {
+  const st = structOf(s, u), defs = STRUCTS[st.kind].fields || [];
+  return defs.map(([key, label, kind]) => {
+    const inp = h("input", { class: "cell tiny", "data-k": `sf:${unitKey(u)}:${key}`, value: st[key] ?? "", "aria-label": label, autocomplete: "off" });
+    inp.addEventListener("input", () => typing(() => { (s.structs[unitKey(u)] ||= structDefaults(st.kind))[key] = inp.value; }));
+    return h("span", { class: "sf" }, kind === "time" ? h("span", { class: "uhint" }, label) : null, withUnit(inp, () => kind === "time" ? (/[:s″"′'λδ]/.test(inp.value) ? "" : "δευτ.") : label));
+  });
+}
+function pickStruct(s, u, b, anchor) {
+  const all = FMT[s.fmt].structs.map(k => ({ label: STRUCTS[k].label, hint: STRUCTS[k].hint, k }));
+  const inp = anchor || document.querySelector(`[data-k="st:${unitKey(u)}"]`);
+  // typing while the list is open filters it, with the same fuzzy match as everywhere else
+  const open = q => {
+    const items = q ? all.map(it => { const m = fuzzy(q, it.label) || fuzzy(q, it.hint); return m && { ...it, marks: fuzzy(q, it.label)?.marks || [], score: m.score }; }).filter(Boolean).sort((a, b) => b.score - a.score) : all.map(it => ({ ...it, marks: [] }));
+    showSugg(inp, items.length ? items : [{ label: "Τίποτα", hint: "σβήσε ένα γράμμα", k: null, marks: [] }], it => it.k && setStruct(s, u, b, it.k));
+    sugg.q = q; sugg.retype = open;
+  };
+  open("");
+}
+function unitAt(s, key) { for (let b = -1; b < s.blocks.length; b++) { const list = b === -1 ? s.intr || [] : s.blocks[b]; const u = unitsOf(list).find(x => unitKey(x) === key || x.rows.some(r => r.id === key)); if (u) return { u, b }; } return null; }
+function setStruct(s, u, b, kind) {
+  const list = listOf(s, b), first = u.rows[0];
+  commit(() => {
+    if (STRUCTS[kind].group && u.rows.length === 1) {
+      // a group needs a partner: the next exercise joins, or a new empty one is added
+      const i = list.indexOf(first), nxt = list[i + 1];
+      const g = id(); first.group = g;
+      if (nxt && !nxt.group) nxt.group = g; else list.splice(i + 1, 0, ex("", "", "", { group: g }));
+      s.structs[g] = structDefaults(kind);
+    } else if (!STRUCTS[kind].group && u.rows.length > 1) {
+      u.rows.forEach(r => { r.group = null; }); delete s.structs[u.group];
+      if (kind !== "single") s.structs[first.id] = structDefaults(kind);
+    } else if (kind === "single" || kind === "superset" && u.group) delete s.structs[unitKey(u)];
+    else s.structs[unitKey(u)] = structDefaults(kind);
+  });
+  const st = STRUCTS[kind];
+  pending = st.fields ? `sf:${u.rows.length > 1 || st.group ? first.group : first.id}:${st.fields[0][0]}` : `r:${first.id}:name`;
+  if (st.group && u.rows.length === 1) { const nx = list[list.indexOf(first) + 1]; if (nx && !nx.name) pending = `r:${nx.id}:name`; }
+  render(); toast(`Δομή: ${st.label}`);
+}
+function flowHead(s) {
+  if (s.fmt === "amrap") return "↻ Γύρος, ξανά και ξανά ως το τέλος του χρόνου";
+  if (s.fmt === "emom") { const e = pTime(s, "every"); return `Κάθε ${e > 0 ? clock(e) : "διάστημα"}`; }
+  if (s.fmt === "intervals") return `Σε κάθε διάστημα δουλειάς (${s.p.work})`;
+  return pCount(s, "rounds") > 1 ? `↻ Γύρος × ${s.p.rounds}` : "Με τη σειρά, μία φορά";
+}
+function roundsView(s) {
+  if (!s.blocks.length) s.blocks.push([]);
+  const k = s.blocks.length, one = k === 1, word = roundWord(s).toLowerCase();
+  const boxes = h("div", { class: "slots" }, ...s.blocks.map((list, b) => h("div", { class: "slot", style: `--c:${BLOCK_C[b % 3]}` },
+    h("div", { class: "lbl" }, one ? flowHead(s) : blockLabel(s, b)),
+    exTable(s, list, b, word),
+    addBtn(one ? "+ Άσκηση" : `+ Άσκηση σε αυτό το κουτί`, () => addRow(s, b, list.at(-1)), one ? "Enter" : null))));
+  const T = totalRounds(s);
+  const how = one ? (s.fmt === "emom" ? "Ό,τι είναι στο κουτί γίνεται στο ίδιο διάστημα." : "")
+    : k >= T ? `Κάθε ${word} έχει τις δικές του ασκήσεις, με τη σειρά.` : `Τα κουτιά εναλλάσσονται: ${s.blocks.map((_, i) => i + 1).join(", ")}, ${s.blocks.map((_, i) => i + 1).join(", ")} …`;
+  return h("div", { class: "stack" }, boxes, hintLine(),
+    s.fmt === "amrap" ? h("p", { class: "uhint" }, "Για «όσες προλάβεις στον χρόνο που μένει» γράψε max στις επαναλήψεις της τελευταίας άσκησης.") : null,
+    h("div", { class: "adds" }, addBtn(`+ ${newRoundLabel(s)}`, () => addRound(s), "Alt+S")),
+    how ? h("p", { class: "uhint" }, how) : null);
+}
+// Add-on lane: what interrupts the flow, kept apart from the flow itself
+function interruptLane(s) {
+  const list = s.intr || (s.intr = []);
+  return h("div", { class: "lane int" }, h("div", { class: "lbl" }, `Διακοπή · κάθε ${s.p.intEvery || "?"} σταματάς και κάνεις`),
+    exTable(s, list, -1, "διακοπή"), hintLine(), addBtn("+ Άσκηση στη διακοπή", () => addRow(s, -1, list.at(-1))));
+}
+// ── exercise tables ─────────────────────────────────────────────────────────
+// One look everywhere: exercises are rows, values sit in columns under a header that names them and their unit.
+// A value field keeps its unit right next to the number; a computed value (from +5, 60→80, or an inherited one)
+// is shown inside the same field, never on an extra line, so rows and columns always stay aligned.
+let notesOpen = new Set();
+const addBtn = (label, fn, kbd) => h("button", { class: "add", onclick: fn }, label, kbd ? h("kbd", { style: "margin-inline-start:6px" }, kbd) : null);
+function vf(key, value, { ph = "", aria = "", suffix = null, onInput = null, cls = "" } = {}) {
+  const inp = h("input", { class: "vi", "data-k": key, value: value || "", placeholder: ph, "aria-label": aria, autocomplete: "off" });
+  const suf = h("span", { class: "vs", "aria-hidden": "true" }), disp = h("span", { class: "vd", "aria-hidden": "true" });
+  const wrap = h("span", { class: "vf " + cls }, inp, suf, disp);
+  wrap.upd = () => { suf.textContent = suffix ? suffix(inp.value) || "" : ""; };
+  wrap.setDisp = (main, badge) => { disp.replaceChildren(...(main ? [h("b", {}, main), badge ? h("small", {}, badge) : ""] : [])); wrap.classList.toggle("has-disp", Boolean(main)); };
+  wrap.setBad = msg => { wrap.classList.toggle("bad", Boolean(msg)); inp.title = msg || ""; inp.dataset.err = msg || ""; };
+  wrap.inp = inp;
+  inp.addEventListener("input", () => { wrap.upd(); onInput?.(inp.value); });
+  wrap.upd();
+  return wrap;
+}
+const vfOf = el => el?.closest?.(".vf");
+const flagTags = r => extrasOf(r).filter(k => MEASURES[k].flag).map(k => h("span", { class: "xtag" }, MEASURES[k].label.toLowerCase()));
+const lineKeys = r => r.kind === "rest" ? ["d"] : ["d", "l", ...extrasOf(r).filter(k => !MEASURES[k].flag)];
+const measureHead = k => { const M = MEASURES[k], u = M.unit(M.ph); return u && !/^[a-zα-ω]/i.test(u) ? `${M.label} ${u}` : u ? `${M.label} (${u})` : M.label; };
+const lineLabel = (r, k, unit) => k === "d" ? (r.kind === "rest" ? "Χρόνος" : "Επαν.") : k === "l" ? `Φορτίο${unit ? " " + unit : ""}` : measureHead(k);
+const dropMeasure = (r, k) => { commit(() => { r.extra = extrasOf(r).filter(x => x !== k); delete r.x?.[k]; r.cells.forEach(c => c && delete c[k]); }); pending = `r:${r.id}:name`; render(); toast(`Αφαιρέθηκε: ${MEASURES[k].label}`); };
+// Text measures (tempo) only repeat; they never count up.
+function repeatText(r, k, n) { const out = []; for (let i = 0; i < n; i++) out.push(r.cells[i]?.[k] || out[i - 1] || ""); return out; }
+const repeatDose = (r, n) => { const out = []; for (let i = 0; i < n; i++) out.push(r.cells[i]?.d || out[i - 1] || ""); return out; };
+const isRelative = t => /^[+-]|→|->|ως|έως/.test(t.trim());
+
+// One set / round cell: one field per line (reps, load, every extra measure), same order as the labels.
+function cellFields(r, i, n, word, grow = false) {
+  const c = r.cells[i] || {};
+  const set = (k, v) => typing(() => { (r.cells[i] ||= { d: "", l: "" })[k] = v; });
+  return lineKeys(r).map(k => {
+    const label = k === "d" ? (r.kind === "rest" ? "ξεκούραση" : "επαναλήψεις") : k === "l" ? "φορτίο" : MEASURES[k].label;
+    const f = vf(`c:${r.id}:${i}:${k}`, c[k], { aria: `${word} ${i + 1} ${label}`, onInput: v => { set(k, v); if (grow && i === n - 1 && v.trim()) { render(); const el = document.querySelector(`[data-k="${CSS.escape(f.inp.dataset.k)}"]`); el?.setSelectionRange?.(el.value.length, el.value.length); return; } refreshRow(r, n, f.closest("[data-row]")); } });
+    return f;
+  });
+}
+const cellBox = (r, i, n, word, grow) => h("div", { class: "c" }, ...cellFields(r, i, n, word, grow));
+// Fill in placeholders (inherited values), computed values and errors for a row of set / round cells.
+function refreshRow(r, n, row) {
+  if (!row) return;
+  document.querySelectorAll(`[data-sum^="${r.id}:"]`).forEach(el => { el.textContent = perSummary(r, el.dataset.sum.split(":")[1], n) || "—"; });
+  const fields = k => [...row.querySelectorAll(`input[data-k^="c:${r.id}:"][data-k$=":${k}"]`)].map(vfOf);
+  const d = repeatDose(r, n);
+  fields("d").forEach((f, j) => { f.inp.placeholder = (!f.inp.value && j ? d[j - 1] : "") || "—"; f.setBad(f.inp.value && parseDose(f.inp.value) === "bad" ? "Δεν διαβάζεται: π.χ. 10, 8-12, max, 400 m" : ""); });
+  if (r.kind !== "ex") return;
+  const loads = setLoads(r, n);
+  fields("l").forEach((f, j) => {
+    const t = f.inp.value.trim(), err = loads.errors[j];
+    f.setBad(err ? (err.startsWith("λείπει") ? "Γράψε kg ή % σε ένα σετ της γραμμής· τα υπόλοιπα το παίρνουν από εκεί" : `Ίδια μονάδα σε όλη τη γραμμή: ${err.replace("όλη η γραμμή σε ", "")}`) : "");
+    // the unit lives in the line label, so cells show only the number
+    const bare = x => (x || "").replace(/\s*(kg|%)$/i, "");
+    f.inp.placeholder = bare(loads[j]) || "—";
+    f.setDisp(t && !err && loads[j] && bare(loads[j]) !== t ? bare(loads[j]) : "", t && isRelative(t) ? bare(t.replace("->", "→")) : "");
+  });
+  const unit = loads.unit;
+  (row.closest("table") || row).querySelectorAll(`[data-lab="${r.id}:l"]`).forEach(el => { el.textContent = lineLabel(r, "l", unit); });
+  for (const k of extrasOf(r)) {
+    const M = MEASURES[k]; if (M.flag) continue;
+    const v = (M.text ? repeatText(r, k, n) : progress(r, k, n, M.clock)).map(x => M.max && +x > M.max ? String(M.max) : x);
+    fields(k).forEach((f, j) => {
+      const t = f.inp.value.trim();
+      const bad = t && (M.text ? !tempoText(t) : !/^[+-]?\d/.test(t)) ? (M.text ? "Tempo σε 4 σημάδια, π.χ. 31X1" : "Αριθμός, +x ή a→b") : "";
+      f.setBad(bad); f.inp.placeholder = v[j] || "—";
+      f.setDisp(t && !bad && !M.text && v[j] && v[j] !== t ? v[j] : "", t && isRelative(t) ? t.replace("->", "→") : "");
+    });
+  }
+}
+// The rows-of-sets grid (Σετ) and the per-round panel share this: name column, then one column per set or round.
+function setTable(s, r, occ, open, word, b) {
+  const n = occ.length;
+  if (narrow()) {
+    // phones: one line per set or round, measures as columns (how workout apps lay out sets)
+    const keys = lineKeys(r);
+    const head = h("tr", {}, h("th", {}, word), ...keys.map(k => h("th", { "data-lab": `${r.id}:${k}` }, lineLabel(r, k, r.kind === "ex" ? setLoads(r, n).unit : ""))));
+    const body = h("tbody", { "data-row": r.id }, ...occ.map((num, i) => h("tr", {}, h("td", { class: "setno" }, `${num}`), ...cellFields(r, i, n, word, open).map(f => h("td", {}, f)))));
+    queueMicrotask(() => refreshRow(r, n, body));
+    return h("div", { class: "gridwrap mini tall" }, h("table", { class: "grid" }, h("thead", {}, head), body));
+  }
+  const head = h("tr", {}, h("th", { class: "lab-h" }), ...occ.map(num => h("th", {}, `${word} ${num}`)));
+  const tr = h("tr", { "data-row": r.id }, h("td", { class: "labs" }, ...lineKeys(r).map(k => h("div", { "data-lab": `${r.id}:${k}` }, lineLabel(r, k, r.kind === "ex" ? setLoads(r, n).unit : "")))), ...Array.from({ length: n }, (_, i) => h("td", {}, cellBox(r, i, n, word, open))));
+  queueMicrotask(() => refreshRow(r, n, tr));
+  return h("div", { class: "gridwrap mini" }, h("table", { class: "grid" }, h("thead", {}, head), h("tbody", {}, tr)));
+}
+// Row menu: every row action in one place (and each keeps its own shortcut).
+function rowMenu(s, r, anchor) {
+  const f = findRow(r.id); if (!f) return;
+  const u = unitsOf(f.list).find(x => x.rows.includes(r));
+  const items = [
+    r.kind === "ex" && FMT[s.fmt].structs.length ? { label: "Δομή σετ…", hint: "Alt+T · cluster, drop set, complex…", go: () => pickStruct(s, u, f.b, anchor) } : null,
+    r.kind === "ex" ? { label: "Παράμετρος…", hint: "Alt+P · ρυθμός, tempo, RPE, ύψος…", go: () => addMeasure(s, r, anchor) } : null,
+    r.kind === "ex" && canPerRound(s, f.b) ? { label: r.perRound ? "Ίδιες τιμές σε κάθε γύρο" : "Τιμές ανά γύρο", hint: "Alt+V", go: () => togglePerRound(s, r) } : null,
+    r.kind === "ex" ? { label: r.note || notesOpen.has(r.id) ? "Σημείωση" : "Προσθήκη σημείωσης", hint: "Alt+N", go: () => { notesOpen.add(r.id); pending = `r:${r.id}:note`; render(); } } : null,
+    f.i > 0 ? { label: r.group ? "Εκτός superset" : "Superset με την από πάνω", hint: "Alt+G", go: () => superset(s, r) } : null,
+    { label: "Ξεκούραση μετά", hint: "Alt+R", go: () => addRow(s, f.b, r, "rest") },
+    ...extrasOf(r).map(k => ({ label: `Αφαίρεση: ${MEASURES[k].label}`, hint: "", go: () => dropMeasure(r, k) })),
+    { label: "Διαγραφή", hint: "⌫ σε κενό όνομα", go: () => deleteRow(r.id) },
+  ].filter(Boolean);
+  const open = q => {
+    const list = q ? items.map(it => { const m = fuzzy(q, it.label); return m && { ...it, marks: m.marks, score: m.score }; }).filter(Boolean).sort((a, b) => b.score - a.score) : items.map(it => ({ ...it, marks: [] }));
+    showSugg(anchor, list.length ? list : [{ label: "Τίποτα", hint: "σβήσε ένα γράμμα", marks: [] }], it => it.go?.());
+    sugg.q = q; sugg.retype = open;
+  };
+  open("");
+}
+const moreBtn = (s, r) => h("button", { class: "more", "data-k": `m:${r.id}`, title: "Ενέργειες (Alt+M)", "aria-label": "Ενέργειες άσκησης", onclick: e => rowMenu(s, r, e.currentTarget) }, "⋯");
+function nameCell(s, r) {
+  if (r.kind === "rest") return h("span", { class: "rest-label", "data-k": `r:${r.id}:name`, tabindex: "-1" }, "Ξεκούραση");
+  return h("span", { class: "nm" }, nameInput(s, r), ...flagTags(r));
+}
+const noteLine = r => r.kind === "ex" && (r.note || notesOpen.has(r.id)) ? noteInput(r, `r:${r.id}:note`, "Σημείωση για την άσκηση") : null;
+// Group / structure header: shown only when a unit is more than a plain exercise
+function unitHead(s, u, b) {
+  const st = structOf(s, u);
+  if (u.rows.length === 1 && st.kind === "single") return null;
+  return h("div", { class: "uhead" }, structChip(s, u, b), ...structFields(s, u), h("span", { class: "uhint" }, STRUCTS[st.kind].hint));
+}
+
+// Σετ: one table per kind of set; rows are exercises, columns are sets, lines inside a cell are the measures.
+const narrow = () => innerWidth < 640;
+let wasNarrow = narrow();
+addEventListener("resize", () => { if (narrow() !== wasNarrow) { wasNarrow = narrow(); render(); } });
+function setCards(s, rows, b) {
+  const occ = occurrences(s, b).list, out = [];
+  for (const u of unitsOf(rows)) {
+    const uh = unitHead(s, u, b);
+    if (uh) out.push(h("div", { class: "xg" }, uh));
+    for (const r of u.rows) out.push(h("div", { class: "scard" + (u.rows.length > 1 ? " in-group" : "") }, h("div", { class: "xr", "data-row": r.id }, h("span", { class: "xn" }, nameCell(s, r)), h("span", { class: "xm" }, moreBtn(s, r))), noteLine(r) ? h("div", { class: "xnote" }, noteLine(r)) : null, setTable(s, r, occ, false, "Σετ", b)));
+  }
+  return h("div", { class: "scards" }, ...out);
+}
+function setGrid(s) {
+  if (!s.blocks.length) s.blocks.push([]);
+  const k = s.blocks.length, sr = setsRange(s);
+  const tables = s.blocks.map((rows, b) => {
+    const occ = occurrences(s, b).list, n = occ.length;
+    const thead = h("tr", {}, h("th", {}, k > 1 ? blockLabel(s, b) : "Άσκηση"), ...occ.map(num => h("th", { class: num > sr.min ? "opt-set" : null, title: num > sr.min ? "Αν αντέχει (το εύρος σετ είναι " + s.p.sets + ")" : null }, `Σετ ${num}${num > sr.min ? "*" : ""}`)), h("th", { class: "more-h" }));
+    const body = [];
+    for (const u of unitsOf(rows)) {
+      const uh = unitHead(s, u, b);
+      if (uh) body.push(h("tr", { class: "grp" }, h("td", { colspan: n + 2 }, uh)));
+      for (const r of u.rows) {
+        const first = h("td", { class: "first" }, h("div", { class: "fx" }, h("div", { class: "fname" }, nameCell(s, r), noteLine(r)), h("div", { class: "labs" }, ...lineKeys(r).map(key => h("div", { "data-lab": `${r.id}:${key}` }, lineLabel(r, key, r.kind === "ex" ? setLoads(r, n).unit : ""))))));
+        const tr = h("tr", { class: (u.rows.length > 1 ? "in-group" : "") + (r.kind === "rest" ? " restline" : ""), "data-row": r.id }, first, ...Array.from({ length: n }, (_, i) => h("td", {}, cellBox(r, i, n, "Σετ"))), h("td", { class: "more-c" }, moreBtn(s, r)));
+        queueMicrotask(() => refreshRow(r, n, tr));
+        body.push(tr);
+      }
+    }
+    const table = narrow() ? setCards(s, rows, b) : h("div", { class: "gridwrap" }, h("table", { class: "grid" }, h("thead", {}, thead), h("tbody", {}, ...body)));
+    return k > 1 ? h("div", { class: "gblock", style: `--c:${BLOCK_C[b % 3]}` }, table, addBtn("+ Άσκηση σε αυτά τα σετ", () => addRow(s, b, rows.at(-1)))) : table;
+  });
+  const cur = () => { const r = currentRow(); const f = r && findRow(r.id); return f && f.b >= 0 ? f : { b: s.blocks.length - 1, r: s.blocks.at(-1).at(-1) }; };
+  const T = totalRounds(s);
+  return h("div", { class: "stack" }, ...tables, hintLine(),
+    sr.max > sr.min ? h("p", { class: "uhint" }, `* αν αντέχει: τα σετ είναι ${s.p.sets}.`) : null,
+    k > 1 ? h("p", { class: "uhint" }, k >= T ? "Κάθε σετ έχει τις δικές του ασκήσεις, με τη σειρά." : `Τα σετ εναλλάσσονται: ${s.blocks.map((_, i) => i + 1).join(", ")}, ${s.blocks.map((_, i) => i + 1).join(", ")} …`) : null,
+    h("div", { class: "adds" }, addBtn("+ Άσκηση", () => { const f = cur(); addRow(s, f.b, f.r); }, "Enter"), addBtn(`+ ${newRoundLabel(s)}`, () => addRound(s), "Alt+S")));
+}
+
+// For Time, AMRAP, EMOM, Intervals, interruptions: a table with one value per column; "per round" opens a set table under the row.
+function exTable(s, list, b, word) {
+  const cols = ["d", "l", ...[...new Set(list.flatMap(r => extrasOf(r).filter(k => !MEASURES[k].flag)))]];
+  const head = h("div", { class: "xh" }, h("span", {}, "Άσκηση"), ...cols.map(k => h("span", {}, k === "d" ? "Επαναλήψεις" : k === "l" ? "Φορτίο" : measureHead(k))), h("span", {}));
+  const rows = [];
+  for (const u of unitsOf(list)) {
+    const uh = unitHead(s, u, b);
+    if (uh) rows.push(h("div", { class: "xg" }, uh));
+    for (const r of u.rows) rows.push(compactRow(s, r, b, cols, word, u.rows.length > 1));
+  }
+  const t = h("div", { class: "xt", style: `--cols:${cols.length}` }, head, ...rows);
+  return h("div", { class: "xtw" }, t);
+}
+function compactRow(s, r, b, cols, word, grouped) {
+  const per = r.kind === "ex" && r.perRound && canPerRound(s, b);
+  const cells = cols.map(k => {
+    const label = k === "d" ? "Επαναλήψεις" : k === "l" ? "Φορτίο" : measureHead(k);
+    if (r.kind === "rest") return h("span", { class: "xv", "data-label": label }, k === "d" ? vf(`r:${r.id}:dose`, r.dose, { ph: "0:30", aria: "Ξεκούραση", suffix: v => !v.trim() ? "" : /[:s″"′'λδ]|min/.test(v) ? "" : +v <= 10 ? "λεπτά" : "δευτ.", onInput: v => typing(() => { r.dose = v; }) }) : null);
+    if (per) { const O = occurrences(s, b); return h("span", { class: "xv", "data-label": label }, h("button", { class: "sumv", "data-sum": `${r.id}:${k}`, onclick: () => { pending = `c:${r.id}:0:${k}`; render(); } }, perSummary(r, k, O.list.length) || "—")); }
+    if (k === "d") return h("span", { class: "xv", "data-label": label }, vf(`r:${r.id}:dose`, r.dose, { ph: "—", aria: "Επαναλήψεις ή ποσότητα", suffix: v => { const d = parseDose(v); return d && d !== "bad" && d.unit !== "reps" ? doseUnit(d, v) : ""; }, onInput: v => { typing(() => { r.dose = v; }); checkCompact(r, cellsEl); } }));
+    if (k === "l") return h("span", { class: "xv", "data-label": label }, vf(`r:${r.id}:load`, r.load, { ph: "—", aria: "Φορτίο", onInput: v => { typing(() => { r.load = v; }); checkCompact(r, cellsEl); } }));
+    if (!extrasOf(r).includes(k)) return h("span", { class: "xv empty", "data-label": label });
+    return h("span", { class: "xv", "data-label": label }, vf(`r:${r.id}:x:${k}`, r.x?.[k], { ph: "—", aria: MEASURES[k].label, onInput: v => { typing(() => { (r.x ||= {})[k] = v; }); checkCompact(r, cellsEl); } }));
+  });
+  const cellsEl = h("div", { class: "xr" + (grouped ? " in-group" : "") + (r.kind === "rest" ? " rest" : "") + (per ? " per" : ""), "data-row": r.id }, h("span", { class: "xn" }, nameCell(s, r)), ...cells, h("span", { class: "xm" }, moreBtn(s, r)));
+  const extra = [];
+  const note = noteLine(r); if (note) extra.push(h("div", { class: "xnote" }, note));
+  if (per) { const O = occurrences(s, b); extra.push(h("div", { class: "xp" }, setTable(s, r, O.list, O.open, roundWord(s), b))); }
+  queueMicrotask(() => checkCompact(r, cellsEl));
+  return extra.length ? h("div", { class: "xgroup" }, cellsEl, ...extra) : cellsEl;
+}
+function perSummary(r, k, n) {
+  const vals = k === "d" ? repeatDose(r, n) : k === "l" ? setLoads(r, n) : MEASURES[k]?.text ? repeatText(r, k, n) : progress(r, k, n, MEASURES[k]?.clock);
+  const xs = vals.filter(Boolean); if (!xs.length) return "";
+  return xs.every(x => x === xs[0]) ? xs[0] : `${xs[0]} → ${xs.at(-1)}`;
+}
+function checkCompact(r, row) {
+  if (!row || r.kind !== "ex") return;
+  const q = k => vfOf(row.querySelector(`input[data-k="r:${r.id}:${k}"]`));
+  const d = q("dose"); if (d) d.setBad(d.inp.value && parseDose(d.inp.value) === "bad" ? "Δεν διαβάζεται: π.χ. 10, 8-12, 5-10-15…, max, 400 m, 60s" : "");
+  const l = q("load"); if (l) { const t = l.inp.value.trim(); l.setBad(/^\d+(?:[.,]\d+)?$/.test(t) ? "Γράψε kg ή %, π.χ. 60kg ή 70%" : ""); }
+  for (const k of extrasOf(r)) { const M = MEASURES[k], f = q(`x:${k}`); if (!f) continue; const t = f.inp.value.trim(); f.setBad(t && (M.text ? !tempoText(t) : !/^\d/.test(t)) ? (M.text ? "Tempo σε 4 σημάδια, π.χ. 31X1" : "Αριθμός, π.χ. " + M.ph) : ""); }
+}
+
+// One quiet line under each table: what the focused value means, then how to write it. Nothing shows while you are not in a value.
+const TIPS = {
+  d: [["8-12", "εύρος"], ["5-10-15…", "ανεβαίνει κάθε γύρο"], ["max", "όσες αντέξει"]],
+  dc: [["κενό", "όπως το προηγούμενο"], ["8-12", "εύρος"], ["max", "όσες αντέξει"]],
+  l: [["60kg", "κιλά"], ["70%", "του 1RM"], ["βαρύ", "με λόγια"]],
+  lc: [["κενό", "όπως το προηγούμενο"], ["+5", "ανεβαίνει κάθε φορά"], ["60→80", "ως το τελευταίο"], ["kg ή %", "μία φορά στη γραμμή"]],
+  x: [["κενό", "όπως το προηγούμενο"], ["+1", "αλλάζει κάθε φορά"], ["7→9", "ως το τελευταίο"]],
+  clock: [["κενό", "όπως το προηγούμενο"], ["-0:05", "αλλάζει κάθε φορά"], ["2:00→1:50", "ως το τελευταίο"]],
+  tempo: [["31X1", "δευτ. κατέβασμα · παύση κάτω · ανέβασμα (X = εκρηκτικά) · παύση πάνω"]],
+};
+function hintFor(t) {
+  const k = t?.dataset?.k || "", v = (t?.value || "").trim();
+  let m, meaning = "", tips = null;
+  if ((m = /^r:([^:]+):(dose|load|x:(\w+))$/.exec(k)) || (m = /^c:([^:]+):\d+:(\w+)$/.exec(k))) {
+    const cell = k.startsWith("c:"), key = m[2] === "dose" ? "d" : m[2] === "load" ? "l" : m[3] || m[2];
+    const M = MEASURES[key], f = findRow(m[1]);
+    if (t.dataset.err) meaning = t.dataset.err;
+    else if (key === "d" && v) { const d = parseDose(v); meaning = d && d !== "bad" ? doseCaption(d, f?.s ? roundWord(f.s).toLowerCase() : "γύρο") : ""; }
+    else if (key === "l" && v) { const shown = vfOf(t)?.querySelector(".vd b")?.textContent; meaning = shown && isRelative(v) ? `= ${shown}` : cell ? "" : loadCaption(parseLoad(v)) || ""; }
+    else if (M?.text && v) meaning = tempoText(v) || "";
+    else if (M && v) { const shown = vfOf(t)?.querySelector(".vd b")?.textContent; meaning = shown ? `= ${shown} ${M.unit(shown)}`.trim() : ""; }
+    tips = key === "d" ? TIPS[cell ? "dc" : "d"] : key === "l" ? TIPS[cell ? "lc" : "l"] : M?.text ? TIPS.tempo : cell ? (M?.clock ? TIPS.clock : TIPS.x) : null;
+    // AMRAP has no last round: the coach's own last value decides what comes after it
+    if (cell && tips && f?.s?.fmt === "amrap") tips = [...tips, ["μετά τον τελευταίο γύρο", "ίδια τιμή, ή η ίδια αλλαγή αν γράψεις +x"]];
+  }
+  return { meaning, tips, err: Boolean(t?.dataset?.err) };
+}
+function hintLine() {
+  const el = h("div", { class: "gridhint", "aria-live": "polite" });
+  queueMicrotask(() => {
+    const wrap = el.parentElement; if (!wrap) return;
+    const show = t => { const { meaning, tips, err } = hintFor(t); el.replaceChildren(...(meaning ? [h("span", { class: err ? "err" : "mean" }, meaning)] : []), ...(tips || []).flatMap(([a, b], i) => [meaning || i ? " · " : "", h("code", {}, a), " " + b])); };
+    wrap.addEventListener("focusin", e => show(e.target));
+    wrap.addEventListener("input", e => show(e.target));
+    wrap.addEventListener("focusout", () => show(null));
+  });
+  return el;
+}
+
+// step 4: score (default already chosen) and the section note
+function scoreLine(s) {
+  const opts = FMT[s.fmt].score;
+  const grp = h("div", { class: "choice", role: "radiogroup", "aria-label": "Σκορ" });
+  opts.forEach(o => grp.append(h("button", { "aria-pressed": String(s.score === o), "data-k": s.score === o ? `score:${s.id}` : null, tabindex: s.score === o ? "0" : "-1", onclick: () => commit(() => { s.score = o; }) }, o)));
+  grp.addEventListener("keydown", e => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); e.stopPropagation(); const i = (opts.indexOf(s.score) + (e.key === "ArrowRight" ? 1 : -1) + opts.length) % opts.length; commit(() => { s.score = opts[i]; }); pending = `score:${s.id}`; render(); } });
+  return h("div", { class: "pf", style: "flex-direction:row;align-items:center;gap:8px;flex-wrap:wrap" }, "Σκορ", grp);
+}
+function stepScore(s) {
+  return h("div", { class: "scorepick" }, scoreLine(s), h("p", { style: "font-size:.78rem;color:var(--muted)" }, "Το πιο συνηθισμένο είναι ήδη επιλεγμένο. ← → για αλλαγή."), noteInput(s, `snote:${s.id}`, "Σημείωση για την ενότητα (προαιρετική)"));
+}
+
+// ── row actions ──────────────────────────────────────
+function currentRow() { const k = document.activeElement?.dataset?.k || lastRowKey; const m = /^(?:r|c):([^:]+)/.exec(k || ""); return m ? findRow(m[1])?.r : null; }
+let lastRowKey = null;
+const listOf = (s, b) => b === -1 ? (s.intr ||= []) : (s.blocks[b] ||= []);
+function findRow(rid) { for (const s of state.sections) for (let b = -1; b < s.blocks.length; b++) { const list = b === -1 ? s.intr || [] : s.blocks[b]; const i = list.findIndex(r => r.id === rid); if (i >= 0) return { s, b, i, r: list[i], list }; } return null; }
+function addRow(s, b, after, kind = "ex") {
+  const list = listOf(s, b);
+  const at = after ? list.indexOf(after) + 1 : list.length;
+  const r = kind === "rest" ? restRow("30″", { group: after?.group || null, cells: cells(["30″"]) }) : ex("", "", "", { group: after?.group || null });
+  commit(() => list.splice(at, 0, r));
+  pending = kind === "rest" ? (FMT[s.fmt].layout === "grid" && b !== -1 ? `c:${r.id}:0:d` : `r:${r.id}:dose`) : `r:${r.id}:name`; render();
+}
+function superset(s, r) {
+  const f = findRow(r.id); const prev = f.list[f.i - 1];
+  commit(() => { if (r.group) { const g = r.group; r.group = null; const left = f.list.filter(x => x.group === g); if (left.length === 1) left[0].group = null; } else if (prev) { prev.group ||= id(); r.group = prev.group; } });
+  toast(r.group ? "Superset με την από πάνω" : "Εκτός superset");
+}
+function deleteRow(rid) { const f = findRow(rid); commit(() => { f.list.splice(f.i, 1); if (!f.list.length && f.b >= 0 && f.s.blocks.length > 1) f.s.blocks.splice(f.b, 1); }); const prev = f.list[f.i - 1] || f.list[0]; pending = prev ? `r:${prev.id}:name` : null; render(); toast(`Διαγράφηκε · ${MOD}+Z για αναίρεση`); }
+function addSection(after) {
+  const s = { id: id(), fmt: "sets", p: {}, blocks: [], score: "", note: "", name: "", mods: {}, intr: [], structs: {}, preset: null };
+  commit(() => { state.sections.splice(after ? state.sections.indexOf(after) + 1 : state.sections.length, 0, s); state.openId = s.id; state.step = 0; state.query = ""; state.pick = 0; });
+  if (state.alt === "B") { s.p = Object.fromEntries(FMT.sets.fields.map(f => [f[0], f[3]])); s.blocks = [[ex("")]]; s.score = FMT.sets.score[0]; state.step = 1; pending = `fmt:${s.id}`; }
+  else pending = `pick:${s.id}`;
+  render();
+}
+
+// ── suggestion dropdown (fuzzy, keyboard) ───────────
+const CATALOG = ["Back Squat","Front Squat","Overhead Squat","Deadlift","Romanian Deadlift","Clean","Power Clean","Hang Power Clean","Clean & Jerk","Snatch","Power Snatch","Dual DB Hang Snatch","Thruster","Wall Ball","Pull-up","Butterfly Pull-up","Chest-to-Bar Pull-up","Toes-to-Bar","Push-up","Banded Deficit Push-up","Strict HSPU","Box Jump","Burpee","Burpee over Bar","Burpee to Target","Double Under","Row","Echo Bike","Ski Erg","Kettlebell Swing","Back Step Lunge","Sit-up","Bench Press","Incline Bench Press","Dumbbell Fly","Cable Crossover","Lat Pulldown","Seated Row","Ring Dip","Hip Thrust","Knee Extension","Hamstring Curl","Standing Calf Raise","Cyclist Squat","Lateral Raise","Shoulder Press","Preacher Curl","Skull Crusher","Run","Wall Walk","Shoulder to Overhead","Dual DB Push Press"];
+let sugg = null;
+function closeSugg() { sugg?.el.remove(); sugg = null; }
+document.addEventListener("mousedown", e => { if (sugg && !sugg.el.contains(e.target) && e.target !== sugg.input) closeSugg(); }, true);
+function showSugg(input, items, onPick) {
+  closeSugg(); if (!items.length) return;
+  const b = input.getBoundingClientRect();
+  const el = h("div", { class: "sugg", role: "listbox", style: `left:${Math.max(8, Math.min(b.left + scrollX, innerWidth - 260))}px;top:${b.bottom + scrollY + 4}px` });
+  sugg = { el, items, active: 0, onPick, input };
+  items.forEach((it, i) => { const lab = h("span"); lab.append(highlight(it.label, it.marks || [])); el.append(h("div", { class: "o", role: "option", "aria-selected": String(i === 0), onmousedown: e => { e.preventDefault(); closeSugg(); onPick(it); } }, lab, h("small", {}, it.hint || ""))); });
+  document.body.append(el);
+}
+function moveSugg(d) { sugg.active = (sugg.active + d + sugg.items.length) % sugg.items.length; [...sugg.el.children].forEach((c, i) => c.setAttribute("aria-selected", String(i === sugg.active))); }
+function suggestExercises(input, r) {
+  const q = input.value.trim(); if (!q) return closeSugg();
+  const used = new Set(state.sections.flatMap(s => s.blocks.flat()).map(x => x.name).filter(Boolean));
+  const items = [...new Set([...used, ...CATALOG])].map(n => { const m = fuzzy(q, n); return m && { label: n, marks: m.marks, score: m.score + (used.has(n) ? 2 : 0), hint: used.has(n) ? "σε αυτό το WOD" : "" }; })
+    .filter(x => x && x.label !== q).sort((a, b) => b.score - a.score).slice(0, 7);
+  showSugg(input, items, it => { typing(() => { r.name = it.label; }); input.value = it.label; });
+}
+
+// ── palette and cheat sheet ──────────────────────────
+const layer = document.getElementById("layer");
+function sheet() {
+  const back = document.activeElement;
+  const groups = [
+    ["Ενότητα", [["Shift+Enter", "Νέα ενότητα"], ["Alt+→ / Alt+←", "Επόμενο / προηγούμενο βήμα"], ["Alt+1 … 4", "Πήγαινε σε βήμα"], ["Esc", "Κλείσε την ενότητα σε μία γραμμή"], ["↑ ↓ και Enter", "Σε κλειστές ενότητες: διάλεξε και άνοιξε"]]],
+    ["Ασκήσεις", [["Enter", "Νέα άσκηση"], ["Alt+M", "Ενέργειες γραμμής (το μενού ⋯)"], ["Alt+G", "Superset με την από πάνω"], ["Alt+T", "Δομή του σετ: cluster, drop set, complex…"], ["Alt+P", "Παράμετρος: ρυθμός, tempo, RPE, ύψος, ανά πλευρά…"], ["Alt+V", "Τιμές ανά γύρο (AMRAP, For Time, EMOM)"], ["Alt+R", "Ξεκούραση μέσα στο σετ"], ["Alt+S", "Διαφορετικός γύρος, σετ ή διάστημα (εναλλάξ)"], ["Alt+N", "Σημείωση"], ["κενό κελί", "Όπως το προηγούμενο σετ"], ["+5 / -0:05", "Τιμή που αλλάζει κάθε σετ"], ["60→80", "Τιμή μοιρασμένη ως το τελευταίο σετ"], ["kg ή %", "Μία φορά στη γραμμή"], ["⌫ σε κενό όνομα", "Διαγραφή"], ["Tab, ↑ ↓", "Κίνηση ανάμεσα σε πεδία"]]],
+    ["Γενικά", [[`${MOD}+Z`, "Αναίρεση"], [`${MOD}+Shift+Z`, "Επανάληψη"], [`${MOD}+Enter`, "Δημοσίευση"], ["?", "Αυτή η λίστα"]]],
+  ];
+  const box = h("div", { class: "sheet", role: "dialog", "aria-label": "Συντομεύσεις", tabindex: "-1" }, ...groups.flatMap(([g, rows]) => [h("h4", {}, g), h("div", { class: "keys" }, ...rows.flatMap(([k, t]) => [h("span", {}, t), h("kbd", {}, k)]))]));
+  const shut = () => { layer.replaceChildren(); back?.focus(); };
+  box.addEventListener("keydown", e => { if (e.key === "Escape" || e.key === "?") { e.preventDefault(); e.stopPropagation(); shut(); } });
+  layer.replaceChildren(h("div", { class: "scrim", onmousedown: e => { if (e.target === e.currentTarget) shut(); } }, box));
+  box.focus();
+}
+function drawHint() {
+  const s = secById(state.openId);
+  const A = state.alt === "A";
+  const items = !s ? [["↑ ↓", "ενότητα"], ["Enter", "άνοιγμα"], ["Shift+Enter", "νέα ενότητα"], ["?", "όλες"]]
+    : A && state.step === 0 ? [["γράψε", "αναζήτηση"], ["↑ ↓", "επιλογή"], ["Enter", "συνέχεια"], ["Esc", "κλείσιμο"]]
+    : A && state.step !== 2 ? [["Tab", "επόμενο πεδίο"], ["Enter", "επόμενο βήμα"], ["Alt+←", "πίσω"], ["Esc", "κλείσιμο"]]
+    : [["Enter", "νέα άσκηση"], ["Alt+M", "ενέργειες γραμμής"], ["Alt+S", "διαφορετικός γύρος"], [A ? "Alt+→" : "Esc", A ? "σκορ" : "κλείσιμο"], ["?", "όλες"]];
+  document.getElementById("hint").replaceChildren(...items.map(([k, t]) => h("span", {}, h("kbd", {}, k), " " + t)));
+}
+
+// ── keyboard ─────────────────────────────────────────
+document.addEventListener("focusin", e => { const k = e.target.dataset?.k; if (k && /^(r|c):/.test(k)) lastRowKey = k; });
+document.addEventListener("keydown", e => {
+  if (layer.children.length) return;
+  const mod = mac ? e.metaKey : e.ctrlKey, t = e.target, k = t.dataset?.k || "", inField = t.tagName === "INPUT";
+  if (sugg && sugg.input === t) {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); moveSugg(e.key === "ArrowDown" ? 1 : -1); return; }
+    if ((e.key === "Enter" || e.key === "Tab") && !e.shiftKey) { const it = sugg.items[sugg.active]; if (it && it.label !== t.value) { if (e.key === "Enter") e.preventDefault(); const pick = sugg.onPick; closeSugg(); pick(it); if (e.key === "Enter") return; } else closeSugg(); }
+    if (e.key === "Escape") { e.preventDefault(); closeSugg(); return; }
+    if (sugg.retype && !mod && !e.altKey && (e.key.length === 1 || e.key === "Backspace")) { e.preventDefault(); sugg.retype(e.key === "Backspace" ? sugg.q.slice(0, -1) : sugg.q + e.key); return; }
+  }
+  if ((e.key === "?" && !inField) || (mod && e.code === "Slash")) { e.preventDefault(); sheet(); return; }
+  if (mod && (e.code === "KeyZ" || e.code === "KeyY")) { e.preventDefault(); const redo = e.code === "KeyY" || e.shiftKey; const from = redo ? future : past, to = redo ? past : future; const x = from.pop(); if (x) { to.push(snap()); Object.assign(state, JSON.parse(x)); render(); } return; }
+  if (mod && e.key === "Enter") { e.preventDefault(); toast("Δημοσιεύτηκε (mockup)"); return; }
+  const s = secById(state.openId);
+  if (e.key === "Enter" && e.shiftKey && !mod) { e.preventDefault(); addSection(s || state.sections.at(-1)); return; }
+  // closed cards: arrows move, Enter opens
+  if (k.startsWith("card:")) {
+    const cards = [...root.querySelectorAll(".card, .open")]; const i = cards.indexOf(t);
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); const n = cards[i + (e.key === "ArrowDown" ? 1 : -1)]; (n?.matches(".card") ? n : n?.querySelector("input,button"))?.focus(); }
+    return;
+  }
+  if (k === "w:title" && e.key === "Enter") { e.preventDefault(); root.querySelector(".card, .open input")?.focus(); return; }
+  if (!s || !t.closest(`[data-sec="${s.id}"]`)) return;
+  if (e.key === "Escape") { e.preventDefault(); close(); return; }
+  if (state.alt === "A" && e.altKey && (e.key === "ArrowRight" || e.key === "ArrowLeft")) { e.preventDefault(); if (e.key === "ArrowRight") state.step === 3 ? close() : goStep(s, nextStep(s)); else goStep(s, prevStep(s)); return; }
+  if (state.alt === "A" && e.altKey && /^Digit[1-4]$/.test(e.code)) { e.preventDefault(); const n = +e.code.slice(5) - 1; if (!(n === 1 && !hasTimeStep(s.fmt)) && !(n === 2 && !hasExercises(s.fmt))) goStep(s, n); return; }
+  // step 2 / 4: Enter goes to the next field, then the next step
+  if (e.key === "Enter" && (k.startsWith("p:") || k.startsWith("score:") || k.startsWith("snote:")) && state.alt === "A") {
+    e.preventDefault();
+    const fields = [...t.closest(".open").querySelectorAll("input[data-k^='p:'], button[data-k^='p:'], button[data-k^='score:'], input[data-k^='snote:']")];
+    const i = fields.indexOf(t);
+    if (fields[i + 1]) { fields[i + 1].focus(); fields[i + 1].select?.(); } else state.step === 3 ? close() : goStep(s, nextStep(s));
+    return;
+  }
+  const m = /^(r|c):([^:]+)/.exec(k); const f = m && findRow(m[2]);
+  if (e.altKey && e.code === "KeyN") { e.preventDefault(); if (f) { notesOpen.add(f.r.id); pending = `r:${f.r.id}:note`; } else pending = `snote:${s.id}`; if (state.alt === "A" && !f) { state.step = 3; } render(); return; }
+  if (e.altKey && e.code === "KeyS" && hasExercises(s.fmt)) { e.preventDefault(); addRound(s); return; }
+  if (e.altKey && e.code === "KeyT") {
+    e.preventDefault();
+    const key = f ? f.r.id : /^s[tf]:([^:]+)/.exec(k)?.[1]; const at = key && unitAt(s, key);
+    if (!at || at.u.rows[0].kind === "rest" && at.u.rows.length === 1) { toast("Διάλεξε πρώτα μια άσκηση"); return; }
+    const chip = root.querySelector(`[data-k="st:${unitKey(at.u)}"]`) || root.querySelector(`[data-k="m:${at.u.rows[0].id}"]`); pickStruct(s, at.u, at.b, chip); return;
+  }
+  if (!f) { if (e.key === "Enter" && k.startsWith("p:") && state.alt === "B") { e.preventDefault(); const r = s.blocks.flat()[0]; if (r) { pending = `r:${r.id}:name`; render(); } } return; }
+  if (e.key === "Enter" && !e.altKey && !mod) { e.preventDefault(); addRow(s, f.b, f.r); return; }
+  if (e.altKey && e.code === "KeyG") { e.preventDefault(); superset(s, f.r); return; }
+  if (e.altKey && e.code === "KeyP" && f.r.kind === "ex") { e.preventDefault(); addMeasure(s, f.r, t); return; }
+  if (e.altKey && e.code === "KeyM") { e.preventDefault(); rowMenu(s, f.r, t); return; }
+  if (e.altKey && e.code === "KeyV" && f.r.kind === "ex") { e.preventDefault(); togglePerRound(s, f.r); return; }
+  { const xm = /^r:[^:]+:x:(\w+)$/.exec(k); if (xm && e.key === "Backspace" && t.value === "") { e.preventDefault(); dropMeasure(f.r, xm[1]); toast(`Αφαιρέθηκε: ${MEASURES[xm[1]].label}`); return; } }
+  if (e.altKey && e.code === "KeyR") { e.preventDefault(); addRow(s, f.b, f.r, "rest"); return; }
+  if (e.key === "Backspace" && k.endsWith(":name") && t.value === "") { e.preventDefault(); deleteRow(f.r.id); return; }
+  if ((e.key === "ArrowUp" || e.key === "ArrowDown") && !e.altKey && !mod && !e.shiftKey) {
+    const rows = [...t.closest(".open").querySelectorAll("[data-row]")]; const cur = t.closest("[data-row]"); const i = rows.indexOf(cur); const next = rows[i + (e.key === "ArrowUp" ? -1 : 1)];
+    if (!next) return; e.preventDefault();
+    const col = k.split(":").slice(2).join(":");
+    const cand = [...next.querySelectorAll("input[data-k]")];
+    const same = cand.find(x => x.dataset.k.endsWith(":" + col)) || cand[0];
+    same?.focus(); same?.select?.();
+  }
+});
+document.getElementById("title").addEventListener("input", e => typing(() => { state.title = e.target.value; }));
+document.getElementById("wodnote").addEventListener("input", e => typing(() => { state.note = e.target.value; }));
+document.getElementById("publish").addEventListener("click", () => toast("Δημοσιεύτηκε (mockup)"));
+document.getElementById("add-section").addEventListener("click", () => addSection(state.sections.at(-1)));
+document.querySelectorAll("#alt-switch button").forEach(b => b.addEventListener("click", () => { state.alt = b.dataset.alt; if (state.alt === "B" && state.step === 0) { const s = secById(state.openId); if (s && !s.blocks.length) { s.p = Object.fromEntries(FMT.sets.fields.map(f => [f[0], f[3]])); s.blocks = [[ex("")]]; s.score = FMT.sets.score[0]; } state.step = 1; } render(); }));
+render();
+})();
+</script>

@@ -7,7 +7,7 @@ import type { GridCell } from "@/lib/structured-wod/grid";
 
 export type ExerciseSuggestion = { id: string; label: string; aliases: string[] };
 
-/** What every part of the structured editor shares (ADR-231). */
+/** What every part of the structured editor shares (ADR-270). */
 export type StructuredEditorContextValue = {
   mac: boolean;
   scaleLevels: ScaleLevel[];

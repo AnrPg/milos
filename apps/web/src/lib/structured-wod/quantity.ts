@@ -1,7 +1,7 @@
 import type { LoadMode, PrescriptionUnit } from "@/types/workout";
 
 /**
- * ADR-231: one text field per quantity in the structured WOD editor. The
+ * ADR-270: one text field per quantity in the structured WOD editor. The
  * coach types the amount and its unit together ("10", "30s", "1:30",
  * "15 cal", "70%", "bw") instead of reaching for a stepper and a unit
  * button, so a row is written without the mouse. English and Greek unit

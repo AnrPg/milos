@@ -1,7 +1,7 @@
 import { FORMAT_FIELD_DEFS, makeDefaultFormatParams, type FormatParams, type SectionFormat } from "@/types/workout";
 
 /**
- * ADR-231: the section format is picked by typing what a coach writes on the
+ * ADR-270: the section format is picked by typing what a coach writes on the
  * whiteboard: "amrap 12", "emom 10", "e2mom 20", "tabata", "for time 15",
  * «για χρόνο 15». The words find the format (its label in the screen's
  * language or a common alias); a number fills the format's main field

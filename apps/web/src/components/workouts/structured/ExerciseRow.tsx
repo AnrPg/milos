@@ -42,7 +42,7 @@ type Props = {
 };
 
 /**
- * ADR-231: one exercise as a row of text fields: interval · name · sets ·
+ * ADR-270: one exercise as a row of text fields: interval · name · sets ·
  * reps/time/calories · load · details. The row's details (set by set, scaled
  * versions, rest, tempo, note) open under it with Alt+O.
  */

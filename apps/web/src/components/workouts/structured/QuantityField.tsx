@@ -15,7 +15,7 @@ type Props<T> = Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange"
 };
 
 /**
- * ADR-231: a quantity typed as text ("10", "30s", "70%"). Each change that
+ * ADR-270: a quantity typed as text ("10", "30s", "70%"). Each change that
  * reads as a valid amount is saved at once; while the text cannot be read
  * the field turns red, says why, and the last good value stays. On leaving
  * the field it shows the value in its usual form again.

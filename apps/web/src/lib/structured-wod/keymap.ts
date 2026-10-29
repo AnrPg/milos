@@ -1,5 +1,5 @@
 /**
- * ADR-231: every keyboard shortcut of the structured WOD editor, in one
+ * ADR-270: every keyboard shortcut of the structured WOD editor, in one
  * place. The editor's key handler, the shortcut sheet («?»), the command
  * palette and the button tooltips all read this list, so a key shown to the
  * coach is always the key that works.
