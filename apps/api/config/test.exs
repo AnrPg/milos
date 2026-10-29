@@ -104,3 +104,7 @@ config :palee, :native_push_senders, %{
 
 # ADR-161: Garmin is faked; tests turn it on and script its answers.
 config :palee, :garmin_client, Palee.FakeGarminClient
+
+# ADR-242: a fixed test key for the fiscal journal (never used outside tests).
+config :palee, Palee.Infrastructure.Fiscal.Ed25519JournalSigner,
+  signing_key: "test-1:" <> Base.encode64(:binary.copy(<<7>>, 32))

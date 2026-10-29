@@ -147,6 +147,9 @@ config :palee,
 
 # ADR-202: the spaces of each branch, their floor plans and unavailability.
 config :palee, :space_store, Palee.Infrastructure.Spaces.EctoSpaceStore
+# ADR-240–242: Fiscal (legal identity, documents, inalterable journal).
+config :palee, :fiscal_store, Palee.Infrastructure.Fiscal.EctoFiscalStore
+config :palee, :fiscal_journal_signer, Palee.Infrastructure.Fiscal.Ed25519JournalSigner
 
 # ADR-190: the e-shop and Finance's revenue streams.
 config :palee, :shop_store, Palee.Infrastructure.Shop.EctoShopStore

@@ -2,6 +2,15 @@ import Config
 
 config :palee, :app_env, config_env()
 
+# ADR-242: the fiscal journal's Ed25519 key ("<key id>:<base64 seed>") and the
+# public keys of retired ones. Without a key in prod, fiscal documents are
+# refused (journal_signing_unavailable); the rest of the app runs.
+if config_env() == :prod do
+  config :palee, Palee.Infrastructure.Fiscal.Ed25519JournalSigner,
+    signing_key: System.get_env("FISCAL_JOURNAL_SIGNING_KEY"),
+    retired_public_keys: System.get_env("FISCAL_JOURNAL_RETIRED_PUBLIC_KEYS")
+end
+
 if System.get_env("PHX_SERVER") do
   config :palee, PaleeWeb.Endpoint, server: true
 end
