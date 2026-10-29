@@ -89,7 +89,9 @@ config :palee, Oban,
     # ADR-243: reports to the tax authority (one HTTP call per document).
     fiscal: 2,
     # ADR-246: provider calls for online payments.
-    payments: 2
+    payments: 2,
+    # ADR-254: CSV imports, one at a time per node (each row its own transaction).
+    imports: 1
   ]
 
 config :palee, Palee.Infrastructure.Auth.Guardian,
@@ -200,6 +202,9 @@ config :palee,
 config :palee,
        :documents_certificate_renderer,
        Palee.Infrastructure.Documents.PdfCertificateRenderer
+# ADR-254: CSV imports (upload, dry run, apply, undo).
+config :palee, :import_store, Palee.Infrastructure.Imports.EctoImportStore
+config :palee, :import_clock, Palee.Infrastructure.Imports.SystemClock
 
 # ADR-190: the e-shop and Finance's revenue streams.
 config :palee, :shop_store, Palee.Infrastructure.Shop.EctoShopStore

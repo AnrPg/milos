@@ -61,7 +61,9 @@ defmodule PaleeWeb.RouteCapabilities do
     # ADR-191: partner perks.
     W.AdminPerkController => [:manage_perks],
     # ADR-253: box screens (TVs on the wall), their codes and overrides.
-    W.AdminBoxScreenController => [:manage_settings, :manage_locations]
+    W.AdminBoxScreenController => [:manage_settings, :manage_locations],
+    # ADR-254: CSV imports (owners and admins hold manage_settings).
+    W.AdminImportController => [:manage_settings]
   }
 
   @actions %{

@@ -34,6 +34,9 @@ defmodule Palee.Identity.Account do
     :inserted_at,
     # ADR-184: the demo business a mock person belongs to; nil for real people.
     :demo_organization_id,
+    # ADR-254: the business whose import created this profile, until the
+    # person claims it by proving the inbox; nil otherwise.
+    :held_by_organization_id,
     completed_tours: []
   ]
 
@@ -55,6 +58,7 @@ defmodule Palee.Identity.Account do
           email: String.t() | nil,
           email_verified_at: DateTime.t() | nil,
           inserted_at: DateTime.t() | NaiveDateTime.t() | nil,
-          demo_organization_id: Ecto.UUID.t() | nil
+          demo_organization_id: Ecto.UUID.t() | nil,
+          held_by_organization_id: Ecto.UUID.t() | nil
         }
 end

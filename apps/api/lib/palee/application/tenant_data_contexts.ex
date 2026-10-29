@@ -27,6 +27,7 @@ defmodule Palee.Application.TenantDataContexts do
     Fiscal,
     Gamification,
     Housekeeping,
+    Imports,
     Inventory,
     Journal,
     Media,
@@ -56,6 +57,7 @@ defmodule Palee.Application.TenantDataContexts do
   @purgeable [
     BoxScreens,
     AiUsage,
+    Imports,
     Scaling,
     Analytics,
     Partners,

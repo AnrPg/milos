@@ -32,6 +32,9 @@ defmodule Palee.Identity.User do
     # ADR-184: the demo business a mock person belongs to (nil for everyone
     # real). Set once by the members seeder; the database refuses a change.
     field :demo_organization_id, :binary_id
+    # ADR-254: the business whose import created this profile; cleared when
+    # the person proves the inbox (email verification, password reset).
+    field :held_by_organization_id, :binary_id
 
     belongs_to :login, Login
 

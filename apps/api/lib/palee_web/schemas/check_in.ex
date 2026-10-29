@@ -11,7 +11,7 @@ defmodule PaleeWeb.Schemas.CheckIn do
   @maybe_date %Schema{type: :string, format: :date, nullable: true}
   @maybe_string %Schema{type: :string, nullable: true}
   @maybe_integer %Schema{type: :integer, nullable: true}
-  @methods ~w(door_qr door_poster door_nfc geofence member_qr wallet desk_search self)
+  @methods ~w(door_qr door_poster door_nfc geofence member_qr wallet desk_search self imported)
 
   def body(schema), do: Community.body(schema)
   def error, do: %Schema{type: :object, additionalProperties: true}

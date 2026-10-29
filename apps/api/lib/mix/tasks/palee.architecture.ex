@@ -123,6 +123,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     box_screens/box_screen_store
     documents/document_store
     setup/recipe_application_store
+    imports/import_store
   )
 
   defp tenant_scope_violations do
