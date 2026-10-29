@@ -47,9 +47,9 @@ type Package = Record<string, unknown> & { id: string; sold_online: boolean; onl
 
 const PACKAGES: Package[] = [
   { id: "p-unl", name: "Unlimited", package_type: "membership", billing_period: "monthly", base_price_cents: 7500, active: true, sold_online: true, online_visibility: "visible" },
-  { id: "p-pt", name: "10 προσωπικές προπονήσεις", package_type: "pt_pack", billing_period: "one_time", base_price_cents: 35000, active: true, sold_online: true, online_visibility: "purpose_off" },
+  { id: "p-pt", name: "10 προσωπικές προπονήσεις", package_type: "pt_pack", billing_period: "one_off", base_price_cents: 35000, active: true, sold_online: true, online_visibility: "purpose_off" },
   { id: "p-w3", name: "3 φορές την εβδομάδα", package_type: "membership", billing_period: "monthly", base_price_cents: 6000, active: true, sold_online: false, online_visibility: "off" },
-  { id: "p-trial", name: "Δοκιμαστικό 7 ημερών", package_type: "trial", billing_period: "one_time", base_price_cents: 0, active: true, sold_online: false, online_visibility: "free" },
+  { id: "p-trial", name: "Δοκιμαστικό 7 ημερών", package_type: "trial", billing_period: "one_off", base_price_cents: 0, active: true, sold_online: false, online_visibility: "free" },
 ];
 
 type Write = { method: string; path: string; body: unknown };
@@ -94,7 +94,10 @@ async function stub(page: Page, writes: Write[]) {
     }
     if (path === "/api/admin/payments/account") return json(route, status());
     if (path === "/api/admin/payments/attention") return json(route, { payments: [], total: 0 });
-    if (path === "/api/admin/finance/package-catalog") return json(route, { types: [], modules: [] });
+    if (path === "/api/admin/class-types") return json(route, { class_types: [] });
+    if (path === "/api/admin/locations") return json(route, { locations: [] });
+    if (path === "/api/staff/members") return json(route, { staff: [] });
+    if (path === "/api/admin/finance/package-catalog") return json(route, { version: 2, implemented_phases: [], modules: [], sections: [], fields: [], types: [] });
     if (path === "/api/admin/finance/packages") return json(route, { packages });
     const one = path.match(/^\/api\/admin\/finance\/packages\/([^/]+)$/);
     if (one) {
