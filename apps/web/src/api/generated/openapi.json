@@ -159028,6 +159028,3474 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/documents/audit": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.audit",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "subject_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "action",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 200,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "events": {
+                      "items": {
+                        "properties": {
+                          "action": {
+                            "type": "string"
+                          },
+                          "actor_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "details": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "occurred_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "subject_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "subject_type": {
+                            "type": "string"
+                          },
+                          "subject_user_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "action",
+                          "actor_id",
+                          "details",
+                          "id",
+                          "occurred_at",
+                          "subject_id",
+                          "subject_type",
+                          "subject_user_id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "events",
+                    "total"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Audit events"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The documents audit log, newest first",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/health-certificates": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminHealthCertificatesController.index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "enum": [
+                "missing",
+                "valid",
+                "expiring",
+                "expired"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "full_access": {
+                      "type": "boolean"
+                    },
+                    "health_certificates": {
+                      "items": {
+                        "properties": {
+                          "certificate": {
+                            "description": "Only for staff who manage health certificates",
+                            "nullable": true,
+                            "properties": {
+                              "byte_size": {
+                                "type": "integer"
+                              },
+                              "content_type": {
+                                "enum": [
+                                  "application/pdf",
+                                  "image/jpeg",
+                                  "image/png",
+                                  "image/webp"
+                                ],
+                                "type": "string"
+                              },
+                              "expires_on": {
+                                "description": "The first day it is no longer valid",
+                                "format": "date",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "inserted_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "issued_on": {
+                                "format": "date",
+                                "type": "string"
+                              },
+                              "uploaded_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "byte_size",
+                              "content_type",
+                              "expires_on",
+                              "id",
+                              "inserted_at",
+                              "issued_on",
+                              "uploaded_by_id",
+                              "user_id"
+                            ],
+                            "type": "object"
+                          },
+                          "display_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "handle": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "missing",
+                              "valid",
+                              "expiring",
+                              "expired"
+                            ],
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "certificate",
+                          "display_name",
+                          "handle",
+                          "status",
+                          "user_id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "required": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "full_access",
+                    "health_certificates",
+                    "required"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Health certificates"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Clients with their health certificate status",
+        "tags": [
+          "Documents"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminHealthCertificatesController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "content_type": {
+                    "enum": [
+                      "application/pdf",
+                      "image/jpeg",
+                      "image/png",
+                      "image/webp"
+                    ],
+                    "type": "string"
+                  },
+                  "expires_on": {
+                    "description": "Default: the issue date plus the box's validity (12 months)",
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "file_key": {
+                    "maxLength": 500,
+                    "type": "string"
+                  },
+                  "issued_on": {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "user_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content_type",
+                  "file_key",
+                  "issued_on",
+                  "user_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "health_certificate": {
+                      "properties": {
+                        "byte_size": {
+                          "type": "integer"
+                        },
+                        "content_type": {
+                          "enum": [
+                            "application/pdf",
+                            "image/jpeg",
+                            "image/png",
+                            "image/webp"
+                          ],
+                          "type": "string"
+                        },
+                        "expires_on": {
+                          "description": "The first day it is no longer valid",
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "issued_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "uploaded_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "byte_size",
+                        "content_type",
+                        "expires_on",
+                        "id",
+                        "inserted_at",
+                        "issued_on",
+                        "uploaded_by_id",
+                        "user_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "health_certificate"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Health certificate"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Record an uploaded health certificate with its dates",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/health-certificates/members/{user_id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminHealthCertificatesController.client",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "health_certificates": {
+                      "items": {
+                        "properties": {
+                          "byte_size": {
+                            "type": "integer"
+                          },
+                          "content_type": {
+                            "enum": [
+                              "application/pdf",
+                              "image/jpeg",
+                              "image/png",
+                              "image/webp"
+                            ],
+                            "type": "string"
+                          },
+                          "expires_on": {
+                            "description": "The first day it is no longer valid",
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "issued_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "uploaded_by_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "byte_size",
+                          "content_type",
+                          "expires_on",
+                          "id",
+                          "inserted_at",
+                          "issued_on",
+                          "uploaded_by_id",
+                          "user_id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "user_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "health_certificates",
+                    "user_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Health certificates"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A client's health certificates, newest first",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/health-certificates/uploads": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminHealthCertificatesController.request_upload",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "content_type": {
+                    "enum": [
+                      "application/pdf",
+                      "image/jpeg",
+                      "image/png",
+                      "image/webp"
+                    ],
+                    "type": "string"
+                  },
+                  "user_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content_type",
+                  "user_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "content_type": {
+                      "enum": [
+                        "application/pdf",
+                        "image/jpeg",
+                        "image/png",
+                        "image/webp"
+                      ],
+                      "type": "string"
+                    },
+                    "file_key": {
+                      "type": "string"
+                    },
+                    "max_bytes": {
+                      "type": "integer"
+                    },
+                    "method": {
+                      "enum": [
+                        "PUT"
+                      ],
+                      "type": "string"
+                    },
+                    "required_headers": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "upload_url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "content_type",
+                    "file_key",
+                    "max_bytes",
+                    "method",
+                    "required_headers",
+                    "upload_url"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Upload"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Upload a client's health certificate: get a presigned upload",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/health-certificates/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminHealthCertificatesController.delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "health_certificate": {
+                      "properties": {
+                        "byte_size": {
+                          "type": "integer"
+                        },
+                        "content_type": {
+                          "enum": [
+                            "application/pdf",
+                            "image/jpeg",
+                            "image/png",
+                            "image/webp"
+                          ],
+                          "type": "string"
+                        },
+                        "expires_on": {
+                          "description": "The first day it is no longer valid",
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "issued_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "uploaded_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "byte_size",
+                        "content_type",
+                        "expires_on",
+                        "id",
+                        "inserted_at",
+                        "issued_on",
+                        "uploaded_by_id",
+                        "user_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "health_certificate"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Health certificate"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete a health certificate and its file (audited)",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/health-certificates/{id}/file": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminHealthCertificatesController.file",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "content_type": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "description": "Short-lived link; the look is audited",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "content_type",
+                    "url"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "File"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A short-lived link to the certificate file (audited)",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/members/{user_id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.member",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "documents": {
+                      "items": {
+                        "properties": {
+                          "current_version_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "current_version_number": {
+                            "type": "integer"
+                          },
+                          "kind": {
+                            "enum": [
+                              "waiver",
+                              "terms",
+                              "privacy",
+                              "health_certificate",
+                              "other"
+                            ],
+                            "type": "string"
+                          },
+                          "outstanding": {
+                            "description": "Mandatory and not signed",
+                            "type": "boolean"
+                          },
+                          "requested": {
+                            "description": "Staff asked for it",
+                            "type": "boolean"
+                          },
+                          "requirement": {
+                            "enum": [
+                              "mandatory",
+                              "optional"
+                            ],
+                            "type": "string"
+                          },
+                          "signature": {
+                            "nullable": true,
+                            "properties": {
+                              "content_hash": {
+                                "pattern": "^[0-9a-f]{64}$",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "signed_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "version_number": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "content_hash",
+                              "id",
+                              "signed_at",
+                              "version_number"
+                            ],
+                            "type": "object"
+                          },
+                          "status": {
+                            "enum": [
+                              "signed",
+                              "unsigned",
+                              "resign_required"
+                            ],
+                            "type": "string"
+                          },
+                          "template_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "current_version_id",
+                          "current_version_number",
+                          "kind",
+                          "outstanding",
+                          "requested",
+                          "requirement",
+                          "signature",
+                          "status",
+                          "template_id",
+                          "title"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "health_certificate_status": {
+                      "enum": [
+                        "missing",
+                        "valid",
+                        "expiring",
+                        "expired"
+                      ],
+                      "type": "string"
+                    },
+                    "outstanding": {
+                      "type": "integer"
+                    },
+                    "signatures": {
+                      "items": {
+                        "properties": {
+                          "account": {
+                            "additionalProperties": true,
+                            "description": "The signer's account at signing time",
+                            "type": "object"
+                          },
+                          "content_hash": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "evidence_byte_size": {
+                            "type": "integer"
+                          },
+                          "evidence_hash": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "evidence_sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "has_drawn_signature": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "ip_address": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "level": {
+                            "enum": [
+                              "simple",
+                              "advanced",
+                              "qualified"
+                            ],
+                            "type": "string"
+                          },
+                          "provider": {
+                            "type": "string"
+                          },
+                          "request_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "signed_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "template_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "typed_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "user_agent": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "version_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "version_number": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "account",
+                          "content_hash",
+                          "evidence_byte_size",
+                          "evidence_hash",
+                          "evidence_sha256",
+                          "has_drawn_signature",
+                          "id",
+                          "ip_address",
+                          "level",
+                          "provider",
+                          "request_id",
+                          "signed_at",
+                          "template_id",
+                          "typed_name",
+                          "user_agent",
+                          "user_id",
+                          "version_id",
+                          "version_number"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "user_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "documents",
+                    "health_certificate_status",
+                    "outstanding",
+                    "signatures",
+                    "user_id"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Client documents"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A client's documents, signatures and health certificate status",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/requests": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.requests",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "enum": [
+                "pending",
+                "signed",
+                "cancelled"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "template_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "user_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "batch_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 200,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "requests": {
+                      "items": {
+                        "properties": {
+                          "audience": {
+                            "enum": [
+                              "person",
+                              "all_clients",
+                              "role",
+                              "package"
+                            ],
+                            "type": "string"
+                          },
+                          "batch_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "closed_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "requested_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "requested_by_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "signature_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "signed",
+                              "cancelled"
+                            ],
+                            "type": "string"
+                          },
+                          "template_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "audience",
+                          "batch_id",
+                          "closed_at",
+                          "id",
+                          "requested_at",
+                          "requested_by_id",
+                          "signature_id",
+                          "status",
+                          "template_id",
+                          "user_id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "requests",
+                    "total"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Requests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Signature requests, newest first",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/requests/{id}/cancel": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.cancel_request",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "request": {
+                      "properties": {
+                        "audience": {
+                          "enum": [
+                            "person",
+                            "all_clients",
+                            "role",
+                            "package"
+                          ],
+                          "type": "string"
+                        },
+                        "batch_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "closed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "requested_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "signature_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "signed",
+                            "cancelled"
+                          ],
+                          "type": "string"
+                        },
+                        "template_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "audience",
+                        "batch_id",
+                        "closed_at",
+                        "id",
+                        "requested_at",
+                        "requested_by_id",
+                        "signature_id",
+                        "status",
+                        "template_id",
+                        "user_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "request"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Request"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Cancel a pending request",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/settings": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.settings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "settings": {
+                      "properties": {
+                        "block_booking_on_health_certificate": {
+                          "type": "boolean"
+                        },
+                        "block_booking_on_unsigned": {
+                          "type": "boolean"
+                        },
+                        "health_certificate_reminder_days": {
+                          "maximum": 90,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "health_certificate_required": {
+                          "type": "boolean"
+                        },
+                        "health_certificate_validity_months": {
+                          "maximum": 24,
+                          "minimum": 1,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "block_booking_on_health_certificate",
+                        "block_booking_on_unsigned",
+                        "health_certificate_reminder_days",
+                        "health_certificate_required",
+                        "health_certificate_validity_months"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "settings"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Settings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The box's document rules (booking gate, health certificates)",
+        "tags": [
+          "Documents"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.save_settings",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "block_booking_on_health_certificate": {
+                    "type": "boolean"
+                  },
+                  "block_booking_on_unsigned": {
+                    "type": "boolean"
+                  },
+                  "health_certificate_reminder_days": {
+                    "maximum": 90,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "health_certificate_required": {
+                    "type": "boolean"
+                  },
+                  "health_certificate_validity_months": {
+                    "maximum": 24,
+                    "minimum": 1,
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "settings": {
+                      "properties": {
+                        "block_booking_on_health_certificate": {
+                          "type": "boolean"
+                        },
+                        "block_booking_on_unsigned": {
+                          "type": "boolean"
+                        },
+                        "health_certificate_reminder_days": {
+                          "maximum": 90,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "health_certificate_required": {
+                          "type": "boolean"
+                        },
+                        "health_certificate_validity_months": {
+                          "maximum": 24,
+                          "minimum": 1,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "block_booking_on_health_certificate",
+                        "block_booking_on_unsigned",
+                        "health_certificate_reminder_days",
+                        "health_certificate_required",
+                        "health_certificate_validity_months"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "settings"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Settings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Change the box's document rules (audited)",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/signatures": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.signatures",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "template_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "user_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 200,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "signatures": {
+                      "items": {
+                        "properties": {
+                          "account": {
+                            "additionalProperties": true,
+                            "description": "The signer's account at signing time",
+                            "type": "object"
+                          },
+                          "content_hash": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "evidence_byte_size": {
+                            "type": "integer"
+                          },
+                          "evidence_hash": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "evidence_sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "has_drawn_signature": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "ip_address": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "level": {
+                            "enum": [
+                              "simple",
+                              "advanced",
+                              "qualified"
+                            ],
+                            "type": "string"
+                          },
+                          "provider": {
+                            "type": "string"
+                          },
+                          "request_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "signed_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "template_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "typed_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "user_agent": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "version_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "version_number": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "account",
+                          "content_hash",
+                          "evidence_byte_size",
+                          "evidence_hash",
+                          "evidence_sha256",
+                          "has_drawn_signature",
+                          "id",
+                          "ip_address",
+                          "level",
+                          "provider",
+                          "request_id",
+                          "signed_at",
+                          "template_id",
+                          "typed_name",
+                          "user_agent",
+                          "user_id",
+                          "version_id",
+                          "version_number"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "signatures",
+                    "total"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Signatures"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Signatures with their evidence, newest first",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/signatures/{id}/evidence": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.evidence",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "byte_size": {
+                      "type": "integer"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "url": {
+                      "description": "Short-lived link to the PDF certificate",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "byte_size",
+                    "sha256",
+                    "url"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Certificate"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A short-lived link to a signature's PDF certificate (audited)",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/starters": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.starters",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "enum": [
+                "el",
+                "en"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "starters": {
+                      "items": {
+                        "properties": {
+                          "body": {
+                            "type": "string"
+                          },
+                          "draft": {
+                            "type": "boolean"
+                          },
+                          "kind": {
+                            "enum": [
+                              "waiver",
+                              "terms",
+                              "privacy",
+                              "health_certificate",
+                              "other"
+                            ],
+                            "type": "string"
+                          },
+                          "language": {
+                            "type": "string"
+                          },
+                          "legal_review_required": {
+                            "type": "boolean"
+                          },
+                          "requirement": {
+                            "enum": [
+                              "mandatory",
+                              "optional"
+                            ],
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "body",
+                          "draft",
+                          "kind",
+                          "language",
+                          "legal_review_required",
+                          "requirement",
+                          "title"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "starters"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Drafts"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Ready-made drafts to start from (always marked for legal review)",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/templates": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "enum": [
+                "active",
+                "archived"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "requirement",
+            "required": false,
+            "schema": {
+              "enum": [
+                "mandatory",
+                "optional"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "templates": {
+                      "items": {
+                        "properties": {
+                          "archived_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "current_version_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "current_version_number": {
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "waiver",
+                              "terms",
+                              "privacy",
+                              "health_certificate",
+                              "other"
+                            ],
+                            "type": "string"
+                          },
+                          "required_version_number": {
+                            "description": "The latest major version; older signatures no longer count",
+                            "minimum": 0,
+                            "type": "integer"
+                          },
+                          "requirement": {
+                            "enum": [
+                              "mandatory",
+                              "optional"
+                            ],
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "active",
+                              "archived"
+                            ],
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "versions": {
+                            "items": {
+                              "properties": {
+                                "body": {
+                                  "description": "Only when one version is read",
+                                  "type": "string"
+                                },
+                                "change_kind": {
+                                  "enum": [
+                                    "major",
+                                    "minor"
+                                  ],
+                                  "type": "string"
+                                },
+                                "content_hash": {
+                                  "pattern": "^[0-9a-f]{64}$",
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "language": {
+                                  "type": "string"
+                                },
+                                "number": {
+                                  "minimum": 1,
+                                  "type": "integer"
+                                },
+                                "published_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "published_by_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "template_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "change_kind",
+                                "content_hash",
+                                "id",
+                                "language",
+                                "number",
+                                "published_at",
+                                "published_by_id",
+                                "template_id",
+                                "title"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "archived_at",
+                          "current_version_id",
+                          "current_version_number",
+                          "id",
+                          "inserted_at",
+                          "kind",
+                          "required_version_number",
+                          "requirement",
+                          "status",
+                          "title",
+                          "updated_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "templates"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Documents"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The box's documents, active first",
+        "tags": [
+          "Documents"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "body": {
+                    "maxLength": 100000,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "kind": {
+                    "enum": [
+                      "waiver",
+                      "terms",
+                      "privacy",
+                      "health_certificate",
+                      "other"
+                    ],
+                    "type": "string"
+                  },
+                  "language": {
+                    "enum": [
+                      "el",
+                      "en",
+                      "de",
+                      "fr",
+                      "es",
+                      "it",
+                      "ru",
+                      "pt-PT",
+                      "nl",
+                      "bg",
+                      "ar",
+                      "he"
+                    ],
+                    "type": "string"
+                  },
+                  "requirement": {
+                    "enum": [
+                      "mandatory",
+                      "optional"
+                    ],
+                    "type": "string"
+                  },
+                  "title": {
+                    "maxLength": 200,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "body",
+                  "kind",
+                  "title"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "template": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "current_version_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "current_version_number": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "waiver",
+                            "terms",
+                            "privacy",
+                            "health_certificate",
+                            "other"
+                          ],
+                          "type": "string"
+                        },
+                        "required_version_number": {
+                          "description": "The latest major version; older signatures no longer count",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "requirement": {
+                          "enum": [
+                            "mandatory",
+                            "optional"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "archived"
+                          ],
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "versions": {
+                          "items": {
+                            "properties": {
+                              "body": {
+                                "description": "Only when one version is read",
+                                "type": "string"
+                              },
+                              "change_kind": {
+                                "enum": [
+                                  "major",
+                                  "minor"
+                                ],
+                                "type": "string"
+                              },
+                              "content_hash": {
+                                "pattern": "^[0-9a-f]{64}$",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "language": {
+                                "type": "string"
+                              },
+                              "number": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "published_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "published_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "template_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "change_kind",
+                              "content_hash",
+                              "id",
+                              "language",
+                              "number",
+                              "published_at",
+                              "published_by_id",
+                              "template_id",
+                              "title"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "archived_at",
+                        "current_version_id",
+                        "current_version_number",
+                        "id",
+                        "inserted_at",
+                        "kind",
+                        "required_version_number",
+                        "requirement",
+                        "status",
+                        "title",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    },
+                    "version": {
+                      "properties": {
+                        "body": {
+                          "description": "Only when one version is read",
+                          "type": "string"
+                        },
+                        "change_kind": {
+                          "enum": [
+                            "major",
+                            "minor"
+                          ],
+                          "type": "string"
+                        },
+                        "content_hash": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "language": {
+                          "type": "string"
+                        },
+                        "number": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "published_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "published_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "template_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "change_kind",
+                        "content_hash",
+                        "id",
+                        "language",
+                        "number",
+                        "published_at",
+                        "published_by_id",
+                        "template_id",
+                        "title"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "template",
+                    "version"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Document"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create a document with its first version",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/templates/{id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "current_version": {
+                      "nullable": true,
+                      "properties": {
+                        "body": {
+                          "description": "Only when one version is read",
+                          "type": "string"
+                        },
+                        "change_kind": {
+                          "enum": [
+                            "major",
+                            "minor"
+                          ],
+                          "type": "string"
+                        },
+                        "content_hash": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "language": {
+                          "type": "string"
+                        },
+                        "number": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "published_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "published_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "template_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "change_kind",
+                        "content_hash",
+                        "id",
+                        "language",
+                        "number",
+                        "published_at",
+                        "published_by_id",
+                        "template_id",
+                        "title"
+                      ],
+                      "type": "object"
+                    },
+                    "template": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "current_version_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "current_version_number": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "waiver",
+                            "terms",
+                            "privacy",
+                            "health_certificate",
+                            "other"
+                          ],
+                          "type": "string"
+                        },
+                        "required_version_number": {
+                          "description": "The latest major version; older signatures no longer count",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "requirement": {
+                          "enum": [
+                            "mandatory",
+                            "optional"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "archived"
+                          ],
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "versions": {
+                          "items": {
+                            "properties": {
+                              "body": {
+                                "description": "Only when one version is read",
+                                "type": "string"
+                              },
+                              "change_kind": {
+                                "enum": [
+                                  "major",
+                                  "minor"
+                                ],
+                                "type": "string"
+                              },
+                              "content_hash": {
+                                "pattern": "^[0-9a-f]{64}$",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "language": {
+                                "type": "string"
+                              },
+                              "number": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "published_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "published_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "template_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "change_kind",
+                              "content_hash",
+                              "id",
+                              "language",
+                              "number",
+                              "published_at",
+                              "published_by_id",
+                              "template_id",
+                              "title"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "archived_at",
+                        "current_version_id",
+                        "current_version_number",
+                        "id",
+                        "inserted_at",
+                        "kind",
+                        "required_version_number",
+                        "requirement",
+                        "status",
+                        "title",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "current_version",
+                    "template"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Document"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A document with its versions and the current text",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/archive": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.archive",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "template": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "current_version_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "current_version_number": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "waiver",
+                            "terms",
+                            "privacy",
+                            "health_certificate",
+                            "other"
+                          ],
+                          "type": "string"
+                        },
+                        "required_version_number": {
+                          "description": "The latest major version; older signatures no longer count",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "requirement": {
+                          "enum": [
+                            "mandatory",
+                            "optional"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "archived"
+                          ],
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "versions": {
+                          "items": {
+                            "properties": {
+                              "body": {
+                                "description": "Only when one version is read",
+                                "type": "string"
+                              },
+                              "change_kind": {
+                                "enum": [
+                                  "major",
+                                  "minor"
+                                ],
+                                "type": "string"
+                              },
+                              "content_hash": {
+                                "pattern": "^[0-9a-f]{64}$",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "language": {
+                                "type": "string"
+                              },
+                              "number": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "published_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "published_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "template_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "change_kind",
+                              "content_hash",
+                              "id",
+                              "language",
+                              "number",
+                              "published_at",
+                              "published_by_id",
+                              "template_id",
+                              "title"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "archived_at",
+                        "current_version_id",
+                        "current_version_number",
+                        "id",
+                        "inserted_at",
+                        "kind",
+                        "required_version_number",
+                        "requirement",
+                        "status",
+                        "title",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "template"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Document"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Archive a document: no longer offered, required or requested",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/requests": {
+      "post": {
+        "callbacks": {},
+        "description": "Clients who already signed the required version or have a pending request are skipped. Each new request notifies its client.",
+        "operationId": "PaleeWeb.AdminDocumentsController.request",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "audience": {
+                    "enum": [
+                      "person",
+                      "all_clients",
+                      "role",
+                      "package"
+                    ],
+                    "type": "string"
+                  },
+                  "package_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "role": {
+                    "enum": [
+                      "member",
+                      "athlete"
+                    ],
+                    "type": "string"
+                  },
+                  "user_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "audience"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "audience": {
+                      "type": "string"
+                    },
+                    "batch_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "created": {
+                      "type": "integer"
+                    },
+                    "recipients": {
+                      "type": "integer"
+                    },
+                    "requests": {
+                      "items": {
+                        "properties": {
+                          "audience": {
+                            "enum": [
+                              "person",
+                              "all_clients",
+                              "role",
+                              "package"
+                            ],
+                            "type": "string"
+                          },
+                          "batch_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "closed_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "requested_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "requested_by_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "signature_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "signed",
+                              "cancelled"
+                            ],
+                            "type": "string"
+                          },
+                          "template_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "audience",
+                          "batch_id",
+                          "closed_at",
+                          "id",
+                          "requested_at",
+                          "requested_by_id",
+                          "signature_id",
+                          "status",
+                          "template_id",
+                          "user_id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "skipped": {
+                      "description": "Already signed or already asked",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "audience",
+                    "batch_id",
+                    "created",
+                    "recipients",
+                    "requests",
+                    "skipped"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Requests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Ask one client, every client, a role or a package's holders to sign",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/requirement": {
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.set_requirement",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "requirement": {
+                    "enum": [
+                      "mandatory",
+                      "optional"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "requirement"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "template": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "current_version_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "current_version_number": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "waiver",
+                            "terms",
+                            "privacy",
+                            "health_certificate",
+                            "other"
+                          ],
+                          "type": "string"
+                        },
+                        "required_version_number": {
+                          "description": "The latest major version; older signatures no longer count",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "requirement": {
+                          "enum": [
+                            "mandatory",
+                            "optional"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "archived"
+                          ],
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "versions": {
+                          "items": {
+                            "properties": {
+                              "body": {
+                                "description": "Only when one version is read",
+                                "type": "string"
+                              },
+                              "change_kind": {
+                                "enum": [
+                                  "major",
+                                  "minor"
+                                ],
+                                "type": "string"
+                              },
+                              "content_hash": {
+                                "pattern": "^[0-9a-f]{64}$",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "language": {
+                                "type": "string"
+                              },
+                              "number": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "published_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "published_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "template_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "change_kind",
+                              "content_hash",
+                              "id",
+                              "language",
+                              "number",
+                              "published_at",
+                              "published_by_id",
+                              "template_id",
+                              "title"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "archived_at",
+                        "current_version_id",
+                        "current_version_number",
+                        "id",
+                        "inserted_at",
+                        "kind",
+                        "required_version_number",
+                        "requirement",
+                        "status",
+                        "title",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "template"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Document"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Mark a document mandatory (blocks booking) or optional (only offered)",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/versions": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.publish",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "body": {
+                    "maxLength": 100000,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "change_kind": {
+                    "description": "major (default): everyone signs again; minor: earlier signatures count",
+                    "enum": [
+                      "major",
+                      "minor"
+                    ],
+                    "type": "string"
+                  },
+                  "language": {
+                    "enum": [
+                      "el",
+                      "en",
+                      "de",
+                      "fr",
+                      "es",
+                      "it",
+                      "ru",
+                      "pt-PT",
+                      "nl",
+                      "bg",
+                      "ar",
+                      "he"
+                    ],
+                    "type": "string"
+                  },
+                  "title": {
+                    "maxLength": 200,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "body"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "template": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "current_version_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "current_version_number": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "waiver",
+                            "terms",
+                            "privacy",
+                            "health_certificate",
+                            "other"
+                          ],
+                          "type": "string"
+                        },
+                        "required_version_number": {
+                          "description": "The latest major version; older signatures no longer count",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "requirement": {
+                          "enum": [
+                            "mandatory",
+                            "optional"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "archived"
+                          ],
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "versions": {
+                          "items": {
+                            "properties": {
+                              "body": {
+                                "description": "Only when one version is read",
+                                "type": "string"
+                              },
+                              "change_kind": {
+                                "enum": [
+                                  "major",
+                                  "minor"
+                                ],
+                                "type": "string"
+                              },
+                              "content_hash": {
+                                "pattern": "^[0-9a-f]{64}$",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "language": {
+                                "type": "string"
+                              },
+                              "number": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "published_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "published_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "template_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "change_kind",
+                              "content_hash",
+                              "id",
+                              "language",
+                              "number",
+                              "published_at",
+                              "published_by_id",
+                              "template_id",
+                              "title"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "archived_at",
+                        "current_version_id",
+                        "current_version_number",
+                        "id",
+                        "inserted_at",
+                        "kind",
+                        "required_version_number",
+                        "requirement",
+                        "status",
+                        "title",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    },
+                    "version": {
+                      "properties": {
+                        "body": {
+                          "description": "Only when one version is read",
+                          "type": "string"
+                        },
+                        "change_kind": {
+                          "enum": [
+                            "major",
+                            "minor"
+                          ],
+                          "type": "string"
+                        },
+                        "content_hash": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "language": {
+                          "type": "string"
+                        },
+                        "number": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "published_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "published_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "template_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "change_kind",
+                        "content_hash",
+                        "id",
+                        "language",
+                        "number",
+                        "published_at",
+                        "published_by_id",
+                        "template_id",
+                        "title"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "template",
+                    "version"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Version"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Publish a new version (major: everyone signs again; minor: signatures still count)",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/versions/{version_id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.version",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "version_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "version": {
+                      "properties": {
+                        "body": {
+                          "description": "Only when one version is read",
+                          "type": "string"
+                        },
+                        "change_kind": {
+                          "enum": [
+                            "major",
+                            "minor"
+                          ],
+                          "type": "string"
+                        },
+                        "content_hash": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "language": {
+                          "type": "string"
+                        },
+                        "number": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "published_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "published_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "template_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "change_kind",
+                        "content_hash",
+                        "id",
+                        "language",
+                        "number",
+                        "published_at",
+                        "published_by_id",
+                        "template_id",
+                        "title"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "version"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Version"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "One version's text",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/accounting-exports": {
       "get": {
         "callbacks": {},
@@ -217769,6 +221237,1232 @@
         "summary": "Join my company's corporate plan with its code, or by my email domain",
         "tags": [
           "Payment models"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/documents": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyDocumentsController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "documents": {
+                      "items": {
+                        "properties": {
+                          "current_version_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "current_version_number": {
+                            "type": "integer"
+                          },
+                          "kind": {
+                            "enum": [
+                              "waiver",
+                              "terms",
+                              "privacy",
+                              "health_certificate",
+                              "other"
+                            ],
+                            "type": "string"
+                          },
+                          "outstanding": {
+                            "description": "Mandatory and not signed",
+                            "type": "boolean"
+                          },
+                          "requested": {
+                            "description": "Staff asked for it",
+                            "type": "boolean"
+                          },
+                          "requirement": {
+                            "enum": [
+                              "mandatory",
+                              "optional"
+                            ],
+                            "type": "string"
+                          },
+                          "signature": {
+                            "nullable": true,
+                            "properties": {
+                              "content_hash": {
+                                "pattern": "^[0-9a-f]{64}$",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "signed_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "version_number": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "content_hash",
+                              "id",
+                              "signed_at",
+                              "version_number"
+                            ],
+                            "type": "object"
+                          },
+                          "status": {
+                            "enum": [
+                              "signed",
+                              "unsigned",
+                              "resign_required"
+                            ],
+                            "type": "string"
+                          },
+                          "template_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "current_version_id",
+                          "current_version_number",
+                          "kind",
+                          "outstanding",
+                          "requested",
+                          "requirement",
+                          "signature",
+                          "status",
+                          "template_id",
+                          "title"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "health_certificate": {
+                      "properties": {
+                        "certificate": {
+                          "nullable": true,
+                          "properties": {
+                            "byte_size": {
+                              "type": "integer"
+                            },
+                            "content_type": {
+                              "enum": [
+                                "application/pdf",
+                                "image/jpeg",
+                                "image/png",
+                                "image/webp"
+                              ],
+                              "type": "string"
+                            },
+                            "expires_on": {
+                              "description": "The first day it is no longer valid",
+                              "format": "date",
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "inserted_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "issued_on": {
+                              "format": "date",
+                              "type": "string"
+                            },
+                            "uploaded_by_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "byte_size",
+                            "content_type",
+                            "expires_on",
+                            "id",
+                            "inserted_at",
+                            "issued_on",
+                            "uploaded_by_id",
+                            "user_id"
+                          ],
+                          "type": "object"
+                        },
+                        "required": {
+                          "type": "boolean"
+                        },
+                        "status": {
+                          "enum": [
+                            "missing",
+                            "valid",
+                            "expiring",
+                            "expired"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "certificate",
+                        "required",
+                        "status"
+                      ],
+                      "type": "object"
+                    },
+                    "outstanding": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "documents",
+                    "health_certificate",
+                    "outstanding"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "My documents"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "My documents: what is outstanding, offered or signed, and my health certificate",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/documents/health-certificate": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyDocumentsController.create_health_certificate",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "content_type": {
+                    "enum": [
+                      "application/pdf",
+                      "image/jpeg",
+                      "image/png",
+                      "image/webp"
+                    ],
+                    "type": "string"
+                  },
+                  "expires_on": {
+                    "description": "Default: the issue date plus the box's validity (12 months)",
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "file_key": {
+                    "maxLength": 500,
+                    "type": "string"
+                  },
+                  "issued_on": {
+                    "format": "date",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content_type",
+                  "file_key",
+                  "issued_on"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "health_certificate": {
+                      "properties": {
+                        "byte_size": {
+                          "type": "integer"
+                        },
+                        "content_type": {
+                          "enum": [
+                            "application/pdf",
+                            "image/jpeg",
+                            "image/png",
+                            "image/webp"
+                          ],
+                          "type": "string"
+                        },
+                        "expires_on": {
+                          "description": "The first day it is no longer valid",
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "issued_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "uploaded_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "byte_size",
+                        "content_type",
+                        "expires_on",
+                        "id",
+                        "inserted_at",
+                        "issued_on",
+                        "uploaded_by_id",
+                        "user_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "health_certificate"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Health certificate"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Record my uploaded health certificate with its dates",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/documents/health-certificate/uploads": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyDocumentsController.request_health_upload",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "content_type": {
+                    "enum": [
+                      "application/pdf",
+                      "image/jpeg",
+                      "image/png",
+                      "image/webp"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content_type"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "content_type": {
+                      "enum": [
+                        "application/pdf",
+                        "image/jpeg",
+                        "image/png",
+                        "image/webp"
+                      ],
+                      "type": "string"
+                    },
+                    "file_key": {
+                      "type": "string"
+                    },
+                    "max_bytes": {
+                      "type": "integer"
+                    },
+                    "method": {
+                      "enum": [
+                        "PUT"
+                      ],
+                      "type": "string"
+                    },
+                    "required_headers": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "upload_url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "content_type",
+                    "file_key",
+                    "max_bytes",
+                    "method",
+                    "required_headers",
+                    "upload_url"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Upload"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Upload my health certificate: get a presigned upload",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/documents/health-certificate/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyDocumentsController.delete_health_certificate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "health_certificate": {
+                      "properties": {
+                        "byte_size": {
+                          "type": "integer"
+                        },
+                        "content_type": {
+                          "enum": [
+                            "application/pdf",
+                            "image/jpeg",
+                            "image/png",
+                            "image/webp"
+                          ],
+                          "type": "string"
+                        },
+                        "expires_on": {
+                          "description": "The first day it is no longer valid",
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "issued_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "uploaded_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "byte_size",
+                        "content_type",
+                        "expires_on",
+                        "id",
+                        "inserted_at",
+                        "issued_on",
+                        "uploaded_by_id",
+                        "user_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "health_certificate"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Health certificate"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete my health certificate and its file",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/documents/health-certificate/{id}/file": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyDocumentsController.health_file",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "content_type": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "description": "Short-lived link; the look is audited",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "content_type",
+                    "url"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "File"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A short-lived link to my health certificate file",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/documents/signatures": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyDocumentsController.signatures",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "signatures": {
+                      "items": {
+                        "properties": {
+                          "account": {
+                            "additionalProperties": true,
+                            "description": "The signer's account at signing time",
+                            "type": "object"
+                          },
+                          "content_hash": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "evidence_byte_size": {
+                            "type": "integer"
+                          },
+                          "evidence_hash": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "evidence_sha256": {
+                            "pattern": "^[0-9a-f]{64}$",
+                            "type": "string"
+                          },
+                          "has_drawn_signature": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "ip_address": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "level": {
+                            "enum": [
+                              "simple",
+                              "advanced",
+                              "qualified"
+                            ],
+                            "type": "string"
+                          },
+                          "provider": {
+                            "type": "string"
+                          },
+                          "request_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "signed_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "template_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "typed_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "user_agent": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "version_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "version_number": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "account",
+                          "content_hash",
+                          "evidence_byte_size",
+                          "evidence_hash",
+                          "evidence_sha256",
+                          "has_drawn_signature",
+                          "id",
+                          "ip_address",
+                          "level",
+                          "provider",
+                          "request_id",
+                          "signed_at",
+                          "template_id",
+                          "typed_name",
+                          "user_agent",
+                          "user_id",
+                          "version_id",
+                          "version_number"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "signatures",
+                    "total"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Signatures"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "My signatures, newest first",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/documents/signatures/{id}/evidence": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyDocumentsController.evidence",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "byte_size": {
+                      "type": "integer"
+                    },
+                    "sha256": {
+                      "pattern": "^[0-9a-f]{64}$",
+                      "type": "string"
+                    },
+                    "url": {
+                      "description": "Short-lived link to the PDF certificate",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "byte_size",
+                    "sha256",
+                    "url"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Certificate"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A short-lived link to the PDF certificate of my signature",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/documents/{id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyDocumentsController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "template": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "current_version_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "current_version_number": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "waiver",
+                            "terms",
+                            "privacy",
+                            "health_certificate",
+                            "other"
+                          ],
+                          "type": "string"
+                        },
+                        "required_version_number": {
+                          "description": "The latest major version; older signatures no longer count",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "requirement": {
+                          "enum": [
+                            "mandatory",
+                            "optional"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "archived"
+                          ],
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "versions": {
+                          "items": {
+                            "properties": {
+                              "body": {
+                                "description": "Only when one version is read",
+                                "type": "string"
+                              },
+                              "change_kind": {
+                                "enum": [
+                                  "major",
+                                  "minor"
+                                ],
+                                "type": "string"
+                              },
+                              "content_hash": {
+                                "pattern": "^[0-9a-f]{64}$",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "language": {
+                                "type": "string"
+                              },
+                              "number": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "published_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "published_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "template_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "title": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "change_kind",
+                              "content_hash",
+                              "id",
+                              "language",
+                              "number",
+                              "published_at",
+                              "published_by_id",
+                              "template_id",
+                              "title"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "archived_at",
+                        "current_version_id",
+                        "current_version_number",
+                        "id",
+                        "inserted_at",
+                        "kind",
+                        "required_version_number",
+                        "requirement",
+                        "status",
+                        "title",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    },
+                    "version": {
+                      "properties": {
+                        "body": {
+                          "description": "Only when one version is read",
+                          "type": "string"
+                        },
+                        "change_kind": {
+                          "enum": [
+                            "major",
+                            "minor"
+                          ],
+                          "type": "string"
+                        },
+                        "content_hash": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "language": {
+                          "type": "string"
+                        },
+                        "number": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "published_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "published_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "template_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "change_kind",
+                        "content_hash",
+                        "id",
+                        "language",
+                        "number",
+                        "published_at",
+                        "published_by_id",
+                        "template_id",
+                        "title"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "template",
+                    "version"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Document"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The current text of a document, to read before signing",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/documents/{id}/sign": {
+      "post": {
+        "callbacks": {},
+        "description": "Simple electronic signature (eIDAS art. 25): the evidence keeps the SHA-256 of the exact text, the time, the IP address, the device and the account, and a PDF certificate is stored. `version_id` must be the version that was read.",
+        "operationId": "PaleeWeb.MyDocumentsController.sign",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "agreed": {
+                    "description": "I have read and accept the text",
+                    "type": "boolean"
+                  },
+                  "drawn_signature": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "height": {
+                        "maximum": 2000,
+                        "minimum": 10,
+                        "type": "integer"
+                      },
+                      "strokes": {
+                        "items": {
+                          "items": {
+                            "items": {
+                              "type": "number"
+                            },
+                            "maxItems": 2,
+                            "minItems": 2,
+                            "type": "array"
+                          },
+                          "minItems": 1,
+                          "type": "array"
+                        },
+                        "maxItems": 100,
+                        "minItems": 1,
+                        "type": "array"
+                      },
+                      "width": {
+                        "maximum": 2000,
+                        "minimum": 10,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "height",
+                      "strokes",
+                      "width"
+                    ],
+                    "type": "object"
+                  },
+                  "typed_name": {
+                    "maxLength": 120,
+                    "minLength": 2,
+                    "type": "string"
+                  },
+                  "version_id": {
+                    "description": "The version read",
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "agreed",
+                  "version_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "signature": {
+                      "properties": {
+                        "account": {
+                          "additionalProperties": true,
+                          "description": "The signer's account at signing time",
+                          "type": "object"
+                        },
+                        "content_hash": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "evidence_byte_size": {
+                          "type": "integer"
+                        },
+                        "evidence_hash": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "evidence_sha256": {
+                          "pattern": "^[0-9a-f]{64}$",
+                          "type": "string"
+                        },
+                        "has_drawn_signature": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "ip_address": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "level": {
+                          "enum": [
+                            "simple",
+                            "advanced",
+                            "qualified"
+                          ],
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "request_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "signed_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "template_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "typed_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_agent": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "version_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "version_number": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "account",
+                        "content_hash",
+                        "evidence_byte_size",
+                        "evidence_hash",
+                        "evidence_sha256",
+                        "has_drawn_signature",
+                        "id",
+                        "ip_address",
+                        "level",
+                        "provider",
+                        "request_id",
+                        "signed_at",
+                        "template_id",
+                        "typed_name",
+                        "user_agent",
+                        "user_id",
+                        "version_id",
+                        "version_number"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "signature"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Signature"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Sign the current version (typed name and/or drawn signature)",
+        "tags": [
+          "Documents"
         ]
       }
     },

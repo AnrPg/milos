@@ -5537,6 +5537,352 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/documents/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The documents audit log, newest first */
+        get: operations["PaleeWeb.AdminDocumentsController.audit"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/health-certificates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Clients with their health certificate status */
+        get: operations["PaleeWeb.AdminHealthCertificatesController.index"];
+        put?: never;
+        /** Record an uploaded health certificate with its dates */
+        post: operations["PaleeWeb.AdminHealthCertificatesController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/health-certificates/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A client's health certificates, newest first */
+        get: operations["PaleeWeb.AdminHealthCertificatesController.client"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/health-certificates/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload a client's health certificate: get a presigned upload */
+        post: operations["PaleeWeb.AdminHealthCertificatesController.request_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/health-certificates/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a health certificate and its file (audited) */
+        delete: operations["PaleeWeb.AdminHealthCertificatesController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/health-certificates/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A short-lived link to the certificate file (audited) */
+        get: operations["PaleeWeb.AdminHealthCertificatesController.file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A client's documents, signatures and health certificate status */
+        get: operations["PaleeWeb.AdminDocumentsController.member"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Signature requests, newest first */
+        get: operations["PaleeWeb.AdminDocumentsController.requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/requests/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel a pending request */
+        post: operations["PaleeWeb.AdminDocumentsController.cancel_request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's document rules (booking gate, health certificates) */
+        get: operations["PaleeWeb.AdminDocumentsController.settings"];
+        /** Change the box's document rules (audited) */
+        put: operations["PaleeWeb.AdminDocumentsController.save_settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/signatures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Signatures with their evidence, newest first */
+        get: operations["PaleeWeb.AdminDocumentsController.signatures"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/signatures/{id}/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A short-lived link to a signature's PDF certificate (audited) */
+        get: operations["PaleeWeb.AdminDocumentsController.evidence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/starters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ready-made drafts to start from (always marked for legal review) */
+        get: operations["PaleeWeb.AdminDocumentsController.starters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's documents, active first */
+        get: operations["PaleeWeb.AdminDocumentsController.index"];
+        put?: never;
+        /** Create a document with its first version */
+        post: operations["PaleeWeb.AdminDocumentsController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A document with its versions and the current text */
+        get: operations["PaleeWeb.AdminDocumentsController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive a document: no longer offered, required or requested */
+        post: operations["PaleeWeb.AdminDocumentsController.archive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask one client, every client, a role or a package's holders to sign
+         * @description Clients who already signed the required version or have a pending request are skipped. Each new request notifies its client.
+         */
+        post: operations["PaleeWeb.AdminDocumentsController.request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/requirement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Mark a document mandatory (blocks booking) or optional (only offered) */
+        put: operations["PaleeWeb.AdminDocumentsController.set_requirement"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish a new version (major: everyone signs again; minor: signatures still count) */
+        post: operations["PaleeWeb.AdminDocumentsController.publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/versions/{version_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One version's text */
+        get: operations["PaleeWeb.AdminDocumentsController.version"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/accounting-exports": {
         parameters: {
             query?: never;
@@ -9933,6 +10279,162 @@ export interface paths {
         put?: never;
         /** Join my company's corporate plan with its code, or by my email domain */
         post: operations["PaleeWeb.PaymentModelsController.enroll"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My documents: what is outstanding, offered or signed, and my health certificate */
+        get: operations["PaleeWeb.MyDocumentsController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/health-certificate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record my uploaded health certificate with its dates */
+        post: operations["PaleeWeb.MyDocumentsController.create_health_certificate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/health-certificate/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload my health certificate: get a presigned upload */
+        post: operations["PaleeWeb.MyDocumentsController.request_health_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/health-certificate/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete my health certificate and its file */
+        delete: operations["PaleeWeb.MyDocumentsController.delete_health_certificate"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/health-certificate/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A short-lived link to my health certificate file */
+        get: operations["PaleeWeb.MyDocumentsController.health_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/signatures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My signatures, newest first */
+        get: operations["PaleeWeb.MyDocumentsController.signatures"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/signatures/{id}/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A short-lived link to the PDF certificate of my signature */
+        get: operations["PaleeWeb.MyDocumentsController.evidence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The current text of a document, to read before signing */
+        get: operations["PaleeWeb.MyDocumentsController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/{id}/sign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sign the current version (typed name and/or drawn signature)
+         * @description Simple electronic signature (eIDAS art. 25): the evidence keeps the SHA-256 of the exact text, the time, the IP address, the device and the account, and a PDF certificate is stored. `version_id` must be the version that was read.
+         */
+        post: operations["PaleeWeb.MyDocumentsController.sign"];
         delete?: never;
         options?: never;
         head?: never;
@@ -68657,6 +69159,1252 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminDocumentsController.audit": {
+        parameters: {
+            query?: {
+                subject_id?: string;
+                action?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Audit events */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        events: {
+                            action: string;
+                            /** Format: uuid */
+                            actor_id: string | null;
+                            details: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            occurred_at: string;
+                            /** Format: uuid */
+                            subject_id: string | null;
+                            subject_type: string;
+                            /** Format: uuid */
+                            subject_user_id: string | null;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.index": {
+        parameters: {
+            query?: {
+                status?: "missing" | "valid" | "expiring" | "expired";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Health certificates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        full_access: boolean;
+                        health_certificates: {
+                            /** @description Only for staff who manage health certificates */
+                            certificate: {
+                                byte_size: number;
+                                /** @enum {string} */
+                                content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                                /**
+                                 * Format: date
+                                 * @description The first day it is no longer valid
+                                 */
+                                expires_on: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                /** Format: date */
+                                issued_on: string;
+                                /** Format: uuid */
+                                uploaded_by_id: string | null;
+                                /** Format: uuid */
+                                user_id: string;
+                            } | null;
+                            display_name: string | null;
+                            handle: string | null;
+                            /** @enum {string} */
+                            status: "missing" | "valid" | "expiring" | "expired";
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        required: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                    /**
+                     * Format: date
+                     * @description Default: the issue date plus the box's validity (12 months)
+                     */
+                    expires_on?: string;
+                    file_key: string;
+                    /** Format: date */
+                    issued_on: string;
+                    /** Format: uuid */
+                    user_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Health certificate */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        health_certificate: {
+                            byte_size: number;
+                            /** @enum {string} */
+                            content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                            /**
+                             * Format: date
+                             * @description The first day it is no longer valid
+                             */
+                            expires_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date */
+                            issued_on: string;
+                            /** Format: uuid */
+                            uploaded_by_id: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.client": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Health certificates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        health_certificates: {
+                            byte_size: number;
+                            /** @enum {string} */
+                            content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                            /**
+                             * Format: date
+                             * @description The first day it is no longer valid
+                             */
+                            expires_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date */
+                            issued_on: string;
+                            /** Format: uuid */
+                            uploaded_by_id: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        /** Format: uuid */
+                        user_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.request_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                    /** Format: uuid */
+                    user_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                        file_key: string;
+                        max_bytes: number;
+                        /** @enum {string} */
+                        method: "PUT";
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Health certificate */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        health_certificate: {
+                            byte_size: number;
+                            /** @enum {string} */
+                            content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                            /**
+                             * Format: date
+                             * @description The first day it is no longer valid
+                             */
+                            expires_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date */
+                            issued_on: string;
+                            /** Format: uuid */
+                            uploaded_by_id: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description File */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        content_type: string;
+                        /** @description Short-lived link; the look is audited */
+                        url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Client documents */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        documents: {
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description Mandatory and not signed */
+                            outstanding: boolean;
+                            /** @description Staff asked for it */
+                            requested: boolean;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            signature: {
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                signed_at: string;
+                                version_number: number;
+                            } | null;
+                            /** @enum {string} */
+                            status: "signed" | "unsigned" | "resign_required";
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        }[];
+                        /** @enum {string} */
+                        health_certificate_status: "missing" | "valid" | "expiring" | "expired";
+                        outstanding: number;
+                        signatures: {
+                            /** @description The signer's account at signing time */
+                            account: {
+                                [key: string]: unknown;
+                            };
+                            content_hash: string;
+                            evidence_byte_size: number;
+                            evidence_hash: string;
+                            evidence_sha256: string;
+                            has_drawn_signature: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            ip_address: string | null;
+                            /** @enum {string} */
+                            level: "simple" | "advanced" | "qualified";
+                            provider: string;
+                            /** Format: uuid */
+                            request_id: string | null;
+                            /** Format: date-time */
+                            signed_at: string;
+                            /** Format: uuid */
+                            template_id: string;
+                            typed_name: string | null;
+                            user_agent: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** Format: uuid */
+                            version_id: string;
+                            version_number: number;
+                        }[];
+                        /** Format: uuid */
+                        user_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.requests": {
+        parameters: {
+            query?: {
+                status?: "pending" | "signed" | "cancelled";
+                template_id?: string;
+                user_id?: string;
+                batch_id?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Requests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        requests: {
+                            /** @enum {string} */
+                            audience: "person" | "all_clients" | "role" | "package";
+                            /** Format: uuid */
+                            batch_id: string | null;
+                            /** Format: date-time */
+                            closed_at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** Format: uuid */
+                            requested_by_id: string | null;
+                            /** Format: uuid */
+                            signature_id: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "signed" | "cancelled";
+                            /** Format: uuid */
+                            template_id: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.cancel_request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        request: {
+                            /** @enum {string} */
+                            audience: "person" | "all_clients" | "role" | "package";
+                            /** Format: uuid */
+                            batch_id: string | null;
+                            /** Format: date-time */
+                            closed_at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** Format: uuid */
+                            requested_by_id: string | null;
+                            /** Format: uuid */
+                            signature_id: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "signed" | "cancelled";
+                            /** Format: uuid */
+                            template_id: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        settings: {
+                            block_booking_on_health_certificate: boolean;
+                            block_booking_on_unsigned: boolean;
+                            health_certificate_reminder_days: number;
+                            health_certificate_required: boolean;
+                            health_certificate_validity_months: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.save_settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    block_booking_on_health_certificate?: boolean;
+                    block_booking_on_unsigned?: boolean;
+                    health_certificate_reminder_days?: number;
+                    health_certificate_required?: boolean;
+                    health_certificate_validity_months?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        settings: {
+                            block_booking_on_health_certificate: boolean;
+                            block_booking_on_unsigned: boolean;
+                            health_certificate_reminder_days: number;
+                            health_certificate_required: boolean;
+                            health_certificate_validity_months: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.signatures": {
+        parameters: {
+            query?: {
+                template_id?: string;
+                user_id?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signatures */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        signatures: {
+                            /** @description The signer's account at signing time */
+                            account: {
+                                [key: string]: unknown;
+                            };
+                            content_hash: string;
+                            evidence_byte_size: number;
+                            evidence_hash: string;
+                            evidence_sha256: string;
+                            has_drawn_signature: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            ip_address: string | null;
+                            /** @enum {string} */
+                            level: "simple" | "advanced" | "qualified";
+                            provider: string;
+                            /** Format: uuid */
+                            request_id: string | null;
+                            /** Format: date-time */
+                            signed_at: string;
+                            /** Format: uuid */
+                            template_id: string;
+                            typed_name: string | null;
+                            user_agent: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** Format: uuid */
+                            version_id: string;
+                            version_number: number;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Certificate */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        byte_size: number;
+                        sha256: string;
+                        /** @description Short-lived link to the PDF certificate */
+                        url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.starters": {
+        parameters: {
+            query?: {
+                language?: "el" | "en";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Drafts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        starters: {
+                            body: string;
+                            draft: boolean;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            language: string;
+                            legal_review_required: boolean;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            title: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.index": {
+        parameters: {
+            query?: {
+                status?: "active" | "archived";
+                requirement?: "mandatory" | "optional";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Documents */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        templates: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                    /** @enum {string} */
+                    kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                    /** @enum {string} */
+                    language?: "el" | "en" | "de" | "fr" | "es" | "it" | "ru" | "pt-PT" | "nl" | "bg" | "ar" | "he";
+                    /** @enum {string} */
+                    requirement?: "mandatory" | "optional";
+                    title: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Document */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                        version: {
+                            /** @description Only when one version is read */
+                            body?: string;
+                            /** @enum {string} */
+                            change_kind: "major" | "minor";
+                            content_hash: string;
+                            /** Format: uuid */
+                            id: string;
+                            language: string;
+                            number: number;
+                            /** Format: date-time */
+                            published_at: string;
+                            /** Format: uuid */
+                            published_by_id: string | null;
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Document */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        current_version: {
+                            /** @description Only when one version is read */
+                            body?: string;
+                            /** @enum {string} */
+                            change_kind: "major" | "minor";
+                            content_hash: string;
+                            /** Format: uuid */
+                            id: string;
+                            language: string;
+                            number: number;
+                            /** Format: date-time */
+                            published_at: string;
+                            /** Format: uuid */
+                            published_by_id: string | null;
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        } | null;
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Document */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    audience: "person" | "all_clients" | "role" | "package";
+                    /** Format: uuid */
+                    package_id?: string;
+                    /** @enum {string} */
+                    role?: "member" | "athlete";
+                    /** Format: uuid */
+                    user_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Requests */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        audience: string;
+                        /** Format: uuid */
+                        batch_id: string;
+                        created: number;
+                        recipients: number;
+                        requests: {
+                            /** @enum {string} */
+                            audience: "person" | "all_clients" | "role" | "package";
+                            /** Format: uuid */
+                            batch_id: string | null;
+                            /** Format: date-time */
+                            closed_at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** Format: uuid */
+                            requested_by_id: string | null;
+                            /** Format: uuid */
+                            signature_id: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "signed" | "cancelled";
+                            /** Format: uuid */
+                            template_id: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        /** @description Already signed or already asked */
+                        skipped: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.set_requirement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    requirement: "mandatory" | "optional";
+                };
+            };
+        };
+        responses: {
+            /** @description Document */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                    /**
+                     * @description major (default): everyone signs again; minor: earlier signatures count
+                     * @enum {string}
+                     */
+                    change_kind?: "major" | "minor";
+                    /** @enum {string} */
+                    language?: "el" | "en" | "de" | "fr" | "es" | "it" | "ru" | "pt-PT" | "nl" | "bg" | "ar" | "he";
+                    title?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Version */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                        version: {
+                            /** @description Only when one version is read */
+                            body?: string;
+                            /** @enum {string} */
+                            change_kind: "major" | "minor";
+                            content_hash: string;
+                            /** Format: uuid */
+                            id: string;
+                            language: string;
+                            number: number;
+                            /** Format: date-time */
+                            published_at: string;
+                            /** Format: uuid */
+                            published_by_id: string | null;
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.version": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Version */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        version: {
+                            /** @description Only when one version is read */
+                            body?: string;
+                            /** @enum {string} */
+                            change_kind: "major" | "minor";
+                            content_hash: string;
+                            /** Format: uuid */
+                            id: string;
+                            language: string;
+                            number: number;
+                            /** Format: date-time */
+                            published_at: string;
+                            /** Format: uuid */
+                            published_by_id: string | null;
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminFinanceAccountingController.exports": {
         parameters: {
             query?: {
@@ -90371,6 +92119,474 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description My documents */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        documents: {
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description Mandatory and not signed */
+                            outstanding: boolean;
+                            /** @description Staff asked for it */
+                            requested: boolean;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            signature: {
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                signed_at: string;
+                                version_number: number;
+                            } | null;
+                            /** @enum {string} */
+                            status: "signed" | "unsigned" | "resign_required";
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        }[];
+                        health_certificate: {
+                            certificate: {
+                                byte_size: number;
+                                /** @enum {string} */
+                                content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                                /**
+                                 * Format: date
+                                 * @description The first day it is no longer valid
+                                 */
+                                expires_on: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                /** Format: date */
+                                issued_on: string;
+                                /** Format: uuid */
+                                uploaded_by_id: string | null;
+                                /** Format: uuid */
+                                user_id: string;
+                            } | null;
+                            required: boolean;
+                            /** @enum {string} */
+                            status: "missing" | "valid" | "expiring" | "expired";
+                        };
+                        outstanding: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.create_health_certificate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                    /**
+                     * Format: date
+                     * @description Default: the issue date plus the box's validity (12 months)
+                     */
+                    expires_on?: string;
+                    file_key: string;
+                    /** Format: date */
+                    issued_on: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Health certificate */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        health_certificate: {
+                            byte_size: number;
+                            /** @enum {string} */
+                            content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                            /**
+                             * Format: date
+                             * @description The first day it is no longer valid
+                             */
+                            expires_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date */
+                            issued_on: string;
+                            /** Format: uuid */
+                            uploaded_by_id: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.request_health_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                        file_key: string;
+                        max_bytes: number;
+                        /** @enum {string} */
+                        method: "PUT";
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.delete_health_certificate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Health certificate */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        health_certificate: {
+                            byte_size: number;
+                            /** @enum {string} */
+                            content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                            /**
+                             * Format: date
+                             * @description The first day it is no longer valid
+                             */
+                            expires_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date */
+                            issued_on: string;
+                            /** Format: uuid */
+                            uploaded_by_id: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.health_file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description File */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        content_type: string;
+                        /** @description Short-lived link; the look is audited */
+                        url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.signatures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signatures */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        signatures: {
+                            /** @description The signer's account at signing time */
+                            account: {
+                                [key: string]: unknown;
+                            };
+                            content_hash: string;
+                            evidence_byte_size: number;
+                            evidence_hash: string;
+                            evidence_sha256: string;
+                            has_drawn_signature: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            ip_address: string | null;
+                            /** @enum {string} */
+                            level: "simple" | "advanced" | "qualified";
+                            provider: string;
+                            /** Format: uuid */
+                            request_id: string | null;
+                            /** Format: date-time */
+                            signed_at: string;
+                            /** Format: uuid */
+                            template_id: string;
+                            typed_name: string | null;
+                            user_agent: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** Format: uuid */
+                            version_id: string;
+                            version_number: number;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Certificate */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        byte_size: number;
+                        sha256: string;
+                        /** @description Short-lived link to the PDF certificate */
+                        url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Document */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        status: string | null;
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                        version: {
+                            /** @description Only when one version is read */
+                            body?: string;
+                            /** @enum {string} */
+                            change_kind: "major" | "minor";
+                            content_hash: string;
+                            /** Format: uuid */
+                            id: string;
+                            language: string;
+                            number: number;
+                            /** Format: date-time */
+                            published_at: string;
+                            /** Format: uuid */
+                            published_by_id: string | null;
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.sign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description I have read and accept the text */
+                    agreed: boolean;
+                    drawn_signature?: {
+                        height: number;
+                        strokes: number[][][];
+                        width: number;
+                    };
+                    typed_name?: string;
+                    /**
+                     * Format: uuid
+                     * @description The version read
+                     */
+                    version_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Signature */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        signature: {
+                            /** @description The signer's account at signing time */
+                            account: {
+                                [key: string]: unknown;
+                            };
+                            content_hash: string;
+                            evidence_byte_size: number;
+                            evidence_hash: string;
+                            evidence_sha256: string;
+                            has_drawn_signature: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            ip_address: string | null;
+                            /** @enum {string} */
+                            level: "simple" | "advanced" | "qualified";
+                            provider: string;
+                            /** Format: uuid */
+                            request_id: string | null;
+                            /** Format: date-time */
+                            signed_at: string;
+                            /** Format: uuid */
+                            template_id: string;
+                            typed_name: string | null;
+                            user_agent: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** Format: uuid */
+                            version_id: string;
+                            version_number: number;
+                        };
                     };
                 };
             };
