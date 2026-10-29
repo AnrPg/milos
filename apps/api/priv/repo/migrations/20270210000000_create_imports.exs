@@ -147,9 +147,7 @@ defmodule Palee.Repo.Migrations.CreateImports do
     create unique_index(:imported_people, [:organization_id, :user_id])
     create index(:imported_people, [:organization_id, :email], where: "email IS NOT NULL")
 
-    create index(:imported_people, [:organization_id, :phone_key],
-             where: "phone_key IS NOT NULL"
-           )
+    create index(:imported_people, [:organization_id, :phone_key], where: "phone_key IS NOT NULL")
 
     for table <- @tables do
       execute("""

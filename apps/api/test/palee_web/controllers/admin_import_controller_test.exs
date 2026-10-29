@@ -64,28 +64,47 @@ defmodule PaleeWeb.AdminImportControllerTest do
     assert catalog["limits"]["max_rows"] == 20_000
 
     import = create_import(owner, base)
-    assert %{"status" => "draft", "delimiter" => ";", "row_count" => 2, "source" => "excel"} = import
-    assert Enum.map(import["mapping"], & &1["field"]) == ~w(full_name email payment_amount payment_date)
 
-    preview = owner |> send_json("POST", "#{base}/#{import["id"]}/preview", %{}) |> json_response(200)
+    assert %{"status" => "draft", "delimiter" => ";", "row_count" => 2, "source" => "excel"} =
+             import
+
+    assert Enum.map(import["mapping"], & &1["field"]) ==
+             ~w(full_name email payment_amount payment_date)
+
+    preview =
+      owner |> send_json("POST", "#{base}/#{import["id"]}/preview", %{}) |> json_response(200)
+
     assert preview["import"]["preview"]["outcomes"] == %{"create_person" => 2}
 
-    applied = owner |> send_json("POST", "#{base}/#{import["id"]}/apply", %{}) |> json_response(202)
+    applied =
+      owner |> send_json("POST", "#{base}/#{import["id"]}/apply", %{}) |> json_response(202)
+
     assert applied["import"]["status"] == "applied"
     assert applied["import"]["undo_until"]
 
-    rows = owner |> recycle() |> get("#{base}/#{import["id"]}/rows?status=applied&limit=1") |> json_response(200)
+    rows =
+      owner
+      |> recycle()
+      |> get("#{base}/#{import["id"]}/rows?status=applied&limit=1")
+      |> json_response(200)
+
     assert [%{"row_number" => 1, "outcome" => "create_person"}] = rows["rows"]
     assert rows["next_after_row"] == 1
 
-    rows = owner |> recycle() |> get("#{base}/#{import["id"]}/rows?after_row=1") |> json_response(200)
+    rows =
+      owner |> recycle() |> get("#{base}/#{import["id"]}/rows?after_row=1") |> json_response(200)
+
     assert [%{"row_number" => 2}] = rows["rows"]
     assert rows["next_after_row"] == nil
 
-    sent = owner |> send_json("POST", "#{base}/#{import["id"]}/invitations", %{}) |> json_response(200)
+    sent =
+      owner |> send_json("POST", "#{base}/#{import["id"]}/invitations", %{}) |> json_response(200)
+
     assert %{"sent" => 1, "failed" => 0, "remaining" => 0} = sent
 
-    assert [%{"id" => id}] = owner |> recycle() |> get(base) |> json_response(200) |> Map.fetch!("imports")
+    assert [%{"id" => id}] =
+             owner |> recycle() |> get(base) |> json_response(200) |> Map.fetch!("imports")
+
     assert id == import["id"]
 
     assert %{"code" => "import_already_applied"} =
@@ -106,10 +125,16 @@ defmodule PaleeWeb.AdminImportControllerTest do
     too_large = String.duplicate("a", 5 * 1024 * 1024 + 1)
 
     assert %{"code" => "file_too_large"} =
-             owner |> recycle() |> post_multipart(base, %{"file" => upload_file(too_large)}) |> json_response(413)
+             owner
+             |> recycle()
+             |> post_multipart(base, %{"file" => upload_file(too_large)})
+             |> json_response(413)
 
     assert %{"code" => "no_rows"} =
-             owner |> recycle() |> post_multipart(base, %{"file" => upload_file("Name\n")}) |> json_response(422)
+             owner
+             |> recycle()
+             |> post_multipart(base, %{"file" => upload_file("Name\n")})
+             |> json_response(422)
 
     assert %{"code" => "unbalanced_quotes"} =
              owner
@@ -144,7 +169,12 @@ defmodule PaleeWeb.AdminImportControllerTest do
     import = create_import(owner, base)
 
     assert member |> recycle() |> get(base) |> json_response(403)
-    assert member |> recycle() |> post_multipart(base, %{"file" => upload_file(@csv)}) |> json_response(403)
+
+    assert member
+           |> recycle()
+           |> post_multipart(base, %{"file" => upload_file(@csv)})
+           |> json_response(403)
+
     assert member |> send_json("POST", "#{base}/#{import["id"]}/apply", %{}) |> json_response(403)
   end
 
@@ -162,7 +192,9 @@ defmodule PaleeWeb.AdminImportControllerTest do
     assert params["outcome"]["enum"] == ImportPolicy.outcomes()
 
     import =
-      path.("/{id}")["get"]["responses"]["200"]["content"]["application/json"]["schema"]["properties"][
+      path.("/{id}")["get"]["responses"]["200"]["content"]["application/json"]["schema"][
+        "properties"
+      ][
         "import"
       ]["properties"]
 

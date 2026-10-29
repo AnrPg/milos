@@ -863,7 +863,11 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
                "created_by_id" => params["created_by_id"],
                "reversed_credit_ledger_entry_id" => original_entry.id,
                "idempotency_key" =>
-                 scoped_finance_key("credit_grant_reversal:#{original_entry.id}", membership.id, params),
+                 scoped_finance_key(
+                   "credit_grant_reversal:#{original_entry.id}",
+                   membership.id,
+                   params
+                 ),
                "params" => reversal_params(params, original_entry.id)
              }) do
         refresh_invoice_and_entitlement(nil, membership.id)

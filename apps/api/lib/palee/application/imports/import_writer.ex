@@ -91,7 +91,11 @@ defmodule Palee.Application.Imports.ImportWriter do
     values = read.values
 
     if Imports.applied?(context, read.fingerprint) do
-      finish(context, row, read, %{outcome: "already_imported", warnings: read.warnings, errors: []})
+      finish(context, row, read, %{
+        outcome: "already_imported",
+        warnings: read.warnings,
+        errors: []
+      })
     else
       index = live_index(context, values)
       match = RowPlan.match(values, index)
@@ -192,7 +196,8 @@ defmodule Palee.Application.Imports.ImportWriter do
          state
          | user_id: account.id,
            person: person,
-           result: Map.merge(state.result, %{"created_profile" => true, "membership_added" => true})
+           result:
+             Map.merge(state.result, %{"created_profile" => true, "membership_added" => true})
        }}
     end
   end
@@ -279,7 +284,8 @@ defmodule Palee.Application.Imports.ImportWriter do
              "description" => "Imported balance",
              "created_by_id" => context.user_id
            }),
-         {:ok, person} <- Imports.update_person(context, state.person.id, %{credit_entry_id: entry.id}) do
+         {:ok, person} <-
+           Imports.update_person(context, state.person.id, %{credit_entry_id: entry.id}) do
       {:ok,
        %{state | person: person}
        |> put_result("credit_entry_id", entry.id)

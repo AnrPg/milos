@@ -16,7 +16,11 @@ defmodule Palee.Workers.ApplyImportJob do
 
   @impl Oban.Worker
   def perform(%Oban.Job{
-        args: %{"organization_id" => organization_id, "import_id" => import_id, "user_id" => user_id}
+        args: %{
+          "organization_id" => organization_id,
+          "import_id" => import_id,
+          "user_id" => user_id
+        }
       }) do
     PeopleImports.run_as(organization_id, import_id, user_id)
   end

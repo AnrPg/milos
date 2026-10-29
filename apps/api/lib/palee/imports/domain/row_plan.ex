@@ -132,7 +132,10 @@ defmodule Palee.Imports.Domain.RowPlan do
 
     member =
       email &&
-        Enum.find(Map.get(index[:profiles_by_email] || %{}, email, []), &Map.has_key?(members, &1))
+        Enum.find(
+          Map.get(index[:profiles_by_email] || %{}, email, []),
+          &Map.has_key?(members, &1)
+        )
 
     imported =
       (email && get_in(index, [:people_by_email, email])) ||

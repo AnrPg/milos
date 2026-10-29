@@ -78,7 +78,7 @@ defmodule Palee.Finance.Domain.CreditLedger do
     cond do
       Map.get(original_entry, :entry_type) != "grant" or
         Map.get(original_entry, :source_type) != "manual_credit" or
-          not is_integer(original_amount) or original_amount <= 0 ->
+        not is_integer(original_amount) or original_amount <= 0 ->
         {:error, :credit_entry_not_reversible}
 
       amount_cents <= 0 ->

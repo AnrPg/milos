@@ -21,7 +21,10 @@ defmodule PaleeWeb.Schemas.Imports do
   def error_enum, do: %Schema{type: :string, enum: ImportPolicy.errors()}
 
   def json_body(schema),
-    do: %RequestBody{required: false, content: %{"application/json" => %MediaType{schema: schema}}}
+    do: %RequestBody{
+      required: false,
+      content: %{"application/json" => %MediaType{schema: schema}}
+    }
 
   def upload_body do
     %RequestBody{
@@ -61,7 +64,11 @@ defmodule PaleeWeb.Schemas.Imports do
           type: :array,
           items: %Schema{
             type: :object,
-            properties: %{key: source_enum(), name: %Schema{type: :string}, date_order: date_order_enum()},
+            properties: %{
+              key: source_enum(),
+              name: %Schema{type: :string},
+              date_order: date_order_enum()
+            },
             required: [:date_order, :key, :name]
           }
         },
@@ -82,7 +89,10 @@ defmodule PaleeWeb.Schemas.Imports do
         outcomes: %Schema{type: :array, items: outcome_enum()},
         warnings: %Schema{type: :array, items: warning_enum()},
         errors: %Schema{type: :array, items: error_enum()},
-        encodings: %Schema{type: :array, items: %Schema{type: :string, enum: Encoding.encodings()}}
+        encodings: %Schema{
+          type: :array,
+          items: %Schema{type: :string, enum: Encoding.encodings()}
+        }
       },
       required: [
         :date_orders,

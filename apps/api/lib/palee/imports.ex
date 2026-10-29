@@ -106,7 +106,9 @@ defmodule Palee.Imports do
   end
 
   defp check_source(nil), do: :ok
-  defp check_source(source), do: if(source in Presets.keys(), do: :ok, else: {:error, :invalid_source})
+
+  defp check_source(source),
+    do: if(source in Presets.keys(), do: :ok, else: {:error, :invalid_source})
 
   defp guess_date_order(rows, %{mapping: mapping, date_order: default}) do
     date_columns =
@@ -202,8 +204,7 @@ defmodule Palee.Imports do
         rows: length(plans),
         outcomes: Enum.frequencies_by(plans, & &1.outcome),
         actions: plans |> Enum.flat_map(& &1.actions) |> Enum.frequencies(),
-        warnings:
-          plans |> Enum.flat_map(& &1.warnings) |> Enum.frequencies_by(& &1.code)
+        warnings: plans |> Enum.flat_map(& &1.warnings) |> Enum.frequencies_by(& &1.code)
       }
 
       ImportStore.update_import(context, import.id, %{preview: preview, previewed_at: now})

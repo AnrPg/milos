@@ -79,7 +79,10 @@ defmodule Palee.Imports.Domain.DateParser do
 
   defp strip_time(value) do
     value
-    |> String.replace(~r/[T\s]\d{1,2}:\d{2}(:\d{2}(\.\d+)?)?\s*([ap]\.?m\.?)?\s*(Z|[+-]\d{2}:?\d{2})?$/iu, "")
+    |> String.replace(
+      ~r/[T\s]\d{1,2}:\d{2}(:\d{2}(\.\d+)?)?\s*([ap]\.?m\.?)?\s*(Z|[+-]\d{2}:?\d{2})?$/iu,
+      ""
+    )
     |> String.trim()
   end
 

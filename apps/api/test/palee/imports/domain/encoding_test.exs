@@ -39,7 +39,9 @@ defmodule Palee.Imports.Domain.EncodingTest do
   end
 
   test "bytes with no character become U+FFFD with a warning" do
-    assert {:ok, text, "windows1252", [:undecodable_bytes]} = Encoding.to_utf8(<<"a", 0x81, "b", 0xE9>>)
+    assert {:ok, text, "windows1252", [:undecodable_bytes]} =
+             Encoding.to_utf8(<<"a", 0x81, "b", 0xE9>>)
+
     assert text == "a�bé"
   end
 end

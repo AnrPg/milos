@@ -161,7 +161,8 @@ defmodule Palee.Finance do
   `created_by_id`.
   """
   def reverse_credit_grant(context, membership_id, entry_id, params),
-    do: scoped(context, fn -> FinanceStore.reverse_credit_grant(membership_id, entry_id, params) end)
+    do:
+      scoped(context, fn -> FinanceStore.reverse_credit_grant(membership_id, entry_id, params) end)
 
   defdelegate get_invoice(invoice_id), to: FinanceStore, as: :get_invoice
   def get_invoice(context, invoice_id), do: scoped(context, fn -> get_invoice(invoice_id) end)
@@ -377,7 +378,8 @@ defmodule Palee.Finance do
   that assigned it) and refreshes the member's entitlement.
   """
   def cancel_subscription(context, membership_id, subscription_id),
-    do: scoped(context, fn -> FinanceStore.cancel_subscription(membership_id, subscription_id) end)
+    do:
+      scoped(context, fn -> FinanceStore.cancel_subscription(membership_id, subscription_id) end)
 
   defdelegate create_referral_event(params), to: CreateReferralEvent, as: :call
 

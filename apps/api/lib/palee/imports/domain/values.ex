@@ -39,7 +39,9 @@ defmodule Palee.Imports.Domain.Values do
       {:ok, text} ->
         international = Regex.match?(~r/^\s*(\+|00)/, text)
         digits = String.replace(text, ~r/\D/, "")
-        digits = if String.starts_with?(text, "00"), do: String.slice(digits, 2..-1//1), else: digits
+
+        digits =
+          if String.starts_with?(text, "00"), do: String.slice(digits, 2..-1//1), else: digits
 
         cond do
           String.length(digits) < @min_phone_digits or String.length(digits) > 15 ->
@@ -135,9 +137,14 @@ defmodule Palee.Imports.Domain.Values do
         folded = fold(text)
 
         cond do
-          folded in folded(~w(athlete athletes αθλητής αθλήτρια αθλητές)) -> {:ok, "athlete"}
-          folded in folded(~w(member members client customer μέλος μέλη πελάτης)) -> {:ok, "member"}
-          true -> {:error, :invalid_role}
+          folded in folded(~w(athlete athletes αθλητής αθλήτρια αθλητές)) ->
+            {:ok, "athlete"}
+
+          folded in folded(~w(member members client customer μέλος μέλη πελάτης)) ->
+            {:ok, "member"}
+
+          true ->
+            {:error, :invalid_role}
         end
 
       other ->

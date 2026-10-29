@@ -115,7 +115,9 @@ defmodule Palee.Application.Imports.PeopleImports do
     members =
       context
       |> Organizations.member_roles_by_user()
-      |> Map.new(fn {user_id, %{roles: roles}} -> {user_id, ImportWriter.client_roles?(roles)} end)
+      |> Map.new(fn {user_id, %{roles: roles}} ->
+        {user_id, ImportWriter.client_roles?(roles)}
+      end)
 
     profiles =
       emails
@@ -291,8 +293,10 @@ defmodule Palee.Application.Imports.PeopleImports do
 
   defp invitable?(context, person) do
     is_binary(person.email) and is_nil(person.invited_at) and is_nil(person.removed_at) and
-      match?(%{held_by_organization_id: held} when held == context.organization_id,
-        Identity.find_by_id(person.user_id))
+      match?(
+        %{held_by_organization_id: held} when held == context.organization_id,
+        Identity.find_by_id(person.user_id)
+      )
   end
 
   defp send_invitations(_context, [], remaining),
@@ -311,8 +315,11 @@ defmodule Palee.Application.Imports.PeopleImports do
       emails = Enum.map(group, & &1.email)
 
       case InvitationEmails.bulk(context, %{"emails" => emails, "roles" => [role]}) do
-        {:ok, %{results: sent}} -> {:cont, {:ok, results ++ record_invitations(context, group, sent)}}
-        {:error, reason} -> {:halt, {:error, reason}}
+        {:ok, %{results: sent}} ->
+          {:cont, {:ok, results ++ record_invitations(context, group, sent)}}
+
+        {:error, reason} ->
+          {:halt, {:error, reason}}
       end
     end)
     |> case do

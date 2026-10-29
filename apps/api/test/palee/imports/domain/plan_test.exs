@@ -17,12 +17,23 @@ defmodule Palee.Imports.Domain.PlanTest do
         HeaderMatcher.suggest(["Όνομα", "Επώνυμο", "Κινητό", "E-mail", "Πακέτο", "Λήξη", "Χ"])
 
       assert Enum.map(mapping, & &1.field) ==
-               ["first_name", "last_name", "phone", "email", "package_name", "package_ends_on", nil]
+               [
+                 "first_name",
+                 "last_name",
+                 "phone",
+                 "email",
+                 "package_name",
+                 "package_ends_on",
+                 nil
+               ]
     end
 
     test "a vendor is detected and its date order proposed" do
       header = ["first_name", "last_name", "email", "plan_name", "Charge Amount", "customer_id"]
-      assert %{source: "pushpress", date_order: "mdy", mapping: mapping} = HeaderMatcher.suggest(header)
+
+      assert %{source: "pushpress", date_order: "mdy", mapping: mapping} =
+               HeaderMatcher.suggest(header)
+
       assert Enum.map(mapping, & &1.field) |> Enum.all?()
 
       # Generic names alone stay generic (dates day first).
@@ -47,7 +58,11 @@ defmodule Palee.Imports.Domain.PlanTest do
       ]
 
       %{values: values, warnings: warnings} =
-        RowPlan.read(["Μαρία", "Παπαδοπούλου", "not-an-email", "31/12/2025", "-5", "30"], mapping, @options)
+        RowPlan.read(
+          ["Μαρία", "Παπαδοπούλου", "not-an-email", "31/12/2025", "-5", "30"],
+          mapping,
+          @options
+        )
 
       assert values["name"] == "Μαρία Παπαδοπούλου"
       assert values["package_ends_on"] == ~D[2025-12-31]
@@ -88,15 +103,30 @@ defmodule Palee.Imports.Domain.PlanTest do
     end
 
     test "outcomes" do
-      values = %{"name" => "Maria", "email" => "m@x.co", "role" => "member", "package_name" => "Monthly"}
+      values = %{
+        "name" => "Maria",
+        "email" => "m@x.co",
+        "role" => "member",
+        "package_name" => "Monthly"
+      }
 
-      assert %{outcome: "create_person", actions: [:create_person, :finance_profile, :create_package, :assign_package]} =
+      assert %{
+               outcome: "create_person",
+               actions: [:create_person, :finance_profile, :create_package, :assign_package]
+             } =
                RowPlan.plan(values, %{person: :new})
 
-      assert %{outcome: "update_person", actions: [:match_person, :finance_profile, :assign_package]} =
+      assert %{
+               outcome: "update_person",
+               actions: [:match_person, :finance_profile, :assign_package]
+             } =
                RowPlan.plan(values, %{person: {:member, "u", true}, package_exists?: true})
 
-      assert %{outcome: "update_person", actions: [:match_person], warnings: [%{code: "not_a_client"}]} =
+      assert %{
+               outcome: "update_person",
+               actions: [:match_person],
+               warnings: [%{code: "not_a_client"}]
+             } =
                RowPlan.plan(values, %{person: {:member, "u", false}})
 
       assert %{outcome: "already_imported"} = RowPlan.plan(values, %{already_imported?: true})
@@ -144,14 +174,25 @@ defmodule Palee.Imports.Domain.PlanTest do
 
     test "a mapping maps each field once and identifies people" do
       assert {:ok, [%{column: 0, field: "email"}]} =
-               ImportPolicy.validate_mapping([%{"column" => 0, "field" => "email"}, %{column: 1, field: nil}], 2)
+               ImportPolicy.validate_mapping(
+                 [%{"column" => 0, "field" => "email"}, %{column: 1, field: nil}],
+                 2
+               )
 
       assert {:error, :invalid_mapping} =
-               ImportPolicy.validate_mapping([%{column: 0, field: "email"}, %{column: 1, field: "email"}], 2)
+               ImportPolicy.validate_mapping(
+                 [%{column: 0, field: "email"}, %{column: 1, field: "email"}],
+                 2
+               )
 
-      assert {:error, :invalid_mapping} = ImportPolicy.validate_mapping([%{column: 0, field: "notes"}], 1)
-      assert {:error, :invalid_mapping} = ImportPolicy.validate_mapping([%{column: 3, field: "email"}], 2)
-      assert {:error, :invalid_mapping} = ImportPolicy.validate_mapping([%{column: 0, field: "age"}], 1)
+      assert {:error, :invalid_mapping} =
+               ImportPolicy.validate_mapping([%{column: 0, field: "notes"}], 1)
+
+      assert {:error, :invalid_mapping} =
+               ImportPolicy.validate_mapping([%{column: 3, field: "email"}], 2)
+
+      assert {:error, :invalid_mapping} =
+               ImportPolicy.validate_mapping([%{column: 0, field: "age"}], 1)
     end
 
     test "transitions and the undo window" do
@@ -162,12 +203,20 @@ defmodule Palee.Imports.Domain.PlanTest do
       assert {:error, :import_already_applied} = ImportPolicy.can_delete(%{status: "applied"})
 
       assert :ok =
-               ImportPolicy.can_undo(%{status: "applied", finished_at: finished}, ~U[2027-02-08 10:00:00Z])
+               ImportPolicy.can_undo(
+                 %{status: "applied", finished_at: finished},
+                 ~U[2027-02-08 10:00:00Z]
+               )
 
       assert {:error, :undo_window_closed} =
-               ImportPolicy.can_undo(%{status: "applied", finished_at: finished}, ~U[2027-02-08 10:00:01Z])
+               ImportPolicy.can_undo(
+                 %{status: "applied", finished_at: finished},
+                 ~U[2027-02-08 10:00:01Z]
+               )
 
-      assert {:error, :import_already_undone} = ImportPolicy.can_undo(%{status: "undone"}, finished)
+      assert {:error, :import_already_undone} =
+               ImportPolicy.can_undo(%{status: "undone"}, finished)
+
       assert {:error, :import_not_applied} = ImportPolicy.can_undo(%{status: "draft"}, finished)
     end
   end

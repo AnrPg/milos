@@ -101,7 +101,10 @@ defmodule Palee.Infrastructure.Imports.EctoImportStore do
 
   @impl true
   def delete_import(%{organization_id: organization_id}, id) do
-    Repo.delete_all(from i in Import, where: i.organization_id == ^organization_id and i.id == ^id)
+    Repo.delete_all(
+      from i in Import, where: i.organization_id == ^organization_id and i.id == ^id
+    )
+
     :ok
   end
 
@@ -155,7 +158,10 @@ defmodule Palee.Infrastructure.Imports.EctoImportStore do
         [
           Ecto.UUID.dump!(organization_id),
           Ecto.UUID.dump!(import_id),
-          Enum.map(chunk, &Map.take(&1, [:row_number, :outcome, :fingerprint, :warnings, :errors]))
+          Enum.map(
+            chunk,
+            &Map.take(&1, [:row_number, :outcome, :fingerprint, :warnings, :errors])
+          )
         ]
       )
     end)

@@ -179,7 +179,12 @@ defmodule Palee.Imports.Domain.Encoding do
   }
 
   # Greek letters C0–FE (except D2) are U+0390 + (byte − C0) in both pages.
-  @greek_letters for(byte <- 0xC0..0xFE, byte != 0xD2, into: %{}, do: {byte, 0x0390 + byte - 0xC0})
+  @greek_letters for(
+                   byte <- 0xC0..0xFE,
+                   byte != 0xD2,
+                   into: %{},
+                   do: {byte, 0x0390 + byte - 0xC0}
+                 )
                  |> Map.merge(%{0xD2 => nil, 0xFF => nil})
 
   @iso88597 Map.merge(@greek_letters, %{

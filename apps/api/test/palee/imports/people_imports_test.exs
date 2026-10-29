@@ -113,7 +113,10 @@ defmodule Palee.Imports.PeopleImportsTest do
 
     assert {:ok, %{date_order: "mdy", default_role: "athlete"}} =
              PeopleImports.preview(context, import.id, %{
-               "mapping" => [%{"column" => 0, "field" => "email"}, %{"column" => 1, "field" => "joined_on"}],
+               "mapping" => [
+                 %{"column" => 0, "field" => "email"},
+                 %{"column" => 1, "field" => "joined_on"}
+               ],
                "date_order" => "mdy",
                "default_role" => "athlete"
              })
@@ -159,18 +162,30 @@ defmodule Palee.Imports.PeopleImportsTest do
       Identity.profiles_by_emails(["maria@import.test"])
 
     assert held == context.organization_id
-    assert Organizations.member_roles(context.organization_id, maria) |> Enum.map(&to_string/1) == ["member"]
+
+    assert Organizations.member_roles(context.organization_id, maria) |> Enum.map(&to_string/1) ==
+             ["member"]
 
     profile = Finance.get_member_profile(context, maria)
     assert profile.membership.signup_source == "imported"
-    assert [%{price_cents_snapshot: 5000, ends_on: ~D[2027-12-31]}] = profile.package_subscriptions
+
+    assert [%{price_cents_snapshot: 5000, ends_on: ~D[2027-12-31]}] =
+             profile.package_subscriptions
+
     assert profile.credit_balance == 2000
-    assert [%{amount_cents: 5000, payment_method: "cash", paid_on: ~D[2027-01-05]}] = profile.payments
+
+    assert [%{amount_cents: 5000, payment_method: "cash", paid_on: ~D[2027-01-05]}] =
+             profile.payments
+
     assert Fiscal.list_documents(context).documents == []
 
     visits = Facility.list_check_ins(context, %{user_id: maria})
     assert visits |> Enum.map(& &1.method) |> Enum.uniq() == ["imported"]
-    assert visits |> Enum.map(& &1.checked_in_on) |> Enum.sort() == [~D[2027-01-10], ~D[2027-01-11]]
+
+    assert visits |> Enum.map(& &1.checked_in_on) |> Enum.sort() == [
+             ~D[2027-01-10],
+             ~D[2027-01-11]
+           ]
 
     # Nikos has no email: a placeholder login that never receives mail.
     %{user_id: nikos} = Imports.find_person(context, :phone_key, "6942222222")
@@ -201,7 +216,10 @@ defmodule Palee.Imports.PeopleImportsTest do
     %{user_id: anna} = Imports.find_person(context, :email, "anna@import.test")
 
     second =
-      upload(context, "Name,Phone,Payment amount,Payment date\nAnna L.,(415) 555-0100,30,2027-01-02\n")
+      upload(
+        context,
+        "Name,Phone,Payment amount,Payment date\nAnna L.,(415) 555-0100,30,2027-01-02\n"
+      )
 
     {:ok, applied} = PeopleImports.apply(context, second.id)
     assert applied.summary["people_created"] == 0
@@ -209,12 +227,21 @@ defmodule Palee.Imports.PeopleImportsTest do
     assert [%{amount_cents: 3000}] = Finance.get_member_profile(context, anna).payments
   end
 
-  test "a staff member matched by email gets no finance records", %{context: context, owner: owner} do
+  test "a staff member matched by email gets no finance records", %{
+    context: context,
+    owner: owner
+  } do
     email = Identity.find_by_id(owner.id).email
     import = upload(context, "Name,Email,Amount,Payment date\nOwner,#{email},10,2027-01-01\n")
     {:ok, _} = PeopleImports.apply(context, import.id)
 
-    assert [%{status: "applied", outcome: "update_person", warnings: [%{"code" => "not_a_client"}]}] =
+    assert [
+             %{
+               status: "applied",
+               outcome: "update_person",
+               warnings: [%{"code" => "not_a_client"}]
+             }
+           ] =
              rows(context, import.id)
 
     assert Finance.get_member_profile(context, owner.id) == nil
@@ -286,7 +313,8 @@ defmodule Palee.Imports.PeopleImportsTest do
     {:ok, _} = PeopleImports.apply(context, import.id)
     %{user_id: maria} = Imports.find_person(context, :email, "maria@import.test")
 
-    assert {:ok, %{status: "undone", undone_at: %DateTime{}}} = PeopleImports.undo(context, import.id)
+    assert {:ok, %{status: "undone", undone_at: %DateTime{}}} =
+             PeopleImports.undo(context, import.id)
 
     assert Organizations.member_roles(context.organization_id, maria) == []
     assert Facility.list_check_ins(context, %{user_id: maria}) == []
@@ -326,7 +354,8 @@ defmodule Palee.Imports.PeopleImportsTest do
     File.write!(path, "Name,Email\n")
     on_exit(fn -> File.rm(path) end)
 
-    assert {:error, :no_rows} = PeopleImports.upload(context, %{filename: "x.csv", path: path}, nil)
+    assert {:error, :no_rows} =
+             PeopleImports.upload(context, %{filename: "x.csv", path: path}, nil)
 
     assert {:error, :invalid_source} =
              PeopleImports.upload(context, %{filename: "x.csv", path: path}, "mindbody")

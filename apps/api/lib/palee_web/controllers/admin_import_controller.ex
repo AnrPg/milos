@@ -50,7 +50,11 @@ defmodule PaleeWeb.AdminImportController do
     body = conn.body_params
 
     with {:ok, import} <-
-           PeopleImports.upload(conn.assigns.tenant_context, field(body, :file), field(body, :source)) do
+           PeopleImports.upload(
+             conn.assigns.tenant_context,
+             field(body, :file),
+             field(body, :source)
+           ) do
       conn |> put_status(:created) |> json(%{import: import})
     end
   end
@@ -95,7 +99,8 @@ defmodule PaleeWeb.AdminImportController do
 
   operation(:preview,
     summary: "Save the mapping and options of a draft and run the dry run",
-    description: "Nothing is written outside the import: every row gets its outcome and warnings.",
+    description:
+      "Nothing is written outside the import: every row gets its outcome and warnings.",
     parameters: [@id],
     request_body: S.json_body(S.preview_body()),
     responses: [ok: {"Import", "application/json", S.one(S.import())}]
