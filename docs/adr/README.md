@@ -237,3 +237,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-252 | Documents and simple electronic signatures (evidence, PDF certificate), health certificates, booking gate | Accepted |
 | ADR-255 | Setup recipes per box type and the settings catalog («Προχωρημένα») | Accepted |
 | ADR-254 | Importing clients from a CSV file: Imports context, dry run, idempotent apply, held profiles, undo | Accepted |
+| ADR-256 | Store apps: physical services paid through the box's provider in the in-app browser, digital-only packages and Plan (Palee) not sold in the apps, /pay/return app link | Accepted |

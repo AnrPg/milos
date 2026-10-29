@@ -21,6 +21,8 @@
 		A1730000000000000000000B /* PaleeWidgetsPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1730000000000000000000A /* PaleeWidgetsPlugin.swift */; };
 		A1730000000000000000000D /* PaleeGeofencePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1730000000000000000000C /* PaleeGeofencePlugin.swift */; };
 		A1730000000000000000000F /* PaleeNfcPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1730000000000000000000E /* PaleeNfcPlugin.swift */; };
+		A2560000000000000000000B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A2560000000000000000000A /* InfoPlist.strings */; };
+		A2560000000000000000000F /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A2560000000000000000000E /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +42,9 @@
 		A1730000000000000000000C /* PaleeGeofencePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaleeGeofencePlugin.swift; sourceTree = "<group>"; };
 		A1730000000000000000000E /* PaleeNfcPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaleeNfcPlugin.swift; sourceTree = "<group>"; };
 		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
+		A2560000000000000000000C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A2560000000000000000000D /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A2560000000000000000000E /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +91,8 @@
 				504EC30E1FED79650016851F /* Assets.xcassets */,
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
 				504EC3131FED79650016851F /* Info.plist */,
+				A2560000000000000000000A /* InfoPlist.strings */,
+				A2560000000000000000000E /* PrivacyInfo.xcprivacy */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
 			);
@@ -137,6 +144,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				el,
 				Base,
 			);
 			mainGroup = 504EC2FB1FED79650016851F;
@@ -163,6 +171,8 @@
 				50379B232058CBB4000EE86E /* capacitor.config.json in Resources */,
 				504EC30D1FED79650016851F /* Main.storyboard in Resources */,
 				2FAD9763203C412B000D30F8 /* config.xml in Resources */,
+				A2560000000000000000000B /* InfoPlist.strings in Resources */,
+				A2560000000000000000000F /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -200,6 +210,15 @@
 				504EC3111FED79650016851F /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		A2560000000000000000000A /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A2560000000000000000000C /* en */,
+				A2560000000000000000000D /* el */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -328,7 +347,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 3.0.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
 				PRODUCT_BUNDLE_IDENTIFIER = app.palee.member;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -351,7 +370,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 3.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = app.palee.member;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ADR-256: the status-bar icon of push notifications: the arms-up mark in
+     one colour (Android draws only the shape). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <path
+        android:pathData="M40,52 Q46,150 100,150 Q154,150 160,52"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="26"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M100,88 m-24,0 a24,24 0,1 0,48 0 a24,24 0,1 0,-48 0"
+        android:fillColor="#FFFFFFFF" />
+</vector>

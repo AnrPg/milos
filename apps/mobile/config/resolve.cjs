@@ -46,4 +46,27 @@ function appLinkPathPrefixes() {
   return JSON.parse(fs.readFileSync(appLinksFile, "utf8")).pathPrefixes;
 }
 
-module.exports = { resolveEnvironment, appLinkPathPrefixes };
+// Google Play refuses a versionCode above 2 100 000 000.
+const MAX_BUILD = 2100000000;
+
+/**
+ * ADR-256: the store version (release.json) and the build number, which
+ * PALEE_BUILD_NUMBER may override for one build. The version is three
+ * dot-separated numbers (Apple allows no more); the build a whole number
+ * from 1 that only goes up.
+ */
+function resolveRelease(env = process.env, release = JSON.parse(fs.readFileSync(path.join(configDir, "release.json"), "utf8"))) {
+  const version = String(release.version ?? "").trim();
+  if (!/^(0|[1-9]\d{0,3})\.(0|[1-9]\d{0,3})\.(0|[1-9]\d{0,3})$/.test(version)) {
+    throw new Error(`release.json version must look like 3.0.0, got "${version}"`);
+  }
+
+  const rawBuild = (env.PALEE_BUILD_NUMBER || "").trim() || String(release.build ?? "");
+  if (!/^[1-9]\d*$/.test(rawBuild) || Number(rawBuild) > MAX_BUILD) {
+    throw new Error(`The build number must be a whole number from 1 to ${MAX_BUILD}, got "${rawBuild}"`);
+  }
+
+  return { version, build: Number(rawBuild) };
+}
+
+module.exports = { resolveEnvironment, appLinkPathPrefixes, resolveRelease };

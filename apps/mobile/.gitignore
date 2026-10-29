@@ -6,6 +6,8 @@ android/app/google-services.json
 ios/App/App/GoogleService-Info.plist
 *.jks
 *.keystore
+# ADR-256: the upload key's passwords (docs/release/signing-guide.md).
+android/keystore.properties
 *.p8
 *.p12
 *.mobileprovision
