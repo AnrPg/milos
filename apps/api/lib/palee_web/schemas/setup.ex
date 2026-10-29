@@ -191,9 +191,10 @@ defmodule PaleeWeb.Schemas.Setup do
       properties: %{
         recipes: %Schema{type: :array, items: recipe()},
         applications: %Schema{type: :array, items: application()},
-        can_apply: %Schema{type: :boolean, description: "Only the owner applies a recipe"}
+        can_apply: %Schema{type: :boolean, description: "Only the owner applies a recipe"},
+        currency: %Schema{type: :string, description: "ISO currency of the suggested prices"}
       },
-      required: [:applications, :can_apply, :recipes]
+      required: [:applications, :can_apply, :currency, :recipes]
     }
   end
 

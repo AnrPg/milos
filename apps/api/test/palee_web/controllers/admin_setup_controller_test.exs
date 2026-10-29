@@ -57,6 +57,7 @@ defmodule PaleeWeb.AdminSetupControllerTest do
     assert "crossfit_box" in keys and "independent_coach" in keys
     assert body["can_apply"] == true
     assert body["applications"] == []
+    assert body["currency"] =~ ~r/^[A-Z]{3}$/
 
     crossfit = Enum.find(body["recipes"], &(&1["key"] == "crossfit_box"))
     assert crossfit["names"] == %{"en" => "CrossFit box", "el" => "CrossFit box"}

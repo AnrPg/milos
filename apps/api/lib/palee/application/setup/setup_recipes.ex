@@ -31,7 +31,7 @@ defmodule Palee.Application.Setup.SetupRecipes do
     end
   end
 
-  @doc "`%{recipes, applications}`: every recipe and the business's applications."
+  @doc "`%{recipes, applications, can_apply, currency}`: every recipe, the business's applications and the currency of the suggested prices."
   def list(context) do
     with :ok <- Organizations.authorize_capability(context, :manage_settings),
          {:ok, snapshot} <- Setup.configurator().snapshot(context) do
@@ -39,7 +39,8 @@ defmodule Palee.Application.Setup.SetupRecipes do
        %{
          recipes: Enum.map(Setup.recipes(), &present_recipe(&1, snapshot.locale)),
          applications: Setup.list_applications(context, @history),
-         can_apply: owner?(context)
+         can_apply: owner?(context),
+         currency: Map.get(snapshot, :currency) || "EUR"
        }}
     end
   end
