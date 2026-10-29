@@ -12331,6 +12331,7 @@
       "keyEmptyCell": "κενό κελί",
       "keyUnit": "kg ή %",
       "keyDeleteRow": "⌫ σε κενό όνομα"
-    }
+    },
+    "perSide": "ανά πλευρά"
   }
 }
