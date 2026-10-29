@@ -56030,6 +56030,334 @@
         "title": "PlaceSuggestion",
         "type": "object"
       },
+      "PlanBodySection": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "plan": {
+            "additionalProperties": true,
+            "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+            "nullable": true,
+            "properties": {
+              "blocks": {
+                "items": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "maxItems": 60,
+                  "type": "array"
+                },
+                "maxItems": 12,
+                "type": "array"
+              },
+              "flow": {
+                "enum": [
+                  "amrap",
+                  "emom",
+                  "for_time",
+                  "intervals",
+                  "rest",
+                  "sets"
+                ],
+                "type": "string"
+              },
+              "interrupt": {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "maxItems": 60,
+                "type": "array"
+              },
+              "levelNotes": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "mods": {
+                "additionalProperties": {
+                  "type": "boolean"
+                },
+                "type": "object"
+              },
+              "note": {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              "params": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "preset": {
+                "nullable": true,
+                "type": "string"
+              },
+              "score": {
+                "type": "string"
+              },
+              "structs": {
+                "additionalProperties": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              "v": {
+                "enum": [
+                  1
+                ],
+                "type": "integer"
+              }
+            },
+            "required": [
+              "blocks",
+              "flow",
+              "params",
+              "score",
+              "v"
+            ],
+            "title": "PlanSection",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "plan"
+        ],
+        "title": "PlanBodySection",
+        "type": "object"
+      },
+      "PlanSection": {
+        "additionalProperties": true,
+        "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+        "nullable": true,
+        "properties": {
+          "blocks": {
+            "items": {
+              "items": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "maxItems": 60,
+              "type": "array"
+            },
+            "maxItems": 12,
+            "type": "array"
+          },
+          "flow": {
+            "enum": [
+              "amrap",
+              "emom",
+              "for_time",
+              "intervals",
+              "rest",
+              "sets"
+            ],
+            "type": "string"
+          },
+          "interrupt": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "maxItems": 60,
+            "type": "array"
+          },
+          "levelNotes": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "mods": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "type": "object"
+          },
+          "note": {
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "preset": {
+            "nullable": true,
+            "type": "string"
+          },
+          "score": {
+            "type": "string"
+          },
+          "structs": {
+            "additionalProperties": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "object"
+          },
+          "v": {
+            "enum": [
+              1
+            ],
+            "type": "integer"
+          }
+        },
+        "required": [
+          "blocks",
+          "flow",
+          "params",
+          "score",
+          "v"
+        ],
+        "title": "PlanSection",
+        "type": "object"
+      },
+      "PlanWorkoutBody": {
+        "additionalProperties": false,
+        "description": "ADR-270: written in the structured WOD editor, one plan per section",
+        "properties": {
+          "kind": {
+            "enum": [
+              "plan"
+            ],
+            "type": "string"
+          },
+          "sections": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "plan": {
+                  "additionalProperties": true,
+                  "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                  "nullable": true,
+                  "properties": {
+                    "blocks": {
+                      "items": {
+                        "items": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "maxItems": 60,
+                        "type": "array"
+                      },
+                      "maxItems": 12,
+                      "type": "array"
+                    },
+                    "flow": {
+                      "enum": [
+                        "amrap",
+                        "emom",
+                        "for_time",
+                        "intervals",
+                        "rest",
+                        "sets"
+                      ],
+                      "type": "string"
+                    },
+                    "interrupt": {
+                      "items": {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      "maxItems": 60,
+                      "type": "array"
+                    },
+                    "levelNotes": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "mods": {
+                      "additionalProperties": {
+                        "type": "boolean"
+                      },
+                      "type": "object"
+                    },
+                    "note": {
+                      "maxLength": 2000,
+                      "type": "string"
+                    },
+                    "params": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "preset": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "score": {
+                      "type": "string"
+                    },
+                    "structs": {
+                      "additionalProperties": {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      "type": "object"
+                    },
+                    "v": {
+                      "enum": [
+                        1
+                      ],
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "blocks",
+                    "flow",
+                    "params",
+                    "score",
+                    "v"
+                  ],
+                  "title": "PlanSection",
+                  "type": "object"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "plan"
+              ],
+              "title": "PlanBodySection",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "kind",
+          "sections"
+        ],
+        "title": "PlanWorkoutBody",
+        "type": "object"
+      },
       "PlatformPlan": {
         "properties": {
           "active": {
@@ -80843,6 +81171,136 @@
             ],
             "title": "StructuredWorkoutBody",
             "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "description": "ADR-270: written in the structured WOD editor, one plan per section",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "plan"
+                ],
+                "type": "string"
+              },
+              "sections": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "plan": {
+                      "additionalProperties": true,
+                      "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                      "nullable": true,
+                      "properties": {
+                        "blocks": {
+                          "items": {
+                            "items": {
+                              "additionalProperties": true,
+                              "type": "object"
+                            },
+                            "maxItems": 60,
+                            "type": "array"
+                          },
+                          "maxItems": 12,
+                          "type": "array"
+                        },
+                        "flow": {
+                          "enum": [
+                            "amrap",
+                            "emom",
+                            "for_time",
+                            "intervals",
+                            "rest",
+                            "sets"
+                          ],
+                          "type": "string"
+                        },
+                        "interrupt": {
+                          "items": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "maxItems": 60,
+                          "type": "array"
+                        },
+                        "levelNotes": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "mods": {
+                          "additionalProperties": {
+                            "type": "boolean"
+                          },
+                          "type": "object"
+                        },
+                        "note": {
+                          "maxLength": 2000,
+                          "type": "string"
+                        },
+                        "params": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "preset": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "score": {
+                          "type": "string"
+                        },
+                        "structs": {
+                          "additionalProperties": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "type": "object"
+                        },
+                        "v": {
+                          "enum": [
+                            1
+                          ],
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "blocks",
+                        "flow",
+                        "params",
+                        "score",
+                        "v"
+                      ],
+                      "title": "PlanSection",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "plan"
+                  ],
+                  "title": "PlanBodySection",
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "kind",
+              "sections"
+            ],
+            "title": "PlanWorkoutBody",
+            "type": "object"
           }
         ],
         "title": "WorkoutBody"
@@ -80858,7 +81316,8 @@
             "enum": [
               "free_text",
               "text_sections",
-              "structured"
+              "structured",
+              "plan"
             ],
             "type": "string"
           },
@@ -186449,7 +186908,7 @@
       },
       "get": {
         "callbacks": {},
-        "description": "`programming` (clients only, else null): `{allowed, grant, reason}` says whether a WOD can be assigned to the person: their subscription package needs online programming (`online_programming`) or personal training (`personal_training`), ADR-225.",
+        "description": "`programming` (clients only, else null): `{allowed, grant, reason}` says whether a WOD can be assigned to the person: their subscription package needs online programming (`online_programming`) or personal training (`personal_training`), ADR-232.",
         "operationId": "PaleeWeb.AdminUserController.show",
         "parameters": [
           {
@@ -188242,7 +188701,7 @@
     "/api/org/{organization_slug}/admin/users/{id}/programming": {
       "post": {
         "callbacks": {},
-        "description": "Athletes receive a personal assignment. Members follow `mode` (ADR-125). Without folder_id, copies are filed automatically (ADR-136): athletes in their folder, class workouts in the class-day folder, member variations in the member's variations folder. Athletes, and members in the personal and class_variant modes, need a package with online programming or personal training (ADR-225); otherwise 403 `programming_not_in_package`.",
+        "description": "Athletes receive a personal assignment. Members follow `mode` (ADR-125). Without folder_id, copies are filed automatically (ADR-136): athletes in their folder, class workouts in the class-day folder, member variations in the member's variations folder. Athletes, and members in the personal and class_variant modes, need a package with online programming or personal training (ADR-232); otherwise 403 `programming_not_in_package`.",
         "operationId": "PaleeWeb.AdminUserController.program_workout",
         "parameters": [
           {
@@ -191390,7 +191849,8 @@
                                 "enum": [
                                   "free_text",
                                   "text_sections",
-                                  "structured"
+                                  "structured",
+                                  "plan"
                                 ],
                                 "type": "string"
                               },
@@ -192997,7 +193457,8 @@
                             "structured",
                             "quick_text",
                             "free_text",
-                            "sectioned_text"
+                            "sectioned_text",
+                            "structured_plan"
                           ],
                           "type": "string"
                         },
@@ -193239,6 +193700,136 @@
                                 "sections"
                               ],
                               "title": "StructuredWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "ADR-270: written in the structured WOD editor, one plan per section",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "plan"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "plan": {
+                                        "additionalProperties": true,
+                                        "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                                        "nullable": true,
+                                        "properties": {
+                                          "blocks": {
+                                            "items": {
+                                              "items": {
+                                                "additionalProperties": true,
+                                                "type": "object"
+                                              },
+                                              "maxItems": 60,
+                                              "type": "array"
+                                            },
+                                            "maxItems": 12,
+                                            "type": "array"
+                                          },
+                                          "flow": {
+                                            "enum": [
+                                              "amrap",
+                                              "emom",
+                                              "for_time",
+                                              "intervals",
+                                              "rest",
+                                              "sets"
+                                            ],
+                                            "type": "string"
+                                          },
+                                          "interrupt": {
+                                            "items": {
+                                              "additionalProperties": true,
+                                              "type": "object"
+                                            },
+                                            "maxItems": 60,
+                                            "type": "array"
+                                          },
+                                          "levelNotes": {
+                                            "additionalProperties": {
+                                              "type": "string"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "mods": {
+                                            "additionalProperties": {
+                                              "type": "boolean"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "note": {
+                                            "maxLength": 2000,
+                                            "type": "string"
+                                          },
+                                          "params": {
+                                            "additionalProperties": {
+                                              "type": "string"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "preset": {
+                                            "nullable": true,
+                                            "type": "string"
+                                          },
+                                          "score": {
+                                            "type": "string"
+                                          },
+                                          "structs": {
+                                            "additionalProperties": {
+                                              "additionalProperties": true,
+                                              "type": "object"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "v": {
+                                            "enum": [
+                                              1
+                                            ],
+                                            "type": "integer"
+                                          }
+                                        },
+                                        "required": [
+                                          "blocks",
+                                          "flow",
+                                          "params",
+                                          "score",
+                                          "v"
+                                        ],
+                                        "title": "PlanSection",
+                                        "type": "object"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "name",
+                                      "plan"
+                                    ],
+                                    "title": "PlanBodySection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "PlanWorkoutBody",
                               "type": "object"
                             }
                           ],
@@ -194205,6 +194796,95 @@
                                 "nullable": true,
                                 "type": "string"
                               },
+                              "plan": {
+                                "additionalProperties": true,
+                                "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                                "nullable": true,
+                                "properties": {
+                                  "blocks": {
+                                    "items": {
+                                      "items": {
+                                        "additionalProperties": true,
+                                        "type": "object"
+                                      },
+                                      "maxItems": 60,
+                                      "type": "array"
+                                    },
+                                    "maxItems": 12,
+                                    "type": "array"
+                                  },
+                                  "flow": {
+                                    "enum": [
+                                      "amrap",
+                                      "emom",
+                                      "for_time",
+                                      "intervals",
+                                      "rest",
+                                      "sets"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "interrupt": {
+                                    "items": {
+                                      "additionalProperties": true,
+                                      "type": "object"
+                                    },
+                                    "maxItems": 60,
+                                    "type": "array"
+                                  },
+                                  "levelNotes": {
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "mods": {
+                                    "additionalProperties": {
+                                      "type": "boolean"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "note": {
+                                    "maxLength": 2000,
+                                    "type": "string"
+                                  },
+                                  "params": {
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "preset": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "score": {
+                                    "type": "string"
+                                  },
+                                  "structs": {
+                                    "additionalProperties": {
+                                      "additionalProperties": true,
+                                      "type": "object"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "v": {
+                                    "enum": [
+                                      1
+                                    ],
+                                    "type": "integer"
+                                  }
+                                },
+                                "required": [
+                                  "blocks",
+                                  "flow",
+                                  "params",
+                                  "score",
+                                  "v"
+                                ],
+                                "title": "PlanSection",
+                                "type": "object"
+                              },
                               "rest_after_seconds": {
                                 "nullable": true,
                                 "type": "integer"
@@ -195021,6 +195701,95 @@
                                       "nullable": true,
                                       "type": "string"
                                     },
+                                    "plan": {
+                                      "additionalProperties": true,
+                                      "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                                      "nullable": true,
+                                      "properties": {
+                                        "blocks": {
+                                          "items": {
+                                            "items": {
+                                              "additionalProperties": true,
+                                              "type": "object"
+                                            },
+                                            "maxItems": 60,
+                                            "type": "array"
+                                          },
+                                          "maxItems": 12,
+                                          "type": "array"
+                                        },
+                                        "flow": {
+                                          "enum": [
+                                            "amrap",
+                                            "emom",
+                                            "for_time",
+                                            "intervals",
+                                            "rest",
+                                            "sets"
+                                          ],
+                                          "type": "string"
+                                        },
+                                        "interrupt": {
+                                          "items": {
+                                            "additionalProperties": true,
+                                            "type": "object"
+                                          },
+                                          "maxItems": 60,
+                                          "type": "array"
+                                        },
+                                        "levelNotes": {
+                                          "additionalProperties": {
+                                            "type": "string"
+                                          },
+                                          "type": "object"
+                                        },
+                                        "mods": {
+                                          "additionalProperties": {
+                                            "type": "boolean"
+                                          },
+                                          "type": "object"
+                                        },
+                                        "note": {
+                                          "maxLength": 2000,
+                                          "type": "string"
+                                        },
+                                        "params": {
+                                          "additionalProperties": {
+                                            "type": "string"
+                                          },
+                                          "type": "object"
+                                        },
+                                        "preset": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "score": {
+                                          "type": "string"
+                                        },
+                                        "structs": {
+                                          "additionalProperties": {
+                                            "additionalProperties": true,
+                                            "type": "object"
+                                          },
+                                          "type": "object"
+                                        },
+                                        "v": {
+                                          "enum": [
+                                            1
+                                          ],
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "required": [
+                                        "blocks",
+                                        "flow",
+                                        "params",
+                                        "score",
+                                        "v"
+                                      ],
+                                      "title": "PlanSection",
+                                      "type": "object"
+                                    },
                                     "rest_after_seconds": {
                                       "nullable": true,
                                       "type": "integer"
@@ -195340,7 +196109,8 @@
                       "structured",
                       "quick_text",
                       "free_text",
-                      "sectioned_text"
+                      "sectioned_text",
+                      "structured_plan"
                     ],
                     "nullable": true,
                     "type": "string"
@@ -196282,6 +197052,95 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "plan": {
+                          "additionalProperties": true,
+                          "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                          "nullable": true,
+                          "properties": {
+                            "blocks": {
+                              "items": {
+                                "items": {
+                                  "additionalProperties": true,
+                                  "type": "object"
+                                },
+                                "maxItems": 60,
+                                "type": "array"
+                              },
+                              "maxItems": 12,
+                              "type": "array"
+                            },
+                            "flow": {
+                              "enum": [
+                                "amrap",
+                                "emom",
+                                "for_time",
+                                "intervals",
+                                "rest",
+                                "sets"
+                              ],
+                              "type": "string"
+                            },
+                            "interrupt": {
+                              "items": {
+                                "additionalProperties": true,
+                                "type": "object"
+                              },
+                              "maxItems": 60,
+                              "type": "array"
+                            },
+                            "levelNotes": {
+                              "additionalProperties": {
+                                "type": "string"
+                              },
+                              "type": "object"
+                            },
+                            "mods": {
+                              "additionalProperties": {
+                                "type": "boolean"
+                              },
+                              "type": "object"
+                            },
+                            "note": {
+                              "maxLength": 2000,
+                              "type": "string"
+                            },
+                            "params": {
+                              "additionalProperties": {
+                                "type": "string"
+                              },
+                              "type": "object"
+                            },
+                            "preset": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "score": {
+                              "type": "string"
+                            },
+                            "structs": {
+                              "additionalProperties": {
+                                "additionalProperties": true,
+                                "type": "object"
+                              },
+                              "type": "object"
+                            },
+                            "v": {
+                              "enum": [
+                                1
+                              ],
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "blocks",
+                            "flow",
+                            "params",
+                            "score",
+                            "v"
+                          ],
+                          "title": "PlanSection",
+                          "type": "object"
+                        },
                         "rest_after_seconds": {
                           "nullable": true,
                           "type": "integer"
@@ -197097,6 +197956,95 @@
                                 "format": "uuid",
                                 "nullable": true,
                                 "type": "string"
+                              },
+                              "plan": {
+                                "additionalProperties": true,
+                                "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                                "nullable": true,
+                                "properties": {
+                                  "blocks": {
+                                    "items": {
+                                      "items": {
+                                        "additionalProperties": true,
+                                        "type": "object"
+                                      },
+                                      "maxItems": 60,
+                                      "type": "array"
+                                    },
+                                    "maxItems": 12,
+                                    "type": "array"
+                                  },
+                                  "flow": {
+                                    "enum": [
+                                      "amrap",
+                                      "emom",
+                                      "for_time",
+                                      "intervals",
+                                      "rest",
+                                      "sets"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "interrupt": {
+                                    "items": {
+                                      "additionalProperties": true,
+                                      "type": "object"
+                                    },
+                                    "maxItems": 60,
+                                    "type": "array"
+                                  },
+                                  "levelNotes": {
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "mods": {
+                                    "additionalProperties": {
+                                      "type": "boolean"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "note": {
+                                    "maxLength": 2000,
+                                    "type": "string"
+                                  },
+                                  "params": {
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "preset": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "score": {
+                                    "type": "string"
+                                  },
+                                  "structs": {
+                                    "additionalProperties": {
+                                      "additionalProperties": true,
+                                      "type": "object"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "v": {
+                                    "enum": [
+                                      1
+                                    ],
+                                    "type": "integer"
+                                  }
+                                },
+                                "required": [
+                                  "blocks",
+                                  "flow",
+                                  "params",
+                                  "score",
+                                  "v"
+                                ],
+                                "title": "PlanSection",
+                                "type": "object"
                               },
                               "rest_after_seconds": {
                                 "nullable": true,
@@ -198632,7 +199580,8 @@
                       "structured",
                       "quick_text",
                       "free_text",
-                      "sectioned_text"
+                      "sectioned_text",
+                      "structured_plan"
                     ],
                     "nullable": true,
                     "type": "string"
@@ -199574,6 +200523,95 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "plan": {
+                          "additionalProperties": true,
+                          "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                          "nullable": true,
+                          "properties": {
+                            "blocks": {
+                              "items": {
+                                "items": {
+                                  "additionalProperties": true,
+                                  "type": "object"
+                                },
+                                "maxItems": 60,
+                                "type": "array"
+                              },
+                              "maxItems": 12,
+                              "type": "array"
+                            },
+                            "flow": {
+                              "enum": [
+                                "amrap",
+                                "emom",
+                                "for_time",
+                                "intervals",
+                                "rest",
+                                "sets"
+                              ],
+                              "type": "string"
+                            },
+                            "interrupt": {
+                              "items": {
+                                "additionalProperties": true,
+                                "type": "object"
+                              },
+                              "maxItems": 60,
+                              "type": "array"
+                            },
+                            "levelNotes": {
+                              "additionalProperties": {
+                                "type": "string"
+                              },
+                              "type": "object"
+                            },
+                            "mods": {
+                              "additionalProperties": {
+                                "type": "boolean"
+                              },
+                              "type": "object"
+                            },
+                            "note": {
+                              "maxLength": 2000,
+                              "type": "string"
+                            },
+                            "params": {
+                              "additionalProperties": {
+                                "type": "string"
+                              },
+                              "type": "object"
+                            },
+                            "preset": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "score": {
+                              "type": "string"
+                            },
+                            "structs": {
+                              "additionalProperties": {
+                                "additionalProperties": true,
+                                "type": "object"
+                              },
+                              "type": "object"
+                            },
+                            "v": {
+                              "enum": [
+                                1
+                              ],
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "blocks",
+                            "flow",
+                            "params",
+                            "score",
+                            "v"
+                          ],
+                          "title": "PlanSection",
+                          "type": "object"
+                        },
                         "rest_after_seconds": {
                           "nullable": true,
                           "type": "integer"
@@ -200390,6 +201428,95 @@
                                 "nullable": true,
                                 "type": "string"
                               },
+                              "plan": {
+                                "additionalProperties": true,
+                                "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                                "nullable": true,
+                                "properties": {
+                                  "blocks": {
+                                    "items": {
+                                      "items": {
+                                        "additionalProperties": true,
+                                        "type": "object"
+                                      },
+                                      "maxItems": 60,
+                                      "type": "array"
+                                    },
+                                    "maxItems": 12,
+                                    "type": "array"
+                                  },
+                                  "flow": {
+                                    "enum": [
+                                      "amrap",
+                                      "emom",
+                                      "for_time",
+                                      "intervals",
+                                      "rest",
+                                      "sets"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "interrupt": {
+                                    "items": {
+                                      "additionalProperties": true,
+                                      "type": "object"
+                                    },
+                                    "maxItems": 60,
+                                    "type": "array"
+                                  },
+                                  "levelNotes": {
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "mods": {
+                                    "additionalProperties": {
+                                      "type": "boolean"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "note": {
+                                    "maxLength": 2000,
+                                    "type": "string"
+                                  },
+                                  "params": {
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "preset": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "score": {
+                                    "type": "string"
+                                  },
+                                  "structs": {
+                                    "additionalProperties": {
+                                      "additionalProperties": true,
+                                      "type": "object"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "v": {
+                                    "enum": [
+                                      1
+                                    ],
+                                    "type": "integer"
+                                  }
+                                },
+                                "required": [
+                                  "blocks",
+                                  "flow",
+                                  "params",
+                                  "score",
+                                  "v"
+                                ],
+                                "title": "PlanSection",
+                                "type": "object"
+                              },
                               "rest_after_seconds": {
                                 "nullable": true,
                                 "type": "integer"
@@ -200590,7 +201717,8 @@
                             "structured",
                             "quick_text",
                             "free_text",
-                            "sectioned_text"
+                            "sectioned_text",
+                            "structured_plan"
                           ],
                           "type": "string"
                         },
@@ -200832,6 +201960,136 @@
                                 "sections"
                               ],
                               "title": "StructuredWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "ADR-270: written in the structured WOD editor, one plan per section",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "plan"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "plan": {
+                                        "additionalProperties": true,
+                                        "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                                        "nullable": true,
+                                        "properties": {
+                                          "blocks": {
+                                            "items": {
+                                              "items": {
+                                                "additionalProperties": true,
+                                                "type": "object"
+                                              },
+                                              "maxItems": 60,
+                                              "type": "array"
+                                            },
+                                            "maxItems": 12,
+                                            "type": "array"
+                                          },
+                                          "flow": {
+                                            "enum": [
+                                              "amrap",
+                                              "emom",
+                                              "for_time",
+                                              "intervals",
+                                              "rest",
+                                              "sets"
+                                            ],
+                                            "type": "string"
+                                          },
+                                          "interrupt": {
+                                            "items": {
+                                              "additionalProperties": true,
+                                              "type": "object"
+                                            },
+                                            "maxItems": 60,
+                                            "type": "array"
+                                          },
+                                          "levelNotes": {
+                                            "additionalProperties": {
+                                              "type": "string"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "mods": {
+                                            "additionalProperties": {
+                                              "type": "boolean"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "note": {
+                                            "maxLength": 2000,
+                                            "type": "string"
+                                          },
+                                          "params": {
+                                            "additionalProperties": {
+                                              "type": "string"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "preset": {
+                                            "nullable": true,
+                                            "type": "string"
+                                          },
+                                          "score": {
+                                            "type": "string"
+                                          },
+                                          "structs": {
+                                            "additionalProperties": {
+                                              "additionalProperties": true,
+                                              "type": "object"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "v": {
+                                            "enum": [
+                                              1
+                                            ],
+                                            "type": "integer"
+                                          }
+                                        },
+                                        "required": [
+                                          "blocks",
+                                          "flow",
+                                          "params",
+                                          "score",
+                                          "v"
+                                        ],
+                                        "title": "PlanSection",
+                                        "type": "object"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "name",
+                                      "plan"
+                                    ],
+                                    "title": "PlanBodySection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "PlanWorkoutBody",
                               "type": "object"
                             }
                           ],
@@ -201798,6 +203056,95 @@
                                 "nullable": true,
                                 "type": "string"
                               },
+                              "plan": {
+                                "additionalProperties": true,
+                                "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                                "nullable": true,
+                                "properties": {
+                                  "blocks": {
+                                    "items": {
+                                      "items": {
+                                        "additionalProperties": true,
+                                        "type": "object"
+                                      },
+                                      "maxItems": 60,
+                                      "type": "array"
+                                    },
+                                    "maxItems": 12,
+                                    "type": "array"
+                                  },
+                                  "flow": {
+                                    "enum": [
+                                      "amrap",
+                                      "emom",
+                                      "for_time",
+                                      "intervals",
+                                      "rest",
+                                      "sets"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "interrupt": {
+                                    "items": {
+                                      "additionalProperties": true,
+                                      "type": "object"
+                                    },
+                                    "maxItems": 60,
+                                    "type": "array"
+                                  },
+                                  "levelNotes": {
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "mods": {
+                                    "additionalProperties": {
+                                      "type": "boolean"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "note": {
+                                    "maxLength": 2000,
+                                    "type": "string"
+                                  },
+                                  "params": {
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "preset": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "score": {
+                                    "type": "string"
+                                  },
+                                  "structs": {
+                                    "additionalProperties": {
+                                      "additionalProperties": true,
+                                      "type": "object"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "v": {
+                                    "enum": [
+                                      1
+                                    ],
+                                    "type": "integer"
+                                  }
+                                },
+                                "required": [
+                                  "blocks",
+                                  "flow",
+                                  "params",
+                                  "score",
+                                  "v"
+                                ],
+                                "title": "PlanSection",
+                                "type": "object"
+                              },
                               "rest_after_seconds": {
                                 "nullable": true,
                                 "type": "integer"
@@ -202613,6 +203960,95 @@
                                       "format": "uuid",
                                       "nullable": true,
                                       "type": "string"
+                                    },
+                                    "plan": {
+                                      "additionalProperties": true,
+                                      "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                                      "nullable": true,
+                                      "properties": {
+                                        "blocks": {
+                                          "items": {
+                                            "items": {
+                                              "additionalProperties": true,
+                                              "type": "object"
+                                            },
+                                            "maxItems": 60,
+                                            "type": "array"
+                                          },
+                                          "maxItems": 12,
+                                          "type": "array"
+                                        },
+                                        "flow": {
+                                          "enum": [
+                                            "amrap",
+                                            "emom",
+                                            "for_time",
+                                            "intervals",
+                                            "rest",
+                                            "sets"
+                                          ],
+                                          "type": "string"
+                                        },
+                                        "interrupt": {
+                                          "items": {
+                                            "additionalProperties": true,
+                                            "type": "object"
+                                          },
+                                          "maxItems": 60,
+                                          "type": "array"
+                                        },
+                                        "levelNotes": {
+                                          "additionalProperties": {
+                                            "type": "string"
+                                          },
+                                          "type": "object"
+                                        },
+                                        "mods": {
+                                          "additionalProperties": {
+                                            "type": "boolean"
+                                          },
+                                          "type": "object"
+                                        },
+                                        "note": {
+                                          "maxLength": 2000,
+                                          "type": "string"
+                                        },
+                                        "params": {
+                                          "additionalProperties": {
+                                            "type": "string"
+                                          },
+                                          "type": "object"
+                                        },
+                                        "preset": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "score": {
+                                          "type": "string"
+                                        },
+                                        "structs": {
+                                          "additionalProperties": {
+                                            "additionalProperties": true,
+                                            "type": "object"
+                                          },
+                                          "type": "object"
+                                        },
+                                        "v": {
+                                          "enum": [
+                                            1
+                                          ],
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "required": [
+                                        "blocks",
+                                        "flow",
+                                        "params",
+                                        "score",
+                                        "v"
+                                      ],
+                                      "title": "PlanSection",
+                                      "type": "object"
                                     },
                                     "rest_after_seconds": {
                                       "nullable": true,
@@ -245643,7 +247079,8 @@
                             "structured",
                             "quick_text",
                             "free_text",
-                            "sectioned_text"
+                            "sectioned_text",
+                            "structured_plan"
                           ],
                           "type": "string"
                         },
@@ -245885,6 +247322,136 @@
                                 "sections"
                               ],
                               "title": "StructuredWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "ADR-270: written in the structured WOD editor, one plan per section",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "plan"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "plan": {
+                                        "additionalProperties": true,
+                                        "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                                        "nullable": true,
+                                        "properties": {
+                                          "blocks": {
+                                            "items": {
+                                              "items": {
+                                                "additionalProperties": true,
+                                                "type": "object"
+                                              },
+                                              "maxItems": 60,
+                                              "type": "array"
+                                            },
+                                            "maxItems": 12,
+                                            "type": "array"
+                                          },
+                                          "flow": {
+                                            "enum": [
+                                              "amrap",
+                                              "emom",
+                                              "for_time",
+                                              "intervals",
+                                              "rest",
+                                              "sets"
+                                            ],
+                                            "type": "string"
+                                          },
+                                          "interrupt": {
+                                            "items": {
+                                              "additionalProperties": true,
+                                              "type": "object"
+                                            },
+                                            "maxItems": 60,
+                                            "type": "array"
+                                          },
+                                          "levelNotes": {
+                                            "additionalProperties": {
+                                              "type": "string"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "mods": {
+                                            "additionalProperties": {
+                                              "type": "boolean"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "note": {
+                                            "maxLength": 2000,
+                                            "type": "string"
+                                          },
+                                          "params": {
+                                            "additionalProperties": {
+                                              "type": "string"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "preset": {
+                                            "nullable": true,
+                                            "type": "string"
+                                          },
+                                          "score": {
+                                            "type": "string"
+                                          },
+                                          "structs": {
+                                            "additionalProperties": {
+                                              "additionalProperties": true,
+                                              "type": "object"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "v": {
+                                            "enum": [
+                                              1
+                                            ],
+                                            "type": "integer"
+                                          }
+                                        },
+                                        "required": [
+                                          "blocks",
+                                          "flow",
+                                          "params",
+                                          "score",
+                                          "v"
+                                        ],
+                                        "title": "PlanSection",
+                                        "type": "object"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "name",
+                                      "plan"
+                                    ],
+                                    "title": "PlanBodySection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "PlanWorkoutBody",
                               "type": "object"
                             }
                           ],
@@ -246851,6 +248418,95 @@
                                 "nullable": true,
                                 "type": "string"
                               },
+                              "plan": {
+                                "additionalProperties": true,
+                                "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                                "nullable": true,
+                                "properties": {
+                                  "blocks": {
+                                    "items": {
+                                      "items": {
+                                        "additionalProperties": true,
+                                        "type": "object"
+                                      },
+                                      "maxItems": 60,
+                                      "type": "array"
+                                    },
+                                    "maxItems": 12,
+                                    "type": "array"
+                                  },
+                                  "flow": {
+                                    "enum": [
+                                      "amrap",
+                                      "emom",
+                                      "for_time",
+                                      "intervals",
+                                      "rest",
+                                      "sets"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "interrupt": {
+                                    "items": {
+                                      "additionalProperties": true,
+                                      "type": "object"
+                                    },
+                                    "maxItems": 60,
+                                    "type": "array"
+                                  },
+                                  "levelNotes": {
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "mods": {
+                                    "additionalProperties": {
+                                      "type": "boolean"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "note": {
+                                    "maxLength": 2000,
+                                    "type": "string"
+                                  },
+                                  "params": {
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "preset": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "score": {
+                                    "type": "string"
+                                  },
+                                  "structs": {
+                                    "additionalProperties": {
+                                      "additionalProperties": true,
+                                      "type": "object"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "v": {
+                                    "enum": [
+                                      1
+                                    ],
+                                    "type": "integer"
+                                  }
+                                },
+                                "required": [
+                                  "blocks",
+                                  "flow",
+                                  "params",
+                                  "score",
+                                  "v"
+                                ],
+                                "title": "PlanSection",
+                                "type": "object"
+                              },
                               "rest_after_seconds": {
                                 "nullable": true,
                                 "type": "integer"
@@ -247667,6 +249323,95 @@
                                       "nullable": true,
                                       "type": "string"
                                     },
+                                    "plan": {
+                                      "additionalProperties": true,
+                                      "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                                      "nullable": true,
+                                      "properties": {
+                                        "blocks": {
+                                          "items": {
+                                            "items": {
+                                              "additionalProperties": true,
+                                              "type": "object"
+                                            },
+                                            "maxItems": 60,
+                                            "type": "array"
+                                          },
+                                          "maxItems": 12,
+                                          "type": "array"
+                                        },
+                                        "flow": {
+                                          "enum": [
+                                            "amrap",
+                                            "emom",
+                                            "for_time",
+                                            "intervals",
+                                            "rest",
+                                            "sets"
+                                          ],
+                                          "type": "string"
+                                        },
+                                        "interrupt": {
+                                          "items": {
+                                            "additionalProperties": true,
+                                            "type": "object"
+                                          },
+                                          "maxItems": 60,
+                                          "type": "array"
+                                        },
+                                        "levelNotes": {
+                                          "additionalProperties": {
+                                            "type": "string"
+                                          },
+                                          "type": "object"
+                                        },
+                                        "mods": {
+                                          "additionalProperties": {
+                                            "type": "boolean"
+                                          },
+                                          "type": "object"
+                                        },
+                                        "note": {
+                                          "maxLength": 2000,
+                                          "type": "string"
+                                        },
+                                        "params": {
+                                          "additionalProperties": {
+                                            "type": "string"
+                                          },
+                                          "type": "object"
+                                        },
+                                        "preset": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "score": {
+                                          "type": "string"
+                                        },
+                                        "structs": {
+                                          "additionalProperties": {
+                                            "additionalProperties": true,
+                                            "type": "object"
+                                          },
+                                          "type": "object"
+                                        },
+                                        "v": {
+                                          "enum": [
+                                            1
+                                          ],
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "required": [
+                                        "blocks",
+                                        "flow",
+                                        "params",
+                                        "score",
+                                        "v"
+                                      ],
+                                      "title": "PlanSection",
+                                      "type": "object"
+                                    },
                                     "rest_after_seconds": {
                                       "nullable": true,
                                       "type": "integer"
@@ -248060,7 +249805,8 @@
                               "structured",
                               "quick_text",
                               "free_text",
-                              "sectioned_text"
+                              "sectioned_text",
+                              "structured_plan"
                             ],
                             "type": "string"
                           },
@@ -248302,6 +250048,136 @@
                                   "sections"
                                 ],
                                 "title": "StructuredWorkoutBody",
+                                "type": "object"
+                              },
+                              {
+                                "additionalProperties": false,
+                                "description": "ADR-270: written in the structured WOD editor, one plan per section",
+                                "properties": {
+                                  "kind": {
+                                    "enum": [
+                                      "plan"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "sections": {
+                                    "items": {
+                                      "additionalProperties": false,
+                                      "properties": {
+                                        "id": {
+                                          "format": "uuid",
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "name": {
+                                          "type": "string"
+                                        },
+                                        "plan": {
+                                          "additionalProperties": true,
+                                          "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                                          "nullable": true,
+                                          "properties": {
+                                            "blocks": {
+                                              "items": {
+                                                "items": {
+                                                  "additionalProperties": true,
+                                                  "type": "object"
+                                                },
+                                                "maxItems": 60,
+                                                "type": "array"
+                                              },
+                                              "maxItems": 12,
+                                              "type": "array"
+                                            },
+                                            "flow": {
+                                              "enum": [
+                                                "amrap",
+                                                "emom",
+                                                "for_time",
+                                                "intervals",
+                                                "rest",
+                                                "sets"
+                                              ],
+                                              "type": "string"
+                                            },
+                                            "interrupt": {
+                                              "items": {
+                                                "additionalProperties": true,
+                                                "type": "object"
+                                              },
+                                              "maxItems": 60,
+                                              "type": "array"
+                                            },
+                                            "levelNotes": {
+                                              "additionalProperties": {
+                                                "type": "string"
+                                              },
+                                              "type": "object"
+                                            },
+                                            "mods": {
+                                              "additionalProperties": {
+                                                "type": "boolean"
+                                              },
+                                              "type": "object"
+                                            },
+                                            "note": {
+                                              "maxLength": 2000,
+                                              "type": "string"
+                                            },
+                                            "params": {
+                                              "additionalProperties": {
+                                                "type": "string"
+                                              },
+                                              "type": "object"
+                                            },
+                                            "preset": {
+                                              "nullable": true,
+                                              "type": "string"
+                                            },
+                                            "score": {
+                                              "type": "string"
+                                            },
+                                            "structs": {
+                                              "additionalProperties": {
+                                                "additionalProperties": true,
+                                                "type": "object"
+                                              },
+                                              "type": "object"
+                                            },
+                                            "v": {
+                                              "enum": [
+                                                1
+                                              ],
+                                              "type": "integer"
+                                            }
+                                          },
+                                          "required": [
+                                            "blocks",
+                                            "flow",
+                                            "params",
+                                            "score",
+                                            "v"
+                                          ],
+                                          "title": "PlanSection",
+                                          "type": "object"
+                                        }
+                                      },
+                                      "required": [
+                                        "id",
+                                        "name",
+                                        "plan"
+                                      ],
+                                      "title": "PlanBodySection",
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "sections"
+                                ],
+                                "title": "PlanWorkoutBody",
                                 "type": "object"
                               }
                             ],
@@ -249268,6 +251144,95 @@
                                   "nullable": true,
                                   "type": "string"
                                 },
+                                "plan": {
+                                  "additionalProperties": true,
+                                  "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                                  "nullable": true,
+                                  "properties": {
+                                    "blocks": {
+                                      "items": {
+                                        "items": {
+                                          "additionalProperties": true,
+                                          "type": "object"
+                                        },
+                                        "maxItems": 60,
+                                        "type": "array"
+                                      },
+                                      "maxItems": 12,
+                                      "type": "array"
+                                    },
+                                    "flow": {
+                                      "enum": [
+                                        "amrap",
+                                        "emom",
+                                        "for_time",
+                                        "intervals",
+                                        "rest",
+                                        "sets"
+                                      ],
+                                      "type": "string"
+                                    },
+                                    "interrupt": {
+                                      "items": {
+                                        "additionalProperties": true,
+                                        "type": "object"
+                                      },
+                                      "maxItems": 60,
+                                      "type": "array"
+                                    },
+                                    "levelNotes": {
+                                      "additionalProperties": {
+                                        "type": "string"
+                                      },
+                                      "type": "object"
+                                    },
+                                    "mods": {
+                                      "additionalProperties": {
+                                        "type": "boolean"
+                                      },
+                                      "type": "object"
+                                    },
+                                    "note": {
+                                      "maxLength": 2000,
+                                      "type": "string"
+                                    },
+                                    "params": {
+                                      "additionalProperties": {
+                                        "type": "string"
+                                      },
+                                      "type": "object"
+                                    },
+                                    "preset": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "score": {
+                                      "type": "string"
+                                    },
+                                    "structs": {
+                                      "additionalProperties": {
+                                        "additionalProperties": true,
+                                        "type": "object"
+                                      },
+                                      "type": "object"
+                                    },
+                                    "v": {
+                                      "enum": [
+                                        1
+                                      ],
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "required": [
+                                    "blocks",
+                                    "flow",
+                                    "params",
+                                    "score",
+                                    "v"
+                                  ],
+                                  "title": "PlanSection",
+                                  "type": "object"
+                                },
                                 "rest_after_seconds": {
                                   "nullable": true,
                                   "type": "integer"
@@ -250084,6 +252049,95 @@
                                         "nullable": true,
                                         "type": "string"
                                       },
+                                      "plan": {
+                                        "additionalProperties": true,
+                                        "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                                        "nullable": true,
+                                        "properties": {
+                                          "blocks": {
+                                            "items": {
+                                              "items": {
+                                                "additionalProperties": true,
+                                                "type": "object"
+                                              },
+                                              "maxItems": 60,
+                                              "type": "array"
+                                            },
+                                            "maxItems": 12,
+                                            "type": "array"
+                                          },
+                                          "flow": {
+                                            "enum": [
+                                              "amrap",
+                                              "emom",
+                                              "for_time",
+                                              "intervals",
+                                              "rest",
+                                              "sets"
+                                            ],
+                                            "type": "string"
+                                          },
+                                          "interrupt": {
+                                            "items": {
+                                              "additionalProperties": true,
+                                              "type": "object"
+                                            },
+                                            "maxItems": 60,
+                                            "type": "array"
+                                          },
+                                          "levelNotes": {
+                                            "additionalProperties": {
+                                              "type": "string"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "mods": {
+                                            "additionalProperties": {
+                                              "type": "boolean"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "note": {
+                                            "maxLength": 2000,
+                                            "type": "string"
+                                          },
+                                          "params": {
+                                            "additionalProperties": {
+                                              "type": "string"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "preset": {
+                                            "nullable": true,
+                                            "type": "string"
+                                          },
+                                          "score": {
+                                            "type": "string"
+                                          },
+                                          "structs": {
+                                            "additionalProperties": {
+                                              "additionalProperties": true,
+                                              "type": "object"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "v": {
+                                            "enum": [
+                                              1
+                                            ],
+                                            "type": "integer"
+                                          }
+                                        },
+                                        "required": [
+                                          "blocks",
+                                          "flow",
+                                          "params",
+                                          "score",
+                                          "v"
+                                        ],
+                                        "title": "PlanSection",
+                                        "type": "object"
+                                      },
                                       "rest_after_seconds": {
                                         "nullable": true,
                                         "type": "integer"
@@ -250282,7 +252336,8 @@
                             "structured",
                             "quick_text",
                             "free_text",
-                            "sectioned_text"
+                            "sectioned_text",
+                            "structured_plan"
                           ],
                           "type": "string"
                         },
@@ -250524,6 +252579,136 @@
                                 "sections"
                               ],
                               "title": "StructuredWorkoutBody",
+                              "type": "object"
+                            },
+                            {
+                              "additionalProperties": false,
+                              "description": "ADR-270: written in the structured WOD editor, one plan per section",
+                              "properties": {
+                                "kind": {
+                                  "enum": [
+                                    "plan"
+                                  ],
+                                  "type": "string"
+                                },
+                                "sections": {
+                                  "items": {
+                                    "additionalProperties": false,
+                                    "properties": {
+                                      "id": {
+                                        "format": "uuid",
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "name": {
+                                        "type": "string"
+                                      },
+                                      "plan": {
+                                        "additionalProperties": true,
+                                        "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                                        "nullable": true,
+                                        "properties": {
+                                          "blocks": {
+                                            "items": {
+                                              "items": {
+                                                "additionalProperties": true,
+                                                "type": "object"
+                                              },
+                                              "maxItems": 60,
+                                              "type": "array"
+                                            },
+                                            "maxItems": 12,
+                                            "type": "array"
+                                          },
+                                          "flow": {
+                                            "enum": [
+                                              "amrap",
+                                              "emom",
+                                              "for_time",
+                                              "intervals",
+                                              "rest",
+                                              "sets"
+                                            ],
+                                            "type": "string"
+                                          },
+                                          "interrupt": {
+                                            "items": {
+                                              "additionalProperties": true,
+                                              "type": "object"
+                                            },
+                                            "maxItems": 60,
+                                            "type": "array"
+                                          },
+                                          "levelNotes": {
+                                            "additionalProperties": {
+                                              "type": "string"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "mods": {
+                                            "additionalProperties": {
+                                              "type": "boolean"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "note": {
+                                            "maxLength": 2000,
+                                            "type": "string"
+                                          },
+                                          "params": {
+                                            "additionalProperties": {
+                                              "type": "string"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "preset": {
+                                            "nullable": true,
+                                            "type": "string"
+                                          },
+                                          "score": {
+                                            "type": "string"
+                                          },
+                                          "structs": {
+                                            "additionalProperties": {
+                                              "additionalProperties": true,
+                                              "type": "object"
+                                            },
+                                            "type": "object"
+                                          },
+                                          "v": {
+                                            "enum": [
+                                              1
+                                            ],
+                                            "type": "integer"
+                                          }
+                                        },
+                                        "required": [
+                                          "blocks",
+                                          "flow",
+                                          "params",
+                                          "score",
+                                          "v"
+                                        ],
+                                        "title": "PlanSection",
+                                        "type": "object"
+                                      }
+                                    },
+                                    "required": [
+                                      "id",
+                                      "name",
+                                      "plan"
+                                    ],
+                                    "title": "PlanBodySection",
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "sections"
+                              ],
+                              "title": "PlanWorkoutBody",
                               "type": "object"
                             }
                           ],
@@ -251490,6 +253675,95 @@
                                 "nullable": true,
                                 "type": "string"
                               },
+                              "plan": {
+                                "additionalProperties": true,
+                                "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                                "nullable": true,
+                                "properties": {
+                                  "blocks": {
+                                    "items": {
+                                      "items": {
+                                        "additionalProperties": true,
+                                        "type": "object"
+                                      },
+                                      "maxItems": 60,
+                                      "type": "array"
+                                    },
+                                    "maxItems": 12,
+                                    "type": "array"
+                                  },
+                                  "flow": {
+                                    "enum": [
+                                      "amrap",
+                                      "emom",
+                                      "for_time",
+                                      "intervals",
+                                      "rest",
+                                      "sets"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "interrupt": {
+                                    "items": {
+                                      "additionalProperties": true,
+                                      "type": "object"
+                                    },
+                                    "maxItems": 60,
+                                    "type": "array"
+                                  },
+                                  "levelNotes": {
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "mods": {
+                                    "additionalProperties": {
+                                      "type": "boolean"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "note": {
+                                    "maxLength": 2000,
+                                    "type": "string"
+                                  },
+                                  "params": {
+                                    "additionalProperties": {
+                                      "type": "string"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "preset": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "score": {
+                                    "type": "string"
+                                  },
+                                  "structs": {
+                                    "additionalProperties": {
+                                      "additionalProperties": true,
+                                      "type": "object"
+                                    },
+                                    "type": "object"
+                                  },
+                                  "v": {
+                                    "enum": [
+                                      1
+                                    ],
+                                    "type": "integer"
+                                  }
+                                },
+                                "required": [
+                                  "blocks",
+                                  "flow",
+                                  "params",
+                                  "score",
+                                  "v"
+                                ],
+                                "title": "PlanSection",
+                                "type": "object"
+                              },
                               "rest_after_seconds": {
                                 "nullable": true,
                                 "type": "integer"
@@ -252305,6 +254579,95 @@
                                       "format": "uuid",
                                       "nullable": true,
                                       "type": "string"
+                                    },
+                                    "plan": {
+                                      "additionalProperties": true,
+                                      "description": "ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach)",
+                                      "nullable": true,
+                                      "properties": {
+                                        "blocks": {
+                                          "items": {
+                                            "items": {
+                                              "additionalProperties": true,
+                                              "type": "object"
+                                            },
+                                            "maxItems": 60,
+                                            "type": "array"
+                                          },
+                                          "maxItems": 12,
+                                          "type": "array"
+                                        },
+                                        "flow": {
+                                          "enum": [
+                                            "amrap",
+                                            "emom",
+                                            "for_time",
+                                            "intervals",
+                                            "rest",
+                                            "sets"
+                                          ],
+                                          "type": "string"
+                                        },
+                                        "interrupt": {
+                                          "items": {
+                                            "additionalProperties": true,
+                                            "type": "object"
+                                          },
+                                          "maxItems": 60,
+                                          "type": "array"
+                                        },
+                                        "levelNotes": {
+                                          "additionalProperties": {
+                                            "type": "string"
+                                          },
+                                          "type": "object"
+                                        },
+                                        "mods": {
+                                          "additionalProperties": {
+                                            "type": "boolean"
+                                          },
+                                          "type": "object"
+                                        },
+                                        "note": {
+                                          "maxLength": 2000,
+                                          "type": "string"
+                                        },
+                                        "params": {
+                                          "additionalProperties": {
+                                            "type": "string"
+                                          },
+                                          "type": "object"
+                                        },
+                                        "preset": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "score": {
+                                          "type": "string"
+                                        },
+                                        "structs": {
+                                          "additionalProperties": {
+                                            "additionalProperties": true,
+                                            "type": "object"
+                                          },
+                                          "type": "object"
+                                        },
+                                        "v": {
+                                          "enum": [
+                                            1
+                                          ],
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "required": [
+                                        "blocks",
+                                        "flow",
+                                        "params",
+                                        "score",
+                                        "v"
+                                      ],
+                                      "title": "PlanSection",
+                                      "type": "object"
                                     },
                                     "rest_after_seconds": {
                                       "nullable": true,

@@ -3,6 +3,7 @@ import type { components } from "@/api/generated/schema";
 import type { WorkoutContentEntry } from "@/components/workouts/WorkoutContent";
 import type { WorkoutDslVocabulary } from "@/lib/workout-dsl-suggestions";
 import type { FreeTextTimerPreset } from "@/lib/free-text-timer";
+import type { PlanSection } from "@/lib/structured-plan/types";
 import type { LoadMode, LoadProgression, PrescriptionUnit, WorkoutType } from "@/types/workout";
 
 export type ScaleLevel = {
@@ -146,6 +147,12 @@ export type WorkoutSectionRecord = {
   free_text_document?: Record<string, unknown> | null;
   /** ADR-180: the timer the coach picked for this text section. */
   timer_preset?: FreeTextTimerPreset | null;
+  /**
+   * ADR-270: the section's plan from the structured WOD editor, the source of
+   * truth of a `structured_plan` workout (its `exercises` are materialised
+   * from it on save). Null in every other mode.
+   */
+  plan?: PlanSection | null;
   exercises: WorkoutExerciseRecord[];
 };
 
@@ -186,15 +193,21 @@ export type WorkoutBody =
         scoreable: boolean;
         exercises: WorkoutExerciseRecord[];
       }>;
-    };
+    }
+  /** ADR-270: written in the structured WOD editor, one plan per section. */
+  | { kind: "plan"; sections: Array<{ id: string | null; name: string; plan: PlanSection | null }> };
 
 export type WorkoutBodySummary =
   | { kind: "free_text"; excerpt: string | null; timer: Record<string, unknown> | null; structured: boolean }
   | { kind: "text_sections"; sections: Array<{ title: string | null; excerpt: string | null; timer: FreeTextTimerPreset | null; scored: boolean }> }
-  | { kind: "structured"; sections: Array<{ name: string; timer: Record<string, unknown> | null; exercise_count: number }> };
+  | { kind: "structured"; sections: Array<{ name: string; timer: Record<string, unknown> | null; exercise_count: number }> }
+  | { kind: "plan"; sections: Array<{ name: string; flow: PlanSection["flow"] | null; exercise_count: number }> };
 
-/** How a workout was written; `sectioned_text` = text sections without the assistant (ADR-180). */
-export type WorkoutAuthoringMode = "structured" | "quick_text" | "free_text" | "sectioned_text";
+/**
+ * How a workout was written; `sectioned_text` = text sections without the
+ * assistant (ADR-180), `structured_plan` = the structured WOD editor (ADR-270).
+ */
+export type WorkoutAuthoringMode = "structured" | "quick_text" | "free_text" | "sectioned_text" | "structured_plan";
 
 export type WorkoutRecord = {
   id: string;

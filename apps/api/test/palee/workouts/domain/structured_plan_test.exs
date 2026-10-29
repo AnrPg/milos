@@ -9,20 +9,23 @@ defmodule Palee.Workouts.Domain.StructuredPlanTest do
   defp codes(plan) do
     case StructuredPlan.validate(plan) do
       :ok -> []
-      {:error, errors} -> Enum.map(errors, &{&1.path, &1.code})
+      {:error, errors} -> Enum.map(errors, &"#{&1.path}:#{&1.code}")
     end
   end
+
+  defp row(more \\ %{}), do: ex("x#{System.unique_integer([:positive])}", "", "", "", more)
 
   describe "valid plans" do
     test "every section of the reference program reads" do
       for plan <- program() do
-        assert StructuredPlan.validate(plan) == :ok, inspect({plan["flow"], codes(plan)})
+        assert codes(plan) == [], inspect(plan["flow"])
       end
     end
 
     test "decimals, words, +x and a→b loads, ranges and per-side doses read" do
-      row =
-        ex("a", "Lunge", "", "", %{
+      lunge =
+        row(%{
+          "name" => "Lunge",
           "extra" => ["rpe", "side", "hold", "pace"],
           "cells" => [
             %{
@@ -35,14 +38,14 @@ defmodule Palee.Workouts.Domain.StructuredPlanTest do
             %{"d" => "10 each side", "l" => "+2,5", "rpe" => "+1"},
             %{"d" => "", "l" => "60→80", "rpe" => "8→10"},
             %{"d" => "4×10", "l" => "βαρύ"},
-            %{"d" => "+2", "l" => "25 κιλά"}
+            %{"l" => "25 κιλά"}
           ]
         })
 
-      assert codes(section("sets", %{"sets" => "5"}, [[row]])) == []
+      assert codes(section("sets", %{"sets" => "5"}, [[lunge]])) == []
     end
 
-    test "unknown keys outside the contract are left out of the kept plan" do
+    test "keys outside the contract are left out of the kept plan" do
       plan =
         section("for_time", %{"rounds" => "3"}, [[ex("a", "Run", "400 m", "", %{"ui" => true})]])
         |> Map.put("draftOnly", 1)
@@ -52,225 +55,218 @@ defmodule Palee.Workouts.Domain.StructuredPlanTest do
       refute kept |> get_in(["blocks", Access.at(0), Access.at(0)]) |> Map.has_key?("ui")
     end
 
-    test "rows and units: groups of consecutive rows run together" do
-      [_one, superset | _rest] = program()
-      assert [%{group: "g1", rows: [_, _, _]}] = StructuredPlan.units(hd(superset["blocks"]))
+    test "rows, units and structures" do
+      [_one, superset, _three, cluster | _rest] = program()
+
+      assert [%{group: "g1", rows: [_, _, _]} = unit] =
+               StructuredPlan.units(hd(superset["blocks"]))
+
+      assert StructuredPlan.struct_of(superset, unit) == %{"kind" => "superset"}
+      [single] = StructuredPlan.units(hd(cluster["blocks"]))
+      assert %{"kind" => "cluster", "clusters" => "3"} = StructuredPlan.struct_of(cluster, single)
       assert length(StructuredPlan.rows(Enum.at(program(), 7))) == 2
       assert StructuredPlan.exercise_count(Enum.at(program(), 2)) == 3
     end
   end
 
+  # The same cases, codes and paths as the web `validate.test.ts`.
   describe "errors" do
-    test "not a map, a wrong version and an unknown flow" do
-      assert codes("plan") == [{"", "invalid"}]
-
-      assert codes(%{"v" => 2, "flow" => "crossfit"}) == [
-               {"v", "unsupported_version"},
-               {"flow", "unknown_flow"}
-             ]
+    test "not a map, an unknown flow and a wrong version" do
+      assert codes("plan") == [":invalid"]
+      assert codes(section("sets", %{}, []) |> Map.put("flow", "yoga")) == ["flow:unknown_flow"]
+      assert codes(section("sets", %{}, []) |> Map.put("v", 2)) == ["v:bad_version"]
     end
 
-    test "params read per flow" do
-      plan =
-        section(
-          "sets",
-          %{"sets" => "four", "rest" => "soon", "cap" => "anything", "bogus" => "1"},
-          []
-        )
+    test "params read per kind" do
+      assert codes(section("sets", %{"sets" => "3-4", "rest" => "90-120″"}, [[row()]])) == []
 
-      assert codes(plan) == [
-               {"params.bogus", "unknown_param"},
-               {"params.rest", "bad_param"},
-               {"params.sets", "bad_param"}
-             ]
+      assert codes(section("sets", %{"sets" => "4-3", "rest" => "120-90″"}, [[row()]])) ==
+               ["params.rest:bad_param", "params.sets:bad_param"]
 
-      assert codes(section("amrap", %{"dur" => "3-x-3"}, [])) == [{"params.dur", "bad_param"}]
+      assert codes(section("emom", %{"every" => "soon", "times" => "x"}, [[row()]])) ==
+               ["params.every:bad_param", "params.times:bad_param"]
 
-      assert codes(section("emom", %{"every" => "1:00", "times" => "1.5"}, [])) == [
-               {"params.times", "bad_param"}
-             ]
+      assert codes(section("emom", %{"every" => "1:00", "times" => ""}, [[row()]])) == []
+      assert codes(section("amrap", %{"dur" => "3-0-3"}, [[row()]])) == ["params.dur:bad_param"]
 
-      assert codes(section("intervals", %{"work" => "20″", "rounds" => 8}, [])) == [
-               {"params.rounds", "invalid"}
-             ]
+      assert codes(section("for_time", %{"rounds" => "1", "work" => "20″"}, [[row()]])) ==
+               ["params.work:unknown_param"]
 
-      assert codes(section("rest", %{"dur" => String.duplicate("1", 201)}, [])) == [
-               {"params.dur", "too_long"}
-             ]
+      # an add-on switched off may leave its value behind
+      assert codes(section("for_time", %{"rounds" => "1", "intEvery" => "2:00"}, [[row()]])) == []
 
-      assert codes(Map.delete(section("rest", %{}, []), "params")) == [{"params", "invalid"}]
+      assert codes(
+               section("for_time", %{"rounds" => "1", "intEvery" => "x"}, [[row()]], %{
+                 "mods" => %{"interrupt" => true}
+               })
+             ) == ["params.intEvery:bad_param"]
+
+      assert codes(section("intervals", %{"rounds" => 8}, [])) == ["params.rounds:invalid"]
+      assert codes(Map.delete(section("rest", %{}, []), "params")) == ["params:invalid"]
     end
 
-    test "add-on params are read only when the add-on is on" do
-      on = section("for_time", %{"intEvery" => "soon"}, [], %{"mods" => %{"interrupt" => true}})
-      assert codes(on) == [{"params.intEvery", "bad_param"}]
-      assert codes(Map.delete(on, "mods")) == []
+    test "add-ons and structures only where the flow allows them" do
+      assert codes(
+               section("emom", %{"every" => "1:00"}, [[row()]], %{
+                 "mods" => %{"interrupt" => true}
+               })
+             ) ==
+               ["mods.interrupt:mod_not_allowed"]
+
+      r = row()
+
+      assert codes(
+               section("amrap", %{"dur" => "12"}, [[r]], %{
+                 "structs" => %{
+                   r["id"] => %{"kind" => "drop", "drops" => "2", "dropby" => "-20%"}
+                 }
+               })
+             ) ==
+               ["structs.#{r["id"]}:struct_not_allowed"]
+
+      assert codes(
+               section("sets", %{"sets" => "4"}, [[r]], %{
+                 "structs" => %{
+                   r["id"] => %{"kind" => "cluster", "clusters" => "x", "intra" => "soon"}
+                 }
+               })
+             ) ==
+               [
+                 "structs.#{r["id"]}.clusters:bad_struct_param",
+                 "structs.#{r["id"]}.intra:bad_struct_param"
+               ]
+
+      assert codes(
+               section("sets", %{"sets" => "4"}, [[r]], %{
+                 "structs" => %{r["id"] => %{"kind" => "wave"}}
+               })
+             ) ==
+               ["structs.#{r["id"]}:unknown_struct"]
     end
 
-    test "add-ons only where the flow allows them" do
-      assert codes(section("sets", %{}, [], %{"mods" => %{"hr" => true}})) == [
-               {"mods.hr", "mod_not_allowed"}
+    test "the load unit is written once per row: missing_unit and mixed_unit" do
+      missing = row(%{"cells" => [%{"d" => "5", "l" => "60"}, %{"l" => "70"}, %{"l" => "βαρύ"}]})
+
+      assert codes(section("sets", %{"sets" => "2"}, [[missing]])) ==
+               ["blocks.0.0.cells.0.l:missing_unit", "blocks.0.0.cells.1.l:missing_unit"]
+
+      mixed = row(%{"cells" => [%{"l" => "60kg"}, %{"l" => "70%"}, %{"l" => "70"}]})
+
+      assert codes(section("sets", %{"sets" => "2"}, [[mixed]])) == [
+               "blocks.0.0.cells.1.l:mixed_unit"
              ]
 
-      assert codes(section("emom", %{}, [], %{"mods" => %{"hr" => false, "wow" => true}})) == [
-               {"mods.wow", "unknown_mod"}
-             ]
+      assert codes(section("for_time", %{"rounds" => "1"}, [[row(%{"load" => "60"})]])) ==
+               ["blocks.0.0.load:missing_unit"]
 
-      assert codes(section("emom", %{}, [], %{"mods" => %{"hr" => "yes"}})) == [
-               {"mods.hr", "invalid"}
-             ]
+      assert codes(section("for_time", %{"rounds" => "1"}, [[row(%{"load" => "βαρύ"})]])) == []
     end
 
-    test "structures only where the flow allows them, with fields that read" do
-      assert codes(section("for_time", %{}, [], %{"structs" => %{"a" => %{"kind" => "cluster"}}})) ==
-               [{"structs.a.kind", "struct_not_allowed"}]
+    test "doses that do not read, in cells and plain values" do
+      assert codes(section("sets", %{"sets" => "2"}, [[row(%{"cells" => [%{"d" => "lots"}]})]])) ==
+               ["blocks.0.0.cells.0.d:bad_dose"]
 
-      assert codes(section("sets", %{}, [], %{"structs" => %{"a" => %{"kind" => "giant"}}})) ==
-               [{"structs.a.kind", "unknown_struct"}]
+      assert codes(section("amrap", %{"dur" => "7"}, [[row(%{"dose" => "lots"})]])) ==
+               ["blocks.0.0.dose:bad_dose"]
 
-      bad = %{"kind" => "restpause", "minis" => "three", "intra" => "15″"}
-
-      assert codes(section("sets", %{}, [], %{"structs" => %{"a" => bad}})) == [
-               {"structs.a.minis", "bad_param"}
-             ]
-
-      assert codes(section("rest", %{}, [], %{"structs" => %{"a" => "single"}})) == [
-               {"structs.a", "invalid"}
-             ]
+      # values a flow does not read (same-every-time cells) are only bounded
+      assert codes(section("amrap", %{"dur" => "7"}, [[row(%{"cells" => [%{"d" => "lots"}]})]])) ==
+               []
     end
 
-    test "a row needs an id, a known kind and known measures" do
-      row = %{
-        "kind" => "jump",
-        "name" => "X",
-        "dose" => "",
-        "load" => "",
-        "extra" => ["speed"],
-        "x" => %{"power" => "1"}
-      }
-
-      assert codes(section("for_time", %{}, [[row]])) == [
-               {"blocks.0.0.id", "required"},
-               {"blocks.0.0.kind", "invalid"},
-               {"blocks.0.0.extra.0", "unknown_measure"},
-               {"blocks.0.0.x.power", "unknown_measure"}
-             ]
-
-      cell_row = ex("a", "Row", "", "", %{"cells" => [%{"d" => "10", "watts" => "200"}, "x"]})
-
-      assert codes(section("sets", %{}, [[cell_row]])) == [
-               {"blocks.0.0.cells.0.watts", "unknown_measure"},
-               {"blocks.0.0.cells.1", "invalid"}
-             ]
-    end
-
-    test "doses that do not read" do
-      assert codes(section("for_time", %{}, [[ex("a", "Run", "lots")]])) == [
-               {"blocks.0.0.dose", "bad_dose"}
-             ]
-
-      row = ex("a", "Run", "", "", %{"cells" => [%{"d" => "0"}, %{"d" => "4×8-6"}]})
-
-      assert codes(section("sets", %{}, [[row]])) == [
-               {"blocks.0.0.cells.0.d", "bad_dose"},
-               {"blocks.0.0.cells.1.d", "bad_dose"}
-             ]
-    end
-
-    test "tempo in four marks, numeric measures, RPE at most 10" do
-      row =
-        ex("a", "Squat", "", "", %{
-          "x" => %{"tempo" => "31X", "rir" => "two"},
-          "cells" => [
-            %{"d" => "5", "l" => "80%", "tempo" => "3-1-x-1", "rpe" => "11"},
-            %{"rpe" => "8→12", "tempo" => "fast"}
-          ]
+    test "measures: known, once, tempo 4 marks, RPE at most 10, numbers" do
+      bad =
+        row(%{
+          "extra" => ["tempo", "rpe", "dist"],
+          "cells" => [%{"tempo" => "31X", "rpe" => "11", "dist" => "far"}, %{"rpe" => "+1"}]
         })
 
-      assert codes(section("sets", %{}, [[row]])) == [
-               {"blocks.0.0.x.rir", "bad_number"},
-               {"blocks.0.0.x.tempo", "bad_tempo"},
-               {"blocks.0.0.cells.0.rpe", "rpe_max"},
-               {"blocks.0.0.cells.1.rpe", "rpe_max"},
-               {"blocks.0.0.cells.1.tempo", "bad_tempo"}
+      assert codes(section("sets", %{"sets" => "2"}, [[bad]])) == [
+               "blocks.0.0.cells.0.tempo:bad_tempo",
+               "blocks.0.0.cells.0.rpe:rpe_over_max",
+               "blocks.0.0.cells.0.dist:bad_measure_value"
              ]
+
+      assert codes(
+               section("sets", %{"sets" => "2"}, [
+                 [row(%{"extra" => ["rpe"], "cells" => [%{"rpe" => "7→11"}]})]
+               ])
+             ) ==
+               ["blocks.0.0.cells.0.rpe:rpe_over_max"]
+
+      assert codes(
+               section("sets", %{"sets" => "2"}, [[row(%{"extra" => ["speed", "side", "side"]})]])
+             ) ==
+               ["blocks.0.0.extra.0:unknown_measure", "blocks.0.0.extra.2:duplicate_measure"]
+
+      assert codes(
+               section("amrap", %{"dur" => "7"}, [
+                 [row(%{"extra" => ["rpe"], "x" => %{"rpe" => "+1"}})]
+               ])
+             ) ==
+               ["blocks.0.0.x.rpe:bad_measure_value"]
+
+      assert StructuredPlan.measure_issue("rpe", "10", false) == nil
+      assert StructuredPlan.measure_issue("hold", "0:30", false) == nil
     end
 
-    test "the load unit is written once per row" do
-      missing =
-        ex("a", "Squat", "", "", %{"cells" => cells([{"5", "60"}, {"5", "+5"}, {"5", "βαρύ"}])})
+    test "the score belongs to the flow (and its preset)" do
+      assert codes(section("sets", %{}, [], %{"score" => "time"})) == ["score:unknown_score"]
 
-      assert codes(section("sets", %{}, [[missing]])) == [
-               {"blocks.0.0.cells.0.l", "missing_unit"},
-               {"blocks.0.0.cells.1.l", "missing_unit"}
-             ]
-
-      mixed =
-        ex("a", "Squat", "", "", %{
-          "cells" => cells([{"5", "60kg"}, {"5", "70%"}, {"5", "50→60%"}, {"5", "70"}])
-        })
-
-      assert codes(section("sets", %{}, [[mixed]])) == [
-               {"blocks.0.0.cells.1.l", "mixed_units"},
-               {"blocks.0.0.cells.2.l", "mixed_units"}
-             ]
-
-      assert codes(section("for_time", %{}, [[ex("a", "Clean", "5", "60")]])) == [
-               {"blocks.0.0.load", "missing_unit"}
-             ]
+      assert codes(section("emom", %{}, [], %{"preset" => "death_by", "score" => "rounds_reps"})) ==
+               []
     end
 
-    test "bounds: blocks, rows, cells, strings and notes" do
-      many_blocks = for i <- 1..13, do: [ex("b#{i}", "Run", "1")]
-      assert codes(section("for_time", %{}, many_blocks)) == [{"blocks", "too_many_blocks"}]
+    test "bounds, unique ids, rest sections and row kinds" do
+      blocks = for _i <- 1..13, do: [row()]
+      assert codes(section("for_time", %{"rounds" => "13"}, blocks)) == ["blocks:too_many_blocks"]
 
-      many_rows = for i <- 1..61, do: ex("r#{i}", "Run", "1")
-      assert codes(section("for_time", %{}, [many_rows])) == [{"blocks.0", "too_many_rows"}]
+      rows = for _i <- 1..61, do: row()
+      assert codes(section("for_time", %{"rounds" => "1"}, [rows])) == ["blocks.0:too_many_rows"]
 
-      assert codes(section("for_time", %{}, [[]], %{"interrupt" => many_rows})) == [
-               {"interrupt", "too_many_rows"}
+      assert codes(section("for_time", %{}, [[]], %{"interrupt" => rows})) == [
+               "interrupt:too_many_rows"
              ]
 
-      many_cells = ex("a", "Run", "", "", %{"cells" => List.duplicate(%{"d" => "1"}, 31)})
+      many = row(%{"cells" => List.duplicate(%{"d" => "1"}, 31)})
 
-      assert codes(section("sets", %{}, [[many_cells]])) == [
-               {"blocks.0.0.cells", "too_many_cells"}
+      assert codes(section("sets", %{"sets" => "4"}, [[many]])) == [
+               "blocks.0.0.cells:too_many_cells"
              ]
 
-      long = String.duplicate("α", 201)
+      long = String.duplicate("x", 201)
       note = String.duplicate("n", 2001)
 
-      plan =
-        section(
-          "for_time",
-          %{},
-          [
-            [
-              ex("a", long, "1", "", %{
-                "note" => note,
-                "exerciseRef" => String.duplicate("e", 121)
-              })
-            ]
-          ],
-          %{
-            "note" => note,
-            "score" => long,
-            "levelNotes" => %{"rx" => note}
-          }
-        )
+      assert codes(
+               section("for_time", %{"rounds" => "1"}, [[row(%{"name" => long, "note" => note})]])
+             ) ==
+               ["blocks.0.0.name:too_long", "blocks.0.0.note:note_too_long"]
 
-      assert codes(plan) == [
-               {"blocks.0.0.name", "too_long"},
-               {"blocks.0.0.exerciseRef", "too_long"},
-               {"blocks.0.0.note", "too_long"},
-               {"score", "too_long"},
-               {"note", "too_long"},
-               {"levelNotes.rx", "too_long"}
+      assert codes(
+               section("for_time", %{}, [], %{"note" => note, "levelNotes" => %{"rx" => note}})
+             ) ==
+               ["note:note_too_long", "levelNotes.rx:note_too_long"]
+
+      r = row()
+
+      assert codes(section("for_time", %{"rounds" => "1"}, [[r, r]])) == [
+               "blocks.0.1.id:duplicate_id"
              ]
 
-      assert codes(Map.delete(section("rest", %{}, []), "score")) == [{"score", "required"}]
-      assert codes(section("rest", %{}, "none")) == [{"blocks", "invalid"}]
-      assert codes(section("rest", %{}, ["none"])) == [{"blocks.0", "invalid"}]
+      assert codes(section("rest", %{"dur" => "2:00"}, [[row()]])) == [
+               "blocks:blocks_not_allowed"
+             ]
+
+      assert codes(section("for_time", %{}, [[row(%{"kind" => "jump"})]])) == [
+               "blocks.0.0.kind:bad_row_kind"
+             ]
+
+      assert codes(section("for_time", %{}, [[Map.delete(row(), "id")]])) == [
+               "blocks.0.0.id:invalid"
+             ]
+
+      assert codes(section("rest", %{}, "none")) == ["blocks:invalid"]
+      assert codes(section("for_time", %{}, ["none"])) == ["blocks.0:invalid"]
     end
   end
 

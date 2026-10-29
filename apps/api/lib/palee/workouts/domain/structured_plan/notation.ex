@@ -64,8 +64,9 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Notation do
   end
 
   @doc "Several times (\"3-3-3-4\", \"90-120″\"): `%{range: bool, secs: [..]}`, `nil` or `:bad`."
-  @spec parse_times(String.t()) :: %{range: boolean(), secs: [pos_integer()]} | nil | :bad
-  def parse_times(text) when is_binary(text) do
+  @spec parse_times(String.t(), :min | :smart) ::
+          %{range: boolean(), secs: [pos_integer()]} | nil | :bad
+  def parse_times(text, default \\ :min) when is_binary(text) do
     value = text |> String.trim() |> String.downcase()
 
     if value == "" do
@@ -82,7 +83,7 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Notation do
         |> String.split(~r/\s*[-–,]\s*/u)
         |> Enum.map(fn part ->
           part = if unit && Regex.match?(~r/^\d+$/, part), do: part <> unit, else: part
-          parse_clock(part, :min)
+          parse_clock(part, default)
         end)
 
       if Enum.all?(secs, &(is_integer(&1) and &1 > 0)) do
@@ -281,7 +282,7 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Notation do
 
   @doc """
   The load unit of a row, written once (kg or %), and the columns whose load
-  breaks the rule: `%{unit: "kg" | "%" | nil, issues: %{index => :missing_unit | :mixed_units}}`.
+  breaks the rule: `%{unit: "kg" | "%" | nil, issues: %{index => :missing_unit | :mixed_unit}}`.
   Empty columns and words never have an issue.
   """
   @spec row_load_issues([String.t() | nil]) :: %{unit: String.t() | nil, issues: map()}
@@ -309,12 +310,10 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Notation do
 
   defp load_issue(match, unit, index, acc) do
     stated = stated_unit(match)
-    units = match |> Enum.drop(1) |> Enum.filter(&(&1 in ["kg", "%"])) |> Enum.uniq()
 
     cond do
       is_nil(unit) -> Map.put(acc, index, :missing_unit)
-      length(units) > 1 -> Map.put(acc, index, :mixed_units)
-      stated && stated != unit -> Map.put(acc, index, :mixed_units)
+      stated && stated != unit -> Map.put(acc, index, :mixed_unit)
       true -> acc
     end
   end
@@ -364,9 +363,80 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Notation do
 
   defp stated_unit(_match), do: nil
 
+  @doc """
+  Load or intensity as written in one field: `%{kind: :bw}`, `%{kind: :rpe, min, max}`,
+  `%{kind: :zone, zone}`, `%{kind: :pace, per, secs}`, `%{kind: :kg | :pct, entries, up}`
+  or `%{kind: :text, text}`. Never fails: anything else is the coach's words.
+  """
+  @spec parse_load(String.t() | nil) :: map() | nil
+  def parse_load(text) when is_binary(text) do
+    value = text |> String.trim() |> String.downcase() |> String.replace(~r/\s+/u, " ")
+
+    cond do
+      value == "" ->
+        nil
+
+      value in ["bw", "σβ", "body", "bodyweight", "σωματικό βάρος"] ->
+        %{kind: :bw}
+
+      match = Regex.run(~r/^rpe\s*(\d+(?:\.\d)?)(?:\s*-\s*(\d+(?:\.\d)?))?$/u, value) ->
+        [_all, min | rest] = match
+        %{kind: :rpe, min: to_num(min), max: to_num(List.first(rest) || min)}
+
+      match = Regex.run(~r/^(?:z|zone|ζώνη|ζωνη)\s*([1-5])$/u, value) ->
+        %{kind: :zone, zone: String.to_integer(Enum.at(match, 1))}
+
+      match = Regex.run(~r/^(\d+:\d{2})\s*\/\s*(500m|500|km|100m|mi)$/u, value) ->
+        [_all, secs, per] = match
+        %{kind: :pace, per: if(per == "500", do: "500m", else: per), secs: to_num(secs)}
+
+      true ->
+        amount_load(value, String.trim(text))
+    end
+  end
+
+  def parse_load(_text), do: nil
+
+  defp amount_load(value, original) do
+    {value, up} =
+      if Regex.match?(~r/(\+|↑)$/u, value),
+        do: {value |> String.replace(~r/(\+|↑)$/u, "") |> String.trim(), true},
+        else: {value, false}
+
+    with [{at, _length}, {unit_at, unit_length}] <-
+           Regex.run(~r/\s*(kg|κιλά|κιλα|%)$/u, value, return: :index),
+         numbers =
+           value
+           |> binary_part(0, at)
+           |> String.trim()
+           |> String.replace(~r/(\d),(\d)$/u, "\\1.\\2"),
+         %{entries: entries, cont: false} <- parse_nums(numbers) do
+      kind = if binary_part(value, unit_at, unit_length) == "%", do: :pct, else: :kg
+      %{kind: kind, entries: entries, up: up}
+    else
+      _words -> %{kind: :text, text: original}
+    end
+  end
+
   @doc "A tempo: four marks, digits or X (\"31X1\", \"3-1-X-1\")."
   @spec tempo?(String.t()) :: boolean()
   def tempo?(text), do: Regex.match?(@tempo, String.trim(text))
+
+  @doc "A tempo's four marks (seconds, or \"X\" = explosive), or nil."
+  @spec tempo_parts(String.t()) :: %{down: mark, bottom: mark, up: mark, top: mark} | nil
+        when mark: non_neg_integer() | String.t()
+  def tempo_parts(text) do
+    case Regex.run(@tempo, String.trim(text)) do
+      [_all, down, bottom, up, top] ->
+        %{down: mark(down), bottom: mark(bottom), up: mark(up), top: mark(top)}
+
+      nil ->
+        nil
+    end
+  end
+
+  defp mark(char) when char in ["x", "X"], do: "X"
+  defp mark(char), do: String.to_integer(char)
 
   @doc "A value relative to the column before (\"+5\", \"-0:05\") or spread to the last (\"60→80\")."
   @spec relative?(String.t()) :: boolean()
