@@ -121,9 +121,47 @@ wall from ever disagreeing on who may appear.
 - Overrides do not expire by a job: the TV gets `focus.until` and reads
   `/today` again then; staff see the override as gone once it lapses.
 - Coaches cannot pin a screen unless their role has `manage_settings` or
-  `manage_locations` (an open question for the product owner).
+  `manage_locations` (an open question for the product owner; answered by
+  the update of 2026-10-29 below).
 
 ## Implementation Notes
 - Migration `20270209000000_create_box_screens`.
 - Tenant data: `box_screens` is purged (order 6), the code hash never
   exported.
+
+## Update 2026-10-29: the class's coach puts their class on the screen
+Product-owner decision of 2026-10-29 (it answers the open question under
+Consequences): a coach may change and pin what a box screen shows, but only
+for their own class, from where they run it.
+
+1. **Rule** (`BoxScreens.Domain.ClassScreenPolicy`, pure). A coach may pin
+   `timer`, `leaderboard` or `wod` of a class when they coach it
+   (`scheduled_classes.coach_user_id`), it is held today on the box's clock
+   and not cancelled, and the screen is of the class's branch or the whole
+   box (a whole-box class shows on every screen, as in Decision 5). The pin
+   always carries the class's `slot_id`, so it falls back to automatic when
+   the class leaves today's screen (Decision 8); `until` is allowed as for
+   staff. A coach returns a screen to automatic («Επιστροφή στο
+   αυτόματο») only while nothing is pinned or what is pinned is their
+   class; they may pin over another choice. A coach of another class, a
+   coach on another branch's screen or for another day's class, and
+   members get 403 `forbidden`; a view a coach may not pin is 422
+   `invalid_screen_override`.
+2. **Staff rights unchanged.** `manage_settings` / `manage_locations` keep
+   Staff › Box screens and may use the new endpoints for any screen of
+   their branches with any view (branch-scoped staff as in Decision 11).
+3. **Endpoints** (signed-in members of the box, next to the class timer
+   remote; the service decides): `GET
+   /api/org/:slug/class-timers/:slot_id/screens` (`{screens, views}`: the
+   screens the person may change for that class), `PUT` and `DELETE
+   /api/org/:slug/class-timers/:slot_id/screens/:screen_id/override`
+   (`{view, until?}`). Same signals as the staff override: the paired TV
+   hears it at once and the console shows who changed it.
+4. **UI.** The class timer remote (`/class-timer/:slot_id/control`) gets
+   «Στην οθόνη» («On screen»): a dialog with the class's screens, what each
+   shows, the three choices and «Επιστροφή στο αυτόματο». It is hidden when
+   no screen can show the class. Coaches never get the settings page.
+5. **Layers.** `Application.BoxScreens.ClassScreens` (one service for
+   `ClassScreenController`); the screen view and the TV announcement moved
+   to `Application.BoxScreens.ScreenPresenter`, shared with
+   `BoxScreenAdmin`.

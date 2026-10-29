@@ -179,6 +179,43 @@ defmodule PaleeWeb.Schemas.BoxScreens do
     }
   end
 
+  # ── One class, from its timer remote ────────────────────────────────────
+
+  def class_screen_list do
+    %Schema{
+      title: "ClassScreenList",
+      type: :object,
+      description:
+        "The box screens the person may change for this class: its coach (today, screens " <>
+          "of the class's branch or the whole box) or staff who manage screens",
+      properties: %{
+        screens: %Schema{type: :array, items: screen()},
+        views: %Schema{
+          type: :array,
+          description: "What the person may pin: a coach `timer`, `leaderboard` and `wod`",
+          items: %Schema{type: :string, enum: @override_views}
+        }
+      },
+      required: [:screens, :views]
+    }
+  end
+
+  def class_override_request do
+    %Schema{
+      type: :object,
+      properties: %{
+        view: %Schema{type: :string, enum: @override_views},
+        until: %Schema{
+          type: :string,
+          format: :"date-time",
+          nullable: true,
+          description: "When the screen goes back to automatic (within 24 hours); null to keep it"
+        }
+      },
+      required: [:view]
+    }
+  end
+
   # ── TV ──────────────────────────────────────────────────────────────────
 
   def pair_request do

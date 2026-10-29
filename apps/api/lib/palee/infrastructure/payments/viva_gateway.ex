@@ -133,7 +133,10 @@ defmodule Palee.Infrastructure.Payments.VivaGateway do
            failure: failure(body["statusId"], body["errorText"]),
            # ADR-249: the merchant reference and time, to tie a terminal sale to its request.
            reference: body["merchantTrns"],
-           created_at: parse_time(body["insDate"])
+           created_at: parse_time(body["insDate"]),
+           # ADR-264: the parts of `amount` that are a tip and a card surcharge.
+           tip_cents: Http.cents(body["tipAmount"]) || 0,
+           surcharge_cents: Http.cents(body["surchargeAmount"]) || 0
          }}
       end
     else

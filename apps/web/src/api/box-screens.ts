@@ -52,6 +52,27 @@ export function unpinBoxScreen(token: string, id: string) {
   return apiRequest<{ screen: BoxScreen }>(`/admin/box-screens/${id}/override`, { method: "DELETE", token });
 }
 
+// --- «Στην οθόνη»: one class, from its timer remote (ADR-253 update) --------
+// The class's own coach (today, screens of the class's branch or the whole
+// box) pins its timer, leaderboard or WOD; the API decides who may.
+
+export type ClassScreenList = Schemas["ClassScreenList"];
+export type ClassScreenInput = { view: BoxScreenOverrideView; until?: string | null };
+
+export const classScreensKey = (slotId: string) => ["class-timers", slotId, "screens"] as const;
+
+export function listClassScreens(token: string, slotId: string) {
+  return apiRequest<ClassScreenList>(`/class-timers/${slotId}/screens`, { token });
+}
+
+export function pinClassScreen(token: string, slotId: string, screenId: string, input: ClassScreenInput) {
+  return apiRequest<{ screen: BoxScreen }>(`/class-timers/${slotId}/screens/${screenId}/override`, { method: "PUT", token, body: input });
+}
+
+export function unpinClassScreen(token: string, slotId: string, screenId: string) {
+  return apiRequest<{ screen: BoxScreen }>(`/class-timers/${slotId}/screens/${screenId}/override`, { method: "DELETE", token });
+}
+
 // --- The TV ---------------------------------------------------------------
 // Plain fetch on purpose: the display token is not a session, so the
 // session's refresh-on-401 and organization scoping must never touch it.

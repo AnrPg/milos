@@ -117,6 +117,14 @@ defmodule PaleeWeb.AdminDocumentsController do
     end
   end
 
+  operation(:outstanding,
+    summary: "Per active document: how many clients signed and who has not",
+    responses: [ok: {"Outstanding", "application/json", D.outstanding()}]
+  )
+
+  def outstanding(conn, _params),
+    do: json(conn, DocumentsAdmin.outstanding(conn.assigns.tenant_context))
+
   operation(:request,
     summary: "Ask one client, every client, a role or a package's holders to sign",
     description:

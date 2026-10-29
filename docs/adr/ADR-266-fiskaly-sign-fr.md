@@ -25,8 +25,11 @@ attestation for every French box alone.
    TSE (DE) and RKSV (AT) receipts: same outbox, side table
    (`fiscal_till_signatures`), attempts log, uncertain handling and
    endpoints (`/fiscal/till-connections/sign_fr`), behind the
-   `CashRegisterSecurity` port of ADR-251. Invoices are not till sales and
-   are not signed (as in DE/AT).
+   `CashRegisterSecurity` port of ADR-251. Unlike DE/AT (ADR-251 update
+   2026-10-29), an invoice paid at the till and its credit note are not
+   sent to SIGN FR yet: they stay secured by Palee's journal until fiskaly
+   confirms how SIGN FR records invoices (its API has a
+   `TRANSACTION::INVOICE` type that needs the buyer as recipient).
 2. **Adapter.** `Palee.Infrastructure.Fiscal.FiskalySignFr` on the shared
    Unified API client `FiskalyUnified` (ADR-250 update).
    - *Provision* (saving the connection): `POST /taxpayers` (type `COMPANY`,

@@ -109,6 +109,7 @@ defmodule Palee.Finance.MembershipPayment do
     |> validate_inclusion(:revenue_stream, Palee.Finance.Domain.RevenueStream.keys())
     |> check_constraint(:membership_id, name: :membership_payments_member_or_shop_check)
     |> unique_constraint(:source_id, name: :membership_payments_shop_order_index)
+    |> unique_constraint(:source_id, name: :membership_payments_terminal_source_index)
     |> foreign_key_constraint(:finance_invoice_id)
   end
 end

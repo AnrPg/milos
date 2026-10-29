@@ -189,3 +189,9 @@ msgstr ""
 
 msgid "Page"
 msgstr ""
+
+msgid "Technical security system (TSE)"
+msgstr "Technical security system (TSE)"
+
+msgid "Cash register security device (RKSV)"
+msgstr "Cash register security device (RKSV)"

@@ -18,6 +18,15 @@ defmodule Palee.Finance.Ports.RevenueStreamStore do
   @callback record_payment(context(), map()) :: result()
 
   @doc """
+  ADR-264: a sale paid on the spot, written at once: the issued invoice
+  with its lines (`invoice`) and the payment that settles it (`payment`,
+  with its `source_type` / `source_id`), in one transaction. Idempotent
+  per payment source: a second call returns the first sale with
+  `replayed: true`. Answers `%{invoice, payment, replayed}`.
+  """
+  @callback record_sale(context(), map()) :: result()
+
+  @doc """
   A refund of a stream payment (`membership_payment_id`, `amount_cents`,
   `idempotency_key`); the reversal inherits the payment's stream and source.
   """

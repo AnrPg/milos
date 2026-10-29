@@ -286,15 +286,34 @@ defmodule Palee.Fiscal.Domain.SaleLines do
         {:ok, lines}
 
       true ->
-        groups =
-          lines
-          |> Enum.group_by(&{&1.tax_category, &1.exemption_reason, &1.rate_bp})
-          |> Enum.map(fn {key, group} -> {key, Enum.sum(Enum.map(group, &line_gross/1))} end)
-          |> Enum.reject(fn {_key, gross} -> gross == 0 end)
-          |> Enum.sort()
-
-        {:ok, allocate(groups, amount_cents, total, description)}
+        {:ok, allocate(tax_groups(lines), amount_cents, total, description)}
     end
+  end
+
+  @doc """
+  ADR-264: lines for money charged on top of a sale that follows the
+  sale's taxes (a card surcharge is part of the price of what it is paid
+  for): `amount_cents` split across the tax groups of `lines` in
+  proportion to each group's gross, one line per group, described as
+  `description`. The amount may be any positive size.
+
+  `{:ok, lines}`, or `{:error, :invalid_amount}` for an amount of zero or
+  a sale with no gross to follow.
+  """
+  def follow_sale(lines, amount_cents, description) when is_list(lines) do
+    total = Enum.sum(Enum.map(lines, &line_gross/1))
+
+    if is_integer(amount_cents) and amount_cents > 0 and total > 0,
+      do: {:ok, allocate(tax_groups(lines), amount_cents, total, description)},
+      else: {:error, :invalid_amount}
+  end
+
+  defp tax_groups(lines) do
+    lines
+    |> Enum.group_by(&{&1.tax_category, &1.exemption_reason, &1.rate_bp})
+    |> Enum.map(fn {key, group} -> {key, Enum.sum(Enum.map(group, &line_gross/1))} end)
+    |> Enum.reject(fn {_key, gross} -> gross == 0 end)
+    |> Enum.sort()
   end
 
   defp line_gross(line), do: line.quantity * line.unit_price_cents - (line.discount_cents || 0)

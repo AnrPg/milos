@@ -63,16 +63,58 @@ defmodule Palee.Fiscal.Domain.TillSigningPolicy do
 
   def offline?(_now, _issued_at), do: false
 
+  @till_methods ~w(cash card)
+
+  @doc "Payment methods of money taken at the till (the desk): cash and card, a terminal's too."
+  def till_methods, do: @till_methods
+
   @doc """
   True when the document must be signed: its country has a till device
-  and it is a receipt, or a credit note correcting a receipt
-  (`original_kind`). Invoices paid by transfer are not till sales.
+  and it records money taken at the till (ADR-251, update 2026-10-29):
+
+    * a receipt;
+    * an invoice paid at the till (`payment_method` cash or card, a card
+      terminal's too). DSFinV-K's process type `Beleg` covers every
+      transaction closed at the till, "neben der Rechnung (§ 14 UStG) auch
+      Gutschriften und Korrekturrechnungen"; in Austria a cash sale
+      (Barumsatz, § 131b (1) Z 3 BAO) includes card payments;
+    * a credit note correcting a document signed by these rules
+      (`original` is the corrected document, or only its kind).
+
+  An invoice paid later by bank transfer or online, or with no payment
+  method, is not a till transaction and is not signed.
+
+  France (`sign_fr`, ADR-266) signs receipts and their credit notes only:
+  an invoice paid at the till, and its credit note, stay secured by
+  Palee's own journal (ADR-242) until fiskaly confirms how SIGN FR records
+  invoices.
   """
-  def required?(profile, document, original_kind \\ nil) do
-    not is_nil(device(profile)) and
-      (document.kind == "receipt" or
-         (document.kind == "credit_note" and original_kind == "receipt"))
+  def required?(profile, document, original \\ nil) do
+    case device(profile) do
+      nil -> false
+      "sign_fr" -> receipt_only?(document, original)
+      _device -> till_transaction?(document, original)
+    end
   end
+
+  defp receipt_only?(%{kind: "receipt"}, _original), do: true
+  defp receipt_only?(%{kind: "credit_note"}, "receipt"), do: true
+  defp receipt_only?(%{kind: "credit_note"}, %{kind: "receipt"}), do: true
+  defp receipt_only?(_document, _original), do: false
+
+  defp till_transaction?(%{kind: "receipt"}, _original), do: true
+
+  defp till_transaction?(%{kind: "invoice"} = document, _original),
+    do: Map.get(document, :payment_method) in @till_methods
+
+  defp till_transaction?(%{kind: "credit_note"}, original) when is_binary(original),
+    do: original == "receipt"
+
+  defp till_transaction?(%{kind: "credit_note"}, %{kind: kind} = original)
+       when kind in ["receipt", "invoice"],
+       do: till_transaction?(original, nil)
+
+  defp till_transaction?(_document, _original), do: false
 
   def retryable?(%{status: status}), do: status in @retryable
 
