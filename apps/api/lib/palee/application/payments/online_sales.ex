@@ -122,14 +122,20 @@ defmodule Palee.Application.Payments.OnlineSales do
   end
 
   defp package_for_sale(context, package_id) do
-    case Finance.get_package(context, package_id) do
-      {:ok, %{active: true, sold_online: true} = package} when package.base_price_cents > 0 ->
-        {:ok, package}
+    case Ecto.UUID.cast(package_id) do
+      {:ok, id} ->
+        case Finance.get_package(context, id) do
+          %{active: true, sold_online: true} = package when package.base_price_cents > 0 ->
+            {:ok, package}
 
-      {:ok, _package} ->
-        {:error, :package_not_for_sale}
+          %{} ->
+            {:error, :package_not_for_sale}
 
-      _missing ->
+          nil ->
+            {:error, :not_found}
+        end
+
+      :error ->
         {:error, :not_found}
     end
   end

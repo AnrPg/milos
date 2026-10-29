@@ -6803,7 +6803,9 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
          subscription_id: subscription.id,
          status: subscription.status,
          starts_on: subscription.starts_on,
-         ends_on: subscription.ends_on,
+         ends_on:
+           subscription.ends_on ||
+             billing_period_end(subscription.starts_on, subscription.billing_period_snapshot),
          visits_used: subscription_visits_used(subscription.id),
          visits_total: subscription_visits_total(subscription.params_snapshot)
        }}
@@ -6811,6 +6813,19 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       _missing -> {:error, :not_found}
     end
   end
+
+  # An open-ended recurring package: its current billing period.
+  defp billing_period_end(%Date{} = starts, period) do
+    case period do
+      "monthly" -> Date.shift(starts, month: 1)
+      "quarterly" -> Date.shift(starts, month: 3)
+      "semiannual" -> Date.shift(starts, month: 6)
+      "annual" -> Date.shift(starts, year: 1)
+      _other -> nil
+    end
+  end
+
+  defp billing_period_end(_starts, _period), do: nil
 
   defp subscription_visits_used(subscription_id) do
     FinanceEntitlementUsageEntry
