@@ -230,6 +230,30 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: to_string(reason), error: message})
   end
 
+  # ADR-255: setup recipes.
+  @setup_errors %{
+    recipe_not_found: {:not_found, "There is no such setup recipe"},
+    recipe_owner_only: {:forbidden, "Only the owner applies a setup recipe"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@setup_errors, reason) do
+    {status, message} = Map.fetch!(@setup_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
+  def call(conn, {:error, {:recipe_step_failed, step, _reason}}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "recipe_step_failed",
+      error: "A step of the setup recipe could not be applied; nothing was changed",
+      step: step
+    })
+  end
+
   # ADR-246/247: online payments.
   @payment_errors %{
     online_payments_unavailable: {:conflict, "Online payments are not set up for this business"},

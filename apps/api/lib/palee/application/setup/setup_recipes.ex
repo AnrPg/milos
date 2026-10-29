@@ -57,7 +57,7 @@ defmodule Palee.Application.Setup.SetupRecipes do
   Applies recipe `key`: `%{plan, application}` where `plan` lists what was
   changed. Owner only (the provider kind and role grants are the owner's).
   """
-  def apply(context, key, now \\ DateTime.utc_now()) do
+  def apply_recipe(context, key, now \\ DateTime.utc_now()) do
     with :ok <- Organizations.authorize_capability(context, :manage_settings),
          :ok <- owner(context),
          {:ok, recipe} <- Setup.fetch_recipe(key),
