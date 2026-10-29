@@ -7,6 +7,7 @@ defmodule PaleeWeb.PublicBoxController do
   use PaleeWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
+  alias Palee.Application.Payments.OnlineSales
   alias Palee.Application.PublicBox
   alias PaleeWeb.Schemas.Social, as: S
   alias OpenApiSpex.{Parameter, Schema}
@@ -36,6 +37,19 @@ defmodule PaleeWeb.PublicBoxController do
 
   def show(conn, %{slug: slug}) do
     with {:ok, box} <- PublicBox.get(slug), do: json(conn, box)
+  end
+
+  operation(:packages,
+    summary: "The packages a published box sells online (ADR-248)",
+    parameters: [@slug],
+    responses: [
+      ok: {"Packages", "application/json", PaleeWeb.Schemas.Payments.public_packages()},
+      not_found: {"No published box with this slug", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def packages(conn, %{slug: slug}) do
+    with {:ok, packages} <- OnlineSales.public_packages(slug), do: json(conn, packages)
   end
 
   operation(:schedule,

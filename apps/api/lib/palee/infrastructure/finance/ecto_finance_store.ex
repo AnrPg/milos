@@ -474,6 +474,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       Repo.transaction(fn ->
         with %Membership{} = membership <- locked_membership(membership_id),
              nil <- payment_by_idempotency_key(membership.id, params["idempotency_key"]),
+             {:ok, params} <- with_purchased_package(membership.id, params),
              :ok <- ReceivedPayment.validate_purpose(document, params),
              {:ok, result} <- receive_into(document, membership.id, params) do
           Map.put(result, :replayed, false)
@@ -491,6 +492,20 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     end
   end
 
+  # ADR-248: a package bought online is assigned in the same transaction as
+  # its money, so a retried fulfilment never assigns it twice.
+  defp with_purchased_package(membership_id, %{"purchase_package_id" => package_id} = params)
+       when is_binary(package_id) and package_id != "" do
+    with {:ok, subscription} <- assign_package(membership_id, package_id, %{}) do
+      {:ok,
+       params
+       |> Map.delete("purchase_package_id")
+       |> Map.put("membership_package_subscription_id", subscription.id)}
+    end
+  end
+
+  defp with_purchased_package(_membership_id, params), do: {:ok, params}
+
   defp receive_into(:settle_invoice, membership_id, params) do
     with {:ok, payment} <-
            record_payment(membership_id, %{
@@ -501,10 +516,11 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
              "payment_method" => params["payment_method"],
              "payment_status" => "paid",
              "notes" => params["notes"],
-             "params" => %{
-               "idempotency_key" => params["idempotency_key"],
-               "created_by_id" => params["created_by_id"]
-             }
+             "params" =>
+               online_reference(params, %{
+                 "idempotency_key" => params["idempotency_key"],
+                 "created_by_id" => params["created_by_id"]
+               })
            }) do
       {:ok, received_payment_result(Repo.get!(MembershipPayment, payment.id))}
     end
@@ -513,6 +529,17 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   defp receive_into(document, membership_id, params) do
     create_paid_document(membership_id, document, params)
   end
+
+  # ADR-246: an online payment keeps the provider's references with it.
+  defp online_reference(%{"payment_method" => "online"} = params, stored) do
+    Map.merge(stored, %{
+      "payment_intent_id" => params["payment_intent_id"],
+      "provider" => params["provider"],
+      "provider_transaction_id" => params["provider_transaction_id"]
+    })
+  end
+
+  defp online_reference(_params, stored), do: stored
 
   defp payment_by_idempotency_key(membership_id, key) do
     MembershipPayment
@@ -606,11 +633,12 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
                "payment_method" => params["payment_method"] || "cash",
                "payment_status" => "paid",
                "notes" => params["notes"],
-               "params" => %{
-                 "document_kind" => kind,
-                 "idempotency_key" => params["idempotency_key"],
-                 "created_by_id" => params["created_by_id"]
-               }
+               "params" =>
+                 online_reference(params, %{
+                   "document_kind" => kind,
+                   "idempotency_key" => params["idempotency_key"],
+                   "created_by_id" => params["created_by_id"]
+                 })
              }) do
         received_payment_result(Repo.get!(MembershipPayment, payment.id))
       else
@@ -5835,6 +5863,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       active: package.active,
       tax_category: package.tax_category,
       exemption_reason: package.exemption_reason,
+      sold_online: package.sold_online,
       inserted_at: package.inserted_at,
       updated_at: package.updated_at
     }
@@ -6760,6 +6789,94 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   # ── Renewal choice and leaving the box (ADR-220) ───────────────────────────
+
+  # ADR-248: what a withdrawal needs to know about the package a payment bought.
+  @impl true
+  def withdrawal_facts(payment_id) do
+    with {:ok, payment_id} <- Ecto.UUID.cast(payment_id),
+         %MembershipPayment{membership_package_subscription_id: subscription_id} = payment
+         when is_binary(subscription_id) <-
+           MembershipPayment |> tenant_scope() |> Repo.get(payment_id),
+         %MembershipPackageSubscription{} = subscription <-
+           MembershipPackageSubscription |> tenant_scope() |> Repo.get(subscription_id) do
+      {:ok,
+       %{
+         membership_id: payment.membership_id,
+         subscription_id: subscription.id,
+         status: subscription.status,
+         starts_on: subscription.starts_on,
+         ends_on:
+           subscription.ends_on ||
+             billing_period_end(subscription.starts_on, subscription.billing_period_snapshot),
+         visits_used: subscription_visits_used(subscription.id),
+         visits_total: subscription_visits_total(subscription.params_snapshot)
+       }}
+    else
+      _missing -> {:error, :not_found}
+    end
+  end
+
+  # An open-ended recurring package: its current billing period.
+  defp billing_period_end(%Date{} = starts, period) do
+    case period do
+      "monthly" -> Date.shift(starts, month: 1)
+      "quarterly" -> Date.shift(starts, month: 3)
+      "semiannual" -> Date.shift(starts, month: 6)
+      "annual" -> Date.shift(starts, year: 1)
+      _other -> nil
+    end
+  end
+
+  defp billing_period_end(_starts, _period), do: nil
+
+  defp subscription_visits_used(subscription_id) do
+    FinanceEntitlementUsageEntry
+    |> tenant_scope()
+    |> where([entry], entry.membership_package_subscription_id == ^subscription_id)
+    |> where([entry], entry.event_type in ["finalize", "consume"])
+    |> where([entry], like(entry.allowance_key, "class_visits%"))
+    |> select([entry], coalesce(sum(fragment("abs(?)", entry.quantity_delta)), 0))
+    |> Repo.one()
+    |> db_integer()
+  end
+
+  # Only a limit for the whole package counts (a weekly limit renews).
+  defp subscription_visits_total(params) do
+    case EntitlementPlan.parse(params || %{}) do
+      {:ok, %{allowances: %{class_visits: %{limit: limit, period: period}}}}
+      when is_integer(limit) and limit > 0 and period == :subscription_period ->
+        limit
+
+      _other ->
+        nil
+    end
+  end
+
+  @impl true
+  def withdraw_subscription(subscription_id, %Date{} = today) do
+    Repo.transaction(fn ->
+      with %MembershipPackageSubscription{} = subscription <-
+             MembershipPackageSubscription
+             |> tenant_scope()
+             |> where([s], s.id == ^subscription_id)
+             |> lock("FOR UPDATE")
+             |> Repo.one() do
+        updated =
+          subscription
+          |> MembershipPackageSubscription.changeset(%{
+            status: "cancelled",
+            ends_on: Enum.max([today, subscription.starts_on || today], Date),
+            auto_renew: false
+          })
+          |> Repo.update!()
+
+        refresh_entitlement_snapshot(subscription.membership_id)
+        normalize_subscription(updated)
+      else
+        nil -> Repo.rollback(:not_found)
+      end
+    end)
+  end
 
   @impl true
   def set_subscription_auto_renew(user_id, subscription_id, auto_renew, by)

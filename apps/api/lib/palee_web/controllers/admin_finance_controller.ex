@@ -183,7 +183,9 @@ defmodule PaleeWeb.AdminFinanceController do
       nullable: true,
       maxLength: 300,
       description: "Required with `exempt`: the article of the VAT law printed on the document."
-    }
+    },
+    # ADR-248: members can buy it online (public box page and the app).
+    sold_online: %Schema{type: :boolean}
   }
   @create_package_request_body %RequestBody{
     required: true,

@@ -23,6 +23,8 @@ defmodule Palee.Finance.MembershipPackage do
     # ADR-244: the tax category printed on fiscal documents (nil: standard).
     field :tax_category, :string
     field :exemption_reason, :string
+    # ADR-248: members can buy it themselves, online.
+    field :sold_online, :boolean, default: false
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -41,7 +43,8 @@ defmodule Palee.Finance.MembershipPackage do
       :params,
       :active,
       :tax_category,
-      :exemption_reason
+      :exemption_reason,
+      :sold_online
     ])
     |> update_change(:code, &PackageCode.normalize/1)
     |> validate_required([:name, :package_type, :billing_period])

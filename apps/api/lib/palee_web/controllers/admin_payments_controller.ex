@@ -1,0 +1,116 @@
+defmodule PaleeWeb.AdminPaymentsController do
+  @moduledoc """
+  Staff › Finance › online payments (ADR-246/247): the business's own
+  provider account (credentials are written, never read back), payments,
+  refunds and asking the provider again.
+  """
+
+  use PaleeWeb, :controller
+  use OpenApiSpex.ControllerSpecs
+
+  alias OpenApiSpex.{Parameter, Schema}
+  alias Palee.Application.Payments.OnlinePayments
+  alias PaleeWeb.Schemas.Payments, as: P
+
+  action_fallback PaleeWeb.FallbackController
+
+  tags(["Payments"])
+  security([%{"bearerAuth" => []}])
+
+  plug OpenApiSpex.Plug.CastAndValidate, json_render_error_v2: true
+
+  operation(:account,
+    summary: "The business's payment provider account (never its credentials)",
+    responses: [ok: {"Account", "application/json", P.account_status()}]
+  )
+
+  def account(conn, _params), do: json(conn, OnlinePayments.account(conn.assigns.tenant_context))
+
+  operation(:save_account,
+    summary: "Connect the business's own Viva or Stripe account",
+    description:
+      "The provider checks the credentials before they are saved. Secrets left out keep " <>
+        "their saved values when the provider stays the same.",
+    request_body: P.body(P.account_body()),
+    responses: [ok: {"Account", "application/json", P.account_status()}]
+  )
+
+  def save_account(conn, _params) do
+    with {:ok, status} <-
+           OnlinePayments.save_account(conn.assigns.tenant_context, conn.body_params) do
+      json(conn, status)
+    end
+  end
+
+  operation(:index,
+    summary: "Online payments, newest first",
+    parameters: [
+      %Parameter{
+        name: :status,
+        in: :query,
+        required: false,
+        schema: %Schema{
+          type: :string,
+          enum: ~w(scheduled awaiting_payer processing succeeded failed cancelled expired)
+        }
+      },
+      %Parameter{name: :user_id, in: :query, required: false, schema: P.uuid()},
+      %Parameter{
+        name: :limit,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :integer, minimum: 1, maximum: 200}
+      },
+      %Parameter{
+        name: :offset,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :integer, minimum: 0}
+      }
+    ],
+    responses: [ok: {"Payments", "application/json", P.intent_page()}]
+  )
+
+  def index(conn, params) do
+    filters = Map.take(params, [:status, :user_id, :limit, :offset])
+    json(conn, OnlinePayments.list(conn.assigns.tenant_context, filters))
+  end
+
+  operation(:show,
+    summary: "One online payment with its refunds",
+    parameters: [%Parameter{name: :id, in: :path, required: true, schema: P.uuid()}],
+    responses: [ok: {"Payment", "application/json", P.one(:payment, P.intent_detail())}]
+  )
+
+  def show(conn, %{id: id}) do
+    with {:ok, payment} <- OnlinePayments.get(conn.assigns.tenant_context, id) do
+      json(conn, %{payment: payment})
+    end
+  end
+
+  operation(:refund,
+    summary: "Give back part or all of a payment through the provider",
+    parameters: [%Parameter{name: :id, in: :path, required: true, schema: P.uuid()}],
+    request_body: P.body(P.refund_body()),
+    responses: [ok: {"Refund", "application/json", P.one(:refund, P.refund())}]
+  )
+
+  def refund(conn, %{id: id}) do
+    with {:ok, refund} <-
+           OnlinePayments.refund(conn.assigns.tenant_context, id, conn.body_params) do
+      json(conn, %{refund: refund})
+    end
+  end
+
+  operation(:retry,
+    summary: "Ask the provider about a payment now",
+    parameters: [%Parameter{name: :id, in: :path, required: true, schema: P.uuid()}],
+    responses: [ok: {"Payment", "application/json", P.one(:payment, P.intent())}]
+  )
+
+  def retry(conn, %{id: id}) do
+    with {:ok, payment} <- OnlinePayments.retry(conn.assigns.tenant_context, id) do
+      json(conn, %{payment: payment})
+    end
+  end
+end
