@@ -138,6 +138,24 @@ defmodule Palee.Fiscal.Domain.UblInvoiceTest do
     end
   end
 
+  test "the rule check catches broken totals, references and endpoints" do
+    [{invoice, _opts} | _rest] = documents()
+    xml = xml(invoice)
+    payable = UblInvoice.amount(invoice.gross_cents)
+
+    broken =
+      xml
+      |> String.replace(
+        ~s(<cbc:PayableAmount currencyID="EUR">#{payable}</cbc:PayableAmount>),
+        ~s(<cbc:PayableAmount currencyID="EUR">1.00</cbc:PayableAmount>)
+      )
+      |> String.replace("<cbc:BuyerReference>I-000001</cbc:BuyerReference>", "")
+      |> String.replace(~s(<cbc:EndpointID schemeID="0208">0202239951</cbc:EndpointID>), "")
+
+    assert Enum.sort(PeppolBisRules.check(broken)) ==
+             Enum.sort(["BR-CO-16", "PEPPOL-EN16931-R003", "BR-63", "PEPPOL-EN16931-R010"])
+  end
+
   @tag :xmllint
   @tag :tmp_dir
   test "invoices and credit notes are valid UBL 2.1", %{tmp_dir: dir} do
