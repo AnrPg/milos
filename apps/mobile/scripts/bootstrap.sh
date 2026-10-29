@@ -4,12 +4,15 @@
 #   PALEE_APP_ENV=production|staging|development  (default production)
 #   PALEE_APP_URL=https://…                        (overrides the environment's URL)
 #   PALEE_APS_ENVIRONMENT=production|development   (iOS push entitlement)
+#   PALEE_BUILD_NUMBER=<n>                         (store build number; default config/release.json)
 #
 # The ios/ and android/ projects are in git (generated with `npx cap add`
 # from the pinned Capacitor versions). This installs the exact JS versions,
 # writes the environment into the native projects and syncs the plugins.
-# Building needs Android Studio (SDK 36, JDK 21) and Xcode 16+ on macOS;
-# signing material and Firebase files are owner actions (ADR-171).
+# Building needs Android Studio (SDK 36, JDK 21) and Xcode 26+ on macOS (App
+# Store uploads need the iOS 26 SDK since 28 April 2026);
+# signing material and Firebase files are owner actions (ADR-171,
+# docs/release/signing-guide.md).
 set -eu
 
 cd "$(dirname "$0")/.."
