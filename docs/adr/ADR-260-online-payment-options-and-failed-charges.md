@@ -60,3 +60,11 @@ desk only.
 - The staff notice `payment_needs_attention` opens
   `/admin/finance?tab=queues&queue=failed_charges`, the «Αποτυχημένες
   χρεώσεις» group of the Queues tab.
+
+## Update 2026-10-29: PayPal and Klarna
+PayPal, Klarna, Apple Pay and Google Pay appear at checkout when the business
+switches them on at its provider (ADR-246 update 2026-10-29); the per-purpose
+switches here do not change. They pay one-off checkouts only: autopay and the
+failed-charge retries of this ADR charge a saved card, and a checkout that
+saves the card offers only methods that can be saved. Stripe's PayPal is not
+available on one-button Connect accounts (ADR-261).

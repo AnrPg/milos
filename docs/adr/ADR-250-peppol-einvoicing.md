@@ -105,3 +105,65 @@ outbox and attempt log reuse the ADR-243 shape operators already know.
   OASIS UBL 2.1 (https://docs.oasis-open.org/ubl/os-UBL-2.1/),
   Peppol in Belgium (https://efacture.belgium.be/en/peppol),
   Storecove API (https://www.storecove.com/docs/).
+
+## Update 2026-10-29: fiskaly E-INVOICE replaces Storecove
+Product owner decision (2026-10-29): fiskaly is the single vendor for fiscal
+work outside Greece, so the access point is fiskaly E-INVOICE.
+
+- **Adapter.** `Palee.Infrastructure.Fiscal.FiskalyEInvoiceNetwork` implements
+  the same `EInvoiceNetwork` port; `fiskaly` is the default (and only
+  non-sandbox) provider. The shared Unified API client is
+  `Palee.Infrastructure.Fiscal.FiskalyUnified` (API version `2026-06-01`,
+  `test.api.fiskaly.com` / `live.api.fiskaly.com`, bearer token from
+  `POST /tokens` with the API key and secret). The Storecove adapter, its
+  config and its tests are removed; the migrations are untouched and
+  `storecove` stays an allowed `provider` value so old rows load. Such a row
+  is marked invalid ("provider_retired: reconnect with fiskaly") and its
+  documents wait as `connection_invalid` until the owner reconnects.
+- **JSON, not UBL.** fiskaly does not accept an uploaded UBL file: it builds
+  the Peppol BIS Billing 3.0 document (and XRechnung for Germany) from its
+  own JSON record. Palee still builds and validates its UBL first (it is what
+  the archive keeps and what the BIS rule tests check), then sends the same
+  document as fiskaly JSON: an `INTENTION` record, then a `TRANSACTION`
+  record of type `INVOICE` (buyer as a `BUSINESS` recipient with
+  `invoicing.type = PEPPOL`, `scheme:identifier`), or a `CORRECTION` that
+  points at the original invoice's fiskaly record id for a credit note. A
+  credit note whose original was never sent through fiskaly is refused
+  (`original_not_sent`). VAT rates map to the codes the business's fiskaly
+  System lists (`STANDARD`, `REDUCED_n`), exemptions to its exemption codes;
+  an unmapped rate or exemption is refused before anything is sent. The port
+  takes the document and its original next to the UBL for this.
+- **Status by polling.** fiskaly sends no webhooks for E-INVOICE: Palee polls
+  `GET /records/{id}` and then the `E_INVOICE::TRANSMISSION` record named in
+  `used_in` (`COMPLETED` + `FINISHED` = delivered; `REJECTED`/`FAILED` =
+  failed). The webhook URL stays as a harmless hint endpoint.
+- **Idempotency.** Every POST carries `X-Idempotency-Key`, a UUID v3 derived
+  from the submission guid (`einvoice:<guid>:intention` / `:transaction`), so
+  a staff retry of an uncertain submission replays the same request. fiskaly
+  keeps keys for 24 hours: a 422 about the key, a 409 (in progress) or a
+  timeout are uncertain and never resent by Palee itself. After 24 hours a
+  staff retry is a new request, so staff must check fiskaly first (as before).
+- **Credentials.** The connection stores an encrypted `api_key` and
+  `api_secret` (new column, migration `20270222000000`), never returned or
+  logged (`has_api_key`, `has_api_secret`, `credentials_source`). When the
+  owner leaves them out, the fiskaly till connection's key and secret of the
+  same environment are used (ADR-251) until the e-invoicing connection gets
+  its own. `legal_entity_id` is now the business's fiskaly E-INVOICE System id
+  (`E_INVOICE_SERVICE`, whose Peppol registration and proof of ownership are
+  done once in the fiskaly HUB). The key must be a UNIT-level key of that
+  business (no `X-Scope-Identifier` is sent).
+- **Countries.** fiskaly E-INVOICE is live for Belgium (Peppol), Germany and
+  Italy; France, Spain, Sweden and Austria are announced. Palee sends only
+  where the country profile names Peppol (Belgium today); German B2B
+  (EN 16931 / XRechnung) can use the same adapter once its policy is decided.
+- Sources: fiskaly E-INVOICE integration guide
+  (https://workspace.fiskaly.com/e-invoice/2026-06-01/integration-guide),
+  Belgium (https://workspace.fiskaly.com/e-invoice/2026-06-01/belgium),
+  Germany (https://workspace.fiskaly.com/e-invoice/2026-06-01/germany),
+  example (https://workspace.fiskaly.com/e-invoice/2026-06-01/einvoice-example),
+  OpenAPI specs
+  (https://workspace.fiskaly.com/specs/fiskaly.uapi.e-invoice-be.2026-06-01.yaml,
+  https://workspace.fiskaly.com/specs/fiskaly.uapi.e-invoice-de.2026-06-01.yaml),
+  Postman collection
+  (https://workspace.fiskaly.com/static/postman/E-INVOICE/fiskaly_e-invoice_be_2026-06-01_postman_collection.json),
+  product page (https://www.fiskaly.com/e-invoice-germany).

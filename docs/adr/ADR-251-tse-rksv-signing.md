@@ -97,3 +97,12 @@ transaction signed twice is a gap auditors see.
   RKSV (https://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=20009390),
   BMF Registrierkassen (https://www.bmf.gv.at/themen/steuern/fuer-unternehmen/registrierkassen.html),
   fiskaly SIGN AT (https://workspace.fiskaly.com/api/rksv/v1/).
+
+## Update 2026-10-29: France (SIGN FR) and shared fiskaly credentials
+- France is the third device, `sign_fr`, through fiskaly SIGN FR on the
+  Unified API (ADR-266), with the same outbox, side table and endpoints.
+- The e-invoicing connection (ADR-250 update) reuses this connection's
+  fiskaly key and secret of the same environment when it has none of its
+  own. Open: SIGN DE v2 and SIGN AT v1 keys are older per-product keys and
+  may not be accepted by the Unified API; a business may then need a
+  Unified API key on the e-invoicing connection itself.
