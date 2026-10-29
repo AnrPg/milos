@@ -14,14 +14,8 @@
  *   - interruptions pause the main work every X and resume where it was
  *     (the runner fires them from the clock: `interrupt`).
  */
-import type {
-  PlanFlow,
-  PlanMeasure,
-  PlanRow,
-  PlanSection,
-  PlanStructure,
-  PlanUnit,
-} from "@/lib/structured-plan/types";
+import type { PlanFlow, PlanMeasure, PlanRow, PlanSection, PlanUnit } from "@/lib/structured-plan/types";
+import { setsRange, structOf, unitKey, unitsOf, usesCells as rowUsesCells } from "@/lib/structured-plan/rounds";
 
 import {
   parseClock,
@@ -35,7 +29,7 @@ import {
   showDoseAt,
   showLoadAt,
   type ShowWords,
-} from "./parse-shim";
+} from "@/lib/structured-plan/parse";
 
 /** Rounds generated for one AMRAP window: far more than anyone finishes. */
 export const AMRAP_ROUNDS = 40;
@@ -130,28 +124,6 @@ export type RunSequence = {
   open: boolean;
 };
 
-// ── units and structures (same rules as `rounds.ts` in the core library) ──
-
-export function unitsOf(list: PlanRow[]): PlanUnit[] {
-  const out: PlanUnit[] = [];
-  for (const row of list) {
-    const last = out[out.length - 1];
-    if (row.group && last && last.group === row.group) last.rows.push(row);
-    else out.push({ group: row.group ?? null, rows: [row] });
-  }
-  return out;
-}
-
-const unitKey = (u: PlanUnit) => u.group || u.rows[0].id;
-const GROUP_KINDS = new Set(["superset", "complex"]);
-
-export function structOf(section: PlanSection, u: PlanUnit): PlanStructure {
-  const st = section.structs?.[unitKey(u)];
-  const isGroup = u.rows.length > 1;
-  if (st && GROUP_KINDS.has(st.kind) === isGroup) return st;
-  return isGroup ? { kind: "superset" } : { kind: "single" };
-}
-
 // ── params ────────────────────────────────────────────────────────────────
 
 const count = (text: string | undefined): number | null => {
@@ -163,13 +135,6 @@ const secsOf = (text: string | undefined, dflt: "min" | "smart"): number | null 
   const v = parseClock(text ?? "", dflt);
   return typeof v === "number" && v > 0 ? v : null;
 };
-
-function setsRange(text: string | undefined): { min: number; max: number } {
-  const m = /^(\d+)(?:\s*-\s*(\d+))?$/.exec((text ?? "").trim());
-  if (!m || !+m[1]) return { min: 1, max: 1 };
-  const min = +m[1];
-  return { min, max: Math.max(min, +(m[2] || m[1])) };
-}
 
 /** A rest as written: one time, a range ("90-120″") or text it cannot read. */
 function restOf(text: string): Pick<RunRest, "secs" | "range" | "text"> {
@@ -232,7 +197,10 @@ export function rowValues(
       if (v && extra.includes(k)) measures[k] = v;
     }
   }
-  const perSide = extra.includes("side") || /\/side|πλευρ|each/i.test(row.dose) || cells && /\/side|πλευρ|each/i.test(row.cells[0]?.d ?? "");
+  // "per side" is a flag of the row (Alt+P), or written into the dose ("8/side", "ανά πλευρά").
+  const doseText = cells ? (row.cells[0]?.d ?? "") : row.dose;
+  const parsed = parseDose(doseText);
+  const perSide = extra.includes("side") || Boolean(parsed && parsed !== "bad" && parsed.perSide);
   return { dose, load, measures, tempo, perSide };
 }
 
@@ -312,7 +280,7 @@ const intraRest = (ctx: Ctx, text: string, c: Column): RunRest => ({
 
 /** One unit (an exercise or a group) in one set / round, with its inner structure. */
 function unitSteps(ctx: Ctx, u: PlanUnit, c: Column): RunStep[] {
-  const usesCells = (row: PlanRow) => ctx.section.flow === "sets" || Boolean(row.perRound);
+  const usesCells = (row: PlanRow) => rowUsesCells(ctx.section, row);
   const st = structOf(ctx.section, u);
   if (u.rows.length > 1) {
     const kind = st.kind === "complex" ? "complex" : "superset";
@@ -371,7 +339,7 @@ function betweenSets(ctx: Ctx, round: number): RunRest | null {
 
 function setsPhases(ctx: Ctx): RunPhase[] {
   const { section } = ctx;
-  const { min, max } = setsRange(section.params.sets);
+  const { min, max } = setsRange(section);
   const steps: RunStep[] = [];
   const push = (s: RunStep | null) => {
     if (s) steps.push(s);
