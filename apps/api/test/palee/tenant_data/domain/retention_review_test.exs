@@ -113,8 +113,14 @@ defmodule Palee.TenantData.Domain.RetentionReviewTest do
     assert by_context["fiscal"].disposition == :retain
     assert by_context["fiscal"].retain_years == 10
 
+    # ADR-252: signatures and their certificates are evidence (5 years);
+    # health certificates and settings are not kept.
+    assert by_context["documents"].disposition == :retain
+    assert by_context["documents"].retain_years == 5
+    refute "health_certificates" in by_context["documents"].retained_tables
+
     assert by_context
-           |> Map.drop(["finance", "shop", "fiscal", "analytics"])
+           |> Map.drop(["finance", "shop", "fiscal", "documents", "analytics"])
            |> Map.values()
            |> Enum.all?(&(&1.disposition == :purge))
   end
