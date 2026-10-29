@@ -165,6 +165,13 @@ defmodule Palee.Execution.Domain.TimerSequenceBuilder do
   end
 
   defp build_own_segments(section, child_sections) do
+    case plan_clock(section) do
+      %{} = clock -> build_plan_segments(section, clock)
+      nil -> build_format_segments(section, child_sections)
+    end
+  end
+
+  defp build_format_segments(section, child_sections) do
     format = section_format(section)
     exercises = section_exercises(section)
 
@@ -248,6 +255,138 @@ defmodule Palee.Execution.Domain.TimerSequenceBuilder do
         [segment(section, :no_timer, nil, nil, nil, exercises)]
     end
   end
+
+  # ── Structured plan (ADR-270): the clock of the plan's read model ───────────
+  #
+  # A section written in the structured WOD editor runs as its plan's flow
+  # says (`sections[].prescription.clock`, unit-normalised by the Workouts
+  # context). Its segments carry the format `structured_plan`, so the score
+  # is the one its plan sets (`score_config`), as the plan runner sends it.
+
+  @max_plan_segments 200
+
+  defp plan_clock(section) do
+    case section[:prescription] || section["prescription"] do
+      %{} = prescription ->
+        case prescription[:clock] || prescription["clock"] do
+          %{} = clock -> clock
+          _none -> nil
+        end
+
+      _none ->
+        nil
+    end
+  end
+
+  defp build_plan_segments(section, clock) do
+    section = Map.put(section, :timer_config, %{"type" => "structured_plan"})
+    exercises = section_exercises(section)
+    get = fn key -> clock[key] || clock[Atom.to_string(key)] end
+
+    plan_segments(get.(:flow), section, exercises, get)
+  end
+
+  defp plan_segments("sets", section, exercises, get) do
+    rounds = min(positive(get.(:total_rounds)) || 1, @max_plan_segments)
+    rest = get.(:rest_secs) |> range_min() |> positive()
+
+    if rounds > 1 do
+      with_rests(1..rounds, rest, fn set_num ->
+        segment(
+          section,
+          :no_timer,
+          nil,
+          set_num,
+          rounds,
+          exercises,
+          text("set", %{set: set_num, total: rounds})
+        )
+      end)
+    else
+      [segment(section, :no_timer, nil, nil, nil, exercises)]
+    end
+  end
+
+  defp plan_segments("for_time", section, exercises, get) do
+    rounds = positive(get.(:rounds))
+    total_rounds = if rounds && rounds > 1, do: rounds
+    [segment(section, :countup, positive(get.(:cap_secs)), nil, total_rounds, exercises)]
+  end
+
+  defp plan_segments("amrap", section, exercises, get) do
+    case Enum.filter(List.wrap(get.(:windows_secs)), &positive/1) do
+      [] ->
+        [segment(section, :countup, nil, nil, nil, exercises)]
+
+      [window] ->
+        [segment(section, :countdown, window, nil, nil, exercises)]
+
+      windows ->
+        total = length(windows)
+        rest = get.(:rest_secs) |> range_min() |> positive()
+
+        with_rests(1..total, rest, fn round ->
+          segment(
+            section,
+            :countdown,
+            Enum.at(windows, round - 1),
+            round,
+            total,
+            exercises,
+            text("round", %{round: round, total: total})
+          )
+        end)
+    end
+  end
+
+  defp plan_segments("emom", section, exercises, get) do
+    every = positive(get.(:every_secs)) || 60
+    [segment(section, :interval_cycle, every, nil, positive(get.(:times)), exercises, text("emom"))]
+  end
+
+  defp plan_segments("intervals", section, exercises, get) do
+    rounds = min(positive(get.(:rounds)) || 1, @max_plan_segments)
+    work = positive(get.(:work_secs))
+    off = positive(get.(:off_secs))
+    hr = positive(get.(:hr_target_bpm))
+
+    Enum.flat_map(1..rounds, fn round ->
+      work_segment =
+        segment(
+          section,
+          if(work, do: :countdown, else: :countup),
+          work,
+          round,
+          rounds,
+          exercises,
+          text("work", %{round: round, total: rounds})
+        )
+
+      cond do
+        round == rounds -> [work_segment]
+        off -> [work_segment, rest_after(work_segment, off)]
+        hr -> [work_segment, %{rest_after(work_segment, nil) | kind: :manual} |> recover_label()]
+        true -> [work_segment]
+      end
+    end)
+  end
+
+  defp plan_segments("rest", section, _exercises, get) do
+    duration = positive(get.(:dur_secs))
+    kind = if duration, do: :countdown, else: :manual
+    [segment(section, kind, duration, nil, nil, [], [phase: "rest"] ++ text("rest"))]
+  end
+
+  defp plan_segments(_flow, section, exercises, _get),
+    do: [segment(section, :no_timer, nil, nil, nil, exercises)]
+
+  defp recover_label(segment) do
+    [label: label, label_key: key, label_params: params] = text("recover")
+    %{segment | label: label, label_key: key, label_params: params}
+  end
+
+  defp range_min(%{} = range), do: range[:min] || range["min"]
+  defp range_min(_range), do: nil
 
   # ── Untimed: optional authored rounds with rest between them ─────────────────
 
