@@ -553,6 +553,67 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
     |> then(&assert(&1["code"] == "payment_not_cancellable"))
   end
 
+  test "a shop order waiting for payment is settled at the terminal", %{conn: conn} = ctx do
+    connect_sandbox(conn, ctx)
+    shop = "/api/org/#{ctx.organization.slug}"
+
+    %{"variants" => [variant]} =
+      conn
+      |> as(ctx.admin)
+      |> post("#{shop}/staff/shop/products", %{
+        title: "Chalk",
+        category: "accessories",
+        status: "published",
+        variants: [%{price_cents: 500, initial_quantity: 3}]
+      })
+      |> json_response(201)
+      |> Map.fetch!("product")
+
+    %{"order" => order} =
+      conn
+      |> as(ctx.member)
+      |> post("#{shop}/me/shop/orders", %{
+        lines: [%{variant_id: variant["id"], quantity: 2}],
+        idempotency_key: "order-" <> Ecto.UUID.generate()
+      })
+      |> json_response(201)
+
+    assert order["payment_status"] == "pending_payment"
+
+    # Only its total.
+    conn
+    |> start(ctx, %{purpose: "shop_order", purpose_id: order["id"], amount_cents: 999})
+    |> json_response(422)
+    |> then(&assert(&1["code"] == "invalid_payment_amount"))
+
+    %{"payment" => payment} =
+      conn
+      |> start(ctx, %{purpose: "shop_order", purpose_id: order["id"], amount_cents: 1_000})
+      |> json_response(201)
+
+    assert payment["user_id"] == ctx.member.id
+
+    settled =
+      conn
+      |> as(ctx.admin)
+      |> post(tpath(ctx, "/#{payment["id"]}/sandbox-complete"), %{outcome: "succeeded"})
+      |> json_response(200)
+      |> Map.fetch!("payment")
+
+    assert settled["status"] == "succeeded"
+    assert settled["fulfilment_status"] == "done"
+
+    paid = Palee.Shop.get_order(ctx.context, order["id"])
+    assert paid.payment_status == :paid
+    assert paid.payment_provider == "sandbox"
+    assert paid.payment_reference == settled["provider_transaction_id"]
+
+    lineage = Finance.revenue_lineage(ctx.context, Palee.Shop.order_source_type(), order["id"])
+    assert [%{id: finance_payment_id} = shop_payment] = lineage.payments
+    assert finance_payment_id == settled["finance_payment_id"]
+    assert Map.get(shop_payment, :payment_method) in [nil, "card_manual"]
+  end
+
   test "staff never record card_terminal by hand; members cannot take payments",
        %{conn: conn} = ctx do
     invoice = open_invoice(ctx.context, ctx.membership, 1_000)

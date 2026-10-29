@@ -13,6 +13,7 @@ defmodule Palee.Application.Payments.TerminalFulfilment do
   alias Palee.Application.Shop.Checkout
   alias Palee.Finance
   alias Palee.Organizations
+  alias Palee.Shop
 
   def fulfil(context, %{purpose_type: "finance_invoice"} = intent) do
     with {:ok, invoice} <- Finance.get_invoice(context, intent.purpose_id) do
@@ -45,11 +46,19 @@ defmodule Palee.Application.Payments.TerminalFulfilment do
              reference: intent.provider_transaction_id,
              idempotency_key: "terminal:" <> intent.id
            }) do
-      {:ok, %{finance_payment_id: order[:finance_payment_id]}}
+      {:ok, %{finance_payment_id: shop_payment_id(context, order)}}
     end
   end
 
   def fulfil(_context, intent), do: {:error, {:purpose_not_supported, intent.purpose_type}}
+
+  # The Finance payment the shop recorded for the order (its revenue lineage).
+  defp shop_payment_id(context, order) do
+    case Finance.revenue_lineage(context, Shop.order_source_type(), order.id) do
+      %{payments: [payment | _]} -> Map.get(payment, :id)
+      _none -> nil
+    end
+  end
 
   defp record(context, user_id, intent, purpose) do
     params =
