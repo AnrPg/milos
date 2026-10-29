@@ -176186,6 +176186,17 @@
                           "country_code": {
                             "type": "string"
                           },
+                          "credit_reason": {
+                            "description": "Why a credit note was issued (ADR-265); null on other documents.",
+                            "enum": [
+                              "product_return",
+                              "billing_error",
+                              "subscription_cancelled",
+                              "other"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "currency": {
                             "type": "string"
                           },
@@ -176795,6 +176806,17 @@
                               "country_code": {
                                 "type": "string"
                               },
+                              "credit_reason": {
+                                "description": "Why a credit note was issued (ADR-265); null on other documents.",
+                                "enum": [
+                                  "product_return",
+                                  "billing_error",
+                                  "subscription_cancelled",
+                                  "other"
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              },
                               "currency": {
                                 "type": "string"
                               },
@@ -177320,6 +177342,17 @@
                           },
                           "type": "array"
                         },
+                        "credit_reason": {
+                          "description": "Why a credit note was issued (ADR-265); null on other documents.",
+                          "enum": [
+                            "product_return",
+                            "billing_error",
+                            "subscription_cancelled",
+                            "other"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "currency": {
                           "type": "string"
                         },
@@ -177519,6 +177552,30 @@
                         },
                         "prices_include_tax": {
                           "type": "boolean"
+                        },
+                        "refund_option": {
+                          "nullable": true,
+                          "properties": {
+                            "card_brand": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "card_last4": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "provider": {
+                              "type": "string"
+                            },
+                            "refundable_cents": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "provider",
+                            "refundable_cents"
+                          ],
+                          "type": "object"
                         },
                         "seller": {
                           "additionalProperties": true,
@@ -177868,7 +177925,7 @@
     "/api/org/{organization_slug}/admin/fiscal/documents/{id}/credit-notes": {
       "post": {
         "callbacks": {},
-        "description": "Documents are never changed: a credit note corrects them. Idempotent by `idempotency_key`.",
+        "description": "Documents are never changed: a credit note corrects them, with its reason (ADR-265). With `refund: true` the money goes back to the card the document was paid with and that refund issues the note (`document` is null when the refund could not issue it yet). Idempotent by `idempotency_key`.",
         "operationId": "PaleeWeb.AdminFiscalController.credit",
         "parameters": [
           {
@@ -177912,10 +177969,24 @@
                     },
                     "maxItems": 200,
                     "type": "array"
+                  },
+                  "reason": {
+                    "enum": [
+                      "product_return",
+                      "billing_error",
+                      "subscription_cancelled",
+                      "other"
+                    ],
+                    "type": "string"
+                  },
+                  "refund": {
+                    "description": "Give the money back to the card the document was paid with (ADR-265).",
+                    "type": "boolean"
                   }
                 },
                 "required": [
-                  "idempotency_key"
+                  "idempotency_key",
+                  "reason"
                 ],
                 "type": "object"
               }
@@ -177930,6 +178001,7 @@
                 "schema": {
                   "properties": {
                     "document": {
+                      "nullable": true,
                       "properties": {
                         "buyer": {
                           "additionalProperties": true,
@@ -177945,6 +178017,17 @@
                           "type": "string"
                         },
                         "country_code": {
+                          "type": "string"
+                        },
+                        "credit_reason": {
+                          "description": "Why a credit note was issued (ADR-265); null on other documents.",
+                          "enum": [
+                            "product_return",
+                            "billing_error",
+                            "subscription_cancelled",
+                            "other"
+                          ],
+                          "nullable": true,
                           "type": "string"
                         },
                         "currency": {
@@ -178469,10 +178552,64 @@
                         "tax_cents"
                       ],
                       "type": "object"
+                    },
+                    "refund": {
+                      "nullable": true,
+                      "properties": {
+                        "amount_cents": {
+                          "type": "integer"
+                        },
+                        "completed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "failure_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finance_reversal_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "succeeded",
+                            "failed"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "amount_cents",
+                        "currency",
+                        "id",
+                        "status"
+                      ],
+                      "type": "object"
                     }
                   },
                   "required": [
-                    "document"
+                    "document",
+                    "refund"
                   ],
                   "type": "object"
                 }
@@ -178486,6 +178623,7 @@
                 "schema": {
                   "properties": {
                     "document": {
+                      "nullable": true,
                       "properties": {
                         "buyer": {
                           "additionalProperties": true,
@@ -178501,6 +178639,17 @@
                           "type": "string"
                         },
                         "country_code": {
+                          "type": "string"
+                        },
+                        "credit_reason": {
+                          "description": "Why a credit note was issued (ADR-265); null on other documents.",
+                          "enum": [
+                            "product_return",
+                            "billing_error",
+                            "subscription_cancelled",
+                            "other"
+                          ],
+                          "nullable": true,
                           "type": "string"
                         },
                         "currency": {
@@ -179025,10 +179174,64 @@
                         "tax_cents"
                       ],
                       "type": "object"
+                    },
+                    "refund": {
+                      "nullable": true,
+                      "properties": {
+                        "amount_cents": {
+                          "type": "integer"
+                        },
+                        "completed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "failure_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finance_reversal_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "succeeded",
+                            "failed"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "amount_cents",
+                        "currency",
+                        "id",
+                        "status"
+                      ],
+                      "type": "object"
                     }
                   },
                   "required": [
-                    "document"
+                    "document",
+                    "refund"
                   ],
                   "type": "object"
                 }
@@ -179179,6 +179382,159 @@
           }
         ],
         "summary": "Send a refused, failed or uncertain document over Peppol again",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/email": {
+      "post": {
+        "callbacks": {},
+        "description": "Queued in the email outbox with the PDF attached, in the document's language (or `language`), and journaled. Without `to` the buyer's email printed on the document is used. Idempotent by `idempotency_key`; one address gets at most a few a day (`throttled`); a business in demo mode cannot send (`business_not_activated`).",
+        "operationId": "PaleeWeb.AdminFiscalTaxController.email_document",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "idempotency_key": {
+                    "maxLength": 120,
+                    "minLength": 8,
+                    "type": "string"
+                  },
+                  "language": {
+                    "enum": [
+                      "el",
+                      "en",
+                      "de",
+                      "fr",
+                      "it",
+                      "nl",
+                      "es"
+                    ],
+                    "type": "string"
+                  },
+                  "to": {
+                    "description": "The address; the buyer's email on the document when left out.",
+                    "maxLength": 254,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "idempotency_key"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "recipient": {
+                          "enum": [
+                            "buyer",
+                            "address"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "to": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "recipient",
+                        "status",
+                        "to"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "email"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The email of an earlier identical request"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "recipient": {
+                          "enum": [
+                            "buyer",
+                            "address"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "to": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "recipient",
+                        "status",
+                        "to"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "email"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Queued"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Email a fiscal document's PDF to its buyer or to a typed address (ADR-265)",
         "tags": [
           "Fiscal"
         ]
@@ -181028,6 +181384,316 @@
           }
         ],
         "summary": "Connect to Peppol: sandbox, or Storecove (test or production)",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/registry-connection": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFiscalRegistryController.connection",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "connection": {
+                      "description": "The AADE registry connection; the password is never returned.",
+                      "nullable": true,
+                      "properties": {
+                        "environment": {
+                          "enum": [
+                            "sandbox",
+                            "production"
+                          ],
+                          "type": "string"
+                        },
+                        "has_password": {
+                          "type": "boolean"
+                        },
+                        "last_error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "invalid"
+                          ],
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "environment",
+                        "has_password",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "connection"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Connection"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The AADE registry connection (environment and user; never the password)",
+        "tags": [
+          "Fiscal"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "description": "`production` needs the special credentials AADE issued to the business for this service; a saved password is kept when none is sent. `sandbox` answers with made-up details and needs none.",
+        "operationId": "PaleeWeb.AdminFiscalRegistryController.save_connection",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "environment": {
+                    "enum": [
+                      "sandbox",
+                      "production"
+                    ],
+                    "type": "string"
+                  },
+                  "password": {
+                    "format": "password",
+                    "maxLength": 200,
+                    "type": "string"
+                  },
+                  "username": {
+                    "maxLength": 100,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "environment"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "connection": {
+                      "description": "The AADE registry connection; the password is never returned.",
+                      "nullable": true,
+                      "properties": {
+                        "environment": {
+                          "enum": [
+                            "sandbox",
+                            "production"
+                          ],
+                          "type": "string"
+                        },
+                        "has_password": {
+                          "type": "boolean"
+                        },
+                        "last_error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "invalid"
+                          ],
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "environment",
+                        "has_password",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "connection"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Connection"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Connect AADE's registry service (RgWsPublic2) with the business's credentials",
+        "tags": [
+          "Fiscal"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/fiscal/registry/businesses/{tax_id}": {
+      "get": {
+        "callbacks": {},
+        "description": "The ΑΦΜ's check digit is verified first (`invalid_tax_id`). Errors: `registry_not_connected`, `registry_credentials_rejected`, `registry_not_found`, `registry_limit_reached`, `registry_unavailable`.",
+        "operationId": "PaleeWeb.AdminFiscalRegistryController.lookup",
+        "parameters": [
+          {
+            "description": "The ΑΦΜ (9 digits)",
+            "in": "path",
+            "name": "tax_id",
+            "required": true,
+            "schema": {
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "business": {
+                      "properties": {
+                        "active": {
+                          "type": "boolean"
+                        },
+                        "activities": {
+                          "items": {
+                            "properties": {
+                              "code": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "main": {
+                                "type": "boolean"
+                              }
+                            },
+                            "required": [
+                              "code",
+                              "main"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "activity_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "activity_description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "building_number": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "city": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "legal_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "legal_status": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "postal_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "street": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tax_id": {
+                          "type": "string"
+                        },
+                        "tax_office": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tax_office_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "trade_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "vat_registered": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "active",
+                        "activities",
+                        "tax_id",
+                        "vat_registered"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "business"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Business"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A Greek business's registry details by ΑΦΜ (AADE)",
         "tags": [
           "Fiscal"
         ]
@@ -189323,6 +189989,11 @@
                                     "nullable": true,
                                     "type": "string"
                                   },
+                                  "finance_reversal_id": {
+                                    "format": "uuid",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
                                   "id": {
                                     "format": "uuid",
                                     "type": "string"
@@ -189819,6 +190490,11 @@
                           "type": "string"
                         },
                         "failure_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finance_reversal_id": {
+                          "format": "uuid",
                           "nullable": true,
                           "type": "string"
                         },
