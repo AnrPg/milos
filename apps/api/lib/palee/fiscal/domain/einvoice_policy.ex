@@ -128,7 +128,20 @@ defmodule Palee.Fiscal.Domain.EInvoicePolicy do
         }
 
       {:ok, :in_progress} ->
-        %{status: "submitted", polls: polls, next_attempt_at: next_poll_at(polls, now)}
+        case next_poll_at(polls, now) do
+          # After about five days without an acknowledgement, staff look.
+          nil ->
+            %{
+              status: "failed",
+              polls: polls,
+              next_attempt_at: nil,
+              last_error_code: "delivery_unconfirmed",
+              last_error_message: nil
+            }
+
+          next ->
+            %{status: "submitted", polls: polls, next_attempt_at: next}
+        end
 
       {:error, {:unauthorized, reason}} ->
         %{
