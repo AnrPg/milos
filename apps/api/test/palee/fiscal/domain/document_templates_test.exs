@@ -370,7 +370,7 @@ defmodule Palee.Fiscal.Domain.DocumentTemplatesTest do
         )
 
       assert credit.title == "Credit note"
-      assert {labels.corrects, "I-000042" <> _date} = List.keyfind(credit.meta, labels.corrects, 0)
+      assert {_label, "I-000042 (" <> _date} = List.keyfind(credit.meta, labels.corrects, 0)
       assert credit.qr_bill == nil
     end
   end
@@ -422,8 +422,8 @@ defmodule Palee.Fiscal.Domain.DocumentTemplatesTest do
       swiss_texts = swiss |> DocumentPdf.texts(fonts) |> Enum.map(&text_of/1)
       assert "Zahlteil" in swiss_texts
       assert "Empfangsschein" in swiss_texts
-      assert "21 00000 00003 13947 14300 09017" in swiss_texts or
-               Enum.any?(swiss_texts, &(&1 =~ "21 00000"))
+      assert swiss.qr_bill.reference in swiss_texts
+      assert QrBill.valid_qr_reference?(String.replace(swiss.qr_bill.reference, " ", ""))
     end
   end
 
