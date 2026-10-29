@@ -238,7 +238,7 @@ must have an ADR. See `template.md` for the format.
 | ADR-250 | Peppol e-invoicing: UBL 2.1 / BIS Billing 3.0, outbox with uncertain never resent, access point port (sandbox, Storecove) | Accepted |
 | ADR-251 | Till security devices: cloud TSE (DE) and RKSV (AT) through fiskaly, signatures on a side table, outages recorded; invoices paid at the till signed too (update 2026-10-29) | Accepted |
 | ADR-252 | Documents and simple electronic signatures (evidence, PDF certificate), health certificates, booking gate | Accepted |
-| ADR-253 | Box screen: TV paired with a code, display token, today's classes/WODs/leaderboards, automatic focus and staff override | Accepted |
+| ADR-253 | Box screen: TV paired with a code, display token, today's classes/WODs/leaderboards, automatic focus and staff override; the class's coach pins their own class (update 2026-10-29) | Accepted |
 | ADR-254 | Importing clients from a CSV file: Imports context, dry run, idempotent apply, held profiles, undo | Accepted |
 | ADR-255 | Setup recipes per box type and the settings catalog («Προχωρημένα») | Accepted |
 | ADR-256 | Store apps: physical services paid through the box's provider in the in-app browser, digital-only packages and Plan (Palee) not sold in the apps, /pay/return app link | Accepted |
