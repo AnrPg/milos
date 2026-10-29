@@ -188,6 +188,33 @@ defmodule PaleeWeb.OrganizationAccessController do
     ]
   )
 
+  operation(:guest_boxes,
+    summary: "The boxes the account is only a guest of (ADR-272)",
+    security: [%{"bearerAuth" => []}],
+    responses: [
+      ok:
+        {"Boxes", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             boxes: %Schema{
+               type: :array,
+               items: %Schema{
+                 type: :object,
+                 properties: %{
+                   id: %Schema{type: :string, format: :uuid},
+                   name: %Schema{type: :string},
+                   slug: %Schema{type: :string}
+                 },
+                 required: [:id, :name, :slug]
+               }
+             }
+           },
+           required: [:boxes]
+         }}
+    ]
+  )
+
   operation(:issue,
     summary: "Issue a one-time organization invitation",
     security: [%{"bearerAuth" => []}],
@@ -571,6 +598,13 @@ defmodule PaleeWeb.OrganizationAccessController do
     with {:ok, redemption} <-
            RedeemRegistrationInvitation.call(user, conn.body_params.invitation_token) do
       conn |> put_status(:created) |> json(serialize_membership(redemption))
+    end
+  end
+
+  def guest_boxes(conn, _params) do
+    with {:ok, boxes} <-
+           ListOrganizationMemberships.guest_boxes(GuardianPlug.current_resource(conn)) do
+      json(conn, %{boxes: boxes})
     end
   end
 

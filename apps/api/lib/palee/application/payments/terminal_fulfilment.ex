@@ -23,14 +23,33 @@ defmodule Palee.Application.Payments.TerminalFulfilment do
   alias Palee.Finance
   alias Palee.Fiscal
   alias Palee.Organizations
-  alias Palee.Payments.Domain.TerminalSale
+  alias Palee.Payments.Domain.{TerminalSale, TipAttribution}
   alias Palee.Shop
 
   def fulfil(context, intent) do
     with {:ok, result} <- fulfil_sale(context, intent),
          :ok <- record_surcharge(context, intent) do
-      {:ok, result}
+      {:ok, Map.merge(result, tip_attribution(context, intent))}
     end
+  end
+
+  # ADR-272: whose tip it is, decided once with the fulfilment.
+  defp tip_attribution(context, intent) do
+    case TipAttribution.attribute(intent, front_desk_roles(context, intent)) do
+      nil -> %{}
+      changes -> changes
+    end
+  end
+
+  # The box's roles are only read when the starter on a phone is unknown.
+  defp front_desk_roles(context, intent) do
+    if (intent[:tip_cents] || 0) > 0 and
+         not (is_binary(intent[:created_by_id]) and TipAttribution.started_on(intent) == "phone"),
+       do:
+         context
+         |> Organizations.member_roles_by_user()
+         |> Map.new(fn {id, m} -> {id, m.roles} end),
+       else: %{}
   end
 
   defp fulfil_sale(context, %{purpose_type: "finance_invoice"} = intent) do

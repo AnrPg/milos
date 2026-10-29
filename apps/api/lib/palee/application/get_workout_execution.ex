@@ -52,7 +52,8 @@ defmodule Palee.Application.GetWorkoutExecution do
   defp execution_context(_context, %{organization_id: organization_id}, actor) do
     case Enum.find(Organizations.list_memberships(actor.id), fn membership ->
            membership.organization.id == organization_id and
-             membership.membership.status == :active
+             membership.membership.status == :active and
+             not Organizations.guest_only?(membership)
          end) do
       nil ->
         nil

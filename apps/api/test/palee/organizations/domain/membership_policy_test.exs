@@ -12,7 +12,8 @@ defmodule Palee.Organizations.Domain.MembershipPolicyTest do
              :accountant,
              :janitor,
              :member,
-             :athlete
+             :athlete,
+             :guest
            ]
 
     assert MembershipPolicy.statuses() == [:invited, :active, :suspended, :revoked]
@@ -30,6 +31,48 @@ defmodule Palee.Organizations.Domain.MembershipPolicyTest do
   # is now asserted against the live paths instead - see
   # organizations_test.exs ("a member cannot issue invitations") and
   # set_membership_role_test.exs ("a coach cannot change roles at all").
+
+  describe "the guest role (ADR-272)" do
+    test "is the lowest tier, below every client role" do
+      assert MembershipPolicy.tier(:guest) > 0
+      assert MembershipPolicy.tier(:member) > MembershipPolicy.tier(:guest)
+      assert MembershipPolicy.tier(:athlete) > MembershipPolicy.tier(:guest)
+    end
+
+    test "buys like a client but is neither a client nor staff" do
+      assert MembershipPolicy.guest?([:guest])
+      assert MembershipPolicy.buyer?([:guest])
+      refute MembershipPolicy.client?([:guest])
+      refute MembershipPolicy.staff?([:guest])
+      assert MembershipPolicy.buyer_role([:guest]) == :guest
+      assert MembershipPolicy.buyer_role([:member, :guest]) == :member
+      assert MembershipPolicy.buyer_role([:coach]) == nil
+      refute MembershipPolicy.buyer?([:front_desk])
+    end
+
+    test "only a guest with no client or staff role is guest-only" do
+      assert MembershipPolicy.guest_only?([:guest])
+      assert MembershipPolicy.guest_only?(["guest"])
+      refute MembershipPolicy.guest_only?([:member, :guest])
+      refute MembershipPolicy.guest_only?([:front_desk, :guest])
+      refute MembershipPolicy.guest_only?([:member])
+    end
+
+    test "staff who invite clients may make someone a guest; nobody makes themselves one" do
+      for issuer <- [[:owner], [:admin], [:coach], [:front_desk]],
+          do: assert(MembershipPolicy.can_grant_role?(issuer, :guest))
+
+      refute MembershipPolicy.can_grant_role?([:accountant], :guest)
+      refute MembershipPolicy.can_grant_role?([:member], :guest)
+      assert MembershipPolicy.can_manage_member?([:front_desk], [:guest])
+      refute MembershipPolicy.can_manage_member?([:guest], [:guest])
+      refute MembershipPolicy.self_assignable_role?([:owner], :guest)
+      refute MembershipPolicy.self_assignable_role?([:member], :guest)
+
+      assert :ok =
+               MembershipPolicy.authorize_role_change([:front_desk], [:guest], [:member], :other)
+    end
+  end
 
   describe "the role hierarchy (ADR-219)" do
     test "ranks owner over admin over staff over clients; a tier's roles are peers" do

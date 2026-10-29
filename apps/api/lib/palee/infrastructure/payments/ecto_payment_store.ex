@@ -211,7 +211,10 @@ defmodule Palee.Infrastructure.Payments.EctoPaymentStore do
       |> filter(:purpose_type, filters[:purpose_type])
       |> filter(:purpose_id, filters[:purpose_id])
       |> filter(:finance_payment_id, filters[:finance_payment_id])
+      |> filter(:initiation, filters[:initiation])
       |> attention(filters[:attention])
+      |> tipped(filters[:tipped])
+      |> succeeded_between(filters[:succeeded_from], filters[:succeeded_to])
 
     %{
       intents:
@@ -253,6 +256,18 @@ defmodule Palee.Infrastructure.Payments.EctoPaymentStore do
   end
 
   defp attention(query, _no), do: query
+
+  # ADR-272: payments whose card paid a tip.
+  defp tipped(query, true), do: where(query, [i], i.tip_cents > 0)
+  defp tipped(query, _no), do: query
+
+  defp succeeded_between(query, nil, nil), do: query
+
+  defp succeeded_between(query, from, to) do
+    query
+    |> then(&if(from, do: where(&1, [i], i.succeeded_at >= ^from), else: &1))
+    |> then(&if(to, do: where(&1, [i], i.succeeded_at < ^to), else: &1))
+  end
 
   defp filter(query, _field, nil), do: query
   defp filter(query, field, value), do: where(query, [i], field(i, ^field) == ^value)

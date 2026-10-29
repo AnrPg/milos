@@ -1106,6 +1106,13 @@ defmodule Palee.Payments do
 
   defp notifier, do: Application.fetch_env!(:palee, :payment_notifier)
 
+  @doc """
+  ADR-272: payments as stored (with their tip attribution), for the tips
+  summary. `filters` as `list/2`, plus `tipped`, `succeeded_from`,
+  `succeeded_to`.
+  """
+  def list_raw(context, filters), do: PaymentStore.list_intents(context, filters)
+
   def list(context, filters) do
     %{intents: intents, total: total} = PaymentStore.list_intents(context, filters)
     %{payments: Enum.map(intents, &public_intent/1), total: total}

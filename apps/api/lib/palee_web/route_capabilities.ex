@@ -289,6 +289,12 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminTerminalPaymentsController, :show} => [:take_payments],
     {W.AdminTerminalPaymentsController, :cancel} => [:take_payments],
     {W.AdminTerminalPaymentsController, :sandbox_complete} => [:take_payments],
+    # ADR-272: the receipt by email, «Ποιος;» / «Τι;», guests of the box, tips.
+    {W.AdminTerminalPaymentsController, :receipt_email} => [:take_payments],
+    {W.AdminDeskBuyersController, :people} => [:take_payments],
+    {W.AdminDeskBuyersController, :options} => [:take_payments],
+    {W.AdminDeskBuyersController, :make_guest} => [:take_payments],
+    {W.AdminTipsController, :index} => [:view_finance_reports, :manage_billing],
     # ADR-252: documents are box rules (manage_settings: which are
     # mandatory, their text, the booking gate); asking clients to sign and
     # reading who signed is membership work too, and front desk work

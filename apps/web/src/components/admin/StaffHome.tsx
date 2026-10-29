@@ -30,6 +30,7 @@ import { SquadsSection } from "@/components/community/squads/SquadsSection";
 import { FormReviewQueue } from "@/components/staff/FormReviewQueue";
 import { ScalingQueue } from "@/components/scaling/ScalingQueue";
 import { SetupRecipeCard } from "@/components/admin/setup/SetupRecipeCard";
+import { CollectEntry } from "@/components/admin/collect/CollectEntry";
 import { ReplyQueue } from "@/components/staff/ReplyQueue";
 import {
   inputClass,
@@ -84,6 +85,8 @@ export function StaffHome() {
     <AdminDashboard membership={membership}>
       {/* ADR-255: a new box picks its kind once (mockup s10 A). */}
       <SetupRecipeCard membership={membership} />
+      {/* ADR-272: «Είσπραξη» with Tap to Pay, on a staff phone only. */}
+      {has("take_payments") ? <CollectEntry /> : null}
       {frontDesk ? <FrontDeskCard membership={membership} /> : null}
       {accountant ? <AccountsCard membership={membership} /> : null}
       {coach ? <MyClientsSection membership={membership} /> : null}

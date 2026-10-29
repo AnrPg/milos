@@ -386,7 +386,14 @@ defmodule PaleeWeb.FallbackController do
     terminal_transaction_used:
       {:conflict, "This card payment is already recorded for another request"},
     payment_not_cancellable: {:conflict, "This payment can no longer be cancelled"},
-    package_inactive: {:conflict, "This package is no longer offered"}
+    package_inactive: {:conflict, "This package is no longer offered"},
+    # ADR-272: the receipt, guests of the box and the tips summary.
+    terminal_no_receipt: {:conflict, "This payment has no receipt yet"},
+    guest_name_required: {:unprocessable_entity, "Enter the person's name"},
+    guest_email_invalid: {:unprocessable_entity, "Enter a valid email address"},
+    guest_is_staff:
+      {:conflict, "This person works at the box; give them a client role in Users instead"},
+    tips_period_invalid: {:unprocessable_entity, "Choose a period of up to one year"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@terminal_payment_errors, reason) do

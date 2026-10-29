@@ -96,8 +96,10 @@ defmodule Palee.Application.AuthorizeWorkoutExecutionSource do
   defp active_member?(%{id: user_id}, organization_id) do
     user_id
     |> Organizations.list_memberships()
-    |> Enum.any?(fn %{membership: membership, organization: organization} ->
-      organization.id == organization_id and membership.status == :active
+    |> Enum.any?(fn %{membership: membership, organization: organization} = entry ->
+      # ADR-272: a guest of the box does not get its workouts.
+      organization.id == organization_id and membership.status == :active and
+        not Organizations.guest_only?(entry)
     end)
   end
 

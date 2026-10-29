@@ -325,6 +325,13 @@ defmodule PaleeWeb.Router do
     get("/:slug/packages", PublicBoxController, :packages)
   end
 
+  # ADR-272: a walk-in's receipt behind the QR on the staff phone.
+  scope "/api/public/receipts", PaleeWeb do
+    pipe_through([:api, :public_box_rate_limited])
+
+    get("/:token", PublicReceiptsController, :show)
+  end
+
   # ADR-170: the public platform plan catalog (pricing, coach onboarding).
   scope "/api/public/platform-plans", PaleeWeb do
     pipe_through([:api, :public_box_rate_limited])
@@ -513,6 +520,8 @@ defmodule PaleeWeb.Router do
     pipe_through([:api, :authenticated, :authenticated_rate_limited])
 
     get("/memberships", OrganizationAccessController, :memberships)
+    # ADR-272: the boxes the account is only a guest of (the box page's banner).
+    get("/memberships/guest-boxes", OrganizationAccessController, :guest_boxes)
     post("/organizations", OwnerOrganizationController, :create)
     # ADR-170: an account opens its practice as an independent coach.
     post("/coach-practices", CoachPracticeController, :create)
@@ -1343,6 +1352,12 @@ defmodule PaleeWeb.Router do
     post("/payments/terminal/result", AdminTerminalPaymentsController, :result)
     get("/payments/terminal/:id", AdminTerminalPaymentsController, :show)
     post("/payments/terminal/:id/cancel", AdminTerminalPaymentsController, :cancel)
+    # ADR-272: the receipt by email, who pays and what, guests, tips.
+    post("/payments/terminal/:id/receipt-email", AdminTerminalPaymentsController, :receipt_email)
+    get("/payments/desk/people", AdminDeskBuyersController, :people)
+    get("/payments/desk/options", AdminDeskBuyersController, :options)
+    post("/payments/desk/guests", AdminDeskBuyersController, :make_guest)
+    get("/payments/tips", AdminTipsController, :index)
 
     post(
       "/payments/terminal/:id/sandbox-complete",

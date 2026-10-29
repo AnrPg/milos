@@ -4,13 +4,14 @@ defmodule Palee.Application.UpdateFinanceMember do
   (a member or athlete role in the gym) have one. Staff never get a profile,
   a package or a status, so they never reach the finance ledger or analytics;
   someone who is both staff and a client (a role they were explicitly given)
-  is treated as the client they are.
+  is treated as the client they are. ADR-272: a guest of the box buys
+  like a client, so a guest has one too.
   """
 
   alias Palee.{Finance, Organizations}
 
   def call(%{organization_id: _} = context, user_id, params) do
-    case Organizations.client_role(context, user_id) do
+    case Organizations.buyer_role(context, user_id) do
       nil ->
         {:error, :not_a_client}
 

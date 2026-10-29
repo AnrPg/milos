@@ -159,7 +159,8 @@ defmodule Palee.Organizations.Domain.AccessPolicy do
     accountant: @accountant,
     janitor: @janitor,
     member: %{},
-    athlete: %{}
+    athlete: %{},
+    guest: %{}
   }
 
   # What a gym may unlock for a role on top of its defaults (ADR-099,
