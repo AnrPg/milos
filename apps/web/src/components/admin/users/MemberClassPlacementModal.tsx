@@ -22,7 +22,7 @@ type Props = {
 };
 
 /**
- * ADR-225: staff book a member into a class, or move one of their upcoming
+ * ADR-232: staff book a member into a class, or move one of their upcoming
  * bookings to another class. The API lists what can be chosen and why a
  * class cannot take the member; times read on the box's clock (ADR-179).
  */

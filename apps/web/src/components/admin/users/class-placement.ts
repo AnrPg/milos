@@ -1,7 +1,7 @@
 import type { ClassPlacementClass } from "@/api/admin-users";
 
 /**
- * ADR-225: why a class cannot take the member, in staff words. The codes are
+ * ADR-232: why a class cannot take the member, in staff words. The codes are
  * the booking error codes the API answers, so the same text explains a
  * disabled class in the list and a refused placement.
  */

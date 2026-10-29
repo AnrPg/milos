@@ -7995,10 +7995,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** What staff can choose when booking a member into a class or moving them (ADR-225) */
+        /** What staff can choose when booking a member into a class or moving them (ADR-232) */
         get: operations["PaleeWeb.AdminUserController.class_placement_options"];
         put?: never;
-        /** Book a member into a class, optionally moving them out of an upcoming booking in one transaction (ADR-225) */
+        /** Book a member into a class, optionally moving them out of an upcoming booking in one transaction (ADR-232) */
         post: operations["PaleeWeb.AdminUserController.place_in_class"];
         delete?: never;
         options?: never;

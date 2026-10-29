@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { placementBlocked, placementReasonKey } from "./class-placement";
 
-describe("class placement (ADR-225)", () => {
+describe("class placement (ADR-232)", () => {
   it("explains each booking refusal in staff words", () => {
     expect(placementReasonKey(null)).toBeNull();
     expect(placementReasonKey("slot_full")).toBe("placementReasonFull");

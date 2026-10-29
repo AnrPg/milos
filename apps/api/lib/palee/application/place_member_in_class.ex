@@ -1,7 +1,7 @@
 defmodule Palee.Application.PlaceMemberInClass do
   @moduledoc """
   Lets staff book a member into a scheduled class from the member's profile,
-  optionally moving them out of one of their upcoming bookings (ADR-225).
+  optionally moving them out of one of their upcoming bookings (ADR-232).
 
   The new booking passes the regular checks (class open and published, a free
   place, not in the past, the member's package covers it and has a visit

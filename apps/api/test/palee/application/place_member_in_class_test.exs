@@ -1,5 +1,5 @@
 defmodule Palee.Application.PlaceMemberInClassTest do
-  @moduledoc "ADR-225: staff booking a member into a class or moving them."
+  @moduledoc "ADR-232: staff booking a member into a class or moving them."
   use Palee.DataCase, async: false
 
   alias Palee.Application.{GetClassPlacementOptions, PlaceMemberInClass, SubmitBooking}

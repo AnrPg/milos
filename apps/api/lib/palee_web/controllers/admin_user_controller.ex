@@ -428,7 +428,7 @@ defmodule PaleeWeb.AdminUserController do
     description:
       "`programming` (clients only, else null): `{allowed, grant, reason}` says whether a WOD " <>
         "can be assigned to the person: their subscription package needs online programming " <>
-        "(`online_programming`) or personal training (`personal_training`), ADR-225.",
+        "(`online_programming`) or personal training (`personal_training`), ADR-232.",
     parameters: [
       %Parameter{
         name: :id,
@@ -488,7 +488,7 @@ defmodule PaleeWeb.AdminUserController do
         "folder, class workouts in the class-day folder, member variations in the " <>
         "member's variations folder. " <>
         "Athletes, and members in the personal and class_variant modes, need a package with " <>
-        "online programming or personal training (ADR-225); otherwise 403 `programming_not_in_package`.",
+        "online programming or personal training (ADR-232); otherwise 403 `programming_not_in_package`.",
     parameters: [@id_parameter],
     request_body: @program_body,
     responses: [created: {"Programming result", "application/json", @summary_object}]
@@ -510,7 +510,7 @@ defmodule PaleeWeb.AdminUserController do
 
   operation(:place_in_class,
     summary:
-      "Book a member into a class, optionally moving them out of an upcoming booking in one transaction (ADR-225)",
+      "Book a member into a class, optionally moving them out of an upcoming booking in one transaction (ADR-232)",
     parameters: [@id_parameter],
     request_body: @class_placement_body,
     responses: [created: {"Class placement result", "application/json", @summary_object}]
@@ -568,7 +568,7 @@ defmodule PaleeWeb.AdminUserController do
   }
 
   operation(:class_placement_options,
-    summary: "What staff can choose when booking a member into a class or moving them (ADR-225)",
+    summary: "What staff can choose when booking a member into a class or moving them (ADR-232)",
     parameters: [@id_parameter],
     responses: [ok: {"Class placement options", "application/json", @placement_options}]
   )

@@ -1,7 +1,7 @@
 defmodule Palee.Application.GetClassPlacementOptions do
   @moduledoc """
   What staff can choose in «Κλείσιμο ή μετακίνηση μαθήματος» on a member's
-  profile (ADR-225): the member's upcoming bookings that can be moved, and
+  profile (ADR-232): the member's upcoming bookings that can be moved, and
   the upcoming classes of the staff member's branches, each with the reason
   it cannot take the member now (or nil), decided by the same rules as
   `PlaceMemberInClass`. The reasons are the booking error codes, so the

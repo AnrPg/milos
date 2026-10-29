@@ -186830,7 +186830,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "What staff can choose when booking a member into a class or moving them (ADR-225)",
+        "summary": "What staff can choose when booking a member into a class or moving them (ADR-232)",
         "tags": [
           "Admin Users"
         ]
@@ -186896,7 +186896,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Book a member into a class, optionally moving them out of an upcoming booking in one transaction (ADR-225)",
+        "summary": "Book a member into a class, optionally moving them out of an upcoming booking in one transaction (ADR-232)",
         "tags": [
           "Admin Users"
         ]

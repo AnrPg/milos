@@ -244,7 +244,7 @@ export type AdminUserPRs = {
   prs: AdminUserPR[];
 };
 
-/** ADR-225: the member's movable bookings and the classes staff may place them in. */
+/** ADR-232: the member's movable bookings and the classes staff may place them in. */
 export type ClassPlacementOptions =
   paths["/api/org/{organization_slug}/admin/users/{id}/class-placement"]["get"]["responses"][200]["content"]["application/json"];
 export type ClassPlacementBooking = ClassPlacementOptions["bookings"][number];

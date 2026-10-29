@@ -1,7 +1,7 @@
 import { expect, test, type Page, type Request } from "./support/test";
 import { chooseOption } from "./support/select";
 
-// ADR-225: on a member's profile, staff book the member into a class or move
+// ADR-232: on a member's profile, staff book the member into a class or move
 // one of their bookings. The API lists the choices and says why a class
 // cannot take the member; a member out of visits can still be moved, since
 // the move returns the old booking's visit. The API is stubbed; every route
@@ -77,7 +77,7 @@ const option = (slot_id: string, name: string, scheduled_at: string, blocked_rea
   blocked_reason,
 });
 
-test.describe("Member profile › Book or move (ADR-225)", () => {
+test.describe("Member profile › Book or move (ADR-232)", () => {
   test("staff move a member out of visits, and full classes stay closed", async ({ page }) => {
     await common(page);
     const placements: unknown[] = [];
