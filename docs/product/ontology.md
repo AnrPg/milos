@@ -449,6 +449,8 @@ Staff screens only (Fiscal). The German and Austrian texts a receipt prints are 
 | Withdrawal | Υπαναχώρηση | `/me/payments/:id/withdraw` | The member's right to cancel an online purchase within 14 days, getting back the price minus what was used. Not for a visit booked for a set day and time. | Cancelling a booking; refund by the box. |
 | Pay with another card | Πληρωμή με άλλη κάρτα | `/me/payments?payment=<id>` | What a member does when a saved-card charge did not go through. | |
 | Sales page | Σελίδα πακέτων | `/b/<slug>/packages` | The box's public page of subscription packages that can be bought online. | Public box page (`/b/<slug>`). |
+| Sold online | Πωλείται online | `membership_packages.sold_online`, `online_visibility` | A subscription package box members can buy themselves on the Σελίδα πακέτων and in the app. Switched on by itself for paid packages when the box connects online payments (ADR-271); the owner turns it off per package in the package's «Προχωρημένες ρυθμίσεις», and Palee never turns it back on. List badge: "Online". | Front desk only («Μόνο στην υποδοχή»); «Τι πληρώνεται online» (what members may pay online at all). |
+| Front desk only | Μόνο στην υποδοχή | `sold_online = false` | A subscription package staff sell at the desk; box members do not see it online. | Retired package. |
 
 ### 4.19 Privacy and legal (ADR-267)
 
