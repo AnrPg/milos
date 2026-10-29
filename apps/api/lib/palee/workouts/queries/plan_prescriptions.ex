@@ -8,6 +8,8 @@ defmodule Palee.Workouts.Queries.PlanPrescriptions do
 
   * `workload/3` — sets, reps, volume, calories, distance and the time
     domain of what an athlete did (`PlanWorkload`);
+  * `clock/1`, `score_config/1` — how a plan section runs and is scored
+    (the executor's timer segments);
   * `exercise_weights/1` — how many sets each exercise of a plan section is
     done in, as prescribed.
   """
@@ -18,6 +20,8 @@ defmodule Palee.Workouts.Queries.PlanPrescriptions do
     StructuredPlan,
     StructuredPlanWorkout
   }
+
+  alias Palee.Workouts.Domain.StructuredPlan.Prescription
 
   @doc "Whether a workout (read model or params) is written in the structured WOD editor."
   @spec plan_workout?(term()) :: boolean()
@@ -37,6 +41,20 @@ defmodule Palee.Workouts.Queries.PlanPrescriptions do
   @spec plan_section?(term()) :: boolean()
   def plan_section?(%{} = section), do: is_map(field(section, :plan))
   def plan_section?(_section), do: false
+
+  @doc """
+  The canonical clock of a plan section (`StructuredPlan.Prescription`): its
+  `flow` and unit-normalised timing; nil when the section has no valid plan.
+  """
+  @spec clock(term()) :: map() | nil
+  def clock(%{} = section) do
+    case section |> field(:plan) |> Prescription.build() do
+      %{clock: clock} -> clock
+      _none -> nil
+    end
+  end
+
+  def clock(_section), do: nil
 
   @doc "The score config of a plan section (`%{\"type\", \"unit\"}`), nil when it is not scored."
   @spec score_config(map()) :: map() | nil

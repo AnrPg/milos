@@ -62,6 +62,18 @@ defmodule Palee.Workouts.Queries.PlanPrescriptionsTest do
              ["Back Squat", "Burpee over Bar", "Butterfly Pull-up", "Power Snatch", "Thruster"]
   end
 
+  test "clock and score config of a section, for the executor's timer" do
+    [strength, _amrap, engine] =
+      workout([Enum.at(program(), 0), Enum.at(program(), 6), Enum.at(program(), 7)]).sections
+
+    assert %{flow: "sets"} = PlanPrescriptions.clock(strength)
+    assert %{flow: "for_time", interrupt_every_secs: 120} = PlanPrescriptions.clock(engine)
+    assert %{"type" => "time"} = PlanPrescriptions.score_config(engine)
+
+    assert PlanPrescriptions.clock(%{"plan" => nil}) == nil
+    assert PlanPrescriptions.clock(nil) == nil
+  end
+
   test "workload and weights are empty for a workout without plans" do
     assert PlanPrescriptions.workload(%{sections: [%{id: "a", exercises: []}]}, []) == nil
     assert PlanPrescriptions.workload(nil) == nil
