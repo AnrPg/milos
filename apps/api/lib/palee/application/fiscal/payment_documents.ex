@@ -143,6 +143,10 @@ defmodule Palee.Application.Fiscal.PaymentDocuments do
   its fiscal document by the amount given back: `{:ok, credit_note}`,
   `{:ok, :no_document}` when the payment issued none, or `{:error, reason}`.
   Idempotent per reversal (`finance-reversal:<id>`).
+
+  A refund started from the credit-note panel (ADR-265) carries
+  `fiscal_credit` (`%{"reason" => ..., "lines" => [...]}`): the note then
+  has that reason and, for a partial note, exactly the chosen lines.
   """
   def credit(context, payment_id, reversal, actor_id, %DateTime{} = now) do
     case Fiscal.document_by_key(context, "finance-payment:" <> payment_id) do
@@ -151,15 +155,17 @@ defmodule Palee.Application.Fiscal.PaymentDocuments do
 
       document ->
         today = Organizations.local_today(context.organization_id, now)
+        {requested, opts} = credit_request(reversal)
 
         case Fiscal.credit(
                context,
                document.id,
-               %{amount_cents: reversal.amount_cents},
+               requested,
                today,
                "finance-reversal:" <> reversal.id,
                actor_id,
-               now
+               now,
+               opts
              ) do
           {:ok, note, _mode} ->
             {:ok, note}
@@ -173,6 +179,30 @@ defmodule Palee.Application.Fiscal.PaymentDocuments do
         end
     end
   end
+
+  @doc """
+  The credit request of a refund's `fiscal_credit` (ADR-265), as stored
+  (string keys) or as given (atom keys): the chosen lines or the amount,
+  and the reason.
+  """
+  def credit_request(reversal) do
+    fiscal_credit = Map.get(reversal, :fiscal_credit) || %{}
+    reason = field(fiscal_credit, :reason)
+
+    requested =
+      case field(fiscal_credit, :lines) do
+        [_ | _] = lines ->
+          Enum.map(lines, &%{position: field(&1, :position), quantity: field(&1, :quantity)})
+
+        _none ->
+          %{amount_cents: reversal.amount_cents}
+      end
+
+    {requested, if(reason, do: [reason: reason], else: [])}
+  end
+
+  defp field(map, key) when is_map(map), do: Map.get(map, key, Map.get(map, Atom.to_string(key)))
+  defp field(_other, _key), do: nil
 
   @doc "Adds `fiscal_credit_note` (or `fiscal_error`) to a desk reversal."
   def attach_credit(context, payment_id, reversal, actor_id) do

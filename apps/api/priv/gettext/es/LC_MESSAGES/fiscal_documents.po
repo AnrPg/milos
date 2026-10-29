@@ -190,6 +190,18 @@ msgstr "Huella del documento (SHA-256)"
 msgid "Page"
 msgstr "Página"
 
+msgid "Reason for the credit note"
+msgstr "Motivo de la factura rectificativa"
+
+msgid "Product returned"
+msgstr "Devolución del producto"
+
+msgid "Billing error"
+msgstr "Error de facturación"
+
+msgid "Subscription cancelled"
+msgstr "Cancelación de la suscripción"
+
 msgid "Technical security system (TSE)"
 msgstr "Dispositivo técnico de seguridad (TSE)"
 

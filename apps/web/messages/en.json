@@ -12250,7 +12250,8 @@
       "branchCode": "Change it only if you have a branch registered with AADE.",
       "optional": "Optional.",
       "iban": "Optional. Printed on invoices to be paid by bank transfer.",
-      "qrIban": "Optional. For QR-bills with a QR reference."
+      "qrIban": "Optional. For QR-bills with a QR reference.",
+      "checkDigitsOk": "Check digits: correct."
     },
     "reason": {
       "blank": "Fill this in.",
@@ -12289,6 +12290,21 @@
       "sandbox": "sandbox",
       "test": "test",
       "production": "production"
+    },
+    "registry": {
+      "lookup": "Fill in from the tax ID",
+      "looking": "Looking it up at AADE…",
+      "orByHand": "Or fill in the fields yourself.",
+      "found": "Found in AADE's registry. Please check them.",
+      "foundLater": "AADE also gave the address and activity code (ΚΑΔ): you'll find them filled in in the next steps.",
+      "error": {
+        "invalid_tax_id": "This tax ID isn't right. Check the digits.",
+        "registry_not_connected": "The AADE registry credentials are missing. Fill in the fields yourself.",
+        "registry_credentials_rejected": "AADE didn't accept the registry credentials. Fill in the fields yourself.",
+        "registry_not_found": "AADE couldn't find this tax ID.",
+        "registry_limit_reached": "Too many look-ups. Try again in a little while.",
+        "registry_unavailable": "AADE isn't answering right now. Try again later or fill in the fields yourself."
+      }
     }
   },
   "FiscalDocuments": {
@@ -12411,7 +12427,33 @@
     "mapPlaceholder": "category=value, one per line",
     "auditOk": "OK",
     "pdf": "PDF",
-    "txAccepted": "myDATA"
+    "txAccepted": "myDATA",
+    "sendEmail": "Send by email",
+    "reason": "Reason",
+    "reasons": {
+      "product_return": "Product returned",
+      "billing_error": "Billing error",
+      "subscription_cancelled": "Subscription cancelled",
+      "other": "Other"
+    },
+    "pickReason": "Choose a reason.",
+    "refundToCard": "Refund to the card {card}",
+    "refundToCardHint": "Through {provider}, together with the credit note. Turn it off if you gave the money back another way.",
+    "refundingToCard": "The money is going back to the card {card} (2–5 working days).",
+    "noRefund": "No money refunded.",
+    "emailTitle": "Send {number} by email",
+    "emailTo": "Recipient's email",
+    "emailHint": "We send the PDF in the document's language.",
+    "emailSend": "Send",
+    "emailSending": "Sending…",
+    "emailSent": "Sent to {to}.",
+    "emailError": {
+      "invalid_address": "This email doesn't look right. Please check it.",
+      "no_recipient": "Type the email to send it to.",
+      "throttled": "This was just sent to that email. Try again later.",
+      "suppressed": "This email doesn't accept our messages. Try another one.",
+      "business_not_activated": "Emails to customers start once your box is activated."
+    }
   },
   "BoxScreens": {
     "eyebrow": "Settings",

@@ -12250,7 +12250,8 @@
       "branchCode": "Cámbialo solo si tienes una sucursal registrada en la AADE.",
       "optional": "Opcional.",
       "iban": "Opcional. Se imprime en las facturas que se pagan por transferencia.",
-      "qrIban": "Opcional. Para facturas QR con referencia QR."
+      "qrIban": "Opcional. Para facturas QR con referencia QR.",
+      "checkDigitsOk": "Dígitos de control: correctos."
     },
     "reason": {
       "blank": "Completa este campo.",
@@ -12289,6 +12290,21 @@
       "sandbox": "entorno de pruebas",
       "test": "prueba",
       "production": "producción"
+    },
+    "registry": {
+      "lookup": "Rellenar desde el número fiscal (ΑΦΜ)",
+      "looking": "Consultando a la AADE…",
+      "orByHand": "O rellena los campos tú mismo.",
+      "found": "Encontrados en el registro de la AADE. Revísalos.",
+      "foundLater": "La AADE también dio la dirección y el código de actividad (ΚΑΔ): los encontrarás rellenados en los siguientes pasos.",
+      "error": {
+        "invalid_tax_id": "Este número fiscal no es correcto. Revisa los dígitos.",
+        "registry_not_connected": "Faltan las credenciales del registro de la AADE. Rellena los campos tú mismo.",
+        "registry_credentials_rejected": "La AADE no aceptó las credenciales. Rellena los campos tú mismo.",
+        "registry_not_found": "La AADE no encontró este número fiscal.",
+        "registry_limit_reached": "Demasiadas consultas. Inténtalo de nuevo en un rato.",
+        "registry_unavailable": "La AADE no responde ahora. Inténtalo más tarde o rellena los campos tú mismo."
+      }
     }
   },
   "FiscalDocuments": {
@@ -12411,7 +12427,33 @@
     "mapPlaceholder": "categoría=valor, uno por línea",
     "auditOk": "OK",
     "pdf": "PDF",
-    "txAccepted": "myDATA"
+    "txAccepted": "myDATA",
+    "sendEmail": "Enviar por email",
+    "reason": "Motivo",
+    "reasons": {
+      "product_return": "Devolución de producto",
+      "billing_error": "Error de cobro",
+      "subscription_cancelled": "Suscripción cancelada",
+      "other": "Otro"
+    },
+    "pickReason": "Elige un motivo.",
+    "refundToCard": "Devolver el dinero a la tarjeta {card}",
+    "refundToCardHint": "A través de {provider}, junto con la nota de crédito. Desactívalo si devolviste el dinero de otra forma.",
+    "refundingToCard": "El dinero vuelve a la tarjeta {card} (2–5 días hábiles).",
+    "noRefund": "Sin devolución de dinero.",
+    "emailTitle": "Enviar {number} por email",
+    "emailTo": "Email del destinatario",
+    "emailHint": "Enviamos el PDF en el idioma del documento.",
+    "emailSend": "Enviar",
+    "emailSending": "Enviando…",
+    "emailSent": "Enviado a {to}.",
+    "emailError": {
+      "invalid_address": "Este email no parece correcto. Revísalo.",
+      "no_recipient": "Escribe el email al que enviarlo.",
+      "throttled": "Se acaba de enviar a este email. Inténtalo más tarde.",
+      "suppressed": "Este email no acepta nuestros mensajes. Prueba con otro.",
+      "business_not_activated": "Los emails a clientes empiezan en cuanto se active tu box."
+    }
   },
   "BoxScreens": {
     "eyebrow": "Ajustes",

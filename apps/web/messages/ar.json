@@ -12250,7 +12250,8 @@
       "branchCode": "غيّره فقط إذا كان لديك فرع مسجّل لدى AADE.",
       "optional": "اختياري.",
       "iban": "اختياري. يُطبع على الفواتير التي تُدفع بالتحويل المصرفي.",
-      "qrIban": "اختياري. لفواتير QR ذات مرجع QR."
+      "qrIban": "اختياري. لفواتير QR ذات مرجع QR.",
+      "checkDigitsOk": "أرقام التحقق: صحيحة."
     },
     "reason": {
       "blank": "املأ هذا الحقل.",
@@ -12289,6 +12290,21 @@
       "sandbox": "بيئة تجريبية",
       "test": "اختبار",
       "production": "بيئة الإنتاج"
+    },
+    "registry": {
+      "lookup": "التعبئة من الرقم الضريبي (ΑΦΜ)",
+      "looking": "جارٍ البحث لدى AADE…",
+      "orByHand": "أو املأ الحقول بنفسك.",
+      "found": "وُجدت في سجل AADE. تحقق منها.",
+      "foundLater": "قدّمت AADE أيضًا العنوان ورمز النشاط (ΚΑΔ): ستجدها معبأة في الخطوات التالية.",
+      "error": {
+        "invalid_tax_id": "هذا الرقم الضريبي غير صحيح. تحقق من الأرقام.",
+        "registry_not_connected": "بيانات الدخول إلى سجل AADE غير موجودة. املأ الحقول بنفسك.",
+        "registry_credentials_rejected": "لم تقبل AADE بيانات الدخول. املأ الحقول بنفسك.",
+        "registry_not_found": "لم تجد AADE هذا الرقم الضريبي.",
+        "registry_limit_reached": "عمليات بحث كثيرة جدًا. حاول بعد قليل.",
+        "registry_unavailable": "لا تستجيب AADE الآن. حاول لاحقًا أو املأ الحقول بنفسك."
+      }
     }
   },
   "FiscalDocuments": {
@@ -12411,7 +12427,33 @@
     "mapPlaceholder": "الفئة=القيمة، واحدة في كل سطر",
     "auditOk": "OK",
     "pdf": "PDF",
-    "txAccepted": "myDATA"
+    "txAccepted": "myDATA",
+    "sendEmail": "إرسال بالبريد الإلكتروني",
+    "reason": "السبب",
+    "reasons": {
+      "product_return": "إرجاع منتج",
+      "billing_error": "خطأ في الفوترة",
+      "subscription_cancelled": "إلغاء الاشتراك",
+      "other": "آخر"
+    },
+    "pickReason": "اختر سببًا.",
+    "refundToCard": "إعادة المبلغ إلى البطاقة {card}",
+    "refundToCardHint": "عبر {provider}، مع إشعار الدائن. أوقفه إذا أعدت المبلغ بطريقة أخرى.",
+    "refundingToCard": "يُعاد المبلغ إلى البطاقة {card} (2–5 أيام عمل).",
+    "noRefund": "بدون إعادة المبلغ.",
+    "emailTitle": "إرسال {number} بالبريد الإلكتروني",
+    "emailTo": "بريد المستلم الإلكتروني",
+    "emailHint": "نرسل ملف PDF بلغة المستند.",
+    "emailSend": "إرسال",
+    "emailSending": "جارٍ الإرسال…",
+    "emailSent": "أُرسل إلى {to}.",
+    "emailError": {
+      "invalid_address": "يبدو أن هذا البريد الإلكتروني غير صحيح. تحقق منه.",
+      "no_recipient": "اكتب البريد الإلكتروني الذي يُرسل إليه.",
+      "throttled": "أُرسل للتو إلى هذا البريد. حاول لاحقًا.",
+      "suppressed": "هذا البريد لا يستقبل رسائلنا. جرّب بريدًا آخر.",
+      "business_not_activated": "تبدأ رسائل العملاء بمجرد تفعيل البوكس الخاص بك."
+    }
   },
   "BoxScreens": {
     "eyebrow": "الإعدادات",

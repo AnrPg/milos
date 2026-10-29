@@ -3,7 +3,9 @@ import { describe, expect, it } from "vitest";
 import {
   changesFor,
   doneGroups,
+  fromRegistry,
   groupFields,
+  isValidAfm,
   groupOfMissing,
   localTerm,
   nextStep,
@@ -93,5 +95,43 @@ describe("summary and next step", () => {
     expect(localTerm("GR", "tax_id")).toBe("ΑΦΜ");
     expect(localTerm("DE", "vat_number")).toBe("USt-IdNr.");
     expect(localTerm("GB", "tax_office")).toBeNull();
+  });
+});
+
+describe("isValidAfm (ADR-265)", () => {
+  it("checks the ninth digit against the weighted sum of the first eight", () => {
+    expect(isValidAfm("090000045")).toBe(true);
+    expect(isValidAfm(" 094014201 ")).toBe(true);
+    expect(isValidAfm("090000046")).toBe(false);
+    expect(isValidAfm("000000000")).toBe(false);
+    expect(isValidAfm("09000004")).toBe(false);
+    expect(isValidAfm("EL090000045")).toBe(false);
+  });
+});
+
+describe("fromRegistry (ADR-265)", () => {
+  const business = {
+    legal_name: " ΚΥΨΕΛΗ Ι.Κ.Ε. ",
+    trade_name: null,
+    tax_office: "Ζ' ΑΘΗΝΩΝ",
+    street: "ΦΩΚΙΩΝΟΣ ΝΕΓΡΗ",
+    building_number: "12",
+    postal_code: "11361",
+    city: "ΑΘΗΝΑ",
+    activity_code: "93130000",
+  };
+
+  it("fills the row's fields and keeps address and ΚΑΔ for later rows", () => {
+    expect(fromRegistry(business, {})).toEqual({
+      shown: { legal_name: "ΚΥΨΕΛΗ Ι.Κ.Ε.", tax_office: "Ζ' ΑΘΗΝΩΝ" },
+      later: { street: "ΦΩΚΙΩΝΟΣ ΝΕΓΡΗ 12", postal_code: "11361", city: "ΑΘΗΝΑ", activity_code: "93130000" },
+    });
+  });
+
+  it("never overwrites what the later rows already have", () => {
+    expect(fromRegistry(business, { city: "Πειραιάς", activity_code: "93110000" }).later).toEqual({
+      street: "ΦΩΚΙΩΝΟΣ ΝΕΓΡΗ 12",
+      postal_code: "11361",
+    });
   });
 });

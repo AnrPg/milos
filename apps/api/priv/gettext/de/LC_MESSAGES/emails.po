@@ -207,3 +207,21 @@ msgstr "Der Link ist 24 Stunden gültig."
 
 msgid "You're receiving this email because someone asked to use this address for a %{product} account."
 msgstr "Sie erhalten diese E-Mail, weil angefragt wurde, diese Adresse für ein %{product}-Konto zu verwenden."
+
+msgid "%{title} %{number} from %{business}"
+msgstr "%{title} %{number} von %{business}"
+
+msgid "%{business} sent you this document. You'll find it attached as a PDF."
+msgstr "%{business} hat dir diesen Beleg geschickt. Du findest ihn als PDF im Anhang."
+
+msgid "Document"
+msgstr "Beleg"
+
+msgid "Date of issue"
+msgstr "Ausstellungsdatum"
+
+msgid "Total"
+msgstr "Gesamtbetrag"
+
+msgid "Keep it for your records. For questions about it, contact the business."
+msgstr "Bewahre ihn für deine Unterlagen auf. Bei Fragen dazu wende dich an das Unternehmen."

@@ -156,6 +156,61 @@ defmodule Palee.FiscalTest do
       assert [_, _] = Fiscal.credit_notes(context, doc.id)
     end
 
+    test "a credit note keeps its reason in the document, its hash and the journal (ADR-265)",
+         %{context: context, owner: owner} do
+      {:ok, doc, :issued} = Fiscal.issue(context, request("k"), owner.id, @now)
+
+      assert {:error, :invalid_credit_reason} =
+               Fiscal.credit(context, doc.id, :all, ~D[2027-02-02], "c-1", owner.id, @now,
+                 reason: "whim"
+               )
+
+      assert {:ok, preview} =
+               Fiscal.credit_preview(
+                 context,
+                 doc.id,
+                 [%{position: 2, quantity: 2}],
+                 ~D[2027-02-02]
+               )
+
+      assert preview.gross_cents == 3000
+
+      assert {:ok, note, :issued} =
+               Fiscal.credit(
+                 context,
+                 doc.id,
+                 [%{position: 2, quantity: 2}],
+                 ~D[2027-02-02],
+                 "c-1",
+                 owner.id,
+                 @now,
+                 reason: "product_return"
+               )
+
+      assert note.credit_reason == "product_return"
+      assert note.gross_cents == preview.gross_cents
+      stored = Fiscal.get_document(context, note.id)
+      assert stored.credit_reason == "product_return"
+
+      # The reason is hashed: the same content without it hashes differently.
+      assert Fiscal.document_hash(stored, stored.lines) == stored.content_hash
+
+      refute Fiscal.document_hash(%{stored | credit_reason: nil}, stored.lines) ==
+               stored.content_hash
+
+      # Without a reason the hash is the one documents had before ADR-265.
+      assert Fiscal.document_hash(%{stored | credit_reason: nil}, stored.lines) ==
+               Fiscal.document_hash(Map.delete(stored, :credit_reason), stored.lines)
+
+      [entry] =
+        context
+        |> Fiscal.FiscalStore.list_journal_entries(%{})
+        |> Enum.filter(&(&1.subject_id == note.id))
+
+      assert entry.payload["credit_reason"] == "product_return"
+      assert {:ok, %{valid: true}} = Fiscal.verify_journal(context, owner.id, @now)
+    end
+
     test "another gym never sees the documents", %{context: context, owner: owner} do
       {:ok, doc, :issued} = Fiscal.issue(context, request("k"), owner.id, @now)
       {_org, _owner, other} = bypass_rls(fn -> organization_fixture() end)

@@ -1,4 +1,4 @@
-import type { Closing, FiscalDocument, FiscalDocumentDetail, FiscalDocumentLine, Transmission } from "@/api/fiscal";
+import type { Closing, FiscalDocument, FiscalDocumentDetail, FiscalDocumentLine, RefundOption, Transmission } from "@/api/fiscal";
 
 /**
  * Mockup s2, option A as the product owner changed it: the list of fiscal
@@ -96,6 +96,25 @@ export function creditLines(lines: Pick<FiscalDocumentLine, "position" | "quanti
 export function buyerName(document: Pick<FiscalDocument, "buyer">): string | null {
   const name = document.buyer?.name;
   return typeof name === "string" && name.trim() ? name : null;
+}
+
+/** The buyer's email as printed, the default address of «Αποστολή με email». */
+export function buyerEmail(document: Pick<FiscalDocument, "buyer">): string | null {
+  const email = document.buyer?.email;
+  return typeof email === "string" && email.trim() ? email.trim() : null;
+}
+
+/** The card a refund goes back to, as the mockup prints it: «••4242». */
+export function cardLabel(option: Pick<RefundOption, "card_last4" | "card_brand">): string {
+  if (option.card_last4) return `••${option.card_last4}`;
+  return option.card_brand?.trim() || "••••";
+}
+
+const PROVIDER_NAMES: Record<string, string> = { viva: "Viva", stripe: "Stripe", sandbox: "Sandbox" };
+
+/** A payment provider's brand name («Μέσω Viva»); brand names are not translated. */
+export function providerName(provider: string): string {
+  return PROVIDER_NAMES[provider] ?? provider.charAt(0).toUpperCase() + provider.slice(1);
 }
 
 /** The seller as printed on the document, in one line. */

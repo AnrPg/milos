@@ -210,6 +210,7 @@ defmodule Palee.Infrastructure.Payments.EctoPaymentStore do
       |> filter(:user_id, filters[:user_id])
       |> filter(:purpose_type, filters[:purpose_type])
       |> filter(:purpose_id, filters[:purpose_id])
+      |> filter(:finance_payment_id, filters[:finance_payment_id])
       |> attention(filters[:attention])
 
     %{

@@ -207,3 +207,21 @@ msgstr "De link is 24 uur geldig."
 
 msgid "You're receiving this email because someone asked to use this address for a %{product} account."
 msgstr "U ontvangt deze e-mail omdat is gevraagd dit adres te gebruiken voor een %{product}-account."
+
+msgid "%{title} %{number} from %{business}"
+msgstr "%{title} %{number} van %{business}"
+
+msgid "%{business} sent you this document. You'll find it attached as a PDF."
+msgstr "%{business} heeft je dit document gestuurd. Je vindt het als pdf in de bijlage."
+
+msgid "Document"
+msgstr "Document"
+
+msgid "Date of issue"
+msgstr "Uitgiftedatum"
+
+msgid "Total"
+msgstr "Totaal"
+
+msgid "Keep it for your records. For questions about it, contact the business."
+msgstr "Bewaar het voor je administratie. Neem bij vragen contact op met het bedrijf."

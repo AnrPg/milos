@@ -40,6 +40,7 @@ const api = vi.hoisted(() => ({
   fetchFiscalCountries: vi.fn(),
   saveFiscalIdentity: vi.fn(),
   fetchAuthorityConnection: vi.fn(),
+  lookupRegistryBusiness: vi.fn(),
 }));
 
 vi.mock("@/api/fiscal", async (original) => ({ ...(await original<object>()), ...api }));
@@ -110,6 +111,78 @@ describe("FiscalIdentitySettings", () => {
       tax_id: "801234568",
       tax_office: "Ζ΄ Αθηνών",
     });
+  });
+
+  it("fills the business row from AADE's registry once the ΑΦΜ's check digit is right (ADR-265)", async () => {
+    api.fetchFiscalIdentity.mockResolvedValue({ identity: identity({ city: "Πειραιάς" }), profile: GR, missing: ["legal_name", "tax_id", "tax_office"], complete: false });
+    api.lookupRegistryBusiness
+      .mockRejectedValueOnce(new ApiError(409, "registry_not_connected", { code: "registry_not_connected" }))
+      .mockResolvedValueOnce({
+        business: {
+          tax_id: "090000045",
+          legal_name: "ΚΥΨΕΛΗ ΑΘΛΗΤΙΚΗ Ι.Κ.Ε.",
+          trade_name: "ΚΥΨΕΛΗ STRONG",
+          tax_office: "Ζ' ΑΘΗΝΩΝ",
+          tax_office_code: "1118",
+          street: "ΦΩΚΙΩΝΟΣ ΝΕΓΡΗ",
+          building_number: "12",
+          postal_code: "11361",
+          city: "ΑΘΗΝΑ",
+          activity_code: "93130000",
+          activity_description: "ΥΠΗΡΕΣΙΕΣ ΓΥΜΝΑΣΤΗΡΙΩΝ",
+          activities: [],
+          active: true,
+          legal_status: "ΙΚΕ",
+          vat_registered: true,
+        },
+      });
+    api.saveFiscalIdentity.mockResolvedValue({ identity: identity({}), profile: GR, missing: [], complete: true });
+    wrap();
+
+    fireEvent.click(await screen.findByTestId("fiscal-row-business"));
+    const panel = await screen.findByTestId("fiscal-panel-business");
+    const lookup = within(panel).getByTestId("fiscal-registry-lookup");
+    expect(lookup).toHaveTextContent(en.FiscalIdentity.registry.lookup);
+    expect(lookup).toBeDisabled();
+
+    fireEvent.change(within(panel).getByTestId("fiscal-field-tax_id"), { target: { value: "090000046" } });
+    expect(lookup).toBeDisabled();
+    fireEvent.change(within(panel).getByTestId("fiscal-field-tax_id"), { target: { value: "090000045" } });
+    expect(panel).toHaveTextContent(en.FiscalIdentity.hint.checkDigitsOk);
+    expect(lookup).toBeEnabled();
+
+    fireEvent.click(lookup);
+    expect(await within(panel).findByText(en.FiscalIdentity.registry.error.registry_not_connected)).toBeInTheDocument();
+
+    fireEvent.click(lookup);
+    const found = await within(panel).findByTestId("fiscal-registry-found");
+    expect(found).toHaveTextContent(en.FiscalIdentity.registry.found);
+    expect(found).toHaveTextContent(en.FiscalIdentity.registry.foundLater);
+    expect(api.lookupRegistryBusiness).toHaveBeenLastCalledWith("token", "090000045");
+    expect(within(panel).getByTestId("fiscal-field-legal_name")).toHaveValue("ΚΥΨΕΛΗ ΑΘΛΗΤΙΚΗ Ι.Κ.Ε.");
+    expect(within(panel).getByTestId("fiscal-field-tax_office")).toHaveValue("Ζ' ΑΘΗΝΩΝ");
+
+    fireEvent.click(within(panel).getByTestId("fiscal-panel-save"));
+    await waitFor(() => expect(api.saveFiscalIdentity).toHaveBeenCalled());
+    // Address and ΚΑΔ go with the row; the city typed before stays.
+    expect(api.saveFiscalIdentity).toHaveBeenCalledWith("token", {
+      legal_name: "ΚΥΨΕΛΗ ΑΘΛΗΤΙΚΗ Ι.Κ.Ε.",
+      trade_name: "ΚΥΨΕΛΗ STRONG",
+      tax_id: "090000045",
+      tax_office: "Ζ' ΑΘΗΝΩΝ",
+      street: "ΦΩΚΙΩΝΟΣ ΝΕΓΡΗ 12",
+      postal_code: "11361",
+      activity_code: "93130000",
+    });
+  });
+
+  it("offers no registry look-up outside Greece", async () => {
+    api.fetchFiscalIdentity.mockResolvedValue({ identity: identity({ country_code: "CY" }), profile: CY, missing: ["legal_name"], complete: false });
+    wrap();
+
+    fireEvent.click(await screen.findByTestId("fiscal-row-business"));
+    const panel = await screen.findByTestId("fiscal-panel-business");
+    expect(within(panel).queryByTestId("fiscal-registry-lookup")).not.toBeInTheDocument();
   });
 
   it("fills the Greek VAT number from the ΑΦΜ when the tax row is saved", async () => {

@@ -141,6 +141,24 @@ defmodule Palee.Application.Fiscal.PaymentDocumentsTest do
       |> documents()
   end
 
+  test "a refund from the credit-note panel carries its reason and lines (ADR-265)" do
+    # Plain refunds credit by amount, as before.
+    assert PaymentDocuments.credit_request(%{amount_cents: 1_500}) ==
+             {%{amount_cents: 1_500}, []}
+
+    # A full note with a reason (stored JSON: string keys).
+    assert PaymentDocuments.credit_request(%{
+             amount_cents: 6_000,
+             fiscal_credit: %{"reason" => "billing_error"}
+           }) == {%{amount_cents: 6_000}, [reason: "billing_error"]}
+
+    # A partial note credits exactly the chosen lines (atom keys before reload).
+    assert PaymentDocuments.credit_request(%{
+             amount_cents: 1_500,
+             fiscal_credit: %{reason: "product_return", lines: [%{position: 2, quantity: 1}]}
+           }) == {[%{position: 2, quantity: 1}], [reason: "product_return"]}
+  end
+
   defp tenant_fixture(user, name) do
     {:ok, organization} =
       Organizations.create_organization(%{name: "#{name} #{System.unique_integer([:positive])}"})

@@ -57,6 +57,10 @@ defmodule Palee.Email do
       `"owner_invitation:<invitation id>"`, to list them with
       `list_by_idempotency_prefix/1`);
     * `:category` - overrides the template's category;
+    * `:attachments` - files to send with it (ADR-265):
+      `[%{filename, content_type: "application/pdf", data}]`, at most 5 MB
+      in all; they are encrypted with the body and cleared with it
+      (`{:error, :invalid_attachment | :attachment_too_large}` otherwise);
     * `:now` - the current time (tests).
 
   `{:ok, message}` (status `queued`, or `deferred` past today's budget), or

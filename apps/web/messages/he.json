@@ -12250,7 +12250,8 @@
       "branchCode": "שנו רק אם יש לכם סניף הרשום ב-AADE.",
       "optional": "לא חובה.",
       "iban": "לא חובה. מודפס על חשבוניות לתשלום בהעברה בנקאית.",
-      "qrIban": "לא חובה. לחשבוניות QR עם אסמכתת QR."
+      "qrIban": "לא חובה. לחשבוניות QR עם אסמכתת QR.",
+      "checkDigitsOk": "ספרות ביקורת: תקינות."
     },
     "reason": {
       "blank": "מלאו את השדה.",
@@ -12289,6 +12290,21 @@
       "sandbox": "סביבת ניסוי",
       "test": "בדיקה",
       "production": "סביבת ייצור"
+    },
+    "registry": {
+      "lookup": "מילוי ממספר המס (ΑΦΜ)",
+      "looking": "מחפש ב-AADE…",
+      "orByHand": "או למלא את השדות בעצמך.",
+      "found": "נמצאו במרשם של AADE. כדאי לבדוק אותם.",
+      "foundLater": "AADE נתנה גם כתובת וקוד פעילות (ΚΑΔ): הם יופיעו ממולאים בשלבים הבאים.",
+      "error": {
+        "invalid_tax_id": "מספר המס הזה לא תקין. כדאי לבדוק את הספרות.",
+        "registry_not_connected": "חסרים פרטי הגישה למרשם של AADE. יש למלא את השדות בעצמך.",
+        "registry_credentials_rejected": "AADE לא קיבלה את פרטי הגישה. יש למלא את השדות בעצמך.",
+        "registry_not_found": "AADE לא מצאה את מספר המס הזה.",
+        "registry_limit_reached": "יותר מדי חיפושים. אפשר לנסות שוב בעוד רגע.",
+        "registry_unavailable": "AADE לא עונה כרגע. אפשר לנסות מאוחר יותר או למלא את השדות בעצמך."
+      }
     }
   },
   "FiscalDocuments": {
@@ -12411,7 +12427,33 @@
     "mapPlaceholder": "קטגוריה=ערך, אחד בכל שורה",
     "auditOk": "OK",
     "pdf": "PDF",
-    "txAccepted": "myDATA"
+    "txAccepted": "myDATA",
+    "sendEmail": "שליחה במייל",
+    "reason": "סיבה",
+    "reasons": {
+      "product_return": "החזרת מוצר",
+      "billing_error": "חיוב שגוי",
+      "subscription_cancelled": "ביטול מנוי",
+      "other": "אחר"
+    },
+    "pickReason": "יש לבחור סיבה.",
+    "refundToCard": "החזר כספי לכרטיס {card}",
+    "refundToCardHint": "דרך {provider}, יחד עם הודעת הזיכוי. כבו את זה אם החזרתם את הכסף בדרך אחרת.",
+    "refundingToCard": "הכסף חוזר לכרטיס {card} (2–5 ימי עסקים).",
+    "noRefund": "ללא החזר כספי.",
+    "emailTitle": "שליחת {number} במייל",
+    "emailTo": "המייל של הנמען",
+    "emailHint": "אנחנו שולחים את ה-PDF בשפת המסמך.",
+    "emailSend": "שליחה",
+    "emailSending": "שולח…",
+    "emailSent": "נשלח אל {to}.",
+    "emailError": {
+      "invalid_address": "כתובת המייל הזו לא נראית תקינה. כדאי לבדוק אותה.",
+      "no_recipient": "יש לכתוב לאיזה מייל לשלוח.",
+      "throttled": "זה נשלח הרגע למייל הזה. אפשר לנסות שוב מאוחר יותר.",
+      "suppressed": "המייל הזה לא מקבל הודעות מאיתנו. אפשר לנסות כתובת אחרת.",
+      "business_not_activated": "מיילים ללקוחות יתחילו ברגע שהבוקס שלך יופעל."
+    }
   },
   "BoxScreens": {
     "eyebrow": "הגדרות",

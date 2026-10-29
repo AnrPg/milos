@@ -95,7 +95,11 @@ defmodule Palee.Application.Payments.FinanceFulfilment do
            PaymentDocuments.credit(
              context,
              intent.finance_payment_id,
-             %{id: reversal_id(reversal), amount_cents: refund.amount_cents},
+             %{
+               id: reversal_id(reversal),
+               amount_cents: refund.amount_cents,
+               fiscal_credit: Map.get(refund, :fiscal_credit)
+             },
              refund.created_by_id,
              DateTime.utc_now()
            ) do

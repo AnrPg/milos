@@ -260,6 +260,50 @@ defmodule Palee.Fiscal.Domain.UblInvoiceTest do
     assert [line] = PeppolBisRules.all(root, "cac:CreditNoteLine")
     assert PeppolBisRules.text(line, "cbc:CreditedQuantity") == "1"
     refute String.starts_with?(PeppolBisRules.text(line, "cbc:LineExtensionAmount"), "-")
+    # Without a reason there is no document note.
+    assert PeppolBisRules.all(root, "cbc:Note") == []
+  end
+
+  test "a credit note's reason is its one document note (ADR-265, BT-22)" do
+    [_invoice, _paid, {credit, opts}] = documents()
+
+    xml = credit |> Map.put(:credit_reason, "billing_error") |> xml(opts)
+    assert PeppolBisRules.check(xml) == [], xml
+    root = PeppolBisRules.parse(xml)
+
+    if xmllint = System.find_executable("xmllint") do
+      path = Path.join(System.tmp_dir!(), "adr265-credit-note-#{System.unique_integer()}.xml")
+      File.write!(path, xml)
+
+      {output, status} =
+        System.cmd(
+          xmllint,
+          ["--noout", "--schema", Path.join(@xsd_dir, "UBL-CreditNote-2.1.xsd"), path],
+          stderr_to_stdout: true
+        )
+
+      File.rm(path)
+      assert status == 0, output
+    end
+
+    assert [_one] = PeppolBisRules.all(root, "cbc:Note")
+    assert PeppolBisRules.text(root, "cbc:Note") =~ ~r/:/
+
+    assert UblInvoice.credit_note_text(%{
+             kind: "credit_note",
+             credit_reason: "other",
+             language: "de"
+           }) ==
+             "Gutschrift"
+
+    assert UblInvoice.credit_note_text(%{
+             kind: "credit_note",
+             credit_reason: "product_return",
+             language: "el"
+           }) == "Credit note: product returned"
+
+    assert UblInvoice.credit_note_text(%{kind: "invoice", credit_reason: nil, language: "en"}) ==
+             nil
   end
 
   test "documents that cannot be sent say why" do

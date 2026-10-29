@@ -131,6 +131,66 @@ test.describe("Settings › Billing details", () => {
     await expect(page.getByTestId("fiscal-mydata-status")).toHaveText("Connected");
     await expect(page.getByRole("img", { name: "100% complete" })).toBeVisible();
   });
+
+  test("fills the business row from the ΑΦΜ through AADE's registry (ADR-265)", async ({ page }) => {
+    await signIn(page);
+    const sent: Record<string, unknown>[] = [];
+    const lookups: string[] = [];
+    await page.route("**/api/org/box1/admin/fiscal/countries", (route) => route.fulfill(json({ countries: [DE, GR], vat_schemes: ["standard", "small_business", "exempt"] })));
+    await page.route("**/api/org/box1/admin/fiscal/authority-connection", (route) => route.fulfill(json({ connection: null, environments: ["sandbox", "test", "production"] })));
+    await page.route("**/api/org/box1/admin/fiscal/identity", (route) => {
+      if (route.request().method() === "PUT") sent.push(bodyOf(route.request()));
+      const identity = { id: "identity-1", country_code: "GR", currency: "EUR", vat_scheme: "standard", branch_code: 0, fiscal_year_start_month: 1, ...Object.assign({}, ...sent) };
+      return route.fulfill(json({ identity, profile: GR, missing: sent.length ? [] : ["legal_name", "tax_id", "tax_office"], complete: sent.length > 0 }));
+    });
+    await page.route("**/api/org/box1/admin/fiscal/registry/businesses/*", (route) => {
+      lookups.push(route.request().url().split("/").pop() ?? "");
+      return route.fulfill(
+        json({
+          business: {
+            tax_id: "090000045",
+            legal_name: "KYPSELI ATHLETIC P.C.",
+            trade_name: "KYPSELI STRONG",
+            tax_office: "Z ATHENS",
+            tax_office_code: "1118",
+            street: "FOKIONOS NEGRI",
+            building_number: "12",
+            postal_code: "11361",
+            city: "ATHENS",
+            activity_code: "93130000",
+            activity_description: "GYM SERVICES",
+            activities: [],
+            active: true,
+            legal_status: "IKE",
+            vat_registered: true,
+          },
+        }),
+      );
+    });
+
+    await page.goto("/admin/settings/billing");
+    await page.getByTestId("fiscal-row-business").click();
+    const business = page.getByTestId("fiscal-panel-business");
+    const lookup = business.getByTestId("fiscal-registry-lookup");
+    await expect(lookup).toHaveText("Fill in from the tax ID");
+    await expect(lookup).toBeDisabled();
+
+    // A wrong check digit never reaches AADE.
+    await business.getByTestId("fiscal-field-tax_id").fill("090000046");
+    await expect(lookup).toBeDisabled();
+    await business.getByTestId("fiscal-field-tax_id").fill("090000045");
+    await expect(business).toContainText("Check digits: correct.");
+    await lookup.click();
+
+    await expect(business.getByTestId("fiscal-registry-found")).toContainText("Found in AADE's registry. Please check them.");
+    await expect(business.getByTestId("fiscal-field-legal_name")).toHaveValue("KYPSELI ATHLETIC P.C.");
+    await expect(business.getByTestId("fiscal-field-tax_office")).toHaveValue("Z ATHENS");
+    expect(lookups).toEqual(["090000045"]);
+
+    await business.getByTestId("fiscal-panel-save").click();
+    await expect(business).toBeHidden();
+    expect(sent[0]).toMatchObject({ tax_id: "090000045", street: "FOKIONOS NEGRI 12", postal_code: "11361", city: "ATHENS", activity_code: "93130000" });
+  });
 });
 
 const today = localDay(0);
@@ -207,10 +267,71 @@ test.describe("Finance › Documents", () => {
     await credit.getByTestId("fiscal-credit-part").click();
     await credit.getByTestId("fiscal-credit-line-2").click();
     await expect(credit.getByTestId("fiscal-credit-amount")).toHaveText("-€34.00");
+    await expect(credit.getByTestId("fiscal-credit-issue")).toBeDisabled();
+    await credit.getByTestId("fiscal-credit-reason-product_return").click();
     await credit.getByTestId("fiscal-credit-issue").click();
 
     await expect.poll(() => credited?.lines).toEqual([{ position: 2, quantity: 1 }]);
+    expect(credited).toMatchObject({ reason: "product_return" });
+    expect(credited).not.toHaveProperty("refund");
     await expect(page.getByTestId("fiscal-document-panel").getByTestId("fiscal-doc-credit-note")).toContainText("C-000010");
+  });
+
+  test("refunds the card with the credit note and emails the PDF (ADR-265)", async ({ page }) => {
+    await signIn(page);
+    let credited: Record<string, unknown> | null = null;
+    let emailed: Record<string, unknown> | null = null;
+    await page.route("**/api/org/box1/admin/fiscal/documents?**", (route) => route.fulfill(json({ documents: [r418], total: 1 })));
+    await page.route("**/api/org/box1/admin/fiscal/closings?**", (route) => route.fulfill(json({ closings: [] })));
+    const note = { ...r418, id: "c11", number: "C-000011", kind: "credit_note", gross_cents: 12400, credit_reason: "subscription_cancelled" };
+    await page.route("**/api/org/box1/admin/fiscal/documents/d1", (route) =>
+      route.fulfill(
+        json({
+          document: {
+            ...r418,
+            buyer: { name: "Maria P.", email: "maria@example.com" },
+            lines,
+            tax_breakdown: [{ tax_category: "standard", rate_bp: 2400, net_cents: 10000, tax_cents: 2400, gross_cents: 12400 }],
+            credit_notes: credited ? [note] : [],
+            refund_option: credited ? null : { provider: "viva", card_brand: "visa", card_last4: "4242", refundable_cents: 12400 },
+          },
+        }),
+      ),
+    );
+    await page.route("**/api/org/box1/admin/fiscal/documents/d1/credit-notes", (route) => {
+      credited = bodyOf(route.request());
+      return route.fulfill(json({ document: note, refund: { id: "rf1", status: "succeeded", amount_cents: 12400 } }, 201));
+    });
+    await page.route("**/api/org/box1/admin/fiscal/documents/d1/email", (route) => {
+      emailed = bodyOf(route.request());
+      return route.fulfill(json({ email: { id: "e1", status: "queued", to: "maria@example.com", recipient: "buyer" } }, 202));
+    });
+
+    await page.goto("/admin/finance?tab=documents");
+    await page.getByTestId("fiscal-doc-R-000418").click();
+    const panel = page.getByTestId("fiscal-document-panel");
+    await panel.getByTestId("fiscal-doc-credit").click();
+
+    const credit = page.getByTestId("fiscal-credit-panel");
+    const refund = credit.getByRole("switch", { name: "Refund to the card ••4242" });
+    await expect(refund).toHaveAttribute("aria-checked", "true");
+    await expect(credit).toContainText("Through Viva, together with the credit note.");
+    await credit.getByTestId("fiscal-credit-reason-subscription_cancelled").click();
+    await credit.getByTestId("fiscal-credit-issue").click();
+
+    await expect.poll(() => credited).toMatchObject({ reason: "subscription_cancelled", refund: true });
+    const issued = page.getByTestId("fiscal-document-panel").getByTestId("fiscal-doc-credit-note");
+    await expect(issued).toContainText("C-000011");
+    await expect(issued).toContainText("Subscription cancelled");
+    await expect(issued).toContainText("The money is going back to the card ••4242 (2–5 working days).");
+
+    await page.getByTestId("fiscal-doc-email").click();
+    const dialog = page.getByTestId("fiscal-email-dialog");
+    await expect(dialog.getByTestId("fiscal-email-to")).toHaveValue("maria@example.com");
+    await dialog.getByTestId("fiscal-email-send").click();
+    await expect(page.getByTestId("fiscal-doc-email-sent")).toHaveText("Sent to maria@example.com.");
+    expect(emailed).toMatchObject({ to: "maria@example.com" });
+    expect(String(emailed?.["idempotency_key"] ?? "")).not.toBe("");
   });
 
   test("checks the audit archive and lists the export formats", async ({ page }) => {

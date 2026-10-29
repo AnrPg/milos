@@ -48,6 +48,8 @@ defmodule Palee.Fiscal do
   defdelegate vat_schemes(), to: BusinessIdentityPolicy
   defdelegate document_kinds(), to: FiscalDocumentPolicy, as: :kinds
   defdelegate payment_methods(), to: FiscalDocumentPolicy
+  defdelegate credit_reasons(), to: FiscalDocumentPolicy
+  defdelegate credit_reason(reason), to: FiscalDocumentPolicy
 
   # ── Identity ────────────────────────────────────────────────────────────
 
@@ -155,6 +157,10 @@ defmodule Palee.Fiscal do
   Issues a credit note correcting `document_id` by `requested` (`:all`,
   `[%{position, quantity}]` or `%{amount_cents: n}`). Idempotent by
   `idempotency_key`.
+
+  Options: `:reason` – why (ADR-265, one of
+  `FiscalDocumentPolicy.credit_reasons/0`); it is stored on the note,
+  printed on it, hashed with its content and journaled.
   """
   def credit(
         context,
@@ -163,9 +169,36 @@ defmodule Palee.Fiscal do
         %Date{} = issue_date,
         idempotency_key,
         actor_id,
-        %DateTime{} = now
+        %DateTime{} = now,
+        opts \\ []
       ) do
-    request_hash = hash_term(%{credit: document_id, requested: requested})
+    with {:ok, reason} <- FiscalDocumentPolicy.credit_reason(Keyword.get(opts, :reason)) do
+      request = %{
+        document_id: document_id,
+        requested: requested,
+        issue_date: issue_date,
+        idempotency_key: idempotency_key,
+        reason: reason
+      }
+
+      credit_note(context, request, actor_id, now)
+    end
+  end
+
+  defp credit_note(context, request, actor_id, now) do
+    %{
+      document_id: document_id,
+      requested: requested,
+      issue_date: issue_date,
+      idempotency_key: idempotency_key,
+      reason: reason
+    } = request
+
+    # A note without a reason keeps the request hash it had before ADR-265.
+    request_hash =
+      %{credit: document_id, requested: requested}
+      |> put_present(:reason, reason)
+      |> hash_term()
 
     FiscalStore.transaction(context, fn ->
       case replay(context, idempotency_key, request_hash) do
@@ -184,7 +217,8 @@ defmodule Palee.Fiscal do
                credited = FiscalStore.credited_lines(context, original.id),
                {:ok, note} <-
                  FiscalDocumentPolicy.credit_note(original, credited, requested, issue_date),
-               note = Map.put(note, :idempotency_key, idempotency_key),
+               note =
+                 Map.merge(note, %{idempotency_key: idempotency_key, credit_reason: reason}),
                {:ok, saved} <-
                  store_document(context, note, identity.branch_code, request_hash, actor_id, now) do
             {:ok, {saved, :issued}}
@@ -192,6 +226,19 @@ defmodule Palee.Fiscal do
       end
     end)
     |> unwrap_issue()
+  end
+
+  @doc """
+  The credit note `credit/8` would issue now for `requested`, without
+  issuing it: `{:ok, note}` (with totals and lines) or `{:error, reason}`.
+  ADR-265 refunds exactly its `gross_cents` before the refund issues it.
+  """
+  def credit_preview(context, document_id, requested, %Date{} = issue_date) do
+    with original when is_map(original) <-
+           FiscalStore.get_document(context, document_id, []) || {:error, :not_found} do
+      credited = FiscalStore.credited_lines(context, original.id)
+      FiscalDocumentPolicy.credit_note(original, credited, requested, issue_date)
+    end
   end
 
   defp unwrap_issue({:ok, {document, mode}}), do: {:ok, document, mode}
@@ -236,17 +283,19 @@ defmodule Palee.Fiscal do
              subject_id: id,
              actor_id: actor_id,
              occurred_at: issued_at,
-             payload: %{
-               kind: document.kind,
-               number: number,
-               issue_date: document.issue_date,
-               currency: document.currency,
-               net_cents: document.net_cents,
-               tax_cents: document.tax_cents,
-               gross_cents: document.gross_cents,
-               corrects_document_id: document.corrects_document_id,
-               content_hash: content_hash
-             }
+             payload:
+               %{
+                 kind: document.kind,
+                 number: number,
+                 issue_date: document.issue_date,
+                 currency: document.currency,
+                 net_cents: document.net_cents,
+                 tax_cents: document.tax_cents,
+                 gross_cents: document.gross_cents,
+                 corrects_document_id: document.corrects_document_id,
+                 content_hash: content_hash
+               }
+               |> put_present(:credit_reason, Map.get(document, :credit_reason))
            }) do
       with {:ok, saved} <-
              FiscalStore.insert_document(
@@ -270,14 +319,30 @@ defmodule Palee.Fiscal do
                        tax_category rate_bp exemption_reason net_cents tax_cents gross_cents
                        corrects_position source_type source_id)a
 
+  # ADR-265: a credit note's reason is part of what was printed. It is
+  # hashed only when present, so documents issued before keep their hash.
+  @optional_hash_fields ~w(credit_reason)a
+
   @doc "SHA-256 of a document's canonical content (what was printed)."
   def document_hash(document, lines) do
+    optional =
+      document
+      |> Map.take(@optional_hash_fields)
+      |> Map.reject(fn {_field, value} -> is_nil(value) end)
+
     %{
-      document: Map.take(document, @document_hash_fields) |> Map.update(:issued_at, nil, &iso/1),
+      document:
+        document
+        |> Map.take(@document_hash_fields)
+        |> Map.merge(optional)
+        |> Map.update(:issued_at, nil, &iso/1),
       lines: Enum.map(lines, &Map.take(&1, @line_hash_fields))
     }
     |> hash_term()
   end
+
+  defp put_present(map, _key, nil), do: map
+  defp put_present(map, key, value), do: Map.put(map, key, value)
 
   defp iso(%DateTime{} = at), do: at |> JournalChain.microseconds() |> DateTime.to_iso8601()
   defp iso(value), do: value
@@ -298,6 +363,44 @@ defmodule Palee.Fiscal do
   def credit_notes(context, document_id),
     do:
       FiscalStore.list_documents(context, %{corrects_document_id: document_id, limit: 200}).documents
+
+  @doc """
+  Journals that a document was sent by email (ADR-265): who sent it, to
+  whom (`recipient: "buyer" | "address"` and a digest of the address,
+  never the address itself: the journal is never erased) and the outbox
+  message.
+
+  `send` runs in the same transaction and returns `{:ok, sent}` with
+  `recipient`, `recipient_digest`, `message_id` and `language`; the outbox
+  joins that transaction, so an email is queued only when it is journaled.
+  `{:ok, sent}` or `{:error, reason}`.
+  """
+  def email_document(context, document, send, actor_id, %DateTime{} = now)
+      when is_function(send, 0) do
+    FiscalStore.transaction(context, fn ->
+      with {:ok, sent} <- send.(),
+           {:ok, _entry} <- record_document_emailed(context, document, sent, actor_id, now) do
+        {:ok, sent}
+      end
+    end)
+  end
+
+  defp record_document_emailed(context, document, sent, actor_id, now) do
+    append(context, %{
+      event_type: "document_emailed",
+      subject_type: "fiscal_document",
+      subject_id: document.id,
+      actor_id: actor_id,
+      occurred_at: now,
+      payload: %{
+        number: document.number,
+        recipient: sent.recipient,
+        recipient_digest: sent.recipient_digest,
+        email_message_id: sent.message_id,
+        language: sent.language
+      }
+    })
+  end
 
   # ── Journal ─────────────────────────────────────────────────────────────
 

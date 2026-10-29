@@ -2,19 +2,42 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { useRef, useState } from "react";
+import { useRef, useState, type FormEvent } from "react";
 
-import { fetchFiscalDocument, issueCreditNote, retryTransmission, type FiscalDocumentDetail } from "@/api/fiscal";
+import {
+  CREDIT_REASONS,
+  emailFiscalDocument,
+  fetchFiscalDocument,
+  issueCreditNote,
+  retryTransmission,
+  type CreditReason,
+  type CreditResult,
+  type FiscalDocumentDetail,
+} from "@/api/fiscal";
+import { ApiError } from "@/api/client";
 import { Dialog } from "@/components/ui/Dialog";
-import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { ErrorNotice, FieldError } from "@/components/ui/ErrorNotice";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
-import { formErrorsFrom } from "@/lib/form-errors";
+import { fieldBorder, formErrorsFrom, invalidFieldProps } from "@/lib/form-errors";
 
 import { DocumentViewDialog } from "./DocumentViewDialog";
-import { buyerName, canCredit, canRetry, creditAmount, creditLines, ratePercent, sellerLine, transmissionState } from "./documents-model";
+import {
+  buyerEmail,
+  buyerName,
+  canCredit,
+  canRetry,
+  cardLabel,
+  creditAmount,
+  creditLines,
+  providerName,
+  ratePercent,
+  sellerLine,
+  transmissionState,
+} from "./documents-model";
 import {
   Card,
+  Chip,
   dangerButtonStyle,
   formatMoney,
   ghostButtonClass,
@@ -25,6 +48,7 @@ import {
   linkButtonClass,
   linkButtonStyle,
   Pill,
+  primaryButtonStyle,
 } from "./fiscal-ui";
 import { FISCAL_DOCUMENTS_KEY, KindPill, paymentKey, TransmissionPill } from "./document-bits";
 import { clockFormat } from "@/lib/clock";
@@ -49,6 +73,10 @@ export function DocumentPanel({
   const t = useTranslations("FiscalDocuments");
   const [mode, setMode] = useState<"detail" | "credit">("detail");
   const [viewing, setViewing] = useState(false);
+  const [emailing, setEmailing] = useState(false);
+  const [sentTo, setSentTo] = useState<string | null>(null);
+  // What the credit-note panel just did, for the line under the note.
+  const [issued, setIssued] = useState<{ id: string; card: string | null } | null>(null);
   const query = useQuery({ queryKey: documentKey(documentId), enabled: Boolean(token), queryFn: () => fetchFiscalDocument(token, documentId) });
   const document = query.data?.document;
 
@@ -57,7 +85,32 @@ export function DocumentPanel({
   }
 
   if (mode === "credit" && document) {
-    return <CreditPanel token={token} document={document} onBack={() => setMode("detail")} onClose={onClose} />;
+    return (
+      <CreditPanel
+        token={token}
+        document={document}
+        onBack={() => setMode("detail")}
+        onIssued={(result, card) => {
+          if (result.document) setIssued({ id: result.document.id, card });
+          setMode("detail");
+        }}
+        onClose={onClose}
+      />
+    );
+  }
+
+  if (emailing && document) {
+    return (
+      <EmailDialog
+        token={token}
+        document={document}
+        onClose={() => setEmailing(false)}
+        onSent={(to) => {
+          setSentTo(to);
+          setEmailing(false);
+        }}
+      />
+    );
   }
 
   return (
@@ -75,6 +128,9 @@ export function DocumentPanel({
               <Icon name="download" size={15} />
               {t("pdf")}
             </button>
+            <button type="button" className={ghostButtonClass} style={ghostButtonStyle} onClick={() => setEmailing(true)} data-testid="fiscal-doc-email">
+              {t("sendEmail")}
+            </button>
             {canCredit(document) ? (
               <button type="button" className={ghostButtonClass} style={dangerButtonStyle} onClick={() => setMode("credit")} data-testid="fiscal-doc-credit">
                 {t("creditNote")}
@@ -89,13 +145,25 @@ export function DocumentPanel({
       ) : query.isError || !document ? (
         <ErrorNotice>{t("documentLoadFailed")}</ErrorNotice>
       ) : (
-        <DocumentDetail token={token} document={document} onOpen={onOpen} />
+        <DocumentDetail token={token} document={document} onOpen={onOpen} sentTo={sentTo} justIssued={issued} />
       )}
     </Dialog>
   );
 }
 
-function DocumentDetail({ token, document, onOpen }: { token: string; document: FiscalDocumentDetail; onOpen: (id: string) => void }) {
+function DocumentDetail({
+  token,
+  document,
+  onOpen,
+  sentTo,
+  justIssued,
+}: {
+  token: string;
+  document: FiscalDocumentDetail;
+  onOpen: (id: string) => void;
+  sentTo: string | null;
+  justIssued: { id: string; card: string | null } | null;
+}) {
   const t = useTranslations("FiscalDocuments");
   const locale = useUiLocale();
   const queryClient = useQueryClient();
@@ -164,6 +232,11 @@ function DocumentDetail({ token, document, onOpen }: { token: string; document: 
       </div>
 
       {document.payment_method ? <KeyValue label={t("payment.label")}>{t(`payment.${paymentKey(document.payment_method)}`)}</KeyValue> : null}
+      {document.credit_reason ? (
+        <KeyValue label={t("reason")}>
+          <span data-testid="fiscal-doc-reason">{t(`reasons.${document.credit_reason}`)}</span>
+        </KeyValue>
+      ) : null}
       {document.corrects_document_id ? (
         <KeyValue label={t("corrects")}>
           <button type="button" className={linkButtonClass} style={linkButtonStyle} onClick={() => onOpen(document.corrects_document_id!)} data-testid="fiscal-doc-corrects">
@@ -206,11 +279,26 @@ function DocumentDetail({ token, document, onOpen }: { token: string; document: 
               <button type="button" className={linkButtonClass} style={linkButtonStyle} onClick={() => onOpen(credit.id)}>
                 {t("creditNoteLine", { number: credit.number, amount: money(-Math.abs(credit.gross_cents)) })}
               </button>
-              <p className="text-xs" style={hintStyle}>{t("originalUnchanged")}</p>
+              <p className="text-xs" style={hintStyle}>
+                {[
+                  credit.credit_reason ? t(`reasons.${credit.credit_reason}`) : null,
+                  justIssued?.id === credit.id ? (justIssued.card ? t("refundingToCard", { card: justIssued.card }) : t("noRefund")) : null,
+                  t("originalUnchanged"),
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </p>
             </div>
           </div>
         </Card>
       ))}
+
+      {sentTo ? (
+        <p className="flex items-center gap-1.5 text-xs" style={{ color: "var(--success)" }} role="status" data-testid="fiscal-doc-email-sent">
+          <Icon name="check" size={13} />
+          {t("emailSent", { to: sentTo })}
+        </p>
+      ) : null}
 
       <details className="text-xs" style={hintStyle}>
         <summary className="cursor-pointer">{t("printedParties")}</summary>
@@ -226,11 +314,13 @@ function CreditPanel({
   token,
   document,
   onBack,
+  onIssued,
   onClose,
 }: {
   token: string;
   document: FiscalDocumentDetail;
   onBack: () => void;
+  onIssued: (result: CreditResult, card: string | null) => void;
   onClose: () => void;
 }) {
   const t = useTranslations("FiscalDocuments");
@@ -241,18 +331,29 @@ function CreditPanel({
   const lines = document.lines ?? [];
   const [full, setFull] = useState(true);
   const [picked, setPicked] = useState<ReadonlySet<number>>(new Set());
+  const [reason, setReason] = useState<CreditReason | null>(null);
+  const option = document.refund_option ?? null;
+  // Mockup s2: the switch starts on; staff turn it off when they gave the money back another way.
+  const [refund, setRefund] = useState(Boolean(option));
+  const card = option ? cardLabel(option) : null;
   const [error, setError] = useState<string | null>(null);
   // One key per credit note the person means to issue: a retried click is the same request.
   const idempotencyKey = useRef(crypto.randomUUID());
   const amount = creditAmount(lines, full, picked);
-  const ready = amount > 0;
+  const ready = amount > 0 && reason !== null;
 
   const issue = useMutation({
-    mutationFn: () => issueCreditNote(token, document.id, idempotencyKey.current, full ? undefined : creditLines(lines, picked)),
-    onSuccess: () => {
+    mutationFn: () =>
+      issueCreditNote(token, document.id, {
+        idempotencyKey: idempotencyKey.current,
+        reason: reason!,
+        lines: full ? undefined : creditLines(lines, picked),
+        refund: Boolean(option) && refund,
+      }),
+    onSuccess: (result) => {
       void queryClient.invalidateQueries({ queryKey: documentKey(document.id) });
       void queryClient.invalidateQueries({ queryKey: FISCAL_DOCUMENTS_KEY });
-      onBack();
+      onIssued(result, option && refund ? card : null);
     },
     onError: (failure) => setError(formErrorsFrom(failure, translate, []).message),
   });
@@ -268,6 +369,14 @@ function CreditPanel({
     setFull(value);
     idempotencyKey.current = crypto.randomUUID();
   };
+  const pickReason = (value: CreditReason) => {
+    setReason(value);
+    idempotencyKey.current = crypto.randomUUID();
+  };
+  const toggleRefund = () => {
+    setRefund((value) => !value);
+    idempotencyKey.current = crypto.randomUUID();
+  };
 
   return (
     <Dialog
@@ -278,7 +387,13 @@ function CreditPanel({
       dismissible={!issue.isPending}
       error={error}
       testId="fiscal-credit-panel"
-      footerStart={!ready ? <span className="text-xs" style={hintStyle}>{t("pickLines")}</span> : null}
+      footerStart={
+        amount <= 0 ? (
+          <span className="text-xs" style={hintStyle}>{t("pickLines")}</span>
+        ) : reason === null ? (
+          <span className="text-xs" style={hintStyle}>{t("pickReason")}</span>
+        ) : null
+      }
       footer={
         <>
           <button type="button" className={ghostButtonClass} style={ghostButtonStyle} onClick={onBack} disabled={issue.isPending}>
@@ -325,6 +440,48 @@ function CreditPanel({
             })}
           </div>
         ) : null}
+        <div className="grid gap-1.5">
+          <span id="fiscal-credit-reason-label" className="text-xs font-bold" style={{ color: "var(--text-soft)" }}>
+            {t("reason")}
+          </span>
+          <div role="group" aria-labelledby="fiscal-credit-reason-label" className="flex flex-wrap gap-1.5">
+            {CREDIT_REASONS.map((value) => (
+              <Chip key={value} on={reason === value} onClick={() => pickReason(value)} testId={`fiscal-credit-reason-${value}`}>
+                {t(`reasons.${value}`)}
+              </Chip>
+            ))}
+          </div>
+        </div>
+        {option && card ? (
+          <div className="flex items-center gap-3 rounded-[14px] p-2.5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+            <span className="min-w-0 flex-1">
+              <b id="fiscal-credit-refund-label" className="block" style={{ color: "var(--text)" }}>
+                {t("refundToCard", { card })}
+              </b>
+              <span id="fiscal-credit-refund-hint" className="text-xs" style={hintStyle}>
+                {t("refundToCardHint", { provider: providerName(option.provider) })}
+              </span>
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={refund}
+              aria-labelledby="fiscal-credit-refund-label"
+              aria-describedby="fiscal-credit-refund-hint"
+              onClick={toggleRefund}
+              disabled={issue.isPending}
+              data-testid="fiscal-credit-refund"
+              className="hit-area relative h-8 w-14 shrink-0 rounded-full disabled:opacity-60"
+              style={{ background: refund ? "var(--primary)" : "var(--panel-raised)", border: "1px solid var(--border)" }}
+            >
+              <span
+                aria-hidden="true"
+                className="absolute top-1 h-5 w-5 rounded-full transition-all"
+                style={{ left: refund ? "1.9rem" : "0.25rem", background: refund ? "var(--bg)" : "var(--text)" }}
+              />
+            </button>
+          </div>
+        ) : null}
         <KeyValue label={t("creditNote")} total>
           <span data-testid="fiscal-credit-amount">{money(-amount)}</span>
         </KeyValue>
@@ -354,5 +511,97 @@ function Option({ on, onClick, title, hint, testId }: { on: boolean; onClick: ()
         <span className="text-xs" style={hintStyle}>{hint}</span>
       </span>
     </button>
+  );
+}
+
+/** «Αποστολή με email» (ADR-265): the PDF to the customer printed on it, or to an address staff type. */
+function EmailDialog({
+  token,
+  document,
+  onClose,
+  onSent,
+}: {
+  token: string;
+  document: FiscalDocumentDetail;
+  onClose: () => void;
+  onSent: (to: string) => void;
+}) {
+  const t = useTranslations("FiscalDocuments");
+  const translate = useUiTranslations();
+  const [to, setTo] = useState(buyerEmail(document) ?? "");
+  const [fieldError, setFieldError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  // One key per address: a retried click sends nothing twice.
+  const idempotencyKey = useRef(crypto.randomUUID());
+
+  const send = useMutation({
+    mutationFn: () => emailFiscalDocument(token, document.id, idempotencyKey.current, to.trim()),
+    onSuccess: (result) => onSent(result.email.to),
+    onError: (failure) => {
+      const code = failure instanceof ApiError ? failure.payload.code : undefined;
+      if (code === "invalid_address" || code === "no_recipient") setFieldError(t(`emailError.${code}`));
+      else if (code === "throttled" || code === "suppressed" || code === "business_not_activated") setError(t(`emailError.${code}`));
+      else setError(formErrorsFrom(failure, translate, []).message);
+    },
+  });
+
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    if (!to.trim()) {
+      setFieldError(t("emailError.no_recipient"));
+      return;
+    }
+    setFieldError(null);
+    send.mutate();
+  }
+
+  return (
+    <Dialog
+      variant="panel"
+      size="md"
+      title={t("emailTitle", { number: document.number })}
+      onClose={onClose}
+      onSubmit={submit}
+      dismissible={!send.isPending}
+      error={error}
+      testId="fiscal-email-dialog"
+      footer={
+        <>
+          <button type="button" className={ghostButtonClass} style={ghostButtonStyle} onClick={onClose} disabled={send.isPending}>
+            {t("back")}
+          </button>
+          <button type="submit" className={ghostButtonClass} style={primaryButtonStyle} disabled={send.isPending} data-testid="fiscal-email-send">
+            {send.isPending ? t("emailSending") : t("emailSend")}
+          </button>
+        </>
+      }
+    >
+      <div className="grid gap-1">
+        <label htmlFor="fiscal-email-to" className="text-xs font-bold" style={{ color: "var(--text-soft)" }}>
+          {t("emailTo")}
+        </label>
+        <input
+          id="fiscal-email-to"
+          data-testid="fiscal-email-to"
+          type="email"
+          value={to}
+          onChange={(event) => {
+            setTo(event.target.value);
+            setFieldError(null);
+            idempotencyKey.current = crypto.randomUUID();
+          }}
+          autoComplete="off"
+          className="min-h-11 w-full rounded-xl px-3 text-sm"
+          style={{ background: "var(--bg)", border: fieldBorder(fieldError ?? undefined), color: "var(--text)" }}
+          {...invalidFieldProps(fieldError, "fiscal-email-to-error")}
+        />
+        {fieldError ? (
+          <FieldError id="fiscal-email-to-error">{fieldError}</FieldError>
+        ) : (
+          <span className="text-xs" style={hintStyle}>{t("emailHint")}</span>
+        )}
+      </div>
+    </Dialog>
   );
 }

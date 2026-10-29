@@ -130,4 +130,41 @@ defmodule PaleeWeb.Schemas.FiscalTax do
       required: [:options]
     }
   end
+
+  @doc "ADR-265: «Αποστολή με email» of a fiscal document."
+  def document_email_body do
+    %Schema{
+      type: :object,
+      additionalProperties: false,
+      properties: %{
+        idempotency_key: %Schema{type: :string, minLength: 8, maxLength: 120},
+        to: %Schema{
+          type: :string,
+          maxLength: 254,
+          description: "The address; the buyer's email on the document when left out."
+        },
+        language: %Schema{type: :string, enum: ["el", "en", "de", "fr", "it", "nl", "es"]}
+      },
+      required: [:idempotency_key]
+    }
+  end
+
+  def document_email do
+    %Schema{
+      type: :object,
+      properties: %{
+        email: %Schema{
+          type: :object,
+          properties: %{
+            id: %Schema{type: :string, format: :uuid},
+            status: %Schema{type: :string},
+            to: %Schema{type: :string},
+            recipient: %Schema{type: :string, enum: ["buyer", "address"]}
+          },
+          required: [:id, :recipient, :status, :to]
+        }
+      },
+      required: [:email]
+    }
+  end
 end

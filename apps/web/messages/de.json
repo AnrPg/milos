@@ -12250,7 +12250,8 @@
       "branchCode": "Nur ändern, wenn du eine bei der AADE gemeldete Zweigstelle hast.",
       "optional": "Optional.",
       "iban": "Optional. Wird auf Rechnungen zur Zahlung per Überweisung gedruckt.",
-      "qrIban": "Optional. Für QR-Rechnungen mit QR-Referenz."
+      "qrIban": "Optional. Für QR-Rechnungen mit QR-Referenz.",
+      "checkDigitsOk": "Prüfziffer: korrekt."
     },
     "reason": {
       "blank": "Bitte ausfüllen.",
@@ -12289,6 +12290,21 @@
       "sandbox": "Sandbox",
       "test": "Test",
       "production": "Produktion"
+    },
+    "registry": {
+      "lookup": "Aus der Steuernummer (ΑΦΜ) ausfüllen",
+      "looking": "Abfrage bei der AADE…",
+      "orByHand": "Oder fülle die Felder selbst aus.",
+      "found": "Im Register der AADE gefunden. Bitte prüfe die Angaben.",
+      "foundLater": "Die AADE hat auch Adresse und Tätigkeitscode (ΚΑΔ) geliefert: Du findest sie in den nächsten Schritten ausgefüllt.",
+      "error": {
+        "invalid_tax_id": "Diese Steuernummer stimmt nicht. Prüfe die Ziffern.",
+        "registry_not_connected": "Die Zugangsdaten für das AADE-Register fehlen. Fülle die Felder selbst aus.",
+        "registry_credentials_rejected": "Die AADE hat die Zugangsdaten nicht angenommen. Fülle die Felder selbst aus.",
+        "registry_not_found": "Die AADE hat diese Steuernummer nicht gefunden.",
+        "registry_limit_reached": "Zu viele Abfragen. Versuche es gleich noch einmal.",
+        "registry_unavailable": "Die AADE antwortet gerade nicht. Versuche es später oder fülle die Felder selbst aus."
+      }
     }
   },
   "FiscalDocuments": {
@@ -12411,7 +12427,33 @@
     "mapPlaceholder": "Kategorie=Wert, eine pro Zeile",
     "auditOk": "OK",
     "pdf": "PDF",
-    "txAccepted": "myDATA"
+    "txAccepted": "myDATA",
+    "sendEmail": "Per E-Mail senden",
+    "reason": "Grund",
+    "reasons": {
+      "product_return": "Produktrückgabe",
+      "billing_error": "Falsche Abrechnung",
+      "subscription_cancelled": "Abo gekündigt",
+      "other": "Sonstiges"
+    },
+    "pickReason": "Wähle einen Grund.",
+    "refundToCard": "Geld auf die Karte {card} zurückzahlen",
+    "refundToCardHint": "Über {provider}, zusammen mit der Gutschrift. Schalte es aus, wenn du das Geld anders zurückgegeben hast.",
+    "refundingToCard": "Das Geld geht auf die Karte {card} zurück (2–5 Werktage).",
+    "noRefund": "Ohne Rückzahlung.",
+    "emailTitle": "{number} per E-Mail senden",
+    "emailTo": "E-Mail des Empfängers",
+    "emailHint": "Wir senden das PDF in der Sprache des Belegs.",
+    "emailSend": "Senden",
+    "emailSending": "Wird gesendet…",
+    "emailSent": "An {to} gesendet.",
+    "emailError": {
+      "invalid_address": "Diese E-Mail-Adresse sieht nicht richtig aus. Bitte prüfe sie.",
+      "no_recipient": "Gib die E-Mail-Adresse ein, an die gesendet werden soll.",
+      "throttled": "Das wurde gerade erst an diese Adresse gesendet. Versuche es später noch einmal.",
+      "suppressed": "Diese Adresse nimmt keine Nachrichten von uns an. Versuche eine andere.",
+      "business_not_activated": "E-Mails an Kunden starten, sobald deine Box aktiviert ist."
+    }
   },
   "BoxScreens": {
     "eyebrow": "Einstellungen",

@@ -190,6 +190,17 @@ msgstr ""
 msgid "Page"
 msgstr ""
 
+msgid "Reason for the credit note"
+msgstr ""
+
+msgid "Product returned"
+msgstr ""
+
+msgid "Billing error"
+msgstr ""
+
+msgid "Subscription cancelled"
+
 msgid "Technical security system (TSE)"
 msgstr ""
 

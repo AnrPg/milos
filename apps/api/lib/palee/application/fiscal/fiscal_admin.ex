@@ -7,7 +7,13 @@ defmodule Palee.Application.Fiscal.FiscalAdmin do
   """
 
   alias Palee.{Fiscal, Organizations}
-  alias Palee.Application.Fiscal.{FiscalEInvoicing, FiscalReporting, FiscalTillSigning}
+
+  alias Palee.Application.Fiscal.{
+    CreditRefunds,
+    FiscalEInvoicing,
+    FiscalReporting,
+    FiscalTillSigning
+  }
 
   @doc "Supported countries and their requirements."
   def countries, do: %{countries: Fiscal.countries(), vat_schemes: Fiscal.vat_schemes()}
@@ -72,16 +78,23 @@ defmodule Palee.Application.Fiscal.FiscalAdmin do
          |> Map.put(
            :till_signature,
            context |> FiscalTillSigning.for_documents([document.id]) |> Map.get(document.id)
-         )}
+         )
+         |> Map.put(:refund_option, CreditRefunds.option(context, document))}
     end
   end
 
   @doc """
   A credit note for document `id`: `lines: [%{position, quantity}]` or none
-  for everything not yet credited. Idempotent by `idempotency_key`.
+  for everything not yet credited, with its `reason` (ADR-265). Idempotent
+  by `idempotency_key`.
+
+  With `refund: true` the money goes back to the card the document was paid
+  with, and that refund issues the note (`CreditRefunds`, ADR-262).
+
+  `{:ok, %{document: note | nil, refund: refund | nil}, :issued | :replayed}`.
   """
   def credit(context, id, params, now \\ DateTime.utc_now()) do
-    params = atomize(params, ~w(lines idempotency_key)a)
+    params = atomize(params, ~w(lines idempotency_key reason refund)a)
 
     requested =
       case params[:lines] do
@@ -93,18 +106,19 @@ defmodule Palee.Application.Fiscal.FiscalAdmin do
       end
 
     with key when is_binary(key) and key != "" <-
-           params[:idempotency_key] || {:error, :idempotency_key_required} do
+           params[:idempotency_key] || {:error, :idempotency_key_required},
+         {:ok, reason} <- staff_reason(params[:reason]) do
+      request = %{
+        requested: requested,
+        reason: reason,
+        key: key,
+        issue_date: Organizations.local_date(context, now)
+      }
+
       context
-      |> Fiscal.credit(
-        id,
-        requested,
-        Organizations.local_date(context, now),
-        key,
-        Map.get(context, :user_id),
-        now
-      )
+      |> issue_credit(id, request, params[:refund] == true, now)
       |> tap(fn
-        {:ok, _note, :issued} ->
+        {:ok, %{document: %{}}, :issued} ->
           FiscalReporting.schedule(context)
           FiscalEInvoicing.schedule(context)
           FiscalTillSigning.schedule(context)
@@ -113,6 +127,32 @@ defmodule Palee.Application.Fiscal.FiscalAdmin do
           :ok
       end)
     end
+  end
+
+  defp issue_credit(context, id, request, true = _refund, now),
+    do: CreditRefunds.credit_and_refund(context, id, request, Map.get(context, :user_id), now)
+
+  defp issue_credit(context, id, request, false = _refund, now) do
+    case Fiscal.credit(
+           context,
+           id,
+           request.requested,
+           request.issue_date,
+           request.key,
+           Map.get(context, :user_id),
+           now,
+           reason: request.reason
+         ) do
+      {:ok, note, mode} -> {:ok, %{document: note, refund: nil}, mode}
+      error -> error
+    end
+  end
+
+  # Staff always say why (mockup s2): one of the four reasons.
+  defp staff_reason(reason) do
+    if reason in Fiscal.credit_reasons(),
+      do: {:ok, reason},
+      else: {:error, {:invalid_fields, %{reason: [if(reason, do: "invalid", else: "required")]}}}
   end
 
   def verify_journal(context, now \\ DateTime.utc_now()),
