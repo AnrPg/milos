@@ -23,7 +23,7 @@ export function HintBar({ open, step, mac, status }: { open: boolean; step: Plan
         : [["Enter", "newExercise"], ["Alt+M", "actions"], ["Alt+S", "differentRound"], ["?", "all"]];
   return (
     <div
-      data-testid="plan-hint"
+      data-testid="plan-hint-bar"
       aria-label={t("hint.label")}
       className="sticky bottom-0 flex flex-wrap items-center gap-x-4 gap-y-1 border-t px-2 py-2 text-xs"
       style={{ background: "var(--bg)", borderColor: "var(--border)", color: "var(--muted)" }}

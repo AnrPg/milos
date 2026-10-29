@@ -17,4 +17,10 @@ describe("oneRepMaxLookup", () => {
     expect(lookup("Deadlift", null)).toBeNull();
     expect(normalizeExerciseName("Clean & Jerk 1RM")).toBe("clean jerk");
   });
+
+  it("gives an empty lookup for anything that is not a list of PRs", () => {
+    for (const bad of [undefined, null, {}, "x", [null, 3, { name: 1 }]]) {
+      expect(oneRepMaxLookup(bad)("Back Squat", null)).toBeNull();
+    }
+  });
 });

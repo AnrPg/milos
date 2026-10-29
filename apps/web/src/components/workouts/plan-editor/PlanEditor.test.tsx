@@ -224,12 +224,12 @@ describe("PlanEditor", () => {
 
   it("opens the shortcut sheet with ? and shows the hint line", () => {
     renderEditor();
-    expect(screen.getByTestId("plan-hint")).toHaveTextContent("Shift+Enter");
+    expect(screen.getByTestId("plan-hint-bar")).toHaveTextContent("Shift+Enter");
     screen.getAllByTestId("plan-section-card")[0].focus();
     key({ key: "?" });
     expect(screen.getByRole("dialog")).toHaveTextContent(en.PlanEditor.sheet.superset);
     act(() => store().openSection("s1"));
-    expect(screen.getByTestId("plan-hint")).toHaveTextContent("Alt+M");
+    expect(screen.getByTestId("plan-hint-bar")).toHaveTextContent("Alt+M");
   });
 
   it("does not open the sheet when ? is typed in a field", () => {

@@ -22,11 +22,20 @@ export function normalizeExerciseName(name: string): string {
 const isOneRepMax = (pr: Pick<PRRecord, "name" | "unit" | "supporting_metrics">) =>
   pr.unit === "kg" && (pr.supporting_metrics?.reps === 1 || /\b1\s*rm\b/i.test(pr.name));
 
-/** A lookup over the athlete's PRs; the best one wins when several match. */
-export function oneRepMaxLookup(prs: ReadonlyArray<Pick<PRRecord, "name" | "unit" | "current_score" | "supporting_metrics">>): OneRepMaxLookup {
+type PRLike = Pick<PRRecord, "name" | "unit" | "current_score" | "supporting_metrics">;
+
+const isPRLike = (pr: unknown): pr is PRLike =>
+  typeof pr === "object" && pr !== null && typeof (pr as PRLike).name === "string" && typeof (pr as PRLike).current_score === "number";
+
+/**
+ * A lookup over the athlete's PRs; the best one wins when several match.
+ * Anything that is not a list of PRs (an unexpected API answer) gives an
+ * empty lookup, so % loads simply stay in %.
+ */
+export function oneRepMaxLookup(prs: ReadonlyArray<PRLike> | unknown): OneRepMaxLookup {
   const best = new Map<string, number>();
-  for (const pr of prs) {
-    if (!isOneRepMax(pr) || !(pr.current_score > 0)) continue;
+  for (const pr of Array.isArray(prs) ? (prs as unknown[]) : []) {
+    if (!isPRLike(pr) || !isOneRepMax(pr) || !(pr.current_score > 0)) continue;
     const key = normalizeExerciseName(pr.name);
     if (key) best.set(key, Math.max(best.get(key) ?? 0, pr.current_score));
   }

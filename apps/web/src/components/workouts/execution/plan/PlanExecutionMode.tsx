@@ -90,7 +90,9 @@ export function PlanExecutionMode({ executionId }: { executionId: string }) {
         // The athlete's 1RMs (their PRs) turn % loads into kg; without them % stays %.
         listPRs(accessToken)
           .then((prs) => {
-            if (!cancelled) setOneRepMax(() => oneRepMaxLookup(prs));
+            // Built here, not in the state updater, so a bad answer can never throw during render.
+            const lookup = oneRepMaxLookup(prs);
+            if (!cancelled) setOneRepMax(() => lookup);
           })
           .catch(() => undefined);
       } catch {
