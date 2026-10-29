@@ -75,7 +75,7 @@ export const FEATURE_SECTIONS: FeatureSection[] = [
     summaryKey: "trainingSummary",
     details: [
       "Workout execution screen with a step-synchronised timer, auto-progressing steps, modifications and per-exercise notes",
-      "Structured and free-text WODs with sections and per-section scoring",
+      "Structured and free-text WODs with sections and per-section scoring; structured WODs run set-wise supersets, per-round values, interruptions and heart-rate rest",
       "WOD goals: target muscle groups, fitness qualities and stimulus, then \"what did you feel\" after the workout",
       "Injury warnings with acknowledgement before risky movements",
       "Quick logging of score, RPE and notes without the timer; voice logging that turns speech into a draft entry to confirm",
@@ -133,6 +133,7 @@ export const FEATURE_SECTIONS: FeatureSection[] = [
       "Business console for gyms, studios, boxes and martial-arts clubs",
       "Class schedule, recurring series and appointment slots; check-in desk with door display mode",
       "Workout library (WODs vault) with a workout assistant, sections and goals",
+      "Structured WOD editor next to free text: a wizard per section (flow, time, exercises, score) with six flows (sets, For Time, AMRAP, EMOM, intervals, rest), set structures (superset, complex, cluster, drop set, rest-pause), interruptions and heart-rate rest, presets such as Tabata, Death by and EDT, values per set or per round with ranges, decimals and progressions, optional tempo, RPE, RIR, pace, heart-rate zone and per-side, fully keyboard-operable",
       "Seasonal challenges and leaderboards, community moderation and announcements, content and reviews",
       "Inventory and cleaning log",
       "Reports: overview, finance, training, coaching, engagement, health and marketing",

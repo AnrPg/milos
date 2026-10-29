@@ -48,6 +48,7 @@ import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { useExecutionStore } from "@/stores/execution";
 import { storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
+import { usesPlanRunner } from "@/components/workouts/execution/plan/plan-workout";
 import { usesManualTimer } from "@/lib/workout-execution-mode";
 import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
@@ -800,6 +801,12 @@ export function AssignedWorkoutsConsole({
         source_reference_id: assignment.id,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
+
+      // ADR-270: a structured plan runs in its own runner, which loads the plan itself.
+      if (usesPlanRunner(assignment.workout)) {
+        router.push(`/workouts/${execution.id}/execute`);
+        return;
+      }
 
       const { segments, briefing } = await fetchTimerSequence(tokens.access_token, assignment.workout.id, {
         source: "assigned",

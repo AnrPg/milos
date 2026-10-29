@@ -28,12 +28,25 @@ defmodule Palee.Gamification.Domain.PRDetector do
       (candidate[:section_id] || candidate["section_id"])
   end
 
+  # Stored section configs carry their type as a string ("time"); compare
+  # them like the atoms of the detector's own rules.
+  @string_types %{
+    "time" => :time,
+    "for_time" => :for_time,
+    "duration" => :duration,
+    "load" => :load,
+    "weight" => :weight,
+    "rounds+reps" => :"rounds+reps",
+    "rounds_reps" => :rounds_reps,
+    "reps" => :reps
+  }
+
   defp normalize_score_type(score, opts) do
-    score[:score_type] ||
-      score["score_type"] ||
-      opts[:score_type] ||
-      opts["score_type"] ||
-      :reps
+    case score[:score_type] || score["score_type"] || opts[:score_type] || opts["score_type"] do
+      type when is_binary(type) -> Map.get(@string_types, type, :reps)
+      nil -> :reps
+      type -> type
+    end
   end
 
   defp numeric_value(value, _score_type) when is_number(value), do: {:ok, value}

@@ -2,7 +2,7 @@ defmodule Palee.Workouts.Domain.WorkoutBody do
   @moduledoc """
   What a workout says, in the shape of the way it was written, pure (ADR-224).
 
-  A workout is written in one of three ways, and each has its own data. The
+  A workout is written in one of four ways, and each has its own data. The
   flat workout fields (`free_text_body`, `sections[].exercises`, ...) are a
   superset of all three, so a reader cannot tell which fields matter. `body`
   is a tagged union keyed by `kind` that carries only what that way of
@@ -18,10 +18,18 @@ defmodule Palee.Workouts.Domain.WorkoutBody do
   * `structured` — exercises with every parameter (structured editor, Quick
     Text): ordered `sections` with `name`, `timer` and `exercises`, each
     exercise keeping its full prescription.
+  * `plan` — written in the structured WOD editor (ADR-270, authoring mode
+    `structured_plan`): ordered `sections` with `id`, `name`, the `plan`
+    (`StructuredPlan`, the source of truth) and its `prescription`
+    (`StructuredPlan.Prescription`, the canonical read model); the
+    materialised exercises are left out.
 
   `summary/1` is the same union for lists: text is cut to an excerpt, the
   rich documents and exercise details are left out, and counts stay.
   """
+
+  alias Palee.Workouts.Domain.StructuredPlan
+  alias Palee.Workouts.Domain.StructuredPlan.Prescription
 
   @excerpt_length 280
   @free_text_timer_key "free_text_timer"
@@ -31,6 +39,9 @@ defmodule Palee.Workouts.Domain.WorkoutBody do
     case mode(workout) do
       "sectioned_text" ->
         %{kind: "text_sections", sections: workout |> sections() |> Enum.map(&text_section/1)}
+
+      "structured_plan" ->
+        %{kind: "plan", sections: workout |> sections() |> Enum.map(&plan_section/1)}
 
       "free_text" ->
         %{
@@ -63,6 +74,19 @@ defmodule Palee.Workouts.Domain.WorkoutBody do
             end)
         }
 
+      %{kind: "plan", sections: sections} ->
+        %{
+          kind: "plan",
+          sections:
+            Enum.map(sections, fn section ->
+              %{
+                name: section.name,
+                flow: plan_flow(section.plan),
+                exercise_count: StructuredPlan.exercise_count(section.plan)
+              }
+            end)
+        }
+
       %{kind: "free_text"} = body ->
         %{
           kind: "free_text",
@@ -89,9 +113,10 @@ defmodule Palee.Workouts.Domain.WorkoutBody do
   @doc "The body's kind for an authoring mode."
   def kind(mode) when mode in ["sectioned_text", :sectioned_text], do: "text_sections"
   def kind(mode) when mode in ["free_text", :free_text], do: "free_text"
+  def kind(mode) when mode in ["structured_plan", :structured_plan], do: "plan"
   def kind(_mode), do: "structured"
 
-  def kinds, do: ["free_text", "text_sections", "structured"]
+  def kinds, do: ["free_text", "text_sections", "structured", "plan"]
 
   defp text_section(section) do
     untitled? = get_in(map_value(section, :section_metadata), ["untitled"]) == true
@@ -105,6 +130,20 @@ defmodule Palee.Workouts.Domain.WorkoutBody do
       scoring: section |> map_value(:score_config) |> metrics()
     }
   end
+
+  defp plan_section(section) do
+    plan = map_value(section, :plan)
+
+    %{
+      id: value(section, :id),
+      name: value(section, :name),
+      plan: plan,
+      prescription: plan |> Prescription.build() |> Prescription.to_json()
+    }
+  end
+
+  defp plan_flow(%{} = plan), do: Map.get(plan, "flow")
+  defp plan_flow(_plan), do: nil
 
   defp structured_section(section) do
     %{

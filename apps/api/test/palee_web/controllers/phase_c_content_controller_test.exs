@@ -136,7 +136,7 @@ defmodule PaleeWeb.PhaseCContentControllerTest do
 
     stats = ProgressStats.build(executions, today)
 
-    assert stats.totals == %{sessions: 3, minutes: 90, workouts: 2}
+    assert stats.totals == %{sessions: 3, minutes: 90, workouts: 2, volume_kg: 0}
     assert stats.consistency.current_streak_weeks == 3
     assert stats.consistency.active_weeks == 3
     assert [%{section_id: "s1", points: [%{value: 90}, %{value: 100}]}] = stats.score_history
