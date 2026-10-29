@@ -60,6 +60,13 @@ defmodule PaleeWeb.OnlineSalesControllerTest do
     |> json_response(200)
   end
 
+  defp keep_at_desk(conn, ctx, package) do
+    conn
+    |> put_bearer_token(ctx.owner)
+    |> patch(admin_path(ctx, "/finance/packages/#{package.id}"), %{sold_online: false})
+    |> json_response(200)
+  end
+
   defp connect_sandbox(conn, ctx) do
     conn
     |> put_bearer_token(ctx.owner)
@@ -98,10 +105,7 @@ defmodule PaleeWeb.OnlineSalesControllerTest do
 
   test "a package not sold online cannot be bought", %{conn: conn} = ctx do
     # ADR-271: the owner's «off» survives the automatic opening on connect.
-    conn
-    |> put_bearer_token(ctx.owner)
-    |> patch(admin_path(ctx, "/finance/packages/#{ctx.hidden.id}"), %{sold_online: false})
-    |> json_response(200)
+    keep_at_desk(conn, ctx, ctx.hidden)
 
     connect_sandbox(conn, ctx)
 
@@ -195,6 +199,7 @@ defmodule PaleeWeb.OnlineSalesControllerTest do
   test "buying a package books the class the member wanted once it is paid",
        %{conn: conn} = ctx do
     sell_online(conn, ctx, ctx.package)
+    keep_at_desk(conn, ctx, ctx.hidden)
     connect_sandbox(conn, ctx)
 
     workout = workout_fixture(ctx.owner, %{tenant_context: ctx.context})
@@ -231,6 +236,7 @@ defmodule PaleeWeb.OnlineSalesControllerTest do
   test "the public page and the terms name the provider and the package's in-person services",
        %{conn: conn} = ctx do
     sell_online(conn, ctx, ctx.package)
+    keep_at_desk(conn, ctx, ctx.hidden)
     connect_sandbox(conn, ctx)
 
     {:ok, profile} =

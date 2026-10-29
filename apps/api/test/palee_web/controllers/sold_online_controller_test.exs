@@ -45,24 +45,24 @@ defmodule PaleeWeb.SoldOnlineControllerTest do
     }
   end
 
-  defp path(ctx, path), do: "/api/org/#{ctx.organization.slug}/admin#{path}"
+  defp admin_path(ctx, path), do: "/api/org/#{ctx.organization.slug}/admin#{path}"
   defp as_owner(conn, ctx), do: put_bearer_token(conn, ctx.owner)
 
-  defp connect(conn, ctx) do
+  defp connect_provider(conn, ctx) do
     conn
     |> as_owner(ctx)
-    |> put(path(ctx, "/payments/account"), %{provider: "sandbox", environment: "test"})
+    |> put(admin_path(ctx, "/payments/account"), %{provider: "sandbox", environment: "test"})
     |> json_response(200)
   end
 
   defp disconnect(conn, ctx) do
-    conn |> as_owner(ctx) |> delete(path(ctx, "/payments/account")) |> json_response(200)
+    conn |> as_owner(ctx) |> delete(admin_path(ctx, "/payments/account")) |> json_response(200)
   end
 
   defp set_sold_online(conn, ctx, package, value) do
     conn
     |> as_owner(ctx)
-    |> patch(path(ctx, "/finance/packages/#{package.id}"), %{sold_online: value})
+    |> patch(admin_path(ctx, "/finance/packages/#{package.id}"), %{sold_online: value})
     |> json_response(200)
     |> Map.fetch!("package")
   end
@@ -70,7 +70,7 @@ defmodule PaleeWeb.SoldOnlineControllerTest do
   defp packages(conn, ctx) do
     conn
     |> as_owner(ctx)
-    |> get(path(ctx, "/finance/packages"))
+    |> get(admin_path(ctx, "/finance/packages"))
     |> json_response(200)
     |> Map.fetch!("packages")
     |> Map.new(&{&1["name"], {&1["sold_online"], &1["online_visibility"]}})
@@ -89,7 +89,7 @@ defmodule PaleeWeb.SoldOnlineControllerTest do
   end
 
   test "connecting opens the paid packages once and tells the owner", %{conn: conn} = ctx do
-    status = connect(conn, ctx)
+    status = connect_provider(conn, ctx)
 
     assert %{"count" => 2, "opened_at" => _at} = status["account"]["packages_notice"]
     assert status["online_sales"] == %{"sold_online" => 2, "packages" => 2}
@@ -104,7 +104,7 @@ defmodule PaleeWeb.SoldOnlineControllerTest do
     dismissed =
       conn
       |> as_owner(ctx)
-      |> delete(path(ctx, "/payments/account/packages-notice"))
+      |> delete(admin_path(ctx, "/payments/account/packages-notice"))
       |> json_response(200)
 
     assert dismissed["account"]["packages_notice"] == nil
@@ -114,25 +114,25 @@ defmodule PaleeWeb.SoldOnlineControllerTest do
     off = set_sold_online(conn, ctx, ctx.three, false)
     assert off["online_visibility"] == "off"
 
-    connect(conn, ctx)
+    connect_provider(conn, ctx)
     assert packages(conn, ctx)["3 φορές την εβδομάδα"] == {false, "off"}
 
     # Switched off after connecting, then a reconnect: still off.
     set_sold_online(conn, ctx, ctx.unlimited, false)
     disconnect(conn, ctx)
-    status = connect(conn, ctx)
+    status = connect_provider(conn, ctx)
 
     assert packages(conn, ctx)["Unlimited"] == {false, "off"}
     assert status["online_sales"] == %{"sold_online" => 0, "packages" => 2}
   end
 
   test "a paid package created after connecting starts sold online", %{conn: conn} = ctx do
-    connect(conn, ctx)
+    connect_provider(conn, ctx)
 
     create = fn body ->
       conn
       |> as_owner(ctx)
-      |> post(path(ctx, "/finance/packages"), body)
+      |> post(admin_path(ctx, "/finance/packages"), body)
       |> json_response(201)
       |> Map.fetch!("package")
     end
@@ -156,20 +156,33 @@ defmodule PaleeWeb.SoldOnlineControllerTest do
 
   test "a purpose switched off in «Τι πληρώνεται online» hides the package",
        %{conn: conn} = ctx do
-    connect(conn, ctx)
+    connect_provider(conn, ctx)
 
     conn
     |> as_owner(ctx)
-    |> put(path(ctx, "/payments/account/options"), %{purposes: %{packages: false}})
+    |> put(admin_path(ctx, "/payments/account/options"), %{purposes: %{packages: false}})
     |> json_response(200)
 
     package =
       conn
       |> as_owner(ctx)
-      |> get(path(ctx, "/finance/packages/#{ctx.unlimited.id}"))
+      |> get(admin_path(ctx, "/finance/packages/#{ctx.unlimited.id}"))
       |> json_response(200)
       |> Map.fetch!("package")
 
     assert {package["sold_online"], package["online_visibility"]} == {true, "purpose_off"}
+  end
+
+  defp add_tenant_member(organization, user, role) do
+    {:ok, membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: user.id,
+        role: role,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    membership
   end
 end
