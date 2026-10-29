@@ -16,6 +16,9 @@ import { ClassTimerFace } from "@/components/class-timer/ClassTimerFace";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { useScreenWakeLock } from "@/hooks/useScreenWakeLock";
 import { useUiLocale } from "@/i18n/use-ui-locale";
+import { summary } from "@/lib/structured-plan/describe";
+import type { PlanSection } from "@/lib/structured-plan/types";
+import { usePlanText } from "@/components/workouts/plan-editor/plan-text";
 import {
   entryKey,
   formatPairingCode,
@@ -402,7 +405,10 @@ function WorkoutLines({ body }: { body: BoxScreenWorkout["body"] }) {
   }
   return (
     <>
-      {body.sections.map((section, index) => (
+      {body.sections.map((section, index) =>
+        "plan" in section ? (
+          <PlanSectionLines key={section.id ?? index} name={section.name} plan={section.plan as PlanSection | null} />
+        ) : (
         <div key={section.id ?? index} className="font-bold" style={tv.line}>
           <div style={{ color: "var(--text-soft)" }}>{[section.name, section.subtitle].filter(Boolean).join(" · ")}</div>
           {(section.exercises as ExerciseLine[])
@@ -416,8 +422,26 @@ function WorkoutLines({ body }: { body: BoxScreenWorkout["body"] }) {
               </div>
             ))}
         </div>
-      ))}
+        ),
+      )}
     </>
+  );
+}
+
+/** ADR-270: a structured section as its one-line summary, then its exercises per block. */
+function PlanSectionLines({ name, plan }: { name: string; plan: PlanSection | null }) {
+  const words = usePlanText();
+  const t = useTranslations("PlanEditor");
+  if (!plan) return null;
+  const sum = summary(plan);
+  const params = sum.params.map(words).join(" · ");
+  return (
+    <div className="font-bold" style={tv.line}>
+      <div style={{ color: "var(--text-soft)" }}>{[name, params].filter(Boolean).join(" · ")}</div>
+      {sum.names.map((block, row) => (
+        <div key={row}>{block.map((n) => (n.perSide ? `${n.name} (${t("perSide")})` : n.name)).join(" + ")}</div>
+      ))}
+    </div>
   );
 }
 

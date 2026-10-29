@@ -7,6 +7,8 @@ import en from "../../../messages/en.json";
 import { ApiError } from "@/api/client";
 import type { BoxScreenToday } from "@/api/box-screens";
 
+import { newRow, newSection } from "@/lib/structured-plan/factory";
+
 import { BoxScreenTv, ScreenDay } from "./BoxScreenTv";
 
 const pairBoxScreen = vi.fn();
@@ -92,6 +94,18 @@ describe("the box screen on the TV", () => {
 
     expect(await screen.findByRole("alert")).toHaveTextContent(en.BoxScreens.tvCodeInvalid);
     expect(screen.getByTestId("tv-code")).toHaveAttribute("aria-invalid", "true");
+  });
+
+  it("a structured WOD (ADR-270): each section's name and its exercises per block", () => {
+    const plan = newSection("for_time");
+    plan.blocks = [[newRow("ex", { name: "Thrusters" }), newRow("ex", { name: "Pull-ups" })]];
+    const today = day();
+    today.workouts = [{ id: "fran", title: "Fran", type: "for_time", body: { kind: "plan", sections: [{ id: null, name: "Metcon", plan, prescription: null }] } } as unknown as BoxScreenToday["workouts"][number]];
+    render(wrap(<ScreenDay today={today} token="display" now={at("17:52")} />));
+
+    const wod = screen.getByTestId("tv-wod");
+    expect(wod).toHaveTextContent("Metcon");
+    expect(wod).toHaveTextContent("Thrusters + Pull-ups");
   });
 
   it("before the class: the WOD and who is booked, by first name only", () => {
