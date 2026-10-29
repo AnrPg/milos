@@ -12569,7 +12569,8 @@
       "delete": "Delete",
       "deleteHint": "⌫ on an empty name",
       "structTitle": "Set structure",
-      "measureTitle": "Parameter"
+      "measureTitle": "Parameter",
+      "withKey": "{key} · {hint}"
     },
     "add": {
       "exercise": "+ Exercise",
@@ -12631,7 +12632,8 @@
       "kg": "{value} kg",
       "pct": "{value}% of 1RM",
       "words": "as text for the athlete",
-      "tempo": "↓{down} lowering · {bottom} at the bottom · ↑{up} lifting · {top} at the top (seconds, X = explosive)"
+      "tempo": "↓{down} lowering · {bottom} at the bottom · ↑{up} lifting · {top} at the top (seconds, X = explosive)",
+      "equalsUnit": "= {value} {unit}"
     },
     "word": {
       "set": "set",

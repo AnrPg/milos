@@ -12569,7 +12569,8 @@
       "delete": "Διαγραφή",
       "deleteHint": "⌫ σε κενό όνομα",
       "structTitle": "Δομή σετ",
-      "measureTitle": "Παράμετρος"
+      "measureTitle": "Παράμετρος",
+      "withKey": "{key} · {hint}"
     },
     "add": {
       "exercise": "+ Άσκηση",
@@ -12631,7 +12632,8 @@
       "kg": "{value} kg",
       "pct": "{value}% του 1RM",
       "words": "ως κείμενο για τον αθλητή",
-      "tempo": "↓{down} κατέβασμα · {bottom} κάτω · ↑{up} ανέβασμα · {top} πάνω (δευτ., X = εκρηκτικά)"
+      "tempo": "↓{down} κατέβασμα · {bottom} κάτω · ↑{up} ανέβασμα · {top} πάνω (δευτ., X = εκρηκτικά)",
+      "equalsUnit": "= {value} {unit}"
     },
     "word": {
       "set": "σετ",
