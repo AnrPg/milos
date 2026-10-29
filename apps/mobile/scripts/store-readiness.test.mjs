@@ -115,6 +115,17 @@ test("push messages use Palee's icon and a named channel in English and Greek", 
   assert.match(read("ios/App/App/App.entitlements"), /<key>aps-environment<\/key>/);
 });
 
+test("the App Store icon is 1024 × 1024 without transparency (App Store Connect refuses an alpha channel)", () => {
+  const png = fs.readFileSync(path.join(root, "ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png"));
+  assert.equal(png.readUInt32BE(16), 1024);
+  assert.equal(png.readUInt32BE(20), 1024);
+  // IHDR colour type 2 is RGB; 4 and 6 carry an alpha channel.
+  assert.equal(png[25], 2);
+  for (const density of ["mdpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi"]) {
+    assert.ok(fs.existsSync(path.join(root, `android/app/src/main/res/mipmap-${density}/ic_launcher.png`)), `${density} launcher icon`);
+  }
+});
+
 test("the app's data is not backed up to the cloud", () => {
   assert.match(manifest, /android:allowBackup="false"/);
 });
