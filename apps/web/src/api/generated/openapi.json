@@ -140609,6 +140609,62 @@
         ]
       }
     },
+    "/api/memberships/guest-boxes": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.OrganizationAccessController.guest_boxes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "boxes": {
+                      "items": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "slug"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "boxes"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Boxes"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The boxes the account is only a guest of (ADR-272)",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
     "/api/memberships/join/{slug}": {
       "post": {
         "callbacks": {},
@@ -189152,6 +189208,465 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/payments/desk/guests": {
+      "post": {
+        "callbacks": {},
+        "description": "`user_id` for a person found by «Ποιος;», or `name` and `email` for a walk-in (a new held profile, ADR-254, or the account that already has that email). Someone who is already a box member, athlete or guest stays as they are (`added: false`).",
+        "operationId": "PaleeWeb.AdminDeskBuyersController.make_guest",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "description": "A found person (`user_id`), or a walk-in's `name` and `email`.",
+                "properties": {
+                  "email": {
+                    "maxLength": 254,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 120,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "user_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "added": {
+                      "description": "The person became a guest of the box now.",
+                      "type": "boolean"
+                    },
+                    "created_profile": {
+                      "description": "A new, held profile was made for a walk-in (ADR-254).",
+                      "type": "boolean"
+                    },
+                    "person": {
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "checked_in_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "relation": {
+                          "description": "Box member, athlete, guest of the box, or not in the box yet.",
+                          "enum": [
+                            "member",
+                            "athlete",
+                            "guest",
+                            "none"
+                          ],
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "avatar_url",
+                        "checked_in_at",
+                        "name",
+                        "relation",
+                        "user_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "added",
+                    "created_profile",
+                    "person"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Already buying here"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "added": {
+                      "description": "The person became a guest of the box now.",
+                      "type": "boolean"
+                    },
+                    "created_profile": {
+                      "description": "A new, held profile was made for a walk-in (ADR-254).",
+                      "type": "boolean"
+                    },
+                    "person": {
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "checked_in_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "relation": {
+                          "description": "Box member, athlete, guest of the box, or not in the box yet.",
+                          "enum": [
+                            "member",
+                            "athlete",
+                            "guest",
+                            "none"
+                          ],
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "avatar_url",
+                        "checked_in_at",
+                        "name",
+                        "relation",
+                        "user_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "added",
+                    "created_profile",
+                    "person"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Guest"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Make a found person, or a walk-in who signs up, a guest of the box",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/payments/desk/options": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDeskBuyersController.options",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "user_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "options": {
+                      "properties": {
+                        "invoices": {
+                          "items": {
+                            "properties": {
+                              "balance_due_cents": {
+                                "type": "integer"
+                              },
+                              "currency": {
+                                "type": "string"
+                              },
+                              "description": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "number": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "balance_due_cents",
+                              "currency",
+                              "description",
+                              "id",
+                              "number"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "packages": {
+                          "items": {
+                            "properties": {
+                              "currency": {
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "price_cents": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "currency",
+                              "id",
+                              "name",
+                              "price_cents"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "relation": {
+                          "enum": [
+                            "walk_in",
+                            "member",
+                            "athlete",
+                            "guest",
+                            "none"
+                          ],
+                          "type": "string"
+                        },
+                        "renewal": {
+                          "nullable": true,
+                          "properties": {
+                            "currency": {
+                              "type": "string"
+                            },
+                            "ends_on": {
+                              "format": "date",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "price_cents": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "currency",
+                            "id",
+                            "name",
+                            "price_cents"
+                          ],
+                          "type": "object"
+                        },
+                        "shop_orders": {
+                          "items": {
+                            "properties": {
+                              "currency": {
+                                "type": "string"
+                              },
+                              "customer_name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "number": {
+                                "type": "integer"
+                              },
+                              "summary": {
+                                "type": "string"
+                              },
+                              "total_cents": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "currency",
+                              "customer_name",
+                              "id",
+                              "number",
+                              "summary",
+                              "total_cents"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "invoices",
+                        "packages",
+                        "relation",
+                        "renewal",
+                        "shop_orders",
+                        "user_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "options"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Options"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "What a person (or a walk-in, without `user_id`) can pay at the desk",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/payments/desk/people": {
+      "get": {
+        "callbacks": {},
+        "description": "Without `q`, the people who checked in today; with it, the box's members, athletes and guests whose name or email matches, or a Palee account outside the box when `q` is its exact email.",
+        "operationId": "PaleeWeb.AdminDeskBuyersController.people",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "maxLength": 120,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "people": {
+                      "items": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "checked_in_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "relation": {
+                            "description": "Box member, athlete, guest of the box, or not in the box yet.",
+                            "enum": [
+                              "member",
+                              "athlete",
+                              "guest",
+                              "none"
+                            ],
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "avatar_url",
+                          "checked_in_at",
+                          "name",
+                          "relation",
+                          "user_id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "people"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "People"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Who can pay at the desk",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/payments/terminal": {
       "post": {
         "callbacks": {},
@@ -189200,6 +189715,15 @@
                   },
                   "purpose_id": {
                     "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "started_on": {
+                    "description": "Where the payment was started (ADR-272), for its tip: on the staff member's phone (default) or at the desk.",
+                    "enum": [
+                      "phone",
+                      "desk"
+                    ],
                     "nullable": true,
                     "type": "string"
                   },
@@ -189282,6 +189806,68 @@
                         "description": {
                           "type": "string"
                         },
+                        "document": {
+                          "nullable": true,
+                          "properties": {
+                            "authority": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "currency": {
+                              "type": "string"
+                            },
+                            "gross_cents": {
+                              "type": "integer"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "issued_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "kind": {
+                              "enum": [
+                                "receipt",
+                                "invoice"
+                              ],
+                              "type": "string"
+                            },
+                            "number": {
+                              "type": "string"
+                            },
+                            "receipt_url": {
+                              "description": "A walk-in's receipt as an open, signed link (90 days) for the QR on the phone.",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "transmission_status": {
+                              "description": "Its transmission to the tax authority; none where the country has none.",
+                              "enum": [
+                                "pending",
+                                "sending",
+                                "accepted",
+                                "rejected",
+                                "failed"
+                              ],
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "authority",
+                            "currency",
+                            "gross_cents",
+                            "id",
+                            "kind",
+                            "number",
+                            "receipt_url",
+                            "transmission_status"
+                          ],
+                          "type": "object"
+                        },
                         "environment": {
                           "type": "string"
                         },
@@ -189299,6 +189885,11 @@
                           "type": "string"
                         },
                         "finance_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fiscal_document_id": {
                           "format": "uuid",
                           "nullable": true,
                           "type": "string"
@@ -189360,6 +189951,18 @@
                         "retries": {
                           "type": "integer"
                         },
+                        "started_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "started_on": {
+                          "enum": [
+                            "phone",
+                            "desk"
+                          ],
+                          "type": "string"
+                        },
                         "status": {
                           "enum": [
                             "scheduled",
@@ -189382,10 +189985,32 @@
                           "minimum": 0,
                           "type": "integer"
                         },
+                        "tip_attribution": {
+                          "description": "Whose tip it is (ADR-272): who started the payment on their phone, the box's only front desk person, or the front desk role unpersonalised.",
+                          "enum": [
+                            "started_payment",
+                            "sole_front_desk",
+                            "front_desk_role"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "tip_cents": {
                           "description": "Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale.",
                           "minimum": 0,
                           "type": "integer"
+                        },
+                        "tip_recipient_role": {
+                          "enum": [
+                            "front_desk"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tip_recipient_user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
                         },
                         "user_id": {
                           "format": "uuid",
@@ -189398,6 +190023,7 @@
                         "currency",
                         "declines",
                         "description",
+                        "document",
                         "environment",
                         "fulfilment_status",
                         "id",
@@ -189408,9 +190034,12 @@
                         "reference",
                         "refunded_cents",
                         "retries",
+                        "started_on",
                         "status",
                         "surcharge_cents",
-                        "tip_cents"
+                        "tip_attribution",
+                        "tip_cents",
+                        "tip_recipient_user_id"
                       ],
                       "type": "object"
                     }
@@ -189449,10 +190078,27 @@
                   "properties": {
                     "available": {
                       "type": "boolean"
+                    },
+                    "provider": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "reason": {
+                      "description": "Why not (ADR-272): no payment account, Stripe (no terminal app in Palee), another provider without one, or an account that is not active. Whether the phone has the terminal app is known on the phone only.",
+                      "enum": [
+                        "no_viva",
+                        "stripe_only",
+                        "provider_without_terminal",
+                        "account_not_ready"
+                      ],
+                      "nullable": true,
+                      "type": "string"
                     }
                   },
                   "required": [
-                    "available"
+                    "available",
+                    "provider",
+                    "reason"
                   ],
                   "type": "object"
                 }
@@ -189574,6 +190220,68 @@
                         "description": {
                           "type": "string"
                         },
+                        "document": {
+                          "nullable": true,
+                          "properties": {
+                            "authority": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "currency": {
+                              "type": "string"
+                            },
+                            "gross_cents": {
+                              "type": "integer"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "issued_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "kind": {
+                              "enum": [
+                                "receipt",
+                                "invoice"
+                              ],
+                              "type": "string"
+                            },
+                            "number": {
+                              "type": "string"
+                            },
+                            "receipt_url": {
+                              "description": "A walk-in's receipt as an open, signed link (90 days) for the QR on the phone.",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "transmission_status": {
+                              "description": "Its transmission to the tax authority; none where the country has none.",
+                              "enum": [
+                                "pending",
+                                "sending",
+                                "accepted",
+                                "rejected",
+                                "failed"
+                              ],
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "authority",
+                            "currency",
+                            "gross_cents",
+                            "id",
+                            "kind",
+                            "number",
+                            "receipt_url",
+                            "transmission_status"
+                          ],
+                          "type": "object"
+                        },
                         "environment": {
                           "type": "string"
                         },
@@ -189591,6 +190299,11 @@
                           "type": "string"
                         },
                         "finance_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fiscal_document_id": {
                           "format": "uuid",
                           "nullable": true,
                           "type": "string"
@@ -189652,6 +190365,18 @@
                         "retries": {
                           "type": "integer"
                         },
+                        "started_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "started_on": {
+                          "enum": [
+                            "phone",
+                            "desk"
+                          ],
+                          "type": "string"
+                        },
                         "status": {
                           "enum": [
                             "scheduled",
@@ -189674,10 +190399,32 @@
                           "minimum": 0,
                           "type": "integer"
                         },
+                        "tip_attribution": {
+                          "description": "Whose tip it is (ADR-272): who started the payment on their phone, the box's only front desk person, or the front desk role unpersonalised.",
+                          "enum": [
+                            "started_payment",
+                            "sole_front_desk",
+                            "front_desk_role"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "tip_cents": {
                           "description": "Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale.",
                           "minimum": 0,
                           "type": "integer"
+                        },
+                        "tip_recipient_role": {
+                          "enum": [
+                            "front_desk"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tip_recipient_user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
                         },
                         "user_id": {
                           "format": "uuid",
@@ -189690,6 +190437,7 @@
                         "currency",
                         "declines",
                         "description",
+                        "document",
                         "environment",
                         "fulfilment_status",
                         "id",
@@ -189700,9 +190448,12 @@
                         "reference",
                         "refunded_cents",
                         "retries",
+                        "started_on",
                         "status",
                         "surcharge_cents",
-                        "tip_cents"
+                        "tip_attribution",
+                        "tip_cents",
+                        "tip_recipient_user_id"
                       ],
                       "type": "object"
                     }
@@ -189804,6 +190555,68 @@
                         "description": {
                           "type": "string"
                         },
+                        "document": {
+                          "nullable": true,
+                          "properties": {
+                            "authority": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "currency": {
+                              "type": "string"
+                            },
+                            "gross_cents": {
+                              "type": "integer"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "issued_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "kind": {
+                              "enum": [
+                                "receipt",
+                                "invoice"
+                              ],
+                              "type": "string"
+                            },
+                            "number": {
+                              "type": "string"
+                            },
+                            "receipt_url": {
+                              "description": "A walk-in's receipt as an open, signed link (90 days) for the QR on the phone.",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "transmission_status": {
+                              "description": "Its transmission to the tax authority; none where the country has none.",
+                              "enum": [
+                                "pending",
+                                "sending",
+                                "accepted",
+                                "rejected",
+                                "failed"
+                              ],
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "authority",
+                            "currency",
+                            "gross_cents",
+                            "id",
+                            "kind",
+                            "number",
+                            "receipt_url",
+                            "transmission_status"
+                          ],
+                          "type": "object"
+                        },
                         "environment": {
                           "type": "string"
                         },
@@ -189821,6 +190634,11 @@
                           "type": "string"
                         },
                         "finance_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fiscal_document_id": {
                           "format": "uuid",
                           "nullable": true,
                           "type": "string"
@@ -189882,6 +190700,18 @@
                         "retries": {
                           "type": "integer"
                         },
+                        "started_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "started_on": {
+                          "enum": [
+                            "phone",
+                            "desk"
+                          ],
+                          "type": "string"
+                        },
                         "status": {
                           "enum": [
                             "scheduled",
@@ -189904,10 +190734,32 @@
                           "minimum": 0,
                           "type": "integer"
                         },
+                        "tip_attribution": {
+                          "description": "Whose tip it is (ADR-272): who started the payment on their phone, the box's only front desk person, or the front desk role unpersonalised.",
+                          "enum": [
+                            "started_payment",
+                            "sole_front_desk",
+                            "front_desk_role"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "tip_cents": {
                           "description": "Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale.",
                           "minimum": 0,
                           "type": "integer"
+                        },
+                        "tip_recipient_role": {
+                          "enum": [
+                            "front_desk"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tip_recipient_user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
                         },
                         "user_id": {
                           "format": "uuid",
@@ -189920,6 +190772,7 @@
                         "currency",
                         "declines",
                         "description",
+                        "document",
                         "environment",
                         "fulfilment_status",
                         "id",
@@ -189930,9 +190783,12 @@
                         "reference",
                         "refunded_cents",
                         "retries",
+                        "started_on",
                         "status",
                         "surcharge_cents",
-                        "tip_cents"
+                        "tip_attribution",
+                        "tip_cents",
+                        "tip_recipient_user_id"
                       ],
                       "type": "object"
                     }
@@ -190034,6 +190890,68 @@
                         "description": {
                           "type": "string"
                         },
+                        "document": {
+                          "nullable": true,
+                          "properties": {
+                            "authority": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "currency": {
+                              "type": "string"
+                            },
+                            "gross_cents": {
+                              "type": "integer"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "issued_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "kind": {
+                              "enum": [
+                                "receipt",
+                                "invoice"
+                              ],
+                              "type": "string"
+                            },
+                            "number": {
+                              "type": "string"
+                            },
+                            "receipt_url": {
+                              "description": "A walk-in's receipt as an open, signed link (90 days) for the QR on the phone.",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "transmission_status": {
+                              "description": "Its transmission to the tax authority; none where the country has none.",
+                              "enum": [
+                                "pending",
+                                "sending",
+                                "accepted",
+                                "rejected",
+                                "failed"
+                              ],
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "authority",
+                            "currency",
+                            "gross_cents",
+                            "id",
+                            "kind",
+                            "number",
+                            "receipt_url",
+                            "transmission_status"
+                          ],
+                          "type": "object"
+                        },
                         "environment": {
                           "type": "string"
                         },
@@ -190051,6 +190969,11 @@
                           "type": "string"
                         },
                         "finance_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fiscal_document_id": {
                           "format": "uuid",
                           "nullable": true,
                           "type": "string"
@@ -190112,6 +191035,18 @@
                         "retries": {
                           "type": "integer"
                         },
+                        "started_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "started_on": {
+                          "enum": [
+                            "phone",
+                            "desk"
+                          ],
+                          "type": "string"
+                        },
                         "status": {
                           "enum": [
                             "scheduled",
@@ -190134,10 +191069,32 @@
                           "minimum": 0,
                           "type": "integer"
                         },
+                        "tip_attribution": {
+                          "description": "Whose tip it is (ADR-272): who started the payment on their phone, the box's only front desk person, or the front desk role unpersonalised.",
+                          "enum": [
+                            "started_payment",
+                            "sole_front_desk",
+                            "front_desk_role"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "tip_cents": {
                           "description": "Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale.",
                           "minimum": 0,
                           "type": "integer"
+                        },
+                        "tip_recipient_role": {
+                          "enum": [
+                            "front_desk"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tip_recipient_user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
                         },
                         "user_id": {
                           "format": "uuid",
@@ -190150,6 +191107,7 @@
                         "currency",
                         "declines",
                         "description",
+                        "document",
                         "environment",
                         "fulfilment_status",
                         "id",
@@ -190160,9 +191118,12 @@
                         "reference",
                         "refunded_cents",
                         "retries",
+                        "started_on",
                         "status",
                         "surcharge_cents",
-                        "tip_cents"
+                        "tip_attribution",
+                        "tip_cents",
+                        "tip_recipient_user_id"
                       ],
                       "type": "object"
                     }
@@ -190183,6 +191144,160 @@
           }
         ],
         "summary": "Give up on a Tap to Pay payment that has no card transaction",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/payments/terminal/{id}/receipt-email": {
+      "post": {
+        "callbacks": {},
+        "description": "«Αποστολή με email» on the result screen, through the document email of ADR-265. A walk-in's needs `to`; a member's goes to their account email when `to` is left out.",
+        "operationId": "PaleeWeb.AdminTerminalPaymentsController.receipt_email",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "idempotency_key": {
+                    "maxLength": 120,
+                    "minLength": 8,
+                    "type": "string"
+                  },
+                  "language": {
+                    "enum": [
+                      "el",
+                      "en",
+                      "de",
+                      "fr",
+                      "it",
+                      "nl",
+                      "es"
+                    ],
+                    "type": "string"
+                  },
+                  "to": {
+                    "description": "Required for a walk-in; a member's account email when left out.",
+                    "maxLength": 254,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "idempotency_key"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "recipient": {
+                          "enum": [
+                            "buyer",
+                            "address"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "to": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "recipient",
+                        "status",
+                        "to"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "email"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The email of an earlier identical request"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "email": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "recipient": {
+                          "enum": [
+                            "buyer",
+                            "address"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "to": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "recipient",
+                        "status",
+                        "to"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "email"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Queued"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Email the receipt of a Tap to Pay payment (ADR-272)",
         "tags": [
           "Payments"
         ]
@@ -190303,6 +191418,68 @@
                         "description": {
                           "type": "string"
                         },
+                        "document": {
+                          "nullable": true,
+                          "properties": {
+                            "authority": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "currency": {
+                              "type": "string"
+                            },
+                            "gross_cents": {
+                              "type": "integer"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "issued_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "kind": {
+                              "enum": [
+                                "receipt",
+                                "invoice"
+                              ],
+                              "type": "string"
+                            },
+                            "number": {
+                              "type": "string"
+                            },
+                            "receipt_url": {
+                              "description": "A walk-in's receipt as an open, signed link (90 days) for the QR on the phone.",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "transmission_status": {
+                              "description": "Its transmission to the tax authority; none where the country has none.",
+                              "enum": [
+                                "pending",
+                                "sending",
+                                "accepted",
+                                "rejected",
+                                "failed"
+                              ],
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "authority",
+                            "currency",
+                            "gross_cents",
+                            "id",
+                            "kind",
+                            "number",
+                            "receipt_url",
+                            "transmission_status"
+                          ],
+                          "type": "object"
+                        },
                         "environment": {
                           "type": "string"
                         },
@@ -190320,6 +191497,11 @@
                           "type": "string"
                         },
                         "finance_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fiscal_document_id": {
                           "format": "uuid",
                           "nullable": true,
                           "type": "string"
@@ -190381,6 +191563,18 @@
                         "retries": {
                           "type": "integer"
                         },
+                        "started_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "started_on": {
+                          "enum": [
+                            "phone",
+                            "desk"
+                          ],
+                          "type": "string"
+                        },
                         "status": {
                           "enum": [
                             "scheduled",
@@ -190403,10 +191597,32 @@
                           "minimum": 0,
                           "type": "integer"
                         },
+                        "tip_attribution": {
+                          "description": "Whose tip it is (ADR-272): who started the payment on their phone, the box's only front desk person, or the front desk role unpersonalised.",
+                          "enum": [
+                            "started_payment",
+                            "sole_front_desk",
+                            "front_desk_role"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "tip_cents": {
                           "description": "Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale.",
                           "minimum": 0,
                           "type": "integer"
+                        },
+                        "tip_recipient_role": {
+                          "enum": [
+                            "front_desk"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tip_recipient_user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
                         },
                         "user_id": {
                           "format": "uuid",
@@ -190419,6 +191635,7 @@
                         "currency",
                         "declines",
                         "description",
+                        "document",
                         "environment",
                         "fulfilment_status",
                         "id",
@@ -190429,9 +191646,12 @@
                         "reference",
                         "refunded_cents",
                         "retries",
+                        "started_on",
                         "status",
                         "surcharge_cents",
-                        "tip_cents"
+                        "tip_attribution",
+                        "tip_cents",
+                        "tip_recipient_user_id"
                       ],
                       "type": "object"
                     }
@@ -190452,6 +191672,116 @@
           }
         ],
         "summary": "Dev/test only: the sandbox terminal app takes or refuses the card",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/payments/tips": {
+      "get": {
+        "callbacks": {},
+        "description": "Tips are the staff's, not revenue (ADR-264). Each is attributed to whoever started the payment on their phone, or to the front desk (ADR-272).",
+        "operationId": "PaleeWeb.AdminTipsController.index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "currency": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "from": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "rows": {
+                      "items": {
+                        "properties": {
+                          "kind": {
+                            "enum": [
+                              "person",
+                              "front_desk_role",
+                              "unattributed"
+                            ],
+                            "type": "string"
+                          },
+                          "name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "payments": {
+                            "type": "integer"
+                          },
+                          "tip_cents": {
+                            "type": "integer"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "name",
+                          "payments",
+                          "tip_cents",
+                          "user_id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "to": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "total_cents": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "currency",
+                    "from",
+                    "rows",
+                    "to",
+                    "total_cents"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Tips"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Card tips per staff member for a period (default: this month)",
         "tags": [
           "Payments"
         ]
@@ -211441,7 +212771,8 @@
                         "accountant",
                         "janitor",
                         "member",
-                        "athlete"
+                        "athlete",
+                        "guest"
                       ],
                       "type": "string"
                     },
@@ -244240,7 +245571,8 @@
                         "accountant",
                         "janitor",
                         "member",
-                        "athlete"
+                        "athlete",
+                        "guest"
                       ],
                       "type": "string"
                     },
@@ -284537,7 +285869,8 @@
                       "accountant",
                       "janitor",
                       "member",
-                      "athlete"
+                      "athlete",
+                      "guest"
                     ],
                     "type": "string"
                   },
@@ -284551,7 +285884,8 @@
                         "accountant",
                         "janitor",
                         "member",
-                        "athlete"
+                        "athlete",
+                        "guest"
                       ],
                       "type": "string"
                     },
@@ -291755,6 +293089,38 @@
         "summary": "Active public platform plans (pricing, coach onboarding)",
         "tags": [
           "Platform plans"
+        ]
+      }
+    },
+    "/api/public/receipts/{token}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PublicReceiptsController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "The receipt"
+          }
+        },
+        "summary": "A walk-in's receipt by its signed link",
+        "tags": [
+          "Fiscal"
         ]
       }
     },

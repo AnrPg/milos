@@ -4368,6 +4368,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/memberships/guest-boxes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The boxes the account is only a guest of (ADR-272) */
+        get: operations["PaleeWeb.OrganizationAccessController.guest_boxes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/memberships/join/{slug}": {
         parameters: {
             query?: never;
@@ -8094,6 +8111,63 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/payments/desk/guests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Make a found person, or a walk-in who signs up, a guest of the box
+         * @description `user_id` for a person found by «Ποιος;», or `name` and `email` for a walk-in (a new held profile, ADR-254, or the account that already has that email). Someone who is already a box member, athlete or guest stays as they are (`added: false`).
+         */
+        post: operations["PaleeWeb.AdminDeskBuyersController.make_guest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/desk/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What a person (or a walk-in, without `user_id`) can pay at the desk */
+        get: operations["PaleeWeb.AdminDeskBuyersController.options"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/desk/people": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Who can pay at the desk
+         * @description Without `q`, the people who checked in today; with it, the box's members, athletes and guests whose name or email matches, or a Palee account outside the box when `q` is its exact email.
+         */
+        get: operations["PaleeWeb.AdminDeskBuyersController.people"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/payments/terminal": {
         parameters: {
             query?: never;
@@ -8185,6 +8259,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/payments/terminal/{id}/receipt-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Email the receipt of a Tap to Pay payment (ADR-272)
+         * @description «Αποστολή με email» on the result screen, through the document email of ADR-265. A walk-in's needs `to`; a member's goes to their account email when `to` is left out.
+         */
+        post: operations["PaleeWeb.AdminTerminalPaymentsController.receipt_email"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/payments/terminal/{id}/sandbox-complete": {
         parameters: {
             query?: never;
@@ -8196,6 +8290,26 @@ export interface paths {
         put?: never;
         /** Dev/test only: the sandbox terminal app takes or refuses the card */
         post: operations["PaleeWeb.AdminTerminalPaymentsController.sandbox_complete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/tips": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Card tips per staff member for a period (default: this month)
+         * @description Tips are the staff's, not revenue (ADR-264). Each is attributed to whoever started the payment on their phone, or to the front desk (ADR-272).
+         */
+        get: operations["PaleeWeb.AdminTipsController.index"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -15431,6 +15545,23 @@ export interface paths {
         };
         /** Active public platform plans (pricing, coach onboarding) */
         get: operations["PaleeWeb.PlatformPlanController.index_public"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/receipts/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A walk-in's receipt by its signed link */
+        get: operations["PaleeWeb.PublicReceiptsController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -63548,6 +63679,33 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.OrganizationAccessController.guest_boxes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Boxes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        boxes: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            slug: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.OrganizationAccessController.join": {
         parameters: {
             query?: never;
@@ -81453,6 +81611,178 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminDeskBuyersController.make_guest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    email?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    user_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Already buying here */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The person became a guest of the box now. */
+                        added: boolean;
+                        /** @description A new, held profile was made for a walk-in (ADR-254). */
+                        created_profile: boolean;
+                        person: {
+                            avatar_url: string | null;
+                            /** Format: date-time */
+                            checked_in_at: string | null;
+                            name: string | null;
+                            /**
+                             * @description Box member, athlete, guest of the box, or not in the box yet.
+                             * @enum {string}
+                             */
+                            relation: "member" | "athlete" | "guest" | "none";
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Guest */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The person became a guest of the box now. */
+                        added: boolean;
+                        /** @description A new, held profile was made for a walk-in (ADR-254). */
+                        created_profile: boolean;
+                        person: {
+                            avatar_url: string | null;
+                            /** Format: date-time */
+                            checked_in_at: string | null;
+                            name: string | null;
+                            /**
+                             * @description Box member, athlete, guest of the box, or not in the box yet.
+                             * @enum {string}
+                             */
+                            relation: "member" | "athlete" | "guest" | "none";
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDeskBuyersController.options": {
+        parameters: {
+            query?: {
+                user_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Options */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        options: {
+                            invoices: {
+                                balance_due_cents: number;
+                                currency: string;
+                                description: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                number: string | null;
+                            }[];
+                            packages: {
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                price_cents: number;
+                            }[];
+                            /** @enum {string} */
+                            relation: "walk_in" | "member" | "athlete" | "guest" | "none";
+                            renewal: {
+                                currency: string;
+                                /** Format: date */
+                                ends_on?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                price_cents: number;
+                            } | null;
+                            shop_orders: {
+                                currency: string;
+                                customer_name: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                number: number;
+                                summary: string;
+                                total_cents: number;
+                            }[];
+                            /** Format: uuid */
+                            user_id: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDeskBuyersController.people": {
+        parameters: {
+            query?: {
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description People */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        people: {
+                            avatar_url: string | null;
+                            /** Format: date-time */
+                            checked_in_at: string | null;
+                            name: string | null;
+                            /**
+                             * @description Box member, athlete, guest of the box, or not in the box yet.
+                             * @enum {string}
+                             */
+                            relation: "member" | "athlete" | "guest" | "none";
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminTerminalPaymentsController.create": {
         parameters: {
             query?: never;
@@ -81472,6 +81802,11 @@ export interface operations {
                     purpose: "finance_invoice" | "membership_package" | "shop_order" | "free_sale";
                     /** Format: uuid */
                     purpose_id?: string | null;
+                    /**
+                     * @description Where the payment was started (ADR-272), for its tip: on the staff member's phone (default) or at the desk.
+                     * @enum {string|null}
+                     */
+                    started_on?: "phone" | "desk" | null;
                     /**
                      * Format: uuid
                      * @description The member; none for a walk-in (a shop order or a free sale, ADR-264).
@@ -81506,6 +81841,25 @@ export interface operations {
                             currency: string;
                             declines: number;
                             description: string;
+                            document: {
+                                authority: string | null;
+                                currency: string;
+                                gross_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                issued_at?: string | null;
+                                /** @enum {string} */
+                                kind: "receipt" | "invoice";
+                                number: string;
+                                /** @description A walk-in's receipt as an open, signed link (90 days) for the QR on the phone. */
+                                receipt_url: string | null;
+                                /**
+                                 * @description Its transmission to the tax authority; none where the country has none.
+                                 * @enum {string|null}
+                                 */
+                                transmission_status: "pending" | "sending" | "accepted" | "rejected" | "failed" | null;
+                            } | null;
                             environment: string;
                             /** Format: date-time */
                             expires_at?: string | null;
@@ -81513,6 +81867,8 @@ export interface operations {
                             failure_message?: string | null;
                             /** Format: uuid */
                             finance_payment_id?: string | null;
+                            /** Format: uuid */
+                            fiscal_document_id?: string | null;
                             fulfilment_status: string;
                             /** Format: uuid */
                             id: string;
@@ -81535,14 +81891,27 @@ export interface operations {
                             reference: string;
                             refunded_cents: number;
                             retries: number;
+                            /** Format: uuid */
+                            started_by_id?: string | null;
+                            /** @enum {string} */
+                            started_on: "phone" | "desk";
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
                             succeeded_at?: string | null;
                             /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
                             surcharge_cents: number;
+                            /**
+                             * @description Whose tip it is (ADR-272): who started the payment on their phone, the box's only front desk person, or the front desk role unpersonalised.
+                             * @enum {string|null}
+                             */
+                            tip_attribution: "started_payment" | "sole_front_desk" | "front_desk_role" | null;
                             /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
                             tip_cents: number;
+                            /** @enum {string|null} */
+                            tip_recipient_role?: "front_desk" | null;
+                            /** Format: uuid */
+                            tip_recipient_user_id: string | null;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
@@ -81568,6 +81937,12 @@ export interface operations {
                 content: {
                     "application/json": {
                         available: boolean;
+                        provider: string | null;
+                        /**
+                         * @description Why not (ADR-272): no payment account, Stripe (no terminal app in Palee), another provider without one, or an account that is not active. Whether the phone has the terminal app is known on the phone only.
+                         * @enum {string|null}
+                         */
+                        reason: "no_viva" | "stripe_only" | "provider_without_terminal" | "account_not_ready" | null;
                     };
                 };
             };
@@ -81616,6 +81991,25 @@ export interface operations {
                             currency: string;
                             declines: number;
                             description: string;
+                            document: {
+                                authority: string | null;
+                                currency: string;
+                                gross_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                issued_at?: string | null;
+                                /** @enum {string} */
+                                kind: "receipt" | "invoice";
+                                number: string;
+                                /** @description A walk-in's receipt as an open, signed link (90 days) for the QR on the phone. */
+                                receipt_url: string | null;
+                                /**
+                                 * @description Its transmission to the tax authority; none where the country has none.
+                                 * @enum {string|null}
+                                 */
+                                transmission_status: "pending" | "sending" | "accepted" | "rejected" | "failed" | null;
+                            } | null;
                             environment: string;
                             /** Format: date-time */
                             expires_at?: string | null;
@@ -81623,6 +82017,8 @@ export interface operations {
                             failure_message?: string | null;
                             /** Format: uuid */
                             finance_payment_id?: string | null;
+                            /** Format: uuid */
+                            fiscal_document_id?: string | null;
                             fulfilment_status: string;
                             /** Format: uuid */
                             id: string;
@@ -81645,14 +82041,27 @@ export interface operations {
                             reference: string;
                             refunded_cents: number;
                             retries: number;
+                            /** Format: uuid */
+                            started_by_id?: string | null;
+                            /** @enum {string} */
+                            started_on: "phone" | "desk";
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
                             succeeded_at?: string | null;
                             /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
                             surcharge_cents: number;
+                            /**
+                             * @description Whose tip it is (ADR-272): who started the payment on their phone, the box's only front desk person, or the front desk role unpersonalised.
+                             * @enum {string|null}
+                             */
+                            tip_attribution: "started_payment" | "sole_front_desk" | "front_desk_role" | null;
                             /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
                             tip_cents: number;
+                            /** @enum {string|null} */
+                            tip_recipient_role?: "front_desk" | null;
+                            /** Format: uuid */
+                            tip_recipient_user_id: string | null;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
@@ -81697,6 +82106,25 @@ export interface operations {
                             currency: string;
                             declines: number;
                             description: string;
+                            document: {
+                                authority: string | null;
+                                currency: string;
+                                gross_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                issued_at?: string | null;
+                                /** @enum {string} */
+                                kind: "receipt" | "invoice";
+                                number: string;
+                                /** @description A walk-in's receipt as an open, signed link (90 days) for the QR on the phone. */
+                                receipt_url: string | null;
+                                /**
+                                 * @description Its transmission to the tax authority; none where the country has none.
+                                 * @enum {string|null}
+                                 */
+                                transmission_status: "pending" | "sending" | "accepted" | "rejected" | "failed" | null;
+                            } | null;
                             environment: string;
                             /** Format: date-time */
                             expires_at?: string | null;
@@ -81704,6 +82132,8 @@ export interface operations {
                             failure_message?: string | null;
                             /** Format: uuid */
                             finance_payment_id?: string | null;
+                            /** Format: uuid */
+                            fiscal_document_id?: string | null;
                             fulfilment_status: string;
                             /** Format: uuid */
                             id: string;
@@ -81726,14 +82156,27 @@ export interface operations {
                             reference: string;
                             refunded_cents: number;
                             retries: number;
+                            /** Format: uuid */
+                            started_by_id?: string | null;
+                            /** @enum {string} */
+                            started_on: "phone" | "desk";
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
                             succeeded_at?: string | null;
                             /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
                             surcharge_cents: number;
+                            /**
+                             * @description Whose tip it is (ADR-272): who started the payment on their phone, the box's only front desk person, or the front desk role unpersonalised.
+                             * @enum {string|null}
+                             */
+                            tip_attribution: "started_payment" | "sole_front_desk" | "front_desk_role" | null;
                             /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
                             tip_cents: number;
+                            /** @enum {string|null} */
+                            tip_recipient_role?: "front_desk" | null;
+                            /** Format: uuid */
+                            tip_recipient_user_id: string | null;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
@@ -81778,6 +82221,25 @@ export interface operations {
                             currency: string;
                             declines: number;
                             description: string;
+                            document: {
+                                authority: string | null;
+                                currency: string;
+                                gross_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                issued_at?: string | null;
+                                /** @enum {string} */
+                                kind: "receipt" | "invoice";
+                                number: string;
+                                /** @description A walk-in's receipt as an open, signed link (90 days) for the QR on the phone. */
+                                receipt_url: string | null;
+                                /**
+                                 * @description Its transmission to the tax authority; none where the country has none.
+                                 * @enum {string|null}
+                                 */
+                                transmission_status: "pending" | "sending" | "accepted" | "rejected" | "failed" | null;
+                            } | null;
                             environment: string;
                             /** Format: date-time */
                             expires_at?: string | null;
@@ -81785,6 +82247,8 @@ export interface operations {
                             failure_message?: string | null;
                             /** Format: uuid */
                             finance_payment_id?: string | null;
+                            /** Format: uuid */
+                            fiscal_document_id?: string | null;
                             fulfilment_status: string;
                             /** Format: uuid */
                             id: string;
@@ -81807,16 +82271,88 @@ export interface operations {
                             reference: string;
                             refunded_cents: number;
                             retries: number;
+                            /** Format: uuid */
+                            started_by_id?: string | null;
+                            /** @enum {string} */
+                            started_on: "phone" | "desk";
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
                             succeeded_at?: string | null;
                             /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
                             surcharge_cents: number;
+                            /**
+                             * @description Whose tip it is (ADR-272): who started the payment on their phone, the box's only front desk person, or the front desk role unpersonalised.
+                             * @enum {string|null}
+                             */
+                            tip_attribution: "started_payment" | "sole_front_desk" | "front_desk_role" | null;
                             /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
                             tip_cents: number;
+                            /** @enum {string|null} */
+                            tip_recipient_role?: "front_desk" | null;
+                            /** Format: uuid */
+                            tip_recipient_user_id: string | null;
                             /** Format: uuid */
                             user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.receipt_email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    language?: "el" | "en" | "de" | "fr" | "it" | "nl" | "es";
+                    /** @description Required for a walk-in; a member's account email when left out. */
+                    to?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description The email of an earlier identical request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            recipient: "buyer" | "address";
+                            status: string;
+                            to: string;
+                        };
+                    };
+                };
+            };
+            /** @description Queued */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            recipient: "buyer" | "address";
+                            status: string;
+                            to: string;
                         };
                     };
                 };
@@ -81870,6 +82406,25 @@ export interface operations {
                             currency: string;
                             declines: number;
                             description: string;
+                            document: {
+                                authority: string | null;
+                                currency: string;
+                                gross_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                issued_at?: string | null;
+                                /** @enum {string} */
+                                kind: "receipt" | "invoice";
+                                number: string;
+                                /** @description A walk-in's receipt as an open, signed link (90 days) for the QR on the phone. */
+                                receipt_url: string | null;
+                                /**
+                                 * @description Its transmission to the tax authority; none where the country has none.
+                                 * @enum {string|null}
+                                 */
+                                transmission_status: "pending" | "sending" | "accepted" | "rejected" | "failed" | null;
+                            } | null;
                             environment: string;
                             /** Format: date-time */
                             expires_at?: string | null;
@@ -81877,6 +82432,8 @@ export interface operations {
                             failure_message?: string | null;
                             /** Format: uuid */
                             finance_payment_id?: string | null;
+                            /** Format: uuid */
+                            fiscal_document_id?: string | null;
                             fulfilment_status: string;
                             /** Format: uuid */
                             id: string;
@@ -81899,17 +82456,69 @@ export interface operations {
                             reference: string;
                             refunded_cents: number;
                             retries: number;
+                            /** Format: uuid */
+                            started_by_id?: string | null;
+                            /** @enum {string} */
+                            started_on: "phone" | "desk";
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
                             succeeded_at?: string | null;
                             /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
                             surcharge_cents: number;
+                            /**
+                             * @description Whose tip it is (ADR-272): who started the payment on their phone, the box's only front desk person, or the front desk role unpersonalised.
+                             * @enum {string|null}
+                             */
+                            tip_attribution: "started_payment" | "sole_front_desk" | "front_desk_role" | null;
                             /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
                             tip_cents: number;
+                            /** @enum {string|null} */
+                            tip_recipient_role?: "front_desk" | null;
+                            /** Format: uuid */
+                            tip_recipient_user_id: string | null;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTipsController.index": {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tips */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        currency: string | null;
+                        /** Format: date */
+                        from: string;
+                        rows: {
+                            /** @enum {string} */
+                            kind: "person" | "front_desk_role" | "unattributed";
+                            name: string | null;
+                            payments: number;
+                            tip_cents: number;
+                            /** Format: uuid */
+                            user_id: string | null;
+                        }[];
+                        /** Format: date */
+                        to: string;
+                        total_cents: number;
                     };
                 };
             };
@@ -89982,7 +90591,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    roles: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete")[];
+                    roles: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete" | "guest")[];
                 };
             };
         };
@@ -101755,7 +102364,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    roles: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete")[];
+                    roles: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete" | "guest")[];
                 };
             };
         };
@@ -115819,8 +116428,8 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string} */
-                    role?: "owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete";
-                    roles?: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete")[];
+                    role?: "owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete" | "guest";
+                    roles?: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete" | "guest")[];
                 };
             };
         };
@@ -118735,6 +119344,28 @@ export interface operations {
                             trial_days: number;
                         }[];
                     };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PublicReceiptsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The receipt */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
                 };
             };
         };
