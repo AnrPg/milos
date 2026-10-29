@@ -152,6 +152,7 @@
     "openLogin": "Abrir início de sessão num novo separador"
   },
   "Schedule": {
+    "classCoachChip": "Coach: {coach}",
     "introduction": "introdução ao horário das aulas",
     "showIntro": "Mostrar introdução",
     "title": "Cronograma",
@@ -242,10 +243,10 @@
     "duplicateClass": "Duplicar",
     "seriesScopeLegend": "Aplicar alterações a",
     "seriesScopeThis": "Só esta aula",
-    "seriesScopeAll": "Todas as próximas aulas",
+    "seriesScopeAll": "Esta e as aulas seguintes",
     "seriesScopeRange": "Aulas entre datas",
     "seriesScopeHint_this": "As outras aulas desta aula recorrente ficam como estão.",
-    "seriesScopeHint_all": "Cada próxima aula da série e as que ela adicionar depois. Cada uma mantém a sua data e o seu WOD.",
+    "seriesScopeHint_all": "Esta aula e cada aula seguinte da série, e as que ela adicionar depois. As próximas aulas antes dela ficam como estão. Cada uma mantém a sua data e o seu WOD.",
     "seriesScopeHint_range": "As próximas aulas da série entre estas datas, ambas incluídas. Cada uma mantém a sua data e o seu WOD.",
     "seriesScopeFrom": "De",
     "seriesScopeTo": "Até",

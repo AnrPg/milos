@@ -152,6 +152,7 @@
     "openLogin": "Aanmelden in nieuw tabblad openen"
   },
   "Schedule": {
+    "classCoachChip": "Coach: {coach}",
     "introduction": "introductie lesrooster",
     "showIntro": "Inleiding tonen",
     "title": "Schema",
@@ -242,10 +243,10 @@
     "duplicateClass": "Dupliceren",
     "seriesScopeLegend": "Wijzigingen toepassen op",
     "seriesScopeThis": "Alleen deze les",
-    "seriesScopeAll": "Alle komende lessen",
+    "seriesScopeAll": "Deze en volgende lessen",
     "seriesScopeRange": "Lessen tussen data",
     "seriesScopeHint_this": "De andere lessen van deze terugkerende les blijven zoals ze zijn.",
-    "seriesScopeHint_all": "Elke komende les van de reeks, en de lessen die hij later toevoegt. Elke les houdt zijn eigen datum en WOD.",
+    "seriesScopeHint_all": "Deze les en elke les erna van de reeks, en de lessen die hij later toevoegt. Komende lessen ervoor blijven zoals ze zijn. Elke les houdt zijn eigen datum en WOD.",
     "seriesScopeHint_range": "Komende lessen van de reeks tussen deze data, beide inbegrepen. Elke les houdt zijn eigen datum en WOD.",
     "seriesScopeFrom": "Van",
     "seriesScopeTo": "Tot",

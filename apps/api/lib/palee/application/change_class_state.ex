@@ -43,14 +43,16 @@ defmodule Palee.Application.ChangeClassState do
 
   def call(_id, _params), do: {:error, :organization_context_required}
 
-  defp plans(context, %{current: current, targets: targets}, action, now, reason) do
+  defp plans(context, resolved, action, now, reason) do
+    reached = SeriesScope.reached(resolved)
+
     slots =
       Map.new(
-        Scheduling.list_slots_by_ids(context, [current.id | Enum.map(targets, & &1.id)]),
+        Scheduling.list_slots_by_ids(context, Enum.map(reached, & &1.id)),
         &{&1.id, &1}
       )
 
-    [current | targets]
+    reached
     |> Enum.map(&Map.get(slots, &1.id))
     |> Enum.reject(&is_nil/1)
     |> Enum.map(&{&1, ClassState.plan(&1, action, now, reason)})

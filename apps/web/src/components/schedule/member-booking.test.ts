@@ -13,6 +13,7 @@ import {
   localizeMemberBookingError,
   memberSlotState,
   slotCreditCost,
+  slotCoachName,
   slotLocationName,
   waitlistPositionLabel,
 } from "./member-booking";
@@ -132,6 +133,10 @@ describe("slot details", () => {
     const locations = [{ id: "loc-1", name: "Downtown", address: null, archived_at: null }];
     expect(slotLocationName(slot({ location_id: "loc-1" }), locations)).toBe("Downtown");
     expect(slotLocationName(slot({ location_id: "loc-2" }), locations)).toBeNull();
+    const coaches = [{ id: "c-1", nickname: "Olga", avatar_url: null }];
+    expect(slotCoachName(slot({ coach_user_id: "c-1" }), coaches)).toBe("Olga");
+    expect(slotCoachName(slot({ coach_user_id: "c-2" }), coaches)).toBeNull();
+    expect(slotCoachName(slot({ coach_user_id: null }), coaches)).toBeNull();
     expect(slotLocationName(slot(), locations)).toBeNull();
   });
 });

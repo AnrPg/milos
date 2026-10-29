@@ -152,6 +152,7 @@
     "openLogin": "Ouvrir la connexion dans un nouvel onglet"
   },
   "Schedule": {
+    "classCoachChip": "Coach : {coach}",
     "introduction": "introduction au planning des cours",
     "showIntro": "Afficher l'introduction",
     "title": "Planning",
@@ -242,10 +243,10 @@
     "duplicateClass": "Dupliquer",
     "seriesScopeLegend": "Appliquer les changements à",
     "seriesScopeThis": "Ce cours seulement",
-    "seriesScopeAll": "Tous les cours à venir",
+    "seriesScopeAll": "Ce cours et les suivants",
     "seriesScopeRange": "Cours entre deux dates",
     "seriesScopeHint_this": "Les autres dates de ce cours récurrent ne changent pas.",
-    "seriesScopeHint_all": "Tous les cours à venir de ce cours récurrent, y compris ceux qu’il ajoutera plus tard. Chacun garde sa date et son WOD.",
+    "seriesScopeHint_all": "Ce cours et chaque cours suivant de ce cours récurrent, y compris ceux qu’il ajoutera plus tard. Les cours à venir avant lui restent tels quels. Chacun garde sa date et son WOD.",
     "seriesScopeHint_range": "Les cours à venir de ce cours récurrent entre ces dates, incluses. Chacun garde sa date et son WOD.",
     "seriesScopeFrom": "Du",
     "seriesScopeTo": "Au",

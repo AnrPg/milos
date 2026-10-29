@@ -82,3 +82,28 @@ use case is `ChangeClassState`; the scope is resolved by
 nth class counted from the acted-on class in date order, both forwards and
 backwards (`SeriesEdit.every_nth/3`). Only `all` with `every` 1 updates the
 series template or ends the series.
+
+## §4 "All" means this class and the following ones; deletes from the form (2026-10-29)
+ANR found that deleting a class did not follow the chosen reach. The class
+form's «Delete class» button deleted only that class, without asking, even
+when «Apply changes to» was set further; and `all` reached every upcoming
+class of the series, so acting on Thursday's class also changed Tuesday's if
+it had not started yet, while the label already read «Όλα τα επόμενα».
+
+- `all` now reaches the acted-on class and the classes of the series after it
+  (`SeriesEdit.targets/5` takes the acted-on class, not just its id). Upcoming
+  classes before it stay as they are. This holds for edits, pause, cancel and
+  delete alike. The series template is still updated (edit) or ended (cancel
+  or delete) only by `all` with every 1, so the classes it creates later
+  follow. The labels say «Αυτό και όλα τα επόμενα τμήματα» / "This and
+  following classes" in every locale. This reverses the "this and following"
+  alternative rejected above: "all upcoming" was not what staff expect.
+- `range` stays the dates staff chose, also before the acted-on class. For a
+  pause, cancel or delete, the acted-on class is reached only when its own
+  date is inside the range (`SeriesEdit.reaches_own_class?/3`,
+  `SeriesScope.reached/1`). An edit still always changes the edited class.
+- The class form's «Delete class» opens the same confirmation as the class's
+  own «Delete» (`POST /admin/schedule/slots/:id/state`, action `delete`),
+  pre-set to the reach chosen in the form and still changeable there. The web
+  no longer calls `DELETE /admin/schedule/slots/:id`, which stays for one
+  class.

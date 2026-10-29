@@ -152,6 +152,7 @@
     "openLogin": "Open Login In New Tab"
   },
   "Schedule": {
+    "classCoachChip": "Coach: {coach}",
     "introduction": "class schedule introduction",
     "showIntro": "Show intro",
     "title": "Schedule",
@@ -242,10 +243,10 @@
     "duplicateClass": "Duplicate",
     "seriesScopeLegend": "Apply changes to",
     "seriesScopeThis": "Only this class",
-    "seriesScopeAll": "All upcoming classes",
+    "seriesScopeAll": "This and following classes",
     "seriesScopeRange": "Classes between dates",
     "seriesScopeHint_this": "The other classes of this recurring class stay as they are.",
-    "seriesScopeHint_all": "Every upcoming class of this recurring class, including the ones it adds later. Each keeps its own date and WOD.",
+    "seriesScopeHint_all": "This class and every class of the recurring class after it, including the ones it adds later. Upcoming classes before it stay as they are. Each keeps its own date and WOD.",
     "seriesScopeHint_range": "Upcoming classes of this recurring class between these dates, both included. Each keeps its own date and WOD.",
     "seriesScopeFrom": "From",
     "seriesScopeTo": "To",

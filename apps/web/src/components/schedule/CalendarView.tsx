@@ -6,7 +6,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
-import type { ClassTypeRecord, ScheduleLocation, ScheduleSlot } from "@/api/schedule";
+import type { ClassTypeRecord, ScheduleCoach, ScheduleLocation, ScheduleSlot } from "@/api/schedule";
 import type { DayWorkout } from "@/api/day-workouts";
 import { DayWorkoutStrip } from "@/components/schedule/DayWorkoutStrip";
 import { dayWorkoutsOn } from "@/components/schedule/day-workouts";
@@ -15,7 +15,7 @@ import { buildScheduleWindow, monthKey, parseLocalDate, type ScheduleDays } from
 import { dateKeyInZone, formatInZone } from "@/lib/zoned-time";
 import { WORKOUT_TYPE_COLORS } from "@/lib/workout-colors";
 import { semanticLabel } from "@/i18n/presentation";
-import { classStateBadge, isEventSlot, memberSlotState, slotLocationName, waitlistPositionLabel } from "@/components/schedule/member-booking";
+import { classStateBadge, isEventSlot, memberSlotState, slotCoachName, slotLocationName, waitlistPositionLabel } from "@/components/schedule/member-booking";
 import { ClassStateBadge } from "@/components/schedule/ClassState";
 import { SPARK_CREATE_STYLE } from "@/lib/spark";
 import { classWorkoutNoticeKind } from "@/components/schedule/ClassWorkoutNotice";
@@ -26,6 +26,8 @@ type CalendarViewProps = {
   slots: ScheduleSlot[];
   isAdmin: boolean;
   locations?: ScheduleLocation[];
+  /** The coaches of the window's classes: each class shows its own. */
+  coaches?: ScheduleCoach[];
   onSelectSlot: (slot: ScheduleSlot) => void;
   onCreateSlot: (isoDate: string) => void;
   /** Month view: a cell's date or its "+N more" opens that day's view. */
@@ -69,6 +71,7 @@ export function CalendarView({
   slots,
   isAdmin,
   locations,
+  coaches,
   onSelectSlot,
   onCreateSlot,
   onOpenDay,
@@ -288,6 +291,7 @@ export function CalendarView({
                     compact={days === 7}
                     isAdmin={isAdmin}
                     locationName={slotLocationName(slot, locations)}
+                    coachName={slotCoachName(slot, coaches)}
                     onSelectSlot={onSelectSlot}
                     timeZone={timeZone}
                   />
@@ -306,6 +310,7 @@ function SlotCard({
   compact,
   isAdmin,
   locationName,
+  coachName,
   onSelectSlot,
   timeZone,
 }: {
@@ -314,6 +319,7 @@ function SlotCard({
   compact: boolean;
   isAdmin: boolean;
   locationName: string | null;
+  coachName: string | null;
   onSelectSlot: (slot: ScheduleSlot) => void;
 }) {
   const i18n = useUiTranslations();
@@ -335,7 +341,7 @@ function SlotCard({
   const isUnavailable =
     cancelled || (!slot.current_user_booking && (isPast || (slot.spots_remaining === 0 && isAdmin)));
   const strike = cancelled ? "line-through" : undefined;
-  const details = [isEventSlot(slot) ? i18n("mbEventMarker") : null, locationName].filter(Boolean).join(" · ");
+  const details = [isEventSlot(slot) ? i18n("mbEventMarker") : null, coachName, locationName].filter(Boolean).join(" · ");
   const classType = slotClassType(slot);
   const typeColor = WORKOUT_TYPE_COLORS[classType.slug] ?? "var(--primary)";
   // ADR-176: staff see a class without its WOD as incomplete (a draft, or a
@@ -368,6 +374,11 @@ function SlotCard({
         <p className="truncate text-[10px] uppercase tracking-[0.14em]" style={{ color: isUnavailable ? "var(--dim)" : typeColor }}>
           {classType.name}
         </p>
+        {coachName ? (
+          <p className="truncate text-[10px]" data-testid="slot-coach" style={{ color: isUnavailable ? "var(--dim)" : "var(--muted)" }}>
+            {coachName}
+          </p>
+        ) : null}
         {slot.my_version ? (
           <p className="truncate text-[9px] font-bold" style={{ color: "var(--primary)" }}>
             {i18n("memberProgrammingYourVersion")}
@@ -408,7 +419,7 @@ function SlotCard({
             </span>
           ) : null}
           {details ? (
-            <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>{details}</p>
+            <p className="mt-1 text-xs" data-testid="slot-details" style={{ color: "var(--dim)" }}>{details}</p>
           ) : null}
         </div>
         <span

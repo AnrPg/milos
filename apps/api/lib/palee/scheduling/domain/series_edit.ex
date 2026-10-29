@@ -5,8 +5,9 @@ defmodule Palee.Scheduling.Domain.SeriesEdit do
   Staff edit one class of a series and choose how far the edit goes:
 
     * `:this` - only the edited class;
-    * `:all` - every upcoming class of the series, and the series itself, so
-      classes created later get the edit too;
+    * `:all` - the edited class and every class of the series after it, and
+      the series itself, so classes created later get the edit too; upcoming
+      classes before the edited one stay as they are;
     * `{:range, from, to}` - upcoming classes whose gym-local date falls in
       `from..to` (inclusive); the series itself is unchanged.
 
@@ -94,21 +95,36 @@ defmodule Palee.Scheduling.Domain.SeriesEdit do
 
   @doc """
   The other classes the edit reaches: upcoming ones (`after` `now`) inside the
-  scope, without the edited class itself.
+  scope, without the edited class itself. `edited` is the edited class as it
+  was (`id`, `scheduled_at`).
   """
-  @spec targets([map()], scope(), String.t(), Ecto.UUID.t(), DateTime.t()) :: [map()]
-  def targets(_occurrences, :this, _timezone, _edited_id, _now), do: []
+  @spec targets([map()], scope(), String.t(), map(), DateTime.t()) :: [map()]
+  def targets(_occurrences, :this, _timezone, _edited, _now), do: []
 
-  def targets(occurrences, scope, timezone, edited_id, now) do
+  def targets(occurrences, scope, timezone, edited, now) do
     Enum.filter(occurrences, fn occurrence ->
-      occurrence.id != edited_id and DateTime.compare(occurrence.scheduled_at, now) == :gt and
-        in_scope?(occurrence.scheduled_at, scope, timezone)
+      occurrence.id != edited.id and DateTime.compare(occurrence.scheduled_at, now) == :gt and
+        in_scope?(occurrence.scheduled_at, scope, timezone, edited.scheduled_at)
     end)
   end
 
-  defp in_scope?(_scheduled_at, :all, _timezone), do: true
+  @doc """
+  Whether the class acted on is itself inside the scope. It always is, except
+  for a range that leaves its date out: a pause, cancel or delete then reaches
+  only the classes on the chosen dates. (An edit always changes the edited
+  class.)
+  """
+  @spec reaches_own_class?(scope(), String.t(), DateTime.t()) :: boolean()
+  def reaches_own_class?({:range, _from, _to} = scope, timezone, scheduled_at),
+    do: in_scope?(scheduled_at, scope, timezone, scheduled_at)
 
-  defp in_scope?(scheduled_at, {:range, from, to}, timezone) do
+  def reaches_own_class?(_scope, _timezone, _scheduled_at), do: true
+
+  # "All" is the edited class and the ones after it, never the earlier ones.
+  defp in_scope?(scheduled_at, :all, _timezone, edited_at),
+    do: DateTime.compare(scheduled_at, edited_at) != :lt
+
+  defp in_scope?(scheduled_at, {:range, from, to}, timezone, _edited_at) do
     local = scheduled_at |> DateTime.shift_zone!(timezone) |> DateTime.to_date()
     not Date.before?(local, from) and not Date.after?(local, to)
   end

@@ -152,6 +152,7 @@
     "openLogin": "פתיחת התחברות בכרטיסייה חדשה"
   },
   "Schedule": {
+    "classCoachChip": "מאמן: {coach}",
     "introduction": "היכרות עם מערכת השיעורים",
     "showIntro": "הצג מבוא",
     "title": "לוח זמנים",
@@ -242,10 +243,10 @@
     "duplicateClass": "שכפול",
     "seriesScopeLegend": "להחיל את השינויים על",
     "seriesScopeThis": "רק השיעור הזה",
-    "seriesScopeAll": "כל השיעורים הבאים",
+    "seriesScopeAll": "השיעור הזה והשיעורים שאחריו",
     "seriesScopeRange": "שיעורים בין תאריכים",
     "seriesScopeHint_this": "שאר המפגשים של השיעור הקבוע הזה נשארים כמו שהם.",
-    "seriesScopeHint_all": "כל שיעור בא בסדרה, וגם השיעורים שהיא תוסיף בהמשך. כל שיעור שומר על התאריך וה-WOD שלו.",
+    "seriesScopeHint_all": "השיעור הזה וכל שיעור אחריו בסדרה, וגם השיעורים שהיא תוסיף בהמשך. שיעורים קרובים שלפניו נשארים כמו שהם. כל שיעור שומר על התאריך וה-WOD שלו.",
     "seriesScopeHint_range": "השיעורים הבאים בסדרה בין התאריכים האלה, כולל שניהם. כל שיעור שומר על התאריך וה-WOD שלו.",
     "seriesScopeFrom": "מ-",
     "seriesScopeTo": "עד",

@@ -1,8 +1,8 @@
 defmodule Palee.Application.SeriesScope do
   @moduledoc """
   The classes an operation on one class reaches (ADR-200): only that class, or
-  by `series_scope` (`all` / `range`) and `every` the other upcoming classes of
-  its series. Edits and pause / cancel / delete share it, so they always reach
+  by `series_scope` (`all`: this class and the ones after it / `range`) and
+  `every` the other upcoming classes of its series. Edits and pause / cancel / delete share it, so they always reach
   the same classes. The rules are `Palee.Scheduling.Domain.SeriesEdit`.
   """
 
@@ -39,7 +39,7 @@ defmodule Palee.Application.SeriesScope do
           targets =
             context
             |> Scheduling.list_series_slots(series.id, now)
-            |> SeriesEdit.targets(scope, series.timezone, current.id, now)
+            |> SeriesEdit.targets(scope, series.timezone, current, now)
             |> SeriesEdit.every_nth(current.scheduled_at, every)
 
           {:ok, %{current: current, series: series, targets: targets, scope: scope, every: every}}
@@ -50,7 +50,19 @@ defmodule Palee.Application.SeriesScope do
     end
   end
 
-  @doc "Whether the operation reaches every upcoming class of the series."
+  @doc """
+  The classes a pause, cancel or delete acts on, in date order: the class
+  itself when its date is in the scope, then the others reached.
+  """
+  def reached(%{current: current, series: %{timezone: timezone}, scope: scope, targets: targets}) do
+    if SeriesEdit.reaches_own_class?(scope, timezone, current.scheduled_at),
+      do: Enum.sort_by([current | targets], & &1.scheduled_at, DateTime),
+      else: targets
+  end
+
+  def reached(%{current: current}), do: [current]
+
+  @doc "Whether the operation reaches every class of the series from this one on."
   def whole_series?(%{series: %{}, scope: :all, every: 1}), do: true
   def whole_series?(_resolved), do: false
 

@@ -152,6 +152,7 @@
     "openLogin": "Anmeldung in neuem Tab öffnen"
   },
   "Schedule": {
+    "classCoachChip": "Coach: {coach}",
     "introduction": "Einführung in den Kursplan",
     "showIntro": "Einführung anzeigen",
     "title": "Kursplan",
@@ -242,10 +243,10 @@
     "duplicateClass": "Duplizieren",
     "seriesScopeLegend": "Änderungen anwenden auf",
     "seriesScopeThis": "Nur diesen Kurs",
-    "seriesScopeAll": "Alle kommenden Kurse",
+    "seriesScopeAll": "Dieser und alle folgenden Kurse",
     "seriesScopeRange": "Kurse in einem Zeitraum",
     "seriesScopeHint_this": "Die anderen Kurse dieses wiederkehrenden Kurses bleiben unverändert.",
-    "seriesScopeHint_all": "Alle kommenden Kurse dieses wiederkehrenden Kurses, auch die, die er später hinzufügt. Jeder behält sein eigenes Datum und WOD.",
+    "seriesScopeHint_all": "Dieser Kurs und jeder folgende dieses wiederkehrenden Kurses, auch die, die er später hinzufügt. Kommende Kurse davor bleiben, wie sie sind. Jeder behält sein eigenes Datum und WOD.",
     "seriesScopeHint_range": "Kommende Kurse dieses wiederkehrenden Kurses zwischen diesen Daten, beide eingeschlossen. Jeder behält sein eigenes Datum und WOD.",
     "seriesScopeFrom": "Von",
     "seriesScopeTo": "Bis",

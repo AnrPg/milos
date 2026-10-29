@@ -8,18 +8,17 @@ import { localizeError } from "@/i18n/presentation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
-import { ApiError } from "@/api/client";
 import {
   createScheduleSlot,
   createScheduleSlotsAt,
   createScheduleSeries,
-  deleteScheduleSlot,
   fetchSchedule,
   updateScheduleSlot,
   type ClassAction,
   type SeriesEditScope,
   type ScheduleBooking,
   type ClassTypeRecord,
+  type ScheduleCoach,
   type ScheduleLocation,
   type ScheduleSlot,
   type ScheduleSlotPayload,
@@ -95,6 +94,8 @@ type SlotField = (typeof SLOT_FIELDS)[number];
 
 type SlotEditorState = {
   slotId: string | null;
+  /** The class as it was when the form opened (edits only). */
+  slot?: ScheduleSlot;
   /** ADR-200: the edited class's series; its edit can reach further. */
   seriesId?: string | null;
   values: ClassPayload;
@@ -204,6 +205,7 @@ export function ScheduleConsole({
   const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
   const [classTypes, setClassTypes] = useState<ClassTypeRecord[]>([]);
   const [locations, setLocations] = useState<ScheduleLocation[]>([]);
+  const [windowCoaches, setWindowCoaches] = useState<ScheduleCoach[]>([]);
   // ADR-230: the WOD of each day in the window (staff), and the day being edited.
   const [dayWorkouts, setDayWorkouts] = useState<DayWorkout[]>([]);
   const [dayWodDate, setDayWodDate] = useState<string | null>(null);
@@ -219,7 +221,7 @@ export function ScheduleConsole({
   const submitCommand = useOutboxCommand();
   const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
   // ADR-200 §2: the pause / cancel / delete waiting for its confirmation.
-  const [classAction, setClassAction] = useState<{ slot: ScheduleSlot; action: ClassAction } | null>(null);
+  const [classAction, setClassAction] = useState<{ slot: ScheduleSlot; action: ClassAction; scope?: SeriesEditScope } | null>(null);
   const classActionSummary = useClassActionSummary();
   const [bookingTarget, setBookingTarget] = useState<ScheduleSlot | null>(null);
   const [resolveTarget, setResolveTarget] = useState<{ booking: ScheduleBooking; action: "approve" | "reject" } | null>(
@@ -285,6 +287,7 @@ export function ScheduleConsole({
       setSchedule(nextSlots);
       setClassTypes(nextClassTypes);
       setLocations(Array.isArray(window.locations) ? window.locations : []);
+      setWindowCoaches(Array.isArray(window.coaches) ? window.coaches : []);
       setDayWorkouts(Array.isArray(window.day_workouts) ? window.day_workouts : []);
       return nextSlots;
     } catch (loadError) {
@@ -578,28 +581,11 @@ export function ScheduleConsole({
     }
   }
 
-  async function removeEditedSlot() {
-    if (!tokens?.access_token || !editor?.slotId) return;
-
-    setBusy(true);
-
-    try {
-      await deleteScheduleSlot(tokens.access_token, editor.slotId);
-      const deletedSlotId = editor.slotId;
-      setEditor(null);
-
-      if (selectedSlot?.id === deletedSlotId) {
-        setSelectedSlot(null);
-      }
-
-      await loadSchedule();
-    } catch (requestError) {
-      const message =
-        requestError instanceof ApiError ? localizeError(requestError, i18n) : t("failedToDeleteSlot");
-      setEditor((current) => (current ? { ...current, errors: { fields: {}, message }, sent: current.values } : current));
-    } finally {
-      setBusy(false);
-    }
+  // ADR-200: deleting from the form confirms first and reaches the classes
+  // its «Apply changes to» chose, the same as the class's own delete action.
+  function removeEditedSlot() {
+    if (!editor?.slot) return;
+    setClassAction({ slot: editor.slot, action: "delete", scope: editor.seriesId ? seriesScope : { scope: "this" } });
   }
 
   // ADR-176: a class needs a class type, never a WOD. A gym without any type
@@ -730,7 +716,7 @@ export function ScheduleConsole({
 
   function openUpdateEditor(slot: ScheduleSlot) {
     setSeriesScope({ scope: "this" });
-    setEditor({ slotId: slot.id, seriesId: slot.class_series_id ?? null, values: slotValues(slot), originalScheduledAt: slot.scheduled_at });
+    setEditor({ slotId: slot.id, slot, seriesId: slot.class_series_id ?? null, values: slotValues(slot), originalScheduledAt: slot.scheduled_at });
   }
 
   // A new class like this one, outside any series, at its branch; staff
@@ -872,6 +858,7 @@ export function ScheduleConsole({
             days={days}
             isAdmin={isAdmin}
             locations={locations}
+            coaches={windowCoaches}
             onCreateSlot={(isoDate) => openCreateEditor(isoDate)}
             onOpenDay={openDay}
             onSelectSlot={setSelectedSlot}
@@ -921,6 +908,7 @@ export function ScheduleConsole({
           guestsIncluded={includesGuestPasses(entitlement)}
           canProgramVariations={can(membership, "manage_coaching")}
           locations={locations}
+          coaches={windowCoaches}
           onCancelBooking={({ lateCancellation }) => {
             setNotice(lateCancellation ? i18n("mbLateCancellationNotice") : null);
             void loadSchedule();
@@ -944,11 +932,13 @@ export function ScheduleConsole({
           token={tokens.access_token}
           slot={classAction.slot}
           action={classAction.action}
+          initialScope={classAction.scope}
           classDate={dateTimeLocalInZone(classAction.slot.scheduled_at, gymZone).slice(0, 10)}
           onClose={() => setClassAction(null)}
           onDone={(result) => {
             setClassAction(null);
             setNotice(classActionSummary(result) || null);
+            if (editor?.slotId && result.deleted_ids.includes(editor.slotId)) setEditor(null);
             if (selectedSlot && result.deleted_ids.includes(selectedSlot.id)) {
               setSelectedSlot(null);
               void loadSchedule();
@@ -1013,7 +1003,8 @@ export function ScheduleConsole({
                 <button
                   className="rounded-full px-4 py-2 text-sm font-semibold"
                   style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 25%, transparent)", color: "var(--primary)" }}
-                  onClick={() => void removeEditedSlot()}
+                  onClick={removeEditedSlot}
+                  data-testid="slot-editor-delete"
                   type="button"
                 >
                   {t("deleteSlot")}

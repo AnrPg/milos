@@ -152,6 +152,7 @@
     "openLogin": "Apri accesso in una nuova scheda"
   },
   "Schedule": {
+    "classCoachChip": "Coach: {coach}",
     "introduction": "introduzione al calendario delle lezioni",
     "showIntro": "Mostra introduzione",
     "title": "Calendario",
@@ -242,10 +243,10 @@
     "duplicateClass": "Duplica",
     "seriesScopeLegend": "Applica le modifiche a",
     "seriesScopeThis": "Solo questa lezione",
-    "seriesScopeAll": "Tutte le prossime lezioni",
+    "seriesScopeAll": "Questa e le lezioni successive",
     "seriesScopeRange": "Lezioni tra due date",
     "seriesScopeHint_this": "Le altre lezioni di questa lezione ricorrente restano come sono.",
-    "seriesScopeHint_all": "Ogni prossima lezione di questa lezione ricorrente, comprese quelle che aggiungerà in seguito. Ognuna mantiene la propria data e il proprio WOD.",
+    "seriesScopeHint_all": "Questa lezione e ogni lezione successiva di questa lezione ricorrente, comprese quelle che aggiungerà in seguito. Le prossime lezioni precedenti restano come sono. Ognuna mantiene la propria data e il proprio WOD.",
     "seriesScopeHint_range": "Le prossime lezioni di questa lezione ricorrente tra queste date, incluse. Ognuna mantiene la propria data e il proprio WOD.",
     "seriesScopeFrom": "Dal",
     "seriesScopeTo": "Al",
