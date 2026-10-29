@@ -78,6 +78,9 @@ defmodule Palee.Infrastructure.Documents.Pdf.TrueType do
 
   # ── cmap ──────────────────────────────────────────────────────────────────
 
+  # A subset (what PDF embeds) has no cmap: glyphs are addressed by id.
+  defp cmap(nil), do: %{}
+
   defp cmap(<<_version::16, count::16, rest::binary>> = table) do
     records =
       for <<platform::16, encoding::16, offset::32 <- binary_part(rest, 0, count * 8)>>,
