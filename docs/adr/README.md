@@ -246,3 +246,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-261 | One-button connection of the business's Stripe (Connect OAuth) or Viva (ISV) account; platform credentials, signed state, disconnect | Accepted |
 | ADR-262 | Every recorded payment (desk or online) issues its fiscal receipt once the fiscal identity is complete; part payments split per tax group; idempotent per payment | Accepted |
 | ADR-263 | Member payment screens: buy a subscription package, pay an invoice, saved cards and autopay, withdrawal, /pay/return with the sandbox page, the box's sales page; API adds provider, services, autopay at checkout, dated visits without withdrawal | Accepted |
+| ADR-264 | Tap to Pay for walk-ins' free sales (memberless Finance stream sale with its receipt, idempotent per intent); tips (staff's, not revenue) and card surcharges (revenue on the sale's receipt) Viva confirms on top of the amount | Accepted |
