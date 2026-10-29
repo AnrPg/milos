@@ -398,6 +398,10 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminFinanceController, :members} => [:manage_billing, :take_payments],
     {W.AdminFinanceController, :member} => [:manage_billing, :take_payments],
     {W.AdminFinanceController, :update_member} => [:manage_billing],
+    # ADR-274: values set by hand; the history is read with the ledger.
+    {W.AdminFinanceController, :set_member_override} => [:manage_billing],
+    {W.AdminFinanceController, :reset_member_override} => [:manage_billing],
+    {W.AdminFinanceController, :member_overrides} => [:manage_billing, :take_payments],
     {W.AdminFinanceController, :set_member_auto_renew} => [:manage_billing],
     {W.AdminFinanceController, :mark_member_left} => [:manage_billing],
     {W.AdminFinanceController, :undo_member_left} => [:manage_billing],

@@ -2,9 +2,9 @@ defmodule Palee.Application.GetAdminUserFinance do
   @moduledoc false
 
   alias Palee.Application.EntitlementClassTypeNames
-  alias Palee.Application.GetFinanceMemberProfile
+  alias Palee.Application.{FinanceValueOverrides, GetFinanceMemberProfile}
   alias Palee.Application.TenantUserAccess
-  alias Palee.{Finance, Identity}
+  alias Palee.{Finance, Identity, Organizations}
   alias Palee.Identity.Domain.AdminProfilePolicy
   alias Palee.Organizations.Domain.AdminPath
 
@@ -59,9 +59,18 @@ defmodule Palee.Application.GetAdminUserFinance do
     events = Finance.list_referral_events(tenant_context)
     rewards = Finance.list_referral_rewards(tenant_context)
 
+    today = Organizations.local_today(tenant_context.organization_id)
+
     %{
       membership: serialize_membership(profile.membership),
-      package_subscriptions: Enum.map(profile.package_subscriptions, &serialize_subscription/1),
+      package_subscriptions:
+        Enum.map(
+          profile.package_subscriptions,
+          &serialize_subscription(&1, profile.membership, today)
+        ),
+      # ADR-274: every value set by hand (in force and ended), newest first.
+      overrides:
+        FinanceValueOverrides.with_names(Finance.list_value_overrides(tenant_context, user_id)),
       referral_claims:
         events
         |> Enum.filter(&(&1.referred_user_id == user_id))
@@ -81,6 +90,7 @@ defmodule Palee.Application.GetAdminUserFinance do
     %{
       membership: nil,
       package_subscriptions: [],
+      overrides: [],
       referral_claims: [],
       referred_members: [],
       referral_rewards: []
@@ -94,6 +104,7 @@ defmodule Palee.Application.GetAdminUserFinance do
       :id,
       :user_id,
       :status,
+      :status_shown,
       :user_type_snapshot,
       :signup_source,
       :starts_on,
@@ -108,8 +119,15 @@ defmodule Palee.Application.GetAdminUserFinance do
     ])
   end
 
-  defp serialize_subscription(subscription) do
-    Map.take(subscription, [
+  defp serialize_subscription(subscription, membership, today) do
+    subscription
+    |> Map.put(
+      :current_period,
+      Finance.subscription_current_period(subscription, membership, today)
+    )
+    |> Map.take([
+      :current_period,
+      :charges_from,
       :id,
       :membership_package_id,
       :package_code_snapshot,

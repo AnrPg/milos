@@ -33,6 +33,11 @@ defmodule Palee.Application.GetFinanceOperationalQueues do
       &Enum.map(&1, fn row -> put_user_label(row, users, Map.get(row, :user_id)) end)
     )
     |> Map.update(
+      :open_charges,
+      [],
+      &Enum.map(&1, fn row -> put_user_label(row, users, row.user_id) end)
+    )
+    |> Map.update(
       :pending_referral_rewards,
       [],
       &Enum.map(&1, fn row -> put_user_label(row, users, row.recipient_user_id) end)
@@ -49,7 +54,12 @@ defmodule Palee.Application.GetFinanceOperationalQueues do
 
   defp user_map(queues) do
     queues
-    |> Map.take([:expiring_memberships, :pending_payments, :pending_referral_rewards])
+    |> Map.take([
+      :expiring_memberships,
+      :pending_payments,
+      :open_charges,
+      :pending_referral_rewards
+    ])
     |> Map.values()
     |> List.flatten()
     |> Enum.flat_map(fn row -> [Map.get(row, :user_id), Map.get(row, :recipient_user_id)] end)

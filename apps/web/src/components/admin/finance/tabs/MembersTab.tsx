@@ -21,7 +21,9 @@ import {
   type FinanceRecord,
 } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
-import { InlineCell, InlineToggle } from "@/components/admin/finance/shared/InlineCell";
+import { InlineCell } from "@/components/admin/finance/shared/InlineCell";
+import { MemberStatusCell, SubscriptionEndCell, useStatusLabel } from "@/components/admin/finance/shared/MemberStandingCells";
+import { memberEndsOn, overrideFor, shownStatus } from "@/components/admin/finance/shared/member-standing";
 import { Combobox, type ComboboxOption } from "@/components/admin/finance/shared/Combobox";
 import { SemanticLabel } from "@/components/semantic-label";
 import { semanticLabel } from "@/i18n/presentation";
@@ -130,6 +132,7 @@ function MultiCheck({
 export function MembersTab({ locationIds }: { locationIds?: string } = {}) {
   const i18n = useUiTranslations();
   const uiLocale = useUiLocale();
+  const statusLabel = useStatusLabel();
   const shareExport = useShareExport();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
@@ -255,9 +258,8 @@ export function MembersTab({ locationIds }: { locationIds?: string } = {}) {
     : null;
 
   // ── Unique filter option lists ──────────────────────────────────────────────
-  const uniqueStatuses = Array.from(
-    new Set(members.map((m) => field(m.membership as FinanceRecord, "status")).filter(Boolean)),
-  );
+  // ADR-274: the status staff see (worked out from subscription and payments).
+  const uniqueStatuses = Array.from(new Set(members.map(shownStatus).filter(Boolean)));
   const uniquePlanCodes = Array.from(
     new Set(
       members
@@ -402,7 +404,7 @@ export function MembersTab({ locationIds }: { locationIds?: string } = {}) {
                   onSort={() => cycleSort("status")}
                   filterSlot={
                     <MultiCheck
-                      options={uniqueStatuses.map((v) => ({ label: v, value: v }))}
+                      options={uniqueStatuses.map((v) => ({ label: statusLabel(v), value: v }))}
                       values={(filters.status as { kind: "multi"; values: string[] } | undefined)?.values ?? []}
                       onChange={(vals) =>
                         vals.length
@@ -456,14 +458,6 @@ export function MembersTab({ locationIds }: { locationIds?: string } = {}) {
                     { label: i18n("last30d5ef79d5"), value: "last_30d" },
                     { label: i18n("last90d8c9f9e6"), value: "last_90d" },
                   ])}
-                />
-                <SortableHeader
-                  column="amount"
-                  label={i18n("amount43dc853")}
-                  sort={sort}
-                  hasFilter={Boolean(filters.amount)}
-                  onSort={() => cycleSort("amount")}
-                  filterSlot={presenceFilter("amount", i18n("hasPaymentd3b5c9e"), i18n("noPayment63104bf"))}
                 />
                 <SortableHeader
                   column="credits"
@@ -523,7 +517,7 @@ export function MembersTab({ locationIds }: { locationIds?: string } = {}) {
             <tbody>
               {filteredMembers.length === 0 ? (
                 <tr>
-                  <td colSpan={12} className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>
+                  <td colSpan={11} className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>
                     {members.length === 0 ? i18n("noMembersYetea27c45") : i18n("noMembersMatchTheActiveFilters14acbb5")}
                   </td>
                 </tr>
@@ -623,23 +617,20 @@ function MemberRow({
 }) {
   const i18n = useUiTranslations();
   const receiveT = useTranslations("ReceivePayment");
+  const standingT = useTranslations("MemberStanding");
   const uiLocale = useUiLocale();
   const eur = new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR" });
-  const membershipStatusOptions = [
-    { value: "active", label: i18n("activea733b80"), accent: true },
-    { value: "trial", label: i18n("trial5f7537c") },
-    { value: "expiring", label: i18n("expiringb98d672") },
-    { value: "expired", label: i18n("expireda689a99") },
-    { value: "comped", label: i18n("comped1945ffe") },
-    { value: "paused", label: i18n("pausedc7dfb6f") },
-  ];
   const membership = member.membership as FinanceRecord | null | undefined;
   const activeSub = member.active_package_subscription as FinanceRecord | null | undefined;
   const referralsMade = (member.referrals_made_user_ids as string[]) ?? [];
 
-  const expiresOn = field(activeSub, "ends_on") || field(membership, "expires_on");
+  const ends = memberEndsOn(member);
+  const expiresOn = ends.date;
   // ADR-217: no profile yet means no status, never a made-up "trial".
-  const membershipStatus = field(membership, "status");
+  // ADR-274: the status is worked out from subscription and payments.
+  const membershipStatus = shownStatus(member);
+  const overrides = member.overrides;
+  const oldestUnpaidDueOn = field(member, "oldest_unpaid_due_on");
   const referredById = field(membership, "referred_by_user_id");
   const creditCents =
     typeof member.credit_balance === "number"
@@ -693,12 +684,11 @@ function MemberRow({
 
       {/* Status */}
       <td className="px-4 py-3" style={{ whiteSpace: "nowrap" }}>
-        <InlineToggle
-          value={membershipStatus}
-          options={membershipStatusOptions}
-          placeholder={i18n("noFinanceProfilef804f44")}
-          onSave={(status) => onSave({ status })}
-        />
+        {membership ? (
+          <MemberStatusCell userId={field(member, "id")} status={membershipStatus} override={overrideFor(overrides, "status")} />
+        ) : (
+          <span className="text-xs" style={{ color: "var(--dim)" }}>{i18n("noFinanceProfilef804f44")}</span>
+        )}
       </td>
 
       {/* Plan — inline assign */}
@@ -715,32 +705,32 @@ function MemberRow({
 
       {/* Expires */}
       <td className="px-4 py-3" style={{ whiteSpace: "nowrap" }}>
-        <InlineCell
-          value={expiresOn}
-          type="date"
-          onSave={(expires_on) => onSave({ expires_on })}
-          placeholder={i18n("noExpiry39d436a")}
-          warn={expiresWarn(expiresOn)}
-          dimmed={!expiresOn}
-        />
-      </td>
-
-      {/* Last paid */}
-      <td className="px-4 py-3" style={{ whiteSpace: "nowrap" }}>
-        {lastPaidOn ? (
-          <span className="text-xs" style={{ color: "var(--text-soft)" }}>
-            {lastPaidOn}
-          </span>
+        {activeSub ? (
+          <SubscriptionEndCell
+            userId={field(member, "id")}
+            subscriptionId={field(activeSub, "id")}
+            endsOn={expiresOn}
+            renews={ends.renews}
+            override={overrideFor(overrides, "ends_on", field(activeSub, "id"))}
+          />
         ) : (
-          <span className="text-xs" style={{ color: "var(--dim)" }}>—</span>
+          <InlineCell
+            value={expiresOn}
+            type="date"
+            onSave={(expires_on) => onSave({ expires_on })}
+            placeholder={i18n("noExpiry39d436a")}
+            warn={expiresWarn(expiresOn)}
+            dimmed={!expiresOn}
+          />
         )}
       </td>
 
-      {/* Amount */}
+      {/* Last payment received: amount · day (ADR-274: paid money only) */}
       <td className="px-4 py-3" style={{ whiteSpace: "nowrap" }}>
-        {lastPaidCents !== null ? (
-          <span className="text-xs font-semibold" style={{ color: "var(--text-soft)" }}>
-            {eur.format(lastPaidCents / 100)}
+        {lastPaidOn && lastPaidCents !== null ? (
+          <span className="text-xs" style={{ color: "var(--text-soft)" }}>
+            <span className="font-semibold">{eur.format(lastPaidCents / 100)}</span>
+            <span style={{ color: "var(--dim)" }}> · {lastPaidOn}</span>
           </span>
         ) : (
           <span className="text-xs" style={{ color: "var(--dim)" }}>—</span>
@@ -773,6 +763,7 @@ function MemberRow({
               }}
             >
               {eur.format(outstandingCents / 100)} {i18n("due30cdf73")}
+              {oldestUnpaidDueOn ? <span> · {standingT("dueSince", { date: oldestUnpaidDueOn.slice(0, 10) })}</span> : null}
             </span>
           ) : (
             <span className="text-xs" style={{ color: "var(--dim)" }}>—</span>

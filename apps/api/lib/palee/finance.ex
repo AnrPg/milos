@@ -504,6 +504,38 @@ defmodule Palee.Finance do
   def refresh_entitlement_snapshots(context),
     do: scoped(context, fn -> FinanceStore.refresh_entitlement_snapshots() end)
 
+  @doc "ADR-274: issues the charges every subscription owes on `today`."
+  defdelegate charge_due_subscriptions(today), to: FinanceStore
+
+  @doc "ADR-274: issues the charges one subscription owes today."
+  defdelegate charge_subscription_now(subscription_id), to: FinanceStore
+
+  def charge_due_subscriptions(context, today),
+    do: scoped(context, fn -> FinanceStore.charge_due_subscriptions(today) end)
+
+  @doc "ADR-274: staff set a worked-out value (`status`, `ends_on`) by hand."
+  defdelegate set_value_override(user_id, field, params), to: FinanceStore
+
+  def set_value_override(context, user_id, field, params),
+    do: scoped(context, fn -> FinanceStore.set_value_override(user_id, field, params) end)
+
+  @doc "ADR-274: puts a value set by hand back to automatic."
+  defdelegate reset_value_override(user_id, field, params), to: FinanceStore
+
+  def reset_value_override(context, user_id, field, params),
+    do: scoped(context, fn -> FinanceStore.reset_value_override(user_id, field, params) end)
+
+  @doc "ADR-274: the period a subscription is in on `today` (first and last day, renews?)."
+  defdelegate subscription_current_period(subscription, membership, today),
+    to: Palee.Finance.Domain.SubscriptionCharges,
+    as: :current_period
+
+  @doc "ADR-274: every value set by hand for a member, newest first."
+  defdelegate list_value_overrides(user_id), to: FinanceStore
+
+  def list_value_overrides(context, user_id),
+    do: scoped(context, fn -> FinanceStore.list_value_overrides(user_id) end)
+
   defdelegate total_outstanding_balance_cents(),
     to: FinanceStore,
     as: :total_outstanding_balance_cents

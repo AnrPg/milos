@@ -263,7 +263,11 @@ defmodule Palee.Application.Imports.ImportWriter do
       }
       |> Map.reject(fn {_key, value} -> is_nil(value) end)
 
-    opts = if values["package_price"], do: [price_cents: values["package_price"]], else: []
+    # ADR-274: an imported member has settled the current period elsewhere;
+    # Palee bills them from the next one.
+    opts =
+      if(values["package_price"], do: [price_cents: values["package_price"]], else: [])
+      |> Keyword.put(:billing, :next_period)
 
     with {:ok, subscription} <-
            AssignFinanceMemberPackage.call(context, state.user_id, params, opts) do

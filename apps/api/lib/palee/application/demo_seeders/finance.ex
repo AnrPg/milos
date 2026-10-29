@@ -67,7 +67,10 @@ defmodule Palee.Application.DemoSeeders.Finance do
              status: "active",
              signup_source: "admin_created"
            }),
-         {:ok, subscription} <- Finance.assign_package(context, membership.id, package.id, %{}),
+         # The demo writes its own invoice for the package (ADR-274: it then
+         # counts as the first period's charge).
+         {:ok, subscription} <-
+           Finance.assign_package(context, membership.id, package.id, %{"charge_now" => false}),
          {:ok, invoice} <-
            Finance.create_invoice(context, membership.id, %{
              "membership_package_subscription_id" => subscription.id

@@ -1524,6 +1524,15 @@ defmodule PaleeWeb.Router do
     get("/finance/members", AdminFinanceController, :members)
     get("/finance/members/:id", AdminFinanceController, :member)
     patch("/finance/members/:id", AdminFinanceController, :update_member)
+    get("/finance/members/:id/overrides", AdminFinanceController, :member_overrides)
+    put("/finance/members/:id/overrides/:field", AdminFinanceController, :set_member_override)
+
+    delete(
+      "/finance/members/:id/overrides/:field",
+      AdminFinanceController,
+      :reset_member_override
+    )
+
     post("/finance/members/:id/packages", AdminFinanceController, :assign_package)
     # ADR-220: renewal choice and leaving the box.
     put(

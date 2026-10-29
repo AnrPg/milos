@@ -118,6 +118,14 @@ defmodule Palee.Finance.Ports.FinanceStore do
   @callback undo_leave_membership(Ecto.UUID.t(), String.t()) :: {:ok, map()} | {:error, term()}
   @doc "Refreshes every snapshot; returns the memberships that lost access."
   @callback refresh_entitlement_snapshots() :: [map()]
+  # ADR-274: subscription charges and values staff set by hand.
+  @callback charge_due_subscriptions(Date.t()) :: [map()]
+  @callback charge_subscription_now(Ecto.UUID.t()) :: {:ok, [map()]} | {:error, term()}
+  @callback set_value_override(Ecto.UUID.t(), String.t(), map()) ::
+              {:ok, map()} | {:error, term()}
+  @callback reset_value_override(Ecto.UUID.t(), String.t(), map()) ::
+              {:ok, map()} | {:error, term()}
+  @callback list_value_overrides(Ecto.UUID.t()) :: [map()]
   @callback total_outstanding_balance_cents() :: non_neg_integer()
   @callback count_pending_referral_approvals() :: non_neg_integer()
 

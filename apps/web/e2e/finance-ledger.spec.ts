@@ -36,7 +36,13 @@ type Reply = { status: number; body: unknown };
 async function ledger(
   page: Page,
   assign: (body: unknown) => Reply,
-  money: { documentMode?: "invoice" | "receipt"; profile?: Record<string, unknown>; receive?: (body: Record<string, unknown>) => Reply } = {},
+  money: {
+    documentMode?: "invoice" | "receipt";
+    profile?: Record<string, unknown>;
+    receive?: (body: Record<string, unknown>) => Reply;
+    /** ADR-274: fields of the ledger row (status, period, values set by hand). */
+    row?: Record<string, unknown>;
+  } = {},
 ) {
   const persona = owner();
   const assigned: unknown[] = [];
@@ -47,6 +53,7 @@ async function ledger(
     user_type: "member",
     membership: { status: "active" },
     active_package_subscription: null,
+    ...money.row,
   };
   await page.context().addCookies([{ name: "palee_locale", value: "en", url: "http://127.0.0.1" }]);
   await page.route("**/api/**", (route) => route.fulfill(json({})));
@@ -58,7 +65,13 @@ async function ledger(
         {
           role: "owner",
           roles: ["owner"],
-          capabilities: { take_payments: "all", manage_memberships: "all", manage_packages: "all", view_package_catalog: "all" },
+          capabilities: {
+            take_payments: "all",
+            manage_billing: "all",
+            manage_memberships: "all",
+            manage_packages: "all",
+            view_package_catalog: "all",
+          },
           organization: { id: "org-1", slug: "kypseli", name: "Box Kypseli" },
           settings: { brand_name: "Box Kypseli", brand_logo_url: null, brand_primary_color: null },
         },
@@ -246,5 +259,95 @@ test.describe("finance ledger", () => {
     await dialog.getByRole("button", { name: "Record payment" }).click();
     await expect(dialog.getByText("This invoice is already fully paid.")).toBeVisible();
     await expect(dialog.getByRole("combobox", { name: "For" })).toHaveAttribute("aria-invalid", "true");
+  });
+
+  test("the status follows payments, and a value set by hand shows who changed it (ADR-274)", async ({ page }) => {
+    const calls: Array<{ method: string; url: string; body: unknown }> = [];
+    await ledger(page, () => ({ status: 201, body: {} }), {
+      row: {
+        membership: { status: "active", status_shown: "unpaid" },
+        active_package_subscription: {
+          id: "sub-1",
+          status: "active",
+          package_name: "Unlimited monthly",
+          membership_package_id: PACKAGE_ID,
+          current_period: { starts_on: "2026-10-29", ends_on: "2026-11-28", renews: true },
+        },
+        outstanding_balance_cents: 4500,
+        oldest_unpaid_due_on: "2026-10-29",
+        last_payment_on: "2026-10-29",
+        last_payment_amount_cents: 500,
+        overrides: [
+          {
+            id: "ov-1",
+            field: "ends_on",
+            subject_id: "sub-1",
+            computed_value: "2026-11-28",
+            value: "2026-12-15",
+            reason: "Injury",
+            set_by_name: "Apostolos",
+            set_at: "2026-10-29T21:50:00Z",
+          },
+        ],
+      },
+    });
+
+    // Registered after the catch-all stubs, so these win.
+    await page.route(`**/api/org/kypseli/admin/finance/members/${MEMBER_ID}/overrides/**`, (route) => {
+      const request = route.request();
+      calls.push({ method: request.method(), url: request.url(), body: request.postDataJSON() });
+      return route.fulfill(json({ override: { id: "ov-2", field: "status", value: "active", set_at: "2026-10-29T21:41:00Z" } }));
+    });
+
+    const row = page.getByRole("row", { name: /Maria/ });
+    await expect(row.locator("[data-member-status]")).toHaveText("Unpaid");
+    await expect(row).toContainText("€5.00");
+    await expect(row).toContainText("since 2026-10-29");
+
+    // The end date set by hand: a dot in its corner, and on hover who, when, from and to.
+    const dot = row.getByRole("button", { name: "Changed by hand" });
+    await expect(dot).toBeVisible();
+    await dot.hover();
+    const card = page.getByRole("dialog", { name: "Changed by hand" });
+    await expect(card).toContainText("Apostolos");
+    await expect(card).toContainText("Injury");
+    await card.getByRole("button", { name: "Back to automatic" }).click();
+    await expect.poll(() => calls.map((call) => call.method)).toEqual(["DELETE"]);
+    expect(calls[0].url).toContain("/overrides/ends_on?subscription_id=sub-1");
+
+    // Setting the status by hand asks for an optional reason and records it.
+    await row.getByRole("button", { name: "Set status" }).click();
+    const editor = page.getByRole("dialog", { name: "Set status" });
+    await expect(editor).toContainText("Automatic: Unpaid");
+    await chooseOption(page, editor.getByRole("combobox", { name: "Set status" }), "active");
+    await editor.getByRole("textbox", { name: "Reason (optional)" }).fill("Pays on Friday");
+    await editor.getByRole("button", { name: "Save" }).click();
+    await expect.poll(() => calls.length).toBe(2);
+    expect(calls[1]).toMatchObject({ method: "PUT", body: { value: "active", reason: "Pays on Friday" } });
+    await expect(editor).toBeHidden();
+  });
+
+  test("«Debts» lists who owes, oldest first, with a payment button (ADR-274)", async ({ page }) => {
+    await ledger(page, () => ({ status: 201, body: {} }));
+    await page.route("**/api/org/kypseli/admin/finance/queues**", (route) =>
+      route.fulfill(
+        json({
+          queues: {
+            open_charges: [
+              { id: "m-2", user_id: "u-2", user_label: "nikos", balance_due_cents: 5000, oldest_due_on: "2026-10-05", state: "overdue" },
+              { id: "m-1", user_id: MEMBER_ID, user_label: "Maria", balance_due_cents: 4500, oldest_due_on: "2026-10-29", state: "unpaid" },
+            ],
+          },
+        }),
+      ),
+    );
+    await page.goto("/org/kypseli/admin/finance?tab=queues");
+
+    const debts = page.getByRole("button", { name: /Debts/ });
+    await expect(debts).toBeVisible();
+    await expect(page.locator("[data-debt-state]")).toHaveText(["Overdue", "Unpaid"]);
+    await expect(page.getByText("€45.00")).toBeVisible();
+    await page.getByRole("button", { name: "+ Payment" }).nth(1).click();
+    await expect(page.getByRole("dialog", { name: "Record payment" })).toBeVisible();
   });
 });

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { FinanceRecord } from "@/api/finance";
+import { memberEndsOn, shownStatus } from "@/components/admin/finance/shared/member-standing";
 
 export type ColumnKey =
   | "nickname"
@@ -75,7 +76,7 @@ function applyFilter(member: FinanceRecord, col: ColumnKey, filter: FilterValue)
     }
     case "status": {
       if (filter.kind !== "multi" || filter.values.length === 0) return true;
-      return filter.values.includes(str(field(mem, "status")));
+      return filter.values.includes(shownStatus(member));
     }
     case "plan": {
       if (filter.kind !== "multi" || filter.values.length === 0) return true;
@@ -87,7 +88,7 @@ function applyFilter(member: FinanceRecord, col: ColumnKey, filter: FilterValue)
     }
     case "expires": {
       if (filter.kind !== "date_preset") return true;
-      const raw = str(field(sub, "ends_on")) || str(field(mem, "expires_on"));
+      const raw = memberEndsOn(member).date;
       const now = Date.now();
       switch (filter.preset) {
         case "expired":
@@ -166,12 +167,12 @@ function cmp(a: FinanceRecord, b: FinanceRecord, col: ColumnKey): number {
       return ta.localeCompare(tb);
     }
     case "status":
-      return str(field(memA, "status")).localeCompare(str(field(memB, "status")));
+      return shownStatus(a).localeCompare(shownStatus(b));
     case "plan":
       return packageLabel(subA).localeCompare(packageLabel(subB));
     case "expires": {
-      const ea = str(field(subA, "ends_on")) || str(field(memA, "expires_on"));
-      const eb = str(field(subB, "ends_on")) || str(field(memB, "expires_on"));
+      const ea = memberEndsOn(a).date;
+      const eb = memberEndsOn(b).date;
       if (!ea && !eb) return 0;
       if (!ea) return 1;
       if (!eb) return -1;

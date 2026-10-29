@@ -33,6 +33,8 @@ defmodule Palee.Finance.MembershipPackageSubscription do
     field :renewal_changed_at, :utc_datetime_usec
     field :renewal_changed_by, :string
     field :ends_on_from_renewal_stop, :boolean, default: false
+    # ADR-274: the first period start Palee bills by itself (nil: never).
+    field :charges_from, :date
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -57,7 +59,8 @@ defmodule Palee.Finance.MembershipPackageSubscription do
       :corporate_client_id,
       :corporate_enrolled_via,
       :expiry_reminder_sent_at,
-      :grace_notice_sent_at
+      :grace_notice_sent_at,
+      :charges_from
     ])
     |> validate_required([
       :membership_id,

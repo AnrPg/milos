@@ -47,7 +47,9 @@ defmodule PaleeWeb.MyMembershipControllerTest do
         signup_source: "direct"
       })
 
-    {:ok, subscription} = Finance.assign_package(staff, membership.id, package.id, %{})
+    # ADR-274: these tests write their own invoices for each period.
+    {:ok, subscription} =
+      Finance.assign_package(staff, membership.id, package.id, %{charge_now: false})
 
     %{
       conn: conn,
