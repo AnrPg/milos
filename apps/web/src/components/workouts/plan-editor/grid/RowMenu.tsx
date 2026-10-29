@@ -1,0 +1,164 @@
+"use client";
+
+import { useMemo, useState, type KeyboardEvent, type RefObject } from "react";
+
+import { Popover } from "@/components/ui/Popover";
+import type { PlanMeasure, PlanStructureKind } from "@/lib/structured-plan/types";
+
+import { useGridActions } from "./actions";
+import { useGrid, useGridT, type PickerState } from "./context";
+import { FLOW_STRUCTS, MEASURE_KEYS, MEASURES, fuzzy, type FuzzyMatch } from "./lib-shim";
+import { canPerRound, findRow, structureOfRow } from "./mutations";
+import { Highlight } from "./NameCell";
+import s from "./grid.module.css";
+
+type Item = { id: string; label: string; hint: string; alias?: string; run: () => void };
+
+/**
+ * The one popover of the grid: the row's ⋯ menu (Alt+M) and the two lists
+ * it leads to, set structure (Alt+T) and parameter (Alt+P). Typing filters
+ * with the same fuzzy match as everywhere; ↑ ↓ Enter pick; Esc or a click
+ * outside closes and gives the caret back.
+ */
+export function RowMenu({ picker, onClose }: { picker: PickerState; onClose: (refocus: boolean) => void }) {
+  const { plan } = useGrid();
+  const { t } = useGridT();
+  const act = useGridActions();
+  const [mode, setMode] = useState(picker.mode);
+  const [query, setQuery] = useState("");
+  const [active, setActive] = useState(0);
+  const anchorRef = useMemo<RefObject<HTMLElement | null>>(() => ({ current: picker.anchor }), [picker.anchor]);
+
+  const at = findRow(plan, picker.rowId);
+  const row = at?.row;
+
+  const items = ((): Item[] => {
+    if (!row || !at) return [];
+    const done = (fn: () => void) => () => {
+      onClose(false);
+      fn();
+    };
+    if (mode === "struct") {
+      const current = structureOfRow(plan, row.id)?.kind;
+      return FLOW_STRUCTS[plan.flow].map((k: PlanStructureKind) => ({
+        id: k,
+        label: t(`struct.${k}`),
+        hint: k === current ? `✓ ${t(`structHint.${k}`)}` : t(`structHint.${k}`),
+        run: done(() => act.setStruct(row.id, k)),
+      }));
+    }
+    if (mode === "measure") {
+      const have = new Set(row.extra ?? []);
+      return MEASURE_KEYS.filter((k) => !have.has(k)).map((k: PlanMeasure) => ({
+        id: k,
+        label: t(`measure.${k}`),
+        hint: t(`measureHint.${k}`),
+        alias: MEASURES[k].aliases,
+        run: done(() => act.addMeasure(row.id, k)),
+      }));
+    }
+    const ex = row.kind === "ex";
+    const list: (Item | null)[] = [
+      ex && FLOW_STRUCTS[plan.flow].length ? { id: "struct", label: t("menu.struct"), hint: `Alt+T · ${t("menu.structHint")}`, run: () => switchTo("struct") } : null,
+      ex ? { id: "measure", label: t("menu.measure"), hint: `Alt+P · ${t("menu.measureHint")}`, run: () => switchTo("measure") } : null,
+      ex && canPerRound(plan, at.b)
+        ? { id: "perRound", label: row.perRound ? t("menu.sameEachRound") : t("menu.perRound"), hint: "Alt+V", run: done(() => act.togglePerRound(row.id)) }
+        : null,
+      ex ? { id: "note", label: row.note ? t("menu.note") : t("menu.addNote"), hint: "Alt+N", run: done(() => act.note(row.id)) } : null,
+      at.i > 0 || row.group
+        ? { id: "superset", label: row.group ? t("menu.unsuperset") : t("menu.superset"), hint: "Alt+G", run: done(() => act.toggleSuperset(row.id)) }
+        : null,
+      { id: "rest", label: t("menu.restAfter"), hint: "Alt+R", run: done(() => act.addRow({ afterId: row.id }, "rest")) },
+      ...(row.extra ?? []).map((k) => ({
+        id: `drop-${k}`,
+        label: t("menu.remove", { measure: t(`measure.${k}`) }),
+        hint: "",
+        run: done(() => act.dropMeasure(row.id, k)),
+      })),
+      { id: "delete", label: t("menu.delete"), hint: t("menu.deleteHint"), run: done(() => act.deleteRow(row.id)) },
+    ];
+    return list.filter((x): x is Item => Boolean(x));
+  })();
+
+  function switchTo(next: PickerState["mode"]) {
+    setMode(next);
+    setQuery("");
+    setActive(0);
+  }
+
+  const shown: (Item & { marks: FuzzyMatch["marks"] })[] = query
+    ? items
+        .map((it) => {
+          const onLabel = fuzzy(query, it.label);
+          const m = onLabel ?? fuzzy(query, `${it.alias ?? ""} ${it.hint}`);
+          return m ? { ...it, marks: onLabel?.marks ?? [], score: m.score + (onLabel ? 1 : 0) } : null;
+        })
+        .filter((x): x is Item & { marks: FuzzyMatch["marks"]; score: number } => Boolean(x))
+        .sort((a, b) => b.score - a.score)
+    : items.map((it) => ({ ...it, marks: [] }));
+
+  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      if (shown.length) setActive((i) => (i + (event.key === "ArrowDown" ? 1 : -1) + shown.length) % shown.length);
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      shown[active]?.run();
+    } else if (event.key === "Backspace" && !query && mode !== "menu" && picker.mode === "menu") {
+      event.preventDefault();
+      switchTo("menu");
+    }
+    event.stopPropagation();
+  };
+
+  const title = mode === "struct" ? t("menu.structTitle") : mode === "measure" ? t("menu.measureTitle") : null;
+  return (
+    <Popover anchorRef={anchorRef} open onClose={() => onClose(true)} role="dialog" ariaLabel={title ?? t("menu.button")} className={s.pop} align="end" minWidth={260} restoreFocus={false}>
+      <div data-testid="plan-row-menu" data-mode={mode}>
+        {title ? <div className={s.popTitle}>{title}</div> : null}
+        <input
+          className={s.popFilter}
+          autoFocus
+          value={query}
+          placeholder={t("menu.filter")}
+          aria-label={t("menu.filter")}
+          role="combobox"
+          aria-expanded
+          aria-controls={`plan-menu-${picker.rowId}`}
+          aria-activedescendant={shown[active] ? `plan-menu-${picker.rowId}-${shown[active].id}` : undefined}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setActive(0);
+          }}
+          onKeyDown={onKeyDown}
+        />
+        <div role="listbox" id={`plan-menu-${picker.rowId}`}>
+          {shown.length ? (
+            shown.map((it, i) => (
+              <div
+                key={it.id}
+                id={`plan-menu-${picker.rowId}-${it.id}`}
+                role="option"
+                aria-selected={i === active}
+                data-item={it.id}
+                className={s.opt}
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                  it.run();
+                }}
+              >
+                <Highlight text={it.label} marks={it.marks} />
+                <small>{it.hint}</small>
+              </div>
+            ))
+          ) : (
+            <div className={s.opt} aria-disabled>
+              <span>{t("menu.nothing")}</span>
+              <small>{t("menu.nothingHint")}</small>
+            </div>
+          )}
+        </div>
+      </div>
+    </Popover>
+  );
+}
