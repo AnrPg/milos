@@ -220,8 +220,9 @@ that is (product owner, 2026-10-29):
 - for a document switched to mandatory, that document's `outstanding`.
 
 Starter texts keep their «Προσχέδιο για νομικό έλεγχο» flag; Palee's law
-consultant reviews them. Signatures and certificates are kept 5 years after
-a box is deleted (confirmed).
+consultant reviews them. Signatures and their evidence certificates are kept
+5 years after a box is deleted (confirmed); health certificates are still
+not retained (§10).
 
 ### 8. Endpoints
 Staff endpoints are under `/api/org/:slug/admin/documents`:
