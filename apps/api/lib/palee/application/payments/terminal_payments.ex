@@ -169,10 +169,17 @@ defmodule Palee.Application.Payments.TerminalPayments do
   defp at_most(_amount, _limit), do: {:error, :invalid_payment_amount}
 
   defp package_for_desk(context, package_id) do
-    case Finance.get_package(context, package_id) do
-      {:ok, %{active: true} = package} -> {:ok, package}
-      {:ok, _inactive} -> {:error, :package_inactive}
-      _missing -> {:error, :not_found}
+    package =
+      case Finance.get_package(context, package_id) do
+        {:ok, %{} = package} -> package
+        %{id: _id} = package -> package
+        _missing -> nil
+      end
+
+    case package do
+      %{active: true} -> {:ok, package}
+      %{} -> {:error, :package_inactive}
+      nil -> {:error, :not_found}
     end
   end
 

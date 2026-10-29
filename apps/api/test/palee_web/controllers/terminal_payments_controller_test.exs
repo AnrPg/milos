@@ -553,6 +553,40 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
     |> then(&assert(&1["code"] == "payment_not_cancellable"))
   end
 
+  test "a package sold at the desk is assigned with its card_terminal money", %{conn: conn} = ctx do
+    connect_sandbox(conn, ctx)
+
+    {:ok, package} =
+      Finance.create_package(ctx.context, %{
+        name: "8 επισκέψεις",
+        package_type: "class_pack",
+        base_price_cents: 6_000
+      })
+
+    %{"payment" => payment} =
+      conn
+      |> start(ctx, %{
+        purpose: "membership_package",
+        purpose_id: package.id,
+        user_id: ctx.member.id,
+        amount_cents: 6_000
+      })
+      |> json_response(201)
+
+    assert payment["description"] == "8 επισκέψεις"
+
+    assert %{"payment" => %{"status" => "succeeded", "fulfilment_status" => "done"}} =
+             conn
+             |> as(ctx.admin)
+             |> post(tpath(ctx, "/#{payment["id"]}/sandbox-complete"), %{outcome: "succeeded"})
+             |> json_response(200)
+
+    assert [%{payment_method: "card_terminal", membership_package_subscription_id: sub_id}] =
+             payments_of(ctx)
+
+    assert is_binary(sub_id)
+  end
+
   test "a shop order waiting for payment is settled at the terminal", %{conn: conn} = ctx do
     connect_sandbox(conn, ctx)
     shop = "/api/org/#{ctx.organization.slug}"
