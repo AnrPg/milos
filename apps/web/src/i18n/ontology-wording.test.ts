@@ -97,4 +97,33 @@ describe("canonical wording", () => {
     expect(ui.package7431e3d).toBe("Πακέτο συνδρομής");
     expect((catalog("en").Ui as Record<string, string>).package7431e3d).toBe("Subscription package");
   });
+  it("names the Finance tab «Εκκρεμότητες» (pending items) the same everywhere", () => {
+    // ontology §4.17: one name per locale for the tab, the hint that points to it and its lists.
+    const pendingItems: Record<string, string> = {
+      en: "Pending items",
+      el: "Εκκρεμότητες",
+      de: "Offene Punkte",
+      fr: "Éléments en attente",
+      es: "Pendientes",
+      it: "Voci in sospeso",
+      nl: "Openstaande zaken",
+      "pt-PT": "Pendentes",
+      ru: "Незавершённые дела",
+      bg: "Висящи въпроси",
+      ar: "العناصر المعلقة",
+      he: "פריטים ממתינים",
+    };
+    const oldName = /Ουρ[έά]ς|Queues|Arbeitslisten|Files de traitement|Colas|Code operative|[wW]achtrij|Filas|[оО]черед|[оО]пашк|طوابير|قوائم الانتظار|תורים/u;
+    for (const locale of locales) {
+      const messages = catalog(locale);
+      const ui = messages.Ui as Record<string, string>;
+      const hint = (messages.OnlinePayments as Record<string, string>).notifyStaffHint;
+      expect(ui.queues83dbc32, locale).toBe(pendingItems[locale]);
+      expect(ui.operationalQueuesc2120a9, locale).toBe(pendingItems[locale]);
+      expect(hint, locale).toContain(`› ${pendingItems[locale]}`);
+      for (const key of ["loadingQueuea1e2a39", "noItemsInThisQueuec992fc9", "manageMembersPackagesPromotionsReferralsAndOperationalQueues9eab02d"]) {
+        expect(ui[key], `${locale}.${key}`).not.toMatch(oldName);
+      }
+    }
+  });
 });
