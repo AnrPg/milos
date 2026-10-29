@@ -211,6 +211,9 @@ Staff endpoints are under `/api/org/:slug/admin/documents`:
 - templates (list, create, show, version, publish, requirement, archive,
   requests);
 - starters;
+- outstanding: for each active document, how many clients signed its
+  required version and which clients have not (added with the staff screen,
+  `manage_settings` or `manage_memberships`);
 - requests (list, cancel);
 - signatures and evidence;
 - members/:user_id;
