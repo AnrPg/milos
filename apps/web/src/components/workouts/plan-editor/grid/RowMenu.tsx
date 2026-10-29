@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type KeyboardEvent, type RefObject } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type RefObject } from "react";
 
 import { Popover } from "@/components/ui/Popover";
 import type { PlanMeasure, PlanStructureKind } from "@/lib/structured-plan/types";
@@ -28,6 +28,23 @@ export function RowMenu({ picker, onClose }: { picker: PickerState; onClose: (re
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const anchorRef = useMemo<RefObject<HTMLElement | null>>(() => ({ current: picker.anchor }), [picker.anchor]);
+  const filterRef = useRef<HTMLInputElement>(null);
+
+  // The popover stays hidden until it is placed, so `autoFocus` alone misses
+  // and the caret stays in the cell (Alt+P then types into the value): focus
+  // the filter as soon as it can take focus, and again on a mode switch.
+  useEffect(() => {
+    let frame = 0;
+    let tries = 0;
+    const grab = () => {
+      const input = filterRef.current;
+      if (!input) return;
+      input.focus();
+      if (document.activeElement !== input && tries++ < 10) frame = requestAnimationFrame(grab);
+    };
+    grab();
+    return () => cancelAnimationFrame(frame);
+  }, [mode]);
 
   const at = findRow(plan, picker.rowId);
   const row = at?.row;
@@ -118,6 +135,7 @@ export function RowMenu({ picker, onClose }: { picker: PickerState; onClose: (re
       <div data-testid="plan-row-menu" data-mode={mode}>
         {title ? <div className={s.popTitle}>{title}</div> : null}
         <input
+          ref={filterRef}
           className={s.popFilter}
           autoFocus
           value={query}
