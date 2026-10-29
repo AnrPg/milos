@@ -17,6 +17,7 @@ import { fetchFinanceQueues, fetchFinanceSummary, fetchPackageCatalog, type Fina
 import { AccountingTab } from "@/components/admin/finance/tabs/AccountingTab";
 import { moduleEnabled } from "@/components/admin/finance/packages/package-catalog";
 import { CorporateTab } from "@/components/admin/finance/tabs/CorporateTab";
+import { FiscalDocumentsTab } from "@/components/fiscal/FiscalDocumentsTab";
 import { MembersTab } from "@/components/admin/finance/tabs/MembersTab";
 import { PackagesTab } from "@/components/admin/finance/tabs/PackagesTab";
 import { PromotionsTab } from "@/components/admin/finance/tabs/PromotionsTab";
@@ -30,7 +31,7 @@ import { BranchFilterControl, BranchFilterNote, useBranchFilter } from "@/compon
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
 import { GuideButton } from "@/components/guides/GuideButton";
 
-type Tab = "members" | "packages" | "seasons" | "promotions" | "referrals" | "queues" | "accounting" | "corporate";
+type Tab = "members" | "packages" | "seasons" | "promotions" | "referrals" | "documents" | "queues" | "accounting" | "corporate";
 
 export function FinanceOperations() {
   const uiLocale = useUiLocale();
@@ -38,6 +39,7 @@ export function FinanceOperations() {
   const accountingT = useTranslations("FinanceAccounting");
   const branchT = useTranslations("BranchScope");
   const seasonsT = useTranslations("Seasons");
+  const documentsT = useTranslations("FiscalDocuments");
   const router = useRouter();
   const searchParams = useSearchParams();
   const { tokens } = useSession();
@@ -58,6 +60,8 @@ export function FinanceOperations() {
     { id: "seasons", label: seasonsT("tab") },
     { id: "promotions", label: i18n("promotions086e09b") },
     { id: "referrals", label: i18n("referrals2b0e3a3") },
+    // Mockup s2 (ADR-241): receipts, invoices and credit notes.
+    { id: "documents", label: documentsT("tab") },
     { id: "queues", label: i18n("queues83dbc32") },
     { id: "accounting", label: accountingT("tab") },
     ...(corporateEnabled ? [{ id: "corporate" as const, label: i18n("stfTabCorporate") }] : []),
@@ -77,6 +81,7 @@ export function FinanceOperations() {
     referrals: branchT("filterNoteReferrals"),
     accounting: branchT("filterNoteAccounting"),
     seasons: branchT("filterNoteBusinessWide"),
+    documents: branchT("filterNoteBusinessWide"),
     corporate: branchT("filterNoteBusinessWide"),
   };
 
@@ -191,6 +196,7 @@ export function FinanceOperations() {
         {activeTab === "seasons" && <SeasonsTab />}
         {activeTab === "promotions" && <PromotionsTab locationIds={locationIds} />}
         {activeTab === "referrals" && <ReferralsTab locationIds={locationIds} />}
+        {activeTab === "documents" && <FiscalDocumentsTab />}
         {activeTab === "queues" && <QueuesTab locationIds={locationIds} />}
         {activeTab === "accounting" && <AccountingTab locationIds={locationIds} />}
         {activeTab === "corporate" && <CorporateTab />}
