@@ -13,11 +13,8 @@ import {
   type DraftSection,
   type EmomScoringMode,
   type ScoreType,
-  SECTION_TEMPLATES,
 } from "@/types/workout";
 
-import { FormatContextualFields } from "./FormatContextualFields";
-import { FormatDropdown } from "./FormatDropdown";
 import { SHORT_DURATION_PRESETS, TimeInput } from "./TimeInput";
 import { TimerTimeline } from "./TimerTimeline";
 import { IntegerInput } from "@/components/integer-input";
@@ -29,11 +26,17 @@ type Props = {
   section: DraftSection;
 };
 
+/**
+ * A section's less common settings, opened under its row in the structured
+ * editor (ADR-231): Complex EMOM minutes, the timer timeline, rest after the
+ * section and scoring. Name, format and the format's main fields are edited
+ * in the section's own row.
+ */
 export function SectionConfig({ section }: Props) {
   const i18n = useUiTranslations();
   const emomScoringModeLabels = getEmomScoringModeLabels(i18n);
   const emomScoringModeDescriptions = getEmomScoringModeDescriptions(i18n);
-  const { updateSection, setFormat, setFormatParams, applySectionTemplate, deleteSection, setEmomScoringMode, setEmomAmrapScoringStyle } = useWorkoutCreationStore();
+  const { updateSection, setFormatParams, setEmomScoringMode, setEmomAmrapScoringStyle } = useWorkoutCreationStore();
 
   const autoScore = AUTO_SCORE_MAP[section.format];
   const isEmomFormat = section.format === "emom" || section.format === "complex_emom";
@@ -48,52 +51,7 @@ export function SectionConfig({ section }: Props) {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-          {i18n("sectionConfigc77acc9")}
-        </span>
-        <button onClick={() => deleteSection(section.localId)} className="text-xs" style={{ color: "var(--red)" }}>
-          {i18n("deletef6fdbe4")}
-        </button>
-      </div>
-
       <div>
-        <label className="mb-1 block text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-          {i18n("name709a232")}
-        </label>
-        <input
-          type="text"
-          value={section.name}
-          onChange={(event) => updateSection(section.localId, { name: event.target.value })}
-          placeholder={i18n("eGMainSet8e9364b")}
-          className="w-full rounded-xl px-3 py-2 text-sm outline-none"
-          style={{ background: "var(--bg)", border: "1px solid var(--dim)", color: "var(--text)" }}
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
-          {i18n("format041a5de")}
-        </label>
-        <div className="mb-2 flex flex-wrap gap-1.5" role="group" aria-label={i18n("sectionTemplatesLabel")}>
-          {SECTION_TEMPLATES.map((template) => (
-            <button
-              key={template.id}
-              type="button"
-              onClick={() => applySectionTemplate(section.localId, template.format, template.params)}
-              className="min-h-8 rounded-full px-2.5 text-xs font-semibold"
-              style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
-            >
-              {i18n(`timerPreset_${template.id}`)}
-            </button>
-          ))}
-        </div>
-        <FormatDropdown value={section.format} onChange={(format) => setFormat(section.localId, format)} />
-        <FormatContextualFields
-          format={section.format}
-          params={section.formatParams}
-          onChange={(params) => setFormatParams(section.localId, params)}
-        />
         {section.format === "complex_emom" && (() => {
           const totalDuration = (section.formatParams.duration_seconds as number) || 0;
           const minuteCount = (section.formatParams.minute_count as number) || 0;

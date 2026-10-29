@@ -86,6 +86,25 @@ type WorkoutCreationStore = DraftWorkoutState & {
   setLeftCollapsed: (value: boolean) => void;
   setRightCollapsed: (value: boolean) => void;
   toApiPayload: () => unknown;
+  // ── ADR-231: keyboard authoring ────────────────────────────────────────────
+  /** Inserts a section after `afterSectionId` (null: at the end); returns its id. */
+  insertSection: (afterSectionId: string | null, init?: { format: SectionFormat; params: FormatParams }) => string;
+  /**
+   * Inserts a row after `afterExerciseId` (null: at the end) and returns its
+   * id. A new exercise repeats the sets and prescription of the row above and
+   * joins its superset, the way a coach keeps writing a list.
+   */
+  insertExercise: (sectionId: string, afterExerciseId: string | null, itemType?: "exercise" | "header", name?: string) => string;
+  duplicateExercise: (sectionId: string, exerciseId: string) => string | null;
+  /** Moves a row one place; past the first or last row it moves into the neighbouring section. Returns where it is now. */
+  moveExerciseBy: (sectionId: string, exerciseId: string, delta: -1 | 1) => string;
+  moveSectionBy: (sectionId: string, delta: -1 | 1) => void;
+  /** Joins the row to the superset of the exercise above it, or takes it out of its group. */
+  toggleSupersetWithPrevious: (sectionId: string, exerciseId: string) => void;
+  canUndo: boolean;
+  canRedo: boolean;
+  undo: () => void;
+  redo: () => void;
 };
 
 function parseSectionFormat(value: unknown): SectionFormat {
@@ -238,7 +257,7 @@ function intervalPatternPayload(section: DraftSection) {
   return pattern ? { interval_pattern_seconds: pattern } : {};
 }
 
-function parseDraftSections(raw: unknown): DraftSection[] {
+export function parseDraftSections(raw: unknown): DraftSection[] {
   if (!Array.isArray(raw)) return [];
   return raw.map((s: unknown) => {
     if (!s || typeof s !== "object") return makeDefaultSection();
@@ -284,6 +303,22 @@ function parseDraftSections(raw: unknown): DraftSection[] {
       note: typeof sec.note === "string" ? sec.note : null,
     };
   });
+}
+
+/** A superset or alternating group left with one exercise is no group any more. */
+function dropLoneGroups(exercises: DraftExercise[]): DraftExercise[] {
+  const counts = new Map<string, number>();
+  for (const exercise of exercises) {
+    for (const id of [exercise.supersetGroupId, exercise.alternatingGroupId]) {
+      if (id) counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+  }
+  return exercises.map((exercise) =>
+    (exercise.supersetGroupId && counts.get(exercise.supersetGroupId) === 1) ||
+    (exercise.alternatingGroupId && counts.get(exercise.alternatingGroupId) === 1)
+      ? { ...exercise, supersetGroupId: null, alternatingGroupId: null }
+      : exercise,
+  );
 }
 
 function parseWorkoutType(value: unknown): WorkoutType | null {
@@ -336,6 +371,8 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
       isTeamWorkout: Boolean(record.is_team_workout),
       sections: parseDraftSections(source.sections),
     });
+    // A loaded draft is where undo starts.
+    resetWorkoutHistory();
   },
 
   setDraftRevision: (draftRevision) => set({ draftRevision }),
@@ -481,7 +518,7 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
         if (section.localId !== sectionId) return section;
         return {
           ...section,
-          exercises: section.exercises.filter((exercise) => exercise.localId !== exerciseId),
+          exercises: dropLoneGroups(section.exercises.filter((exercise) => exercise.localId !== exerciseId)),
         };
       }),
     })),
@@ -721,6 +758,191 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
   setLeftCollapsed: (leftCollapsed) => set({ leftCollapsed }),
   setRightCollapsed: (rightCollapsed) => set({ rightCollapsed }),
 
+  insertSection: (afterSectionId, init) => {
+    const section = makeDefaultSection();
+    if (init) {
+      const autoScore = AUTO_SCORE_MAP[init.format] ?? null;
+      section.format = init.format;
+      section.formatParams = { ...makeDefaultFormatParams(init.format), ...init.params };
+      section.scoreType = autoScore;
+      section.scoreable = autoScore !== null;
+    }
+    set((state) => {
+      const sections = [...state.sections];
+      const index = afterSectionId ? sections.findIndex((item) => item.localId === afterSectionId) : -1;
+      sections.splice(index === -1 ? sections.length : index + 1, 0, section);
+      return { sections, selectedSectionId: section.localId };
+    });
+    return section.localId;
+  },
+
+  insertExercise: (sectionId, afterExerciseId, itemType = "exercise", name = "") => {
+    const item = itemType === "header" ? makeDefaultHeader() : makeDefaultExercise();
+    item.name = name;
+    set((state) => ({
+      sections: state.sections.map((section) => {
+        if (section.localId !== sectionId) return section;
+        const exercises = [...section.exercises];
+        const index = afterExerciseId ? exercises.findIndex((exercise) => exercise.localId === afterExerciseId) : -1;
+        const at = index === -1 ? exercises.length : index + 1;
+        const above = exercises.slice(0, at).reverse().find((exercise) => exercise.itemType === "exercise");
+        if (item.itemType === "exercise" && above) {
+          item.sets = above.sets;
+          item.prescriptionValue = above.prescriptionValue;
+          item.prescriptionUnit = above.prescriptionUnit;
+          item.prescriptionStep = above.prescriptionStep;
+          const aboveIsLast = index !== -1 && exercises[index]?.localId === above.localId;
+          const next = exercises[at];
+          // Inside a group (the row above and the one below share it) the new row joins too.
+          if (aboveIsLast && above.supersetGroupId && next?.supersetGroupId === above.supersetGroupId) {
+            item.supersetGroupId = above.supersetGroupId;
+          }
+          if (aboveIsLast && above.alternatingGroupId && next?.alternatingGroupId === above.alternatingGroupId) {
+            item.alternatingGroupId = above.alternatingGroupId;
+          }
+        }
+        if (FORMAT_EXERCISE_CONTEXT[section.format].ladderPrescription && item.prescriptionStep == null) {
+          item.prescriptionStep = 1;
+        }
+        exercises.splice(at, 0, item);
+        return { ...section, exercises };
+      }),
+      selectedSectionId: sectionId,
+    }));
+    return item.localId;
+  },
+
+  duplicateExercise: (sectionId, exerciseId) => {
+    const section = get().sections.find((item) => item.localId === sectionId);
+    const original = section?.exercises.find((exercise) => exercise.localId === exerciseId);
+    if (!original) return null;
+    const copy: DraftExercise = {
+      ...structuredClone(original),
+      localId: crypto.randomUUID(),
+      variationsOpen: false,
+      advancedOpen: false,
+    };
+    set((state) => ({
+      sections: state.sections.map((item) => {
+        if (item.localId !== sectionId) return item;
+        const exercises = [...item.exercises];
+        exercises.splice(exercises.findIndex((exercise) => exercise.localId === exerciseId) + 1, 0, copy);
+        return { ...item, exercises };
+      }),
+    }));
+    return copy.localId;
+  },
+
+  moveExerciseBy: (sectionId, exerciseId, delta) => {
+    const { sections } = get();
+    const sectionIndex = sections.findIndex((section) => section.localId === sectionId);
+    const section = sections[sectionIndex];
+    const index = section?.exercises.findIndex((exercise) => exercise.localId === exerciseId) ?? -1;
+    if (!section || index === -1) return sectionId;
+    const target = index + delta;
+
+    if (target >= 0 && target < section.exercises.length) {
+      const exercises = [...section.exercises];
+      const [moved] = exercises.splice(index, 1);
+      const above = exercises[target - 1];
+      const below = exercises[target];
+      // A row keeps its group only while it still sits next to another row of it.
+      const keep = (groupId: string | null, key: "supersetGroupId" | "alternatingGroupId") =>
+        groupId && (above?.[key] === groupId || below?.[key] === groupId) ? groupId : null;
+      exercises.splice(target, 0, {
+        ...moved,
+        supersetGroupId: keep(moved.supersetGroupId, "supersetGroupId"),
+        alternatingGroupId: keep(moved.alternatingGroupId, "alternatingGroupId"),
+      });
+      set((state) => ({
+        sections: state.sections.map((item) => (item.localId === sectionId ? { ...item, exercises: dropLoneGroups(exercises) } : item)),
+      }));
+      return sectionId;
+    }
+
+    const destination = sections[sectionIndex + delta];
+    if (!destination) return sectionId;
+    const moved = {
+      ...adaptExerciseToDestination(section.exercises[index], destination.format),
+      supersetGroupId: null,
+      alternatingGroupId: null,
+    };
+    set((state) => ({
+      sections: state.sections.map((item) => {
+        if (item.localId === sectionId) {
+          return { ...item, exercises: dropLoneGroups(item.exercises.filter((exercise) => exercise.localId !== exerciseId)) };
+        }
+        if (item.localId === destination.localId) {
+          return { ...item, exercises: delta > 0 ? [moved, ...item.exercises] : [...item.exercises, moved] };
+        }
+        return item;
+      }),
+      selectedSectionId: destination.localId,
+    }));
+    return destination.localId;
+  },
+
+  moveSectionBy: (sectionId, delta) =>
+    set((state) => {
+      const index = state.sections.findIndex((section) => section.localId === sectionId);
+      const target = index + delta;
+      if (index === -1 || target < 0 || target >= state.sections.length) return state;
+      const sections = [...state.sections];
+      const [moved] = sections.splice(index, 1);
+      sections.splice(target, 0, moved);
+      return { sections };
+    }),
+
+  toggleSupersetWithPrevious: (sectionId, exerciseId) =>
+    set((state) => ({
+      sections: state.sections.map((section) => {
+        if (section.localId !== sectionId) return section;
+        const index = section.exercises.findIndex((exercise) => exercise.localId === exerciseId);
+        const current = section.exercises[index];
+        if (!current || current.itemType === "header") return section;
+        const groupId = current.supersetGroupId ?? current.alternatingGroupId;
+
+        if (groupId) {
+          const exercises = section.exercises.map((exercise) =>
+            exercise.localId === exerciseId ? { ...exercise, supersetGroupId: null, alternatingGroupId: null } : exercise,
+          );
+          // A group of one is no group.
+          const left = exercises.filter((exercise) => exercise.supersetGroupId === groupId || exercise.alternatingGroupId === groupId);
+          return {
+            ...section,
+            exercises: left.length === 1
+              ? exercises.map((exercise) =>
+                  exercise.localId === left[0].localId ? { ...exercise, supersetGroupId: null, alternatingGroupId: null } : exercise,
+                )
+              : exercises,
+          };
+        }
+
+        const previous = section.exercises[index - 1];
+        if (!previous || previous.itemType === "header") return section;
+        const join = previous.supersetGroupId ?? previous.alternatingGroupId ?? crypto.randomUUID();
+        const alternating = Boolean(previous.alternatingGroupId);
+        return {
+          ...section,
+          exercises: section.exercises.map((exercise) =>
+            exercise.localId === exerciseId || exercise.localId === previous.localId
+              ? {
+                  ...exercise,
+                  supersetGroupId: alternating ? null : join,
+                  alternatingGroupId: alternating ? join : null,
+                  sets: previous.sets,
+                }
+              : exercise,
+          ),
+        };
+      }),
+    })),
+
+  canUndo: false,
+  canRedo: false,
+  undo: () => stepHistory(-1),
+  redo: () => stepHistory(1),
+
   toApiPayload: () => {
     const { title, type, isTeamWorkout, sections, draftRevision } = get();
 
@@ -747,12 +969,14 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
     }
 
     return {
+      // ADR-231: saving from the structured editor makes the workout structured.
+      authoring_mode: "structured",
       title,
       type,
       is_team_workout: isTeamWorkout,
       expected_source_revision: draftRevision,
-      sections: sections.map((section) => ({
-        name: section.name,
+      sections: sections.map((section, sectionIndex) => ({
+        name: section.name.trim() || sectionLetter(sectionIndex),
         timer_config: {
           type: section.format,
           ...timerConfigParams(section.format, {
@@ -849,9 +1073,19 @@ export const useWorkoutCreationStore = create<WorkoutCreationStore>((set, get) =
   },
 }));
 
-export function isSectionComplete(section: DraftSection): boolean {
-  if (!section.name) return false;
+/** A section's place as a whiteboard letter (A, B, …, Z, AA): its name when the coach gives none. */
+export function sectionLetter(index: number): string {
+  let label = "";
+  let rest = index;
+  do {
+    label = String.fromCharCode(65 + (rest % 26)) + label;
+    rest = Math.floor(rest / 26) - 1;
+  } while (rest >= 0);
+  return label;
+}
 
+/** ADR-231: a section needs no name of its own; it is called by its letter. */
+export function isSectionComplete(section: DraftSection): boolean {
   const ctx = FORMAT_EXERCISE_CONTEXT[section.format];
   const needsExercises = section.format !== "rest" && section.format !== "kcal_target";
 
@@ -860,7 +1094,7 @@ export function isSectionComplete(section: DraftSection): boolean {
   }
 
   return section.exercises.every((exercise) => {
-    if (!exercise.name) return false;
+    if (!exercise.name.trim()) return false;
     if (exercise.itemType === "header") return true;
     if (ctx.showSets && exercise.sets <= 0) return false;
     if (ctx.showPrescription && !ctx.prescriptionHint && !ctx.ladderPrescription && exercise.prescriptionValue <= 0) return false;
@@ -878,3 +1112,76 @@ export function completionSummary(sections: DraftSection[], translate: (key: str
   const complete = sections.filter(isSectionComplete).length;
   return translate("sectionCompletionSummary", {complete, total: sections.length});
 }
+
+// ── Undo / redo (ADR-231) ─────────────────────────────────────────────────────
+//
+// Every change of the workout itself (title, type, team, sections) is kept,
+// so Ctrl/⌘+Z undoes a deleted row or a moved section as well as typing.
+// Changes that keep the same rows and come within HISTORY_COALESCE_MS of the
+// previous one (typing a name) are one step. Loading a draft starts afresh.
+
+type WorkoutSnapshot = Pick<DraftWorkoutState, "title" | "type" | "isTeamWorkout" | "sections">;
+
+const HISTORY_LIMIT = 200;
+const HISTORY_COALESCE_MS = 800;
+const history = { past: [] as WorkoutSnapshot[], future: [] as WorkoutSnapshot[], lastAt: 0, lastShape: "", muted: false };
+
+function snapshotOf(state: WorkoutSnapshot): WorkoutSnapshot {
+  return { title: state.title, type: state.type, isTeamWorkout: state.isTeamWorkout, sections: state.sections };
+}
+
+function shapeOf(state: WorkoutSnapshot) {
+  return state.sections.map((section) => `${section.localId}:${section.format}:${section.exercises.map((exercise) => exercise.localId).join(",")}`).join("|");
+}
+
+function syncHistoryFlags() {
+  history.muted = true;
+  useWorkoutCreationStore.setState({ canUndo: history.past.length > 0, canRedo: history.future.length > 0 });
+  history.muted = false;
+}
+
+export function resetWorkoutHistory() {
+  history.past = [];
+  history.future = [];
+  history.lastAt = 0;
+  history.lastShape = "";
+  syncHistoryFlags();
+}
+
+function stepHistory(direction: -1 | 1) {
+  const from = direction < 0 ? history.past : history.future;
+  const to = direction < 0 ? history.future : history.past;
+  const snapshot = from.pop();
+  if (!snapshot) return;
+  to.push(snapshotOf(useWorkoutCreationStore.getState()));
+  history.muted = true;
+  useWorkoutCreationStore.setState({ ...snapshot, canUndo: history.past.length > 0, canRedo: history.future.length > 0 });
+  history.muted = false;
+  history.lastAt = 0;
+}
+
+useWorkoutCreationStore.subscribe((state, previous) => {
+  if (history.muted) return;
+  if (state.draftId !== previous.draftId) {
+    resetWorkoutHistory();
+    return;
+  }
+  const changed =
+    state.title !== previous.title ||
+    state.type !== previous.type ||
+    state.isTeamWorkout !== previous.isTeamWorkout ||
+    state.sections !== previous.sections;
+  if (!changed) return;
+
+  const now = Date.now();
+  const shape = shapeOf(state);
+  const coalesce = now - history.lastAt < HISTORY_COALESCE_MS && shape === history.lastShape && shape === shapeOf(previous);
+  if (!coalesce) {
+    history.past.push(snapshotOf(previous));
+    if (history.past.length > HISTORY_LIMIT) history.past.shift();
+  }
+  history.future = [];
+  history.lastAt = now;
+  history.lastShape = shape;
+  syncHistoryFlags();
+});
