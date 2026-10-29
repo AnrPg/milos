@@ -216,8 +216,15 @@ defmodule PaleeWeb.Schemas.Documents do
 
     %Schema{
       type: :object,
-      properties: %{templates: %Schema{type: :array, items: row}},
-      required: [:templates]
+      properties: %{
+        clients: %Schema{
+          type: :integer,
+          description:
+            "Clients of the box: everyone a new mandatory document or a major version would block from booking until they sign"
+        },
+        templates: %Schema{type: :array, items: row}
+      },
+      required: [:clients, :templates]
     }
   end
 

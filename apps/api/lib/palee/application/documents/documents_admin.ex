@@ -102,7 +102,12 @@ defmodule Palee.Application.Documents.DocumentsAdmin do
       |> Documents.list_templates(%{status: "active"})
       |> Enum.filter(&(&1.current_version_number > 0))
 
-    %{templates: Enum.map(templates, &outstanding_row(&1, clients, statuses, names))}
+    # `clients`: everyone a new mandatory document (or a major version)
+    # would block from booking until they sign.
+    %{
+      clients: length(clients),
+      templates: Enum.map(templates, &outstanding_row(&1, clients, statuses, names))
+    }
   end
 
   defp outstanding_row(template, clients, statuses, names) do

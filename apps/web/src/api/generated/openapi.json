@@ -163663,6 +163663,10 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "clients": {
+                      "description": "Clients of the box: everyone a new mandatory document or a major version would block from booking until they sign",
+                      "type": "integer"
+                    },
                     "templates": {
                       "items": {
                         "properties": {
@@ -163724,6 +163728,7 @@
                     }
                   },
                   "required": [
+                    "clients",
                     "templates"
                   ],
                   "type": "object"

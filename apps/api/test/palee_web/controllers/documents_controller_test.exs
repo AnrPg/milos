@@ -104,8 +104,10 @@ defmodule PaleeWeb.DocumentsControllerTest do
              })
              |> json_response(201)
 
-    assert %{"templates" => [row]} =
+    assert %{"templates" => [row], "clients" => clients} =
              ctx.owner |> get_json("#{ctx.admin}/outstanding") |> json_response(200)
+
+    assert clients == row["signed"] + row["outstanding"]
 
     assert row["template_id"] == template["id"]
     assert row["outstanding"] == length(row["clients"])
@@ -129,8 +131,28 @@ defmodule PaleeWeb.DocumentsControllerTest do
              |> json_response(403)
 
       assert staff |> get_json("#{ctx.admin}/settings") |> json_response(403)
-      assert staff |> get_json("#{ctx.admin}/outstanding") |> json_response(403)
     end
+
+    assert ctx.coach |> get_json("#{ctx.admin}/outstanding") |> json_response(403)
+
+    # Front desk asks clients to sign and sees who has not (product owner,
+    # 2026-10-29), but never writes documents or opens the evidence PDF.
+    assert %{"templates" => [_]} =
+             ctx.desk |> get_json("#{ctx.admin}/outstanding") |> json_response(200)
+
+    assert %{"skipped" => 1, "created" => 0} =
+             ctx.desk
+             |> send_json(:post, "#{ctx.admin}/templates/#{template["id"]}/requests", %{
+               "audience" => "person",
+               "user_id" => ctx.client_user.id
+             })
+             |> json_response(201)
+
+    assert ctx.desk
+           |> send_json(:put, "#{ctx.admin}/templates/#{template["id"]}/requirement", %{
+             "requirement" => "mandatory"
+           })
+           |> json_response(403)
 
     assert %{"events" => events} =
              ctx.owner |> get_json("#{ctx.admin}/audit") |> json_response(200)
@@ -251,8 +273,35 @@ defmodule PaleeWeb.DocumentsControllerTest do
              |> get_json("#{ctx.admin}/health-certificates/#{id}/file")
              |> json_response(200)
 
-    # Front desk lacks the capability by default; coaches read statuses only.
-    assert ctx.desk |> get_json("#{ctx.admin}/health-certificates") |> json_response(403)
+    # Front desk sees certificates by default (product owner, 2026-10-29):
+    # dates and the file, but uploads and deletes stay with
+    # manage_health_certificates. Coaches read statuses only.
+    assert %{"health_certificates" => [desk_row], "full_access" => true} =
+             ctx.desk |> get_json("#{ctx.admin}/health-certificates") |> json_response(200)
+
+    assert desk_row["certificate"]["id"] == id
+
+    assert %{"url" => _} =
+             ctx.desk
+             |> get_json("#{ctx.admin}/health-certificates/#{id}/file")
+             |> json_response(200)
+
+    assert %{"health_certificates" => [_]} =
+             ctx.desk
+             |> get_json("#{ctx.admin}/health-certificates/members/#{ctx.client_user.id}")
+             |> json_response(200)
+
+    assert ctx.desk
+           |> send_json(:post, "#{ctx.admin}/health-certificates/uploads", %{
+             "user_id" => ctx.client_user.id,
+             "content_type" => "application/pdf"
+           })
+           |> json_response(403)
+
+    assert ctx.desk
+           |> recycle()
+           |> delete("#{ctx.admin}/health-certificates/#{id}")
+           |> json_response(403)
 
     {:ok, _} =
       Palee.Coaching.start_relationship(ctx.context, %{

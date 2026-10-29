@@ -71875,6 +71875,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Clients of the box: everyone a new mandatory document or a major version would block from booking until they sign */
+                        clients: number;
                         templates: {
                             /** @description Clients who have not signed */
                             clients: {
