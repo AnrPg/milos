@@ -54,6 +54,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     fiscal_journal_heads fiscal_journal_entries fiscal_period_closings
     fiscal_authority_connections fiscal_transmissions fiscal_transmission_attempts
     payment_accounts payment_methods payment_intents payment_refunds payment_webhook_events
+    setup_recipe_applications
     review_questionnaires reviews review_answers
     messaging_threads
     messaging_participants messaging_messages seasonal_challenges
