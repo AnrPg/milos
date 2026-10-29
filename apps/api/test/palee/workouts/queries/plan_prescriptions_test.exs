@@ -26,28 +26,6 @@ defmodule Palee.Workouts.Queries.PlanPrescriptionsTest do
     }
   end
 
-  test "plan sections are scored as their plan says; other sections are left alone" do
-    legacy = %{id: "x", name: "Legacy", scoreable: true, score_config: %{"type" => "reps"}}
-
-    workout =
-      [Enum.at(program(), 6), Enum.at(program(), 0), Enum.at(program(), 2)]
-      |> workout()
-      |> Map.update!(:sections, &(&1 ++ [legacy]))
-      |> PlanPrescriptions.decorate()
-
-    [amrap, sets, _sets, untouched] = workout.sections
-    assert %{scoreable: true, score_config: %{"type" => "rounds_reps"}} = amrap
-    assert %{scoreable: false, score_config: nil} = sets
-    assert untouched == legacy
-
-    best_load = put_in(Enum.at(program(), 0), ["score"], "best_load")
-
-    assert %{sections: [%{scoreable: true, score_config: %{"type" => "load", "unit" => "kg"}}]} =
-             PlanPrescriptions.decorate(workout([best_load]))
-
-    assert PlanPrescriptions.decorate(nil) == nil
-  end
-
   test "workload reads the actuals of each section and the scored rounds of the others" do
     plans = [Enum.at(program(), 0), Enum.at(program(), 6), Enum.at(program(), 7)]
     workout = workout(plans)

@@ -6,17 +6,13 @@ defmodule Palee.Workouts.Queries.PlanPrescriptions do
   (`Workouts.get_workout/2`: sections with their `plan`) and on the
   athlete's plan actuals (`Execution.list_plan_sets/1`).
 
-  * `decorate/1` — the read model of a plan section carries the score its
-    plan sets (`scoreable`, `score_config`), like any other section, so the
-    training log, WOD leaderboards, PR detection and the timer sequence
-    score it without knowing about plans;
   * `workload/3` — sets, reps, volume, calories, distance and the time
     domain of what an athlete did (`PlanWorkload`);
   * `exercise_weights/1` — how many sets each exercise of a plan section is
     done in, as prescribed.
   """
 
-  alias Palee.Workouts.Domain.{PlanWorkload, StructuredPlanWorkout}
+  alias Palee.Workouts.Domain.{PlanWorkload, StructuredPlan, StructuredPlanWorkout}
 
   @doc "Whether a workout (read model or params) is written in the structured WOD editor."
   @spec plan_workout?(term()) :: boolean()
@@ -28,41 +24,9 @@ defmodule Palee.Workouts.Queries.PlanPrescriptions do
   def plan_section?(%{} = section), do: is_map(field(section, :plan))
   def plan_section?(_section), do: false
 
-  @doc """
-  The workout with every plan section scored as its plan says
-  (`scoreable`, `score_config` with string keys like a stored one). Other
-  sections and workouts are returned as they are.
-  """
-  @spec decorate(term()) :: term()
-  def decorate(%{sections: sections} = workout) when is_list(sections),
-    do: %{workout | sections: Enum.map(sections, &decorate_section/1)}
-
-  def decorate(workout), do: workout
-
-  defp decorate_section(%{} = section) do
-    if plan_section?(section) do
-      case score_config(section) do
-        nil -> section |> Map.put(:scoreable, false) |> Map.put(:score_config, nil)
-        config -> section |> Map.put(:scoreable, true) |> Map.put(:score_config, config)
-      end
-    else
-      section
-    end
-  end
-
-  defp decorate_section(section), do: section
-
   @doc "The score config of a plan section (`%{\"type\", \"unit\"}`), nil when it is not scored."
   @spec score_config(map()) :: map() | nil
-  def score_config(section) do
-    case section |> field(:plan) |> plan_score() |> PlanWorkload.score_config() do
-      nil -> nil
-      config -> Map.new(config, fn {key, value} -> {Atom.to_string(key), value} end)
-    end
-  end
-
-  defp plan_score(%{"score" => score}), do: score
-  defp plan_score(_plan), do: nil
+  def score_config(section), do: section |> field(:plan) |> StructuredPlan.score_config()
 
   @doc """
   What an athlete did in the plan sections of a workout, or nil when it has

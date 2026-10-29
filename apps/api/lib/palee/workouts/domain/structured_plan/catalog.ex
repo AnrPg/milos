@@ -105,13 +105,13 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Catalog do
     do: ~w(none best_load reps time rounds_reps done total_reps lowest_round distance)
 
   @doc "The params a flow reads with the add-ons switched on (`mods`)."
-  @spec param_defs(String.t(), map() | nil) :: [param_def()]
-  def param_defs(flow, mods) do
+  @spec param_defs(String.t(), map() | nil, (term() -> boolean())) :: [param_def()]
+  def param_defs(flow, mods, on? \\ &(&1 == true)) do
     spec = flow(flow)
 
     extra =
       spec.mods
-      |> Enum.filter(&(is_map(mods) and Map.get(mods, &1) == true))
+      |> Enum.filter(&(is_map(mods) and on?.(Map.get(mods, &1))))
       |> Enum.flat_map(&Map.fetch!(@mods, &1))
 
     Enum.map(spec.params ++ extra, fn {key, kind, bare} -> %{key: key, kind: kind, bare: bare} end)
@@ -137,5 +137,6 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Catalog do
 
   @doc "The flow writes values per column for this row (the sets grid, or per round on)."
   @spec uses_cells?(String.t(), map()) :: boolean()
-  def uses_cells?(flow, row), do: layout(flow) == :grid or Map.get(row, "perRound") == true
+  def uses_cells?(flow, row),
+    do: layout(flow) == :grid or Map.get(row, "perRound") not in [nil, false, 0, ""]
 end

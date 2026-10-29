@@ -100,7 +100,6 @@ defmodule PaleeWeb.PlanWorkoutConsumersTest do
     workout = plan_workout!(conn, admin)
     [strength, amrap, thrusters] = Enum.sort_by(workout["sections"], & &1["order"])
 
-    # The plan's clock: 4 sets with rests, a 7' AMRAP, a For Time; scored as the plan says.
     segments =
       athlete_conn
       |> recycle()
@@ -108,18 +107,14 @@ defmodule PaleeWeb.PlanWorkoutConsumersTest do
       |> json_response(200)
       |> Map.fetch!("segments")
 
-    by_section = Enum.group_by(segments, & &1["section_id"])
-    assert length(by_section[strength["id"]]) == 7
+    # One segment per plan section, from its clock (`PlanTimer`), scored as the plan says.
+    by_section = Map.new(segments, &{&1["section_id"], &1})
+    assert %{"scoreable" => false} = by_section[strength["id"]]
 
-    assert [
-             %{"kind" => "countdown", "duration_seconds" => 420, "scoreable" => true} =
-               amrap_segment
-           ] =
+    assert %{"kind" => "countdown", "duration_seconds" => 420, "scoreable" => true} =
              by_section[amrap["id"]]
 
-    assert amrap_segment["score_config"] == %{"type" => "rounds_reps"}
-
-    assert [%{"kind" => "countup", "score_config" => %{"type" => "time"}}] =
+    assert %{"kind" => "countup", "score_config" => %{"type" => "time"}} =
              by_section[thrusters["id"]]
 
     execution_id =

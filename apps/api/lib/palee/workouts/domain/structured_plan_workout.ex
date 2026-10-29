@@ -94,17 +94,30 @@ defmodule Palee.Workouts.Domain.StructuredPlanWorkout do
 
   # The section keeps its own key style (internal callers use atoms, requests
   # strings), so it still casts; the materialised exercises follow it.
+  # The section's score is the plan's (`scoreable` / `score_config` like a
+  # structured section), so leaderboards and PR detection read it as usual.
   defp put_plan(section, plan) do
     exercises = exercises(plan)
+    score_config = StructuredPlan.score_config(plan)
 
     if Enum.any?(Map.keys(section), &is_atom/1) do
       section
-      |> Map.drop([:sections, :exercises, :plan])
-      |> Map.merge(%{plan: plan, exercises: Enum.map(exercises, &atom_keys/1)})
+      |> Map.drop([:sections, :exercises, :plan, :scoreable, :score_config])
+      |> Map.merge(%{
+        plan: plan,
+        exercises: Enum.map(exercises, &atom_keys/1),
+        scoreable: score_config != nil,
+        score_config: score_config
+      })
     else
       section
-      |> Map.drop(["sections", "exercises", "plan"])
-      |> Map.merge(%{"plan" => plan, "exercises" => exercises})
+      |> Map.drop(["sections", "exercises", "plan", "scoreable", "score_config"])
+      |> Map.merge(%{
+        "plan" => plan,
+        "exercises" => exercises,
+        "scoreable" => score_config != nil,
+        "score_config" => score_config
+      })
     end
   end
 

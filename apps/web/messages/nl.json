@@ -12766,7 +12766,16 @@
       "too_many_rows": "Maximaal 60 oefeningen",
       "too_many_cells": "Maximaal 30 sets",
       "too_long": "Maximaal 200 tekens",
-      "note_too_long": "Maximaal 2000 tekens"
+      "note_too_long": "Maximaal 2000 tekens",
+      "wrong_unit": "Geen gewichtseenheid: schrijf kg of %",
+      "no_base": "Er staat niets voor om te veranderen: schrijf eerst een getal",
+      "bad_shape": "Deze waarde heeft de verkeerde vorm"
+    },
+    "ambiguous": {
+      "rangeOrList": "bereik {range}, de atleet kiest · voor {count} sets schrijf {write}",
+      "listOrLadder": "{list}, daarna blijft de laatste · om verder te stijgen schrijf {write}",
+      "windows": "{count} AMRAP-vensters: {list} · voor één AMRAP schrijf {write}",
+      "clock": "gelezen als {reading} · voor de andere eenheid schrijf {write}"
     }
   },
   "PlanRun": {

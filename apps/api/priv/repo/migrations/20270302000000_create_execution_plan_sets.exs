@@ -16,8 +16,9 @@ defmodule Palee.Repo.Migrations.CreateExecutionPlanSets do
     create table(:execution_plan_sets, primary_key: false) do
       add :id, :binary_id, primary_key: true
 
-      add :execution_id, references(:workout_executions, type: :binary_id, on_delete: :delete_all),
-        null: false
+      add :execution_id,
+          references(:workout_executions, type: :binary_id, on_delete: :delete_all),
+          null: false
 
       add :user_id, references(:users, type: :binary_id, on_delete: :delete_all), null: false
       add :organization_id, :binary_id

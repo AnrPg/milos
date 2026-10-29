@@ -44,19 +44,6 @@ defmodule Palee.Workouts.Domain.PlanWorkload do
   # Rounds counted for an open-ended section, whatever a score claims.
   @max_rounds 500
 
-  # Score keys of the plan catalog → the existing score model
-  # (`ScoreModal`/`FinishWizard`, `apps/web/.../execution/plan/score.ts`).
-  @score_configs %{
-    "time" => %{type: "time"},
-    "rounds_reps" => %{type: "rounds_reps"},
-    "reps" => %{type: "reps"},
-    "total_reps" => %{type: "reps"},
-    "lowest_round" => %{type: "reps"},
-    "best_load" => %{type: "load", unit: "kg"},
-    "done" => %{type: "pass_fail"},
-    "distance" => %{type: "reps", unit: "m"}
-  }
-
   @type one_rep_max :: (String.t() | nil, String.t() | nil -> number() | Decimal.t() | nil)
 
   @type row_workload :: %{
@@ -77,14 +64,6 @@ defmodule Palee.Workouts.Domain.PlanWorkload do
           top_set: %{load_kg: number(), reps: number() | nil} | nil,
           estimated: boolean()
         }
-
-  @doc """
-  The score config (`%{type, unit}`) of a plan score key, as the execution
-  and the training log score it; nil for `none` and unknown keys.
-  """
-  @spec score_config(term()) :: map() | nil
-  def score_config(key) when is_binary(key), do: Map.get(@score_configs, key)
-  def score_config(_key), do: nil
 
   @doc """
   The workload of one plan section (see the module doc), or nil for anything
@@ -554,7 +533,15 @@ defmodule Palee.Workouts.Domain.PlanWorkload do
     }
   end
 
-  defp actual_row(row, clock, records, opts) do
+  # The exercise as the athlete ran it (the runner names it as it showed it,
+  # e.g. at their scale), else the plan row's.
+  defp actual_row(row, clock, [first | _rest] = records, opts) do
+    row = %{
+      row
+      | name: present(first.exercise_name) || row.name,
+        exercise_ref: present(first.exercise_ref) || row.exercise_ref
+    }
+
     one_rep_max = one_rep_max(row, opts)
 
     places =
@@ -746,6 +733,12 @@ defmodule Palee.Workouts.Domain.PlanWorkload do
       _none -> nil
     end
   end
+
+  defp present(text) when is_binary(text) do
+    if String.trim(text) == "", do: nil, else: text
+  end
+
+  defp present(_text), do: nil
 
   defp midpoint(a, b), do: a |> Decimal.add(b) |> Decimal.div(2)
 

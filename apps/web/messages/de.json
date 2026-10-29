@@ -12766,7 +12766,16 @@
       "too_many_rows": "Höchstens 60 Übungen",
       "too_many_cells": "Höchstens 30 Sätze",
       "too_long": "Höchstens 200 Zeichen",
-      "note_too_long": "Höchstens 2000 Zeichen"
+      "note_too_long": "Höchstens 2000 Zeichen",
+      "wrong_unit": "Keine Lasteinheit: schreib kg oder %",
+      "no_base": "Davor steht nichts zum Ändern: schreib zuerst eine Zahl",
+      "bad_shape": "Dieser Wert hat die falsche Form"
+    },
+    "ambiguous": {
+      "rangeOrList": "Spanne {range}, der Athlet wählt · für {count} Sätze schreib {write}",
+      "listOrLadder": "{list}, danach bleibt der letzte Wert · zum Weitersteigern schreib {write}",
+      "windows": "{count} AMRAP-Fenster: {list} · für ein AMRAP schreib {write}",
+      "clock": "gelesen als {reading} · für die andere Einheit schreib {write}"
     }
   },
   "PlanRun": {

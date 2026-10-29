@@ -300,16 +300,6 @@ defmodule Palee.Workouts.Domain.PlanWorkloadTest do
     assert PlanWorkload.exercise_weights(nil) == []
   end
 
-  test "score configs follow the web runner's score model" do
-    assert PlanWorkload.score_config("time") == %{type: "time"}
-    assert PlanWorkload.score_config("rounds_reps") == %{type: "rounds_reps"}
-    assert PlanWorkload.score_config("total_reps") == %{type: "reps"}
-    assert PlanWorkload.score_config("best_load") == %{type: "load", unit: "kg"}
-    assert PlanWorkload.score_config("distance") == %{type: "reps", unit: "m"}
-    assert PlanWorkload.score_config("none") == nil
-    assert PlanWorkload.score_config(nil) == nil
-  end
-
   test "rounds from a score" do
     assert PlanWorkload.rounds_from_score("5+3") == 5
     assert PlanWorkload.rounds_from_score(" 7 ") == 7

@@ -225,9 +225,11 @@ defmodule Palee.Application.CompleteWorkout do
 
   defp text_section_scores(_workout, _params), do: {:ok, []}
 
-  # ADR-270: how much of a structured plan workout was done, for analytics:
-  # sets (and how many the athlete logged), volume and whether any number is
-  # an estimate. Counts only; nothing the athlete typed.
+  # ADR-270: the volume of a structured plan workout for analytics, next to
+  # the set counts and tonnage of its actuals (`ExecutionAnalytics`): kg ×
+  # reps with what the actuals lack read from the plan (% loads through the
+  # 1RM, ranges at their midpoint, scored rounds of an AMRAP done without
+  # actuals), and whether any of it is an estimate.
   defp plan_completion_facts(execution, %{} = workout) do
     if PlanPrescriptions.plan_workout?(workout) do
       case PlanPrescriptions.workload(workout, Map.get(execution, :plan_sets) || [],
@@ -237,10 +239,8 @@ defmodule Palee.Application.CompleteWorkout do
         %{totals: totals} ->
           %{
             authoring_mode: "structured_plan",
-            plan_set_count: totals.sets,
-            plan_logged_set_count: totals.logged_sets,
             plan_volume_kg: totals.volume_kg,
-            plan_estimated: totals.estimated
+            plan_volume_estimated: totals.estimated
           }
 
         nil ->

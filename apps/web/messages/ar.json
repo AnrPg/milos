@@ -12766,7 +12766,16 @@
       "too_many_rows": "60 تمرينًا كحد أقصى",
       "too_many_cells": "30 مجموعة كحد أقصى",
       "too_long": "200 حرف كحد أقصى",
-      "note_too_long": "2000 حرف كحد أقصى"
+      "note_too_long": "2000 حرف كحد أقصى",
+      "wrong_unit": "ليست وحدة حمل: اكتب kg أو %",
+      "no_base": "لا توجد قيمة سابقة لتغييرها: اكتب رقمًا أولًا",
+      "bad_shape": "هذه القيمة بصيغة خاطئة"
+    },
+    "ambiguous": {
+      "rangeOrList": "النطاق {range}، يختار الرياضي · لـ{count} مجموعات اكتب {write}",
+      "listOrLadder": "{list}، ثم تتكرر الأخيرة · للاستمرار في الزيادة اكتب {write}",
+      "windows": "{count} نوافذ AMRAP: {list} · لـAMRAP واحد اكتب {write}",
+      "clock": "تُقرأ {reading} · للوحدة الأخرى اكتب {write}"
     }
   },
   "PlanRun": {
