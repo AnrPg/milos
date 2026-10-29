@@ -11,7 +11,7 @@ defmodule Palee.Payments do
   """
 
   alias Palee.Payments.PaymentStore
-  alias Palee.Payments.Domain.{Consent, IntentPolicy}
+  alias Palee.Payments.Domain.{AccountOptions, Consent, IntentPolicy}
 
   @providers ~w(sandbox viva stripe)
   @environments ~w(test live)
@@ -43,6 +43,30 @@ defmodule Palee.Payments do
       %{status: "active", provider: "sandbox"} -> sandbox_enabled?()
       %{status: "active"} -> true
       _other -> false
+    end
+  end
+
+  @doc """
+  Whether members may pay `purpose` online now (ADR-260): the account is
+  active and the business left that purpose on.
+  """
+  def available?(context, purpose) do
+    case PaymentStore.get_account(context) do
+      %{status: "active"} = account ->
+        available?(context) and AccountOptions.allows?(account.options || %{}, purpose)
+
+      _other ->
+        false
+    end
+  end
+
+  @doc "Changes what members pay online and who hears about failed charges."
+  def save_options(context, params, actor_id, %DateTime{} = _now) do
+    with %{} = account <- PaymentStore.get_account(context) || {:error, :online_payments_unavailable},
+         {:ok, options} <- AccountOptions.change(account.options || %{}, params),
+         {:ok, saved} <-
+           PaymentStore.save_account(context, %{options: options, updated_by_id: actor_id}) do
+      {:ok, public_account(saved)}
     end
   end
 
@@ -175,6 +199,7 @@ defmodule Palee.Payments do
       :updated_at
     ])
     |> Map.put(:credentials_set, (account.credentials || %{}) |> Map.keys() |> Enum.sort())
+    |> Map.put(:options, AccountOptions.resolve(account[:options] || %{}))
   end
 
   defp active_account(context) do

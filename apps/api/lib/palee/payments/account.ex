@@ -13,7 +13,8 @@ defmodule Palee.Payments.Account do
 
   @primary_key {:id, :binary_id, autogenerate: true}
 
-  @fields ~w(provider environment status settings credentials last_error checked_at updated_by_id)a
+  @fields ~w(provider environment status settings options credentials last_error checked_at
+             updated_by_id)a
 
   schema "payment_accounts" do
     field :organization_id, :binary_id, read_after_writes: true
@@ -21,6 +22,7 @@ defmodule Palee.Payments.Account do
     field :environment, :string
     field :status, :string, default: "active"
     field :settings, :map, default: %{}
+    field :options, :map, default: %{}
     field :credentials, EncryptedBinary, redact: true
     field :last_error, :string
     field :checked_at, :utc_datetime_usec
