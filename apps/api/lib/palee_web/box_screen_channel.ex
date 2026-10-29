@@ -14,7 +14,8 @@ defmodule PaleeWeb.BoxScreenChannel do
 
   @impl true
   def join("box_screen:" <> organization_id, _payload, socket) do
-    with {:ok, %{screen: screen}} <- BoxScreenDisplay.authenticate(socket.assigns.box_screen_token),
+    with {:ok, %{screen: screen}} <-
+           BoxScreenDisplay.authenticate(socket.assigns.box_screen_token),
          ^organization_id <- screen.organization_id do
       {:ok, socket}
     else

@@ -26,7 +26,9 @@ defmodule Palee.Application.BoxScreens.BoxScreenToday do
     day = day(context, now)
     classes = classes(context, screen, day)
     workouts = workouts(context, classes)
-    results = Map.new(workouts, &{&1.id, WorkoutDayLeaderboard.results(context, &1.id, day.from, day.to)})
+
+    results =
+      Map.new(workouts, &{&1.id, WorkoutDayLeaderboard.results(context, &1.id, day.from, day.to)})
 
     people_ids =
       Enum.flat_map(classes, &[&1.coach_user_id | ScreenPrivacy.nameable_user_ids(&1.bookings)]) ++
@@ -43,7 +45,10 @@ defmodule Palee.Application.BoxScreens.BoxScreenToday do
       classes: Enum.map(classes, &class_view(&1, hidden, names)),
       workouts: Enum.map(workouts, &workout_view/1),
       leaderboards:
-        Enum.map(workouts, &leaderboard(context, &1, day, Map.fetch!(results, &1.id), hidden, names)),
+        Enum.map(
+          workouts,
+          &leaderboard(context, &1, day, Map.fetch!(results, &1.id), hidden, names)
+        ),
       focus:
         BoxScreens.focus(
           Enum.map(classes, &focus_class/1),
@@ -61,6 +66,7 @@ defmodule Palee.Application.BoxScreens.BoxScreenToday do
 
   @doc "Whether the screen shows `slot` (its branch or the whole box)."
   def shows?(%{location_id: nil}, _slot), do: true
+
   def shows?(%{location_id: location_id}, %{location_id: slot_location}),
     do: slot_location in [nil, location_id]
 

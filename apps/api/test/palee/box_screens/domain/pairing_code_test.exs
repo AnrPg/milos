@@ -17,7 +17,8 @@ defmodule Palee.BoxScreens.Domain.PairingCodeTest do
       end)
     end
 
-    assert 200 == 1..200 |> Enum.map(fn _ -> PairingCode.generate() end) |> Enum.uniq() |> length()
+    assert 200 ==
+             1..200 |> Enum.map(fn _ -> PairingCode.generate() end) |> Enum.uniq() |> length()
   end
 
   test "typing ignores case, spaces and dashes; anything else is refused" do

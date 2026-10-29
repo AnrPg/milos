@@ -178,10 +178,12 @@ defmodule PaleeWeb.BoxScreenControllerTest do
     cat = member("Κατερίνα")
     dan = member("Δανάη")
 
-    {:ok, _} = Community.put_social_settings(%{user_id: bob.id}, bob.id, %{hide_from_members: true})
+    {:ok, _} =
+      Community.put_social_settings(%{user_id: bob.id}, bob.id, %{hide_from_members: true})
 
     for user <- [anna, bob] do
-      {:ok, _} = Scheduling.submit_auto_approved_booking_with(ctx.context, user.id, running.id, %{})
+      {:ok, _} =
+        Scheduling.submit_auto_approved_booking_with(ctx.context, user.id, running.id, %{})
     end
 
     {:ok, _} =
@@ -222,11 +224,16 @@ defmodule PaleeWeb.BoxScreenControllerTest do
 
     {id, code} = new_screen(ctx, %{name: "Κυψέλη TV", location_id: kypseli.id})
     %{"token" => token} = ctx |> pair(code) |> json_response(201)
-    today = fn -> ctx.tv |> with_token(token) |> get("/api/box-screen/today") |> json_response(200) end
+
+    today = fn ->
+      ctx.tv |> with_token(token) |> get("/api/box-screen/today") |> json_response(200)
+    end
 
     body = today.()
 
-    assert body["date"] == ctx.now |> DateTime.shift_zone!(ctx.zone) |> DateTime.to_date() |> Date.to_iso8601()
+    assert body["date"] ==
+             ctx.now |> DateTime.shift_zone!(ctx.zone) |> DateTime.to_date() |> Date.to_iso8601()
+
     assert body["time_zone"] == ctx.zone
     assert %{"name" => "Κυψέλη TV", "branch" => %{"name" => "Κυψέλη"}} = body["screen"]
 
@@ -245,7 +252,13 @@ defmodule PaleeWeb.BoxScreenControllerTest do
              running_view["bookings"]
 
     # Opted in, not hidden, not journal-private.
-    assert [%{"workout_id" => ^workout_id, "score" => %{"score_type" => "time"}, "entries" => entries}] =
+    assert [
+             %{
+               "workout_id" => ^workout_id,
+               "score" => %{"score_type" => "time"},
+               "entries" => entries
+             }
+           ] =
              body["leaderboards"]
 
     assert [%{"rank" => 1, "name" => "Άννα", "value" => "4:10"}] = entries
@@ -279,7 +292,10 @@ defmodule PaleeWeb.BoxScreenControllerTest do
     # Another branch's class cannot be pinned on this screen.
     assert %{"code" => "invalid_screen_override"} =
              ctx.owner
-             |> send_json(:put, "#{ctx.admin}/#{id}/override", %{view: "class", slot_id: elsewhere.id})
+             |> send_json(:put, "#{ctx.admin}/#{id}/override", %{
+               view: "class",
+               slot_id: elsewhere.id
+             })
              |> json_response(422)
 
     # «Επιστροφή στο αυτόματο».
@@ -288,7 +304,9 @@ defmodule PaleeWeb.BoxScreenControllerTest do
 
     # 55 minutes later the class has ended: its results, for 30 minutes.
     FixedBoxScreenClock.set(DateTime.add(ctx.now, 55 * 60))
-    assert %{"source" => "auto", "view" => "results", "slot_id" => ^running_id} = today.()["focus"]
+
+    assert %{"source" => "auto", "view" => "results", "slot_id" => ^running_id} =
+             today.()["focus"]
 
     # The class timer: this screen's classes only.
     assert %{"class" => %{"id" => ^running_id}, "timer" => %{"status" => "ready"}} =

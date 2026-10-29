@@ -73,7 +73,8 @@ defmodule PaleeWeb.AdminBoxScreenControllerTest do
     assert screen["location_id"] == nil
     assert screen["override"] == nil
 
-    assert %{"screens" => [%{"id" => ^id}]} = ctx.owner |> get_json(ctx.admin) |> json_response(200)
+    assert %{"screens" => [%{"id" => ^id}]} =
+             ctx.owner |> get_json(ctx.admin) |> json_response(200)
 
     {:ok, branch} = Facility.create_location(ctx.context, %{name: "Κυψέλη"})
 
@@ -158,7 +159,11 @@ defmodule PaleeWeb.AdminBoxScreenControllerTest do
     assert %{"by" => %{"id" => by}} = changed
     assert by == ctx.owner_user.id
 
-    assert %{"screen" => %{"override" => %{"view" => "bookings", "slot_id" => nil, "until" => nil}}} =
+    assert %{
+             "screen" => %{
+               "override" => %{"view" => "bookings", "slot_id" => nil, "until" => nil}
+             }
+           } =
              ctx.owner |> send_json(:put, path, %{view: "bookings"}) |> json_response(200)
 
     for bad <- [

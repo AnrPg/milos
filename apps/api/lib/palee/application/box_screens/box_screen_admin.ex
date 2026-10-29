@@ -185,7 +185,10 @@ defmodule Palee.Application.BoxScreens.BoxScreenAdmin do
             at: screen.focus_changed_at,
             by:
               screen.focus_changed_by_id &&
-                %{id: screen.focus_changed_by_id, name: Map.get(names, screen.focus_changed_by_id)}
+                %{
+                  id: screen.focus_changed_by_id,
+                  name: Map.get(names, screen.focus_changed_by_id)
+                }
           },
       inserted_at: screen.inserted_at
     }

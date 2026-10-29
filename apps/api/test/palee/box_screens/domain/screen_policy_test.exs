@@ -46,7 +46,11 @@ defmodule Palee.BoxScreens.Domain.ScreenPolicyTest do
   end
 
   test "an override with an end lapses at that end" do
-    screen = %{override_view: "wod", override_slot_id: nil, override_until: ~U[2027-02-09 11:00:00Z]}
+    screen = %{
+      override_view: "wod",
+      override_slot_id: nil,
+      override_until: ~U[2027-02-09 11:00:00Z]
+    }
 
     assert %{view: "wod"} = ScreenPolicy.active_override(screen, @now)
     assert nil == ScreenPolicy.active_override(screen, ~U[2027-02-09 11:00:00Z])

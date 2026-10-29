@@ -125,6 +125,7 @@ defmodule PaleeWeb.RealtimeEventHandler do
       Map.get(payload, :organization_id) || Map.get(payload, "organization_id"),
       Map.get(payload, :slot_id) || Map.get(payload, "slot_id")
     )
+
     {:noreply, state}
   end
 

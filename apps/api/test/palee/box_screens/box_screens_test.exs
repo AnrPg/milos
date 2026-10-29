@@ -17,7 +17,9 @@ defmodule Palee.BoxScreensTest do
 
   setup do
     {organization, owner, context} = bypass_rls(fn -> organization_fixture() end)
-    {other_organization, _other_owner, other_context} = bypass_rls(fn -> organization_fixture() end)
+
+    {other_organization, _other_owner, other_context} =
+      bypass_rls(fn -> organization_fixture() end)
 
     %{
       organization: organization,
@@ -93,12 +95,17 @@ defmodule Palee.BoxScreensTest do
              BoxScreens.find_pairing(code, DateTime.add(@now, 15 * 60, :second))
 
     later = DateTime.add(@now, 3600, :second)
-    assert {:ok, _screen, %{code: second}} = BoxScreens.new_pairing_code(ctx.context, screen.id, later)
+
+    assert {:ok, _screen, %{code: second}} =
+             BoxScreens.new_pairing_code(ctx.context, screen.id, later)
+
     assert {:error, :invalid_pairing_code} = BoxScreens.find_pairing(code, later)
     assert {:ok, _org, _id, hash} = BoxScreens.find_pairing(second, later)
     assert {:ok, %{token_version: 1}} = BoxScreens.claim(ctx.context, screen.id, hash, later)
 
-    assert {:ok, _screen, %{code: third}} = BoxScreens.new_pairing_code(ctx.context, screen.id, later)
+    assert {:ok, _screen, %{code: third}} =
+             BoxScreens.new_pairing_code(ctx.context, screen.id, later)
+
     assert {:ok, _org, _id, hash} = BoxScreens.find_pairing(third, later)
     assert {:ok, %{token_version: 2}} = BoxScreens.claim(ctx.context, screen.id, hash, later)
   end
@@ -138,7 +145,14 @@ defmodule Palee.BoxScreensTest do
     assert %{view: "class", slot_id: ^slot_id} = BoxScreens.active_override(pinned, @now)
 
     assert {:error, :invalid_screen_override} =
-             BoxScreens.set_override(ctx.context, screen.id, %{view: "class"}, [], ctx.owner.id, @now)
+             BoxScreens.set_override(
+               ctx.context,
+               screen.id,
+               %{view: "class"},
+               [],
+               ctx.owner.id,
+               @now
+             )
 
     later = DateTime.add(@now, 60, :second)
     assert {:ok, auto} = BoxScreens.clear_override(ctx.context, screen.id, ctx.owner.id, later)

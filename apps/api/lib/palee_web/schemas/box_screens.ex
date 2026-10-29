@@ -115,7 +115,10 @@ defmodule PaleeWeb.Schemas.BoxScreens do
       properties: %{
         screens: %Schema{type: :array, items: screen()},
         max_screens: %Schema{type: :integer},
-        override_views: %Schema{type: :array, items: %Schema{type: :string, enum: @override_views}}
+        override_views: %Schema{
+          type: :array,
+          items: %Schema{type: :string, enum: @override_views}
+        }
       },
       required: [:max_screens, :override_views, :screens]
     }
@@ -206,7 +209,11 @@ defmodule PaleeWeb.Schemas.BoxScreens do
           properties: %{id: @uuid, name: %Schema{type: :string}},
           required: [:id, :name]
         },
-        box: %Schema{type: :object, properties: %{name: %Schema{type: :string}}, required: [:name]}
+        box: %Schema{
+          type: :object,
+          properties: %{name: %Schema{type: :string}},
+          required: [:name]
+        }
       },
       required: [:box, :expires_at, :screen, :token]
     }

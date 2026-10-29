@@ -3,8 +3,18 @@ defmodule Palee.BoxScreens.Domain.FocusTest do
 
   alias Palee.BoxScreens.Domain.Focus
 
-  @seven %{id: "a", scheduled_at: ~U[2027-02-09 07:00:00Z], duration_minutes: 60, cancelled: false}
-  @eight %{id: "b", scheduled_at: ~U[2027-02-09 08:00:00Z], duration_minutes: 60, cancelled: false}
+  @seven %{
+    id: "a",
+    scheduled_at: ~U[2027-02-09 07:00:00Z],
+    duration_minutes: 60,
+    cancelled: false
+  }
+  @eight %{
+    id: "b",
+    scheduled_at: ~U[2027-02-09 08:00:00Z],
+    duration_minutes: 60,
+    cancelled: false
+  }
   @eighteen %{
     id: "c",
     scheduled_at: ~U[2027-02-09 18:00:00Z],
@@ -50,7 +60,11 @@ defmodule Palee.BoxScreens.Domain.FocusTest do
              Focus.resolve(@day, override, ~U[2027-02-09 07:10:00Z])
 
     assert %{source: "staff", view: "bookings", slot_id: nil} =
-             Focus.resolve(@day, %{view: "bookings", slot_id: nil, until: nil}, ~U[2027-02-09 07:10:00Z])
+             Focus.resolve(
+               @day,
+               %{view: "bookings", slot_id: nil, until: nil},
+               ~U[2027-02-09 07:10:00Z]
+             )
 
     gone = %{view: "class", slot_id: "zz", until: nil}
 
