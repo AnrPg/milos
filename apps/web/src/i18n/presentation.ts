@@ -237,6 +237,8 @@ const SEMANTIC_KEYS: Record<string, string> = {
 };
 
 const API_ERROR_KEYS: Record<string, string> = {
+  // ADR-252: the booking gate (screens that cannot open the documents in place).
+  documents_required: "apiErrorDocumentsRequired",
   // ADR-222: recording money received at the desk.
   payment_exceeds_invoice_balance: "apiErrorPaymentExceedsInvoiceBalance",
   invoice_already_paid: "apiErrorInvoiceAlreadyPaid",

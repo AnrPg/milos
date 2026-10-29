@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 
+import { documentsRequired, type DocumentsRequired } from "@/api/documents";
 import { fetchMyEntitlement } from "@/api/my-finance";
 import { fetchBookablePlaces } from "@/api/places";
 import { CLASS_LEVELS, fetchSchedule, type ScheduleSlot } from "@/api/schedule";
@@ -71,6 +72,8 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  // ADR-252: what the booking gate asks for, shown in the class sheet.
+  const [documentsGate, setDocumentsGate] = useState<DocumentsRequired | null>(null);
 
   // The grid starts on the Monday of the 1st, so the selected day's week is always inside it.
   const windowStart = monthGridStart(selectedDate);
@@ -230,9 +233,12 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
       const outcome = await submitCommand("booking.request", { slotId: slot.id, label: slot.name });
       setNotice(outcome.status === "queued" ? i18n("outboxQueuedNotice") : null);
       setOpenSlotId(null);
+      setDocumentsGate(null);
       if (outcome.status === "delivered") reload();
     } catch (error) {
-      setActionError(localizeMemberBookingError(error, i18n, locale, "book"));
+      const gate = documentsRequired(error);
+      if (gate) setDocumentsGate(gate);
+      else setActionError(localizeMemberBookingError(error, i18n, locale, "book"));
     } finally {
       setBusy(false);
     }
@@ -373,9 +379,11 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
           busy={busy}
           error={actionError}
           onBook={() => void book(openSlot)}
+          documentsGate={documentsGate}
           onClose={() => {
             setOpenSlotId(null);
             setActionError(null);
+            setDocumentsGate(null);
           }}
           onChanged={reload}
           onCancelled={({ lateCancellation }) => {
