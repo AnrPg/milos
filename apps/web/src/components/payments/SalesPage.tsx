@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 import type { PublicPackage } from "@/api/my-payments";
 import type { PublicBoxPage } from "@/api/social";
@@ -187,8 +187,8 @@ function BuyDialog({ slug, boxName, pkg, onClose }: { slug: string; boxName: str
   const locale = useUiLocale();
   const { status } = useSession();
   const memberships = useOrganizationMemberships();
-  const [here, setHere] = useState("");
-  useEffect(() => setHere(window.location.pathname + window.location.search), []);
+  // Back here after signing in, with the same package open.
+  const here = `/b/${encodeURIComponent(slug)}/packages?buy=${encodeURIComponent(pkg.id)}`;
   const member = (memberships.data ?? []).some((membership) => membership.organization.slug === slug);
 
   return (
