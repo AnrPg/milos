@@ -29,29 +29,28 @@
  */
 import { create } from "zustand";
 
-import type {
-  PlanCell,
-  PlanFlow,
-  PlanMeasure,
-  PlanMods,
-  PlanParams,
-  PlanRow,
-  PlanSection,
-  PlanStructure,
-  PlanStructureKind,
-} from "@/lib/structured-plan/types";
 import {
-  FLOW_RULES,
-  MOD_FIELDS,
-  PRESETS,
-  convertFlow,
-  emptySection,
-  isGroupStructure,
+  FLOWS,
+  MODS,
+  STRUCTS,
+  canPerRound,
+  changeFlow,
   newId,
   newRow,
-  structureDefaults,
+  newSection,
+  newStructure,
+  presetByKey,
   totalRounds,
-} from "@/stores/structured-plan-shim";
+  type PlanCell,
+  type PlanFlow,
+  type PlanMeasure,
+  type PlanMods,
+  type PlanParams,
+  type PlanRow,
+  type PlanSection,
+  type PlanStructure,
+  type PlanStructureKind,
+} from "@/lib/structured-plan";
 
 /** One section of the WOD as the editor holds it. */
 export type PlanEditorSection = { id: string; name: string; plan: PlanSection };
@@ -211,9 +210,9 @@ export const focusKey = {
 };
 
 /** True when a flow has a Χρόνος step (it has parameters). */
-export const hasTimeStep = (flow: PlanFlow) => FLOW_RULES[flow].fields.length > 0;
+export const hasTimeStep = (flow: PlanFlow) => FLOWS[flow].params.length > 0;
 /** True when a flow has exercises (every flow but rest). */
-export const hasExercises = (flow: PlanFlow) => FLOW_RULES[flow].layout !== "none";
+export const hasExercises = (flow: PlanFlow) => FLOWS[flow].layout !== "none";
 /** Whether a wizard step has content for a flow (Ροή and Σκορ always do). */
 export const stepAvailable = (flow: PlanFlow, step: PlanWizardStep) =>
   step === 1 ? hasTimeStep(flow) : step === 2 ? hasExercises(flow) : true;
@@ -227,10 +226,10 @@ function nextAvailable(flow: PlanFlow, step: PlanWizardStep, delta: 1 | -1): Pla
 export function firstFocusOf(section: PlanEditorSection, step: PlanWizardStep): string {
   const { plan } = section;
   if (step === 0) return focusKey.pick(section.id);
-  if (step === 1) return focusKey.param(section.id, FLOW_RULES[plan.flow].fields[0]?.key ?? "");
+  if (step === 1) return focusKey.param(section.id, FLOWS[plan.flow].params[0]?.key ?? "");
   if (step === 3) return focusKey.score(section.id);
   const row = plan.blocks.flat()[0];
-  return row ? focusKey.row(row.id, "name") : focusKey.param(section.id, FLOW_RULES[plan.flow].fields[0]?.key ?? "");
+  return row ? focusKey.row(row.id, "name") : focusKey.param(section.id, FLOWS[plan.flow].params[0]?.key ?? "");
 }
 
 const listOf = (plan: PlanSection, block: number): PlanRow[] =>
@@ -334,13 +333,13 @@ export const usePlanEditorStore = create<PlanEditorState>((set, get) => {
     fn(sec.plan, listOf(sec.plan, at.block), at.index, sec);
   };
   const chooseFlow = (sectionId: string, flow: PlanFlow, presetKey: string | null) => {
-    const preset = presetKey ? PRESETS.find((p) => p.key === presetKey) ?? null : null;
+    const preset = presetKey ? presetByKey(presetKey) ?? null : null;
     if (presetKey && !preset) return;
     let focus: string | null = null;
     commit((draft) => {
       const sec = section(draft, sectionId);
       if (!sec) return;
-      sec.plan = convertFlow(sec.plan, flow, preset);
+      sec.plan = changeFlow(sec.plan, flow, preset);
       draft.openId = sectionId;
       draft.step = nextAvailable(flow, 0, 1) ?? 3;
       focus = firstFocusOf(sec, draft.step);
@@ -380,7 +379,7 @@ export const usePlanEditorStore = create<PlanEditorState>((set, get) => {
     addSection: (afterId = null) => {
       const id = newId();
       // A new section has no exercises until a flow is chosen; `sets` is a placeholder flow.
-      const plan: PlanSection = { ...emptySection("sets"), blocks: [] };
+      const plan: PlanSection = { ...newSection("sets"), blocks: [] };
       commit((draft) => {
         const at = afterId ? draft.sections.findIndex((s) => s.id === afterId) + 1 : draft.sections.length;
         draft.sections.splice(at > 0 ? at : draft.sections.length, 0, { id, name: "", plan });
@@ -454,15 +453,15 @@ export const usePlanEditorStore = create<PlanEditorState>((set, get) => {
 
     setFlow: (sectionId, flow) => chooseFlow(sectionId, flow, null),
     applyPreset: (sectionId, presetKey) => {
-      const preset = PRESETS.find((p) => p.key === presetKey);
+      const preset = presetByKey(presetKey);
       if (preset) chooseFlow(sectionId, preset.flow, presetKey);
     },
     setParam: (sectionId, key, value) => typing((draft) => { const sec = section(draft, sectionId); if (sec) sec.plan.params[key] = value; }),
     toggleMod: (sectionId, mod) => {
       const sec = get().sections.find((s) => s.id === sectionId);
-      if (!sec || !FLOW_RULES[sec.plan.flow].mods.includes(mod)) return;
+      if (!sec || !FLOWS[sec.plan.flow].mods.includes(mod)) return;
       const on = !sec.plan.mods?.[mod];
-      const field = MOD_FIELDS[mod];
+      const field = MODS[mod].params[0];
       commit((draft) => {
         const plan = section(draft, sectionId)!.plan;
         const mods = { ...(plan.mods ?? {}) };
@@ -507,7 +506,7 @@ export const usePlanEditorStore = create<PlanEditorState>((set, get) => {
       const sec = get().sections.find((s) => s.id === slot.sectionId);
       if (!sec) return "";
       const afterRow = typeof after === "string" ? locate(get().sections, after)?.row ?? null : null;
-      const grid = FLOW_RULES[sec.plan.flow].layout === "grid" && slot.block !== INTERRUPT_BLOCK;
+      const grid = FLOWS[sec.plan.flow].layout === "grid" && slot.block !== INTERRUPT_BLOCK;
       const row = kind === "rest"
         ? newRow("rest", { group: afterRow?.group ?? null, ...(grid ? { cells: [{ d: "30″" }] } : { dose: "30″" }) })
         : newRow("ex", { group: afterRow?.group ?? null });
@@ -562,7 +561,7 @@ export const usePlanEditorStore = create<PlanEditorState>((set, get) => {
         const unit = unitOf(list, index);
         const structs = (plan.structs ??= {});
         const first = unit.rows[0];
-        if (isGroupStructure(kind) && unit.rows.length === 1) {
+        if (STRUCTS[kind].group && unit.rows.length === 1) {
           // A group needs a partner: the next ungrouped row joins, or a new empty one.
           const group = newId();
           first.group = group;
@@ -576,15 +575,15 @@ export const usePlanEditorStore = create<PlanEditorState>((set, get) => {
             list.splice(unit.start + 1, 0, partner);
             focus = focusKey.row(partner.id, "name");
           }
-          structs[group] = structureDefaults(kind);
-        } else if (!isGroupStructure(kind) && unit.rows.length > 1) {
+          structs[group] = newStructure(kind);
+        } else if (!STRUCTS[kind].group && unit.rows.length > 1) {
           for (const row of unit.rows) row.group = null;
           delete structs[unit.key];
-          if (kind !== "single") structs[first.id] = structureDefaults(kind);
+          if (kind !== "single") structs[first.id] = newStructure(kind);
         } else if (kind === "single") {
           delete structs[unit.key];
         } else {
-          structs[unit.key] = structureDefaults(kind);
+          structs[unit.key] = newStructure(kind);
         }
       }));
       set({ pendingFocus: focus });
@@ -599,7 +598,7 @@ export const usePlanEditorStore = create<PlanEditorState>((set, get) => {
       const at = locate(get().sections, rowId);
       if (!at || at.row.extra?.includes(measure)) return;
       const sec = get().sections.find((s) => s.id === at.sectionId)!;
-      const perCell = (FLOW_RULES[sec.plan.flow].layout === "grid" && at.block !== INTERRUPT_BLOCK) || at.row.perRound;
+      const perCell = (FLOWS[sec.plan.flow].layout === "grid" && at.block !== INTERRUPT_BLOCK) || at.row.perRound;
       const focus = measure === "side" ? focusKey.row(rowId, "name") : perCell ? focusKey.cell(rowId, 0, measure) : focusKey.row(rowId, `x:${measure}`);
       commit((draft) => onRow(draft, rowId, (_plan, list, index) => { list[index] = { ...list[index], extra: [...(list[index].extra ?? []), measure] }; }), focus);
     },
@@ -619,13 +618,7 @@ export const usePlanEditorStore = create<PlanEditorState>((set, get) => {
       if (!at || at.row.kind !== "ex") return false;
       const sec = get().sections.find((s) => s.id === at.sectionId)!;
       const { plan } = sec;
-      if (FLOW_RULES[plan.flow].layout === "grid" || at.block === INTERRUPT_BLOCK) return false;
-      const blocks = Math.max(1, plan.blocks.length);
-      if (totalRounds(plan) <= blocks && totalRounds(plan) !== Infinity) {
-        // The block occurs once: nothing to vary.
-        const occurs = Math.ceil((totalRounds(plan) - at.block) / blocks);
-        if (occurs < 2) return false;
-      }
+            if (!canPerRound(plan, at.block)) return false;
       const on = !at.row.perRound;
       commit((draft) => onRow(draft, rowId, (_p, list, index) => {
         const row = list[index];
