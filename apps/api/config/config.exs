@@ -69,6 +69,9 @@ config :palee, Oban,
        {"20 * * * *", Palee.Workers.CloseFiscalPeriodsJob},
        # ADR-243: retries and deferred reports to the tax authority.
        {"*/5 * * * *", Palee.Workers.TransmitFiscalDocumentsJob},
+       # ADR-250/251: Peppol sends and delivery polls; TSE/RKSV signatures.
+       {"*/5 * * * *", Palee.Workers.SendEInvoicesJob},
+       {"*/2 * * * *", Palee.Workers.SignTillReceiptsJob},
        # ADR-246/247: settle online payments; hourly autopay of due invoices.
        {"*/3 * * * *", Palee.Workers.ProcessPaymentsJob},
        {"11 * * * *", Palee.Workers.ProcessPaymentsJob, args: %{"autopay" => true}}

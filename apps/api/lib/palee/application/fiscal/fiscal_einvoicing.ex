@@ -6,6 +6,7 @@ defmodule Palee.Application.Fiscal.FiscalEInvoicing do
   issue and every few minutes).
   """
 
+  alias Palee.Application.PublicURL
   alias Palee.Fiscal.EInvoicing
   alias Palee.Workers.SendEInvoicesJob
 
@@ -41,8 +42,8 @@ defmodule Palee.Application.Fiscal.FiscalEInvoicing do
   end
 
   defp webhook_url(organization_id, token) do
-    base = PaleeWeb.Endpoint.url()
-    "#{base}/api/webhooks/peppol/#{organization_id}/#{token}"
+    (PublicURL.base_url() |> String.trim_trailing("/")) <>
+      "/api/webhooks/peppol/#{organization_id}/#{token}"
   end
 
   @statuses ~w(pending sending submitted delivered rejected failed uncertain)
