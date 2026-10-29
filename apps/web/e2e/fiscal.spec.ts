@@ -73,6 +73,46 @@ const GR = {
 };
 const DE = { ...GR, country: "DE", authority: "none", till_device: "tse", required_fields: ["legal_name", "street", "postal_code", "city", "tax_id_or_vat_number"], tax_office: false };
 
+// ADR-273: the «Συνδέσεις» card.
+const MYDATA = {
+  authority: "mydata",
+  environment: "production",
+  user_id: "kypseli_box",
+  has_subscription_key: true,
+  status: "active",
+  error_code: null,
+  checked_at: null,
+  updated_at: "2026-10-29T12:32:00Z",
+  updated_by_platform: false,
+  updated_by_name: "Apostolos",
+};
+const connections = (saved: Record<string, unknown>, extra: Record<string, unknown> = {}) => ({
+  country: "GR",
+  kinds: ["mydata", "registry"],
+  managed_by: "owner",
+  connections: { mydata: null, registry: null, ...saved },
+  ...extra,
+});
+const greekIdentity = {
+  identity: {
+    id: "identity-1",
+    country_code: "GR",
+    currency: "EUR",
+    vat_scheme: "standard",
+    branch_code: 0,
+    fiscal_year_start_month: 1,
+    legal_name: "KYPSELI ATHLETIC P.C.",
+    tax_id: "801234567",
+    tax_office: "Z Athens",
+    street: "Fokionos Negri 12",
+    postal_code: "11361",
+    city: "Athens",
+  },
+  profile: GR,
+  missing: [],
+  complete: true,
+};
+
 test.describe("Settings › Billing details", () => {
   test("chooses the country first, then fills one row at a time", async ({ page }) => {
     await signIn(page);
@@ -84,8 +124,8 @@ test.describe("Settings › Billing details", () => {
       return { identity, profile: GR, missing, complete: missing.length === 0 };
     };
     await page.route("**/api/org/box1/admin/fiscal/countries", (route) => route.fulfill(json({ countries: [DE, GR], vat_schemes: ["standard", "small_business", "exempt"] })));
-    await page.route("**/api/org/box1/admin/fiscal/authority-connection", (route) =>
-      route.fulfill(json({ connection: { authority: "mydata", environment: "production", status: "active", has_subscription_key: true }, environments: ["sandbox", "test", "production"] })),
+    await page.route("**/api/org/box1/admin/fiscal/connections", (route) =>
+      route.fulfill(json(connections({ mydata: { ...MYDATA, status: "active" } }))),
     );
     await page.route("**/api/org/box1/admin/fiscal/identity", (route) => {
       if (route.request().method() === "PUT") {
@@ -128,7 +168,8 @@ test.describe("Settings › Billing details", () => {
     await address.getByTestId("fiscal-panel-save").click();
 
     await expect(page.getByTestId("fiscal-identity-ready")).toContainText("Receipts and invoices are issued legally.");
-    await expect(page.getByTestId("fiscal-mydata-status")).toHaveText("Connected");
+    await expect(page.getByTestId("fiscal-connection-mydata-status")).toHaveText("Connected");
+    await expect(page.getByTestId("fiscal-connection-registry-status")).toHaveText("Not connected");
     await expect(page.getByRole("img", { name: "100% complete" })).toBeVisible();
   });
 
@@ -137,7 +178,7 @@ test.describe("Settings › Billing details", () => {
     const sent: Record<string, unknown>[] = [];
     const lookups: string[] = [];
     await page.route("**/api/org/box1/admin/fiscal/countries", (route) => route.fulfill(json({ countries: [DE, GR], vat_schemes: ["standard", "small_business", "exempt"] })));
-    await page.route("**/api/org/box1/admin/fiscal/authority-connection", (route) => route.fulfill(json({ connection: null, environments: ["sandbox", "test", "production"] })));
+    await page.route("**/api/org/box1/admin/fiscal/connections", (route) => route.fulfill(json(connections({}))));
     await page.route("**/api/org/box1/admin/fiscal/identity", (route) => {
       if (route.request().method() === "PUT") sent.push(bodyOf(route.request()));
       const identity = { id: "identity-1", country_code: "GR", currency: "EUR", vat_scheme: "standard", branch_code: 0, fiscal_year_start_month: 1, ...Object.assign({}, ...sent) };
@@ -190,6 +231,78 @@ test.describe("Settings › Billing details", () => {
     await business.getByTestId("fiscal-panel-save").click();
     await expect(business).toBeHidden();
     expect(sent[0]).toMatchObject({ tax_id: "090000045", street: "FOKIONOS NEGRI 12", postal_code: "11361", city: "ATHENS", activity_code: "93130000" });
+  });
+
+  test("connects myDATA in the side panel and runs «Connection test» (ADR-273)", async ({ page }) => {
+    await signIn(page);
+    const saves: Record<string, unknown>[] = [];
+    let saved: Record<string, unknown> | null = null;
+    await page.route("**/api/org/box1/admin/fiscal/countries", (route) => route.fulfill(json({ countries: [DE, GR], vat_schemes: ["standard", "small_business", "exempt"] })));
+    await page.route("**/api/org/box1/admin/fiscal/identity", (route) => route.fulfill(json(greekIdentity)));
+    await page.route("**/api/org/box1/admin/fiscal/connections", (route) => route.fulfill(json(connections(saved ? { mydata: saved } : {}))));
+    await page.route("**/api/org/box1/admin/fiscal/authority-connection", (route) => {
+      const body = bodyOf(route.request());
+      saves.push(body);
+      if (!body.user_id) return route.fulfill(json({ code: "validation_failed", errors: { user_id: ["required"] } }, 422));
+      if (body.subscription_key === "wrong-key") {
+        saved = { ...MYDATA, status: "invalid", error_code: "credentials_rejected" };
+        return route.fulfill(json({ connection: saved, check: { result: "invalid", error_code: "credentials_rejected", detail: {} } }));
+      }
+      saved = { ...MYDATA, status: "active", checked_at: "2026-10-29T12:33:00Z" };
+      return route.fulfill(json({ connection: saved, check: { result: "ok", error_code: null, detail: {} } }));
+    });
+    await page.route("**/api/org/box1/admin/fiscal/connections/mydata/check", (route) =>
+      route.fulfill(json({ connection: saved, check: { result: "ok", error_code: null, detail: {} } })),
+    );
+
+    await page.goto("/admin/settings/billing");
+    const card = page.getByTestId("fiscal-connections");
+    await expect(card.getByTestId("fiscal-connection-mydata-status")).toHaveText("Not connected");
+    await expect(card.getByTestId("fiscal-connection-tse")).toHaveCount(0);
+
+    await card.getByTestId("fiscal-connection-mydata").click();
+    const panel = page.getByTestId("fiscal-connection-panel-mydata");
+    await expect(panel.getByTestId("fiscal-connection-check")).toBeDisabled();
+    // The environment waits under Advanced.
+    await expect(panel.getByTestId("fiscal-connection-env-test")).toHaveCount(0);
+
+    await panel.getByTestId("fiscal-connection-save").click();
+    await expect(panel.getByTestId("fiscal-connection-user_id")).toHaveAttribute("aria-invalid", "true");
+
+    await panel.getByTestId("fiscal-connection-user_id").fill("kypseli_box");
+    await panel.getByTestId("fiscal-connection-subscription_key").fill("wrong-key");
+    await panel.getByTestId("fiscal-connection-save").click();
+    await expect(panel.getByText("AADE did not accept the key.", { exact: false })).toBeVisible();
+    await expect(panel.getByTestId("fiscal-connection-subscription_key")).toHaveAttribute("aria-invalid", "true");
+
+    await panel.getByTestId("fiscal-connection-subscription_key").fill("right-key");
+    await panel.getByTestId("fiscal-connection-save").click();
+    await expect(panel.getByTestId("fiscal-connection-saved")).toHaveText("Saved. Secrets are not shown again.");
+    expect(saves.at(-1)).toEqual({ environment: "production", user_id: "kypseli_box", subscription_key: "right-key" });
+    // The key is now only «Saved», with «Replace».
+    await expect(panel.getByTestId("fiscal-connection-subscription_key")).toHaveAttribute("data-saved", "true");
+    await expect(panel.getByTestId("fiscal-connection-subscription_key-replace")).toBeVisible();
+
+    await panel.getByTestId("fiscal-connection-check").click();
+    await expect(panel.getByTestId("fiscal-connection-check-result")).toHaveText("The connection works.");
+    await panel.getByRole("button", { name: "Cancel" }).click();
+    await expect(card.getByTestId("fiscal-connection-mydata-status")).toHaveText("Connected");
+  });
+
+  test("shows that the Palee team manages the connections (ADR-273)", async ({ page }) => {
+    await signIn(page);
+    await page.route("**/api/org/box1/admin/fiscal/countries", (route) => route.fulfill(json({ countries: [DE, GR], vat_schemes: ["standard", "small_business", "exempt"] })));
+    await page.route("**/api/org/box1/admin/fiscal/identity", (route) => route.fulfill(json(greekIdentity)));
+    await page.route("**/api/org/box1/admin/fiscal/connections", (route) =>
+      route.fulfill(json(connections({ mydata: { ...MYDATA, updated_by_platform: true, updated_by_name: null } }, { managed_by: "palee" }))),
+    );
+
+    await page.goto("/admin/settings/billing?connection=mydata");
+    await expect(page.getByTestId("fiscal-connections-managed")).toHaveText("The Palee team manages this connection");
+    const panel = page.getByTestId("fiscal-connection-panel-mydata");
+    await expect(panel.getByTestId("fiscal-connection-managed")).toBeVisible();
+    await expect(panel.getByTestId("fiscal-connection-save")).toHaveCount(0);
+    await expect(panel.getByTestId("fiscal-connection-check")).toBeEnabled();
   });
 });
 
