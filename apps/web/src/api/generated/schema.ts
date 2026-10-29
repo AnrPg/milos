@@ -10557,6 +10557,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/class-timers/{slot_id}/screens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box screens this class can be shown on, for its coach */
+        get: operations["PaleeWeb.ClassScreenController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/class-timers/{slot_id}/screens/{screen_id}/override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Pin the class's timer, leaderboard or WOD on a box screen
+         * @description The class's own coach, today, on a screen of the class's branch or the whole box (or staff who manage screens). The TV changes at once.
+         */
+        put: operations["PaleeWeb.ClassScreenController.put_override"];
+        post?: never;
+        /**
+         * Return the screen to automatic from the class's remote
+         * @description A coach may only while the screen shows their class, or nothing pinned.
+         */
+        delete: operations["PaleeWeb.ClassScreenController.delete_override"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/community/channels/{id}/membership": {
         parameters: {
             query?: never;
@@ -22558,6 +22599,58 @@ export interface components {
                 /** Format: uuid */
                 user_id: string;
             }[];
+        };
+        /**
+         * ClassScreenList
+         * @description The box screens the person may change for this class: its coach (today, screens of the class's branch or the whole box) or staff who manage screens
+         */
+        ClassScreenList: {
+            screens: {
+                /** @description Who last changed what the screen shows, and when */
+                focus_changed: {
+                    /** Format: date-time */
+                    at: string;
+                    by: {
+                        /** Format: uuid */
+                        id: string;
+                        name: string | null;
+                    } | null;
+                } | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                /** Format: date-time */
+                last_seen_at: string | null;
+                /**
+                 * Format: uuid
+                 * @description The branch; null for the whole box
+                 */
+                location_id: string | null;
+                name: string;
+                /**
+                 * BoxScreenOverride
+                 * @description What staff pinned on the screen; null when it follows the day automatically
+                 */
+                override: {
+                    /** Format: uuid */
+                    slot_id: string | null;
+                    /** Format: date-time */
+                    until: string | null;
+                    /** @enum {string} */
+                    view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                } | null;
+                paired: boolean;
+                /** Format: date-time */
+                paired_at: string | null;
+                /**
+                 * Format: date-time
+                 * @description When the pending pairing code stops working; null without one
+                 */
+                pairing_expires_at: string | null;
+            }[];
+            /** @description What the person may pin: a coach `timer`, `leaderboard` and `wod` */
+            views: ("wod" | "timer" | "leaderboard" | "bookings" | "class")[];
         };
         /** ClassSlotInjuryWarnings */
         ClassSlotInjuryWarnings: {
@@ -94379,6 +94472,312 @@ export interface operations {
             };
             /** @description Invalid command */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ClassScreenController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Scheduled class ID */
+                slot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Screens of the class */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        screens: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        }[];
+                        /** @description What the person may pin: a coach `timer`, `leaderboard` and `wod` */
+                        views: ("wod" | "timer" | "leaderboard" | "bookings" | "class")[];
+                    };
+                };
+            };
+            /** @description Not this class's coach today */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description No such class */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ClassScreenController.put_override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Scheduled class ID */
+                slot_id: string;
+                screen_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: date-time
+                     * @description When the screen goes back to automatic (within 24 hours); null to keep it
+                     */
+                    until?: string | null;
+                    /** @enum {string} */
+                    view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                };
+            };
+        };
+        responses: {
+            /** @description Box screen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Not this class's coach today */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description No such class or screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Invalid choice */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ClassScreenController.delete_override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Scheduled class ID */
+                slot_id: string;
+                screen_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Box screen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Not this class's coach, or another choice is pinned */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description No such class or screen */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
