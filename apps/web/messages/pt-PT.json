@@ -12329,5 +12329,108 @@
       "too_long": "No máximo 200 caracteres",
       "note_too_long": "No máximo 2000 caracteres"
     }
+  },
+  "PlanView": {
+    "label": "Treino estruturado",
+    "untitledSection": "Secção {letter}",
+    "empty": "Ainda não há nada escrito.",
+    "flow": {
+      "sets": "Séries",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Intervalos",
+      "rest": "Descanso"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "death_by": "Death by",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "hrr": "Recuperação cardíaca (HRR)",
+      "even_odd": "Alternado (ímpar / par)",
+      "ladder": "Escada / pirâmide",
+      "calorie_target": "Objetivo de calorias",
+      "to_failure": "Até à falha",
+      "superset": "Supersérie / série gigante",
+      "interrupt": "Com interrupções"
+    },
+    "params": {
+      "sets": "{sets} séries",
+      "rest": "{time} de descanso",
+      "rounds": "{rounds} rondas",
+      "cap": "limite {time}",
+      "windows": "{count} janelas: {times}",
+      "restBetween": "{time} de descanso entre elas",
+      "every": "a cada {time}",
+      "times": "× {count}",
+      "untilFailure": "até não conseguires acompanhar",
+      "intervals": "{rounds} × {work} de trabalho / {off} de descanso",
+      "intervalsHr": "{rounds} × {work} de trabalho, descanso até a pulsação descer para {bpm}"
+    },
+    "roundWord": {
+      "set": "Série {numbers}",
+      "round": "Ronda {numbers}",
+      "interval": "Intervalo {numbers}",
+      "minute": "Minuto {numbers}"
+    },
+    "struct": {
+      "superset": "Supersérie",
+      "complex": "Complexo",
+      "cluster": "Cluster · {clusters} partes · {intra} de pausa",
+      "drop": "Série descendente · {drops} reduções de {dropby}",
+      "restpause": "Descanso-pausa · {minis} minisséries · {intra} de pausa"
+    },
+    "perSide": "por lado",
+    "rest": "Descanso",
+    "measure": {
+      "pace": "Ritmo {value}",
+      "tempo": "Cadência {value}",
+      "rpe": "RPE {value}",
+      "rir": "RIR {value}",
+      "zone": "Zona de pulsação {value}",
+      "height": "Altura {value}",
+      "dist": "Distância {value}",
+      "hold": "Manter {value}"
+    },
+    "interruptEvery": "A cada {time}, para para",
+    "scoreLine": "Pontuação: {score}",
+    "score": {
+      "best_load": "Carga (melhor série)",
+      "reps": "Repetições",
+      "time": "Tempo",
+      "rounds_reps": "Rondas + rep.",
+      "done": "Concluído",
+      "total_reps": "Repetições (total)",
+      "lowest_round": "Ronda mais baixa",
+      "distance": "Distância"
+    },
+    "levelNotes": "Notas por nível",
+    "sectionNote": "Nota da secção",
+    "exerciseCount": "{count, plural, one {# exercício} other {# exercícios}}",
+    "authoring": {
+      "label": "Como este treino é escrito",
+      "freeText": "Texto livre",
+      "structured": "Estruturado",
+      "toStructuredTitle": "Mudar para estruturado?",
+      "toStructuredBody": "O plano estruturado começa vazio. O teu texto fica como nota da primeira secção, para não se perder nada.",
+      "toTextTitle": "Mudar para texto livre?",
+      "toTextBody": "O plano passa a texto que podes continuar a editar. Fluxos, valores por série e estruturas são escritos como texto e deixam de estar estruturados.",
+      "confirm": "Mudar",
+      "cancel": "Cancelar",
+      "switchFailed": "Não foi possível guardar o treino antes de mudar. Tenta novamente.",
+      "switching": "A guardar…"
+    },
+    "editor": {
+      "planEmpty": "Adiciona pelo menos um exercício ou um descanso antes de publicar.",
+      "fixProblems": "Alguns valores não se leem: corrige as linhas marcadas a vermelho.",
+      "sectionCount": "{count, plural, one {# secção} other {# secções}}"
+    }
   }
 }

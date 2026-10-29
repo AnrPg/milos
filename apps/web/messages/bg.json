@@ -12329,5 +12329,108 @@
       "too_long": "Най-много 200 знака",
       "note_too_long": "Най-много 2000 знака"
     }
+  },
+  "PlanView": {
+    "label": "Структурирана тренировка",
+    "untitledSection": "Раздел {letter}",
+    "empty": "Още няма нищо написано.",
+    "flow": {
+      "sets": "Серии",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Интервали",
+      "rest": "Почивка"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "death_by": "Death by",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "hrr": "Възстановяване на пулса (HRR)",
+      "even_odd": "Редуване (нечетни / четни)",
+      "ladder": "Стълба / пирамида",
+      "calorie_target": "Цел калории",
+      "to_failure": "До отказ",
+      "superset": "Суперсерия / гигантска серия",
+      "interrupt": "С прекъсвания"
+    },
+    "params": {
+      "sets": "{sets} серии",
+      "rest": "{time} почивка",
+      "rounds": "{rounds} рунда",
+      "cap": "лимит {time}",
+      "windows": "{count} прозореца: {times}",
+      "restBetween": "{time} почивка между тях",
+      "every": "на всеки {time}",
+      "times": "× {count}",
+      "untilFailure": "докато не можеш да смогнеш",
+      "intervals": "{rounds} × {work} работа / {off} почивка",
+      "intervalsHr": "{rounds} × {work} работа, почивка докато пулсът падне до {bpm}"
+    },
+    "roundWord": {
+      "set": "Серия {numbers}",
+      "round": "Рунд {numbers}",
+      "interval": "Интервал {numbers}",
+      "minute": "Минута {numbers}"
+    },
+    "struct": {
+      "superset": "Суперсерия",
+      "complex": "Комплекс",
+      "cluster": "Клъстер · {clusters} части · {intra} пауза",
+      "drop": "Дропсет · {drops} намаления с {dropby}",
+      "restpause": "Почивка-пауза · {minis} мини серии · {intra} пауза"
+    },
+    "perSide": "на страна",
+    "rest": "Почивка",
+    "measure": {
+      "pace": "Темпо на разстояние {value}",
+      "tempo": "Темпо на изпълнение {value}",
+      "rpe": "RPE {value}",
+      "rir": "RIR {value}",
+      "zone": "Пулсова зона {value}",
+      "height": "Височина {value}",
+      "dist": "Разстояние {value}",
+      "hold": "Задържане {value}"
+    },
+    "interruptEvery": "На всеки {time} спираш за",
+    "scoreLine": "Резултат: {score}",
+    "score": {
+      "best_load": "Тежест (най-добра серия)",
+      "reps": "Повторения",
+      "time": "Време",
+      "rounds_reps": "Рундове + повторения",
+      "done": "Завършено",
+      "total_reps": "Повторения (общо)",
+      "lowest_round": "Най-слаб рунд",
+      "distance": "Разстояние"
+    },
+    "levelNotes": "Бележки по нива",
+    "sectionNote": "Бележка към раздела",
+    "exerciseCount": "{count, plural, one {# упражнение} other {# упражнения}}",
+    "authoring": {
+      "label": "Как е написана тази тренировка",
+      "freeText": "Свободен текст",
+      "structured": "Структурирано",
+      "toStructuredTitle": "Към структуриран вид?",
+      "toStructuredBody": "Структурираният план започва празен. Текстът ти остава като бележка към първия раздел, така че нищо не се губи.",
+      "toTextTitle": "Към свободен текст?",
+      "toTextBody": "Планът става текст, който можеш да продължиш да редактираш. Схемите, стойностите по серии и структурите се изписват като текст и вече не са структурирани.",
+      "confirm": "Смени",
+      "cancel": "Отказ",
+      "switchFailed": "Тренировката не можа да се запази преди смяната. Опитай пак.",
+      "switching": "Запазване…"
+    },
+    "editor": {
+      "planEmpty": "Добави поне едно упражнение или почивка преди публикуване.",
+      "fixProblems": "Някои стойности не се четат: поправи редовете в червено.",
+      "sectionCount": "{count, plural, one {# раздел} other {# раздела}}"
+    }
   }
 }

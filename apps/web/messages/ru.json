@@ -12329,5 +12329,108 @@
       "too_long": "Не больше 200 символов",
       "note_too_long": "Не больше 2000 символов"
     }
+  },
+  "PlanView": {
+    "label": "Структурированная тренировка",
+    "untitledSection": "Раздел {letter}",
+    "empty": "Пока ничего не написано.",
+    "flow": {
+      "sets": "Подходы",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Интервалы",
+      "rest": "Отдых"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "death_by": "Death by",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "hrr": "Восстановление пульса (HRR)",
+      "even_odd": "Чередование (нечёт / чёт)",
+      "ladder": "Лесенка / пирамида",
+      "calorie_target": "Цель по калориям",
+      "to_failure": "До отказа",
+      "superset": "Суперсет / гигантский сет",
+      "interrupt": "С прерываниями"
+    },
+    "params": {
+      "sets": "подходов: {sets}",
+      "rest": "отдых {time}",
+      "rounds": "раундов: {rounds}",
+      "cap": "лимит {time}",
+      "windows": "окон: {count} — {times}",
+      "restBetween": "отдых {time} между ними",
+      "every": "каждые {time}",
+      "times": "× {count}",
+      "untilFailure": "пока успеваешь",
+      "intervals": "{rounds} × {work} работы / {off} отдыха",
+      "intervalsHr": "{rounds} × {work} работы, отдых, пока пульс не упадёт до {bpm}"
+    },
+    "roundWord": {
+      "set": "Подход {numbers}",
+      "round": "Раунд {numbers}",
+      "interval": "Интервал {numbers}",
+      "minute": "Минута {numbers}"
+    },
+    "struct": {
+      "superset": "Суперсет",
+      "complex": "Комплекс",
+      "cluster": "Кластер · частей: {clusters} · пауза {intra}",
+      "drop": "Дропсет · снижений: {drops}, по {dropby}",
+      "restpause": "Отдых-пауза · мини-подходов: {minis} · пауза {intra}"
+    },
+    "perSide": "на каждую сторону",
+    "rest": "Отдых",
+    "measure": {
+      "pace": "Темп на дистанции {value}",
+      "tempo": "Темп выполнения {value}",
+      "rpe": "RPE {value}",
+      "rir": "RIR {value}",
+      "zone": "Пульсовая зона {value}",
+      "height": "Высота {value}",
+      "dist": "Дистанция {value}",
+      "hold": "Удержание {value}"
+    },
+    "interruptEvery": "Каждые {time} прерывайся на",
+    "scoreLine": "Результат: {score}",
+    "score": {
+      "best_load": "Вес (лучший подход)",
+      "reps": "Повторения",
+      "time": "Время",
+      "rounds_reps": "Раунды + повторения",
+      "done": "Выполнено",
+      "total_reps": "Повторения (всего)",
+      "lowest_round": "Худший раунд",
+      "distance": "Дистанция"
+    },
+    "levelNotes": "Заметки по уровням",
+    "sectionNote": "Заметка к разделу",
+    "exerciseCount": "{count, plural, one {# упражнение} few {# упражнения} many {# упражнений} other {# упражнения}}",
+    "authoring": {
+      "label": "Как написана эта тренировка",
+      "freeText": "Свободный текст",
+      "structured": "Структурированно",
+      "toStructuredTitle": "Перейти на структурированный вид?",
+      "toStructuredBody": "Структурированный план начинается пустым. Твой текст останется заметкой к первому разделу, так что ничего не потеряется.",
+      "toTextTitle": "Перейти на свободный текст?",
+      "toTextBody": "План станет текстом, который можно дальше редактировать. Схемы, значения по подходам и структуры будут записаны текстом и перестанут быть структурированными.",
+      "confirm": "Перейти",
+      "cancel": "Отмена",
+      "switchFailed": "Не удалось сохранить тренировку перед переходом. Попробуй ещё раз.",
+      "switching": "Сохранение…"
+    },
+    "editor": {
+      "planEmpty": "Перед публикацией добавь хотя бы одно упражнение или отдых.",
+      "fixProblems": "Некоторые значения не читаются: исправь строки, отмеченные красным.",
+      "sectionCount": "{count, plural, one {# раздел} few {# раздела} many {# разделов} other {# раздела}}"
+    }
   }
 }

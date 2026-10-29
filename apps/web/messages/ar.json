@@ -12329,5 +12329,108 @@
       "too_long": "200 حرف كحد أقصى",
       "note_too_long": "2000 حرف كحد أقصى"
     }
+  },
+  "PlanView": {
+    "label": "تمرين منظم",
+    "untitledSection": "القسم {letter}",
+    "empty": "لم يُكتب شيء بعد.",
+    "flow": {
+      "sets": "مجموعات",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "فترات",
+      "rest": "راحة"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "death_by": "Death by",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "hrr": "تعافي النبض (HRR)",
+      "even_odd": "بالتناوب (فردي / زوجي)",
+      "ladder": "سلم / هرم",
+      "calorie_target": "هدف السعرات",
+      "to_failure": "حتى الفشل",
+      "superset": "سوبرسِت / مجموعة عملاقة",
+      "interrupt": "مع مقاطعات"
+    },
+    "params": {
+      "sets": "{sets} مجموعات",
+      "rest": "راحة {time}",
+      "rounds": "{rounds} جولات",
+      "cap": "الحد {time}",
+      "windows": "{count} فترات: {times}",
+      "restBetween": "راحة {time} بينها",
+      "every": "كل {time}",
+      "times": "× {count}",
+      "untilFailure": "حتى لا تستطيع المواكبة",
+      "intervals": "{rounds} × {work} عمل / {off} راحة",
+      "intervalsHr": "{rounds} × {work} عمل، راحة حتى ينخفض النبض إلى {bpm}"
+    },
+    "roundWord": {
+      "set": "المجموعة {numbers}",
+      "round": "الجولة {numbers}",
+      "interval": "الفترة {numbers}",
+      "minute": "الدقيقة {numbers}"
+    },
+    "struct": {
+      "superset": "مجموعة مركبة",
+      "complex": "سلسلة متصلة",
+      "cluster": "عنقودية · {clusters} أجزاء · توقف {intra}",
+      "drop": "مجموعة تنازلية · {drops} تخفيضات بمقدار {dropby}",
+      "restpause": "راحة وتوقف · {minis} مجموعات صغيرة · توقف {intra}"
+    },
+    "perSide": "لكل جانب",
+    "rest": "راحة",
+    "measure": {
+      "pace": "الوتيرة {value}",
+      "tempo": "إيقاع التنفيذ {value}",
+      "rpe": "RPE {value}",
+      "rir": "RIR {value}",
+      "zone": "منطقة النبض {value}",
+      "height": "الارتفاع {value}",
+      "dist": "المسافة {value}",
+      "hold": "الثبات {value}"
+    },
+    "interruptEvery": "كل {time} توقف من أجل",
+    "scoreLine": "النتيجة: {score}",
+    "score": {
+      "best_load": "الحمل (أفضل مجموعة)",
+      "reps": "التكرارات",
+      "time": "الوقت",
+      "rounds_reps": "جولات + تكرارات",
+      "done": "مكتمل",
+      "total_reps": "التكرارات (المجموع)",
+      "lowest_round": "أضعف جولة",
+      "distance": "المسافة"
+    },
+    "levelNotes": "ملاحظات حسب المستوى",
+    "sectionNote": "ملاحظة القسم",
+    "exerciseCount": "{count, plural, one {تمرين واحد} other {# تمارين}}",
+    "authoring": {
+      "label": "كيف يُكتب هذا التمرين",
+      "freeText": "نص حر",
+      "structured": "منظم",
+      "toStructuredTitle": "التبديل إلى المنظم؟",
+      "toStructuredBody": "تبدأ الخطة المنظمة فارغة. يبقى نصك ملاحظةً للقسم الأول، فلا يضيع شيء.",
+      "toTextTitle": "التبديل إلى النص الحر؟",
+      "toTextBody": "تصبح الخطة نصًا يمكنك متابعة تعديله. تُكتب الأنماط والقيم لكل مجموعة والبنى نصًا ولا تبقى منظمة.",
+      "confirm": "تبديل",
+      "cancel": "إلغاء",
+      "switchFailed": "تعذّر حفظ التمرين قبل التبديل. حاول مرة أخرى.",
+      "switching": "جارٍ الحفظ…"
+    },
+    "editor": {
+      "planEmpty": "أضف تمرينًا واحدًا على الأقل أو راحة قبل النشر.",
+      "fixProblems": "بعض القيم غير مقروءة: صحّح الصفوف المعلّمة بالأحمر.",
+      "sectionCount": "{count, plural, one {قسم واحد} other {# أقسام}}"
+    }
   }
 }
