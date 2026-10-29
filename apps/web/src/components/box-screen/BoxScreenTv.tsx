@@ -127,9 +127,9 @@ function PairingView({ lost, onPaired }: { lost: boolean; onPaired: (pairing: Bo
             aria-invalid={error ? true : undefined}
             aria-describedby={error ? "tv-code-error" : undefined}
             data-testid="tv-code"
-            className="w-full max-w-[36rem] rounded-2xl px-4 py-3 text-center font-mono font-extrabold uppercase"
+            className="w-full max-w-[46rem] rounded-2xl px-4 py-3 text-center font-mono font-extrabold uppercase"
             style={{
-              fontSize: "clamp(2rem, 7vw, 8rem)",
+              fontSize: "clamp(1.6rem, 5.5vw, 6.5rem)",
               letterSpacing: "0.14em",
               color: "var(--text)",
               background: "var(--panel)",

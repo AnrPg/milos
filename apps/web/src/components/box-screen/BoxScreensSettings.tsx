@@ -194,8 +194,10 @@ function ScreenCard({
           <p className="text-sm" style={{ color: "var(--muted)" }}>
             {screen.location_id ? t("followsBranch", { branch: branchLabel(t, branches, screen.location_id) }) : t("followsBox")}
           </p>
+          <div className="mt-2">
+            {screen.paired ? <Pill tone="success">{t("paired")}</Pill> : pending ? <Pill tone="warning">{t("waiting")}</Pill> : <Pill tone="neutral">{t("notPaired")}</Pill>}
+          </div>
         </div>
-        {screen.paired ? <Pill tone="success">{t("paired")}</Pill> : pending ? <Pill tone="warning">{t("waiting")}</Pill> : <Pill tone="neutral">{t("notPaired")}</Pill>}
         <MoreMenu
           label={t("moreFor", { name: screen.name })}
           testId={`box-screen-more-${screen.id}`}
@@ -207,7 +209,7 @@ function ScreenCard({
       </div>
 
       <div className="flex flex-wrap items-center gap-2 rounded-2xl px-4 py-3" style={{ background: "var(--panel-muted)" }} data-testid="box-screen-focus">
-        <div className="min-w-0 flex-1 text-sm">
+        <div className="min-w-0 basis-full text-sm sm:basis-auto sm:flex-1">
           <span className="font-semibold" style={{ color: "var(--text)" }}>{t("shows")} </span>
           {override ? (
             <span style={{ color: "var(--text)" }}>
