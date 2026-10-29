@@ -103,7 +103,8 @@ defmodule PaleeWeb.Schemas.Payments do
         expires_at: @time,
         succeeded_at: @time,
         next_attempt_at: @time,
-        inserted_at: @time
+        inserted_at: @time,
+        metadata: %Schema{type: :object, additionalProperties: true}
       },
       required: [
         :amount_cents,
@@ -248,6 +249,95 @@ defmodule PaleeWeb.Schemas.Payments do
         decline_card: %Schema{type: :boolean}
       },
       required: [:outcome, :provider_ref]
+    }
+  end
+
+  # ── ADR-248: online sales ───────────────────────────────────────────────
+
+  def public_package do
+    %Schema{
+      type: :object,
+      properties: %{
+        id: @uuid,
+        name: %Schema{type: :string},
+        description: @text,
+        package_type: %Schema{type: :string},
+        billing_period: %Schema{type: :string},
+        base_price_cents: @int,
+        currency: %Schema{type: :string}
+      },
+      required: [:base_price_cents, :billing_period, :currency, :id, :name, :package_type]
+    }
+  end
+
+  def public_packages do
+    %Schema{
+      type: :object,
+      properties: %{
+        packages: %Schema{type: :array, items: public_package()},
+        online_payments: %Schema{type: :boolean},
+        withdrawal_days: %{@int | nullable: true}
+      },
+      required: [:online_payments, :packages, :withdrawal_days]
+    }
+  end
+
+  def package_terms do
+    %Schema{
+      type: :object,
+      properties: %{
+        package: public_package(),
+        available: %Schema{type: :boolean},
+        withdrawal_days: %{@int | nullable: true},
+        start_now_text: @text,
+        consent_text: %Schema{type: :string},
+        consent_version: %Schema{type: :string}
+      },
+      required: [
+        :available,
+        :consent_text,
+        :consent_version,
+        :package,
+        :start_now_text,
+        :withdrawal_days
+      ]
+    }
+  end
+
+  def buy_body do
+    %Schema{
+      type: :object,
+      properties: %{
+        idempotency_key: %Schema{type: :string, minLength: 8, maxLength: 200},
+        save_card: %Schema{type: :boolean},
+        consent_accepted: %Schema{type: :boolean},
+        start_now: %Schema{type: :boolean},
+        language: %Schema{type: :string, enum: ["el", "en"]},
+        book_slot_id: @uuid
+      },
+      required: [:idempotency_key]
+    }
+  end
+
+  def withdrawal do
+    %Schema{
+      type: :object,
+      properties: %{
+        refund: %Schema{type: :object, additionalProperties: true},
+        refunded_cents: @int
+      },
+      required: [:refund, :refunded_cents]
+    }
+  end
+
+  def shop_pay_body do
+    %Schema{
+      type: :object,
+      properties: %{
+        idempotency_key: %Schema{type: :string, minLength: 8, maxLength: 200},
+        language: %Schema{type: :string, enum: ["el", "en"]}
+      },
+      required: [:idempotency_key]
     }
   end
 end

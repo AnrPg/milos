@@ -250,7 +250,14 @@ defmodule PaleeWeb.FallbackController do
     payment_method_expired: {:conflict, "The card has expired"},
     refund_exceeds_payment: {:unprocessable_entity, "More than what is left of the payment"},
     refund_refused: {:conflict, "The payment provider refused the refund"},
-    invoice_not_payable: {:conflict, "This invoice has nothing left to pay"}
+    invoice_not_payable: {:conflict, "This invoice has nothing left to pay"},
+    # ADR-248: online sales and withdrawal.
+    package_not_for_sale: {:conflict, "This package is not sold online"},
+    start_now_consent_required:
+      {:unprocessable_entity, "Ask for the package to start now to buy it online"},
+    withdrawal_period_over: {:conflict, "The 14 days to withdraw have passed"},
+    withdrawal_not_available: {:conflict, "This payment cannot be withdrawn from"},
+    already_withdrawn: {:conflict, "You have already withdrawn from this package"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@payment_errors, reason) do

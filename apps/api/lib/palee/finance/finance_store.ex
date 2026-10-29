@@ -226,6 +226,13 @@ defmodule Palee.Finance.FinanceStore do
     do: adapter().subscriptions_needing_expiry_notice(kind, days)
 
   @impl true
+  def withdrawal_facts(payment_id), do: adapter().withdrawal_facts(payment_id)
+
+  @impl true
+  def withdraw_subscription(subscription_id, today),
+    do: adapter().withdraw_subscription(subscription_id, today)
+
+  @impl true
   def set_subscription_auto_renew(user_id, subscription_id, auto_renew, by),
     do: adapter().set_subscription_auto_renew(user_id, subscription_id, auto_renew, by)
 

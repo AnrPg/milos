@@ -19,6 +19,8 @@ defmodule Palee.Finance.MembershipPackage do
     field :tags, {:array, :string}, default: []
     field :params, :map, default: %{}
     field :active, :boolean, default: true
+    # ADR-248: members can buy it themselves, online.
+    field :sold_online, :boolean, default: false
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -35,7 +37,8 @@ defmodule Palee.Finance.MembershipPackage do
       :currency,
       :tags,
       :params,
-      :active
+      :active,
+      :sold_online
     ])
     |> update_change(:code, &PackageCode.normalize/1)
     |> validate_required([:name, :package_type, :billing_period])
