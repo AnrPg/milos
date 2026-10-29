@@ -39,12 +39,36 @@ export type OneRepMaxLookup = (name: string, exerciseRef: string | null) => numb
 
 export type ActualsOptions = { oneRepMaxKg?: OneRepMaxLookup };
 
-/** The load a step prescribes in kg: written in kg, or a % of a known 1RM. */
+/** A drop set's reduction per drop: "-20%" / "20%" (of the previous drop's load) or "-10kg" / "10" (kg off each drop). */
+export function dropBy(by: string): { unit: "pct" | "kg"; amount: number } | null {
+  const m = /^\s*-?\s*(\d+(?:[.,]\d+)?)\s*(%|kg)?\s*$/i.exec(by);
+  return m ? { unit: m[2] === "%" ? "pct" : "kg", amount: Number(m[1].replace(",", ".")) } : null;
+}
+
+/**
+ * The load a step prescribes in kg: written in kg, or a % of a known 1RM.
+ * A drop set's later parts are lowered by its `dropby` once per drop, as the
+ * API's PlanWorkload counts them: a % compounds (100 kg, -20% → 80, 64), kg
+ * come off each drop (100 kg, -10kg → 90, 80), never below zero; a % load
+ * lowered by kg stays a % only when the 1RM is known.
+ */
 export function prescribedKg(step: RunWork, oneRepMaxKg?: OneRepMaxLookup): { kg: number | null; pct: number | null; oneRm: number | null } {
-  const kg = kgOf(step.values.load);
-  const pct = pctOf(step.values.load);
-  const oneRm = pct != null ? (oneRepMaxKg?.(step.name, step.exerciseRef) ?? null) : null;
-  return { kg: kg ?? (pct != null && oneRm != null ? round2((pct / 100) * oneRm) : null), pct, oneRm };
+  const basePct = pctOf(step.values.load);
+  const oneRm = basePct != null ? (oneRepMaxKg?.(step.name, step.exerciseRef) ?? null) : null;
+  const baseKg = kgOf(step.values.load) ?? (basePct != null && oneRm != null ? round2((basePct / 100) * oneRm) : null);
+  const drops = step.part?.kind === "drop" ? step.part.index : 0;
+  const by = step.part?.kind === "drop" && drops > 0 ? dropBy(step.part.by) : null;
+  if (!by) return { kg: baseKg, pct: basePct, oneRm };
+  if (by.unit === "pct") {
+    const factor = Math.max(0, 1 - by.amount / 100) ** drops;
+    return {
+      kg: baseKg != null ? round2(baseKg * factor) : null,
+      pct: basePct != null ? round2(basePct * factor) : null,
+      oneRm,
+    };
+  }
+  const kg = baseKg != null ? round2(Math.max(0, baseKg - by.amount * drops)) : null;
+  return { kg, pct: basePct != null && kg != null && oneRm ? round2((kg / oneRm) * 100) : null, oneRm };
 }
 
 function record(
