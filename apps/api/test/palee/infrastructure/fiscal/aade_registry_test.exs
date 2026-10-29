@@ -45,6 +45,14 @@ defmodule Palee.Infrastructure.Fiscal.AadeRegistryTest do
     """
   end
 
+  defp flush_requests do
+    receive do
+      {:request, _conn, _body} -> flush_requests()
+    after
+      0 -> :ok
+    end
+  end
+
   defp stub(status, body) do
     test_pid = self()
 
@@ -118,6 +126,7 @@ defmodule Palee.Infrastructure.Fiscal.AadeRegistryTest do
     assert AadeRegistry.lookup(@connection, "090000045", ~D[2027-02-21]) == {:error, :unavailable}
 
     stub(200, @found)
+    flush_requests()
 
     assert AadeRegistry.lookup(%{@connection | subscription_key: nil}, "090000045", ~D[2027-02-21]) ==
              {:error, :credentials_rejected}

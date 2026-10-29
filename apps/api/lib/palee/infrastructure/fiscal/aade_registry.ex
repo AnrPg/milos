@@ -113,7 +113,7 @@ defmodule Palee.Infrastructure.Fiscal.AadeRegistry do
   defp parse(body) do
     {document, _rest} =
       body
-      |> :unicode.characters_to_list()
+      |> :binary.bin_to_list()
       |> :xmerl_scan.string(allow_entities: false, quiet: true, fetch_fun: &no_fetch/2)
 
     case xpath(document, "//*[local-name()='basic_rec']") do
