@@ -449,6 +449,18 @@ Staff screens only (Fiscal). The German and Austrian texts a receipt prints are 
 | Pay with another card | Πληρωμή με άλλη κάρτα | `/me/payments?payment=<id>` | What a member does when a saved-card charge did not go through. | |
 | Sales page | Σελίδα πακέτων | `/b/<slug>/packages` | The box's public page of subscription packages that can be bought online. | Public box page (`/b/<slug>`). |
 
+### 4.19 Privacy and legal (ADR-267)
+
+| English | Ελληνικά | Code | What it is | Not to be confused with |
+|---|---|---|---|---|
+| Privacy policy | Πολιτική απορρήτου | `/privacy` | Palee's public page on what personal data it keeps, why, who processes it, for how long, and the person's rights. | A box's privacy notice the client signs («Έγγραφα», ADR-252). |
+| Terms of use | Όροι χρήσης | `/terms` | Palee's public terms for using the app, including the minimum age and the rules for content. | A box's terms the client signs; purchase terms (Πριν πληρώσεις). |
+| Minimum age | Ελάχιστη ηλικία | `AgePolicy`, `age_confirmed` | 16: the person confirms it at sign-up («Είμαι 16 ετών ή μεγαλύτερος/η»). No date of birth is asked. | Age rating in the stores. |
+| Your data | Τα δεδομένα σου | `/me/settings#your-data` | The Settings section with «Λήψη των δεδομένων μου» and the links to the privacy policy and the terms. | Delete profile or account. |
+| Download my data | Λήψη των δεδομένων μου | `POST /me/data-exports` | One request for a copy of all of the person's own data; ready in the background, with an email when it is. | Journal export («Εξαγωγή», only the journal); accounting export. |
+| Data file | Αρχείο δεδομένων | `personal_data_exports` | The ZIP (JSON files) «Λήψη των δεδομένων μου» makes; downloadable for 7 days, one a day. | Audit archive; a box's tenant export (ADR-117). |
+| Sub-processor | Εκτελών την επεξεργασία | `lib/legal/sub-processors.ts` | A company that processes personal data for Palee (email, hosting, maps, payments…), listed on the privacy policy. | Payment provider (the box's own choice). |
+
 ## 5. Name clashes found, and proposals
 
 Each needs ANR's choice before the UI changes. The recommended option is first.
