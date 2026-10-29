@@ -7433,8 +7433,8 @@ export interface paths {
         /** The Peppol connection (access point, environment, Peppol id; never the key) */
         get: operations["PaleeWeb.AdminFiscalEInvoicingController.connection"];
         /**
-         * Connect to Peppol: sandbox, or Storecove (test or production)
-         * @description `test` and `production` send through Storecove and need the business's legal entity id and API key; a saved key is kept when none is sent. The Peppol id defaults to the `0208` enterprise number of the business. The webhook URL is shown once, when a new token is made. Documents waiting for a connection are sent right after.
+         * Connect to Peppol: sandbox, or fiskaly E-INVOICE (test or production)
+         * @description `test` and `production` send through fiskaly E-INVOICE and need the business's fiskaly E-INVOICE System id (`legal_entity_id`) and an API key and secret; saved ones are kept when none are sent, and without any the business's fiskaly till connection's key and secret are used (one fiskaly account per business). The Peppol id defaults to the `0208` enterprise number of the business. The webhook URL is shown once, when a new token is made. Documents waiting for a connection are sent right after.
          */
         put: operations["PaleeWeb.AdminFiscalEInvoicingController.save_connection"];
         post?: never;
@@ -7489,10 +7489,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The TSE or RKSV connection (provider, environment, unit; never the credentials) */
+        /** The TSE, RKSV or SIGN FR connection (provider, environment, unit; never the credentials) */
         get: operations["PaleeWeb.AdminFiscalTillSigningController.connection"];
         /**
-         * Connect the till to a TSE (DE) or RKSV unit (AT): sandbox or fiskaly
+         * Connect the till to a TSE (DE), RKSV unit (AT) or SIGN FR (FR): sandbox or fiskaly
          * @description `test` and `production` use fiskaly SIGN DE / SIGN AT and need the API key and secret; saved ones are kept when none are sent. A new connection (or `reprovision`) creates and initialises the TSS and client, or the signature unit and cash register. Receipts waiting for a connection are signed right after.
          */
         put: operations["PaleeWeb.AdminFiscalTillSigningController.save_connection"];
@@ -76977,7 +76977,7 @@ export interface operations {
                             /** @enum {string} */
                             tax_system: "vat" | "sales_tax";
                             /** @enum {string} */
-                            till_device: "tse" | "rksv" | "none";
+                            till_device: "tse" | "rksv" | "sign_fr" | "none";
                         }[];
                         vat_schemes: string[];
                     };
@@ -77096,7 +77096,7 @@ export interface operations {
                             till_signature?: {
                                 attempts: number;
                                 /** @enum {string} */
-                                device: "tse" | "rksv";
+                                device: "tse" | "rksv" | "sign_fr";
                                 /** Format: uuid */
                                 document_id?: string | null;
                                 environment?: string | null;
@@ -77286,7 +77286,7 @@ export interface operations {
                                 till_signature?: {
                                     attempts: number;
                                     /** @enum {string} */
-                                    device: "tse" | "rksv";
+                                    device: "tse" | "rksv" | "sign_fr";
                                     /** Format: uuid */
                                     document_id?: string | null;
                                     environment?: string | null;
@@ -77436,7 +77436,7 @@ export interface operations {
                             till_signature?: {
                                 attempts: number;
                                 /** @enum {string} */
-                                device: "tse" | "rksv";
+                                device: "tse" | "rksv" | "sign_fr";
                                 /** Format: uuid */
                                 document_id?: string | null;
                                 environment?: string | null;
@@ -77627,7 +77627,7 @@ export interface operations {
                             till_signature?: {
                                 attempts: number;
                                 /** @enum {string} */
-                                device: "tse" | "rksv";
+                                device: "tse" | "rksv" | "sign_fr";
                                 /** Format: uuid */
                                 document_id?: string | null;
                                 environment?: string | null;
@@ -77795,7 +77795,7 @@ export interface operations {
                             till_signature?: {
                                 attempts: number;
                                 /** @enum {string} */
-                                device: "tse" | "rksv";
+                                device: "tse" | "rksv" | "sign_fr";
                                 /** Format: uuid */
                                 document_id?: string | null;
                                 environment?: string | null;
@@ -78320,7 +78320,7 @@ export interface operations {
                             /** @enum {string} */
                             tax_system: "vat" | "sales_tax";
                             /** @enum {string} */
-                            till_device: "tse" | "rksv" | "none";
+                            till_device: "tse" | "rksv" | "sign_fr" | "none";
                         } | null;
                     };
                 };
@@ -78417,7 +78417,7 @@ export interface operations {
                             /** @enum {string} */
                             tax_system: "vat" | "sales_tax";
                             /** @enum {string} */
-                            till_device: "tse" | "rksv" | "none";
+                            till_device: "tse" | "rksv" | "sign_fr" | "none";
                         } | null;
                     };
                 };
@@ -78468,20 +78468,27 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The Peppol connection; the API key and the webhook token are never returned (`webhook_url` appears once, when a new token is made). */
+                        /** @description The Peppol connection; the API key, secret and webhook token are never returned (`webhook_url` appears once, when a new token is made). `storecove` is a retired provider of old connections: they show as invalid until reconnected. */
                         connection: {
+                            /**
+                             * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
+                             * @enum {string}
+                             */
+                            credentials_source: "own" | "till_connection" | "none";
                             /** @enum {string} */
                             environment: "sandbox" | "test" | "production";
                             has_api_key: boolean;
+                            has_api_secret: boolean;
                             has_webhook_token: boolean;
                             last_error?: string | null;
+                            /** @description fiskaly: the business's E-INVOICE System id. */
                             legal_entity_id?: string | null;
                             /** @enum {string} */
                             network: "peppol";
                             /** @example 0208:0123456749 */
                             peppol_id: string;
                             /** @enum {string} */
-                            provider: "sandbox" | "storecove";
+                            provider: "sandbox" | "fiskaly" | "storecove";
                             /** @enum {string} */
                             status: "active" | "invalid";
                             /** Format: date-time */
@@ -78504,13 +78511,21 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    /** @description Leave out to keep the saved key. */
+                    /** @description Leave out to keep the saved key, or (fiskaly) to use the fiskaly till connection's key and secret. */
                     api_key?: string | null;
+                    /** @description Leave out to keep the saved secret. */
+                    api_secret?: string | null;
                     /** @enum {string} */
                     environment: "sandbox" | "test" | "production";
+                    /** @description fiskaly: the business's E-INVOICE System id. */
                     legal_entity_id?: string | null;
                     /** @description `scheme:identifier`; defaults to `0208:` + the enterprise number. */
                     peppol_id?: string | null;
+                    /**
+                     * @description Access point outside the sandbox; defaults to `fiskaly`.
+                     * @enum {string}
+                     */
+                    provider?: "fiskaly";
                     rotate_webhook_token?: boolean;
                 };
             };
@@ -78523,20 +78538,27 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The Peppol connection; the API key and the webhook token are never returned (`webhook_url` appears once, when a new token is made). */
+                        /** @description The Peppol connection; the API key, secret and webhook token are never returned (`webhook_url` appears once, when a new token is made). `storecove` is a retired provider of old connections: they show as invalid until reconnected. */
                         connection: {
+                            /**
+                             * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
+                             * @enum {string}
+                             */
+                            credentials_source: "own" | "till_connection" | "none";
                             /** @enum {string} */
                             environment: "sandbox" | "test" | "production";
                             has_api_key: boolean;
+                            has_api_secret: boolean;
                             has_webhook_token: boolean;
                             last_error?: string | null;
+                            /** @description fiskaly: the business's E-INVOICE System id. */
                             legal_entity_id?: string | null;
                             /** @enum {string} */
                             network: "peppol";
                             /** @example 0208:0123456749 */
                             peppol_id: string;
                             /** @enum {string} */
-                            provider: "sandbox" | "storecove";
+                            provider: "sandbox" | "fiskaly" | "storecove";
                             /** @enum {string} */
                             status: "active" | "invalid";
                             /** Format: date-time */
@@ -78655,7 +78677,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                device: "tse" | "rksv";
+                device: "tse" | "rksv" | "sign_fr";
             };
             cookie?: never;
         };
@@ -78668,10 +78690,10 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The TSE or RKSV connection; key, secret and admin PIN are never returned. */
+                        /** @description The TSE, RKSV or SIGN FR connection; key, secret and admin PIN are never returned. */
                         connection: {
                             /** @enum {string} */
-                            device: "tse" | "rksv";
+                            device: "tse" | "rksv" | "sign_fr";
                             /** @enum {string} */
                             environment: "sandbox" | "test" | "production";
                             has_api_key: boolean;
@@ -78704,7 +78726,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                device: "tse" | "rksv";
+                device: "tse" | "rksv" | "sign_fr";
             };
             cookie?: never;
         };
@@ -78728,10 +78750,10 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The TSE or RKSV connection; key, secret and admin PIN are never returned. */
+                        /** @description The TSE, RKSV or SIGN FR connection; key, secret and admin PIN are never returned. */
                         connection: {
                             /** @enum {string} */
-                            device: "tse" | "rksv";
+                            device: "tse" | "rksv" | "sign_fr";
                             /** @enum {string} */
                             environment: "sandbox" | "test" | "production";
                             has_api_key: boolean;
@@ -78762,7 +78784,7 @@ export interface operations {
         parameters: {
             query?: {
                 status?: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
-                device?: "tse" | "rksv";
+                device?: "tse" | "rksv" | "sign_fr";
                 limit?: number;
                 offset?: number;
             };
@@ -78785,7 +78807,7 @@ export interface operations {
                         signatures: {
                             attempts: number;
                             /** @enum {string} */
-                            device: "tse" | "rksv";
+                            device: "tse" | "rksv" | "sign_fr";
                             /** Format: uuid */
                             document_id?: string | null;
                             environment?: string | null;
@@ -78853,7 +78875,7 @@ export interface operations {
                         signature: {
                             attempts: number;
                             /** @enum {string} */
-                            device: "tse" | "rksv";
+                            device: "tse" | "rksv" | "sign_fr";
                             /** Format: uuid */
                             document_id?: string | null;
                             environment?: string | null;
@@ -78935,7 +78957,7 @@ export interface operations {
                                 started_at: string;
                             }[];
                             /** @enum {string} */
-                            device: "tse" | "rksv";
+                            device: "tse" | "rksv" | "sign_fr";
                             /** Format: uuid */
                             document_id?: string | null;
                             environment?: string | null;
@@ -79004,7 +79026,7 @@ export interface operations {
                         signature: {
                             attempts: number;
                             /** @enum {string} */
-                            device: "tse" | "rksv";
+                            device: "tse" | "rksv" | "sign_fr";
                             /** Format: uuid */
                             document_id?: string | null;
                             environment?: string | null;

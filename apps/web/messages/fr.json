@@ -12279,6 +12279,8 @@
       "tseHint": "Nécessaire seulement pour les paiements en caisse. Nous le connectons avec fiskaly lors d'une étape ultérieure.",
       "rksvTitle": "Dispositif de sécurité de caisse (RKSV)",
       "rksvHint": "Nécessaire seulement pour les paiements en caisse. Nous le connectons lors d'une étape ultérieure.",
+      "signFrTitle": "Dispositif de sécurité de caisse (fiskaly SIGN FR)",
+      "signFrHint": "Nécessaire seulement pour les paiements en caisse. Nous le connectons avec fiskaly lors d'une étape ultérieure. Le registre inaltérable est déjà actif.",
       "nf525Title": "Attestation NF525",
       "nf525Hint": "Le registre inaltérable est déjà actif. Palee fournit l'attestation de l'éditeur."
     },

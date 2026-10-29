@@ -12279,6 +12279,8 @@
       "tseHint": "Needed only for payments at the till. We connect it with fiskaly in a later step.",
       "rksvTitle": "Till security device (RKSV)",
       "rksvHint": "Needed only for payments at the till. We connect it in a later step.",
+      "signFrTitle": "Till security device (fiskaly SIGN FR)",
+      "signFrHint": "Needed only for payments at the till. We connect it with fiskaly in a later step. The inalterable register is already active.",
       "nf525Title": "NF525 attestation",
       "nf525Hint": "The inalterable register is already active. Palee provides the publisher's attestation."
     },

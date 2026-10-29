@@ -12279,6 +12279,8 @@
       "tseHint": "Solo hace falta para los cobros en caja. Lo conectamos con fiskaly en un paso posterior.",
       "rksvTitle": "Dispositivo de seguridad de caja (RKSV)",
       "rksvHint": "Solo hace falta para los cobros en caja. Lo conectamos en un paso posterior.",
+      "signFrTitle": "Dispositivo de seguridad de caja (fiskaly SIGN FR)",
+      "signFrHint": "Solo hace falta para los cobros en caja. Lo conectamos con fiskaly en un paso posterior. El registro inalterable ya está activo.",
       "nf525Title": "Certificación NF525",
       "nf525Hint": "El registro inalterable ya está activo. Palee aporta la certificación del editor."
     },
