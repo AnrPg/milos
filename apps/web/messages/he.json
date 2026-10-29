@@ -12335,6 +12335,134 @@
       }
     }
   },
+  "FiscalConnections": {
+    "title": "חיבורים",
+    "intro": "מה שהחוק דורש במדינה «{country}». המסמכים מונפקים כרגיל וממתינים עד שתתחבר.",
+    "noneTitle": "אין צורך בחיבור",
+    "noneHint": "המדינה «{country}» לא דורשת דיווח לרשות מס ולא התקן אבטחה לקופה.",
+    "managedByPalee": "את החיבור הזה מנהל צוות Palee",
+    "managedByPaleeHint": "אפשר לראות את המצב וללחוץ «בדיקת חיבור». לשינויים, כתוב לצוות Palee.",
+    "loadFailed": "החיבורים לא נטענו. נסה שוב בעוד רגע.",
+    "registryName": "מרשם AADE",
+    "aade": "AADE",
+    "description": {
+      "mydata": "כל מסמך מדווח ל-AADE",
+      "registry": "עבור «מילוי לפי מספר העוסק» · לא חובה",
+      "tse": "התקן אבטחה לקופה (TSE)",
+      "rksv": "התקן אבטחה לקופה (RKSV)",
+      "sign_fr": "חותם ומארכב כל קבלה מהקופה",
+      "peppol": "חשבוניות אלקטרוניות דרך Peppol"
+    },
+    "status": {
+      "active": "מחובר",
+      "invalid": "צריך בדיקה",
+      "provisioning": "בהכנה",
+      "none": "לא מחובר"
+    },
+    "updated": "עודכן {date} · {name}",
+    "updatedAt": "עודכן {date}",
+    "updatedByPalee": "עודכן {date} · צוות Palee",
+    "checkedAt": "נבדק לאחרונה {date}",
+    "help": {
+      "mydata": "מקבלים אותם ב-TAXISnet: myDATA › הרשמה ל-myDATA REST API. זו לא הסיסמה שלך ל-TAXISnet.",
+      "registry": "«פרטי הגישה המיוחדים» ש-AADE נותנת לשירות החיפוש במרשם (RgWsPublic2). לא הסיסמה ל-TAXISnet ולא המפתח של myDATA.",
+      "fiskaly": "חשבון fiskaly אחד לכל ה-box. את המפתח יוצרים ב-fiskaly HUB, ב-UNIT של ה-box.",
+      "peppol": "חשבון fiskaly אחד לכל ה-box. את ה-E-INVOICE System ואת ההרשמה ל-Peppol מגדירים פעם אחת ב-fiskaly HUB."
+    },
+    "field": {
+      "user_id": "שם משתמש myDATA",
+      "username": "שם משתמש",
+      "subscription_key": "מפתח מינוי (subscription key)",
+      "password": "סיסמה",
+      "api_key": "מפתח API",
+      "api_secret": "סוד API",
+      "legal_entity_id": "מזהה E-INVOICE System",
+      "peppol_id": "כתובת Peppol",
+      "environment": "סביבה"
+    },
+    "placeholder": {
+      "user_id": "לדוגמה kypseli_box",
+      "username": "שם משתמש מיוחד",
+      "legal_entity_id": "מתוך fiskaly HUB"
+    },
+    "fieldHint": {
+      "api_key": "מפתח של UNIT. אחרי השמירה הוא לא מוצג שוב.",
+      "peppol_id": "לפי מספר העסק (KBO). שנה רק אם רואה החשבון אומר לך."
+    },
+    "secret": {
+      "saved": "נשמר",
+      "replace": "החלפה",
+      "cancelReplace": "ביטול",
+      "savedHint": "לא מוצג שוב. כדי לשנות, לחץ «החלפה».",
+      "newHint": "אחרי השמירה לא מוצג שוב.",
+      "paste": "הדבק כאן",
+      "newValue": "ערך חדש"
+    },
+    "advanced": "מתקדם",
+    "environment": {
+      "production": "ייצור",
+      "test": "בדיקה",
+      "testAade": "בדיקת AADE",
+      "testHint": "«בדיקה» נועדה לנסות לפני שמתחילים: מה שנשלח לשם לא נחשב."
+    },
+    "device": {
+      "unit": "התקן {device}",
+      "taxpayer": "נישום (fiskaly)",
+      "register": "קופה",
+      "since": "בשימוש מאז"
+    },
+    "reprovision": {
+      "title": "התקן {device} חדש",
+      "hint": "רק אם התמיכה מבקשת. הקבלות הבאות ייחתמו בהתקן חדש.",
+      "action": "התקן חדש",
+      "confirm": "לחץ שוב לאישור"
+    },
+    "check": {
+      "action": "בדיקת חיבור",
+      "running": "בודקים…",
+      "needsSave": "שמור קודם את החיבור.",
+      "registryHint": "מחפש את מספר העוסק שלך · נספר במכסה של AADE",
+      "ok": "החיבור עובד.",
+      "okRegistry": "AADE מצאה את {taxId}: {name}",
+      "unreachable": "הבדיקה לא התאפשרה עכשיו והחיבור לא השתנה. ננסה שוב בקרוב."
+    },
+    "saved": "נשמר. הסודות לא מוצגים שוב.",
+    "savedUnchecked": "נשמר. הסודות לא מוצגים שוב. הבדיקה לא התאפשרה עכשיו; ננסה שוב בקרוב.",
+    "waiting": "המסמכים ממתינים ונשלחים ברגע שזה מתוקן.",
+    "save": "שמירה",
+    "saving": "שומרים…",
+    "cancel": "ביטול",
+    "close": "סגירה",
+    "error": {
+      "credentials_rejected_aade": "AADE לא קיבלה את המפתח. העתק אותו שוב מדף ההרשמה ב-myDATA.",
+      "credentials_rejected_registry": "AADE לא קיבלה את פרטי הגישה המיוחדים. בדוק את שם המשתמש והסיסמה.",
+      "credentials_rejected_fiskaly": "fiskaly לא קיבלה את המפתח הזה. ודא שזה מפתח UNIT לסביבה הנכונה.",
+      "credentials_missing": "חסרים פרטי החיבור. מלא אותם ולחץ «שמירה».",
+      "unit_not_found": "fiskaly לא מוצאת את ההתקן של ה-box. כתוב לתמיכה או צור התקן חדש תחת מתקדם.",
+      "unit_not_ready": "ההתקן ב-fiskaly עוד לא מוכן. נסה שוב בעוד כמה דקות.",
+      "system_not_found": "fiskaly לא מוצאת את ה-E-INVOICE System הזה. בדוק אותו ב-fiskaly HUB.",
+      "tax_id_missing": "חסר מספר העוסק של העסק, לכן הבדיקה לא נעשתה. הוסף אותו בפרטי החיוב.",
+      "tax_id_not_found": "AADE לא מוצאת את מספר העוסק של העסק. בדוק אותו בפרטי החיוב.",
+      "siren_missing": "חסר ה-SIREN של העסק. הוסף אותו בפרטי החיוב ולחץ שוב «שמירה».",
+      "limit_reached": "AADE לא מקבלת חיפושים נוספים כרגע. נסה שוב מאוחר יותר.",
+      "unreachable": "הספק לא ענה. ננסה שוב בקרוב.",
+      "provisioning_failed": "לא ניתן היה להכין את ההתקן ב-fiskaly. לחץ שוב «שמירה» או כתוב לתמיכה.",
+      "provider_retired": "הספק הזה כבר לא נתמך. מלא את פרטי fiskaly ולחץ «שמירה».",
+      "invalid_peppol_id": "זו לא כתובת Peppol תקינה. כתוב אותה כ-סכמה:מספר, לדוגמה 0208:0123456749.",
+      "managed_by_palee": "את החיבור הזה מנהל צוות Palee. לשינויים, כתוב לצוות Palee.",
+      "check_too_soon": "החיבור נבדק זה עתה. נסה שוב בעוד כמה דקות.",
+      "generic": "החיבור צריך בדיקה."
+    },
+    "platform": {
+      "open": "חיבורי מס",
+      "title": "חיבורי מס · {name}",
+      "managedBy": "מי מנהל אותם",
+      "owner": "הבעלים",
+      "palee": "צוות Palee",
+      "managedHint": "כשצוות Palee מנהל אותם, הבעלים רואה אותם אבל לא יכול לשנות. כל שינוי נרשם בלי הסודות.",
+      "empty": "המדינה של ה-box לא דורשת חיבורים, או שעדיין לא נבחרה."
+    }
+  },
   "FiscalDocuments": {
     "tab": "מסמכים פיסקליים",
     "loading": "טוען…",

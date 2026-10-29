@@ -12335,6 +12335,134 @@
       }
     }
   },
+  "FiscalConnections": {
+    "title": "Koppelingen",
+    "intro": "Wat de wet in {country} vraagt. Documenten worden gewoon uitgegeven en wachten tot je gekoppeld bent.",
+    "noneTitle": "Geen koppeling nodig",
+    "noneHint": "{country} vraagt geen melding aan een belastingdienst en geen kassabeveiligingsapparaat.",
+    "managedByPalee": "Deze koppeling wordt beheerd door het Palee-team",
+    "managedByPaleeHint": "Je ziet de status en kunt „Verbindingstest” starten. Voor wijzigingen schrijf je het Palee-team.",
+    "loadFailed": "De koppelingen zijn niet geladen. Probeer het zo opnieuw.",
+    "registryName": "AADE-register",
+    "aade": "AADE",
+    "description": {
+      "mydata": "Elk document wordt aan de AADE gemeld",
+      "registry": "Voor „Invullen vanuit het fiscaal nummer” · optioneel",
+      "tse": "Kassabeveiligingsapparaat (TSE)",
+      "rksv": "Kassabeveiligingsapparaat (RKSV)",
+      "sign_fr": "Ondertekent en archiveert elk kassabon",
+      "peppol": "Elektronische facturen via Peppol"
+    },
+    "status": {
+      "active": "Gekoppeld",
+      "invalid": "Controleren",
+      "provisioning": "Wordt ingericht",
+      "none": "Niet gekoppeld"
+    },
+    "updated": "Bijgewerkt {date} · {name}",
+    "updatedAt": "Bijgewerkt {date}",
+    "updatedByPalee": "Bijgewerkt {date} · Palee-team",
+    "checkedAt": "Laatst gecontroleerd {date}",
+    "help": {
+      "mydata": "Je krijgt ze in TAXISnet: myDATA › Registratie voor de myDATA REST API. Het is niet je TAXISnet-wachtwoord.",
+      "registry": "De „speciale inloggegevens” die de AADE geeft voor haar registeropzoekdienst (RgWsPublic2). Niet je TAXISnet-wachtwoord, niet de myDATA-sleutel.",
+      "fiskaly": "Eén fiskaly-account voor de hele box. De sleutel maak je in de fiskaly HUB, in de UNIT van de box.",
+      "peppol": "Eén fiskaly-account voor de hele box. Het E-INVOICE System en de Peppol-registratie stel je één keer in de fiskaly HUB in."
+    },
+    "field": {
+      "user_id": "myDATA-gebruikersnaam",
+      "username": "Gebruikersnaam",
+      "subscription_key": "Abonnementssleutel (subscription key)",
+      "password": "Wachtwoord",
+      "api_key": "API-sleutel",
+      "api_secret": "API-geheim",
+      "legal_entity_id": "ID van het E-INVOICE System",
+      "peppol_id": "Peppol-adres",
+      "environment": "Omgeving"
+    },
+    "placeholder": {
+      "user_id": "bijv. kypseli_box",
+      "username": "Speciale gebruikersnaam",
+      "legal_entity_id": "Uit de fiskaly HUB"
+    },
+    "fieldHint": {
+      "api_key": "Een UNIT-sleutel. Na het opslaan wordt hij niet meer getoond.",
+      "peppol_id": "Uit het ondernemingsnummer (KBO). Wijzig het alleen als je boekhouder dat zegt."
+    },
+    "secret": {
+      "saved": "Opgeslagen",
+      "replace": "Vervangen",
+      "cancelReplace": "Annuleren",
+      "savedHint": "Wordt niet meer getoond. Druk op „Vervangen” om het te wijzigen.",
+      "newHint": "Na het opslaan wordt het niet meer getoond.",
+      "paste": "Plak het hier",
+      "newValue": "Nieuwe waarde"
+    },
+    "advanced": "Geavanceerd",
+    "environment": {
+      "production": "Productie",
+      "test": "Test",
+      "testAade": "AADE-test",
+      "testHint": "„Test” is om te proberen voor je begint: wat daarheen gaat, telt niet."
+    },
+    "device": {
+      "unit": "Apparaat {device}",
+      "taxpayer": "Belastingplichtige (fiskaly)",
+      "register": "Kassa",
+      "since": "In gebruik sinds"
+    },
+    "reprovision": {
+      "title": "Nieuw apparaat {device}",
+      "hint": "Alleen als support daarom vraagt. De volgende bonnen worden door een nieuw apparaat ondertekend.",
+      "action": "Nieuw apparaat",
+      "confirm": "Druk nogmaals om te bevestigen"
+    },
+    "check": {
+      "action": "Verbindingstest",
+      "running": "Bezig met testen…",
+      "needsSave": "Sla eerst de koppeling op.",
+      "registryHint": "Zoekt je eigen fiscaal nummer op · telt mee voor de AADE-limiet",
+      "ok": "De koppeling werkt.",
+      "okRegistry": "De AADE vond {taxId}: {name}",
+      "unreachable": "De test kon nu niet en de koppeling is niet veranderd. We proberen het snel opnieuw."
+    },
+    "saved": "Opgeslagen. Geheimen worden niet meer getoond.",
+    "savedUnchecked": "Opgeslagen. Geheimen worden niet meer getoond. De test kon nu niet; we proberen het snel opnieuw.",
+    "waiting": "Documenten wachten en worden verstuurd zodra het is opgelost.",
+    "save": "Opslaan",
+    "saving": "Opslaan…",
+    "cancel": "Annuleren",
+    "close": "Sluiten",
+    "error": {
+      "credentials_rejected_aade": "De AADE heeft de sleutel niet aanvaard. Kopieer hem opnieuw van de myDATA-registratiepagina.",
+      "credentials_rejected_registry": "De AADE heeft de speciale inloggegevens niet aanvaard. Controleer gebruikersnaam en wachtwoord.",
+      "credentials_rejected_fiskaly": "fiskaly heeft deze sleutel niet aanvaard. Controleer of het een UNIT-sleutel voor de juiste omgeving is.",
+      "credentials_missing": "De koppelgegevens ontbreken. Vul ze in en druk op „Opslaan”.",
+      "unit_not_found": "fiskaly vindt het apparaat van de box niet. Schrijf support of maak onder Geavanceerd een nieuw apparaat.",
+      "unit_not_ready": "Het apparaat bij fiskaly is nog niet klaar. Probeer het over een paar minuten opnieuw.",
+      "system_not_found": "fiskaly vindt dit E-INVOICE System niet. Controleer het in de fiskaly HUB.",
+      "tax_id_missing": "Het fiscaal nummer van het bedrijf ontbreekt, dus de test liep niet. Vul het in bij de factuurgegevens.",
+      "tax_id_not_found": "De AADE vindt het fiscaal nummer van het bedrijf niet. Controleer het bij de factuurgegevens.",
+      "siren_missing": "Het SIREN-nummer van het bedrijf ontbreekt. Vul het in bij de factuurgegevens en druk opnieuw op „Opslaan”.",
+      "limit_reached": "De AADE aanvaardt voorlopig geen opzoekingen meer. Probeer het later opnieuw.",
+      "unreachable": "De aanbieder antwoordde niet. We proberen het snel opnieuw.",
+      "provisioning_failed": "Het apparaat kon bij fiskaly niet worden ingericht. Druk opnieuw op „Opslaan” of schrijf support.",
+      "provider_retired": "Deze aanbieder wordt niet meer ondersteund. Vul de fiskaly-gegevens in en druk op „Opslaan”.",
+      "invalid_peppol_id": "Dit is geen geldig Peppol-adres. Schrijf het als schema:nummer, bijv. 0208:0123456749.",
+      "managed_by_palee": "Deze koppeling wordt beheerd door het Palee-team. Voor wijzigingen schrijf je het Palee-team.",
+      "check_too_soon": "De koppeling is net gecontroleerd. Probeer het over een paar minuten opnieuw.",
+      "generic": "De koppeling moet gecontroleerd worden."
+    },
+    "platform": {
+      "open": "Fiscale koppelingen",
+      "title": "Fiscale koppelingen · {name}",
+      "managedBy": "Wie ze beheert",
+      "owner": "De eigenaar",
+      "palee": "Het Palee-team",
+      "managedHint": "Als het Palee-team ze beheert, ziet de eigenaar ze maar kan hij ze niet wijzigen. Elke wijziging wordt vastgelegd, zonder de geheimen.",
+      "empty": "Het land van de box vraagt geen koppelingen, of er is nog geen land gekozen."
+    }
+  },
   "FiscalDocuments": {
     "tab": "Documenten",
     "loading": "Laden…",
