@@ -176,13 +176,34 @@ Sources:
   transaction's `tid`/`transactionId` (V3-M3); passing AADE provider
   signature fields to the Terminal app waits for the provider adapter.
 - A business on Stripe cannot take Tap to Pay in Palee yet.
+- Tips and surcharges turned on in the Terminal app make Viva's amount
+  differ from the request, which Palee refuses (`amount_mismatch`, money
+  not recorded, shown to staff): boxes keep both off, or a later change
+  accepts `tipAmount`/`surchargeAmount` on top of the amount.
+- Without a working Viva account (credentials refused, outage), results
+  stay `terminal_unconfirmed` for staff; nothing is recorded on the
+  phone's word.
 
 ## Implementation Notes
 - Migration `20270206000000_terminal_payments` widens the intent checks
   (`initiation` `terminal`, purpose `free_sale`) and the Finance method
   checks (`card_terminal`).
+- New: `Payments.Terminal`, `Payments.Domain.TerminalPolicy`,
+  `Payments.Ports.TerminalGateway`, `VivaTerminalGateway`,
+  `SandboxTerminalGateway`, `Application.Payments.TerminalPayments` and
+  `TerminalFulfilment`, `AdminTerminalPaymentsController`
+  (`/admin/payments/terminal`: `availability`, create, `result`, show,
+  `cancel`, `sandbox-complete` in dev/test), config `:payment_terminals`
+  and `:payment_terminal_app` (`app_id`, `callback`), and the optional
+  `:payment_terminal_secret` (else derived from the endpoint secret).
 - Existing payments files touched (additive): `payments.ex` (worker branch
   for terminal intents, webhook lookup by reference), `viva_gateway.ex`
   (`reference`/`created_at` in `fetch_payment`, `reference` in webhook
   events), `finance_fulfilment.ex` (terminal intents delegate to
-  `TerminalFulfilment`).
+  `TerminalFulfilment`), `schemas/payments.ex` (`initiation` enum).
+- The lookup of a lost result searches the UTC day of the request and the
+  day three hours later (Viva's day is the merchant's).
+- Phone side: `apps/web/src/lib/platform/viva-terminal.ts` (types, URL
+  building, callback parsing, capability `tapToPay`) and the native
+  `PaleeVivaTerminalPlugin` (Kotlin, Swift) with the `palee-terminal`
+  callback scheme and the `vivapayclient` query scheme declared.
