@@ -10,6 +10,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { Select } from "@/components/ui/Select";
 import { SPARK_GO_STYLE } from "@/lib/spark";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { clockFormat } from "@/lib/clock";
 
 /**
  * Open-gym self check-in (ADR-097). Renders nothing unless the member's
@@ -70,7 +71,7 @@ export function OpenGymCheckIn({
   }
 
   const checkedInTime = checkIn
-    ? new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" }).format(new Date(checkIn.checked_in_at))
+    ? clockFormat(locale, { hour: "numeric", minute: "2-digit" }).format(new Date(checkIn.checked_in_at))
     : null;
 
   return (

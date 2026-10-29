@@ -28,6 +28,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { clockFormat } from "@/lib/clock";
 
 type CriteriaType = SaveChallengePayload["criteria_type"];
 
@@ -918,7 +919,7 @@ export function AdminChallenges() {
                                 style={{ color: participant.completed_at ? "var(--success)" : "var(--muted)" }}
                               >
                                 {participant.completed_at
-                                  ? new Intl.DateTimeFormat(uiLocale, {
+                                  ? clockFormat(uiLocale, {
                                       month: "short",
                                       day: "numeric",
                                       hour: "numeric",

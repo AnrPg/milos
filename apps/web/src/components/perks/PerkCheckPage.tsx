@@ -9,6 +9,7 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 import { PerkLogo } from "./PerkRows";
 import { usePerkCheck, useRedeemPerkCheck } from "./use-perks";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { formatClock } from "@/lib/clock";
 
 function errorKey(error: unknown) {
   const code = error instanceof ApiError ? error.payload.code : null;
@@ -44,7 +45,7 @@ export function PerkCheckPage({ token }: { token: string }) {
           {data.member_first_name ? <p className="text-sm font-semibold" style={{ color: "var(--text-soft)" }}>{t("check.member", { name: data.member_first_name })}</p> : null}
           <p role="status" className="rounded-full px-4 py-1.5 text-base font-extrabold" style={{ background: `color-mix(in srgb, ${tone} 16%, var(--panel))`, color: tone }} data-testid="perk-check-status">
             {data.status === "used" && data.used_at
-              ? t("check.usedAt", { date: new Date(data.used_at).toLocaleString(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) })
+              ? t("check.usedAt", { date: formatClock(new Date(data.used_at), locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) })
               : t(`check.status_${data.status}`)}
           </p>
           {data.perk.valid_until ? <p className="text-xs" style={{ color: "var(--dim)" }}>{t("until", { date: formatDate(locale, data.perk.valid_until) })}</p> : null}

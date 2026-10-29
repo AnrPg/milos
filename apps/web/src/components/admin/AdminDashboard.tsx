@@ -35,6 +35,7 @@ import {
   type IconName,
   type TimelineEntry,
 } from "@/components/admin/DashboardWidgets";
+import { clockFormat } from "@/lib/clock";
 
 type AlertCategory = "finance" | "coaching" | "training";
 
@@ -359,7 +360,7 @@ export function AdminDashboard({
     ? classesCoachedToday(slots as Array<(typeof slots)[number] & { coach_user_id?: string | null }>, currentUser?.id, now)
     : slots.filter((slot) => new Date(slot.scheduled_at).toDateString() === now.toDateString())
   ).sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at));
-  const timeFormat = new Intl.DateTimeFormat(uiLocale, { timeStyle: "short" });
+  const timeFormat = clockFormat(uiLocale, { timeStyle: "short" });
   const timeline: TimelineEntry[] = todaySlots.map((slot) => ({
     id: slot.id,
     time: timeFormat.format(new Date(slot.scheduled_at)),

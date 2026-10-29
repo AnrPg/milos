@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import { useSession } from "@/components/session-provider";
 import { geofenceSupported, syncGeofences, type ReminderWords } from "@/lib/platform/geofence";
 import { syncWidgets, widgetsSupported, type WidgetLabels } from "@/lib/platform/widgets";
+import { clockFormat } from "@/lib/clock";
 
 type Removable = { remove: () => Promise<void> };
 
@@ -39,7 +40,7 @@ function words(t: Translate, locale: string): { labels: WidgetLabels; reminder: 
       title: t("reminderTitle", { box }),
       body: className ? t("reminderBody", { className, time }) : t("reminderBodyNoName", { time }),
     }),
-    time: (iso) => new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(iso)),
+    time: (iso) => clockFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(iso)),
   };
 }
 

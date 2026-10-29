@@ -15,6 +15,7 @@ import { useMyProviders, useSourceDirectory, useSwitchProvider } from "@/compone
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
+import { formatClock } from "@/lib/clock";
 
 /** Where an item of «Σήμερα» opens inside Box, once its provider is selected. */
 export function todayItemHref(item: Pick<TodayItem, "kind" | "id">) {
@@ -100,7 +101,7 @@ export function TodayAcrossCard() {
                   <span className="block truncate text-sm font-bold" style={{ color: "var(--text)" }}>
                     {item.at ? (
                       <time dateTime={item.at} className="tabular-nums">
-                        {new Date(item.at).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" })}
+                        {formatClock(new Date(item.at), locale, { hour: "2-digit", minute: "2-digit" })}
                         {" · "}
                       </time>
                     ) : null}

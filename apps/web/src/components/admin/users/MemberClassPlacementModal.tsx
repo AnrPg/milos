@@ -9,6 +9,8 @@ import { useUiTranslations } from "@/i18n/ui";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { clockFormat } from "@/lib/clock";
+import { useUiLocale } from "@/i18n/use-ui-locale";
 
 type Props = {
   token: string;
@@ -27,13 +29,14 @@ function isoDate(date: Date) {
   return local.toISOString().slice(0, 10);
 }
 
-function slotLabel(name: string, scheduledAt: string) {
-  const when = new Intl.DateTimeFormat(undefined, { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(scheduledAt));
+function slotLabel(name: string, scheduledAt: string, locale: string) {
+  const when = clockFormat(locale, { weekday: "short", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(scheduledAt));
   return `${when} · ${name}`;
 }
 
 export function MemberClassPlacementModal({ token, userId, nickname, onClose, onPlaced }: Props) {
   const i18n = useUiTranslations();
+  const uiLocale = useUiLocale();
   const [bookings, setBookings] = useState<MemberBooking[]>([]);
   const [slots, setSlots] = useState<ScheduleSlot[]>([]);
   const [fromBookingId, setFromBookingId] = useState("");
@@ -59,7 +62,7 @@ export function MemberClassPlacementModal({ token, userId, nickname, onClose, on
           const booking = item.user_booking as { id?: unknown } | undefined;
           const scheduledAt = typeof item.scheduled_at === "string" ? item.scheduled_at : "";
           if (typeof booking?.id !== "string" || typeof item.id !== "string" || !scheduledAt || new Date(scheduledAt).getTime() <= now) return [];
-          return [{ bookingId: booking.id, slotId: item.id, label: slotLabel(String(item.name ?? ""), scheduledAt) }];
+          return [{ bookingId: booking.id, slotId: item.id, label: slotLabel(String(item.name ?? ""), scheduledAt, uiLocale) }];
         }));
         setSlots((window.slots ?? []).filter((slot) => new Date(slot.scheduled_at).getTime() > now));
       })
@@ -73,7 +76,7 @@ export function MemberClassPlacementModal({ token, userId, nickname, onClose, on
     return () => {
       cancelled = true;
     };
-  }, [i18n, token, userId]);
+  }, [i18n, token, uiLocale, userId]);
 
   useEffect(() => {
     function handleKey(event: KeyboardEvent) {
@@ -140,7 +143,7 @@ export function MemberClassPlacementModal({ token, userId, nickname, onClose, on
             <option value="">{i18n("featureChooseClass")}</option>
             {targetSlots.map((slot) => (
               <option key={slot.id} value={slot.id} disabled={slot.spots_remaining <= 0}>
-                {slotLabel(slot.name, slot.scheduled_at)} · {i18n("featureSpotsLeft", { count: Math.max(slot.spots_remaining, 0) })}
+                {slotLabel(slot.name, slot.scheduled_at, uiLocale)} · {i18n("featureSpotsLeft", { count: Math.max(slot.spots_remaining, 0) })}
               </option>
             ))}
           </Select>

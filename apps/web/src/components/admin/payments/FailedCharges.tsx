@@ -23,7 +23,7 @@ export const FAILED_CHARGES_KEY = ["admin", "payments", "attention"] as const;
 
 type Translate = (key: string, values?: Record<string, string | number>) => string;
 
-/** ADR-260: saved-card charges that need a person (Οικονομικά › Ουρές). */
+/** ADR-260: saved-card charges that need a person (Οικονομικά › Εκκρεμότητες). */
 export function useFailedCharges(token: string | null | undefined, enabled: boolean) {
   return useQuery({
     queryKey: FAILED_CHARGES_KEY,

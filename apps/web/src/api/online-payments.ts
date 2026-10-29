@@ -3,7 +3,7 @@ import { apiRequest } from "@/api/client";
 /*
  * Online payments for staff (ADR-246/247/260/261): the business's own Viva
  * or Stripe account in Ρυθμίσεις › Πληρωμές, and the saved-card charges that
- * need a person in Οικονομικά › Ουρές. Calls go through the selected gym
+ * need a person in Οικονομικά › Εκκρεμότητες. Calls go through the selected gym
  * (`/org/:slug/admin/payments/...`). Wire shapes follow
  * `PaleeWeb.Schemas.Payments` (see `generated/schema.ts`). Credentials are
  * written, never read back: `credentials_set` names the saved ones.

@@ -25,6 +25,7 @@ import { can } from "@/lib/role-navigation";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { clockFormat } from "@/lib/clock";
 
 /**
  * Staff's trial queue (board 6 Q4): Αιτήματα · Επερχόμενα · Ήρθαν · Έγιναν
@@ -126,7 +127,7 @@ function TrialRow({ trial, token, stage }: { trial: StaffTrial; token: string; s
   });
 
   const start = new Date(trial.class.scheduled_at);
-  const when = new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(start);
+  const when = clockFormat(locale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(start);
   const name = trial.person?.nickname ?? t("someone");
   const started = start <= new Date();
   const button = "min-h-10 flex-1 rounded-2xl px-3 text-sm font-bold disabled:opacity-60";

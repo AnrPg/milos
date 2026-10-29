@@ -36,6 +36,7 @@ import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { DateTimeInput } from "@/components/ui/DateInput";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { formatClock } from "@/lib/clock";
 
 export const TRAINING_LOG_ENTRIES_KEY = ["training-log", "entries"] as const;
 export const TRAINING_LOG_SOURCES_KEY = ["training-log", "sources"] as const;
@@ -112,7 +113,7 @@ export function TrainingLogEntryCard({
 }) {
   const i18n = useUiTranslations();
   const voided = entry.status === "voided";
-  const performedAt = new Date(entry.performed_at_utc).toLocaleString(locale, {
+  const performedAt = formatClock(new Date(entry.performed_at_utc), locale, {
     dateStyle: "medium",
     timeStyle: "short",
   });
@@ -309,7 +310,7 @@ function SourcePicker({ token, onSelect }: { token: string; onSelect: (source: S
             optionButton(
               item.id,
               item.title,
-              new Date(item.scheduled_at).toLocaleString(uiLocale, { dateStyle: "medium", timeStyle: "short" }),
+              formatClock(new Date(item.scheduled_at), uiLocale, { dateStyle: "medium", timeStyle: "short" }),
               { sourceType: "class", referenceId: item.id, title: item.title, scoreableSections: item.scoreable_sections },
             ),
           )}

@@ -2,6 +2,7 @@ import { ApiError } from "@/api/client";
 import type { EffectiveEntitlement } from "@/api/my-finance";
 import type { ScheduleLocation, ScheduleSlot } from "@/api/schedule";
 import { localizeError, type UiTranslator } from "@/i18n/presentation";
+import { clockFormat } from "@/lib/clock";
 
 // Member-side booking helpers for ADR-097 (waitlists, guests, events,
 // locations, credit costs and open-gym check-ins). Kept pure so the schedule
@@ -101,7 +102,7 @@ function formatOpensAt(value: unknown, locale: string) {
   if (typeof value !== "string") return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat(locale, {
+  return clockFormat(locale, {
     weekday: "short",
     day: "numeric",
     month: "short",

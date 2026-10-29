@@ -8,7 +8,7 @@ The approved mockup for online payments (option B) has one card in
 «Αλλαγή» for exceptions, and a failure policy under «Προχωρημένα»
 (3 retries at 1, 3 and 7 days, member told with a link for another card,
 grace days, staff told), with charges that need a person in
-Οικονομικά › Ουρές. ADR-246/247 had dunning but nobody heard about a
+Οικονομικά › Εκκρεμότητες. ADR-246/247 had dunning but nobody heard about a
 declined card, and nothing let a business keep, say, shop payments at the
 desk only.
 
@@ -35,7 +35,7 @@ desk only.
    another card; when no retry is left, staff with `manage_billing` get
    `payment_needs_attention` (category «staff»). Deduplicated per attempt
    and per recipient; a notification failure never touches the payment.
-4. **Ουρές queue.** `GET /admin/payments/attention` lists merchant charges
+4. **Εκκρεμότητες tab.** `GET /admin/payments/attention` lists merchant charges
    declined and waiting for a retry or failed for good, until staff close
    them or the same purpose is paid by a later online payment; invoices
    paid since in any other way (desk, transfer) are left out. Staff can
@@ -56,7 +56,7 @@ desk only.
 
 ## Update (2026-10-29, staff screens)
 - `GET /admin/payments/attention` also answers each charge's `member_name`
-  (the person's display name), so the Ουρές row names the person.
+  (the person's display name), so the Εκκρεμότητες row names the person.
 - The staff notice `payment_needs_attention` opens
   `/admin/finance?tab=queues&queue=failed_charges`, the «Αποτυχημένες
   χρεώσεις» group of the Queues tab.

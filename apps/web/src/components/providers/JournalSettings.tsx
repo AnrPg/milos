@@ -21,6 +21,7 @@ import { CollapsibleSection } from "@/components/profile/CollapsibleSection";
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
+import { formatClock } from "@/lib/clock";
 
 /** Ρυθμίσεις › Ημερολόγιο (ADR-162): «Οι coach μου» (with several providers) and «Εξαγωγή». */
 export function JournalSettingsSections() {
@@ -109,7 +110,7 @@ export function JournalExportSetting() {
     },
   });
   const pending = exports.data?.some?.((item) => item.status === "pending") ?? false;
-  const when = (iso: string) => new Date(iso).toLocaleString(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  const when = (iso: string) => formatClock(new Date(iso), locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 
   return (
     <div className="flex flex-col gap-3">

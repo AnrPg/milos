@@ -46,9 +46,10 @@ import { FollowRequestsRow } from "@/components/social/FollowRequestsRow";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
 import { NavIcon } from "@/components/nav/NavIcons";
 import { Dialog } from "@/components/ui/Dialog";
+import { clockFormat } from "@/lib/clock";
 
 function formatTimestamp(uiLocale: string, isoString: string) {
-  return new Intl.DateTimeFormat(uiLocale, {
+  return clockFormat(uiLocale, {
     month: "short",
     day: "numeric",
     hour: "numeric",

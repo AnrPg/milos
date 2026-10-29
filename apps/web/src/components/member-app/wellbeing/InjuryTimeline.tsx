@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
 import type { InjuryRecord, InjuryUpdateRequest } from "@/api/wellbeing";
@@ -9,6 +9,7 @@ import { SemanticLabel } from "@/components/semantic-label";
 import { timelinePositions, type InjuryEvent } from "./injury-timeline";
 import { Select } from "@/components/ui/Select";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { withClock } from "@/lib/clock";
 
 /**
  * One injury's progress (ADR-140 §3): a line with a point at every event
@@ -18,6 +19,7 @@ import { ErrorNotice } from "@/components/ui/ErrorNotice";
 export function InjuryTimeline({ injury }: { injury: InjuryRecord }) {
   const t = useTranslations("MemberApp.injury");
   const format = useFormatter();
+  const locale = useLocale();
   const events = injury.events as InjuryEvent[];
   const positions = timelinePositions(events);
 
@@ -47,7 +49,7 @@ export function InjuryTimeline({ injury }: { injury: InjuryRecord }) {
               {t(`event.${event.event_type}`)}
               <span className="font-normal" style={{ color: "var(--muted)" }}>
                 {" · "}
-                {format.dateTime(new Date(event.occurred_at), { dateStyle: "medium", timeStyle: "short" })}
+                {format.dateTime(new Date(event.occurred_at), withClock(locale, { dateStyle: "medium", timeStyle: "short" }))}
               </span>
             </p>
             {(event.payload.changes ?? []).map((change) => (

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 
 import { ApiError } from "@/api/client";
 import {
@@ -25,6 +25,7 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { BackLink } from "@/components/ui/BackLink";
+import { withClock } from "@/lib/clock";
 
 type DemoBusiness = BusinessAccountsQueue["demo_businesses"][number];
 
@@ -114,6 +115,7 @@ function VendorError({ error }: { error: unknown }) {
 function RequestCard({ token, request }: { token: string; request: BusinessRequest }) {
   const t = useTranslations("Business");
   const format = useFormatter();
+  const locale = useLocale();
   const queryClient = useQueryClient();
   const [note, setNote] = useState("");
   const [role, setRole] = useState<ActivationRole>("owner");
@@ -148,7 +150,7 @@ function RequestCard({ token, request }: { token: string; request: BusinessReque
           <p className="text-base font-semibold text-[var(--text)]">{request.business_name}</p>
           <p className="text-xs text-[var(--text-soft)]">
             {t(`requestKind.${request.kind}`)} · {t(`kind.${request.business_kind}`)} · {request.requested_by ?? "—"} ·{" "}
-            {format.dateTime(new Date(request.inserted_at), { dateStyle: "medium", timeStyle: "short" })}
+            {format.dateTime(new Date(request.inserted_at), withClock(locale, { dateStyle: "medium", timeStyle: "short" }))}
           </p>
         </div>
         <span className="flex items-center gap-2 text-xs font-semibold text-[var(--text-soft)]">

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 
 import { fetchRecoveryCodesStatus, generateRecoveryCodes } from "@/api/account-profiles";
 import {
@@ -17,6 +17,7 @@ import { Dialog } from "@/components/ui/Dialog";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { withClock } from "@/lib/clock";
 
 const RECOVERY_CODES_QUERY_KEY = ["account", "recovery-codes"] as const;
 
@@ -76,6 +77,7 @@ function RecoveryCodesDialog({ regenerate, onClose }: { regenerate: boolean; onC
   const t = useTranslations("accountProfiles");
   const i18n = useUiTranslations();
   const format = useFormatter();
+  const locale = useLocale();
   const { tokens, currentUser } = useSession();
   const queryClient = useQueryClient();
   const [password, setPassword] = useState("");
@@ -125,7 +127,7 @@ function RecoveryCodesDialog({ regenerate, onClose }: { regenerate: boolean; onC
       recoveryCodesFileText({
         heading: t("codesFileHeading"),
         account,
-        generatedAt: t("codesFileGenerated", { date: format.dateTime(now, { dateStyle: "long", timeStyle: "short" }) }),
+        generatedAt: t("codesFileGenerated", { date: format.dateTime(now, withClock(locale, { dateStyle: "long", timeStyle: "short" })) }),
         note: t("codesFileNote"),
         codes,
       }),

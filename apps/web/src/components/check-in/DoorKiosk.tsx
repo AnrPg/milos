@@ -15,6 +15,7 @@ import { playCue, primeCueAudio } from "@/lib/timer-cues";
 import { clockOffset, countdownLabel, doorFrame, doorRefetchDelay } from "./check-in";
 import { QrCode } from "./QrCode";
 import { useOnline } from "./use-online";
+import { clockFormat } from "@/lib/clock";
 
 type Loaded = { display: DoorDisplay; offset: number };
 type Welcome = { id: number; name: string | null };
@@ -137,7 +138,7 @@ export function DoorKiosk({ locationId }: { locationId: string }) {
 
   const boxName = membership?.settings?.brand_name?.trim() || membership?.organization.name || "";
   const logo = membership?.settings?.brand_logo_url ?? null;
-  const clock = (iso: string) => new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+  const clock = (iso: string) => clockFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
   const offline = failed || !online;
   const nextClass = loaded?.display.next_class ?? null;
   const minutesLeft = batchEndsAt ? Math.max(0, Math.ceil((batchEndsAt - serverNow) / 60_000)) : 0;

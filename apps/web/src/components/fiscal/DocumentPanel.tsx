@@ -27,6 +27,7 @@ import {
   Pill,
 } from "./fiscal-ui";
 import { FISCAL_DOCUMENTS_KEY, KindPill, paymentKey, TransmissionPill } from "./document-bits";
+import { clockFormat } from "@/lib/clock";
 
 const documentKey = (id: string) => ["admin", "fiscal", "document", id] as const;
 
@@ -103,7 +104,7 @@ function DocumentDetail({ token, document, onOpen }: { token: string; document: 
   const credits = document.credit_notes ?? [];
   const transmission = document.transmission ?? null;
   const state = transmissionState(transmission);
-  const issued = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(document.issued_at));
+  const issued = clockFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(document.issued_at));
 
   const retry = useMutation({
     mutationFn: () => retryTransmission(token, document.id),

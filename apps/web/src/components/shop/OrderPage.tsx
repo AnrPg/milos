@@ -13,10 +13,11 @@ import { orderReference, orderTimeline } from "@/lib/shop/catalog";
 import { ErrorNotice, LoadingLine, Money, Panel, ShopHeader } from "./ShopParts";
 import { ProductThumb } from "./shared/ShopBits";
 import { shopHref, useCancelOrder, useShopBox, useShopOrder } from "./use-shop";
+import { formatClock } from "@/lib/clock";
 
 function time(locale: string, value: string | null) {
   if (!value) return null;
-  return new Date(value).toLocaleString(locale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  return formatClock(new Date(value), locale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 }
 
 /**
