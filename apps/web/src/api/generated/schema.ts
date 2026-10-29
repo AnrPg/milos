@@ -7828,6 +7828,114 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/payments/terminal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Open a Tap to Pay payment at the desk
+         * @description Answers the payment and the request the phone hands to the provider's terminal app. A retry with the same idempotency key answers the first payment.
+         */
+        post: operations["PaleeWeb.AdminTerminalPaymentsController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Whether the business can take Tap to Pay now */
+        get: operations["PaleeWeb.AdminTerminalPaymentsController.availability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal/result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * What the terminal app returned (confirmed with the provider)
+         * @description The phone posts the callback it received. Money is recorded only after the provider confirms the transaction; a duplicate callback answers the payment as it stands.
+         */
+        post: operations["PaleeWeb.AdminTerminalPaymentsController.result"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One Tap to Pay payment */
+        get: operations["PaleeWeb.AdminTerminalPaymentsController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Give up on a Tap to Pay payment that has no card transaction */
+        post: operations["PaleeWeb.AdminTerminalPaymentsController.cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal/{id}/sandbox-complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dev/test only: the sandbox terminal app takes or refuses the card */
+        post: operations["PaleeWeb.AdminTerminalPaymentsController.sandbox_complete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/payments/{id}": {
         parameters: {
             query?: never;
@@ -79083,7 +79191,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -79418,7 +79526,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -79481,6 +79589,441 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminTerminalPaymentsController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    amount_cents: number;
+                    /** @enum {string|null} */
+                    charge_category?: "product" | "personal_training" | "event" | "other" | null;
+                    description?: string | null;
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    purpose: "finance_invoice" | "membership_package" | "shop_order" | "free_sale";
+                    /** Format: uuid */
+                    purpose_id?: string | null;
+                    /** Format: uuid */
+                    user_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            /** @description What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched. */
+                            app_request?: {
+                                params: {
+                                    [key: string]: string;
+                                };
+                                scheme: string;
+                                url: string;
+                            } | null;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            /** @description The signed reference the terminal app keeps (clientTransactionId). */
+                            reference: string;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Availability */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        available: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    message?: string | null;
+                    reference: string;
+                    status: string;
+                    transaction_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            /** @description What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched. */
+                            app_request?: {
+                                params: {
+                                    [key: string]: string;
+                                };
+                                scheme: string;
+                                url: string;
+                            } | null;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            /** @description The signed reference the terminal app keeps (clientTransactionId). */
+                            reference: string;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            /** @description What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched. */
+                            app_request?: {
+                                params: {
+                                    [key: string]: string;
+                                };
+                                scheme: string;
+                                url: string;
+                            } | null;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            /** @description The signed reference the terminal app keeps (clientTransactionId). */
+                            reference: string;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            /** @description What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched. */
+                            app_request?: {
+                                params: {
+                                    [key: string]: string;
+                                };
+                                scheme: string;
+                                url: string;
+                            } | null;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            /** @description The signed reference the terminal app keeps (clientTransactionId). */
+                            reference: string;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.sandbox_complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    outcome: "succeeded" | "failed" | "cancelled";
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            /** @description What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched. */
+                            app_request?: {
+                                params: {
+                                    [key: string]: string;
+                                };
+                                scheme: string;
+                                url: string;
+                            } | null;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            /** @description The signed reference the terminal app keeps (clientTransactionId). */
+                            reference: string;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminPaymentsController.show": {
         parameters: {
             query?: never;
@@ -79519,7 +80062,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -79600,7 +80143,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -79666,7 +80209,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -79777,7 +80320,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -79843,7 +80386,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -97612,7 +98155,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -97910,7 +98453,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -98147,7 +98690,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -98220,7 +98763,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -98286,7 +98829,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {
@@ -99907,7 +100450,7 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            initiation: "payer" | "merchant";
+                            initiation: "payer" | "merchant" | "terminal";
                             /** Format: date-time */
                             inserted_at?: string | null;
                             metadata?: {

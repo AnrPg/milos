@@ -7,7 +7,7 @@ defmodule Palee.Finance.FinanceCorporatePayment do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
-  @payment_methods ["cash", "bank_transfer", "card_manual", "online", "other"]
+  @payment_methods ["cash", "bank_transfer", "card_manual", "card_terminal", "online", "other"]
 
   schema "finance_corporate_payments" do
     field :organization_id, :binary_id, read_after_writes: true

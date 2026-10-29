@@ -381,6 +381,16 @@ pt-PT, nl, bg, ar and he got only these terms and the class fixes; their full re
 | Accounting export | Εξαγωγή για λογιστή | `/fiscal/exports/:format` | A period's fiscal documents (and payments) in the file an accounting program imports: DATEV, Xero, QuickBooks, Sage, bexio, CSV, JSON. | Audit archive; Finance data export (ADR-126). |
 | Export settings | Ρυθμίσεις εξαγωγής | `fiscal_export_settings` | Per format: accounts, tax codes and numbers the accountant gave the business. | |
 
+### 4.15 Taking money at the desk (ADR-222, ADR-249)
+
+| English | Ελληνικά | Code | What it is | Not to be confused with |
+|---|---|---|---|---|
+| Tap to Pay | Tap to Pay | `payment_intents.initiation = terminal`, `/admin/payments/terminal` | Staff take a contactless card on their own phone through the «Viva.com Terminal» app; Palee records it after Viva confirms it. The brand name stays in English in both languages. | Online payment (the payer pays on the provider's page). |
+| Card (Tap to Pay) | Κάρτα (Tap to Pay) | payment method `card_terminal` | A card payment Palee confirmed with the provider; never chosen by hand. | Card at the terminal (`card_manual`): staff's word that a standalone card machine took it. |
+| Card at the terminal | Κάρτα στο τερματικό | payment method `card_manual` | A card payment on the box's own card machine, recorded by staff. | Card (Tap to Pay). |
+| Free sale | Ελεύθερη πώληση | purpose `free_sale` | Money for something with no invoice, package or order: a description and a category, for a member. | Shop order. |
+| Walk-in | Επισκέπτης χωρίς λογαριασμό | `shop_orders.customer_name`, no `user_id` | Someone who pays at the desk without a profile in the business. Tap to Pay takes a walk-in's money for a shop order only. | Member, mock person, trial visitor. |
+
 ## 5. Name clashes found, and proposals
 
 Each needs ANR's choice before the UI changes. The recommended option is first.

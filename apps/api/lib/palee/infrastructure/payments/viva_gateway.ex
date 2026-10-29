@@ -130,7 +130,10 @@ defmodule Palee.Infrastructure.Payments.VivaGateway do
              exp_year: nil
            },
            method_token: transaction_id,
-           failure: failure(body["statusId"], body["errorText"])
+           failure: failure(body["statusId"], body["errorText"]),
+           # ADR-249: the merchant reference and time, to tie a terminal sale to its request.
+           reference: body["merchantTrns"],
+           created_at: parse_time(body["insDate"])
          }}
       end
     else
@@ -268,7 +271,9 @@ defmodule Palee.Infrastructure.Payments.VivaGateway do
              event_id: to_string(event["MessageId"] || "#{type}:#{transaction}"),
              type: type,
              provider_ref: data["OrderCode"] && to_string(data["OrderCode"]),
-             transaction_id: transaction
+             transaction_id: transaction,
+             # ADR-249: a terminal sale is known by its merchant reference.
+             reference: data["MerchantTrns"]
            }
          ]}
 
@@ -350,6 +355,15 @@ defmodule Palee.Infrastructure.Payments.VivaGateway do
 
     {:http, status, message}
   end
+
+  defp parse_time(text) when is_binary(text) do
+    case DateTime.from_iso8601(text) do
+      {:ok, at, _offset} -> at
+      _error -> nil
+    end
+  end
+
+  defp parse_time(_text), do: nil
 
   defp drop_nils(map) do
     map

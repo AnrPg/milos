@@ -26,6 +26,7 @@ defmodule Palee.Application.Fiscal.PaymentDocuments do
     "cash" => "cash",
     "card_manual" => "card",
     "card" => "card",
+    "card_terminal" => "card",
     "bank_transfer" => "bank_transfer",
     "online" => "online"
   }

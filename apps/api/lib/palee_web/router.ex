@@ -1284,6 +1284,19 @@ defmodule PaleeWeb.Router do
       :retry
     )
 
+    # ADR-249: Tap to Pay at the desk (the provider's terminal app on a staff phone).
+    get("/payments/terminal/availability", AdminTerminalPaymentsController, :availability)
+    post("/payments/terminal", AdminTerminalPaymentsController, :create)
+    post("/payments/terminal/result", AdminTerminalPaymentsController, :result)
+    get("/payments/terminal/:id", AdminTerminalPaymentsController, :show)
+    post("/payments/terminal/:id/cancel", AdminTerminalPaymentsController, :cancel)
+
+    post(
+      "/payments/terminal/:id/sandbox-complete",
+      AdminTerminalPaymentsController,
+      :sandbox_complete
+    )
+
     # ADR-246/247: online payments through the business's provider account.
     get("/payments/account", AdminPaymentsController, :account)
     put("/payments/account", AdminPaymentsController, :save_account)

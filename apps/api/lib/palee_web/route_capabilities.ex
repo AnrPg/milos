@@ -266,6 +266,13 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminPaymentsController, :retry_charge} => [:manage_billing],
     {W.AdminPaymentsController, :dismiss_charge} => [:manage_billing, :take_payments],
     {W.AdminPaymentsController, :card_link} => [:manage_billing, :take_payments],
+    # ADR-249: Tap to Pay is taking money at the desk, like ADR-222.
+    {W.AdminTerminalPaymentsController, :availability} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :create} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :result} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :show} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :cancel} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :sandbox_complete} => [:take_payments],
     # ADR-252: documents are box rules (manage_settings: which are
     # mandatory, their text, the booking gate); asking clients to sign and
     # reading who signed is membership work too.

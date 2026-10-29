@@ -32,25 +32,52 @@ defmodule Palee.Application.ReceiveFinancePayment do
            Finance.with_tenant_context(context, fn ->
              call(user_id, nil, Map.put(params, "payment_method", "online"))
            end) do
-      # ADR-262: an online payment is fulfilled only with its document, so
-      # a failure makes the payment's fulfilment try again later.
-      case PaymentDocuments.issue(context, received, nil, DateTime.utc_now()) do
-        {:ok, :not_configured} ->
-          {:ok, Map.put(received, :fiscal_document, nil)}
-
-        {:ok, document} ->
-          {:ok, Map.put(received, :fiscal_document, PaymentDocuments.summary(document))}
-
-        {:error, reason} ->
-          {:error, {:fiscal_document_not_issued, reason}}
-      end
+      with_fiscal_document(context, received, nil)
     end
   end
 
-  # Staff never record an "online" payment by hand.
+  @doc """
+  ADR-249: records a card tapped on the Viva.com Terminal app at the desk,
+  after the provider confirmed it (`card_terminal`). Idempotent through the
+  payment's `idempotency_key`; the document follows ADR-222.
+  """
+  def record_terminal(context, user_id, params) do
+    with :ok <- GoLive.check_payment(context, user_id),
+         {:ok, received} <-
+           Finance.with_tenant_context(context, fn ->
+             call(
+               user_id,
+               params["created_by_id"],
+               Map.put(params, "payment_method", "card_terminal")
+             )
+           end) do
+      with_fiscal_document(context, received, params["created_by_id"])
+    end
+  end
+
+  # ADR-262: money a provider confirmed is fulfilled only with its fiscal
+  # document, so a failure makes the payment's fulfilment try again later.
+  defp with_fiscal_document(context, received, actor_id) do
+    case PaymentDocuments.issue(context, received, actor_id, DateTime.utc_now()) do
+      {:ok, :not_configured} ->
+        {:ok, Map.put(received, :fiscal_document, nil)}
+
+      {:ok, document} ->
+        {:ok, Map.put(received, :fiscal_document, PaymentDocuments.summary(document))}
+
+      {:error, reason} ->
+        {:error, {:fiscal_document_not_issued, reason}}
+    end
+  end
+
+  # Staff never record a provider-confirmed method ("online",
+  # "card_terminal") by hand.
   defp desk_method(params) do
     method = params["payment_method"] || params[:payment_method]
-    if method == "online", do: {:error, :invalid_payment_method}, else: :ok
+
+    if method in ["online", "card_terminal"],
+      do: {:error, :invalid_payment_method},
+      else: :ok
   end
 
   def call(user_id, admin_id, params) do

@@ -183461,7 +183461,8 @@
                           "initiation": {
                             "enum": [
                               "payer",
-                              "merchant"
+                              "merchant",
+                              "terminal"
                             ],
                             "type": "string"
                           },
@@ -184453,7 +184454,8 @@
                           "initiation": {
                             "enum": [
                               "payer",
-                              "merchant"
+                              "merchant",
+                              "terminal"
                             ],
                             "type": "string"
                           },
@@ -184631,6 +184633,1234 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/payments/terminal": {
+      "post": {
+        "callbacks": {},
+        "description": "Answers the payment and the request the phone hands to the provider's terminal app. A retry with the same idempotency key answers the first payment.",
+        "operationId": "PaleeWeb.AdminTerminalPaymentsController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "amount_cents": {
+                    "maximum": 10000000,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "charge_category": {
+                    "enum": [
+                      "product",
+                      "personal_training",
+                      "event",
+                      "other"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 120,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "idempotency_key": {
+                    "maxLength": 200,
+                    "minLength": 8,
+                    "type": "string"
+                  },
+                  "purpose": {
+                    "enum": [
+                      "finance_invoice",
+                      "membership_package",
+                      "shop_order",
+                      "free_sale"
+                    ],
+                    "type": "string"
+                  },
+                  "purpose_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "user_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "amount_cents",
+                  "idempotency_key",
+                  "purpose"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "payment": {
+                      "properties": {
+                        "amount_cents": {
+                          "type": "integer"
+                        },
+                        "app_request": {
+                          "description": "What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched.",
+                          "nullable": true,
+                          "properties": {
+                            "params": {
+                              "additionalProperties": {
+                                "type": "string"
+                              },
+                              "type": "object"
+                            },
+                            "scheme": {
+                              "type": "string"
+                            },
+                            "url": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "params",
+                            "scheme",
+                            "url"
+                          ],
+                          "type": "object"
+                        },
+                        "attention_resolution": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attention_resolved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_last4": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "declines": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "environment": {
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finance_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fulfilment_status": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "initiation": {
+                          "enum": [
+                            "payer",
+                            "merchant",
+                            "terminal"
+                          ],
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "provider_transaction_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purpose_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "purpose_type": {
+                          "type": "string"
+                        },
+                        "redirect_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "reference": {
+                          "description": "The signed reference the terminal app keeps (clientTransactionId).",
+                          "type": "string"
+                        },
+                        "refunded_cents": {
+                          "type": "integer"
+                        },
+                        "retries": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "scheduled",
+                            "awaiting_payer",
+                            "processing",
+                            "succeeded",
+                            "failed",
+                            "cancelled",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "succeeded_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "amount_cents",
+                        "currency",
+                        "declines",
+                        "description",
+                        "environment",
+                        "fulfilment_status",
+                        "id",
+                        "initiation",
+                        "provider",
+                        "purpose_id",
+                        "purpose_type",
+                        "reference",
+                        "refunded_cents",
+                        "retries",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "payment"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Payment"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Open a Tap to Pay payment at the desk",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/payments/terminal/availability": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminTerminalPaymentsController.availability",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "available"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Availability"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Whether the business can take Tap to Pay now",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/payments/terminal/result": {
+      "post": {
+        "callbacks": {},
+        "description": "The phone posts the callback it received. Money is recorded only after the provider confirms the transaction; a duplicate callback answers the payment as it stands.",
+        "operationId": "PaleeWeb.AdminTerminalPaymentsController.result",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "What the terminal app returned on the callback, as the phone parsed it.",
+                "properties": {
+                  "message": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "reference": {
+                    "maxLength": 300,
+                    "type": "string"
+                  },
+                  "status": {
+                    "maxLength": 20,
+                    "type": "string"
+                  },
+                  "transaction_id": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "reference",
+                  "status"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "payment": {
+                      "properties": {
+                        "amount_cents": {
+                          "type": "integer"
+                        },
+                        "app_request": {
+                          "description": "What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched.",
+                          "nullable": true,
+                          "properties": {
+                            "params": {
+                              "additionalProperties": {
+                                "type": "string"
+                              },
+                              "type": "object"
+                            },
+                            "scheme": {
+                              "type": "string"
+                            },
+                            "url": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "params",
+                            "scheme",
+                            "url"
+                          ],
+                          "type": "object"
+                        },
+                        "attention_resolution": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attention_resolved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_last4": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "declines": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "environment": {
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finance_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fulfilment_status": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "initiation": {
+                          "enum": [
+                            "payer",
+                            "merchant",
+                            "terminal"
+                          ],
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "provider_transaction_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purpose_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "purpose_type": {
+                          "type": "string"
+                        },
+                        "redirect_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "reference": {
+                          "description": "The signed reference the terminal app keeps (clientTransactionId).",
+                          "type": "string"
+                        },
+                        "refunded_cents": {
+                          "type": "integer"
+                        },
+                        "retries": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "scheduled",
+                            "awaiting_payer",
+                            "processing",
+                            "succeeded",
+                            "failed",
+                            "cancelled",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "succeeded_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "amount_cents",
+                        "currency",
+                        "declines",
+                        "description",
+                        "environment",
+                        "fulfilment_status",
+                        "id",
+                        "initiation",
+                        "provider",
+                        "purpose_id",
+                        "purpose_type",
+                        "reference",
+                        "refunded_cents",
+                        "retries",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "payment"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Payment"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "What the terminal app returned (confirmed with the provider)",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/payments/terminal/{id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminTerminalPaymentsController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "payment": {
+                      "properties": {
+                        "amount_cents": {
+                          "type": "integer"
+                        },
+                        "app_request": {
+                          "description": "What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched.",
+                          "nullable": true,
+                          "properties": {
+                            "params": {
+                              "additionalProperties": {
+                                "type": "string"
+                              },
+                              "type": "object"
+                            },
+                            "scheme": {
+                              "type": "string"
+                            },
+                            "url": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "params",
+                            "scheme",
+                            "url"
+                          ],
+                          "type": "object"
+                        },
+                        "attention_resolution": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attention_resolved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_last4": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "declines": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "environment": {
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finance_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fulfilment_status": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "initiation": {
+                          "enum": [
+                            "payer",
+                            "merchant",
+                            "terminal"
+                          ],
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "provider_transaction_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purpose_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "purpose_type": {
+                          "type": "string"
+                        },
+                        "redirect_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "reference": {
+                          "description": "The signed reference the terminal app keeps (clientTransactionId).",
+                          "type": "string"
+                        },
+                        "refunded_cents": {
+                          "type": "integer"
+                        },
+                        "retries": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "scheduled",
+                            "awaiting_payer",
+                            "processing",
+                            "succeeded",
+                            "failed",
+                            "cancelled",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "succeeded_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "amount_cents",
+                        "currency",
+                        "declines",
+                        "description",
+                        "environment",
+                        "fulfilment_status",
+                        "id",
+                        "initiation",
+                        "provider",
+                        "purpose_id",
+                        "purpose_type",
+                        "reference",
+                        "refunded_cents",
+                        "retries",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "payment"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Payment"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "One Tap to Pay payment",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/payments/terminal/{id}/cancel": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminTerminalPaymentsController.cancel",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "payment": {
+                      "properties": {
+                        "amount_cents": {
+                          "type": "integer"
+                        },
+                        "app_request": {
+                          "description": "What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched.",
+                          "nullable": true,
+                          "properties": {
+                            "params": {
+                              "additionalProperties": {
+                                "type": "string"
+                              },
+                              "type": "object"
+                            },
+                            "scheme": {
+                              "type": "string"
+                            },
+                            "url": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "params",
+                            "scheme",
+                            "url"
+                          ],
+                          "type": "object"
+                        },
+                        "attention_resolution": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attention_resolved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_last4": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "declines": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "environment": {
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finance_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fulfilment_status": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "initiation": {
+                          "enum": [
+                            "payer",
+                            "merchant",
+                            "terminal"
+                          ],
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "provider_transaction_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purpose_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "purpose_type": {
+                          "type": "string"
+                        },
+                        "redirect_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "reference": {
+                          "description": "The signed reference the terminal app keeps (clientTransactionId).",
+                          "type": "string"
+                        },
+                        "refunded_cents": {
+                          "type": "integer"
+                        },
+                        "retries": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "scheduled",
+                            "awaiting_payer",
+                            "processing",
+                            "succeeded",
+                            "failed",
+                            "cancelled",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "succeeded_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "amount_cents",
+                        "currency",
+                        "declines",
+                        "description",
+                        "environment",
+                        "fulfilment_status",
+                        "id",
+                        "initiation",
+                        "provider",
+                        "purpose_id",
+                        "purpose_type",
+                        "reference",
+                        "refunded_cents",
+                        "retries",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "payment"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Payment"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Give up on a Tap to Pay payment that has no card transaction",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/payments/terminal/{id}/sandbox-complete": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminTerminalPaymentsController.sandbox_complete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "outcome": {
+                    "enum": [
+                      "succeeded",
+                      "failed",
+                      "cancelled"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "outcome"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "payment": {
+                      "properties": {
+                        "amount_cents": {
+                          "type": "integer"
+                        },
+                        "app_request": {
+                          "description": "What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched.",
+                          "nullable": true,
+                          "properties": {
+                            "params": {
+                              "additionalProperties": {
+                                "type": "string"
+                              },
+                              "type": "object"
+                            },
+                            "scheme": {
+                              "type": "string"
+                            },
+                            "url": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "params",
+                            "scheme",
+                            "url"
+                          ],
+                          "type": "object"
+                        },
+                        "attention_resolution": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attention_resolved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_last4": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "declines": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "environment": {
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finance_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fulfilment_status": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "initiation": {
+                          "enum": [
+                            "payer",
+                            "merchant",
+                            "terminal"
+                          ],
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "provider_transaction_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purpose_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "purpose_type": {
+                          "type": "string"
+                        },
+                        "redirect_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "reference": {
+                          "description": "The signed reference the terminal app keeps (clientTransactionId).",
+                          "type": "string"
+                        },
+                        "refunded_cents": {
+                          "type": "integer"
+                        },
+                        "retries": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "scheduled",
+                            "awaiting_payer",
+                            "processing",
+                            "succeeded",
+                            "failed",
+                            "cancelled",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "succeeded_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "amount_cents",
+                        "currency",
+                        "declines",
+                        "description",
+                        "environment",
+                        "fulfilment_status",
+                        "id",
+                        "initiation",
+                        "provider",
+                        "purpose_id",
+                        "purpose_type",
+                        "reference",
+                        "refunded_cents",
+                        "retries",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "payment"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Payment"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Dev/test only: the sandbox terminal app takes or refuses the card",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/payments/{id}": {
       "get": {
         "callbacks": {},
@@ -184712,7 +185942,8 @@
                             "initiation": {
                               "enum": [
                                 "payer",
-                                "merchant"
+                                "merchant",
+                                "terminal"
                               ],
                               "type": "string"
                             },
@@ -184956,7 +186187,8 @@
                         "initiation": {
                           "enum": [
                             "payer",
-                            "merchant"
+                            "merchant",
+                            "terminal"
                           ],
                           "type": "string"
                         },
@@ -185140,7 +186372,8 @@
                         "initiation": {
                           "enum": [
                             "payer",
-                            "merchant"
+                            "merchant",
+                            "terminal"
                           ],
                           "type": "string"
                         },
@@ -185443,7 +186676,8 @@
                         "initiation": {
                           "enum": [
                             "payer",
-                            "merchant"
+                            "merchant",
+                            "terminal"
                           ],
                           "type": "string"
                         },
@@ -185627,7 +186861,8 @@
                         "initiation": {
                           "enum": [
                             "payer",
-                            "merchant"
+                            "merchant",
+                            "terminal"
                           ],
                           "type": "string"
                         },
@@ -234054,7 +235289,8 @@
                         "initiation": {
                           "enum": [
                             "payer",
-                            "merchant"
+                            "merchant",
+                            "terminal"
                           ],
                           "type": "string"
                         },
@@ -234703,7 +235939,8 @@
                         "initiation": {
                           "enum": [
                             "payer",
-                            "merchant"
+                            "merchant",
+                            "terminal"
                           ],
                           "type": "string"
                         },
@@ -235337,7 +236574,8 @@
                         "initiation": {
                           "enum": [
                             "payer",
-                            "merchant"
+                            "merchant",
+                            "terminal"
                           ],
                           "type": "string"
                         },
@@ -235542,7 +236780,8 @@
                         "initiation": {
                           "enum": [
                             "payer",
-                            "merchant"
+                            "merchant",
+                            "terminal"
                           ],
                           "type": "string"
                         },
@@ -235726,7 +236965,8 @@
                         "initiation": {
                           "enum": [
                             "payer",
-                            "merchant"
+                            "merchant",
+                            "terminal"
                           ],
                           "type": "string"
                         },
@@ -240234,7 +241474,8 @@
                         "initiation": {
                           "enum": [
                             "payer",
-                            "merchant"
+                            "merchant",
+                            "terminal"
                           ],
                           "type": "string"
                         },

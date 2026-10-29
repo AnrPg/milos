@@ -228,6 +228,37 @@ defmodule Palee.Application.Shop.Checkout do
   end
 
   @doc """
+  ADR-249: settles an order paid by a card tapped on the provider's
+  terminal app at the desk, after the provider confirmed it. Recorded as
+  the shop's desk card method (`card_manual`) with the provider's
+  reference; idempotent (an order already paid is answered as it is).
+  """
+  def settle_at_terminal(context, order_id, receipt) do
+    with {:ok, paid} <-
+           Shop.transaction(context, fn ->
+             case Shop.get_order(context, order_id, lock: true) do
+               %{payment_status: :paid} = paid ->
+                 {:ok, paid}
+
+               %{payment_status: :pending_payment} = locked ->
+                 with {:ok, paid, _payment} <-
+                        OrderMoney.settle(context, locked, :card_manual, receipt) do
+                   {:ok, paid}
+                 end
+
+               %{} ->
+                 {:error, :order_not_payable}
+
+               nil ->
+                 {:error, :not_found}
+             end
+           end) do
+      Observability.order(:paid, context, paid)
+      {:ok, paid}
+    end
+  end
+
+  @doc """
   A staff desk sale. `params`: `lines`, `payment_method` (cash | card_manual |
   bank_transfer | other), optional `user_id` (a member) or `customer_name`
   (a walk-in), `location_id` (the desk's branch), `idempotency_key`.

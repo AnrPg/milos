@@ -159,7 +159,7 @@ defmodule PaleeWeb.Schemas.Payments do
         provider: %Schema{type: :string},
         environment: %Schema{type: :string},
         user_id: %{@uuid | nullable: true},
-        initiation: %Schema{type: :string, enum: ["payer", "merchant"]},
+        initiation: %Schema{type: :string, enum: ["payer", "merchant", "terminal"]},
         purpose_type: %Schema{type: :string},
         purpose_id: @uuid,
         amount_cents: @int,

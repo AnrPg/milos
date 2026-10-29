@@ -530,8 +530,9 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     create_paid_document(membership_id, document, params)
   end
 
-  # ADR-246: an online payment keeps the provider's references with it.
-  defp online_reference(%{"payment_method" => "online"} = params, stored) do
+  # ADR-246/249: a payment the provider confirmed keeps its references.
+  defp online_reference(%{"payment_method" => method} = params, stored)
+       when method in ["online", "card_terminal"] do
     Map.merge(stored, %{
       "payment_intent_id" => params["payment_intent_id"],
       "provider" => params["provider"],

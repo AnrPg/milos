@@ -13,12 +13,16 @@ defmodule Palee.Application.Payments.FinanceFulfilment do
   @behaviour Palee.Payments.Ports.Fulfilment
 
   alias Palee.Application.Fiscal.PaymentDocuments
-  alias Palee.Application.Payments.OnlineSales
+  alias Palee.Application.Payments.{OnlineSales, TerminalFulfilment}
   alias Palee.Application.ReceiveFinancePayment
   alias Palee.Finance
   alias Palee.Organizations
 
   @impl true
+  # ADR-249: a card tapped at the desk (method card_terminal).
+  def fulfil(context, %{initiation: "terminal"} = intent),
+    do: TerminalFulfilment.fulfil(context, intent)
+
   def fulfil(context, %{purpose_type: "finance_invoice"} = intent) do
     with {:ok, invoice} <- Finance.get_invoice(context, intent.purpose_id),
          {:ok, received} <-
@@ -58,6 +62,9 @@ defmodule Palee.Application.Payments.FinanceFulfilment do
 
   @impl true
   def reverse(_context, %{finance_payment_id: nil}, _refund), do: {:ok, %{}}
+
+  def reverse(context, %{initiation: "terminal"} = intent, refund),
+    do: TerminalFulfilment.reverse(context, intent, refund)
 
   def reverse(context, %{purpose_type: "finance_invoice"} = intent, refund) do
     with {:ok, invoice} <- Finance.get_invoice(context, intent.purpose_id) do

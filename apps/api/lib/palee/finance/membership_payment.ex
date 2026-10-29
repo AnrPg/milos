@@ -57,6 +57,7 @@ defmodule Palee.Finance.MembershipPayment do
       "cash",
       "bank_transfer",
       "card_manual",
+      "card_terminal",
       "online",
       "other"
     ])
@@ -100,6 +101,7 @@ defmodule Palee.Finance.MembershipPayment do
       "cash",
       "bank_transfer",
       "card_manual",
+      "card_terminal",
       "online",
       "other"
     ])
