@@ -12131,10 +12131,7 @@
       "cluster": "Cluster",
       "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
-      "interrupt": "С прерываниями",
-      "kcal_target": "Цель по калориям",
-      "drop": "Drop set",
-      "restpause": "Rest-pause"
+      "interrupt": "С прерываниями"
     },
     "params": {
       "sets": "подходов: {sets}",
@@ -12184,8 +12181,7 @@
       "done": "Выполнено",
       "total_reps": "Повторения (всего)",
       "lowest_round": "Худший раунд",
-      "distance": "Дистанция",
-      "load": "Вес (лучший подход)"
+      "distance": "Дистанция"
     },
     "levelNotes": "Заметки по уровням",
     "sectionNote": "Заметка к разделу",

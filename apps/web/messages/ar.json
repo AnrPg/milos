@@ -12131,10 +12131,7 @@
       "cluster": "Cluster",
       "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
-      "interrupt": "مع مقاطعات",
-      "kcal_target": "هدف السعرات",
-      "drop": "Drop set",
-      "restpause": "Rest-pause"
+      "interrupt": "مع مقاطعات"
     },
     "params": {
       "sets": "{sets} مجموعات",
@@ -12184,8 +12181,7 @@
       "done": "مكتمل",
       "total_reps": "التكرارات (المجموع)",
       "lowest_round": "أضعف جولة",
-      "distance": "المسافة",
-      "load": "الحمل (أفضل مجموعة)"
+      "distance": "المسافة"
     },
     "levelNotes": "ملاحظات حسب المستوى",
     "sectionNote": "ملاحظة القسم",

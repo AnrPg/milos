@@ -12131,10 +12131,7 @@
       "cluster": "Cluster",
       "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
-      "interrupt": "С прекъсвания",
-      "kcal_target": "Цел калории",
-      "drop": "Drop set",
-      "restpause": "Rest-pause"
+      "interrupt": "С прекъсвания"
     },
     "params": {
       "sets": "{sets} серии",
@@ -12184,8 +12181,7 @@
       "done": "Завършено",
       "total_reps": "Повторения (общо)",
       "lowest_round": "Най-слаб рунд",
-      "distance": "Разстояние",
-      "load": "Тежест (най-добра серия)"
+      "distance": "Разстояние"
     },
     "levelNotes": "Бележки по нива",
     "sectionNote": "Бележка към раздела",

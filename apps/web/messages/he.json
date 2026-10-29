@@ -12131,10 +12131,7 @@
       "cluster": "Cluster",
       "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
-      "interrupt": "עם הפסקות",
-      "kcal_target": "יעד קלוריות",
-      "drop": "Drop set",
-      "restpause": "Rest-pause"
+      "interrupt": "עם הפסקות"
     },
     "params": {
       "sets": "{sets} סטים",
@@ -12184,8 +12181,7 @@
       "done": "הושלם",
       "total_reps": "חזרות (סה״כ)",
       "lowest_round": "הסבב החלש",
-      "distance": "מרחק",
-      "load": "משקל (הסט הטוב)"
+      "distance": "מרחק"
     },
     "levelNotes": "הערות לפי רמה",
     "sectionNote": "הערה לחלק",

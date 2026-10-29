@@ -12131,10 +12131,7 @@
       "cluster": "Cluster",
       "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
-      "interrupt": "Met onderbrekingen",
-      "kcal_target": "Caloriedoel",
-      "drop": "Drop set",
-      "restpause": "Rest-pause"
+      "interrupt": "Met onderbrekingen"
     },
     "params": {
       "sets": "{sets} sets",
@@ -12184,8 +12181,7 @@
       "done": "Voltooid",
       "total_reps": "Herhalingen (totaal)",
       "lowest_round": "Laagste ronde",
-      "distance": "Afstand",
-      "load": "Gewicht (beste set)"
+      "distance": "Afstand"
     },
     "levelNotes": "Notities per niveau",
     "sectionNote": "Notitie bij het onderdeel",

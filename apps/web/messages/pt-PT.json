@@ -12131,10 +12131,7 @@
       "cluster": "Cluster",
       "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
-      "interrupt": "Com interrupções",
-      "kcal_target": "Objetivo de calorias",
-      "drop": "Drop set",
-      "restpause": "Rest-pause"
+      "interrupt": "Com interrupções"
     },
     "params": {
       "sets": "{sets} séries",
@@ -12184,8 +12181,7 @@
       "done": "Concluído",
       "total_reps": "Repetições (total)",
       "lowest_round": "Ronda mais baixa",
-      "distance": "Distância",
-      "load": "Carga (melhor série)"
+      "distance": "Distância"
     },
     "levelNotes": "Notas por nível",
     "sectionNote": "Nota da secção",
