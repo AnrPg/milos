@@ -24,6 +24,8 @@ import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
 import { BasicsStep, IncludedStep } from "@/components/admin/finance/packages/PackageWizard";
 import { AdvancedSettings, LockStrip, MemberPreview, PackageContractDetails, previewContext, useT } from "@/components/admin/finance/packages/package-ui";
 import { usePackageAuthoring } from "@/components/admin/finance/packages/use-package-authoring";
+import { SoldOnlineCard } from "@/components/admin/finance/packages/SoldOnlineCard";
+import { SoldOnlineBadge } from "@/components/admin/finance/packages/SoldOnlineBadge";
 import {
   applyLocks,
   changedFields,
@@ -255,7 +257,8 @@ export function PackagePanel({
             <summary className="cursor-pointer px-4 py-3 text-sm font-semibold" style={{ color: "var(--text)" }}>
               ⚙ {t("pkgAdvancedSettings")}{changedFields(catalog, draft).length > 0 ? ` · ${changedFields(catalog, draft).length}` : ""}
             </summary>
-            <div className="px-4 pb-4">
+            <div className="space-y-4 px-4 pb-4">
+              <SoldOnlineCard token={token} pkg={pkg} />
               <AdvancedSettings
                 catalog={catalog}
                 type={type}
@@ -297,6 +300,16 @@ export function PackagePanel({
             <Stat label={i18n("statusbae7d5b")} value={pkg.active !== false ? i18n("activea733b80") : i18n("inactive09af574")} />
             <Stat label={t("pkgAdvancedSettings")} value={Array.isArray(pkg.changed_fields) && pkg.changed_fields.length > 0 ? t("pkgChangesFromSuggested", { count: pkg.changed_fields.length }) : t("pkgNoChangesFromSuggested")} />
           </div>
+          {/* ADR-271: «Πωλείται online» lives in the package's advanced settings. */}
+          <details className="rounded-2xl" style={{ border: "1px solid var(--border)" }} data-testid="package-advanced">
+            <summary className="flex cursor-pointer items-center gap-2 px-4 py-3 text-sm font-semibold" style={{ color: "var(--text)" }}>
+              <span className="flex-1">⚙ {t("pkgAdvancedSettings")}</span>
+              <SoldOnlineBadge pkg={pkg} />
+            </summary>
+            <div className="px-4 pb-4">
+              <SoldOnlineCard token={token} pkg={pkg} />
+            </div>
+          </details>
           {catalog ? <PackageContractDetails catalog={catalog} draft={draftFromPackage(catalog, pkg)} packages={packages} /> : null}
           {Array.isArray(pkg.tags) && (pkg.tags as string[]).length > 0 && (
             <div>
