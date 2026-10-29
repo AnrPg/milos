@@ -65,6 +65,39 @@ defmodule Palee.Finance.Domain.CreditLedger do
   def validate_reversal(_original_entry, _already_reversed_cents, _amount_cents),
     do: {:error, :invalid_credit_amount}
 
+  @doc """
+  ADR-254: whether `amount_cents` of a manual credit grant may be taken
+  back (undoing an import). Only a `manual_credit` grant, never more than
+  is left of it, and never more than the balance still holds.
+  """
+  def validate_grant_reversal(original_entry, already_reversed_cents, amount_cents, balance_cents)
+      when is_integer(already_reversed_cents) and is_integer(amount_cents) and
+             is_integer(balance_cents) do
+    original_amount = Map.get(original_entry, :amount_cents)
+
+    cond do
+      Map.get(original_entry, :entry_type) != "grant" or
+        Map.get(original_entry, :source_type) != "manual_credit" or
+          not is_integer(original_amount) or original_amount <= 0 ->
+        {:error, :credit_entry_not_reversible}
+
+      amount_cents <= 0 ->
+        {:error, :invalid_credit_amount}
+
+      amount_cents > original_amount - already_reversed_cents ->
+        {:error, :credit_reversal_exceeds_application}
+
+      amount_cents > balance_cents ->
+        {:error, :insufficient_credit_balance}
+
+      true ->
+        :ok
+    end
+  end
+
+  def validate_grant_reversal(_original_entry, _reversed, _amount_cents, _balance_cents),
+    do: {:error, :invalid_credit_amount}
+
   def normalize_grant_amount(source_type, amount_cents)
       when source_type in @grant_types and is_integer(amount_cents) and amount_cents > 0 do
     {:ok, amount_cents}

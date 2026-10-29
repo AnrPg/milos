@@ -57,6 +57,10 @@ defmodule Palee.Finance.FinanceStore do
     do: adapter().reverse_credit_ledger_entry(membership_id, entry_id, params)
 
   @impl true
+  def reverse_credit_grant(membership_id, entry_id, params),
+    do: adapter().reverse_credit_grant(membership_id, entry_id, params)
+
+  @impl true
   def get_invoice(invoice_id), do: adapter().get_invoice(invoice_id)
   @impl true
   def update_invoice_params(invoice_id, params),

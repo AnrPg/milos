@@ -248,6 +248,23 @@ defmodule Palee.Imports.Domain.Presets do
 
   def public(preset), do: Map.take(preset, [:key, :name, :date_order])
 
+  @doc "The normalized names only this vendor uses (not among the generic ones)."
+  def distinctive_names(key) do
+    generic = @generic |> Map.values() |> List.flatten() |> MapSet.new(&normalize/1)
+
+    case Enum.find(@presets, &(&1.key == key)) do
+      nil ->
+        MapSet.new()
+
+      preset ->
+        preset.headers
+        |> Map.values()
+        |> List.flatten()
+        |> MapSet.new(&normalize/1)
+        |> MapSet.difference(generic)
+    end
+  end
+
   defp with_generic(preset) do
     headers =
       Map.merge(@generic, preset.headers, fn _field, generic, own -> own ++ generic end)

@@ -147,19 +147,15 @@ defmodule Palee.Infrastructure.Imports.EctoImportStore do
                warnings = ARRAY(SELECT jsonb_array_elements(v.warnings)),
                errors = ARRAY(SELECT jsonb_array_elements(v.errors)),
                updated_at = now()
-          FROM unnest($3::int[], $4::text[], $5::text[], $6::jsonb[], $7::jsonb[])
-               AS v(row_number, outcome, fingerprint, warnings, errors)
+          FROM jsonb_to_recordset($3::jsonb)
+               AS v(row_number int, outcome text, fingerprint text, warnings jsonb, errors jsonb)
          WHERE r.organization_id = $1 AND r.import_id = $2 AND r.row_number = v.row_number
            AND r.status = 'pending'
         """,
         [
           Ecto.UUID.dump!(organization_id),
           Ecto.UUID.dump!(import_id),
-          Enum.map(chunk, & &1.row_number),
-          Enum.map(chunk, & &1.outcome),
-          Enum.map(chunk, & &1.fingerprint),
-          Enum.map(chunk, & &1.warnings),
-          Enum.map(chunk, & &1.errors)
+          Enum.map(chunk, &Map.take(&1, [:row_number, :outcome, :fingerprint, :warnings, :errors]))
         ]
       )
     end)

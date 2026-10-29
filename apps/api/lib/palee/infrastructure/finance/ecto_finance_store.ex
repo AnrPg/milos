@@ -828,6 +828,66 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   @impl true
+  def reverse_credit_grant(membership_id, entry_id, params) do
+    params = string_key_map(params)
+
+    Repo.transaction(fn ->
+      with %Membership{} = membership <- locked_membership(membership_id),
+           %FinanceCreditLedgerEntry{} = original_entry <- locked_credit_ledger_entry(entry_id),
+           :ok <- require_request_id(params),
+           :ok <-
+             MembershipLinks.validate_optional_link(
+               :credit_ledger_entry_id,
+               membership.id,
+               original_entry.membership_id
+             ),
+           amount_cents <- parse_integer(params["amount_cents"], 0),
+           :ok <-
+             CreditLedger.validate_grant_reversal(
+               original_entry,
+               credit_grant_reversed_cents(original_entry.id),
+               amount_cents,
+               credit_balance(membership.id)
+             ),
+           {:ok, reversal} <-
+             create_credit_entry(%{
+               "membership_id" => membership.id,
+               "user_id" => membership.user_id,
+               "source_type" => "reversal",
+               "entry_type" => "reversal",
+               "amount_cents" => -amount_cents,
+               "currency" => original_entry.currency || "EUR",
+               "occurred_on" => GymClock.today(),
+               "occurred_at" => utc_now(),
+               "description" => params["reason"],
+               "created_by_id" => params["created_by_id"],
+               "reversed_credit_ledger_entry_id" => original_entry.id,
+               "idempotency_key" =>
+                 scoped_finance_key("credit_grant_reversal:#{original_entry.id}", membership.id, params),
+               "params" => reversal_params(params, original_entry.id)
+             }) do
+        refresh_invoice_and_entitlement(nil, membership.id)
+        reversal
+      else
+        nil -> Repo.rollback(:not_found)
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
+  defp credit_grant_reversed_cents(entry_id) do
+    FinanceCreditLedgerEntry
+    |> where([entry], entry.reversed_credit_ledger_entry_id == ^entry_id)
+    |> where([entry], entry.amount_cents < 0)
+    |> where([entry], is_nil(entry.deleted_at))
+    |> Repo.aggregate(:sum, :amount_cents)
+    |> case do
+      nil -> 0
+      value -> -value
+    end
+  end
+
+  @impl true
   def get_invoice(invoice_id) do
     case FinanceInvoice |> tenant_scope() |> Repo.get(invoice_id) do
       nil -> {:error, :not_found}

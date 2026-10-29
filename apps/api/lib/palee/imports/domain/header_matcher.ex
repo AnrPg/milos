@@ -6,7 +6,8 @@ defmodule Palee.Imports.Domain.HeaderMatcher do
   names first, then the generic ones) contain its normalized header; a
   column matching several fields takes the one where it ranks highest, and
   a field goes to one column only (the first). With no preset (`nil`) the
-  preset that maps the most columns is chosen, `excel` on a tie.
+  preset that maps the most columns is chosen; on a tie the one with most
+  headers only that vendor uses, then `excel`.
   """
 
   alias Palee.Imports.Domain.Presets
@@ -26,7 +27,9 @@ defmodule Palee.Imports.Domain.HeaderMatcher do
       presets
       |> Enum.map(&{&1, map_columns(header, &1)})
       |> Enum.max_by(fn {preset, mapping} ->
-        {Enum.count(mapping, & &1.field), if(preset.key == "excel", do: 1, else: 0)}
+        own = Presets.distinctive_names(preset.key)
+        hits = Enum.count(header, &MapSet.member?(own, Presets.normalize(&1 || "")))
+        {Enum.count(mapping, & &1.field), hits, if(preset.key == "excel", do: 1, else: 0)}
       end)
 
     %{source: preset.key, date_order: preset.date_order, mapping: mapping}

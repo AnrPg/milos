@@ -565,7 +565,7 @@ defmodule Palee.Application.Imports.ImportWriter do
   defp undo_credit(context, row, membership_id, %{"credit_entry_id" => entry_id} = result)
        when is_binary(entry_id) do
     with {:ok, _reversal} <-
-           Finance.reverse_credit_ledger_entry(context, membership_id, entry_id, %{
+           Finance.reverse_credit_grant(context, membership_id, entry_id, %{
              "amount_cents" => result["credit_cents"],
              "request_id" => derived_uuid(row.fingerprint, "undo-credit"),
              "reason" => "Import undone",
