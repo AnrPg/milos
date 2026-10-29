@@ -239,6 +239,8 @@ defmodule Palee.Payments.Domain.IntentPolicy do
       fiscal_document_id: result[:fiscal_document_id],
       claimed_at: nil
     }
+    # ADR-272: a Tap to Pay tip's attribution is written with the fulfilment.
+    |> Map.merge(Map.take(result, [:tip_attribution, :tip_recipient_user_id, :tip_recipient_role]))
   end
 
   def fulfilment_outcome(intent, {:error, reason}, now) do

@@ -13,9 +13,9 @@ defmodule Palee.Application.Payments.TerminalPayments do
   ADR-264, a walk-in).
   """
 
-  alias Palee.Application.GoLive
-  alias Palee.Finance
-  alias Palee.Fiscal
+  alias Palee.Application.Fiscal.{FiscalDocumentRendering, FiscalReporting, ReceiptLinks}
+  alias Palee.Application.{GoLive, UpdateFinanceMember}
+  alias Palee.{Finance, Fiscal, Identity, Organizations}
   alias Palee.Payments.Terminal
   alias Palee.Shop
 
@@ -24,8 +24,8 @@ defmodule Palee.Application.Payments.TerminalPayments do
 
   def charge_categories, do: @charge_categories
 
-  @doc "Whether the business can take Tap to Pay now."
-  def availability(context), do: %{available: Terminal.available?(context)}
+  @doc "Whether the business can take Tap to Pay now and, when not, why (ADR-272)."
+  def availability(context), do: Terminal.availability(context)
 
   @doc """
   Opens a terminal payment. `params`: `purpose` (finance_invoice,
@@ -40,8 +40,9 @@ defmodule Palee.Application.Payments.TerminalPayments do
 
     with :ok <- purpose_named(params),
          {:ok, purpose} <- resolve(context, params[:purpose], params),
-         :ok <- GoLive.check_payment(context, purpose.user_id || user_id) do
-      Terminal.start(
+         :ok <- GoLive.check_payment(context, purpose.user_id || user_id),
+         {:ok, payment} <-
+           Terminal.start(
         context,
         %{
           purpose_type: params[:purpose],
@@ -50,14 +51,20 @@ defmodule Palee.Application.Payments.TerminalPayments do
           amount_cents: params[:amount_cents],
           currency: purpose.currency,
           description: purpose.description,
-          metadata: purpose[:metadata] || %{},
+          metadata: Map.merge(purpose[:metadata] || %{}, started_on(params)),
           idempotency_key: params[:idempotency_key],
           created_by_id: Map.get(context, :user_id)
         },
         now()
-      )
+      ) do
+      {:ok, decorate(context, payment)}
     end
   end
+
+  # ADR-272: where the payment started, for its tip (a phone by default:
+  # Tap to Pay starts on the staff member's phone).
+  defp started_on(%{started_on: "desk"}), do: %{"started_on" => "desk"}
+  defp started_on(_params), do: %{"started_on" => "phone"}
 
   # Every purpose but a free sale names its row.
   defp purpose_named(%{purpose: "free_sale"}), do: :ok
@@ -151,10 +158,23 @@ defmodule Palee.Application.Payments.TerminalPayments do
 
   defp member(_context, nil), do: {:error, :terminal_member_required}
 
+  # The member (a client or, ADR-272, a guest of the box). A buyer without a
+  # finance profile yet gets one, as a package sold at the desk would.
   defp member(context, user_id) do
     case Finance.get_member_profile(context, user_id) do
-      %{membership: %{}} -> {:ok, user_id}
-      _none -> {:error, :not_found}
+      %{membership: %{}} ->
+        {:ok, user_id}
+
+      _none ->
+        with role when not is_nil(role) <-
+               Organizations.buyer_role(context, user_id) || {:error, :not_found},
+             {:ok, _membership} <-
+               UpdateFinanceMember.call(context, user_id, %{
+                 "status" => "active",
+                 "signup_source" => "direct"
+               }) do
+          {:ok, user_id}
+        end
     end
   end
 
@@ -217,11 +237,90 @@ defmodule Palee.Application.Payments.TerminalPayments do
   end
 
   @doc "What the terminal app returned through the phone."
-  def record_result(context, params), do: Terminal.record_result(context, params, now())
+  def record_result(context, params),
+    do: context |> Terminal.record_result(params, now()) |> decorated(context)
 
-  def get(context, id), do: Terminal.get(context, id, now())
+  def get(context, id), do: context |> Terminal.get(id, now()) |> decorated(context)
 
-  def cancel(context, id), do: Terminal.cancel(context, id, now())
+  def cancel(context, id), do: context |> Terminal.cancel(id, now()) |> decorated(context)
+
+  defp decorated({:ok, payment}, context), do: {:ok, decorate(context, payment)}
+  defp decorated(error, _context), do: error
+
+  @doc """
+  ADR-272: the payment with its fiscal document (number, kind, total and
+  the state of its transmission to the tax authority) and, for a walk-in,
+  the open link of its receipt for the QR.
+  """
+  def decorate(context, payment) do
+    Map.put(payment, :document, document(context, payment))
+  end
+
+  defp document(context, %{fiscal_document_id: id} = payment) when is_binary(id) do
+    case Fiscal.get_document(context, id) do
+      nil ->
+        nil
+
+      document ->
+        transmission =
+          context |> FiscalReporting.for_documents([document.id]) |> Map.get(document.id)
+
+        %{
+          id: document.id,
+          kind: document.kind,
+          number: document.number,
+          gross_cents: document.gross_cents,
+          currency: document.currency,
+          issued_at: document.issued_at,
+          authority: transmission && transmission.authority,
+          transmission_status: transmission && transmission.status,
+          receipt_url: if(is_nil(payment.user_id), do: ReceiptLinks.url(context, document))
+        }
+    end
+  end
+
+  defp document(_context, _payment), do: nil
+
+  @doc """
+  ADR-272: «Αποστολή με email» of a Tap to Pay payment's receipt from the
+  result screen (ADR-265's document email). `to` is required for a walk-in;
+  for a member it defaults to their account's email. Idempotent by
+  `idempotency_key`.
+  """
+  def email_receipt(context, id, params) do
+    with {:ok, payment} <- Terminal.get(context, id, now()),
+         {:ok, document_id} <- document_id(payment),
+         {:ok, to} <- receipt_address(params[:to], payment.user_id) do
+      FiscalDocumentRendering.email(context, document_id, %{
+        "to" => to,
+        "idempotency_key" => params[:idempotency_key],
+        "language" => params[:language]
+      })
+    end
+  end
+
+  defp document_id(%{fiscal_document_id: id}) when is_binary(id), do: {:ok, id}
+  defp document_id(_payment), do: {:error, :no_document}
+
+  defp receipt_address(to, user_id) do
+    cond do
+      is_binary(to) and String.trim(to) != "" -> {:ok, String.trim(to)}
+      is_binary(user_id) -> account_email(user_id)
+      true -> {:error, :no_recipient}
+    end
+  end
+
+  # A held or imported profile may carry a placeholder address that never
+  # receives mail (RFC 2606 `.invalid`).
+  defp account_email(user_id) do
+    case Identity.find_by_id(user_id) do
+      %{email: email} when is_binary(email) and email != "" ->
+        if String.ends_with?(email, ".invalid"), do: {:error, :no_recipient}, else: {:ok, email}
+
+      _none ->
+        {:error, :no_recipient}
+    end
+  end
 
   @doc """
   Dev/test only: the sandbox terminal app takes (or refuses) the card;
@@ -230,8 +329,8 @@ defmodule Palee.Application.Payments.TerminalPayments do
   def sandbox_complete(context, id, outcome, extras \\ %{}) do
     with {:ok, reference, transaction_id} <-
            Terminal.sandbox_transaction(context, id, outcome, extras) do
-      Terminal.record_result(
-        context,
+      context
+      |> Terminal.record_result(
         %{
           reference: reference,
           status: if(outcome == "succeeded", do: "success", else: "fail"),
@@ -239,6 +338,7 @@ defmodule Palee.Application.Payments.TerminalPayments do
         },
         now()
       )
+      |> decorated(context)
     end
   end
 

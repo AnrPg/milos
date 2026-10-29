@@ -12,7 +12,7 @@ defmodule Palee.Payments.Terminal do
 
   alias Palee.Payments
   alias Palee.Payments.PaymentStore
-  alias Palee.Payments.Domain.TerminalPolicy
+  alias Palee.Payments.Domain.{TerminalPolicy, TipAttribution}
 
   @doc false
   def gateway(provider) do
@@ -27,6 +27,32 @@ defmodule Palee.Payments.Terminal do
 
   @doc "Whether the business can take Tap to Pay now (an active account whose provider has a terminal app)."
   def available?(context), do: match?({:ok, _account}, terminal_account(context))
+
+  @doc """
+  ADR-272: whether the business can take Tap to Pay now and, when not, why:
+  `no_viva` (no payment account), `stripe_only` (its provider is Stripe,
+  which has no terminal app in Palee), `provider_without_terminal` (another
+  provider without one) or `account_not_ready` (the account is not active).
+  Whether the phone has the terminal app is only known on the phone.
+  """
+  def availability(context) do
+    account = PaymentStore.get_account(context)
+
+    reason =
+      case {account, terminal_account(context)} do
+        {_account, {:ok, _ready}} -> nil
+        {nil, _error} -> "no_viva"
+        {%{provider: "stripe"}, _error} -> "stripe_only"
+        {%{status: "active"}, _error} -> "provider_without_terminal"
+        {%{provider: provider}, _error} -> if gateway(provider), do: "account_not_ready", else: "provider_without_terminal"
+      end
+
+    %{
+      available: is_nil(reason),
+      reason: reason,
+      provider: account && account.provider
+    }
+  end
 
   defp terminal_account(context) do
     case PaymentStore.get_account(context) do
@@ -299,7 +325,14 @@ defmodule Palee.Payments.Terminal do
       surcharge_cents: intent.surcharge_cents || 0,
       expires_at: intent.expires_at,
       failure_message: intent.failure_message,
-      app_request: app_request(intent, reference, now)
+      app_request: app_request(intent, reference, now),
+      # ADR-272: the payment's receipt, and whose tip it is.
+      fiscal_document_id: intent[:fiscal_document_id],
+      started_by_id: intent[:created_by_id],
+      started_on: TipAttribution.started_on(intent),
+      tip_attribution: intent[:tip_attribution],
+      tip_recipient_user_id: intent[:tip_recipient_user_id],
+      tip_recipient_role: intent[:tip_recipient_role]
     })
   end
 
