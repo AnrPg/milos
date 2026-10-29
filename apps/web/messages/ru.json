@@ -12104,7 +12104,7 @@
   },
   "PlanView": {
     "label": "Структурированная тренировка",
-    "untitledSection": "Часть {letter}",
+    "untitledSection": "Раздел {letter}",
     "empty": "Пока ничего не написано.",
     "flow": {
       "sets": "Подходы",
@@ -12119,7 +12119,7 @@
       "billat": "Billat",
       "hrr": "Восстановление пульса (HRR)",
       "death_by": "Death by",
-      "even_odd": "Чередование (нечётные / чётные)",
+      "even_odd": "Чередование (нечёт / чёт)",
       "complex_emom": "Complex EMOM",
       "edt": "EDT",
       "chipper": "Chipper",
@@ -12129,22 +12129,22 @@
       "to_failure": "До отказа",
       "superset": "Суперсет / гигантский сет",
       "cluster": "Cluster",
-      "drop_set": "Дроп-сет",
-      "rest_pause": "Отдых-пауза",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
       "interrupt": "С прерываниями"
     },
     "params": {
       "sets": "подходов: {sets}",
-      "rest": "{time} отдыха",
+      "rest": "отдых {time}",
       "rounds": "раундов: {rounds}",
       "cap": "лимит {time}",
       "windows": "окон: {count} — {times}",
-      "restBetween": "{time} отдыха между ними",
+      "restBetween": "отдых {time} между ними",
       "every": "каждые {time}",
       "times": "× {count}",
       "untilFailure": "пока успеваешь",
       "intervals": "{rounds} × {work} работы / {off} отдыха",
-      "intervalsHr": "{rounds} × {work} работы, отдых до снижения пульса до {bpm}"
+      "intervalsHr": "{rounds} × {work} работы, отдых, пока пульс не упадёт до {bpm}"
     },
     "roundWord": {
       "set": "Подход {numbers}",
@@ -12153,16 +12153,16 @@
       "minute": "Минута {numbers}"
     },
     "struct": {
-      "superset": "Superset",
-      "complex": "Complex",
+      "superset": "Суперсет",
+      "complex": "Комплекс",
       "cluster": "Кластер · частей: {clusters} · пауза {intra}",
-      "drop": "Дроп-сет · снижений: {drops}, по {dropby}",
+      "drop": "Дропсет · снижений: {drops}, по {dropby}",
       "restpause": "Отдых-пауза · мини-подходов: {minis} · пауза {intra}"
     },
     "perSide": "на каждую сторону",
     "rest": "Отдых",
     "measure": {
-      "pace": "Темп {value}",
+      "pace": "Темп на дистанции {value}",
       "tempo": "Темп выполнения {value}",
       "rpe": "RPE {value}",
       "rir": "RIR {value}",
@@ -12171,7 +12171,7 @@
       "dist": "Дистанция {value}",
       "hold": "Удержание {value}"
     },
-    "interruptEvery": "Каждые {time} останавливайся на",
+    "interruptEvery": "Каждые {time} прерывайся на",
     "scoreLine": "Результат: {score}",
     "score": {
       "best_load": "Вес (лучший подход)",
@@ -12184,25 +12184,25 @@
       "distance": "Дистанция"
     },
     "levelNotes": "Заметки по уровням",
-    "sectionNote": "Заметка к части",
+    "sectionNote": "Заметка к разделу",
     "exerciseCount": "{count, plural, one {# упражнение} few {# упражнения} many {# упражнений} other {# упражнения}}",
     "authoring": {
-      "label": "Как записана эта тренировка",
+      "label": "Как написана эта тренировка",
       "freeText": "Свободный текст",
       "structured": "Структурированно",
       "toStructuredTitle": "Перейти на структурированный вид?",
-      "toStructuredBody": "Структурированный план начинается пустым. Твой текст останется заметкой к первой части, так что ничего не потеряется.",
+      "toStructuredBody": "Структурированный план начинается пустым. Твой текст останется заметкой к первому разделу, так что ничего не потеряется.",
       "toTextTitle": "Перейти на свободный текст?",
-      "toTextBody": "План станет текстом, который можно дальше редактировать. Режимы, значения по подходам и структуры будут записаны текстом и перестанут быть структурированными.",
-      "confirm": "Переключить",
+      "toTextBody": "План станет текстом, который можно дальше редактировать. Схемы, значения по подходам и структуры будут записаны текстом и перестанут быть структурированными.",
+      "confirm": "Перейти",
       "cancel": "Отмена",
-      "switchFailed": "Не удалось сохранить тренировку перед переключением. Попробуй ещё раз.",
-      "switching": "Сохраняем…"
+      "switchFailed": "Не удалось сохранить тренировку перед переходом. Попробуй ещё раз.",
+      "switching": "Сохранение…"
     },
     "editor": {
       "planEmpty": "Перед публикацией добавь хотя бы одно упражнение или отдых.",
       "fixProblems": "Некоторые значения не читаются: исправь строки, отмеченные красным.",
-      "sectionCount": "{count, plural, one {# часть} few {# части} many {# частей} other {# части}}"
+      "sectionCount": "{count, plural, one {# раздел} few {# раздела} many {# разделов} other {# раздела}}"
     }
   },
   "PlanEditor": {

@@ -12119,7 +12119,7 @@
       "billat": "Billat",
       "hrr": "התאוששות דופק (HRR)",
       "death_by": "Death by",
-      "even_odd": "לסירוגין (אי-זוגיות / זוגיות)",
+      "even_odd": "לסירוגין (אי-זוגי / זוגי)",
       "complex_emom": "Complex EMOM",
       "edt": "EDT",
       "chipper": "Chipper",
@@ -12127,10 +12127,10 @@
       "ladder": "סולם / פירמידה",
       "calorie_target": "יעד קלוריות",
       "to_failure": "עד כשל",
-      "superset": "סופרסט / ג'איינט סט",
+      "superset": "סופרסט / סט ענק",
       "cluster": "Cluster",
-      "drop_set": "דרופ סט",
-      "rest_pause": "רסט-פוז",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
       "interrupt": "עם הפסקות"
     },
     "params": {
@@ -12142,28 +12142,28 @@
       "restBetween": "{time} מנוחה ביניהם",
       "every": "כל {time}",
       "times": "× {count}",
-      "untilFailure": "עד שאתה לא מספיק",
+      "untilFailure": "עד שלא מספיקים",
       "intervals": "{rounds} × {work} עבודה / {off} מנוחה",
-      "intervalsHr": "{rounds} × {work} עבודה, מנוחה עד שהדופק יורד ל-{bpm}"
+      "intervalsHr": "{rounds} × {work} עבודה, מנוחה עד שהדופק יורד ל־{bpm}"
     },
     "roundWord": {
       "set": "סט {numbers}",
       "round": "סבב {numbers}",
-      "interval": "אינטרוול {numbers}",
+      "interval": "מקטע {numbers}",
       "minute": "דקה {numbers}"
     },
     "struct": {
-      "superset": "Superset",
-      "complex": "Complex",
+      "superset": "סופרסט",
+      "complex": "קומפלקס",
       "cluster": "קלאסטר · {clusters} חלקים · {intra} הפסקה",
-      "drop": "דרופ סט · {drops} הורדות של {dropby}",
-      "restpause": "רסט-פוז · {minis} מיני סטים · {intra} הפסקה"
+      "drop": "סט יורד · {drops} הורדות של {dropby}",
+      "restpause": "מנוחה-הפסקה · {minis} מיני סטים · {intra} הפסקה"
     },
     "perSide": "לכל צד",
     "rest": "מנוחה",
     "measure": {
       "pace": "קצב {value}",
-      "tempo": "טמפו {value}",
+      "tempo": "טמפו ביצוע {value}",
       "rpe": "RPE {value}",
       "rir": "RIR {value}",
       "zone": "אזור דופק {value}",
@@ -12174,13 +12174,13 @@
     "interruptEvery": "כל {time} עוצרים בשביל",
     "scoreLine": "תוצאה: {score}",
     "score": {
-      "best_load": "משקל (הסט הטוב ביותר)",
+      "best_load": "משקל (הסט הטוב)",
       "reps": "חזרות",
       "time": "זמן",
       "rounds_reps": "סבבים + חזרות",
       "done": "הושלם",
-      "total_reps": "חזרות (סך הכול)",
-      "lowest_round": "הסבב הנמוך ביותר",
+      "total_reps": "חזרות (סה״כ)",
+      "lowest_round": "הסבב החלש",
       "distance": "מרחק"
     },
     "levelNotes": "הערות לפי רמה",
@@ -12193,15 +12193,15 @@
       "toStructuredTitle": "לעבור למובנה?",
       "toStructuredBody": "התוכנית המובנית מתחילה ריקה. הטקסט שלך נשאר כהערה של החלק הראשון, כך ששום דבר לא הולך לאיבוד.",
       "toTextTitle": "לעבור לטקסט חופשי?",
-      "toTextBody": "התוכנית הופכת לטקסט שאפשר להמשיך לערוך. מהלכים, ערכים לכל סט ומבנים נכתבים כטקסט ולא נשארים מובנים.",
-      "confirm": "החלפה",
+      "toTextBody": "התוכנית הופכת לטקסט שאפשר להמשיך לערוך. מבנים, ערכים לכל סט ותבניות נכתבים כטקסט ואינם מובנים עוד.",
+      "confirm": "מעבר",
       "cancel": "ביטול",
-      "switchFailed": "לא הצלחנו לשמור את האימון לפני ההחלפה. נסה שוב.",
-      "switching": "שומרים…"
+      "switchFailed": "לא ניתן היה לשמור את האימון לפני המעבר. נסה שוב.",
+      "switching": "שומר…"
     },
     "editor": {
-      "planEmpty": "הוסף לפחות תרגיל אחד או מנוחה לפני הפרסום.",
-      "fixProblems": "חלק מהערכים לא קריאים: תקן את השורות המסומנות באדום.",
+      "planEmpty": "יש להוסיף לפחות תרגיל אחד או מנוחה לפני הפרסום.",
+      "fixProblems": "חלק מהערכים לא נקראים: תקן את השורות המסומנות באדום.",
       "sectionCount": "{count, plural, one {חלק אחד} other {# חלקים}}"
     }
   },

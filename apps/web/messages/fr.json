@@ -12104,8 +12104,8 @@
   },
   "PlanView": {
     "label": "Entraînement structuré",
-    "untitledSection": "Partie {letter}",
-    "empty": "Rien d’écrit pour l’instant.",
+    "untitledSection": "Section {letter}",
+    "empty": "Rien n'est encore écrit.",
     "flow": {
       "sets": "Séries",
       "for_time": "For Time",
@@ -12119,14 +12119,14 @@
       "billat": "Billat",
       "hrr": "Récupération cardiaque (HRR)",
       "death_by": "Death by",
-      "even_odd": "En alternance (impairs / pairs)",
+      "even_odd": "En alternance (impair / pair)",
       "complex_emom": "Complex EMOM",
       "edt": "EDT",
       "chipper": "Chipper",
       "21_15_9": "21-15-9",
       "ladder": "Échelle / pyramide",
       "calorie_target": "Objectif calories",
-      "to_failure": "Jusqu’à l’échec",
+      "to_failure": "Jusqu'à l'échec",
       "superset": "Superset / série géante",
       "cluster": "Cluster",
       "drop_set": "Drop set",
@@ -12139,12 +12139,12 @@
       "rounds": "{rounds} tours",
       "cap": "limite {time}",
       "windows": "{count} fenêtres : {times}",
-      "restBetween": "{time} de repos entre",
+      "restBetween": "{time} de repos entre elles",
       "every": "toutes les {time}",
       "times": "× {count}",
-      "untilFailure": "jusqu’à ne plus tenir le rythme",
-      "intervals": "{rounds} × {work} d’effort / {off} de repos",
-      "intervalsHr": "{rounds} × {work} d’effort, repos jusqu’à ce que le cœur redescende à {bpm}"
+      "untilFailure": "jusqu'à ne plus suivre",
+      "intervals": "{rounds} × {work} d'effort / {off} de repos",
+      "intervalsHr": "{rounds} × {work} d'effort, repos jusqu'à ce que le pouls descende à {bpm}"
     },
     "roundWord": {
       "set": "Série {numbers}",
@@ -12154,10 +12154,10 @@
     },
     "struct": {
       "superset": "Superset",
-      "complex": "Complex",
-      "cluster": "Cluster · {clusters} blocs · {intra} de pause",
-      "drop": "Drop set · {drops} baisses de {dropby}",
-      "restpause": "Rest-pause · {minis} mini-séries · {intra} de pause"
+      "complex": "Complexe",
+      "cluster": "Cluster · {clusters} parties · {intra} de pause",
+      "drop": "Série dégressive · {drops} baisses de {dropby}",
+      "restpause": "Repos-pause · {minis} mini-séries · {intra} de pause"
     },
     "perSide": "par côté",
     "rest": "Repos",
@@ -12166,7 +12166,7 @@
       "tempo": "Tempo {value}",
       "rpe": "RPE {value}",
       "rir": "RIR {value}",
-      "zone": "Zone cardio {value}",
+      "zone": "Zone cardiaque {value}",
       "height": "Hauteur {value}",
       "dist": "Distance {value}",
       "hold": "Maintien {value}"
@@ -12177,32 +12177,32 @@
       "best_load": "Charge (meilleure série)",
       "reps": "Répétitions",
       "time": "Temps",
-      "rounds_reps": "Tours + répétitions",
+      "rounds_reps": "Tours + rép.",
       "done": "Terminé",
       "total_reps": "Répétitions (total)",
       "lowest_round": "Tour le plus faible",
       "distance": "Distance"
     },
     "levelNotes": "Notes par niveau",
-    "sectionNote": "Note de la partie",
+    "sectionNote": "Note de la section",
     "exerciseCount": "{count, plural, one {# exercice} other {# exercices}}",
     "authoring": {
       "label": "Comment cet entraînement est écrit",
       "freeText": "Texte libre",
       "structured": "Structuré",
       "toStructuredTitle": "Passer en structuré ?",
-      "toStructuredBody": "Le plan structuré commence vide. Ton texte reste comme note de la première partie, donc rien n’est perdu.",
+      "toStructuredBody": "Le plan structuré démarre vide. Ton texte reste comme note de la première section, rien n'est perdu.",
       "toTextTitle": "Passer en texte libre ?",
       "toTextBody": "Le plan devient un texte que tu peux continuer à modifier. Les déroulés, les valeurs par série et les structures sont écrits en texte et ne sont plus structurés.",
       "confirm": "Changer",
       "cancel": "Annuler",
-      "switchFailed": "L’entraînement n’a pas pu être enregistré avant le changement. Réessaie.",
+      "switchFailed": "L'entraînement n'a pas pu être enregistré avant le changement. Réessaie.",
       "switching": "Enregistrement…"
     },
     "editor": {
       "planEmpty": "Ajoute au moins un exercice ou un repos avant de publier.",
-      "fixProblems": "Certaines valeurs ne sont pas lisibles : corrige les lignes en rouge.",
-      "sectionCount": "{count, plural, one {# partie} other {# parties}}"
+      "fixProblems": "Certaines valeurs ne se lisent pas : corrige les lignes en rouge.",
+      "sectionCount": "{count, plural, one {# section} other {# sections}}"
     }
   },
   "PlanEditor": {

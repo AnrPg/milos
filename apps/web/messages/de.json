@@ -12103,7 +12103,7 @@
     "panelButton": "+ Zahlung erfassen"
   },
   "PlanView": {
-    "label": "Strukturiertes Workout",
+    "label": "Strukturiertes Training",
     "untitledSection": "Abschnitt {letter}",
     "empty": "Noch nichts geschrieben.",
     "flow": {
@@ -12117,7 +12117,7 @@
     "preset": {
       "tabata": "Tabata",
       "billat": "Billat",
-      "hrr": "Herzfrequenz-Erholung (HRR)",
+      "hrr": "Pulserholung (HRR)",
       "death_by": "Death by",
       "even_odd": "Abwechselnd (ungerade / gerade)",
       "complex_emom": "Complex EMOM",
@@ -12126,12 +12126,12 @@
       "21_15_9": "21-15-9",
       "ladder": "Leiter / Pyramide",
       "calorie_target": "Kalorienziel",
-      "to_failure": "Bis zum Muskelversagen",
+      "to_failure": "Bis zum Versagen",
       "superset": "Supersatz / Riesensatz",
       "cluster": "Cluster",
-      "drop_set": "Drop-Set",
-      "rest_pause": "Rest-Pause",
-      "interrupt": "Mit Unterbrechungen"
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "interrupt": "Mit Unterbrechung"
     },
     "params": {
       "sets": "{sets} Sätze",
@@ -12142,7 +12142,7 @@
       "restBetween": "{time} Pause dazwischen",
       "every": "alle {time}",
       "times": "× {count}",
-      "untilFailure": "bis du nicht mehr mithältst",
+      "untilFailure": "bis du nicht mehr mitkommst",
       "intervals": "{rounds} × {work} Arbeit / {off} Pause",
       "intervalsHr": "{rounds} × {work} Arbeit, Pause bis der Puls auf {bpm} fällt"
     },
@@ -12153,17 +12153,17 @@
       "minute": "Minute {numbers}"
     },
     "struct": {
-      "superset": "Superset",
-      "complex": "Complex",
+      "superset": "Supersatz",
+      "complex": "Komplex",
       "cluster": "Cluster · {clusters} Teile · {intra} Pause",
-      "drop": "Drop-Set · {drops} Reduzierungen um {dropby}",
+      "drop": "Dropsatz · {drops} Reduktionen um {dropby}",
       "restpause": "Rest-Pause · {minis} Mini-Sätze · {intra} Pause"
     },
     "perSide": "pro Seite",
     "rest": "Pause",
     "measure": {
-      "pace": "Pace {value}",
-      "tempo": "Tempo {value}",
+      "pace": "Tempo pro Strecke {value}",
+      "tempo": "Bewegungstempo {value}",
       "rpe": "RPE {value}",
       "rir": "RIR {value}",
       "zone": "Pulszone {value}",
@@ -12172,31 +12172,31 @@
       "hold": "Halten {value}"
     },
     "interruptEvery": "Alle {time} unterbrechen für",
-    "scoreLine": "Score: {score}",
+    "scoreLine": "Wertung: {score}",
     "score": {
       "best_load": "Gewicht (bester Satz)",
       "reps": "Wiederholungen",
       "time": "Zeit",
-      "rounds_reps": "Runden + Wiederholungen",
+      "rounds_reps": "Runden + Wdh.",
       "done": "Geschafft",
       "total_reps": "Wiederholungen (gesamt)",
       "lowest_round": "Schwächste Runde",
       "distance": "Distanz"
     },
-    "levelNotes": "Notizen pro Stufe",
-    "sectionNote": "Notiz zum Abschnitt",
+    "levelNotes": "Hinweise pro Stufe",
+    "sectionNote": "Hinweis zum Abschnitt",
     "exerciseCount": "{count, plural, one {# Übung} other {# Übungen}}",
     "authoring": {
-      "label": "Wie dieses Workout geschrieben ist",
-      "freeText": "Freitext",
+      "label": "Wie dieses Training geschrieben wird",
+      "freeText": "Freier Text",
       "structured": "Strukturiert",
       "toStructuredTitle": "Zu strukturiert wechseln?",
-      "toStructuredBody": "Der strukturierte Plan beginnt leer. Dein Text bleibt als Notiz des ersten Abschnitts erhalten, es geht also nichts verloren.",
-      "toTextTitle": "Zu Freitext wechseln?",
-      "toTextBody": "Der Plan wird zu Text, den du weiter bearbeiten kannst. Abläufe, Werte pro Satz und Satzstrukturen werden als Text ausgeschrieben und sind nicht mehr strukturiert.",
+      "toStructuredBody": "Der strukturierte Plan beginnt leer. Dein Text bleibt als Notiz des ersten Abschnitts erhalten, es geht nichts verloren.",
+      "toTextTitle": "Zu freiem Text wechseln?",
+      "toTextBody": "Der Plan wird zu Text, den du weiter bearbeiten kannst. Abläufe, Werte pro Satz und Strukturen werden als Text ausgeschrieben und sind nicht mehr strukturiert.",
       "confirm": "Wechseln",
       "cancel": "Abbrechen",
-      "switchFailed": "Das Workout konnte vor dem Wechsel nicht gespeichert werden. Versuch es noch einmal.",
+      "switchFailed": "Das Training konnte vor dem Wechsel nicht gespeichert werden. Versuch es noch einmal.",
       "switching": "Wird gespeichert…"
     },
     "editor": {

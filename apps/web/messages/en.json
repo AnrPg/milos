@@ -12376,7 +12376,8 @@
       "side": "per side"
     },
     "unit": {
-      "min": "min"
+      "min": "min",
+      "sec": "s"
     },
     "structChip": "Set structure (Alt+T)",
     "rest": "Rest",
@@ -12506,6 +12507,40 @@
       "set": "Set",
       "round": "Round",
       "slot": "Slot"
+    },
+    "measure": {
+      "pace": "Pace",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "HR zone",
+      "height": "Height / target",
+      "dist": "Distance",
+      "hold": "Hold",
+      "side": "Per side"
+    },
+    "struct": {
+      "single": "Single",
+      "superset": "Superset",
+      "complex": "Complex",
+      "cluster": "Cluster",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
+    },
+    "structHint": {
+      "single": "one exercise, as it is",
+      "superset": "every exercise, then the next set",
+      "complex": "every exercise without putting the bar down",
+      "cluster": "the set breaks into pieces with a short pause",
+      "drop": "lower the weight and keep going",
+      "restpause": "to failure, pause, again"
+    },
+    "structField": {
+      "clusters": "pieces",
+      "intra": "pause",
+      "drops": "drops",
+      "dropby": "each time",
+      "minis": "mini sets"
     }
   },
   "PlanCore": {

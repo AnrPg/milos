@@ -12103,8 +12103,8 @@
     "panelButton": "+ تسجيل دفعة"
   },
   "PlanView": {
-    "label": "تمرين منظَّم",
-    "untitledSection": "الجزء {letter}",
+    "label": "تمرين منظم",
+    "untitledSection": "القسم {letter}",
     "empty": "لم يُكتب شيء بعد.",
     "flow": {
       "sets": "مجموعات",
@@ -12124,27 +12124,27 @@
       "edt": "EDT",
       "chipper": "Chipper",
       "21_15_9": "21-15-9",
-      "ladder": "سلّم / هرم",
+      "ladder": "سلم / هرم",
       "calorie_target": "هدف السعرات",
-      "to_failure": "حتى الفشل العضلي",
-      "superset": "سوبر سِت / مجموعة عملاقة",
+      "to_failure": "حتى الفشل",
+      "superset": "سوبرسِت / مجموعة عملاقة",
       "cluster": "Cluster",
-      "drop_set": "دروب سِت",
-      "rest_pause": "راحة قصيرة (Rest-pause)",
-      "interrupt": "مع توقفات"
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "interrupt": "مع مقاطعات"
     },
     "params": {
       "sets": "{sets} مجموعات",
       "rest": "راحة {time}",
       "rounds": "{rounds} جولات",
       "cap": "الحد {time}",
-      "windows": "{count} نوافذ: {times}",
+      "windows": "{count} فترات: {times}",
       "restBetween": "راحة {time} بينها",
       "every": "كل {time}",
       "times": "× {count}",
-      "untilFailure": "حتى لا تعود تلحق",
+      "untilFailure": "حتى لا تستطيع المواكبة",
       "intervals": "{rounds} × {work} عمل / {off} راحة",
-      "intervalsHr": "{rounds} × {work} عمل، ثم راحة حتى ينخفض النبض إلى {bpm}"
+      "intervalsHr": "{rounds} × {work} عمل، راحة حتى ينخفض النبض إلى {bpm}"
     },
     "roundWord": {
       "set": "المجموعة {numbers}",
@@ -12153,11 +12153,11 @@
       "minute": "الدقيقة {numbers}"
     },
     "struct": {
-      "superset": "Superset",
-      "complex": "Complex",
-      "cluster": "كلَستر · {clusters} أجزاء · راحة {intra}",
-      "drop": "دروب سِت · {drops} تخفيضات بمقدار {dropby}",
-      "restpause": "راحة قصيرة · {minis} مجموعات صغيرة · راحة {intra}"
+      "superset": "مجموعة مركبة",
+      "complex": "سلسلة متصلة",
+      "cluster": "عنقودية · {clusters} أجزاء · توقف {intra}",
+      "drop": "مجموعة تنازلية · {drops} تخفيضات بمقدار {dropby}",
+      "restpause": "راحة وتوقف · {minis} مجموعات صغيرة · توقف {intra}"
     },
     "perSide": "لكل جانب",
     "rest": "راحة",
@@ -12171,10 +12171,10 @@
       "dist": "المسافة {value}",
       "hold": "الثبات {value}"
     },
-    "interruptEvery": "كل {time} توقّف من أجل",
+    "interruptEvery": "كل {time} توقف من أجل",
     "scoreLine": "النتيجة: {score}",
     "score": {
-      "best_load": "الوزن (أفضل مجموعة)",
+      "best_load": "الحمل (أفضل مجموعة)",
       "reps": "التكرارات",
       "time": "الوقت",
       "rounds_reps": "جولات + تكرارات",
@@ -12183,17 +12183,17 @@
       "lowest_round": "أضعف جولة",
       "distance": "المسافة"
     },
-    "levelNotes": "ملاحظات لكل مستوى",
-    "sectionNote": "ملاحظة الجزء",
-    "exerciseCount": "{count, plural, zero {لا تمارين} one {تمرين واحد} two {تمرينان} few {# تمارين} many {# تمرينًا} other {# تمرين}}",
+    "levelNotes": "ملاحظات حسب المستوى",
+    "sectionNote": "ملاحظة القسم",
+    "exerciseCount": "{count, plural, one {تمرين واحد} other {# تمارين}}",
     "authoring": {
-      "label": "كيف كُتب هذا التمرين",
+      "label": "كيف يُكتب هذا التمرين",
       "freeText": "نص حر",
-      "structured": "منظَّم",
-      "toStructuredTitle": "التبديل إلى المنظَّم؟",
-      "toStructuredBody": "تبدأ الخطة المنظَّمة فارغة. يبقى نصك ملاحظةً للجزء الأول، فلا يضيع شيء.",
+      "structured": "منظم",
+      "toStructuredTitle": "التبديل إلى المنظم؟",
+      "toStructuredBody": "تبدأ الخطة المنظمة فارغة. يبقى نصك ملاحظةً للقسم الأول، فلا يضيع شيء.",
       "toTextTitle": "التبديل إلى النص الحر؟",
-      "toTextBody": "تتحول الخطة إلى نص يمكنك متابعة تعديله. تُكتب الأنماط والقيم لكل مجموعة والبُنى كنص ولا تبقى منظَّمة.",
+      "toTextBody": "تصبح الخطة نصًا يمكنك متابعة تعديله. تُكتب الأنماط والقيم لكل مجموعة والبنى نصًا ولا تبقى منظمة.",
       "confirm": "تبديل",
       "cancel": "إلغاء",
       "switchFailed": "تعذّر حفظ التمرين قبل التبديل. حاول مرة أخرى.",
@@ -12201,8 +12201,8 @@
     },
     "editor": {
       "planEmpty": "أضف تمرينًا واحدًا على الأقل أو راحة قبل النشر.",
-      "fixProblems": "بعض القيم غير مفهومة: صحّح الأسطر المعلَّمة بالأحمر.",
-      "sectionCount": "{count, plural, zero {لا أجزاء} one {جزء واحد} two {جزآن} few {# أجزاء} many {# جزءًا} other {# جزء}}"
+      "fixProblems": "بعض القيم غير مقروءة: صحّح الصفوف المعلّمة بالأحمر.",
+      "sectionCount": "{count, plural, one {قسم واحد} other {# أقسام}}"
     }
   },
   "PlanEditor": {

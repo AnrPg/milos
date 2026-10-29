@@ -12103,7 +12103,7 @@
     "panelButton": "+ Betaling vastleggen"
   },
   "PlanView": {
-    "label": "Gestructureerde workout",
+    "label": "Gestructureerde training",
     "untitledSection": "Onderdeel {letter}",
     "empty": "Nog niets geschreven.",
     "flow": {
@@ -12129,7 +12129,7 @@
       "to_failure": "Tot falen",
       "superset": "Superset / reuzenset",
       "cluster": "Cluster",
-      "drop_set": "Dropset",
+      "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
       "interrupt": "Met onderbrekingen"
     },
@@ -12137,7 +12137,7 @@
       "sets": "{sets} sets",
       "rest": "{time} rust",
       "rounds": "{rounds} rondes",
-      "cap": "tijdslimiet {time}",
+      "cap": "limiet {time}",
       "windows": "{count} blokken: {times}",
       "restBetween": "{time} rust ertussen",
       "every": "elke {time}",
@@ -12157,13 +12157,13 @@
       "complex": "Complex",
       "cluster": "Cluster · {clusters} delen · {intra} pauze",
       "drop": "Dropset · {drops} keer {dropby} minder",
-      "restpause": "Rest-pause · {minis} minisets · {intra} pauze"
+      "restpause": "Rust-pauze · {minis} minisets · {intra} pauze"
     },
     "perSide": "per kant",
     "rest": "Rust",
     "measure": {
       "pace": "Tempo per afstand {value}",
-      "tempo": "Tempo {value}",
+      "tempo": "Uitvoeringstempo {value}",
       "rpe": "RPE {value}",
       "rir": "RIR {value}",
       "zone": "Hartslagzone {value}",
@@ -12177,31 +12177,31 @@
       "best_load": "Gewicht (beste set)",
       "reps": "Herhalingen",
       "time": "Tijd",
-      "rounds_reps": "Rondes + herhalingen",
+      "rounds_reps": "Rondes + herh.",
       "done": "Voltooid",
       "total_reps": "Herhalingen (totaal)",
       "lowest_round": "Laagste ronde",
       "distance": "Afstand"
     },
     "levelNotes": "Notities per niveau",
-    "sectionNote": "Notitie bij onderdeel",
+    "sectionNote": "Notitie bij het onderdeel",
     "exerciseCount": "{count, plural, one {# oefening} other {# oefeningen}}",
     "authoring": {
-      "label": "Hoe deze workout is geschreven",
+      "label": "Hoe deze training geschreven is",
       "freeText": "Vrije tekst",
       "structured": "Gestructureerd",
       "toStructuredTitle": "Overschakelen naar gestructureerd?",
-      "toStructuredBody": "Het gestructureerde plan begint leeg. Je tekst blijft staan als notitie bij het eerste onderdeel, dus er gaat niets verloren.",
+      "toStructuredBody": "Het gestructureerde plan begint leeg. Je tekst blijft staan als notitie bij het eerste onderdeel, er gaat niets verloren.",
       "toTextTitle": "Overschakelen naar vrije tekst?",
-      "toTextBody": "Het plan wordt tekst die je verder kunt bewerken. Verlopen, waarden per set en structuren worden als tekst uitgeschreven en zijn niet meer gestructureerd.",
-      "confirm": "Wisselen",
+      "toTextBody": "Het plan wordt tekst die je verder kunt bewerken. Verlopen, waarden per set en structuren worden als tekst uitgeschreven en zijn niet langer gestructureerd.",
+      "confirm": "Overschakelen",
       "cancel": "Annuleren",
-      "switchFailed": "De workout kon niet worden opgeslagen voor het wisselen. Probeer het opnieuw.",
+      "switchFailed": "De training kon niet worden opgeslagen voor het overschakelen. Probeer het opnieuw.",
       "switching": "Opslaan…"
     },
     "editor": {
-      "planEmpty": "Voeg minstens één oefening of een rustmoment toe voordat je publiceert.",
-      "fixProblems": "Sommige waarden zijn niet leesbaar: verbeter de rood gemarkeerde regels.",
+      "planEmpty": "Voeg minstens één oefening of rust toe voordat je publiceert.",
+      "fixProblems": "Sommige waarden zijn niet leesbaar: verbeter de rood gemarkeerde rijen.",
       "sectionCount": "{count, plural, one {# onderdeel} other {# onderdelen}}"
     }
   },

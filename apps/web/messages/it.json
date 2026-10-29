@@ -12104,8 +12104,8 @@
   },
   "PlanView": {
     "label": "Allenamento strutturato",
-    "untitledSection": "Parte {letter}",
-    "empty": "Non hai ancora scritto niente.",
+    "untitledSection": "Sezione {letter}",
+    "empty": "Non c'è ancora niente di scritto.",
     "flow": {
       "sets": "Serie",
       "for_time": "For Time",
@@ -12126,7 +12126,7 @@
       "21_15_9": "21-15-9",
       "ladder": "Scala / piramide",
       "calorie_target": "Obiettivo calorie",
-      "to_failure": "Fino a cedimento",
+      "to_failure": "Fino al cedimento",
       "superset": "Superserie / serie gigante",
       "cluster": "Cluster",
       "drop_set": "Drop set",
@@ -12136,37 +12136,37 @@
     "params": {
       "sets": "{sets} serie",
       "rest": "{time} di recupero",
-      "rounds": "{rounds} round",
+      "rounds": "{rounds} giri",
       "cap": "limite {time}",
       "windows": "{count} finestre: {times}",
-      "restBetween": "{time} di recupero tra un blocco e l’altro",
+      "restBetween": "{time} di recupero tra una e l'altra",
       "every": "ogni {time}",
       "times": "× {count}",
-      "untilFailure": "finché non riesci più a stare nei tempi",
+      "untilFailure": "finché non riesci a stare al passo",
       "intervals": "{rounds} × {work} di lavoro / {off} di recupero",
       "intervalsHr": "{rounds} × {work} di lavoro, recupero finché il battito scende a {bpm}"
     },
     "roundWord": {
       "set": "Serie {numbers}",
-      "round": "Round {numbers}",
+      "round": "Giro {numbers}",
       "interval": "Intervallo {numbers}",
       "minute": "Minuto {numbers}"
     },
     "struct": {
-      "superset": "Superset",
-      "complex": "Complex",
-      "cluster": "Cluster · {clusters} blocchi · {intra} di pausa",
-      "drop": "Drop set · {drops} scalate di {dropby}",
-      "restpause": "Rest-pause · {minis} mini serie · {intra} di pausa"
+      "superset": "Superserie",
+      "complex": "Complesso",
+      "cluster": "Cluster · {clusters} parti · {intra} di pausa",
+      "drop": "Serie a scalare · {drops} riduzioni di {dropby}",
+      "restpause": "Rest-pause · {minis} miniserie · {intra} di pausa"
     },
     "perSide": "per lato",
     "rest": "Recupero",
     "measure": {
       "pace": "Passo {value}",
-      "tempo": "Tempo {value}",
+      "tempo": "Tempo esecutivo {value}",
       "rpe": "RPE {value}",
       "rir": "RIR {value}",
-      "zone": "Zona cardio {value}",
+      "zone": "Zona cardiaca {value}",
       "height": "Altezza {value}",
       "dist": "Distanza {value}",
       "hold": "Tenuta {value}"
@@ -12177,32 +12177,32 @@
       "best_load": "Carico (serie migliore)",
       "reps": "Ripetizioni",
       "time": "Tempo",
-      "rounds_reps": "Round + ripetizioni",
+      "rounds_reps": "Giri + rip.",
       "done": "Completato",
       "total_reps": "Ripetizioni (totale)",
-      "lowest_round": "Round più basso",
+      "lowest_round": "Giro più basso",
       "distance": "Distanza"
     },
     "levelNotes": "Note per livello",
-    "sectionNote": "Nota della parte",
+    "sectionNote": "Nota della sezione",
     "exerciseCount": "{count, plural, one {# esercizio} other {# esercizi}}",
     "authoring": {
       "label": "Come è scritto questo allenamento",
       "freeText": "Testo libero",
       "structured": "Strutturato",
       "toStructuredTitle": "Passare a strutturato?",
-      "toStructuredBody": "Il piano strutturato parte vuoto. Il tuo testo resta come nota della prima parte, così non si perde nulla.",
+      "toStructuredBody": "Il piano strutturato parte vuoto. Il tuo testo resta come nota della prima sezione, così non si perde nulla.",
       "toTextTitle": "Passare a testo libero?",
       "toTextBody": "Il piano diventa testo che puoi continuare a modificare. Flussi, valori per serie e strutture vengono scritti come testo e non sono più strutturati.",
       "confirm": "Cambia",
       "cancel": "Annulla",
-      "switchFailed": "Non è stato possibile salvare l’allenamento prima del cambio. Riprova.",
+      "switchFailed": "Non è stato possibile salvare l'allenamento prima del cambio. Riprova.",
       "switching": "Salvataggio…"
     },
     "editor": {
       "planEmpty": "Aggiungi almeno un esercizio o un recupero prima di pubblicare.",
       "fixProblems": "Alcuni valori non si leggono: correggi le righe segnate in rosso.",
-      "sectionCount": "{count, plural, one {# parte} other {# parti}}"
+      "sectionCount": "{count, plural, one {# sezione} other {# sezioni}}"
     }
   },
   "PlanEditor": {
