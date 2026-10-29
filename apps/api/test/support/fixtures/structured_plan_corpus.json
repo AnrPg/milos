@@ -1,0 +1,7767 @@
+{
+  "version": 1,
+  "about": "ADR-270 structured WOD plan corpus. Shared by the web (vitest) and the API (ExUnit). Expectations are written by hand from docs/product/structured-wod-notation.md. issues: every {path, code} validateSection must return, in any order. checks: readings by type (see corpus.test.ts).",
+  "sections": [
+    {
+      "id": "ref_strength_tempo",
+      "title": "4 sets 12-10-8-8, 60% then +5, tempo 31X1, note",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "4",
+          "rest": "2:00"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "ref1-r1",
+              "kind": "ex",
+              "name": "Back Squat",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "12",
+                  "l": "60%",
+                  "tempo": "31X1"
+                },
+                {
+                  "d": "10",
+                  "l": "+5"
+                },
+                {
+                  "d": "8"
+                },
+                {
+                  "d": "8"
+                }
+              ],
+              "note": "Έλεγχος στο κατέβασμα, με ζώνη",
+              "extra": [
+                "tempo"
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "setLoads",
+            "path": "blocks.0.0",
+            "n": 4,
+            "expect": {
+              "values": [
+                "60%",
+                "65%",
+                "70%",
+                "75%"
+              ],
+              "errors": [
+                null,
+                null,
+                null,
+                null
+              ],
+              "unit": "%"
+            }
+          },
+          {
+            "type": "repeat",
+            "path": "blocks.0.0",
+            "key": "tempo",
+            "n": 4,
+            "expect": [
+              "31X1",
+              "31X1",
+              "31X1",
+              "31X1"
+            ]
+          },
+          {
+            "type": "rounds",
+            "expect": 4
+          },
+          {
+            "type": "describe",
+            "expect": [
+              "PlanCore.describe.setsRest"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ref_superset_3_4_sets_rest_range",
+      "title": "3-4 sets, 90-120″ rest, giant set of three",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "3-4",
+          "rest": "90-120″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "ref2-r1",
+              "kind": "ex",
+              "name": "Knee Extension",
+              "dose": "",
+              "load": "",
+              "group": "ref2-g1",
+              "cells": [
+                {
+                  "d": "12-15"
+                }
+              ]
+            },
+            {
+              "id": "ref2-r2",
+              "kind": "ex",
+              "name": "Standing Calf Raise",
+              "dose": "",
+              "load": "",
+              "group": "ref2-g1",
+              "cells": [
+                {
+                  "d": "15"
+                }
+              ]
+            },
+            {
+              "id": "ref2-r3",
+              "kind": "ex",
+              "name": "Cyclist Squat",
+              "dose": "",
+              "load": "",
+              "group": "ref2-g1",
+              "cells": [
+                {
+                  "d": "20"
+                }
+              ],
+              "note": "Φτέρνες ψηλά"
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "param",
+            "key": "sets",
+            "expect": {
+              "ok": true,
+              "kind": "countRange",
+              "min": 3,
+              "max": 4
+            }
+          },
+          {
+            "type": "param",
+            "key": "rest",
+            "expect": {
+              "ok": true,
+              "kind": "secsRange",
+              "min": 90,
+              "max": 120
+            }
+          },
+          {
+            "type": "rounds",
+            "expect": 4
+          },
+          {
+            "type": "dose",
+            "path": "blocks.0.0.cells.0.d",
+            "expect": {
+              "entries": [
+                {
+                  "min": 12,
+                  "max": 15
+                }
+              ],
+              "unit": "reps",
+              "ambiguous": {
+                "alt": "list",
+                "write": "12, 15"
+              }
+            }
+          },
+          {
+            "type": "units",
+            "block": 0,
+            "expect": [
+              3
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ref_superset_with_rest_rows_and_max_cal",
+      "title": "giant set with rest rows, 60s max cal",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "4",
+          "rest": "3:00"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "ref3-r1",
+              "kind": "ex",
+              "name": "Ring Dip",
+              "dose": "",
+              "load": "",
+              "group": "ref3-g1",
+              "cells": [
+                {
+                  "d": "7",
+                  "l": "με βάρος"
+                }
+              ]
+            },
+            {
+              "id": "ref3-r2",
+              "kind": "rest",
+              "name": "",
+              "dose": "",
+              "load": "",
+              "group": "ref3-g1",
+              "cells": [
+                {
+                  "d": "30″"
+                }
+              ]
+            },
+            {
+              "id": "ref3-r3",
+              "kind": "ex",
+              "name": "Strict HSPU",
+              "dose": "",
+              "load": "",
+              "group": "ref3-g1",
+              "cells": [
+                {
+                  "d": "10"
+                }
+              ]
+            },
+            {
+              "id": "ref3-r4",
+              "kind": "rest",
+              "name": "",
+              "dose": "",
+              "load": "",
+              "group": "ref3-g1",
+              "cells": [
+                {
+                  "d": "30″"
+                }
+              ]
+            },
+            {
+              "id": "ref3-r5",
+              "kind": "ex",
+              "name": "Echo Bike",
+              "dose": "",
+              "load": "",
+              "group": "ref3-g1",
+              "cells": [
+                {
+                  "d": "60s max cal"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "dose",
+            "path": "blocks.0.4.cells.0.d",
+            "expect": {
+              "unit": "kcal",
+              "max": {
+                "within": 60
+              }
+            }
+          },
+          {
+            "type": "setLoads",
+            "path": "blocks.0.0",
+            "n": 4,
+            "expect": {
+              "values": [
+                "με βάρος",
+                "με βάρος",
+                "με βάρος",
+                "με βάρος"
+              ],
+              "errors": [
+                null,
+                null,
+                null,
+                null
+              ],
+              "unit": null
+            }
+          },
+          {
+            "type": "units",
+            "block": 0,
+            "expect": [
+              5
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ref_cluster",
+      "title": "cluster 3 × 15″ inside 5 sets",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "5",
+          "rest": "2:30"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "ref4-r1",
+              "kind": "ex",
+              "name": "Back Squat",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "3",
+                  "l": "80%"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "ref4-r1": {
+            "kind": "cluster",
+            "clusters": "3",
+            "intra": "15″"
+          }
+        },
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "cluster",
+              "clusters": "3",
+              "intra": "15″"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ref_emom_every_2_30",
+      "title": "every 2:30 × 4, superset, βαρύ",
+      "section": {
+        "v": 1,
+        "flow": "emom",
+        "preset": null,
+        "params": {
+          "every": "2:30",
+          "times": "4"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "ref5-r1",
+              "kind": "ex",
+              "name": "Front Squat",
+              "dose": "7",
+              "load": "",
+              "group": "ref5-g1",
+              "cells": [],
+              "note": "Ίδια κιλά με το top set της δεκάρας"
+            },
+            {
+              "id": "ref5-r2",
+              "kind": "ex",
+              "name": "Dual DB Push Press",
+              "dose": "8-12",
+              "load": "βαρύ",
+              "group": "ref5-g1",
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "load",
+            "path": "blocks.0.1.load",
+            "expect": {
+              "kind": "text",
+              "text": "βαρύ"
+            }
+          },
+          {
+            "type": "describe",
+            "expect": [
+              "PlanCore.describe.emom"
+            ]
+          },
+          {
+            "type": "timeline",
+            "expect": {
+              "open": false,
+              "total": 600,
+              "segments": 4,
+              "interrupts": []
+            }
+          },
+          {
+            "type": "rounds",
+            "expect": 4
+          }
+        ]
+      }
+    },
+    {
+      "id": "ref_even_odd",
+      "title": "alternating minutes: odd wall balls, even burpees",
+      "section": {
+        "v": 1,
+        "flow": "emom",
+        "preset": "even_odd",
+        "params": {
+          "every": "1:00",
+          "times": "8"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "ref6-r1",
+              "kind": "ex",
+              "name": "Wall Ball",
+              "dose": "20",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "ref6-r2",
+              "kind": "ex",
+              "name": "Burpee to Target",
+              "dose": "12",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "occurrences",
+            "block": 0,
+            "expect": {
+              "list": [
+                1,
+                3,
+                5,
+                7
+              ],
+              "open": false
+            }
+          },
+          {
+            "type": "occurrences",
+            "block": 1,
+            "expect": {
+              "list": [
+                2,
+                4,
+                6,
+                8
+              ],
+              "open": false
+            }
+          },
+          {
+            "type": "blockLabel",
+            "block": 1,
+            "expect": {
+              "key": "PlanCore.block.minute",
+              "values": {
+                "list": "2, 4, 6, …"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ref_amrap_per_round",
+      "title": "AMRAP 7, power snatch changes per round, +5kg keeps going",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "7",
+          "rest": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "ref7-r1",
+              "kind": "ex",
+              "name": "Butterfly Pull-up",
+              "dose": "15",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "ref7-r2",
+              "kind": "ex",
+              "name": "Power Snatch",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "40kg"
+                },
+                {
+                  "d": "10",
+                  "l": "+5kg"
+                },
+                {
+                  "d": "15"
+                }
+              ],
+              "perRound": true
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "occurrences",
+            "block": 0,
+            "expect": {
+              "list": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "open": true
+            }
+          },
+          {
+            "type": "setLoads",
+            "path": "blocks.0.1",
+            "n": 4,
+            "expect": {
+              "values": [
+                "40 kg",
+                "45 kg",
+                "50 kg",
+                "55 kg"
+              ],
+              "errors": [
+                null,
+                null,
+                null,
+                null
+              ],
+              "unit": "kg"
+            }
+          },
+          {
+            "type": "rounds",
+            "expect": "Infinity"
+          },
+          {
+            "type": "timeline",
+            "expect": {
+              "open": false,
+              "total": 420,
+              "segments": 1,
+              "interrupts": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ref_amrap_ladder_22_5",
+      "title": "AMRAP 12, thrusters 5-10-15… at 22.5 kg",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "12",
+          "rest": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "ref8-r1",
+              "kind": "ex",
+              "name": "Thruster",
+              "dose": "5-10-15…",
+              "load": "22.5kg",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "dose",
+            "path": "blocks.0.0.dose",
+            "expect": {
+              "cont": true,
+              "entries": [
+                {
+                  "min": 5,
+                  "max": 5
+                },
+                {
+                  "min": 10,
+                  "max": 10
+                },
+                {
+                  "min": 15,
+                  "max": 15
+                }
+              ]
+            }
+          },
+          {
+            "type": "doseAt",
+            "path": "blocks.0.0.dose",
+            "i": 4,
+            "expect": "25"
+          },
+          {
+            "type": "load",
+            "path": "blocks.0.0.load",
+            "expect": {
+              "kind": "kg",
+              "entries": [
+                {
+                  "min": 22.5,
+                  "max": 22.5
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ref_for_time_interrupted",
+      "title": "75 thrusters, every 2:00 10 burpees over the bar",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": "interrupt",
+        "params": {
+          "rounds": "1",
+          "cap": "",
+          "intEvery": "2:00"
+        },
+        "mods": {
+          "interrupt": true
+        },
+        "blocks": [
+          [
+            {
+              "id": "ref9-r1",
+              "kind": "ex",
+              "name": "Thruster",
+              "dose": "75",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [
+          {
+            "id": "ref9-r2",
+            "kind": "ex",
+            "name": "Burpee over Bar",
+            "dose": "10",
+            "load": "",
+            "group": null,
+            "cells": []
+          }
+        ],
+        "structs": {},
+        "score": "time"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "timeline",
+            "expect": {
+              "open": false,
+              "total": 720,
+              "segments": 1,
+              "interrupts": [
+                120,
+                240,
+                360,
+                480,
+                600
+              ]
+            }
+          },
+          {
+            "type": "describe",
+            "expect": [
+              "PlanCore.describe.forTime",
+              "PlanCore.describe.interrupt"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ref_different_rounds",
+      "title": "4 rounds, cap 20: rounds 1, 3 row + burpee; 2, 4 run + wall ball",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "4",
+          "cap": "20"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "ref10-r1",
+              "kind": "ex",
+              "name": "Row",
+              "dose": "500 m",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "ref10-r2",
+              "kind": "ex",
+              "name": "Burpee",
+              "dose": "15",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "ref10-r3",
+              "kind": "ex",
+              "name": "Run",
+              "dose": "400 m",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "ref10-r4",
+              "kind": "ex",
+              "name": "Wall Ball",
+              "dose": "20",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "time"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "occurrences",
+            "block": 1,
+            "expect": {
+              "list": [
+                2,
+                4
+              ],
+              "open": false
+            }
+          },
+          {
+            "type": "summary",
+            "expect": {
+              "names": [
+                [
+                  {
+                    "name": "Row",
+                    "perSide": false
+                  },
+                  {
+                    "name": "Burpee",
+                    "perSide": false
+                  }
+                ],
+                [
+                  {
+                    "name": "Run",
+                    "perSide": false
+                  },
+                  {
+                    "name": "Wall Ball",
+                    "perSide": false
+                  }
+                ]
+              ]
+            }
+          },
+          {
+            "type": "dose",
+            "path": "blocks.0.0.dose",
+            "expect": {
+              "unit": "m",
+              "entries": [
+                {
+                  "min": 500,
+                  "max": 500
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ref_amrap_windows",
+      "title": "AMRAP 3′-3′-3′-4′ with 1′ rest between windows",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "3'-3'-3'-4'",
+          "rest": "1:00"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "ref11-r1",
+              "kind": "ex",
+              "name": "Echo Bike",
+              "dose": "15 cal",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "ref11-r2",
+              "kind": "ex",
+              "name": "Wall Ball",
+              "dose": "25",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "ref11-r3",
+              "kind": "ex",
+              "name": "Clean & Jerk",
+              "dose": "max",
+              "load": "60kg",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "param",
+            "key": "dur",
+            "expect": {
+              "ok": true,
+              "kind": "windows",
+              "secs": [
+                180,
+                180,
+                180,
+                240
+              ]
+            }
+          },
+          {
+            "type": "timeline",
+            "expect": {
+              "open": false,
+              "total": 960,
+              "segments": 7,
+              "interrupts": []
+            }
+          },
+          {
+            "type": "describe",
+            "expect": [
+              "PlanCore.describe.amrapWindowsRest"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ref_each_side_rpe",
+      "title": "4 x 8-10 each side at 22.5 kg, RPE 8",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "4",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "ref12-r1",
+              "kind": "ex",
+              "name": "Bulgarian Split Squat",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "4 x 8-10 each side",
+                  "l": "22.5kg",
+                  "rpe": "8"
+                }
+              ],
+              "extra": [
+                "side",
+                "rpe"
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "dose",
+            "path": "blocks.0.0.cells.0.d",
+            "expect": {
+              "sets": {
+                "min": 4,
+                "max": 4
+              },
+              "entries": [
+                {
+                  "min": 8,
+                  "max": 10
+                }
+              ],
+              "perSide": true
+            }
+          },
+          {
+            "type": "summary",
+            "expect": {
+              "names": [
+                [
+                  {
+                    "name": "Bulgarian Split Squat",
+                    "perSide": true
+                  }
+                ]
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ref_start_60_build_up",
+      "title": "start 60% and build up",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "5",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "ref13-r1",
+              "kind": "ex",
+              "name": "Deadlift",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "60%↑"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "setLoads",
+            "path": "blocks.0.0",
+            "n": 3,
+            "expect": {
+              "values": [
+                "60%",
+                "↑ 60%",
+                "↑ 60%"
+              ],
+              "errors": [
+                null,
+                null,
+                null
+              ],
+              "unit": "%"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ref_tabata",
+      "title": "Tabata bike",
+      "section": {
+        "v": 1,
+        "flow": "intervals",
+        "preset": "tabata",
+        "params": {
+          "work": "20″",
+          "off": "10″",
+          "rounds": "8"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "ref14-r1",
+              "kind": "ex",
+              "name": "Echo Bike",
+              "dose": "max cal",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "total_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "timeline",
+            "expect": {
+              "open": false,
+              "total": 240,
+              "segments": 16,
+              "interrupts": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ref_hrr",
+      "title": "HRR: 3′ work, rest until 120 bpm",
+      "section": {
+        "v": 1,
+        "flow": "intervals",
+        "preset": "hrr",
+        "params": {
+          "work": "3:00",
+          "off": "",
+          "rounds": "3",
+          "hrTarget": "120"
+        },
+        "mods": {
+          "hr": true
+        },
+        "blocks": [
+          [
+            {
+              "id": "ref15-r1",
+              "kind": "ex",
+              "name": "Row",
+              "dose": "max m",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "total_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "timeline",
+            "expect": {
+              "open": false,
+              "total": 720,
+              "segments": 6,
+              "interrupts": []
+            }
+          },
+          {
+            "type": "describe",
+            "expect": [
+              "PlanCore.describe.intervalsHr"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "ref_death_by",
+      "title": "Death by burpees: EMOM without times is open",
+      "section": {
+        "v": 1,
+        "flow": "emom",
+        "preset": "death_by",
+        "params": {
+          "every": "1:00",
+          "times": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "ref16-r1",
+              "kind": "ex",
+              "name": "Burpee",
+              "dose": "1-2-3…",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "rounds",
+            "expect": "Infinity"
+          },
+          {
+            "type": "timeline",
+            "expect": {
+              "open": true,
+              "total": null,
+              "segments": 1,
+              "interrupts": []
+            }
+          },
+          {
+            "type": "describe",
+            "expect": [
+              "PlanCore.describe.emomOpen"
+            ]
+          },
+          {
+            "type": "doseAt",
+            "path": "blocks.0.0.dose",
+            "i": 9,
+            "expect": "10"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ref_rest_section",
+      "title": "2′ rest between sections",
+      "section": {
+        "v": 1,
+        "flow": "rest",
+        "preset": null,
+        "params": {
+          "dur": "2:00"
+        },
+        "mods": {},
+        "blocks": [],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "describe",
+            "expect": [
+              "PlanCore.describe.rest"
+            ]
+          },
+          {
+            "type": "timeline",
+            "expect": {
+              "open": false,
+              "total": 0,
+              "segments": 0,
+              "interrupts": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "notes_everywhere",
+      "title": "notes on rows, section and scale levels",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "3",
+          "cap": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "notes-r1",
+              "kind": "ex",
+              "name": "Pull-up",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": [],
+              "note": "kipping ok"
+            },
+            {
+              "id": "notes-r2",
+              "kind": "ex",
+              "name": "Push-up",
+              "dose": "20",
+              "load": "",
+              "group": null,
+              "cells": [],
+              "note": "στα γόνατα αν χρειαστεί"
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "time",
+        "note": "Σταθερός ρυθμός",
+        "levelNotes": {
+          "rx": "Όπως γράφεται",
+          "scaled": "Ring rows αντί για pull-ups",
+          "beginner": "Μισές επαναλήψεις"
+        }
+      },
+      "expect": {
+        "issues": [],
+        "checks": []
+      }
+    },
+    {
+      "id": "nasty_empty_and_spaces",
+      "title": "empty strings and only spaces mean 'not set'",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "  ",
+          "cap": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "empty-r1",
+              "kind": "ex",
+              "name": "",
+              "dose": "   ",
+              "load": " ",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "empty-r2",
+              "kind": "ex",
+              "name": "   ",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "time",
+        "note": "   "
+      },
+      "expect": {
+        "issues": [],
+        "checks": []
+      }
+    },
+    {
+      "id": "nasty_zero",
+      "title": "zero rounds, zero reps, zero time",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "0",
+          "cap": "0"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "zero-r1",
+              "kind": "ex",
+              "name": "Row",
+              "dose": "0",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "zero-r2",
+              "kind": "ex",
+              "name": "Bar",
+              "dose": "5",
+              "load": "0kg",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "time"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "params.rounds",
+            "code": "bad_param"
+          },
+          {
+            "path": "params.cap",
+            "code": "bad_param"
+          },
+          {
+            "path": "blocks.0.0.dose",
+            "code": "bad_dose"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "nasty_negative",
+      "title": "negative values; a negative load is the coach's words",
+      "section": {
+        "v": 1,
+        "flow": "emom",
+        "preset": null,
+        "params": {
+          "every": "-1:00",
+          "times": "-3"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "neg-r1",
+              "kind": "ex",
+              "name": "Pull-up",
+              "dose": "-5",
+              "load": "-10kg",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "params.every",
+            "code": "bad_param"
+          },
+          {
+            "path": "params.times",
+            "code": "bad_param"
+          },
+          {
+            "path": "blocks.0.0.dose",
+            "code": "bad_dose"
+          }
+        ],
+        "checks": [
+          {
+            "type": "load",
+            "path": "blocks.0.0.load",
+            "expect": {
+              "kind": "text",
+              "text": "-10kg"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "nasty_huge_and_long",
+      "title": "huge numbers are read; 201-char names and 2001-char notes are refused",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "999",
+          "cap": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "huge-r1",
+              "kind": "ex",
+              "name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+              "dose": "999999999",
+              "load": "99999kg",
+              "group": null,
+              "cells": [],
+              "note": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "time",
+        "note": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn",
+        "levelNotes": {
+          "rx": "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
+        }
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "note",
+            "code": "note_too_long"
+          },
+          {
+            "path": "levelNotes.rx",
+            "code": "note_too_long"
+          },
+          {
+            "path": "blocks.0.0.name",
+            "code": "too_long"
+          },
+          {
+            "path": "blocks.0.0.note",
+            "code": "note_too_long"
+          }
+        ],
+        "checks": [
+          {
+            "type": "dose",
+            "path": "blocks.0.0.dose",
+            "expect": {
+              "entries": [
+                {
+                  "min": 999999999,
+                  "max": 999999999
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "nasty_30_cells",
+      "title": "30 columns is the limit",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "30",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "c30-r1",
+              "kind": "ex",
+              "name": "Plank",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "occurrences",
+            "block": 0,
+            "expect": {
+              "list": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10,
+                11,
+                12
+              ],
+              "open": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "nasty_31_cells",
+      "title": "31 columns are refused",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "31",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "c31-r1",
+              "kind": "ex",
+              "name": "Plank",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                },
+                {
+                  "d": "30s"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "blocks.0.0.cells",
+            "code": "too_many_cells"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "nasty_emoji",
+      "title": "emoji in names and loads are fine; as reps they do not read",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "1",
+          "cap": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "emoji-r1",
+              "kind": "ex",
+              "name": "Burpee 🔥",
+              "dose": "10",
+              "load": "🏋️",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "emoji-r2",
+              "kind": "ex",
+              "name": "Run 🏃",
+              "dose": "💪",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "time"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "blocks.0.1.dose",
+            "code": "bad_dose"
+          }
+        ],
+        "checks": [
+          {
+            "type": "load",
+            "path": "blocks.0.0.load",
+            "expect": {
+              "kind": "text"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "nasty_wrong_load_units",
+      "title": "60 km and 20 reps are not loads",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "2",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "wrongu-r1",
+              "kind": "ex",
+              "name": "Squat",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "20 reps"
+                }
+              ]
+            },
+            {
+              "id": "wrongu-r2",
+              "kind": "ex",
+              "name": "Sled",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "20 m",
+                  "l": "60kg"
+                },
+                {
+                  "l": "60 km"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "blocks.0.0.cells.0.l",
+            "code": "wrong_unit"
+          },
+          {
+            "path": "blocks.0.1.cells.1.l",
+            "code": "wrong_unit"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "nasty_wrong_load_unit_plain",
+      "title": "60 km as a single load",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "10",
+          "rest": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "wrongu2-r1",
+              "kind": "ex",
+              "name": "Farmer Carry",
+              "dose": "40 m",
+              "load": "60 km",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "blocks.0.0.load",
+            "code": "wrong_unit"
+          }
+        ],
+        "checks": [
+          {
+            "type": "load",
+            "path": "blocks.0.0.load",
+            "expect": {
+              "kind": "wrong"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "nasty_mixed_units",
+      "title": "kg and % in one row",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "3",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "mixed-r1",
+              "kind": "ex",
+              "name": "Bench",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "60kg"
+                },
+                {
+                  "d": "5",
+                  "l": "70%"
+                },
+                {
+                  "d": "5",
+                  "l": "+5"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "blocks.0.0.cells.1.l",
+            "code": "mixed_unit"
+          }
+        ],
+        "checks": [
+          {
+            "type": "setLoads",
+            "path": "blocks.0.0",
+            "n": 3,
+            "expect": {
+              "values": [
+                "60 kg",
+                "",
+                "65 kg"
+              ],
+              "errors": [
+                null,
+                "mixed_unit",
+                null
+              ],
+              "unit": "kg"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "nasty_missing_unit",
+      "title": "a row of bare numbers",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "2",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "missing-r1",
+              "kind": "ex",
+              "name": "Bench",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "60"
+                },
+                {
+                  "d": "5",
+                  "l": "70"
+                }
+              ]
+            },
+            {
+              "id": "missing-r2",
+              "kind": "ex",
+              "name": "Row",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "blocks.0.0.cells.0.l",
+            "code": "missing_unit"
+          },
+          {
+            "path": "blocks.0.0.cells.1.l",
+            "code": "missing_unit"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "nasty_missing_unit_plain",
+      "title": "a bare number as a single load, decimal comma",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "1",
+          "cap": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "missing2-r1",
+              "kind": "ex",
+              "name": "Thruster",
+              "dose": "21",
+              "load": "42,5",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "time"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "blocks.0.0.load",
+            "code": "missing_unit"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "nasty_change_without_base",
+      "title": "+5 with nothing before it",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "3",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "nobase-r1",
+              "kind": "ex",
+              "name": "Press",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "+5kg",
+                  "rpe": "+1"
+                },
+                {
+                  "l": "βαρύ"
+                },
+                {
+                  "l": "+2.5"
+                }
+              ],
+              "extra": [
+                "rpe"
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "blocks.0.0.cells.0.l",
+            "code": "no_base"
+          },
+          {
+            "path": "blocks.0.0.cells.0.rpe",
+            "code": "no_base"
+          },
+          {
+            "path": "blocks.0.0.cells.2.l",
+            "code": "no_base"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "nasty_bad_measures",
+      "title": "tempo with 3 marks, RPE 11, RPE spread to 11, words as distance",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "3",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "measbad-r1",
+              "kind": "ex",
+              "name": "Squat",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "60kg",
+                  "tempo": "31X",
+                  "rpe": "11",
+                  "dist": "far"
+                },
+                {
+                  "rpe": "7→11"
+                }
+              ],
+              "extra": [
+                "tempo",
+                "rpe",
+                "dist"
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "blocks.0.0.cells.0.tempo",
+            "code": "bad_tempo"
+          },
+          {
+            "path": "blocks.0.0.cells.0.rpe",
+            "code": "rpe_over_max"
+          },
+          {
+            "path": "blocks.0.0.cells.0.dist",
+            "code": "bad_measure_value"
+          },
+          {
+            "path": "blocks.0.0.cells.1.rpe",
+            "code": "rpe_over_max"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "nasty_unknowns",
+      "title": "unknown measure, duplicate measure and id, structure and add-on not allowed, wrong score",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "10",
+          "rest": "",
+          "work": "20″"
+        },
+        "mods": {
+          "hr": true
+        },
+        "blocks": [
+          [
+            {
+              "id": "unknown-r1",
+              "kind": "ex",
+              "name": "Squat",
+              "dose": "5",
+              "load": "",
+              "group": null,
+              "cells": [],
+              "extra": [
+                "speed",
+                "side",
+                "side"
+              ]
+            },
+            {
+              "id": "unknown-r1",
+              "kind": "ex",
+              "name": "Dup",
+              "dose": "5",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "unknown-r1": {
+            "kind": "drop",
+            "drops": "2",
+            "dropby": "-20%"
+          }
+        },
+        "score": "time"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "mods.hr",
+            "code": "mod_not_allowed"
+          },
+          {
+            "path": "params.work",
+            "code": "unknown_param"
+          },
+          {
+            "path": "score",
+            "code": "unknown_score"
+          },
+          {
+            "path": "blocks.0.0.extra.0",
+            "code": "unknown_measure"
+          },
+          {
+            "path": "blocks.0.0.extra.2",
+            "code": "duplicate_measure"
+          },
+          {
+            "path": "blocks.0.1.id",
+            "code": "duplicate_id"
+          },
+          {
+            "path": "structs.unknown-r1",
+            "code": "struct_not_allowed"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "nasty_bad_shapes",
+      "title": "numbers for strings, junk cells, unknown cell keys; null cells are empty columns",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": 4,
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "shape-r1",
+              "kind": "ex",
+              "name": 7,
+              "dose": "",
+              "load": "",
+              "cells": [
+                null,
+                3,
+                {
+                  "d": 5,
+                  "zz": "1"
+                },
+                {
+                  "d": "8"
+                }
+              ]
+            },
+            {
+              "id": "shape-r2",
+              "kind": "jump",
+              "name": "x",
+              "dose": "",
+              "load": "",
+              "cells": []
+            },
+            "row"
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "params.sets",
+            "code": "bad_shape"
+          },
+          {
+            "path": "blocks.0.0.cells.1",
+            "code": "bad_shape"
+          },
+          {
+            "path": "blocks.0.0.cells.2.d",
+            "code": "bad_shape"
+          },
+          {
+            "path": "blocks.0.0.cells.2.zz",
+            "code": "bad_shape"
+          },
+          {
+            "path": "blocks.0.0.name",
+            "code": "bad_shape"
+          },
+          {
+            "path": "blocks.0.1.kind",
+            "code": "bad_row_kind"
+          },
+          {
+            "path": "blocks.0.2",
+            "code": "bad_shape"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "nasty_unknown_flow_and_version",
+      "title": "unknown flow and version",
+      "section": {
+        "v": 2,
+        "flow": "yoga",
+        "preset": null,
+        "params": {
+          "rounds": "1",
+          "cap": ""
+        },
+        "mods": {},
+        "blocks": [],
+        "interrupt": [],
+        "structs": {},
+        "score": "time"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "v",
+            "code": "bad_version"
+          },
+          {
+            "path": "flow",
+            "code": "unknown_flow"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "nasty_rest_with_rows",
+      "title": "a rest section has no exercises",
+      "section": {
+        "v": 1,
+        "flow": "rest",
+        "preset": null,
+        "params": {
+          "dur": "2:00"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "restrows-r1",
+              "kind": "ex",
+              "name": "Run",
+              "dose": "400 m",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "blocks",
+            "code": "blocks_not_allowed"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "bounds_12_blocks",
+      "title": "12 different rounds is the limit",
+      "section": {
+        "v": 1,
+        "flow": "emom",
+        "preset": null,
+        "params": {
+          "every": "1:00",
+          "times": "12"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "b12-r1",
+              "kind": "ex",
+              "name": "Move 0",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b12-r2",
+              "kind": "ex",
+              "name": "Move 1",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b12-r3",
+              "kind": "ex",
+              "name": "Move 2",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b12-r4",
+              "kind": "ex",
+              "name": "Move 3",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b12-r5",
+              "kind": "ex",
+              "name": "Move 4",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b12-r6",
+              "kind": "ex",
+              "name": "Move 5",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b12-r7",
+              "kind": "ex",
+              "name": "Move 6",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b12-r8",
+              "kind": "ex",
+              "name": "Move 7",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b12-r9",
+              "kind": "ex",
+              "name": "Move 8",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b12-r10",
+              "kind": "ex",
+              "name": "Move 9",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b12-r11",
+              "kind": "ex",
+              "name": "Move 10",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b12-r12",
+              "kind": "ex",
+              "name": "Move 11",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "occurrences",
+            "block": 11,
+            "expect": {
+              "list": [
+                12
+              ],
+              "open": false
+            }
+          },
+          {
+            "type": "blockLabel",
+            "block": 11,
+            "expect": {
+              "key": "PlanCore.block.one",
+              "values": {
+                "word": "interval",
+                "n": 12
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "bounds_13_blocks",
+      "title": "13 different rounds are refused",
+      "section": {
+        "v": 1,
+        "flow": "emom",
+        "preset": null,
+        "params": {
+          "every": "1:00",
+          "times": "13"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "b13-r1",
+              "kind": "ex",
+              "name": "Move 0",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b13-r2",
+              "kind": "ex",
+              "name": "Move 1",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b13-r3",
+              "kind": "ex",
+              "name": "Move 2",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b13-r4",
+              "kind": "ex",
+              "name": "Move 3",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b13-r5",
+              "kind": "ex",
+              "name": "Move 4",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b13-r6",
+              "kind": "ex",
+              "name": "Move 5",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b13-r7",
+              "kind": "ex",
+              "name": "Move 6",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b13-r8",
+              "kind": "ex",
+              "name": "Move 7",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b13-r9",
+              "kind": "ex",
+              "name": "Move 8",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b13-r10",
+              "kind": "ex",
+              "name": "Move 9",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b13-r11",
+              "kind": "ex",
+              "name": "Move 10",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b13-r12",
+              "kind": "ex",
+              "name": "Move 11",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "b13-r13",
+              "kind": "ex",
+              "name": "Move 12",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "blocks",
+            "code": "too_many_blocks"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "bounds_61_rows",
+      "title": "61 exercises in one block are refused",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "1",
+          "cap": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "rows61-r1",
+              "kind": "ex",
+              "name": "Move 0",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r2",
+              "kind": "ex",
+              "name": "Move 1",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r3",
+              "kind": "ex",
+              "name": "Move 2",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r4",
+              "kind": "ex",
+              "name": "Move 3",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r5",
+              "kind": "ex",
+              "name": "Move 4",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r6",
+              "kind": "ex",
+              "name": "Move 5",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r7",
+              "kind": "ex",
+              "name": "Move 6",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r8",
+              "kind": "ex",
+              "name": "Move 7",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r9",
+              "kind": "ex",
+              "name": "Move 8",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r10",
+              "kind": "ex",
+              "name": "Move 9",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r11",
+              "kind": "ex",
+              "name": "Move 10",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r12",
+              "kind": "ex",
+              "name": "Move 11",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r13",
+              "kind": "ex",
+              "name": "Move 12",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r14",
+              "kind": "ex",
+              "name": "Move 13",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r15",
+              "kind": "ex",
+              "name": "Move 14",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r16",
+              "kind": "ex",
+              "name": "Move 15",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r17",
+              "kind": "ex",
+              "name": "Move 16",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r18",
+              "kind": "ex",
+              "name": "Move 17",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r19",
+              "kind": "ex",
+              "name": "Move 18",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r20",
+              "kind": "ex",
+              "name": "Move 19",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r21",
+              "kind": "ex",
+              "name": "Move 20",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r22",
+              "kind": "ex",
+              "name": "Move 21",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r23",
+              "kind": "ex",
+              "name": "Move 22",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r24",
+              "kind": "ex",
+              "name": "Move 23",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r25",
+              "kind": "ex",
+              "name": "Move 24",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r26",
+              "kind": "ex",
+              "name": "Move 25",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r27",
+              "kind": "ex",
+              "name": "Move 26",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r28",
+              "kind": "ex",
+              "name": "Move 27",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r29",
+              "kind": "ex",
+              "name": "Move 28",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r30",
+              "kind": "ex",
+              "name": "Move 29",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r31",
+              "kind": "ex",
+              "name": "Move 30",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r32",
+              "kind": "ex",
+              "name": "Move 31",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r33",
+              "kind": "ex",
+              "name": "Move 32",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r34",
+              "kind": "ex",
+              "name": "Move 33",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r35",
+              "kind": "ex",
+              "name": "Move 34",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r36",
+              "kind": "ex",
+              "name": "Move 35",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r37",
+              "kind": "ex",
+              "name": "Move 36",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r38",
+              "kind": "ex",
+              "name": "Move 37",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r39",
+              "kind": "ex",
+              "name": "Move 38",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r40",
+              "kind": "ex",
+              "name": "Move 39",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r41",
+              "kind": "ex",
+              "name": "Move 40",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r42",
+              "kind": "ex",
+              "name": "Move 41",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r43",
+              "kind": "ex",
+              "name": "Move 42",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r44",
+              "kind": "ex",
+              "name": "Move 43",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r45",
+              "kind": "ex",
+              "name": "Move 44",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r46",
+              "kind": "ex",
+              "name": "Move 45",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r47",
+              "kind": "ex",
+              "name": "Move 46",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r48",
+              "kind": "ex",
+              "name": "Move 47",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r49",
+              "kind": "ex",
+              "name": "Move 48",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r50",
+              "kind": "ex",
+              "name": "Move 49",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r51",
+              "kind": "ex",
+              "name": "Move 50",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r52",
+              "kind": "ex",
+              "name": "Move 51",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r53",
+              "kind": "ex",
+              "name": "Move 52",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r54",
+              "kind": "ex",
+              "name": "Move 53",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r55",
+              "kind": "ex",
+              "name": "Move 54",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r56",
+              "kind": "ex",
+              "name": "Move 55",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r57",
+              "kind": "ex",
+              "name": "Move 56",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r58",
+              "kind": "ex",
+              "name": "Move 57",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r59",
+              "kind": "ex",
+              "name": "Move 58",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r60",
+              "kind": "ex",
+              "name": "Move 59",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "rows61-r61",
+              "kind": "ex",
+              "name": "Move 60",
+              "dose": "1",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "time"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "blocks.0",
+            "code": "too_many_rows"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "ambiguous_readings",
+      "title": "10-12 reps, 60-70%, 5-10-15 and AMRAP 12-15",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "12-15",
+          "rest": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "amb-r1",
+              "kind": "ex",
+              "name": "Wall Ball",
+              "dose": "10-12",
+              "load": "60-70%",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "amb-r2",
+              "kind": "ex",
+              "name": "Box Jump",
+              "dose": "5-10-15",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "dose",
+            "path": "blocks.0.0.dose",
+            "expect": {
+              "entries": [
+                {
+                  "min": 10,
+                  "max": 12
+                }
+              ],
+              "ambiguous": {
+                "alt": "list",
+                "write": "10, 12"
+              }
+            }
+          },
+          {
+            "type": "load",
+            "path": "blocks.0.0.load",
+            "expect": {
+              "kind": "pct",
+              "entries": [
+                {
+                  "min": 60,
+                  "max": 70
+                }
+              ],
+              "ambiguous": {
+                "alt": "list",
+                "write": "60%, 70%"
+              }
+            }
+          },
+          {
+            "type": "dose",
+            "path": "blocks.0.1.dose",
+            "expect": {
+              "cont": false,
+              "ambiguous": {
+                "alt": "ladder",
+                "write": "5-10-15…"
+              }
+            }
+          },
+          {
+            "type": "param",
+            "key": "dur",
+            "expect": {
+              "ok": true,
+              "kind": "windows",
+              "secs": [
+                720,
+                900
+              ],
+              "ambiguous": {
+                "alt": "range"
+              }
+            }
+          },
+          {
+            "type": "summary",
+            "expect": {
+              "params": [
+                {
+                  "key": "PlanCore.summary.windows",
+                  "values": {
+                    "count": 2
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "not_ambiguous_lists",
+      "title": "21-15-9, 12-10-8-8, 8-8, 4x8-10 read one way",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "3",
+          "cap": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "notamb-r1",
+              "kind": "ex",
+              "name": "Thruster",
+              "dose": "21-15-9",
+              "load": "42.5kg",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "notamb-r2",
+              "kind": "ex",
+              "name": "Pull-up",
+              "dose": "12-10-8-8",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "notamb-r3",
+              "kind": "ex",
+              "name": "Dip",
+              "dose": "8-8",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "notamb-r4",
+              "kind": "ex",
+              "name": "Lunge",
+              "dose": "4x8-10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "time"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "dose",
+            "path": "blocks.0.0.dose",
+            "expect": {
+              "entries": [
+                {
+                  "min": 21,
+                  "max": 21
+                },
+                {
+                  "min": 15,
+                  "max": 15
+                },
+                {
+                  "min": 9,
+                  "max": 9
+                }
+              ]
+            },
+            "noAmbiguity": true
+          },
+          {
+            "type": "dose",
+            "path": "blocks.0.1.dose",
+            "expect": {
+              "cont": false
+            },
+            "noAmbiguity": true
+          },
+          {
+            "type": "dose",
+            "path": "blocks.0.2.dose",
+            "expect": {
+              "entries": [
+                {
+                  "min": 8,
+                  "max": 8
+                },
+                {
+                  "min": 8,
+                  "max": 8
+                }
+              ]
+            },
+            "noAmbiguity": true
+          },
+          {
+            "type": "dose",
+            "path": "blocks.0.3.dose",
+            "expect": {
+              "sets": {
+                "min": 4,
+                "max": 4
+              },
+              "entries": [
+                {
+                  "min": 8,
+                  "max": 10
+                }
+              ]
+            },
+            "noAmbiguity": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "greek_units",
+      "title": "Greek unit words everywhere",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "2",
+          "cap": "20 λεπτά"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "greek-r1",
+              "kind": "ex",
+              "name": "Κωπηλατική",
+              "dose": "500 μέτρα",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "greek-r2",
+              "kind": "ex",
+              "name": "Ποδήλατο",
+              "dose": "15 θερμίδες",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "greek-r3",
+              "kind": "ex",
+              "name": "Κράτημα",
+              "dose": "90 δευτ.",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "greek-r4",
+              "kind": "ex",
+              "name": "Τρέξιμο",
+              "dose": "2 χλμ",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "greek-r5",
+              "kind": "ex",
+              "name": "Σκάλα",
+              "dose": "2 λεπτά",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "greek-r6",
+              "kind": "ex",
+              "name": "Προβολές",
+              "dose": "10 ανά πόδι",
+              "load": "16 κιλά",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "greek-r7",
+              "kind": "ex",
+              "name": "Κάμψεις",
+              "dose": "10 επαναλήψεις",
+              "load": "ΣΒ",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "time"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "dose",
+            "path": "blocks.0.0.dose",
+            "expect": {
+              "unit": "m",
+              "entries": [
+                {
+                  "min": 500,
+                  "max": 500
+                }
+              ]
+            }
+          },
+          {
+            "type": "dose",
+            "path": "blocks.0.1.dose",
+            "expect": {
+              "unit": "kcal"
+            }
+          },
+          {
+            "type": "dose",
+            "path": "blocks.0.2.dose",
+            "expect": {
+              "unit": "secs",
+              "entries": [
+                {
+                  "min": 90,
+                  "max": 90
+                }
+              ]
+            }
+          },
+          {
+            "type": "dose",
+            "path": "blocks.0.3.dose",
+            "expect": {
+              "unit": "m",
+              "entries": [
+                {
+                  "min": 2000,
+                  "max": 2000
+                }
+              ]
+            }
+          },
+          {
+            "type": "dose",
+            "path": "blocks.0.4.dose",
+            "expect": {
+              "unit": "secs",
+              "entries": [
+                {
+                  "min": 120,
+                  "max": 120
+                }
+              ]
+            }
+          },
+          {
+            "type": "dose",
+            "path": "blocks.0.5.dose",
+            "expect": {
+              "perSide": true
+            }
+          },
+          {
+            "type": "load",
+            "path": "blocks.0.5.load",
+            "expect": {
+              "kind": "kg",
+              "entries": [
+                {
+                  "min": 16,
+                  "max": 16
+                }
+              ]
+            }
+          },
+          {
+            "type": "load",
+            "path": "blocks.0.6.load",
+            "expect": {
+              "kind": "bw"
+            }
+          },
+          {
+            "type": "param",
+            "key": "cap",
+            "expect": {
+              "ok": true,
+              "kind": "secs",
+              "secs": 1200
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "unicode_primes_and_dashes",
+      "title": "smart quotes, primes, en/em dashes, unicode minus, case",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "3’–3’–3’–4’",
+          "rest": "1”"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "primes-r1",
+              "kind": "ex",
+              "name": "Row",
+              "dose": "250M",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "primes-r2",
+              "kind": "ex",
+              "name": "Burpee",
+              "dose": "8—12",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "primes-r3",
+              "kind": "ex",
+              "name": "Clean",
+              "dose": "5",
+              "load": "60KG",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "param",
+            "key": "dur",
+            "expect": {
+              "ok": true,
+              "kind": "windows",
+              "secs": [
+                180,
+                180,
+                180,
+                240
+              ]
+            }
+          },
+          {
+            "type": "param",
+            "key": "rest",
+            "expect": {
+              "ok": true,
+              "kind": "secs",
+              "secs": 1
+            }
+          },
+          {
+            "type": "dose",
+            "path": "blocks.0.1.dose",
+            "expect": {
+              "entries": [
+                {
+                  "min": 8,
+                  "max": 12
+                }
+              ]
+            }
+          },
+          {
+            "type": "load",
+            "path": "blocks.0.2.load",
+            "expect": {
+              "kind": "kg"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "decimal_commas_and_spreads",
+      "title": "22,5 kg; +2,5; 60,70% as two sets; spreads with ->, ως, έως",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "4",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "decimals-r1",
+              "kind": "ex",
+              "name": "Press",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "22,5kg"
+                },
+                {
+                  "d": "5",
+                  "l": "+2,5"
+                }
+              ]
+            },
+            {
+              "id": "decimals-r2",
+              "kind": "ex",
+              "name": "Squat",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "60 -> 80%"
+                }
+              ]
+            },
+            {
+              "id": "decimals-r3",
+              "kind": "ex",
+              "name": "Bench",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "60 ως 80kg"
+                }
+              ]
+            },
+            {
+              "id": "decimals-r4",
+              "kind": "ex",
+              "name": "Pull",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "70 έως 90%"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "setLoads",
+            "path": "blocks.0.0",
+            "n": 4,
+            "expect": {
+              "values": [
+                "22.5 kg",
+                "25 kg",
+                "27.5 kg",
+                "30 kg"
+              ],
+              "errors": [
+                null,
+                null,
+                null,
+                null
+              ],
+              "unit": "kg"
+            }
+          },
+          {
+            "type": "setLoads",
+            "path": "blocks.0.1",
+            "n": 3,
+            "expect": {
+              "values": [
+                "60%",
+                "70%",
+                "80%"
+              ],
+              "errors": [
+                null,
+                null,
+                null
+              ],
+              "unit": "%"
+            }
+          },
+          {
+            "type": "setLoads",
+            "path": "blocks.0.2",
+            "n": 3,
+            "expect": {
+              "values": [
+                "60 kg",
+                "70 kg",
+                "80 kg"
+              ],
+              "errors": [
+                null,
+                null,
+                null
+              ],
+              "unit": "kg"
+            }
+          },
+          {
+            "type": "setLoads",
+            "path": "blocks.0.3",
+            "n": 3,
+            "expect": {
+              "values": [
+                "70%",
+                "80%",
+                "90%"
+              ],
+              "errors": [
+                null,
+                null,
+                null
+              ],
+              "unit": "%"
+            }
+          },
+          {
+            "type": "load",
+            "path": "blocks.0.0.cells.0.l",
+            "expect": {
+              "kind": "kg",
+              "entries": [
+                {
+                  "min": 22.5,
+                  "max": 22.5
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ranges_in_every_field",
+      "title": "ranges for the athlete in reps, load, sets, rest, RPE, time",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "3 ή 4",
+          "rest": "1:30-2:00"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "ranges-r1",
+              "kind": "ex",
+              "name": "Row",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "8-12",
+                  "l": "60-70%",
+                  "rpe": "7-8",
+                  "pace": "2:00"
+                },
+                {
+                  "l": "65-75"
+                },
+                {
+                  "d": "30-45s"
+                }
+              ],
+              "extra": [
+                "rpe",
+                "pace"
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "param",
+            "key": "sets",
+            "expect": {
+              "ok": true,
+              "kind": "countRange",
+              "min": 3,
+              "max": 4
+            }
+          },
+          {
+            "type": "param",
+            "key": "rest",
+            "expect": {
+              "ok": true,
+              "kind": "secsRange",
+              "min": 90,
+              "max": 120
+            }
+          },
+          {
+            "type": "setLoads",
+            "path": "blocks.0.0",
+            "n": 3,
+            "expect": {
+              "values": [
+                "60–70%",
+                "65–75%",
+                "65–75%"
+              ],
+              "errors": [
+                null,
+                null,
+                null
+              ],
+              "unit": "%"
+            }
+          },
+          {
+            "type": "progress",
+            "path": "blocks.0.0",
+            "key": "rpe",
+            "n": 3,
+            "expect": [
+              "7-8",
+              "7-8",
+              "7-8"
+            ]
+          },
+          {
+            "type": "dose",
+            "path": "blocks.0.0.cells.2.d",
+            "expect": {
+              "unit": "secs",
+              "entries": [
+                {
+                  "min": 30,
+                  "max": 45
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "all_measures_per_set",
+      "title": "every measure, progressing per set",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "4",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "allmeas-r1",
+              "kind": "ex",
+              "name": "Row",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "500 m",
+                  "l": "bw",
+                  "pace": "2:00",
+                  "tempo": "20X0",
+                  "rpe": "7",
+                  "rir": "3",
+                  "zone": "z2",
+                  "height": "60cm",
+                  "dist": "400",
+                  "hold": "0:30"
+                },
+                {
+                  "pace": "-0:05",
+                  "rpe": "+1",
+                  "rir": "-1",
+                  "height": "+5",
+                  "dist": "400→800",
+                  "hold": "+5"
+                }
+              ],
+              "extra": [
+                "pace",
+                "tempo",
+                "rpe",
+                "rir",
+                "zone",
+                "height",
+                "dist",
+                "hold",
+                "side"
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "progress",
+            "path": "blocks.0.0",
+            "key": "pace",
+            "n": 4,
+            "clock": true,
+            "expect": [
+              "2:00",
+              "1:55",
+              "1:50",
+              "1:45"
+            ]
+          },
+          {
+            "type": "progress",
+            "path": "blocks.0.0",
+            "key": "rpe",
+            "n": 4,
+            "expect": [
+              "7",
+              "8",
+              "9",
+              "10"
+            ]
+          },
+          {
+            "type": "progress",
+            "path": "blocks.0.0",
+            "key": "dist",
+            "n": 4,
+            "expect": [
+              "400",
+              "400",
+              "600",
+              "800"
+            ]
+          },
+          {
+            "type": "progress",
+            "path": "blocks.0.0",
+            "key": "hold",
+            "n": 3,
+            "clock": true,
+            "expect": [
+              "0:30",
+              "35",
+              "40"
+            ]
+          },
+          {
+            "type": "repeat",
+            "path": "blocks.0.0",
+            "key": "tempo",
+            "n": 3,
+            "expect": [
+              "20X0",
+              "20X0",
+              "20X0"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "all_measures_plain",
+      "title": "every measure as a single value in an AMRAP",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "15",
+          "rest": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "allmeas2-r1",
+              "kind": "ex",
+              "name": "Bike",
+              "dose": "max cal",
+              "load": "z3",
+              "group": null,
+              "cells": [],
+              "extra": [
+                "pace",
+                "tempo",
+                "rpe",
+                "rir",
+                "zone",
+                "height",
+                "dist",
+                "hold",
+                "side"
+              ],
+              "x": {
+                "pace": "2:00/500m",
+                "tempo": "3-1-X-1",
+                "rpe": "8,5",
+                "rir": "2",
+                "zone": "zone 2",
+                "height": "60",
+                "dist": "1km",
+                "hold": "3"
+              }
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "load",
+            "path": "blocks.0.0.load",
+            "expect": {
+              "kind": "zone",
+              "zone": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "tempo_variants",
+      "title": "tempo with Greek Χ, dots, slashes",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "2",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "tempos-r1",
+              "kind": "ex",
+              "name": "Squat",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "70%",
+                  "tempo": "31Χ1"
+                },
+                {
+                  "tempo": "3.1.x.1"
+                }
+              ],
+              "extra": [
+                "tempo"
+              ]
+            },
+            {
+              "id": "tempos-r2",
+              "kind": "ex",
+              "name": "Bench",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "60%",
+                  "tempo": "3/0/X/0"
+                }
+              ],
+              "extra": [
+                "tempo"
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "tempo",
+            "path": "blocks.0.0.cells.0.tempo",
+            "expect": "31X1"
+          },
+          {
+            "type": "tempo",
+            "path": "blocks.0.1.cells.0.tempo",
+            "expect": "30X0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "max_variants",
+      "title": "max, max cal, 60s max cal, max cal σε 1:00, AMRAP as reps",
+      "section": {
+        "v": 1,
+        "flow": "intervals",
+        "preset": null,
+        "params": {
+          "work": "1:00",
+          "off": "1:00",
+          "rounds": "5"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "maxv-r1",
+              "kind": "ex",
+              "name": "Bike",
+              "dose": "max cal",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "maxv-r2",
+              "kind": "ex",
+              "name": "Row",
+              "dose": "60s max cal",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "maxv-r3",
+              "kind": "ex",
+              "name": "Ski",
+              "dose": "max cal σε 1:00",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "maxv-r4",
+              "kind": "ex",
+              "name": "Burpee",
+              "dose": "AMRAP",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "maxv-r5",
+              "kind": "ex",
+              "name": "Run",
+              "dose": "max m",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "distance"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "dose",
+            "path": "blocks.0.2.dose",
+            "expect": {
+              "unit": "kcal",
+              "max": {
+                "within": 60
+              }
+            }
+          },
+          {
+            "type": "dose",
+            "path": "blocks.0.3.dose",
+            "expect": {
+              "max": {
+                "within": null
+              }
+            }
+          },
+          {
+            "type": "dose",
+            "path": "blocks.0.4.dose",
+            "expect": {
+              "unit": "m"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "interrupt_superset",
+      "title": "AMRAP 20; every 4:00 a superset of burpees + KB swings",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "20",
+          "rest": "",
+          "intEvery": "4:00"
+        },
+        "mods": {
+          "interrupt": true
+        },
+        "blocks": [
+          [
+            {
+              "id": "intsup-r1",
+              "kind": "ex",
+              "name": "Row",
+              "dose": "250 m",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "intsup-r2",
+              "kind": "ex",
+              "name": "Wall Ball",
+              "dose": "15",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [
+          {
+            "id": "intsup-r3",
+            "kind": "ex",
+            "name": "Burpee",
+            "dose": "5",
+            "load": "",
+            "group": "intsup-g1",
+            "cells": []
+          },
+          {
+            "id": "intsup-r4",
+            "kind": "ex",
+            "name": "Kettlebell Swing",
+            "dose": "10",
+            "load": "24kg",
+            "group": "intsup-g1",
+            "cells": []
+          }
+        ],
+        "structs": {
+          "intsup-g1": {
+            "kind": "superset"
+          }
+        },
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "timeline",
+            "expect": {
+              "open": false,
+              "total": 1200,
+              "segments": 1,
+              "interrupts": [
+                240,
+                480,
+                720,
+                960
+              ]
+            }
+          },
+          {
+            "type": "units",
+            "block": -1,
+            "expect": [
+              2
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "open_emom_per_round",
+      "title": "EMOM until failure, reps per minute written for 3 minutes",
+      "section": {
+        "v": 1,
+        "flow": "emom",
+        "preset": null,
+        "params": {
+          "every": "1:00",
+          "times": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "openemom-r1",
+              "kind": "ex",
+              "name": "Thruster",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "3",
+                  "l": "40kg"
+                },
+                {
+                  "d": "4"
+                },
+                {
+                  "d": "5"
+                }
+              ],
+              "perRound": true
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "done"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "occurrences",
+            "block": 0,
+            "expect": {
+              "list": [
+                1,
+                2,
+                3,
+                4
+              ],
+              "open": true
+            }
+          },
+          {
+            "type": "rounds",
+            "expect": "Infinity"
+          }
+        ]
+      }
+    },
+    {
+      "id": "per_round_three_blocks",
+      "title": "For Time 6 rounds, three kinds of round, per-round values",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "6",
+          "cap": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "multiblock-r1",
+              "kind": "ex",
+              "name": "Row",
+              "dose": "500 m",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "multiblock-r2",
+              "kind": "ex",
+              "name": "Run",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "400 m"
+                },
+                {
+                  "d": "800 m"
+                }
+              ],
+              "perRound": true
+            }
+          ],
+          [
+            {
+              "id": "multiblock-r3",
+              "kind": "ex",
+              "name": "Bike",
+              "dose": "15 cal",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "time"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "occurrences",
+            "block": 1,
+            "expect": {
+              "list": [
+                2,
+                5
+              ],
+              "open": false
+            }
+          },
+          {
+            "type": "blockLabel",
+            "block": 0,
+            "expect": {
+              "key": "PlanCore.block.list",
+              "values": {
+                "word": "round",
+                "list": "1, 4"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "sets_alternating_blocks",
+      "title": "sets with two alternating kinds of set",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "4",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "setsblocks-r1",
+              "kind": "ex",
+              "name": "Squat",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "70%"
+                }
+              ]
+            }
+          ],
+          [
+            {
+              "id": "setsblocks-r2",
+              "kind": "ex",
+              "name": "Deadlift",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "60%"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "occurrences",
+            "block": 1,
+            "expect": {
+              "list": [
+                2,
+                4
+              ],
+              "open": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "complex_emom",
+      "title": "Complex EMOM: three slots, a barbell complex in the first",
+      "section": {
+        "v": 1,
+        "flow": "emom",
+        "preset": "complex_emom",
+        "params": {
+          "every": "1:00",
+          "times": "12"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "cplx-r1",
+              "kind": "ex",
+              "name": "Power Clean",
+              "dose": "1",
+              "load": "60kg",
+              "group": "cplx-g1",
+              "cells": []
+            },
+            {
+              "id": "cplx-r2",
+              "kind": "ex",
+              "name": "Front Squat",
+              "dose": "1",
+              "load": "",
+              "group": "cplx-g1",
+              "cells": []
+            },
+            {
+              "id": "cplx-r3",
+              "kind": "ex",
+              "name": "Push Jerk",
+              "dose": "1",
+              "load": "",
+              "group": "cplx-g1",
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "cplx-r4",
+              "kind": "ex",
+              "name": "Toes-to-Bar",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ],
+          [
+            {
+              "id": "cplx-r5",
+              "kind": "ex",
+              "name": "Bike",
+              "dose": "12 cal",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "cplx-g1": {
+            "kind": "complex"
+          }
+        },
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "complex"
+            }
+          },
+          {
+            "type": "occurrences",
+            "block": 2,
+            "expect": {
+              "list": [
+                3,
+                6,
+                9,
+                12
+              ],
+              "open": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "drop_and_rest_pause",
+      "title": "drop set and rest-pause with custom fields",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "3",
+          "rest": "60"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "drop-r1",
+              "kind": "ex",
+              "name": "Lateral Raise",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "12",
+                  "l": "10kg"
+                }
+              ]
+            },
+            {
+              "id": "drop-r2",
+              "kind": "ex",
+              "name": "Leg Press",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "max",
+                  "l": "100kg"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "drop-r1": {
+            "kind": "drop",
+            "drops": "3",
+            "dropby": "-2.5kg"
+          },
+          "drop-r2": {
+            "kind": "restpause",
+            "minis": "2",
+            "intra": "20″"
+          }
+        },
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "param",
+            "key": "rest",
+            "expect": {
+              "ok": true,
+              "kind": "secs",
+              "secs": 60,
+              "ambiguous": {
+                "alt": "minutes"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "bad_struct_params",
+      "title": "cluster with 0 pieces and an unreadable pause",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "3",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "badstruct-r1",
+              "kind": "ex",
+              "name": "Squat",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "60kg"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "badstruct-r1": {
+            "kind": "cluster",
+            "clusters": "0",
+            "intra": "soon"
+          }
+        },
+        "score": "none"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "structs.badstruct-r1.clusters",
+            "code": "bad_struct_param"
+          },
+          {
+            "path": "structs.badstruct-r1.intra",
+            "code": "bad_struct_param"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "smart_rest_shared_unit",
+      "title": "rest 5-15 = 5″–15″; every 2 = 2:00",
+      "section": {
+        "v": 1,
+        "flow": "emom",
+        "preset": null,
+        "params": {
+          "every": "2",
+          "times": "5"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "smartrest-r1",
+              "kind": "ex",
+              "name": "Clean",
+              "dose": "3",
+              "load": "70%",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "param",
+            "key": "every",
+            "expect": {
+              "ok": true,
+              "kind": "secs",
+              "secs": 120,
+              "ambiguous": {
+                "alt": "seconds",
+                "write": "2″"
+              }
+            }
+          },
+          {
+            "type": "timeline",
+            "expect": {
+              "open": false,
+              "total": 600,
+              "segments": 5,
+              "interrupts": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "sets_rest_range_seconds",
+      "title": "sets rest 5-15 shares one unit",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "3",
+          "rest": "5-15"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "srange-r1",
+              "kind": "ex",
+              "name": "Jump",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "3"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "param",
+            "key": "rest",
+            "expect": {
+              "ok": true,
+              "kind": "secsRange",
+              "min": 5,
+              "max": 15
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "bad_times",
+      "title": "0:90, 3-, 120-90″, unreadable cap",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "4-3",
+          "rest": "120-90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "badtime-r1",
+              "kind": "ex",
+              "name": "Squat",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "60kg"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "params.sets",
+            "code": "bad_param"
+          },
+          {
+            "path": "params.rest",
+            "code": "bad_param"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "bad_times_amrap",
+      "title": "AMRAP 3- and a 0:90 interrupt",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "3-",
+          "rest": "",
+          "intEvery": "0:90"
+        },
+        "mods": {
+          "interrupt": true
+        },
+        "blocks": [
+          [
+            {
+              "id": "badtime2-r1",
+              "kind": "ex",
+              "name": "Row",
+              "dose": "10 cal",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [
+          {
+            "id": "badtime2-r2",
+            "kind": "ex",
+            "name": "Burpee",
+            "dose": "5",
+            "load": "",
+            "group": null,
+            "cells": []
+          }
+        ],
+        "structs": {},
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "params.dur",
+            "code": "bad_param"
+          },
+          {
+            "path": "params.intEvery",
+            "code": "bad_param"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "combo_sets_single",
+      "title": "sets with a single structure",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "4",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-sets-single-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "70%"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "single"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_sets_superset",
+      "title": "sets with a superset structure",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "4",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-sets-superset-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "",
+              "load": "",
+              "group": "combo-sets-superset-g",
+              "cells": [
+                {
+                  "d": "8-10",
+                  "l": "60kg"
+                }
+              ]
+            },
+            {
+              "id": "combo-sets-superset-r2",
+              "kind": "ex",
+              "name": "B",
+              "dose": "",
+              "load": "",
+              "group": "combo-sets-superset-g",
+              "cells": [
+                {
+                  "d": "12"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-sets-superset-g": {
+            "kind": "superset"
+          }
+        },
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "superset"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_sets_complex",
+      "title": "sets with a complex structure",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "4",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-sets-complex-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "",
+              "load": "",
+              "group": "combo-sets-complex-g",
+              "cells": [
+                {
+                  "d": "8-10",
+                  "l": "60kg"
+                }
+              ]
+            },
+            {
+              "id": "combo-sets-complex-r2",
+              "kind": "ex",
+              "name": "B",
+              "dose": "",
+              "load": "",
+              "group": "combo-sets-complex-g",
+              "cells": [
+                {
+                  "d": "12"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-sets-complex-g": {
+            "kind": "complex"
+          }
+        },
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "complex"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_sets_cluster",
+      "title": "sets with a cluster structure",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "4",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-sets-cluster-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "70%"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-sets-cluster-r1": {
+            "kind": "cluster",
+            "clusters": "3",
+            "intra": "15″"
+          }
+        },
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "cluster",
+              "clusters": "3",
+              "intra": "15″"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_sets_drop",
+      "title": "sets with a drop structure",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "4",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-sets-drop-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "70%"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-sets-drop-r1": {
+            "kind": "drop",
+            "drops": "2",
+            "dropby": "-20%"
+          }
+        },
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "drop",
+              "drops": "2",
+              "dropby": "-20%"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_sets_restpause",
+      "title": "sets with a restpause structure",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "4",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-sets-restpause-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "5",
+                  "l": "70%"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-sets-restpause-r1": {
+            "kind": "restpause",
+            "minis": "3",
+            "intra": "15″"
+          }
+        },
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "restpause",
+              "minis": "3",
+              "intra": "15″"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_for_time_single",
+      "title": "for_time with a single structure",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "1",
+          "cap": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-for_time-single-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "5",
+              "load": "70%",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "time"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "single"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_for_time_superset",
+      "title": "for_time with a superset structure",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "1",
+          "cap": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-for_time-superset-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "8-10",
+              "load": "60kg",
+              "group": "combo-for_time-superset-g",
+              "cells": []
+            },
+            {
+              "id": "combo-for_time-superset-r2",
+              "kind": "ex",
+              "name": "B",
+              "dose": "12",
+              "load": "",
+              "group": "combo-for_time-superset-g",
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-for_time-superset-g": {
+            "kind": "superset"
+          }
+        },
+        "score": "time"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "superset"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_for_time_complex",
+      "title": "for_time with a complex structure",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "1",
+          "cap": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-for_time-complex-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "8-10",
+              "load": "60kg",
+              "group": "combo-for_time-complex-g",
+              "cells": []
+            },
+            {
+              "id": "combo-for_time-complex-r2",
+              "kind": "ex",
+              "name": "B",
+              "dose": "12",
+              "load": "",
+              "group": "combo-for_time-complex-g",
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-for_time-complex-g": {
+            "kind": "complex"
+          }
+        },
+        "score": "time"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "complex"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_for_time_cluster",
+      "title": "for_time with a cluster structure",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "1",
+          "cap": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-for_time-cluster-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "5",
+              "load": "70%",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-for_time-cluster-r1": {
+            "kind": "cluster",
+            "clusters": "3",
+            "intra": "15″"
+          }
+        },
+        "score": "time"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "structs.combo-for_time-cluster-r1",
+            "code": "struct_not_allowed"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "combo_for_time_drop",
+      "title": "for_time with a drop structure",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "1",
+          "cap": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-for_time-drop-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "5",
+              "load": "70%",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-for_time-drop-r1": {
+            "kind": "drop",
+            "drops": "2",
+            "dropby": "-20%"
+          }
+        },
+        "score": "time"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "structs.combo-for_time-drop-r1",
+            "code": "struct_not_allowed"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "combo_for_time_restpause",
+      "title": "for_time with a restpause structure",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "1",
+          "cap": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-for_time-restpause-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "5",
+              "load": "70%",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-for_time-restpause-r1": {
+            "kind": "restpause",
+            "minis": "3",
+            "intra": "15″"
+          }
+        },
+        "score": "time"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "structs.combo-for_time-restpause-r1",
+            "code": "struct_not_allowed"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "combo_amrap_single",
+      "title": "amrap with a single structure",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "12",
+          "rest": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-amrap-single-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "5",
+              "load": "70%",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "single"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_amrap_superset",
+      "title": "amrap with a superset structure",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "12",
+          "rest": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-amrap-superset-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "8-10",
+              "load": "60kg",
+              "group": "combo-amrap-superset-g",
+              "cells": []
+            },
+            {
+              "id": "combo-amrap-superset-r2",
+              "kind": "ex",
+              "name": "B",
+              "dose": "12",
+              "load": "",
+              "group": "combo-amrap-superset-g",
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-amrap-superset-g": {
+            "kind": "superset"
+          }
+        },
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "superset"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_amrap_complex",
+      "title": "amrap with a complex structure",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "12",
+          "rest": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-amrap-complex-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "8-10",
+              "load": "60kg",
+              "group": "combo-amrap-complex-g",
+              "cells": []
+            },
+            {
+              "id": "combo-amrap-complex-r2",
+              "kind": "ex",
+              "name": "B",
+              "dose": "12",
+              "load": "",
+              "group": "combo-amrap-complex-g",
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-amrap-complex-g": {
+            "kind": "complex"
+          }
+        },
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "complex"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_amrap_cluster",
+      "title": "amrap with a cluster structure",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "12",
+          "rest": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-amrap-cluster-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "5",
+              "load": "70%",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-amrap-cluster-r1": {
+            "kind": "cluster",
+            "clusters": "3",
+            "intra": "15″"
+          }
+        },
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "structs.combo-amrap-cluster-r1",
+            "code": "struct_not_allowed"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "combo_amrap_drop",
+      "title": "amrap with a drop structure",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "12",
+          "rest": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-amrap-drop-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "5",
+              "load": "70%",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-amrap-drop-r1": {
+            "kind": "drop",
+            "drops": "2",
+            "dropby": "-20%"
+          }
+        },
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "structs.combo-amrap-drop-r1",
+            "code": "struct_not_allowed"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "combo_amrap_restpause",
+      "title": "amrap with a restpause structure",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "12",
+          "rest": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-amrap-restpause-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "5",
+              "load": "70%",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-amrap-restpause-r1": {
+            "kind": "restpause",
+            "minis": "3",
+            "intra": "15″"
+          }
+        },
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "structs.combo-amrap-restpause-r1",
+            "code": "struct_not_allowed"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "combo_emom_single",
+      "title": "emom with a single structure",
+      "section": {
+        "v": 1,
+        "flow": "emom",
+        "preset": null,
+        "params": {
+          "every": "1:00",
+          "times": "10"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-emom-single-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "5",
+              "load": "70%",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "single"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_emom_superset",
+      "title": "emom with a superset structure",
+      "section": {
+        "v": 1,
+        "flow": "emom",
+        "preset": null,
+        "params": {
+          "every": "1:00",
+          "times": "10"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-emom-superset-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "8-10",
+              "load": "60kg",
+              "group": "combo-emom-superset-g",
+              "cells": []
+            },
+            {
+              "id": "combo-emom-superset-r2",
+              "kind": "ex",
+              "name": "B",
+              "dose": "12",
+              "load": "",
+              "group": "combo-emom-superset-g",
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-emom-superset-g": {
+            "kind": "superset"
+          }
+        },
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "superset"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_emom_complex",
+      "title": "emom with a complex structure",
+      "section": {
+        "v": 1,
+        "flow": "emom",
+        "preset": null,
+        "params": {
+          "every": "1:00",
+          "times": "10"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-emom-complex-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "8-10",
+              "load": "60kg",
+              "group": "combo-emom-complex-g",
+              "cells": []
+            },
+            {
+              "id": "combo-emom-complex-r2",
+              "kind": "ex",
+              "name": "B",
+              "dose": "12",
+              "load": "",
+              "group": "combo-emom-complex-g",
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-emom-complex-g": {
+            "kind": "complex"
+          }
+        },
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "complex"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_emom_cluster",
+      "title": "emom with a cluster structure",
+      "section": {
+        "v": 1,
+        "flow": "emom",
+        "preset": null,
+        "params": {
+          "every": "1:00",
+          "times": "10"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-emom-cluster-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "5",
+              "load": "70%",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-emom-cluster-r1": {
+            "kind": "cluster",
+            "clusters": "3",
+            "intra": "15″"
+          }
+        },
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "cluster",
+              "clusters": "3",
+              "intra": "15″"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_emom_drop",
+      "title": "emom with a drop structure",
+      "section": {
+        "v": 1,
+        "flow": "emom",
+        "preset": null,
+        "params": {
+          "every": "1:00",
+          "times": "10"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-emom-drop-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "5",
+              "load": "70%",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-emom-drop-r1": {
+            "kind": "drop",
+            "drops": "2",
+            "dropby": "-20%"
+          }
+        },
+        "score": "none"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "structs.combo-emom-drop-r1",
+            "code": "struct_not_allowed"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "combo_emom_restpause",
+      "title": "emom with a restpause structure",
+      "section": {
+        "v": 1,
+        "flow": "emom",
+        "preset": null,
+        "params": {
+          "every": "1:00",
+          "times": "10"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-emom-restpause-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "5",
+              "load": "70%",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-emom-restpause-r1": {
+            "kind": "restpause",
+            "minis": "3",
+            "intra": "15″"
+          }
+        },
+        "score": "none"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "structs.combo-emom-restpause-r1",
+            "code": "struct_not_allowed"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "combo_intervals_single",
+      "title": "intervals with a single structure",
+      "section": {
+        "v": 1,
+        "flow": "intervals",
+        "preset": null,
+        "params": {
+          "work": "20″",
+          "off": "10″",
+          "rounds": "8"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-intervals-single-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "5",
+              "load": "70%",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "total_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "single"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_intervals_superset",
+      "title": "intervals with a superset structure",
+      "section": {
+        "v": 1,
+        "flow": "intervals",
+        "preset": null,
+        "params": {
+          "work": "20″",
+          "off": "10″",
+          "rounds": "8"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-intervals-superset-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "8-10",
+              "load": "60kg",
+              "group": "combo-intervals-superset-g",
+              "cells": []
+            },
+            {
+              "id": "combo-intervals-superset-r2",
+              "kind": "ex",
+              "name": "B",
+              "dose": "12",
+              "load": "",
+              "group": "combo-intervals-superset-g",
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-intervals-superset-g": {
+            "kind": "superset"
+          }
+        },
+        "score": "total_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "superset"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_intervals_complex",
+      "title": "intervals with a complex structure",
+      "section": {
+        "v": 1,
+        "flow": "intervals",
+        "preset": null,
+        "params": {
+          "work": "20″",
+          "off": "10″",
+          "rounds": "8"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-intervals-complex-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "8-10",
+              "load": "60kg",
+              "group": "combo-intervals-complex-g",
+              "cells": []
+            },
+            {
+              "id": "combo-intervals-complex-r2",
+              "kind": "ex",
+              "name": "B",
+              "dose": "12",
+              "load": "",
+              "group": "combo-intervals-complex-g",
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-intervals-complex-g": {
+            "kind": "complex"
+          }
+        },
+        "score": "total_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "struct",
+            "block": 0,
+            "unit": 0,
+            "expect": {
+              "kind": "complex"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "combo_intervals_cluster",
+      "title": "intervals with a cluster structure",
+      "section": {
+        "v": 1,
+        "flow": "intervals",
+        "preset": null,
+        "params": {
+          "work": "20″",
+          "off": "10″",
+          "rounds": "8"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-intervals-cluster-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "5",
+              "load": "70%",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-intervals-cluster-r1": {
+            "kind": "cluster",
+            "clusters": "3",
+            "intra": "15″"
+          }
+        },
+        "score": "total_reps"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "structs.combo-intervals-cluster-r1",
+            "code": "struct_not_allowed"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "combo_intervals_drop",
+      "title": "intervals with a drop structure",
+      "section": {
+        "v": 1,
+        "flow": "intervals",
+        "preset": null,
+        "params": {
+          "work": "20″",
+          "off": "10″",
+          "rounds": "8"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-intervals-drop-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "5",
+              "load": "70%",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-intervals-drop-r1": {
+            "kind": "drop",
+            "drops": "2",
+            "dropby": "-20%"
+          }
+        },
+        "score": "total_reps"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "structs.combo-intervals-drop-r1",
+            "code": "struct_not_allowed"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "combo_intervals_restpause",
+      "title": "intervals with a restpause structure",
+      "section": {
+        "v": 1,
+        "flow": "intervals",
+        "preset": null,
+        "params": {
+          "work": "20″",
+          "off": "10″",
+          "rounds": "8"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "combo-intervals-restpause-r1",
+              "kind": "ex",
+              "name": "A",
+              "dose": "5",
+              "load": "70%",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "combo-intervals-restpause-r1": {
+            "kind": "restpause",
+            "minis": "3",
+            "intra": "15″"
+          }
+        },
+        "score": "total_reps"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "structs.combo-intervals-restpause-r1",
+            "code": "struct_not_allowed"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "mod_sets_interrupt",
+      "title": "sets with the interrupt add-on",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "4",
+          "rest": "90″",
+          "intEvery": "3:00"
+        },
+        "mods": {
+          "interrupt": true
+        },
+        "blocks": [
+          [
+            {
+              "id": "mod-sets-interrupt-r1",
+              "kind": "ex",
+              "name": "Move",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "10"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [
+          {
+            "id": "mod-sets-interrupt-r2",
+            "kind": "ex",
+            "name": "Burpee",
+            "dose": "5",
+            "load": "",
+            "group": null,
+            "cells": []
+          }
+        ],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": []
+      }
+    },
+    {
+      "id": "mod_sets_hr",
+      "title": "sets with the hr add-on",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": null,
+        "params": {
+          "sets": "4",
+          "rest": "90″",
+          "hrTarget": "130"
+        },
+        "mods": {
+          "hr": true
+        },
+        "blocks": [
+          [
+            {
+              "id": "mod-sets-hr-r1",
+              "kind": "ex",
+              "name": "Move",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "10"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "mods.hr",
+            "code": "mod_not_allowed"
+          },
+          {
+            "path": "params.hrTarget",
+            "code": "unknown_param"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "mod_for_time_interrupt",
+      "title": "for_time with the interrupt add-on",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "1",
+          "cap": "",
+          "intEvery": "3:00"
+        },
+        "mods": {
+          "interrupt": true
+        },
+        "blocks": [
+          [
+            {
+              "id": "mod-for_time-interrupt-r1",
+              "kind": "ex",
+              "name": "Move",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [
+          {
+            "id": "mod-for_time-interrupt-r2",
+            "kind": "ex",
+            "name": "Burpee",
+            "dose": "5",
+            "load": "",
+            "group": null,
+            "cells": []
+          }
+        ],
+        "structs": {},
+        "score": "time"
+      },
+      "expect": {
+        "issues": [],
+        "checks": []
+      }
+    },
+    {
+      "id": "mod_for_time_hr",
+      "title": "for_time with the hr add-on",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": null,
+        "params": {
+          "rounds": "1",
+          "cap": "",
+          "hrTarget": "130"
+        },
+        "mods": {
+          "hr": true
+        },
+        "blocks": [
+          [
+            {
+              "id": "mod-for_time-hr-r1",
+              "kind": "ex",
+              "name": "Move",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "time"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "mods.hr",
+            "code": "mod_not_allowed"
+          },
+          {
+            "path": "params.hrTarget",
+            "code": "unknown_param"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "mod_amrap_interrupt",
+      "title": "amrap with the interrupt add-on",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "12",
+          "rest": "",
+          "intEvery": "3:00"
+        },
+        "mods": {
+          "interrupt": true
+        },
+        "blocks": [
+          [
+            {
+              "id": "mod-amrap-interrupt-r1",
+              "kind": "ex",
+              "name": "Move",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [
+          {
+            "id": "mod-amrap-interrupt-r2",
+            "kind": "ex",
+            "name": "Burpee",
+            "dose": "5",
+            "load": "",
+            "group": null,
+            "cells": []
+          }
+        ],
+        "structs": {},
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": []
+      }
+    },
+    {
+      "id": "mod_amrap_hr",
+      "title": "amrap with the hr add-on",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": null,
+        "params": {
+          "dur": "12",
+          "rest": "",
+          "hrTarget": "130"
+        },
+        "mods": {
+          "hr": true
+        },
+        "blocks": [
+          [
+            {
+              "id": "mod-amrap-hr-r1",
+              "kind": "ex",
+              "name": "Move",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "rounds_reps"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "mods.hr",
+            "code": "mod_not_allowed"
+          },
+          {
+            "path": "params.hrTarget",
+            "code": "unknown_param"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "mod_emom_interrupt",
+      "title": "emom with the interrupt add-on",
+      "section": {
+        "v": 1,
+        "flow": "emom",
+        "preset": null,
+        "params": {
+          "every": "1:00",
+          "times": "10",
+          "intEvery": "3:00"
+        },
+        "mods": {
+          "interrupt": true
+        },
+        "blocks": [
+          [
+            {
+              "id": "mod-emom-interrupt-r1",
+              "kind": "ex",
+              "name": "Move",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [
+          {
+            "id": "mod-emom-interrupt-r2",
+            "kind": "ex",
+            "name": "Burpee",
+            "dose": "5",
+            "load": "",
+            "group": null,
+            "cells": []
+          }
+        ],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "mods.interrupt",
+            "code": "mod_not_allowed"
+          },
+          {
+            "path": "params.intEvery",
+            "code": "unknown_param"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "mod_emom_hr",
+      "title": "emom with the hr add-on",
+      "section": {
+        "v": 1,
+        "flow": "emom",
+        "preset": null,
+        "params": {
+          "every": "1:00",
+          "times": "10",
+          "hrTarget": "130"
+        },
+        "mods": {
+          "hr": true
+        },
+        "blocks": [
+          [
+            {
+              "id": "mod-emom-hr-r1",
+              "kind": "ex",
+              "name": "Move",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "mods.hr",
+            "code": "mod_not_allowed"
+          },
+          {
+            "path": "params.hrTarget",
+            "code": "unknown_param"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "mod_intervals_interrupt",
+      "title": "intervals with the interrupt add-on",
+      "section": {
+        "v": 1,
+        "flow": "intervals",
+        "preset": null,
+        "params": {
+          "work": "20″",
+          "off": "10″",
+          "rounds": "8",
+          "intEvery": "3:00"
+        },
+        "mods": {
+          "interrupt": true
+        },
+        "blocks": [
+          [
+            {
+              "id": "mod-intervals-interrupt-r1",
+              "kind": "ex",
+              "name": "Move",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [
+          {
+            "id": "mod-intervals-interrupt-r2",
+            "kind": "ex",
+            "name": "Burpee",
+            "dose": "5",
+            "load": "",
+            "group": null,
+            "cells": []
+          }
+        ],
+        "structs": {},
+        "score": "total_reps"
+      },
+      "expect": {
+        "issues": [
+          {
+            "path": "mods.interrupt",
+            "code": "mod_not_allowed"
+          },
+          {
+            "path": "params.intEvery",
+            "code": "unknown_param"
+          }
+        ],
+        "checks": []
+      }
+    },
+    {
+      "id": "mod_intervals_hr",
+      "title": "intervals with the hr add-on",
+      "section": {
+        "v": 1,
+        "flow": "intervals",
+        "preset": null,
+        "params": {
+          "work": "20″",
+          "off": "10″",
+          "rounds": "8",
+          "hrTarget": "130"
+        },
+        "mods": {
+          "hr": true
+        },
+        "blocks": [
+          [
+            {
+              "id": "mod-intervals-hr-r1",
+              "kind": "ex",
+              "name": "Move",
+              "dose": "10",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "total_reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": []
+      }
+    },
+    {
+      "id": "preset_21_15_9",
+      "title": "21-15-9",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": "21_15_9",
+        "params": {
+          "rounds": "1",
+          "cap": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "p21-r1",
+              "kind": "ex",
+              "name": "Thruster",
+              "dose": "21-15-9",
+              "load": "42.5kg",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "p21-r2",
+              "kind": "ex",
+              "name": "Pull-up",
+              "dose": "21-15-9",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "time"
+      },
+      "expect": {
+        "issues": [],
+        "checks": []
+      }
+    },
+    {
+      "id": "preset_ladder",
+      "title": "ladder 2-4-6…",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": "ladder",
+        "params": {
+          "rounds": "1",
+          "cap": "15"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "pladder-r1",
+              "kind": "ex",
+              "name": "Clean",
+              "dose": "2-4-6…",
+              "load": "60kg",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "time"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "doseAt",
+            "path": "blocks.0.0.dose",
+            "i": 5,
+            "expect": "12"
+          }
+        ]
+      }
+    },
+    {
+      "id": "preset_calorie_target",
+      "title": "100 cal",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": "calorie_target",
+        "params": {
+          "rounds": "1",
+          "cap": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "pcal-r1",
+              "kind": "ex",
+              "name": "Row",
+              "dose": "100 cal",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "time"
+      },
+      "expect": {
+        "issues": [],
+        "checks": []
+      }
+    },
+    {
+      "id": "preset_to_failure",
+      "title": "max reps for sets",
+      "section": {
+        "v": 1,
+        "flow": "sets",
+        "preset": "to_failure",
+        "params": {
+          "sets": "4",
+          "rest": "90″"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "pfail-r1",
+              "kind": "ex",
+              "name": "Push-up",
+              "dose": "",
+              "load": "",
+              "group": null,
+              "cells": [
+                {
+                  "d": "max"
+                }
+              ]
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "none"
+      },
+      "expect": {
+        "issues": [],
+        "checks": []
+      }
+    },
+    {
+      "id": "preset_edt",
+      "title": "EDT 15′ superset",
+      "section": {
+        "v": 1,
+        "flow": "amrap",
+        "preset": "edt",
+        "params": {
+          "dur": "15",
+          "rest": ""
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "pedt-r1",
+              "kind": "ex",
+              "name": "Chin-up",
+              "dose": "5",
+              "load": "",
+              "group": "pedt-g",
+              "cells": []
+            },
+            {
+              "id": "pedt-r2",
+              "kind": "ex",
+              "name": "Dip",
+              "dose": "5",
+              "load": "",
+              "group": "pedt-g",
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {
+          "pedt-g": {
+            "kind": "superset"
+          }
+        },
+        "score": "reps"
+      },
+      "expect": {
+        "issues": [],
+        "checks": []
+      }
+    },
+    {
+      "id": "preset_billat",
+      "title": "Billat 30/30 × 10, distance",
+      "section": {
+        "v": 1,
+        "flow": "intervals",
+        "preset": "billat",
+        "params": {
+          "work": "30″",
+          "off": "30″",
+          "rounds": "10"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "pbillat-r1",
+              "kind": "ex",
+              "name": "Run",
+              "dose": "max m",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "distance"
+      },
+      "expect": {
+        "issues": [],
+        "checks": [
+          {
+            "type": "timeline",
+            "expect": {
+              "open": false,
+              "total": 600,
+              "segments": 20,
+              "interrupts": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "preset_chipper",
+      "title": "chipper",
+      "section": {
+        "v": 1,
+        "flow": "for_time",
+        "preset": "chipper",
+        "params": {
+          "rounds": "1",
+          "cap": "30"
+        },
+        "mods": {},
+        "blocks": [
+          [
+            {
+              "id": "pchip-r1",
+              "kind": "ex",
+              "name": "Row",
+              "dose": "1000 m",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "pchip-r2",
+              "kind": "ex",
+              "name": "Thruster",
+              "dose": "50",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "pchip-r3",
+              "kind": "ex",
+              "name": "Pull-up",
+              "dose": "30",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "pchip-r4",
+              "kind": "ex",
+              "name": "Box Jump",
+              "dose": "40",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "pchip-r5",
+              "kind": "ex",
+              "name": "Wall Ball",
+              "dose": "50",
+              "load": "",
+              "group": null,
+              "cells": []
+            },
+            {
+              "id": "pchip-r6",
+              "kind": "ex",
+              "name": "Run",
+              "dose": "1 km",
+              "load": "",
+              "group": null,
+              "cells": []
+            }
+          ]
+        ],
+        "interrupt": [],
+        "structs": {},
+        "score": "time"
+      },
+      "expect": {
+        "issues": [],
+        "checks": []
+      }
+    }
+  ]
+}

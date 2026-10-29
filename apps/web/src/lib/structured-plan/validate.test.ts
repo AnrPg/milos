@@ -153,3 +153,30 @@ describe("paramValid", () => {
     expect(paramValid({ kind: "text", bare: "smart" }, "anything")).toBe(true);
   });
 });
+
+describe("validateSection on junk (never throws)", () => {
+  it("reports wrong shapes as bad_shape", () => {
+    expect(validateSection(null)).toEqual([{ path: "", code: "bad_shape" }]);
+    expect(validateSection("x")).toEqual([{ path: "", code: "bad_shape" }]);
+    const s = { ...newSection("sets"), blocks: [[{ id: "a", kind: "ex", name: 5, dose: "", load: "", cells: [null, 3, { d: 7, zz: "1" }] }]] };
+    expect(codes(s as unknown as PlanSection)).toEqual(["blocks.0.0.cells.1:bad_shape", "blocks.0.0.cells.2.d:bad_shape", "blocks.0.0.cells.2.zz:bad_shape", "blocks.0.0.name:bad_shape"]);
+    expect(codes({ ...newSection("sets"), blocks: "no" } as unknown as PlanSection)).toEqual(["blocks:bad_shape"]);
+    expect(codes({ ...newSection("sets"), params: { sets: 4 } } as unknown as PlanSection)).toEqual(["params.sets:bad_shape"]);
+    expect(codes({ ...newSection("sets"), blocks: [[7]] } as unknown as PlanSection)).toEqual(["blocks.0.0:bad_shape"]);
+  });
+
+  it("flags a non-load unit, a change with no base and accepts z2 zones", () => {
+    expect(codes(section("amrap", { dur: "7" }, [[newRow("ex", { load: "60 km" })]]))).toEqual(["blocks.0.0.load:wrong_unit"]);
+    expect(codes(section("sets", { sets: "2" }, [[newRow("ex", { cells: [{ l: "+5kg" }] })]]))).toEqual(["blocks.0.0.cells.0.l:no_base"]);
+    expect(codes(section("sets", { sets: "2" }, [[newRow("ex", { extra: ["rir"], cells: [{ rir: "+1" }] })]]))).toEqual(["blocks.0.0.cells.0.rir:no_base"]);
+    expect(codes(section("amrap", { dur: "7" }, [[newRow("ex", { extra: ["zone"], x: { zone: "z2" } })]]))).toEqual([]);
+    expect(codes(section("sets", { sets: "3 ή 4", rest: "90-120″" }, [[newRow()]]))).toEqual([]);
+  });
+});
+
+describe("bounds found by fuzzing", () => {
+  it("refuses counts above 999 (a 1e11-minute EMOM ran out of memory drawing its timeline)", () => {
+    expect(codes(section("emom", { every: "1″", times: "99999999999" }, [[newRow()]]))).toEqual(["params.times:bad_param"]);
+    expect(codes(section("for_time", { rounds: "999" }, [[newRow()]]))).toEqual([]);
+  });
+});
