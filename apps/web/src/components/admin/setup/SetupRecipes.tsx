@@ -15,7 +15,9 @@ import {
   type RecipeMode,
   type SetupRecipe,
 } from "@/api/setup";
+import { fetchPaymentAccount, isConnected } from "@/api/online-payments";
 import { LineIcon } from "@/components/admin/imports/ImportIcons";
+import { PAYMENT_ACCOUNT_KEY } from "@/components/admin/payments/OnlinePaymentsSettings";
 import { useSession } from "@/components/session-provider";
 import { BackButton } from "@/components/ui/BackLink";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
@@ -71,6 +73,14 @@ export function SetupRecipes() {
     queryFn: () => fetchSetupRecipes(token!),
     enabled: Boolean(token),
     staleTime: FRESHNESS.reference,
+  });
+  // ADR-271: «Τι πωλείται online» in the next steps shows how many packages are sold online.
+  const payments = useQuery({
+    queryKey: PAYMENT_ACCOUNT_KEY,
+    queryFn: () => fetchPaymentAccount(token!),
+    enabled: Boolean(token && step === "done"),
+    staleTime: FRESHNESS.reference,
+    retry: false,
   });
   const recipe = recipes.data?.recipes.find((entry) => entry.key === selected);
   const plan = useQuery({
@@ -377,6 +387,14 @@ export function SetupRecipes() {
     const steps = [
       { href: "/admin/settings/billing", title: t("next.billing"), hint: t("next.billingHint") },
       { href: "/admin/settings?tab=payments", title: t("next.payments"), hint: t("next.paymentsHint") },
+      {
+        href: "/admin/finance?tab=packages",
+        title: t("next.soldOnline"),
+        hint:
+          isConnected(payments.data) && payments.data?.online_sales
+            ? t("next.soldOnlineHint", { count: payments.data.online_sales.sold_online, total: payments.data.online_sales.packages })
+            : t("next.soldOnlineLater"),
+      },
       { href: "/admin/users/import", title: t("next.import"), hint: t("next.importHint") },
     ];
     body = (

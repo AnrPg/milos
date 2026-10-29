@@ -9,6 +9,7 @@ import {
   connectOutcome,
   connectsWithOneButton,
   disconnectPaymentAccount,
+  dismissPackagesNotice,
   fetchPaymentAccount,
   isConnected,
   pickableProviders,
@@ -23,6 +24,7 @@ import {
   type PaymentOptionsUpdate,
   type PaymentProvider,
   type PaymentPurposes,
+  type OnlineSalesSummary,
 } from "@/api/online-payments";
 import { fetchAdminSettings, updateAdminSettings } from "@/api/settings";
 import { Toggle } from "@/components/admin/finance/packages/package-ui";
@@ -31,6 +33,8 @@ import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { Select } from "@/components/ui/Select";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import Link from "next/link";
 import { FRESHNESS } from "@/lib/query-policy";
 import { SPARK_ACTIVE_STYLE } from "@/lib/spark";
 
@@ -344,6 +348,7 @@ function ConnectedView({
         </p>
       ) : null}
       {notice}
+      {account.packages_notice ? <PackagesOpenedNotice token={token} count={account.packages_notice.count} /> : null}
 
       <Card>
         <div className="flex items-center gap-3">
@@ -363,6 +368,8 @@ function ConnectedView({
           </span>
         </div>
       </Card>
+
+      {status.online_sales && status.online_sales.packages > 0 ? <SoldOnlineNudge summary={status.online_sales} /> : null}
 
       <Card>
         <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{t("whatTitle")}</p>
@@ -489,6 +496,77 @@ function ConnectedView({
           <p className="text-sm" style={{ color: "var(--text)" }}>{t("disconnectConfirmBody")}</p>
         </Dialog>
       ) : null}
+    </div>
+  );
+}
+
+const PACKAGES_HREF = "/admin/finance?tab=packages";
+
+/** ADR-271: «Τα N πακέτα σου πωλούνται τώρα online · Αλλαγή», once after the first connection. */
+function PackagesOpenedNotice({ token, count }: { token: string; count: number }) {
+  const t = useTranslations("SoldOnline");
+  const tp = useTranslations("OnlinePayments");
+  const ui = useUiTranslations();
+  const slug = useOrganizationSlug();
+  const queryClient = useQueryClient();
+  const dismiss = useMutation({
+    mutationFn: () => dismissPackagesNotice(token),
+    onSuccess: (next) => queryClient.setQueryData(PAYMENT_ACCOUNT_KEY, next),
+  });
+  return (
+    <div
+      role="status"
+      className="flex flex-wrap items-center gap-3 rounded-2xl px-4 py-3 text-sm"
+      style={{ background: "color-mix(in srgb, var(--success) 14%, transparent)", border: "1px solid var(--success)", color: "var(--text)" }}
+      data-testid="packages-opened-notice"
+    >
+      <span className="min-w-0 flex-1 font-medium">{t("noticeOpened", { count })}</span>
+      <Link href={adminHref(PACKAGES_HREF, slug)} className="font-semibold" style={{ color: "var(--primary)" }}>
+        {t("noticeChange")}
+      </Link>
+      <button
+        type="button"
+        aria-label={t("noticeClose")}
+        className="rounded-full px-2 text-base leading-none"
+        style={{ color: "var(--dim)" }}
+        disabled={dismiss.isPending}
+        onClick={() => dismiss.mutate()}
+      >
+        ×
+      </button>
+      {dismiss.isError ? (
+        <div className="w-full">
+          <ErrorNotice variant="field">{paymentErrorText(dismiss.error, tp, ui)}</ErrorNotice>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/** «Πωλούνται online: N από M πακέτα συνδρομής» with a link to the list; nothing is edited here (ADR-271). */
+function SoldOnlineNudge({ summary }: { summary: OnlineSalesSummary }) {
+  const t = useTranslations("SoldOnline");
+  const slug = useOrganizationSlug();
+  const none = summary.sold_online === 0;
+  const hint = none ? t("payNoneHint") : summary.sold_online >= summary.packages ? t("payAll") : t("payCountHint");
+  return (
+    <div
+      className="flex flex-wrap items-center gap-3 rounded-[1.5rem] p-5"
+      style={{
+        background: "var(--panel-muted)",
+        border: none ? "1px solid color-mix(in srgb, var(--warning) 55%, transparent)" : "1px solid var(--border)",
+      }}
+      data-testid="sold-online-nudge"
+    >
+      <div className="min-w-0 flex-1">
+        <p className="font-semibold" style={{ color: "var(--text)" }}>
+          {none ? t("payNone") : t("payCount", { count: summary.sold_online, total: summary.packages })}
+        </p>
+        <p className="mt-1 text-sm" style={{ color: "var(--dim)" }}>{hint}</p>
+      </div>
+      <Link href={adminHref(PACKAGES_HREF, slug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>
+        {t("packagesLink")} ›
+      </Link>
     </div>
   );
 }
