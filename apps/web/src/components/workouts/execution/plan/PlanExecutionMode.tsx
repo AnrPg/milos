@@ -10,6 +10,7 @@
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 import { completeExecution, fetchExecution, type PlanSetActual, type SectionScore } from "@/api/executions";
 import type { JournalComment } from "@/api/journal-comments";
@@ -223,9 +224,9 @@ export function PlanExecutionMode({ executionId }: { executionId: string }) {
         <span className="w-12" aria-hidden="true" />
       </header>
       {feedback ? (
-        <p role="alert" className="px-4 pt-2 text-sm" style={{ color: "var(--danger)" }}>
+        <ErrorNotice variant="text" className="px-4 pt-2">
           {feedback}
-        </p>
+        </ErrorNotice>
       ) : null}
       <main className="mx-auto flex w-full max-w-xl flex-1 flex-col">
         <PlanExecution

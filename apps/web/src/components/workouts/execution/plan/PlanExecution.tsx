@@ -492,7 +492,7 @@ function WorkView({
             <span
               key={tag}
               className="rounded-full px-3 py-1 text-xs font-semibold"
-              style={{ background: "var(--muted-bg, var(--panel-muted))", color: "var(--text-soft)" }}
+              style={{ background: "var(--panel-muted)", color: "var(--text-soft)" }}
             >
               {tag}
             </span>
