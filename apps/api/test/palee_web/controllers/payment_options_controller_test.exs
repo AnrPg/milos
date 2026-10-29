@@ -216,6 +216,15 @@ defmodule PaleeWeb.PaymentOptionsControllerTest do
     assert failed["status"] == "failed"
     assert "payment_needs_attention" in types(ctx.admin.id)
 
+    # The notice opens the failed charges in Οικονομικά › Ουρές.
+    staff_notice =
+      ctx.admin.id
+      |> Notifications.list_for_user()
+      |> Enum.find(&(to_string(&1.type) == "payment_needs_attention"))
+
+    assert (staff_notice.payload["url"] || staff_notice.payload[:url]) ==
+             "/admin/finance?tab=queues&queue=failed_charges"
+
     # Closed by staff (paid at the desk): leaves the queue, no more retries.
     conn
     |> as(ctx.admin)
