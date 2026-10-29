@@ -84,7 +84,7 @@ async function stub(page: Page, writes: Write[]) {
     }
     if (path === "/api/admin/imports" && method === "GET") return json(route, { imports: current ? [current] : [] });
     if (path === "/api/admin/imports" && method === "POST") {
-      current = { id: "imp-1", status: "draft", source: "wodify", filename: "wodify-members.csv", byte_size: 512, encoding: "utf-8", delimiter: ",", header, row_count: 3, mapping: baseMapping, date_order: "mdy", default_role: "member", file_warnings: [], preview: null, counts: { statuses: { pending: 3 }, outcomes: {} }, inserted_at: "2026-10-29T10:00:00Z" };
+      current = { id: "imp-1", status: "draft", source: "wodify", filename: "wodify-members.csv", byte_size: 512, encoding: "utf8", delimiter: ",", header, row_count: 3, mapping: baseMapping, date_order: "mdy", default_role: "member", file_warnings: [], preview: null, counts: { statuses: { pending: 3 }, outcomes: {} }, inserted_at: "2026-10-29T10:00:00Z" };
       return json(route, { import: current }, 201);
     }
     if (path === "/api/admin/imports/imp-1/preview") {

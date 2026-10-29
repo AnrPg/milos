@@ -38,7 +38,7 @@ const draft: PeopleImport = {
   source: "wodify",
   filename: "wodify-members.csv",
   byte_size: 2048,
-  encoding: "utf-8",
+  encoding: "utf8",
   delimiter: ",",
   header: ["First Name", "Email", "Membership", "Coach Notes"],
   row_count: 3,
