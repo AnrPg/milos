@@ -30,7 +30,16 @@ defmodule PaleeWeb.Schemas.Payments do
         updated_at: @time,
         webhook_url: %Schema{type: :string},
         options: options(),
-        connection: %Schema{type: :string, enum: ["keys", "platform"]}
+        connection: %Schema{type: :string, enum: ["keys", "platform"]},
+        packages_notice: %Schema{
+          type: :object,
+          nullable: true,
+          description:
+            "ADR-271: connecting put `count` paid packages on sale online; shown until " <>
+              "the owner closes it",
+          properties: %{count: @int, opened_at: %Schema{type: :string, format: :"date-time"}},
+          required: [:count, :opened_at]
+        }
       },
       required: [
         :connection,
@@ -38,6 +47,7 @@ defmodule PaleeWeb.Schemas.Payments do
         :environment,
         :id,
         :options,
+        :packages_notice,
         :provider,
         :settings,
         :status,
@@ -117,9 +127,16 @@ defmodule PaleeWeb.Schemas.Payments do
           type: :object,
           description: "Providers that connect with one button, per environment (ADR-261)",
           additionalProperties: %Schema{type: :array, items: %Schema{type: :string}}
+        },
+        online_sales: %Schema{
+          type: :object,
+          description:
+            "ADR-271: of the active paid packages (`packages`), how many are sold online",
+          properties: %{sold_online: @int, packages: @int},
+          required: [:packages, :sold_online]
         }
       },
-      required: [:account, :connect_providers, :environments, :providers]
+      required: [:account, :connect_providers, :environments, :online_sales, :providers]
     }
   end
 
