@@ -46,12 +46,16 @@ defmodule Palee.Fiscal.Domain.TillSigningDomainTest do
 
     test "a credit note is negative; an unknown rate is refused" do
       assert {:ok, schema} =
-               TseTransaction.schema(document("credit_note", [%{rate_bp: 1900, gross_cents: 1_190}], 1_190))
+               TseTransaction.schema(
+                 document("credit_note", [%{rate_bp: 1900, gross_cents: 1_190}], 1_190)
+               )
 
       assert [%{"amount" => "-11.90"}] = schema["standard_v1"]["receipt"]["amounts_per_vat_rate"]
 
       assert {:error, :unsupported_vat_rate} =
-               TseTransaction.schema(document("receipt", [%{rate_bp: 2000, gross_cents: 100}], 100))
+               TseTransaction.schema(
+                 document("receipt", [%{rate_bp: 2000, gross_cents: 100}], 100)
+               )
     end
 
     test "decimal and print lines" do
@@ -92,10 +96,13 @@ defmodule Palee.Fiscal.Domain.TillSigningDomainTest do
       code =
         "_R1-AT1_KASSE-1_83469_2027-02-08T11:00:05_60,00_0,00_0,00_0,00_0,00_dGVzdA==_5c8e5_cHJldg==_"
 
-      assert {:ok, %{receipt_number: "83469", amounts: %{"STANDARD" => "60,00"}, device_failed: false}} =
+      assert {:ok,
+              %{receipt_number: "83469", amounts: %{"STANDARD" => "60,00"}, device_failed: false}} =
                RksvReceipt.parse_code(code <> "c2ln")
 
-      assert {:ok, %{device_failed: true}} = RksvReceipt.parse_code(code <> RksvReceipt.failed_signature())
+      assert {:ok, %{device_failed: true}} =
+               RksvReceipt.parse_code(code <> RksvReceipt.failed_signature())
+
       assert RksvReceipt.failed_signature() == Base.encode64("Sicherheitseinrichtung ausgefallen")
       assert {:error, :invalid_code} = RksvReceipt.parse_code("nope")
 
@@ -108,7 +115,10 @@ defmodule Palee.Fiscal.Domain.TillSigningDomainTest do
         })
 
       assert {"Hinweis", "Sicherheitseinrichtung ausgefallen"} in lines
-      assert RksvReceipt.print_lines(%{qr_code_data: nil}) == [{"Hinweis", RksvReceipt.failed_marker()}]
+
+      assert RksvReceipt.print_lines(%{qr_code_data: nil}) == [
+               {"Hinweis", RksvReceipt.failed_marker()}
+             ]
     end
 
     test "a null receipt is all zero" do
@@ -135,15 +145,28 @@ defmodule Palee.Fiscal.Domain.TillSigningDomainTest do
       assert TillSigningPolicy.operation(%{@row | status: "uncertain"}, @now, nil) == :lookup
       assert TillSigningPolicy.operation(@row, @now, DateTime.add(@now, -299)) == :sign
       assert TillSigningPolicy.operation(@row, @now, DateTime.add(@now, -300)) == :fail
-      assert TillSigningPolicy.operation(%{@row | device: "rksv"}, @now, DateTime.add(@now, -9_999)) == :sign
+
+      assert TillSigningPolicy.operation(
+               %{@row | device: "rksv"},
+               @now,
+               DateTime.add(@now, -9_999)
+             ) == :sign
     end
 
     test "outcomes" do
       assert %{status: "signed", signature_value: "x", signed_at: @now} =
-               TillSigningPolicy.outcome(@row, {:ok, %{signature_value: "x", hint: "ignored"}}, @now)
+               TillSigningPolicy.outcome(
+                 @row,
+                 {:ok, %{signature_value: "x", hint: "ignored"}},
+                 @now
+               )
 
       assert %{status: "device_failed", failed_at: @now, last_error_message: "SCU down"} =
-               TillSigningPolicy.outcome(@row, {:ok, %{device_failed: true, hint: "SCU down"}}, @now)
+               TillSigningPolicy.outcome(
+                 @row,
+                 {:ok, %{device_failed: true, hint: "SCU down"}},
+                 @now
+               )
 
       assert %{status: "uncertain", next_attempt_at: next} =
                TillSigningPolicy.outcome(@row, {:error, {:uncertain, :timeout}}, @now)
@@ -151,10 +174,18 @@ defmodule Palee.Fiscal.Domain.TillSigningDomainTest do
       assert DateTime.compare(next, @now) == :gt
 
       assert %{status: "pending", attempts: 0} =
-               TillSigningPolicy.outcome(%{@row | status: "uncertain"}, {:error, :not_found}, @now)
+               TillSigningPolicy.outcome(
+                 %{@row | status: "uncertain"},
+                 {:error, :not_found},
+                 @now
+               )
 
       assert %{status: "rejected", last_error_code: "E_X"} =
-               TillSigningPolicy.outcome(@row, {:error, {:rejected, [%{code: "E_X", message: "m"}]}}, @now)
+               TillSigningPolicy.outcome(
+                 @row,
+                 {:error, {:rejected, [%{code: "E_X", message: "m"}]}},
+                 @now
+               )
 
       assert %{status: "pending", last_error_code: "transient"} =
                TillSigningPolicy.outcome(@row, {:error, {:transient, :closed}}, @now,
@@ -176,7 +207,10 @@ defmodule Palee.Fiscal.Domain.TillSigningDomainTest do
 
     test "staff retry reads an uncertain row back first" do
       assert %{status: "uncertain"} = TillSigningPolicy.retry(%{status: "uncertain"}, @now)
-      assert %{status: "pending", failed_at: nil} = TillSigningPolicy.retry(%{status: "failed"}, @now)
+
+      assert %{status: "pending", failed_at: nil} =
+               TillSigningPolicy.retry(%{status: "failed"}, @now)
+
       assert TillSigningPolicy.attempt_outcome({:ok, %{device_failed: true}}) == "device_failed"
       assert TillSigningPolicy.attempt_outcome({:error, :not_found}) == "not_found"
     end
@@ -193,7 +227,11 @@ defmodule Palee.Fiscal.Domain.TillSigningDomainTest do
                EInvoicePolicy.submit_outcome(@submission, {:error, {:uncertain, :timeout}}, @now)
 
       assert %{status: "rejected"} =
-               EInvoicePolicy.submit_outcome(@submission, {:error, {:rejected, [%{code: "1", message: "m"}]}}, @now)
+               EInvoicePolicy.submit_outcome(
+                 @submission,
+                 {:error, {:rejected, [%{code: "1", message: "m"}]}},
+                 @now
+               )
 
       assert %{status: "pending", attempts: 0, last_error_code: "connection_invalid"} =
                EInvoicePolicy.submit_outcome(@submission, {:error, {:unauthorized, :bad}}, @now)
@@ -208,19 +246,30 @@ defmodule Palee.Fiscal.Domain.TillSigningDomainTest do
 
     test "polls end delivered, rejected or unconfirmed" do
       submitted = %{@submission | status: "submitted"}
-      assert %{status: "delivered"} = EInvoicePolicy.poll_outcome(submitted, {:ok, :delivered}, @now)
+
+      assert %{status: "delivered"} =
+               EInvoicePolicy.poll_outcome(submitted, {:ok, :delivered}, @now)
 
       assert %{status: "rejected", last_error_code: "delivery_failed"} =
-               EInvoicePolicy.poll_outcome(submitted, {:ok, {:failed, [%{code: "x", message: "y"}]}}, @now)
+               EInvoicePolicy.poll_outcome(
+                 submitted,
+                 {:ok, {:failed, [%{code: "x", message: "y"}]}},
+                 @now
+               )
 
-      assert %{status: "submitted", polls: 1} = EInvoicePolicy.poll_outcome(submitted, {:ok, :in_progress}, @now)
+      assert %{status: "submitted", polls: 1} =
+               EInvoicePolicy.poll_outcome(submitted, {:ok, :in_progress}, @now)
 
       last =
         Stream.iterate(0, &(&1 + 1))
         |> Enum.find(&is_nil(EInvoicePolicy.next_poll_at(&1, @now)))
 
       assert %{status: "failed", last_error_code: "delivery_unconfirmed"} =
-               EInvoicePolicy.poll_outcome(%{submitted | polls: last - 1}, {:ok, :in_progress}, @now)
+               EInvoicePolicy.poll_outcome(
+                 %{submitted | polls: last - 1},
+                 {:ok, :in_progress},
+                 @now
+               )
     end
 
     test "a staff retry keeps the GUID of an uncertain submission only" do
