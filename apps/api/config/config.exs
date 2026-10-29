@@ -180,6 +180,18 @@ config :palee, :payment_gateways, %{
   "stripe" => Palee.Infrastructure.Payments.StripeGateway
 }
 
+# ADR-249: Tap to Pay through the provider's terminal app on a staff phone
+# (providers without one are absent). The phone app's id and the callback
+# the terminal app answers on.
+config :palee, :payment_terminals, %{
+  "sandbox" => Palee.Infrastructure.Payments.SandboxTerminalGateway,
+  "viva" => Palee.Infrastructure.Payments.VivaTerminalGateway
+}
+
+config :palee, :payment_terminal_app,
+  app_id: "app.palee.member",
+  callback: "palee-terminal://result"
+
 # ADR-190: the e-shop and Finance's revenue streams.
 config :palee, :shop_store, Palee.Infrastructure.Shop.EctoShopStore
 config :palee, :shop_notifier, Palee.Infrastructure.Shop.NotificationsShopNotifier
