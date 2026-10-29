@@ -22,6 +22,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- ADR-249: the «Viva.com Terminal» app's answer to a Tap to Pay sale. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="palee-terminal" android:host="result" />
+            </intent-filter>
+
             <!-- palee:app-links begin -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
@@ -138,5 +146,10 @@
 
     <queries>
         <package android:name="com.google.android.apps.healthdata" />
+        <!-- ADR-249: the «Viva.com Terminal» app takes Tap to Pay sales. -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="vivapayclient" />
+        </intent>
     </queries>
 </manifest>
