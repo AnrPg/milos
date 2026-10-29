@@ -67,4 +67,33 @@ describe("useModalFocusTrap", () => {
     expect(outer).toHaveBeenCalledTimes(1);
     outerView.unmount();
   });
+
+  it("keeps the page locked until the last dialog closes, in any order", () => {
+    document.body.style.overflow = "scroll";
+    const outerView = render(<TestDialog onClose={vi.fn()} />);
+    const innerView = render(<TestDialog onClose={vi.fn()} />);
+    expect(document.body.style.overflow).toBe("hidden");
+
+    // The outer dialog closes first (it opened the inner one and stepped away).
+    outerView.unmount();
+    expect(document.body.style.overflow).toBe("hidden");
+
+    innerView.unmount();
+    expect(document.body.style.overflow).toBe("scroll");
+  });
+
+  it("frees the page when a parent dialog unmounts together with its child", () => {
+    function Nested() {
+      const ref = useModalFocusTrap<HTMLDivElement>(vi.fn());
+      return (
+        <div ref={ref} role="dialog" tabIndex={-1}>
+          <TestDialog onClose={vi.fn()} />
+        </div>
+      );
+    }
+    const view = render(<Nested />);
+    expect(document.body.style.overflow).toBe("hidden");
+    view.unmount();
+    expect(document.body.style.overflow).toBe("");
+  });
 });

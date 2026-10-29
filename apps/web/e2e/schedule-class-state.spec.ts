@@ -1,5 +1,6 @@
 import { expect, test, type Page, type Request } from "./support/test";
 import { chooseOption } from "./support/select";
+import { expectPageScrolls } from "./support/scroll";
 
 // ADR-200 §2–3: staff pause, resume, cancel, restore and delete a class, for
 // one class or across its series (optionally every nth class), and a paused
@@ -160,7 +161,9 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
     await dialog.getByRole("button", { name: "Delete", exact: true }).click();
 
     await expect(page.getByText("2 classes have bookings and were kept. Cancel them instead.")).toBeVisible();
-    await expect(page.getByRole("dialog")).toHaveCount(0);
+    // The class dialog and the confirm on top of it close together; the
+    // schedule must scroll again afterwards.
+    await expectPageScrolls(page);
   });
 
   test("a cancelled class shows its reason and offers restore", async ({ page }) => {
