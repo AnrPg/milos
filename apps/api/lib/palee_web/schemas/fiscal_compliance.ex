@@ -229,7 +229,7 @@ defmodule PaleeWeb.Schemas.FiscalCompliance do
       properties: %{
         id: @uuid,
         document_id: nullable(@uuid),
-        device: %Schema{type: :string, enum: ["tse", "rksv"]},
+        device: %Schema{type: :string, enum: ["tse", "rksv", "sign_fr"]},
         kind: %Schema{
           type: :string,
           enum: ["receipt", "start", "null", "monthly", "yearly", "closing"]
@@ -289,9 +289,9 @@ defmodule PaleeWeb.Schemas.FiscalCompliance do
   def till_connection do
     %Schema{
       type: :object,
-      description: "The TSE or RKSV connection; key, secret and admin PIN are never returned.",
+      description: "The TSE, RKSV or SIGN FR connection; key, secret and admin PIN are never returned.",
       properties: %{
-        device: %Schema{type: :string, enum: ["tse", "rksv"]},
+        device: %Schema{type: :string, enum: ["tse", "rksv", "sign_fr"]},
         provider: %Schema{type: :string, enum: ["sandbox", "fiskaly"]},
         environment: %Schema{type: :string, enum: @environments},
         unit_id: @uuid,
