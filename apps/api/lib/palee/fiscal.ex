@@ -152,8 +152,9 @@ defmodule Palee.Fiscal do
   end
 
   @doc """
-  Issues a credit note correcting `document_id` by `requested` (`:all` or
-  `[%{position, quantity}]`). Idempotent by `idempotency_key`.
+  Issues a credit note correcting `document_id` by `requested` (`:all`,
+  `[%{position, quantity}]` or `%{amount_cents: n}`). Idempotent by
+  `idempotency_key`.
   """
   def credit(
         context,
@@ -283,6 +284,10 @@ defmodule Palee.Fiscal do
     do: :crypto.hash(:sha256, CanonicalJson.encode!(term)) |> Base.encode16(case: :lower)
 
   def get_document(context, id), do: FiscalStore.get_document(context, id, [])
+
+  @doc "The document issued under `idempotency_key`, or nil (ADR-262)."
+  def document_by_key(context, key) when is_binary(key),
+    do: FiscalStore.get_document_by_idempotency_key(context, key)
 
   @doc "Documents, newest first; filters: kind, from, to, number, limit, offset."
   def list_documents(context, filters \\ %{}), do: FiscalStore.list_documents(context, filters)

@@ -265,6 +265,74 @@ defmodule Palee.Fiscal.Domain.SaleLines do
     end
   end
 
+  @doc """
+  The lines of a payment of part of a sale (ADR-262): `amount_cents` of the
+  gross of `lines` (request lines of the whole sale), split across its tax
+  groups in proportion to each group's gross (largest remainder, so the
+  parts add up to the amount exactly). One line per group, described as
+  `description`. A payment of the whole gross returns `lines` unchanged.
+
+  `{:ok, lines}`, or `{:error, :invalid_amount}` for an amount of zero or
+  more than the sale.
+  """
+  def payment_part(lines, amount_cents, description) when is_list(lines) do
+    total = Enum.sum(Enum.map(lines, &line_gross/1))
+
+    cond do
+      not (is_integer(amount_cents) and amount_cents > 0 and amount_cents <= total) ->
+        {:error, :invalid_amount}
+
+      amount_cents == total ->
+        {:ok, lines}
+
+      true ->
+        groups =
+          lines
+          |> Enum.group_by(&{&1.tax_category, &1.exemption_reason, &1.rate_bp})
+          |> Enum.map(fn {key, group} -> {key, Enum.sum(Enum.map(group, &line_gross/1))} end)
+          |> Enum.reject(fn {_key, gross} -> gross == 0 end)
+          |> Enum.sort()
+
+        {:ok, allocate(groups, amount_cents, total, description)}
+    end
+  end
+
+  defp line_gross(line), do: line.quantity * line.unit_price_cents - (line.discount_cents || 0)
+
+  defp allocate(groups, amount, total, description) do
+    shares =
+      Enum.map(groups, fn {key, gross} ->
+        exact = amount * gross
+        {key, div(exact, total), rem(exact, total)}
+      end)
+
+    left = amount - Enum.sum(Enum.map(shares, &elem(&1, 1)))
+
+    bonus =
+      shares
+      |> Enum.with_index()
+      |> Enum.sort_by(fn {{_key, _base, remainder}, index} -> {-remainder, index} end)
+      |> Enum.take(left)
+      |> MapSet.new(fn {_share, index} -> index end)
+
+    shares
+    |> Enum.with_index()
+    |> Enum.map(fn {{{category, reason, rate_bp}, base, _remainder}, index} ->
+      %{
+        description: String.slice(description, 0, @max_description),
+        quantity: 1,
+        unit_price_cents: base + if(MapSet.member?(bonus, index), do: 1, else: 0),
+        discount_cents: 0,
+        tax_category: category,
+        exemption_reason: reason,
+        rate_bp: rate_bp,
+        source_type: nil,
+        source_id: nil
+      }
+    end)
+    |> Enum.reject(&(&1.unit_price_cents == 0))
+  end
+
   defp invoice_line_tax(line, taxes) do
     sources = field(taxes, :sources) || %{}
     packages = field(taxes, :packages) || %{}

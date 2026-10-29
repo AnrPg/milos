@@ -167,6 +167,10 @@ defmodule Palee.Finance do
   defdelegate get_invoice(invoice_id), to: FinanceStore, as: :get_invoice
   def get_invoice(context, invoice_id), do: scoped(context, fn -> get_invoice(invoice_id) end)
 
+  @doc "ADR-262: an invoice's lines (description, amounts, package code, charge category)."
+  def invoice_lines(context, invoice_id),
+    do: scoped(context, fn -> FinanceStore.invoice_lines(invoice_id) end)
+
   defdelegate update_invoice_params(invoice_id, params),
     to: FinanceStore,
     as: :update_invoice_params

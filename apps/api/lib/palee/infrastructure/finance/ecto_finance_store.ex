@@ -920,6 +920,9 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   @impl true
+  def invoice_lines(invoice_id), do: list_invoice_lines(invoice_id)
+
+  @impl true
   def get_invoice(invoice_id) do
     case FinanceInvoice |> tenant_scope() |> Repo.get(invoice_id) do
       nil -> {:error, :not_found}
@@ -6385,6 +6388,9 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       total_cents: line.total_cents,
       package_code_snapshot: line.package_code_snapshot,
       package_family_snapshot: line.package_family_snapshot,
+      charge_category: line.charge_category,
+      source_type: line.source_type,
+      source_id: line.source_id,
       params: line.params || %{},
       inserted_at: line.inserted_at,
       updated_at: line.updated_at

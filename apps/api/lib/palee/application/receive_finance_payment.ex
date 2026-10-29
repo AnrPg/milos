@@ -6,6 +6,7 @@ defmodule Palee.Application.ReceiveFinancePayment do
   """
 
   alias Palee.Application.{GoLive, RecordAnalyticsEvent, RecordFinancePayment}
+  alias Palee.Application.Fiscal.PaymentDocuments
   alias Palee.Finance
 
   @doc """
@@ -15,7 +16,10 @@ defmodule Palee.Application.ReceiveFinancePayment do
   def call(context, user_id, admin_id, params) do
     with :ok <- desk_method(params),
          :ok <- GoLive.check_payment(context, user_id),
-         do: call(user_id, admin_id, params)
+         {:ok, received} <- call(user_id, admin_id, params) do
+      # ADR-262: the legal document of the money received.
+      {:ok, PaymentDocuments.attach(context, received, admin_id)}
+    end
   end
 
   @doc """
@@ -23,10 +27,18 @@ defmodule Palee.Application.ReceiveFinancePayment do
   of an invoice). Idempotent through the payment's `idempotency_key`.
   """
   def record_online(context, user_id, params) do
-    with :ok <- GoLive.check_payment(context, user_id) do
-      Finance.with_tenant_context(context, fn ->
-        call(user_id, nil, Map.put(params, "payment_method", "online"))
-      end)
+    with :ok <- GoLive.check_payment(context, user_id),
+         {:ok, received} <-
+           Finance.with_tenant_context(context, fn ->
+             call(user_id, nil, Map.put(params, "payment_method", "online"))
+           end) do
+      # ADR-262: an online payment is fulfilled only with its document, so
+      # a failure makes the payment's fulfilment try again later.
+      case PaymentDocuments.issue(context, received, nil, DateTime.utc_now()) do
+        {:ok, :not_configured} -> {:ok, Map.put(received, :fiscal_document, nil)}
+        {:ok, document} -> {:ok, Map.put(received, :fiscal_document, PaymentDocuments.summary(document))}
+        {:error, reason} -> {:error, {:fiscal_document_not_issued, reason}}
+      end
     end
   end
 
