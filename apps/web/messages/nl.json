@@ -12092,6 +12092,7 @@
     "back": "Terug",
     "connected": "Gekoppeld met {provider}",
     "connectedHint": "Betalingen gaan rechtstreeks naar je eigen {provider}-account",
+    "methodsHint": "PayPal, Klarna, Apple Pay en Google Pay verschijnen vanzelf bij het betalen zodra je ze inschakelt in je {provider}-dashboard, waar {provider} ze aanbiedt.",
     "testMode": "alleen testbetalingen",
     "statusActive": "Actief",
     "whatTitle": "Wat online betaald wordt",
@@ -12279,6 +12280,8 @@
       "tseHint": "Alleen nodig voor betalingen aan de kassa. We koppelen het in een latere stap met fiskaly.",
       "rksvTitle": "Kassabeveiligingsapparaat (RKSV)",
       "rksvHint": "Alleen nodig voor betalingen aan de kassa. We koppelen het in een latere stap.",
+      "signFrTitle": "Kassabeveiligingsapparaat (fiskaly SIGN FR)",
+      "signFrHint": "Alleen nodig voor betalingen aan de kassa. We koppelen het in een latere stap met fiskaly. Het onveranderbare register is al actief.",
       "nf525Title": "NF525-verklaring",
       "nf525Hint": "Het onveranderbare register is al actief. Palee levert de verklaring van de uitgever."
     },

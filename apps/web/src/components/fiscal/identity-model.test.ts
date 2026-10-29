@@ -85,6 +85,7 @@ describe("summary and next step", () => {
     expect(nextStep({ authority: "mydata", till_device: "none", register: "standard" })).toBe("mydata");
     expect(nextStep({ authority: "none", till_device: "tse", register: "standard" })).toBe("tse");
     expect(nextStep({ authority: "none", till_device: "none", register: "nf525" })).toBe("nf525");
+    expect(nextStep({ authority: "none", till_device: "sign_fr", register: "nf525" })).toBe("signFr");
     expect(nextStep({ authority: "none", till_device: "none", register: "standard" })).toBe("none");
   });
 

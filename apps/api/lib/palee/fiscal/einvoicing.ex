@@ -19,20 +19,27 @@ defmodule Palee.Fiscal.EInvoicing do
   """
 
   alias Palee.Fiscal
-  alias Palee.Fiscal.{EInvoiceStore, FiscalStore}
+  alias Palee.Fiscal.{EInvoiceStore, FiscalStore, TillSignatureStore}
   alias Palee.Fiscal.Domain.{CountryProfile, EInvoicePolicy, PeppolId, UblInvoice}
 
   @network "peppol"
   @environments ~w(sandbox test production)
+  # Access points a business can choose outside the sandbox; fiskaly is
+  # the default (ADR-250 update 2026-10-29). `storecove` stays a valid
+  # value of old rows but has no adapter any more.
+  @providers ~w(fiskaly)
+  @default_provider "fiskaly"
+  @till_devices ~w(tse rksv sign_fr)
   @batch 25
 
   def network, do: @network
   def environments, do: @environments
+  def providers, do: @providers
 
   defp adapter(provider) do
     :palee
     |> Application.fetch_env!(:fiscal_einvoice_networks)
-    |> Map.fetch!(provider)
+    |> Map.get(provider)
   end
 
   # ── Outbox ──────────────────────────────────────────────────────────────
@@ -107,7 +114,7 @@ defmodule Palee.Fiscal.EInvoicing do
   end
 
   defp handle(context, submission, now) do
-    connection = EInvoiceStore.get_connection(context, @network)
+    connection = context |> EInvoiceStore.get_connection(@network) |> with_credentials(context)
 
     cond do
       is_nil(connection) and submission.status == "sending" ->
@@ -115,6 +122,9 @@ defmodule Palee.Fiscal.EInvoicing do
 
       is_nil(connection) ->
         :polling
+
+      is_nil(adapter(connection.provider)) ->
+        retired(context, submission, connection, now)
 
       connection.status == "invalid" and submission.status == "sending" ->
         defer(context, submission, :connection_invalid, now)
@@ -127,15 +137,59 @@ defmodule Palee.Fiscal.EInvoicing do
     end
   end
 
+  # A connection to a provider without an adapter (Storecove, retired on
+  # 2026-10-29) is invalid until staff reconnect through fiskaly.
+  defp retired(context, submission, connection, now) do
+    if connection.status != "invalid",
+      do:
+        EInvoiceStore.set_connection_status(
+          context,
+          @network,
+          "invalid",
+          "provider_retired: reconnect with #{@default_provider}"
+        )
+
+    if submission.status == "sending",
+      do: defer(context, submission, :connection_invalid, now),
+      else: :polling
+  end
+
+  # fiskaly: a connection without its own key and secret uses those of the
+  # business's fiskaly till connection in the same environment.
+  defp with_credentials(%{provider: "fiskaly", api_key: nil} = connection, context) do
+    case till_credentials(context, connection.environment) do
+      %{api_key: key, api_secret: secret} -> %{connection | api_key: key, api_secret: secret}
+      nil -> connection
+    end
+  end
+
+  defp with_credentials(connection, _context), do: connection
+
+  defp till_credentials(context, environment) do
+    Enum.find_value(@till_devices, fn device ->
+      case TillSignatureStore.get_connection(context, device) do
+        %{provider: "fiskaly", environment: ^environment, api_key: key, api_secret: secret}
+        when is_binary(key) and is_binary(secret) ->
+          %{api_key: key, api_secret: secret}
+
+        _other ->
+          nil
+      end
+    end)
+  end
+
   defp submit(context, submission, connection, now) do
     started = System.monotonic_time(:millisecond)
     document = FiscalStore.get_document(context, submission.document_id, [])
+    original = original(context, document)
 
     {result, wire} =
-      case ubl(context, document, connection, submission) do
+      case ubl(document, connection, submission, original) do
         {:ok, ubl} ->
           adapter(connection.provider).submit(connection, %{
             ubl: ubl,
+            document: document,
+            original: original,
             document_type: UblInvoice.document_type(document),
             idempotency_guid: submission.idempotency_guid,
             recipient: %{
@@ -171,19 +225,28 @@ defmodule Palee.Fiscal.EInvoicing do
     end
   end
 
-  defp ubl(context, document, connection, submission) do
-    original =
-      case document.corrects_document_id do
-        nil ->
-          nil
+  # The corrected invoice of a credit note, with its submission id at the
+  # access point (fiskaly links a correction to that record).
+  defp original(_context, nil), do: nil
+  defp original(_context, %{corrects_document_id: nil}), do: nil
 
-        id ->
-          case FiscalStore.get_document(context, id, []) do
-            nil -> nil
-            original -> %{number: original.number, issue_date: original.issue_date}
-          end
-      end
+  defp original(context, %{corrects_document_id: id}) do
+    case FiscalStore.get_document(context, id, []) do
+      nil ->
+        nil
 
+      original ->
+        submission = context |> EInvoiceStore.submissions_for_documents([id]) |> Map.get(id)
+
+        %{
+          number: original.number,
+          issue_date: original.issue_date,
+          submission_id: submission && submission.provider_submission_id
+        }
+    end
+  end
+
+  defp ubl(document, connection, submission, original) do
     UblInvoice.build(document,
       seller_endpoint: %{
         scheme: connection.peppol_scheme,
@@ -350,14 +413,27 @@ defmodule Palee.Fiscal.EInvoicing do
 
   # ── Connection ──────────────────────────────────────────────────────────
 
-  @doc "The connection as shown to staff (never the API key or webhook token)."
+  @doc "The connection as shown to staff (never the API key, secret or webhook token)."
   def connection(context) do
-    context
-    |> EInvoiceStore.get_connection(@network)
-    |> public_connection()
+    case EInvoiceStore.get_connection(context, @network) do
+      nil ->
+        nil
+
+      connection ->
+        connection
+        |> public_connection()
+        |> Map.put(:credentials_source, credentials_source(context, connection))
+    end
   end
 
-  defp public_connection(nil), do: nil
+  # `own`, `till_connection` (fiskaly credentials reused) or `none`.
+  defp credentials_source(_context, %{api_key: key}) when is_binary(key), do: "own"
+
+  defp credentials_source(context, %{provider: "fiskaly", environment: environment}) do
+    if till_credentials(context, environment), do: "till_connection", else: "none"
+  end
+
+  defp credentials_source(_context, _connection), do: "none"
 
   defp public_connection(connection) do
     connection
@@ -377,14 +453,18 @@ defmodule Palee.Fiscal.EInvoicing do
           identifier: connection.peppol_identifier
         }),
       has_api_key: is_binary(connection.api_key),
+      has_api_secret: is_binary(Map.get(connection, :api_secret)),
       has_webhook_token: is_binary(connection.webhook_token_hash)
     })
   end
 
   @doc """
-  Saves the Peppol connection. `test` and `production` go through
-  Storecove and need the legal entity id and API key; a saved key is kept
-  when none is sent. The business's Peppol id defaults to the `0208`
+  Saves the Peppol connection. `test` and `production` go through an
+  access point `provider` (the default and only choice: `fiskaly`) and
+  need the business's id there (`legal_entity_id`: its fiskaly
+  E-INVOICE System id) and credentials: an API key and secret sent here
+  (saved ones are kept when none are sent), or else the business's
+  fiskaly till connection's, reused (one fiskaly account per business). The business's Peppol id defaults to the `0208`
   enterprise number of its identity. A webhook token is made on the first
   save (or when `rotate_webhook_token` is true) and returned once.
   Journals the change (never the key or token) and wakes the waiting
@@ -394,7 +474,8 @@ defmodule Palee.Fiscal.EInvoicing do
     before = EInvoiceStore.get_connection(context, @network)
     identity = FiscalStore.get_identity(context)
 
-    with {:ok, attrs} <- validate_connection(before, identity, params) do
+    with {:ok, attrs} <-
+           validate_connection(before, identity, params, &till_credentials(context, &1)) do
       token =
         if is_nil(before) or is_nil(before.webhook_token_hash) or
              params[:rotate_webhook_token] == true,
@@ -422,23 +503,40 @@ defmodule Palee.Fiscal.EInvoicing do
                    environment: saved.environment,
                    peppol_id: "#{saved.peppol_scheme}:#{saved.peppol_identifier}",
                    legal_entity_id: saved.legal_entity_id,
-                   key_changed: Map.has_key?(attrs, :api_key),
+                   key_changed: Map.has_key?(attrs, :api_key) or Map.has_key?(attrs, :api_secret),
                    webhook_token_changed: not is_nil(token)
                  }
                }) do
           EInvoiceStore.wake_waiting(context, now)
-          {:ok, saved |> public_connection() |> Map.put(:webhook_token, token)}
+
+          {:ok,
+           saved
+           |> public_connection()
+           |> Map.merge(%{
+             webhook_token: token,
+             credentials_source: credentials_source(context, saved)
+           })}
         end
       end)
     end
   end
 
-  defp validate_connection(before, identity, params) do
+  defp validate_connection(before, identity, params, till_credentials) do
     environment = params[:environment]
     sandbox? = environment == "sandbox"
+    provider = clean(params[:provider]) || @default_provider
     key = clean(params[:api_key])
-    stored_key = before && before.api_key
-    legal_entity_id = clean(params[:legal_entity_id]) || (before && before.legal_entity_id)
+    secret = clean(params[:api_secret])
+    # What is saved counts only for the same provider.
+    kept = if before && before.provider == provider, do: before, else: %{}
+
+    legal_entity_id = clean(params[:legal_entity_id]) || kept[:legal_entity_id]
+    has_key? = is_binary(key) or is_binary(kept[:api_key])
+    has_secret? = is_binary(secret) or is_binary(kept[:api_secret])
+
+    reused? =
+      not sandbox? and not has_key? and not has_secret? and environment in @environments and
+        not is_nil(till_credentials.(environment))
 
     peppol =
       case clean(params[:peppol_id]) do
@@ -450,14 +548,17 @@ defmodule Palee.Fiscal.EInvoicing do
       %{}
       |> add_error(environment not in @environments, :environment, "invalid")
       |> add_error(match?({:error, _}, peppol), :peppol_id, "invalid")
+      |> add_error(not sandbox? and provider not in @providers, :provider, "invalid")
       |> add_error(not sandbox? and is_nil(legal_entity_id), :legal_entity_id, "required")
-      |> add_error(not sandbox? and is_nil(key) and is_nil(stored_key), :api_key, "required")
+      |> add_error(not sandbox? and not has_key? and not reused?, :api_key, "required")
+      |> add_error(not sandbox? and not has_secret? and not reused?, :api_secret, "required")
       |> add_error(
         is_binary(legal_entity_id) and String.length(legal_entity_id) > 40,
         :legal_entity_id,
         "too_long"
       )
       |> add_error(is_binary(key) and String.length(key) > 500, :api_key, "too_long")
+      |> add_error(is_binary(secret) and String.length(secret) > 500, :api_secret, "too_long")
 
     if errors == %{} do
       {:ok, peppol_id} = peppol
@@ -465,15 +566,25 @@ defmodule Palee.Fiscal.EInvoicing do
       {:ok,
        %{
          environment: environment,
-         provider: if(sandbox?, do: "sandbox", else: "storecove"),
+         provider: if(sandbox?, do: "sandbox", else: provider),
          peppol_scheme: peppol_id.scheme,
          peppol_identifier: peppol_id.identifier,
          legal_entity_id: if(sandbox?, do: nil, else: legal_entity_id)
        }
-       |> then(fn attrs -> if key, do: Map.put(attrs, :api_key, key), else: attrs end)}
+       |> credentials(before, sandbox?, provider, key, secret)}
     else
       {:error, {:invalid_fields, errors}}
     end
+  end
+
+  # Credentials of another provider (or of the sandbox) are dropped.
+  defp credentials(attrs, before, sandbox?, provider, key, secret) do
+    stale? = sandbox? or (not is_nil(before) and before.provider != provider)
+
+    attrs
+    |> then(&if(stale?, do: Map.merge(&1, %{api_key: nil, api_secret: nil}), else: &1))
+    |> then(&if(key && not sandbox?, do: Map.put(&1, :api_key, key), else: &1))
+    |> then(&if(secret && not sandbox?, do: Map.put(&1, :api_secret, secret), else: &1))
   end
 
   defp default_peppol_id(%{peppol_scheme: scheme, peppol_identifier: identifier}, _identity),

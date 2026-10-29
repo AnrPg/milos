@@ -2,8 +2,9 @@ defmodule Palee.Fiscal.TillSigning do
   @moduledoc """
   Signing till receipts with the cash-register security device of the
   business's country (ADR-251): a cloud TSE in Germany, an RKSV signature
-  creation unit in Austria, through the `Fiscal.Ports.CashRegisterSecurity`
-  adapter of the organization's connection.
+  creation unit in Austria, fiskaly SIGN FR in France (ADR-266), through
+  the `Fiscal.Ports.CashRegisterSecurity` adapter of the organization's
+  connection.
 
   Issuing a till transaction in such a country (a receipt, an invoice
   paid at the till in cash or by card, or a credit note correcting one of
@@ -25,11 +26,12 @@ defmodule Palee.Fiscal.TillSigning do
   alias Palee.Fiscal.Domain.{
     CountryProfile,
     RksvReceipt,
+    SignFrReceipt,
     TillSigningPolicy,
     TseTransaction
   }
 
-  @devices ~w(tse rksv)
+  @devices ~w(tse rksv sign_fr)
   @environments ~w(sandbox test production)
   @batch 25
 
@@ -94,6 +96,7 @@ defmodule Palee.Fiscal.TillSigning do
   @doc "What a receipt prints for its signature: `[%{label, value}]`."
   def print(%{device: "tse"} = signature), do: lines(TseTransaction.print_lines(signature))
   def print(%{device: "rksv"} = signature), do: lines(RksvReceipt.print_lines(signature))
+  def print(%{device: "sign_fr"} = signature), do: lines(SignFrReceipt.print_lines(signature))
   def print(_signature), do: []
 
   defp lines(pairs), do: Enum.map(pairs, fn {label, value} -> %{label: label, value: value} end)
@@ -159,10 +162,15 @@ defmodule Palee.Fiscal.TillSigning do
     operation = if signature.status == "uncertain", do: :lookup, else: :sign
 
     {result, wire} =
-      case schema(signature, document) do
+      case schema(context, signature, document, now) do
         {:ok, schema} ->
           request = %{external_id: signature.external_id, kind: signature.kind, schema: schema}
           apply(adapter(connection.device, connection.provider), operation, [connection, request])
+
+        # France: a credit note waits until its receipt is recorded.
+        {:error, :original_not_signed} ->
+          {{:error, {:transient, :original_not_signed}},
+           %{request_body: nil, response_status: nil, response_body: nil}}
 
         {:error, reason} ->
           {{:error, {:rejected, [%{code: Atom.to_string(reason), message: "palee"}]}},
@@ -197,9 +205,26 @@ defmodule Palee.Fiscal.TillSigning do
     record(context, signature, connection, document, changes, attempt, now)
   end
 
-  defp schema(%{kind: "receipt", device: "tse"}, document), do: TseTransaction.schema(document)
-  defp schema(%{kind: "receipt", device: "rksv"}, document), do: RksvReceipt.schema(document)
-  defp schema(_special, _document), do: {:ok, RksvReceipt.null_schema()}
+  defp schema(_context, %{kind: "receipt", device: "tse"}, document, _now),
+    do: TseTransaction.schema(document)
+
+  defp schema(_context, %{kind: "receipt", device: "rksv"}, document, _now),
+    do: RksvReceipt.schema(document)
+
+  defp schema(context, %{kind: "receipt", device: "sign_fr"}, document, now) do
+    original =
+      case document.corrects_document_id do
+        nil ->
+          nil
+
+        id ->
+          context |> TillSignatureStore.signatures_for_documents([id]) |> Map.get(id)
+      end
+
+    SignFrReceipt.schema(document, original, TillSigningPolicy.offline?(now, document.issued_at))
+  end
+
+  defp schema(_context, _special, _document, _now), do: {:ok, RksvReceipt.null_schema()}
 
   defp record(context, signature, connection, document, %{status: status} = changes, attempt, now)
        when status in ["signed", "device_failed"] do
@@ -374,11 +399,23 @@ defmodule Palee.Fiscal.TillSigning do
       |> Map.merge(%{status: "provisioning", provisioned_at: nil, updated_by_id: actor_id})
 
     with {:ok, _saved} <- TillSignatureStore.save_connection(context, device, pending) do
-      provider_context = %{
-        legal_name: identity && identity.legal_name,
-        vat_number: identity && identity.vat_number,
-        register_serial: "PALEE-" <> String.slice(ids.register_id, 0, 8)
-      }
+      provider_context =
+        identity
+        |> Kernel.||(%{})
+        |> Map.take([
+          :legal_name,
+          :trade_name,
+          :vat_number,
+          :tax_id,
+          :registration_number,
+          :activity_code,
+          :street,
+          :building_number,
+          :postal_code,
+          :city,
+          :country_code
+        ])
+        |> Map.put(:register_serial, "PALEE-" <> String.slice(ids.register_id, 0, 8))
 
       {result, _wire} = adapter(device, attrs.provider).provision(connection, provider_context)
 

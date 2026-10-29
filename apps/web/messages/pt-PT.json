@@ -12092,6 +12092,7 @@
     "back": "Voltar",
     "connected": "Ligado à {provider}",
     "connectedHint": "Os pagamentos vão diretamente para a tua própria conta {provider}",
+    "methodsHint": "PayPal, Klarna, Apple Pay e Google Pay aparecem sozinhos no pagamento assim que os ativares no painel da {provider}, onde a {provider} os oferece.",
     "testMode": "só pagamentos de teste",
     "statusActive": "Ativo",
     "whatTitle": "O que se paga online",
@@ -12279,6 +12280,8 @@
       "tseHint": "Só é preciso para pagamentos na caixa. Ligamo-lo ao fiskaly num passo posterior.",
       "rksvTitle": "Dispositivo de segurança da caixa (RKSV)",
       "rksvHint": "Só é preciso para pagamentos na caixa. Ligamo-lo num passo posterior.",
+      "signFrTitle": "Dispositivo de segurança da caixa (fiskaly SIGN FR)",
+      "signFrHint": "Só é preciso para pagamentos na caixa. Ligamo-lo ao fiskaly num passo posterior. O registo inalterável já está ativo.",
       "nf525Title": "Certificação NF525",
       "nf525Hint": "O registo inalterável já está ativo. A Palee fornece a certificação do editor."
     },
