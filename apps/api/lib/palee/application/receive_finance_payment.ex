@@ -30,10 +30,27 @@ defmodule Palee.Application.ReceiveFinancePayment do
     end
   end
 
-  # Staff never record an "online" payment by hand.
+  @doc """
+  ADR-249: records a card tapped on the Viva.com Terminal app at the desk,
+  after the provider confirmed it (`card_terminal`). Idempotent through the
+  payment's `idempotency_key`; the document follows ADR-222.
+  """
+  def record_terminal(context, user_id, params) do
+    with :ok <- GoLive.check_payment(context, user_id) do
+      Finance.with_tenant_context(context, fn ->
+        call(user_id, params["created_by_id"], Map.put(params, "payment_method", "card_terminal"))
+      end)
+    end
+  end
+
+  # Staff never record a provider-confirmed method ("online",
+  # "card_terminal") by hand.
   defp desk_method(params) do
     method = params["payment_method"] || params[:payment_method]
-    if method == "online", do: {:error, :invalid_payment_method}, else: :ok
+
+    if method in ["online", "card_terminal"],
+      do: {:error, :invalid_payment_method},
+      else: :ok
   end
 
   def call(user_id, admin_id, params) do
