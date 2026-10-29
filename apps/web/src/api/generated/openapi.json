@@ -85787,10 +85787,18 @@
           "wod_assistant_enabled": {
             "description": "Off: no assistant; workouts are written in text sections with a timer each",
             "type": "boolean"
+          },
+          "workout_types": {
+            "description": "ADR-275: the workout kinds this gym's editors offer, in catalogue order",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           }
         },
         "required": [
-          "wod_assistant_enabled"
+          "wod_assistant_enabled",
+          "workout_types"
         ],
         "title": "WorkoutAuthoringSettings",
         "type": "object"
@@ -148745,10 +148753,46 @@
                           "type_filter": {
                             "enum": [
                               "crossfit",
+                              "functional_fitness",
+                              "hyrox",
+                              "hiit",
+                              "bootcamp",
+                              "circuit_training",
                               "strength",
+                              "powerlifting",
+                              "olympic_lifting",
+                              "bodybuilding",
+                              "strongman",
+                              "kettlebell",
                               "gymnastics",
+                              "calisthenics",
                               "aerobics",
+                              "running",
+                              "cycling",
+                              "indoor_cycling",
+                              "rowing",
+                              "swimming",
+                              "endurance",
+                              "yoga",
+                              "pilates",
+                              "barre",
                               "flexibility",
+                              "mobility",
+                              "stretching",
+                              "tai_chi_qigong",
+                              "boxing",
+                              "kickboxing",
+                              "muay_thai",
+                              "mma",
+                              "bjj_grappling",
+                              "wrestling",
+                              "martial_arts",
+                              "self_defense",
+                              "dance",
+                              "dance_fitness",
+                              "pole_aerial",
+                              "outdoor_training",
+                              "climbing_bouldering",
                               "recovery"
                             ],
                             "type": "string"
@@ -149053,10 +149097,46 @@
                           "type_filter": {
                             "enum": [
                               "crossfit",
+                              "functional_fitness",
+                              "hyrox",
+                              "hiit",
+                              "bootcamp",
+                              "circuit_training",
                               "strength",
+                              "powerlifting",
+                              "olympic_lifting",
+                              "bodybuilding",
+                              "strongman",
+                              "kettlebell",
                               "gymnastics",
+                              "calisthenics",
                               "aerobics",
+                              "running",
+                              "cycling",
+                              "indoor_cycling",
+                              "rowing",
+                              "swimming",
+                              "endurance",
+                              "yoga",
+                              "pilates",
+                              "barre",
                               "flexibility",
+                              "mobility",
+                              "stretching",
+                              "tai_chi_qigong",
+                              "boxing",
+                              "kickboxing",
+                              "muay_thai",
+                              "mma",
+                              "bjj_grappling",
+                              "wrestling",
+                              "martial_arts",
+                              "self_defense",
+                              "dance",
+                              "dance_fitness",
+                              "pole_aerial",
+                              "outdoor_training",
+                              "climbing_bouldering",
                               "recovery"
                             ],
                             "type": "string"
@@ -188701,11 +188781,66 @@
                         "wod_goals_visible_by_default": {
                           "description": "ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own",
                           "type": "boolean"
+                        },
+                        "workout_types": {
+                          "description": "ADR-275: the workout kinds the gym's editors offer, in catalogue order; null offers every kind",
+                          "items": {
+                            "enum": [
+                              "crossfit",
+                              "functional_fitness",
+                              "hyrox",
+                              "hiit",
+                              "bootcamp",
+                              "circuit_training",
+                              "strength",
+                              "powerlifting",
+                              "olympic_lifting",
+                              "bodybuilding",
+                              "strongman",
+                              "kettlebell",
+                              "gymnastics",
+                              "calisthenics",
+                              "aerobics",
+                              "running",
+                              "cycling",
+                              "indoor_cycling",
+                              "rowing",
+                              "swimming",
+                              "endurance",
+                              "yoga",
+                              "pilates",
+                              "barre",
+                              "flexibility",
+                              "mobility",
+                              "stretching",
+                              "tai_chi_qigong",
+                              "boxing",
+                              "kickboxing",
+                              "muay_thai",
+                              "mma",
+                              "bjj_grappling",
+                              "wrestling",
+                              "martial_arts",
+                              "self_defense",
+                              "dance",
+                              "dance_fitness",
+                              "pole_aerial",
+                              "outdoor_training",
+                              "climbing_bouldering",
+                              "recovery"
+                            ],
+                            "type": "string"
+                          },
+                          "minItems": 1,
+                          "nullable": true,
+                          "type": "array",
+                          "uniqueItems": true
                         }
                       },
                       "required": [
+                        "wod_assistant_enabled",
                         "wod_goals_visible_by_default",
-                        "wod_assistant_enabled"
+                        "workout_types"
                       ],
                       "type": "object"
                     }
@@ -188863,6 +188998,60 @@
                       "wod_goals_visible_by_default": {
                         "description": "ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own",
                         "type": "boolean"
+                      },
+                      "workout_types": {
+                        "description": "ADR-275: the workout kinds the gym's editors offer, in catalogue order; null offers every kind",
+                        "items": {
+                          "enum": [
+                            "crossfit",
+                            "functional_fitness",
+                            "hyrox",
+                            "hiit",
+                            "bootcamp",
+                            "circuit_training",
+                            "strength",
+                            "powerlifting",
+                            "olympic_lifting",
+                            "bodybuilding",
+                            "strongman",
+                            "kettlebell",
+                            "gymnastics",
+                            "calisthenics",
+                            "aerobics",
+                            "running",
+                            "cycling",
+                            "indoor_cycling",
+                            "rowing",
+                            "swimming",
+                            "endurance",
+                            "yoga",
+                            "pilates",
+                            "barre",
+                            "flexibility",
+                            "mobility",
+                            "stretching",
+                            "tai_chi_qigong",
+                            "boxing",
+                            "kickboxing",
+                            "muay_thai",
+                            "mma",
+                            "bjj_grappling",
+                            "wrestling",
+                            "martial_arts",
+                            "self_defense",
+                            "dance",
+                            "dance_fitness",
+                            "pole_aerial",
+                            "outdoor_training",
+                            "climbing_bouldering",
+                            "recovery"
+                          ],
+                          "type": "string"
+                        },
+                        "minItems": 1,
+                        "nullable": true,
+                        "type": "array",
+                        "uniqueItems": true
                       }
                     },
                     "type": "object"
@@ -189084,11 +189273,66 @@
                         "wod_goals_visible_by_default": {
                           "description": "ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own",
                           "type": "boolean"
+                        },
+                        "workout_types": {
+                          "description": "ADR-275: the workout kinds the gym's editors offer, in catalogue order; null offers every kind",
+                          "items": {
+                            "enum": [
+                              "crossfit",
+                              "functional_fitness",
+                              "hyrox",
+                              "hiit",
+                              "bootcamp",
+                              "circuit_training",
+                              "strength",
+                              "powerlifting",
+                              "olympic_lifting",
+                              "bodybuilding",
+                              "strongman",
+                              "kettlebell",
+                              "gymnastics",
+                              "calisthenics",
+                              "aerobics",
+                              "running",
+                              "cycling",
+                              "indoor_cycling",
+                              "rowing",
+                              "swimming",
+                              "endurance",
+                              "yoga",
+                              "pilates",
+                              "barre",
+                              "flexibility",
+                              "mobility",
+                              "stretching",
+                              "tai_chi_qigong",
+                              "boxing",
+                              "kickboxing",
+                              "muay_thai",
+                              "mma",
+                              "bjj_grappling",
+                              "wrestling",
+                              "martial_arts",
+                              "self_defense",
+                              "dance",
+                              "dance_fitness",
+                              "pole_aerial",
+                              "outdoor_training",
+                              "climbing_bouldering",
+                              "recovery"
+                            ],
+                            "type": "string"
+                          },
+                          "minItems": 1,
+                          "nullable": true,
+                          "type": "array",
+                          "uniqueItems": true
                         }
                       },
                       "required": [
+                        "wod_assistant_enabled",
                         "wod_goals_visible_by_default",
-                        "wod_assistant_enabled"
+                        "workout_types"
                       ],
                       "type": "object"
                     }
@@ -198343,10 +198587,18 @@
                     "wod_assistant_enabled": {
                       "description": "Off: no assistant; workouts are written in text sections with a timer each",
                       "type": "boolean"
+                    },
+                    "workout_types": {
+                      "description": "ADR-275: the workout kinds this gym's editors offer, in catalogue order",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
                     }
                   },
                   "required": [
-                    "wod_assistant_enabled"
+                    "wod_assistant_enabled",
+                    "workout_types"
                   ],
                   "title": "WorkoutAuthoringSettings",
                   "type": "object"
@@ -198361,7 +198613,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "What the workout editor may offer in this gym (ADR-180)",
+        "summary": "What the workout editor may offer in this gym (ADR-180, ADR-275)",
         "tags": [
           "Admin Workouts"
         ]
@@ -208963,10 +209215,46 @@
                   "type": {
                     "enum": [
                       "crossfit",
+                      "functional_fitness",
+                      "hyrox",
+                      "hiit",
+                      "bootcamp",
+                      "circuit_training",
                       "strength",
+                      "powerlifting",
+                      "olympic_lifting",
+                      "bodybuilding",
+                      "strongman",
+                      "kettlebell",
                       "gymnastics",
+                      "calisthenics",
                       "aerobics",
+                      "running",
+                      "cycling",
+                      "indoor_cycling",
+                      "rowing",
+                      "swimming",
+                      "endurance",
+                      "yoga",
+                      "pilates",
+                      "barre",
                       "flexibility",
+                      "mobility",
+                      "stretching",
+                      "tai_chi_qigong",
+                      "boxing",
+                      "kickboxing",
+                      "muay_thai",
+                      "mma",
+                      "bjj_grappling",
+                      "wrestling",
+                      "martial_arts",
+                      "self_defense",
+                      "dance",
+                      "dance_fitness",
+                      "pole_aerial",
+                      "outdoor_training",
+                      "climbing_bouldering",
                       "recovery"
                     ],
                     "nullable": true,
@@ -214200,10 +214488,46 @@
                   "type": {
                     "enum": [
                       "crossfit",
+                      "functional_fitness",
+                      "hyrox",
+                      "hiit",
+                      "bootcamp",
+                      "circuit_training",
                       "strength",
+                      "powerlifting",
+                      "olympic_lifting",
+                      "bodybuilding",
+                      "strongman",
+                      "kettlebell",
                       "gymnastics",
+                      "calisthenics",
                       "aerobics",
+                      "running",
+                      "cycling",
+                      "indoor_cycling",
+                      "rowing",
+                      "swimming",
+                      "endurance",
+                      "yoga",
+                      "pilates",
+                      "barre",
                       "flexibility",
+                      "mobility",
+                      "stretching",
+                      "tai_chi_qigong",
+                      "boxing",
+                      "kickboxing",
+                      "muay_thai",
+                      "mma",
+                      "bjj_grappling",
+                      "wrestling",
+                      "martial_arts",
+                      "self_defense",
+                      "dance",
+                      "dance_fitness",
+                      "pole_aerial",
+                      "outdoor_training",
+                      "climbing_bouldering",
                       "recovery"
                     ],
                     "nullable": true,

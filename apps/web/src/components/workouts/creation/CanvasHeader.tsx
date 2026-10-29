@@ -15,18 +15,9 @@ import { useSession } from "@/components/session-provider";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { workoutPublishedHref } from "@/lib/workout-return";
 import { completionSummary, isPublishReady, useWorkoutCreationStore } from "@/stores/workout-creation";
-import { FORMAT_EXERCISE_CONTEXT, type WorkoutType } from "@/types/workout";
-import { Select } from "@/components/ui/Select";
+import { FORMAT_EXERCISE_CONTEXT } from "@/types/workout";
+import { WorkoutTypeSelect } from "@/components/workouts/WorkoutTypeSelect";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
-
-const WORKOUT_TYPES: WorkoutType[] = [
-  "crossfit",
-  "strength",
-  "gymnastics",
-  "aerobics",
-  "flexibility",
-  "recovery",
-];
 
 function SaveStatusIndicator() {
   const i18n = useUiTranslations();
@@ -104,14 +95,6 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
     return messages;
   }
 
-  const TYPE_LABELS: Record<WorkoutType, string> = {
-    crossfit: i18n("crossfit8970db8"),
-    strength: i18n("strength24d3e4f"),
-    gymnastics: i18n("gymnastics1df8712"),
-    aerobics: i18n("aerobics9def223"),
-    flexibility: i18n("flexibility1ef8e6d"),
-    recovery: i18n("recoveryea924f7"),
-  };
   const router = useRouter();
   const organizationSlug = useOrganizationSlug();
   const searchParams = useSearchParams();
@@ -191,25 +174,17 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
         style={{ color: "var(--text)", maxWidth: 320 }}
       />
 
-      <Select
+      <WorkoutTypeSelect
         value={type ?? ""}
-        onValueChange={(value) => setType(value as WorkoutType)}
+        onChange={setType}
+        placeholder={i18n("type3deb745")}
         className="cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold outline-none"
         style={{
           background: "var(--card)",
           color: type ? "var(--text)" : "var(--muted)",
           border: "1px solid var(--dim)",
         }}
-      >
-        <option value="" disabled>
-          {i18n("type3deb745")}
-        </option>
-        {WORKOUT_TYPES.map((workoutType) => (
-          <option key={workoutType} value={workoutType}>
-            {TYPE_LABELS[workoutType]}
-          </option>
-        ))}
-      </Select>
+      />
 
       <button
         type="button"

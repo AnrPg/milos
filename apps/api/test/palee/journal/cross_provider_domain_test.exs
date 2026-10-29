@@ -321,7 +321,7 @@ defmodule Palee.Journal.CrossProviderDomainTest do
       refute VaultFilter.match?(filter, %{@attempt | on: ~D[2026-10-06]})
       refute VaultFilter.match?(filter, %{@attempt | exercise_names: ["Squat"]})
       assert {:ok, ^filter} = filter |> VaultFilter.to_params() |> VaultFilter.parse()
-      assert {:error, [disciplines: _]} = VaultFilter.parse(%{"disciplines" => ["yoga"]})
+      assert {:error, [disciplines: _]} = VaultFilter.parse(%{"disciplines" => ["karaoke"]})
     end
 
     test "the Πρόοδος filter defaults to everything" do
