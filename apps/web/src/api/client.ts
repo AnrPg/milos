@@ -55,8 +55,11 @@ type ApiRequestOptions = {
   method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   token?: string | null;
   body?: unknown;
-  /** "text" returns the raw body of a successful response (e.g. a printable HTML document). */
-  responseType?: "json" | "text";
+  /**
+   * "text" returns the raw body of a successful response (e.g. a printable HTML document);
+   * "blob" returns it as a Blob (a PDF, a ZIP or an export file to save).
+   */
+  responseType?: "json" | "text" | "blob";
   /** Cancels the request (react-query passes one so stale searches stop). */
   signal?: AbortSignal;
   /**
@@ -396,6 +399,10 @@ export async function apiRequest<T>(
 
   if (options.responseType === "text" && response.ok) {
     return (await response.text()) as T;
+  }
+
+  if (options.responseType === "blob" && response.ok) {
+    return (await response.blob()) as T;
   }
 
   const payload = (await response.json().catch(() => ({}))) as T | ApiErrorPayload;
