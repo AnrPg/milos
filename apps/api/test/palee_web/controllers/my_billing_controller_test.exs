@@ -45,7 +45,9 @@ defmodule PaleeWeb.MyBillingControllerTest do
         signup_source: "direct"
       })
 
-    {:ok, subscription} = Finance.assign_package(staff, membership.id, package.id, %{})
+    # ADR-274: the test writes its own invoice for the period.
+    {:ok, subscription} =
+      Finance.assign_package(staff, membership.id, package.id, %{charge_now: false})
 
     {:ok, invoice} =
       Finance.create_invoice(staff, membership.id, %{

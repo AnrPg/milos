@@ -180722,6 +180722,390 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/members/{id}/overrides": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFinanceController.member_overrides",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "overrides": {
+                      "items": {
+                        "properties": {
+                          "computed_value": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "end_reason": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "ended_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "ended_by_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "field": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "reason": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "set_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "set_by_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "set_by_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "subject_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "subject_type": {
+                            "type": "string"
+                          },
+                          "value": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "field",
+                          "id",
+                          "set_at",
+                          "subject_id",
+                          "value"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "overrides"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Override history"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Every value set by hand for a member, newest first (ADR-274)",
+        "tags": [
+          "Admin Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/finance/members/{id}/overrides/{field}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFinanceController.reset_member_override",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "field",
+            "required": true,
+            "schema": {
+              "enum": [
+                "status",
+                "ends_on"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "subscription_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "override": {
+                      "properties": {
+                        "computed_value": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "end_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ended_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ended_by_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "field": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "set_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "subject_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "subject_type": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "field",
+                        "id",
+                        "set_at",
+                        "subject_id",
+                        "value"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "override"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Ended override"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Put a value set by hand back to automatic (ADR-274)",
+        "tags": [
+          "Admin Finance"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminFinanceController.set_member_override",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "field",
+            "required": true,
+            "schema": {
+              "enum": [
+                "status",
+                "ends_on"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "commitment_override_reason": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "reason": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "subscription_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "value"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Override",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "override": {
+                      "properties": {
+                        "computed_value": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "end_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ended_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ended_by_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "field": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "set_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "set_by_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "subject_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "subject_type": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "field",
+                        "id",
+                        "set_at",
+                        "subject_id",
+                        "value"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "override"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Override"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set a worked-out value by hand (ADR-274)",
+        "tags": [
+          "Admin Finance"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/members/{id}/packages": {
       "post": {
         "callbacks": {},

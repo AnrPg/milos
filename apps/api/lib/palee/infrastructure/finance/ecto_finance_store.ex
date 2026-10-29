@@ -43,6 +43,8 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     MembershipLifecycle,
     MembershipLinks,
     MemberRenewal,
+    MemberStatus,
+    OpenCharges,
     PackageCode,
     PackageContract,
     PaymentModelPolicy,
@@ -52,9 +54,14 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     RevenueBreakdown,
     ReferralPolicy,
     ReferralRewardFulfillment,
+    SubscriptionCharges,
     SubscriptionSelection,
-    SubscriptionTerms
+    SubscriptionTerms,
+    ValueOverride
   }
+
+  alias Palee.Finance.FinanceValueOverride
+  alias Palee.Infrastructure.Finance.MemberStanding
 
   alias Palee.Repo
   alias Palee.Infrastructure.Tenancy.{GymClock, RepoContext}
@@ -254,8 +261,8 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
         |> where([membership], membership.user_id == ^user_id)
         |> Repo.one()
 
-      guard_commitment!(existing, params)
-
+      # ADR-274: the status is worked out (staff set it by hand through
+      # `set_value_override/3`); a new profile only needs a starting value.
       membership =
         case existing do
           nil ->
@@ -265,7 +272,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
 
           %Membership{} = membership ->
             membership
-            |> Membership.changeset(params)
+            |> Membership.changeset(Map.delete(params, "status"))
             |> Repo.update()
         end
         |> case do
@@ -371,6 +378,11 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
            {:ok, params} <- payment_model_params(membership, package, string_key_map(params)) do
         subscription = insert_subscription!(membership, package, params)
         rejoin!(membership)
+
+        # ADR-274: what the package costs is owed from the day it starts.
+        if params["charge_now"] != false,
+          do: charge_subscription(subscription, GymClock.today()) |> ok_or_rollback!()
+
         refresh_entitlement_snapshot(membership.id)
         normalize_subscription(subscription)
       else
@@ -394,6 +406,8 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
         "params_snapshot" => package.params || %{}
       })
 
+    params = Map.put(params, "charges_from", charges_from(params))
+
     %MembershipPackageSubscription{}
     |> MembershipPackageSubscription.changeset(params)
     |> Repo.insert()
@@ -402,6 +416,41 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       {:error, reason} -> Repo.rollback(reason)
     end
   end
+
+  # ADR-274: where Palee's own billing starts. `"none"`: never (the money is
+  # collected elsewhere); `"next_period"`: from the period after today (an
+  # imported member who already paid for this one).
+  defp charges_from(%{"charges_from" => "none"}), do: nil
+
+  defp charges_from(%{"charges_from" => "next_period"} = params) do
+    with %Date{} = from <- SubscriptionCharges.charges_from(subscription_terms(params)),
+         {_start, %Date{} = next} <-
+           SubscriptionCharges.period_at(
+             subscription_terms(params),
+             max_date(from, GymClock.today())
+           ) do
+      if SubscriptionCharges.period_months(params["billing_period_snapshot"]), do: next, else: nil
+    else
+      _other -> nil
+    end
+  end
+
+  defp charges_from(params), do: SubscriptionCharges.charges_from(subscription_terms(params))
+
+  defp subscription_terms(params) do
+    %{
+      price_cents_snapshot: params["price_cents_snapshot"],
+      corporate_client_id: params["corporate_client_id"],
+      starts_on: parse_date(params["starts_on"], nil),
+      ends_on: parse_date(params["ends_on"], nil),
+      billing_period_snapshot: params["billing_period_snapshot"]
+    }
+  end
+
+  defp max_date(a, b), do: if(Date.compare(a, b) == :lt, do: b, else: a)
+
+  defp ok_or_rollback!({:ok, value}), do: value
+  defp ok_or_rollback!({:error, reason}), do: Repo.rollback(reason)
 
   # ADR-167: a season sells its package at the season's price; every other
   # assignment takes the package's own price.
@@ -477,7 +526,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   # request is retried (the membership row lock serialises retries).
   @impl true
   def receive_payment(membership_id, params) do
-    params = string_key_map(params)
+    params = params |> string_key_map() |> toward_open_charge()
 
     with :ok <- ReceivedPayment.validate(params) do
       document =
@@ -507,11 +556,47 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     end
   end
 
+  # ADR-274: money taken for a package goes against that package's oldest
+  # open charge (when it covers no more than the charge still owes), so the
+  # charge is settled instead of a second document being issued beside it.
+  defp toward_open_charge(%{"membership_package_subscription_id" => subscription_id} = params)
+       when is_binary(subscription_id) and subscription_id != "" do
+    if blank_id?(params["finance_invoice_id"]) do
+      charges =
+        subscription_id
+        |> subscription_documents()
+        |> Enum.filter(
+          &(&1.invoice_type in ["subscription", "renewal"] and
+              &1.status in InvoiceLifecycle.blocking_invoice_statuses())
+        )
+
+      balances = charges |> Enum.map(& &1.id) |> invoice_balance_due_map()
+      amount = parse_integer(params["amount_cents"], 0)
+
+      charges
+      |> Enum.filter(&(Map.get(balances, &1.id, 0) >= amount and amount > 0))
+      |> Enum.sort_by(&(&1.due_date || &1.service_period_start), Date)
+      |> case do
+        [charge | _] -> Map.put(params, "finance_invoice_id", charge.id)
+        [] -> params
+      end
+    else
+      params
+    end
+  end
+
+  defp toward_open_charge(params), do: params
+
+  defp blank_id?(value), do: value in [nil, ""]
+
   # ADR-248: a package bought online is assigned in the same transaction as
   # its money, so a retried fulfilment never assigns it twice.
   defp with_purchased_package(membership_id, %{"purchase_package_id" => package_id} = params)
        when is_binary(package_id) and package_id != "" do
-    with {:ok, subscription} <- assign_package(membership_id, package_id, %{}) do
+    # ADR-274: the money is in this request; the document it leaves pays
+    # for the first period, so no separate charge is issued for it.
+    with {:ok, subscription} <-
+           assign_package(membership_id, package_id, %{"charge_now" => false}) do
       {:ok,
        params
        |> Map.delete("purchase_package_id")
@@ -3369,15 +3454,85 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     today = GymClock.today()
     cutoff = Date.add(GymClock.today(), parse_integer(days, 30))
 
-    Membership
-    |> for_users(users)
-    |> where([membership], not is_nil(membership.expires_on))
-    |> where([membership], membership.expires_on >= ^today)
-    |> where([membership], membership.expires_on <= ^cutoff)
-    |> where([membership], membership.status in ["active", "expiring", "trial"])
-    |> order_by([membership], asc: membership.expires_on)
-    |> Repo.all()
-    |> Enum.map(&normalize_membership/1)
+    profiles =
+      Membership
+      |> for_users(users)
+      |> where([membership], not is_nil(membership.expires_on))
+      |> where([membership], membership.expires_on >= ^today)
+      |> where([membership], membership.expires_on <= ^cutoff)
+      |> where([membership], membership.status in ["active", "expiring", "trial"])
+      |> Repo.all()
+      |> Enum.map(&normalize_membership/1)
+
+    # ADR-274: a subscription that ends (a validity, renewal turned off, a
+    # date set by hand) is what usually expires; one row per person, the
+    # earliest end first.
+    subscriptions =
+      MembershipPackageSubscription
+      |> tenant_scope()
+      |> join(:inner, [s], m in Membership, on: m.id == s.membership_id)
+      |> where([s], s.status == "active" and not is_nil(s.ends_on))
+      |> where([s], s.ends_on >= ^today and s.ends_on <= ^cutoff)
+      |> where([_s, m], m.status in ["active", "expiring", "trial", "comped"])
+      |> then(fn query ->
+        if is_list(users), do: where(query, [_s, m], m.user_id in ^users), else: query
+      end)
+      |> select([s, m], %{
+        id: s.id,
+        membership_id: m.id,
+        user_id: m.user_id,
+        status: m.status,
+        expires_on: s.ends_on,
+        package_code_snapshot: s.package_code_snapshot,
+        membership_package_subscription_id: s.id
+      })
+      |> Repo.all()
+
+    (profiles ++ subscriptions)
+    |> Enum.sort_by(& &1.expires_on, Date)
+    |> Enum.uniq_by(& &1.user_id)
+  end
+
+  # ADR-274: everyone who owes money, one row per person, the oldest debt
+  # first: what is owed, since when, and whether the grace days are over.
+  defp list_open_charges(limit, users) do
+    today = GymClock.today()
+    grace_days = subscription_grace_days()
+
+    invoices =
+      FinanceInvoice
+      |> for_users(users)
+      |> where([invoice], invoice.status in ^InvoiceLifecycle.blocking_invoice_statuses())
+      |> where([invoice], is_nil(invoice.deleted_at) and not is_nil(invoice.membership_id))
+      |> Repo.all()
+
+    balances = invoices |> Enum.map(& &1.id) |> invoice_balance_due_map()
+
+    invoices
+    |> Enum.map(&{&1, Map.get(balances, &1.id, 0)})
+    |> Enum.filter(fn {_invoice, balance} -> balance > 0 end)
+    |> Enum.group_by(fn {invoice, _balance} -> invoice.membership_id end)
+    |> Enum.map(fn {membership_id, rows} ->
+      {oldest, _balance} =
+        Enum.min_by(rows, fn {invoice, _} -> invoice.due_date || today end, Date)
+
+      oldest_due = oldest.due_date
+
+      %{
+        id: membership_id,
+        membership_id: membership_id,
+        user_id: oldest.user_id,
+        balance_due_cents: rows |> Enum.map(&elem(&1, 1)) |> Enum.sum(),
+        invoice_count: length(rows),
+        oldest_due_on: oldest_due,
+        oldest_invoice_id: oldest.id,
+        service_period_start: oldest.service_period_start,
+        service_period_end: oldest.service_period_end,
+        state: OpenCharges.state(oldest_due, grace_days, today)
+      }
+    end)
+    |> Enum.sort_by(&(&1.oldest_due_on || today), Date)
+    |> Enum.take(limit)
   end
 
   @impl true
@@ -3392,6 +3547,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       expiring_memberships:
         Enum.take(list_expiring_memberships(expiring_within_days, users), limit),
       pending_payments: list_pending_payments(limit, users),
+      open_charges: list_open_charges(limit, users),
       overdue_invoices: list_overdue_invoices(limit, users),
       pending_referral_events: list_pending_referral_events(limit, users),
       pending_referral_rewards: list_pending_referral_rewards(limit, users),
@@ -4893,7 +5049,21 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
         :ok
 
       %Membership{} = membership ->
-        entitlement = entitlement_for_membership(membership)
+        # ADR-274: the status follows the subscriptions and charges, unless
+        # staff set it by hand (until its automatic value moves on).
+        {computed, computed_entitlement} = computed_standing(membership, GymClock.today())
+
+        {status, shown} =
+          case MemberStanding.status_override(membership.id, computed.status) do
+            nil -> {computed.lifecycle, computed.status}
+            override -> {MemberStatus.lifecycle_of_override(override.value), override.value}
+          end
+
+        # Access reads the stored status: the one kept is the one it follows.
+        entitlement =
+          if status == computed.lifecycle,
+            do: computed_entitlement,
+            else: entitlement_for_membership(%{membership | status: status})
 
         membership
         |> Membership.changeset(%{
@@ -4902,6 +5072,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
           entitlement_expires_on: entitlement.expires_on,
           entitlement_updated_at: utc_now()
         })
+        |> Ecto.Changeset.change(status: status, status_shown: shown)
         |> Repo.update()
 
         :ok
@@ -5002,10 +5173,13 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       |> Repo.all()
       |> Enum.group_by(& &1.membership_id, &normalize_subscription/1)
 
+    # ADR-274: the last money actually received (a pending or failed
+    # attempt is not a payment).
     last_payments_by_membership_id =
       from(p in MembershipPayment,
         where: p.membership_id in ^membership_ids,
         where: is_nil(p.deleted_at),
+        where: p.payment_status == "paid",
         distinct: p.membership_id,
         order_by: [asc: p.membership_id, desc: p.inserted_at],
         select: %{
@@ -5020,21 +5194,31 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     outstanding_by_membership_id =
       outstanding_balance_per_membership(membership_ids)
 
+    today = GymClock.today()
+    overrides_by_membership_id = MemberStanding.in_force_by_membership(membership_ids)
+
+    unpaid_due_by_membership_id =
+      MemberStanding.oldest_unpaid_due_on_by_membership(membership_ids, today)
+
     Map.new(memberships, fn membership ->
       subscriptions = Map.get(subscriptions_by_membership_id, membership.id, [])
       last_payment = Map.get(last_payments_by_membership_id, membership.id)
       credit_balance_cents = credit_balance(membership.id)
       outstanding_cents = Map.get(outstanding_by_membership_id, membership.id, 0)
 
+      active_subscription =
+        subscriptions
+        |> Enum.find(&(&1.status in InvoiceLifecycle.active_subscription_statuses()))
+        |> with_current_period(membership, today)
+
       {membership.user_id,
        %{
          membership: normalize_membership(membership),
          package_subscriptions: subscriptions,
-         active_package_subscription:
-           Enum.find(
-             subscriptions,
-             &(&1.status in InvoiceLifecycle.active_subscription_statuses())
-           ),
+         active_package_subscription: active_subscription,
+         # ADR-274: values staff set by hand, and the oldest unpaid charge.
+         overrides: Map.get(overrides_by_membership_id, membership.id, []),
+         oldest_unpaid_due_on: Map.get(unpaid_due_by_membership_id, membership.id),
          credit_balance: credit_balance_cents,
          credit_balance_cents: credit_balance_cents,
          outstanding_balance_cents: outstanding_cents,
@@ -5043,6 +5227,17 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
        }}
     end)
   end
+
+  # ADR-274: the period «Λήγει» shows: its last day and whether it renews.
+  defp with_current_period(nil, _membership, _today), do: nil
+
+  defp with_current_period(subscription, membership, today),
+    do:
+      Map.put(
+        subscription,
+        :current_period,
+        MemberStanding.current_period(subscription, membership, today)
+      )
 
   defp maybe_filter_user_ids(query, []), do: where(query, [membership], is_nil(membership.id))
 
@@ -6070,6 +6265,9 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       user_id: membership.user_id,
       user_type_snapshot: membership.user_type_snapshot,
       status: membership.status,
+      # ADR-274: what staff see (falls back to the stored status until the
+      # first refresh after the upgrade).
+      status_shown: membership.status_shown || membership.status,
       signup_source: membership.signup_source,
       starts_on: membership.starts_on,
       expires_on: membership.expires_on,
@@ -6117,6 +6315,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       corporate_client_id: subscription.corporate_client_id,
       corporate_enrolled_via: subscription.corporate_enrolled_via,
       referral_reward_applied: subscription.referral_reward_applied,
+      charges_from: subscription.charges_from,
       auto_renew: MemberRenewal.auto_renew(subscription),
       renewal_changed_at: subscription.renewal_changed_at,
       renewal_changed_by: subscription.renewal_changed_by,
@@ -7547,6 +7746,262 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp blank_to_nil(_value), do: nil
+
+  # ── Subscription charges and values set by hand (ADR-274) ──────────────
+
+  @impl true
+  def charge_due_subscriptions(%Date{} = today) do
+    MembershipPackageSubscription
+    |> tenant_scope()
+    |> where([s], s.status == "active" and not is_nil(s.charges_from))
+    |> where([s], s.charges_from <= ^today)
+    |> Repo.all()
+    |> Enum.flat_map(fn subscription ->
+      case charge_subscription(subscription, today) do
+        {:ok, charges} -> charges
+        {:error, _reason} -> []
+      end
+    end)
+  end
+
+  @impl true
+  def charge_subscription_now(subscription_id) do
+    case MembershipPackageSubscription |> tenant_scope() |> Repo.get(subscription_id) do
+      nil -> {:error, :not_found}
+      subscription -> charge_subscription(subscription, GymClock.today())
+    end
+  end
+
+  # Issues the charges a subscription owes on `today`, oldest period first,
+  # under the membership row lock (an hourly run and a desk assignment
+  # never issue the same period twice; the unique indexes back this up).
+  defp charge_subscription(%MembershipPackageSubscription{} = subscription, today) do
+    Repo.transaction(fn ->
+      membership = locked_membership(subscription.membership_id) || Repo.rollback(:not_found)
+      subscription = Repo.get!(MembershipPackageSubscription, subscription.id)
+      documents = subscription_documents(subscription.id)
+
+      charged =
+        documents
+        |> Enum.filter(&(&1.invoice_type in ["subscription", "renewal"]))
+        |> Enum.map(& &1.service_period_start)
+
+      charges =
+        subscription
+        |> SubscriptionCharges.due_periods(
+          charged,
+          today,
+          &renewal_open?(subscription, membership, &1)
+        )
+        |> Enum.reduce([], fn period, acc ->
+          case issue_period_charge(subscription, membership, period, documents, today) do
+            {:ok, nil} -> acc
+            {:ok, charge} -> [charge | acc]
+            {:error, :duplicate_renewal_invoice} -> acc
+            {:error, reason} -> Repo.rollback(reason)
+          end
+        end)
+        |> Enum.reverse()
+
+      if charges != [], do: refresh_entitlement_snapshot(membership.id)
+      charges
+    end)
+  end
+
+  # ADR-220: a later period is billed only while the member keeps renewal on
+  # and is not leaving before it begins.
+  defp renewal_open?(subscription, membership, %Date{} = start) do
+    MemberRenewal.renewal_allowed(subscription, membership) == :ok and
+      SubscriptionSelection.renewable?(subscription.params_snapshot || %{}) == :ok and
+      add_on_base_active(subscription) == :ok and
+      (is_nil(membership.leaving_on) or Date.compare(start, membership.leaving_on) != :gt)
+  end
+
+  defp issue_period_charge(subscription, membership, {start, next_start}, documents, today) do
+    accounted =
+      documents
+      |> Enum.reject(&(&1.invoice_type in ["subscription", "renewal"]))
+      |> Enum.filter(&SubscriptionCharges.accounts_for?(subscription, &1, start))
+      |> Enum.reduce(0, &(&1.total_cents + &2))
+
+    amount = SubscriptionCharges.amount_due(subscription, accounted)
+    type = SubscriptionCharges.invoice_type(subscription, start)
+
+    cond do
+      amount <= 0 ->
+        {:ok, nil}
+
+      type == "renewal" and accounted == 0 ->
+        with {:ok, invoice} <-
+               generate_renewal_invoice(membership.id, %{
+                 "membership_package_subscription_id" => subscription.id,
+                 "service_period_start" => start,
+                 "service_period_end" => next_start,
+                 "issue_date" => today,
+                 "due_date" => start
+               }) do
+          issue_invoice(invoice.id, %{})
+        end
+
+      true ->
+        with {:ok, invoice} <-
+               create_invoice(membership.id, %{
+                 "invoice_type" => type,
+                 "membership_package_subscription_id" => subscription.id,
+                 "amount_cents" => amount,
+                 "issue_date" => today,
+                 "due_date" => start,
+                 "service_period_start" => start,
+                 "service_period_end" => next_start
+               }) do
+          issue_invoice(invoice.id, %{})
+        end
+    end
+  end
+
+  # Every live document of a subscription, linked by its header or a line.
+  defp subscription_documents(subscription_id) do
+    line_invoice_ids =
+      FinanceInvoiceLine
+      |> where([line], line.membership_package_subscription_id == ^subscription_id)
+      |> select([line], line.finance_invoice_id)
+
+    FinanceInvoice
+    |> tenant_scope()
+    |> where(
+      [invoice],
+      invoice.membership_package_subscription_id == ^subscription_id or
+        invoice.id in subquery(line_invoice_ids)
+    )
+    |> where([invoice], invoice.status != "void" and is_nil(invoice.deleted_at))
+    |> Repo.all()
+  end
+
+  @impl true
+  def set_value_override(user_id, field, params) do
+    params = string_key_map(params)
+
+    with {:ok, value} <- ValueOverride.validate(field, params["value"]) do
+      Repo.transaction(fn ->
+        membership = locked_membership_for_user(user_id) || Repo.rollback(:not_found)
+        subject = override_subject!(membership, field, params["subscription_id"])
+        computed = automatic_value(membership, field, subject)
+
+        guard_commitment!(membership, %{
+          "status" => value,
+          "commitment_override_reason" => params["commitment_override_reason"]
+        })
+
+        {:ok, override} =
+          case MemberStanding.put(
+                 membership,
+                 field,
+                 subject.id,
+                 value,
+                 computed,
+                 params["reason"],
+                 params["actor_id"]
+               ) do
+            {:ok, override} -> {:ok, override}
+            {:error, reason} -> Repo.rollback(reason)
+          end
+
+        apply_override_value(field, subject, value)
+        refresh_entitlement_snapshot(membership.id)
+        MemberStanding.normalize(override)
+      end)
+    end
+  end
+
+  @impl true
+  def reset_value_override(user_id, field, params) do
+    params = string_key_map(params)
+
+    if field in ValueOverride.fields() do
+      Repo.transaction(fn ->
+        membership = locked_membership_for_user(user_id) || Repo.rollback(:not_found)
+        subject = override_subject!(membership, field, params["subscription_id"])
+
+        case MemberStanding.in_force(subject.id, field) do
+          nil ->
+            Repo.rollback(:override_not_found)
+
+          %FinanceValueOverride{} = override ->
+            ended = MemberStanding.end_override(override, "reset", params["actor_id"])
+            apply_override_value(field, subject, override.computed_value)
+            refresh_entitlement_snapshot(membership.id)
+            MemberStanding.normalize(ended)
+        end
+      end)
+    else
+      {:error, :invalid_override_field}
+    end
+  end
+
+  @impl true
+  def list_value_overrides(user_id) do
+    case tenant_scope(Membership) |> where([m], m.user_id == ^user_id) |> Repo.one() do
+      nil -> []
+      membership -> MemberStanding.history(membership.id)
+    end
+  end
+
+  defp override_subject!(membership, "status", _subscription_id), do: membership
+
+  defp override_subject!(membership, "ends_on", subscription_id)
+       when is_binary(subscription_id) do
+    case locked_subscription(membership.id, subscription_id) do
+      nil -> Repo.rollback(:not_found)
+      subscription -> subscription
+    end
+  end
+
+  defp override_subject!(_membership, _field, _subscription_id), do: Repo.rollback(:not_found)
+
+  # The value Palee works out right now, as the history keeps it.
+  defp automatic_value(membership, "status", _membership) do
+    {computed, _entitlement} = computed_standing(membership, GymClock.today())
+    computed.status
+  end
+
+  defp automatic_value(_membership, "ends_on", subscription) do
+    case MemberStanding.in_force(subscription.id, "ends_on") do
+      %FinanceValueOverride{computed_value: computed} -> computed
+      nil -> ValueOverride.stored_value(subscription.ends_on)
+    end
+  end
+
+  # The automatic status and the access that goes with it. Access depends
+  # on the stored status (which may be one set by hand), so it is read again
+  # for the automatic one when they differ.
+  defp computed_standing(%Membership{} = membership, today) do
+    entitlement = entitlement_for_membership(membership)
+    computed = membership |> MemberStanding.facts(entitlement, today) |> MemberStatus.derive()
+
+    if computed.lifecycle == membership.status do
+      {computed, entitlement}
+    else
+      as_computed = %{membership | status: computed.lifecycle}
+      entitlement = entitlement_for_membership(as_computed)
+
+      {as_computed |> MemberStanding.facts(entitlement, today) |> MemberStatus.derive(),
+       entitlement}
+    end
+  end
+
+  # A status set by hand is applied by the status refresh; a subscription's
+  # last day is the subscription's own `ends_on`.
+  defp apply_override_value("status", _membership, _value), do: :ok
+
+  defp apply_override_value("ends_on", subscription, value) do
+    ends_on = if value in [nil, ""], do: nil, else: Date.from_iso8601!(value)
+
+    subscription
+    |> Ecto.Changeset.change(ends_on: ends_on)
+    |> Repo.update!()
+
+    :ok
+  end
 
   @impl true
   def refresh_entitlement_snapshots do

@@ -31,6 +31,8 @@ import { MembershipFreezes } from "@/components/admin/users/MembershipFreezes";
 import { MembershipLeaving } from "@/components/admin/users/MembershipLeaving";
 import { CommitmentOverridePrompt } from "@/components/admin/finance/shared/CommitmentOverridePrompt";
 import { commitmentConflict } from "@/components/admin/finance/shared/membership-commitment";
+import { MemberStatusCell, SubscriptionEndCell } from "@/components/admin/finance/shared/MemberStandingCells";
+import { overrideFor } from "@/components/admin/finance/shared/member-standing";
 import {
   ADMIN_PROFILE_SECTION_REQUEST,
   openAdminProfileSection,
@@ -339,6 +341,10 @@ function FinanceDetails({
     },
   });
   const fieldStyle = { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" };
+  // ADR-274: «Λήγει» follows the running subscription's period.
+  const currentSubscription = subscriptions.find((subscription) => subscription.status === "active") ?? null;
+  const currentPeriod = (currentSubscription?.current_period ?? null) as { ends_on?: string | null; renews?: boolean } | null;
+  const currentEnds = String(currentPeriod?.ends_on ?? currentSubscription?.ends_on ?? "").slice(0, 10);
   const packageContent = subscriptions
     .map((subscription) => {
       const label = packageSubscriptionLabel(subscription);
@@ -355,12 +361,26 @@ function FinanceDetails({
         <p className="mb-3 font-semibold" style={{ color: "var(--text)" }}>{i18n("membership53bc967")}</p>
         {membership ? (
           <div className="space-y-2">
-            <EditableFinanceCard label={i18n("statusbae7d5b")} editing={editing === "status"} value={<SemanticLabel value={draft.status} />} onOpen={() => setEditing("status")}>
-              <Select className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft.status} onValueChange={(value) => { const status = value; setDraft((current) => ({ ...current, status })); updateMembership.mutate({ status }); }}>
-                {['active', 'paused', 'cancelled'].map((status) => <option key={status} value={status}>{semanticLabel(status, i18n)}</option>)}
-              </Select>
-            </EditableFinanceCard>
-            {([['starts_on', i18n("startsOn6d888f7")], ['expires_on', i18n("expiresOn549cabe")]] as const).map(([key, label]) => (
+            {/* ADR-274: worked out from the subscription and payments; set by hand only with a trace. */}
+            <EditableFinanceCard
+              label={i18n("statusbae7d5b")}
+              value={<MemberStatusCell userId={userId} status={valueText(membership.status_shown) === "—" ? serverStatus : valueText(membership.status_shown)} override={overrideFor(finance.details.overrides, "status")} />}
+            />
+            {currentSubscription ? (
+              <EditableFinanceCard
+                label={i18n("expiresOn549cabe")}
+                value={
+                  <SubscriptionEndCell
+                    userId={userId}
+                    subscriptionId={valueText(currentSubscription.id)}
+                    endsOn={currentEnds}
+                    renews={currentPeriod?.renews === true}
+                    override={overrideFor(finance.details.overrides, "ends_on", valueText(currentSubscription.id))}
+                  />
+                }
+              />
+            ) : null}
+            {(currentSubscription ? ([['starts_on', i18n("startsOn6d888f7")]] as const) : ([['starts_on', i18n("startsOn6d888f7")], ['expires_on', i18n("expiresOn549cabe")]] as const)).map(([key, label]) => (
               <EditableFinanceCard key={key} label={label} editing={editing === key} value={date(draft[key])} onOpen={() => setEditing(key)}>
                 <DateInput className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft[key]} onValueChange={(value) => setDraft((current) => ({ ...current, [key]: value }))} onBlur={() => updateMembership.mutate({ [key]: draft[key] || null })} />
               </EditableFinanceCard>

@@ -40,6 +40,8 @@ defmodule Palee.Finance.Domain.TenantDataPolicy do
               %{table: "membership_payments"},
               %{table: "finance_invoices"},
               %{table: "finance_subscription_freezes"},
+              # ADR-274: values staff set by hand, per membership.
+              %{table: "finance_value_overrides"},
               %{table: "finance_subscription_beneficiaries"},
               %{table: "membership_package_subscriptions"},
               %{table: "finance_corporate_clients"},

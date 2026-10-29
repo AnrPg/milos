@@ -3,6 +3,7 @@ defmodule PaleeWeb.AdminFinanceController do
   use OpenApiSpex.ControllerSpecs
 
   alias Palee.Application.{
+    FinanceValueOverrides,
     BackfillFinanceEntitlements,
     ApplyFinanceCreditToInvoice,
     ApplyFinanceCreditToPayment,
@@ -891,13 +892,145 @@ defmodule PaleeWeb.AdminFinanceController do
   )
 
   def update_member(conn, params) do
+    context = conn.assigns.tenant_context
+    body = body_params(conn, params)
+
+    # ADR-274: the status is worked out; one typed here is set by hand and
+    # kept in the history.
     with {:ok, membership} <-
-           UpdateFinanceMember.call(
+           UpdateFinanceMember.call(context, param_id(params), Map.delete(body, "status")),
+         {:ok, membership} <- maybe_override_status(context, param_id(params), body, membership) do
+      json(conn, %{membership: membership})
+    end
+  end
+
+  defp maybe_override_status(context, user_id, %{"status" => status} = body, _membership)
+       when is_binary(status) do
+    with {:ok, _override} <-
+           FinanceValueOverrides.set(context, user_id, "status", %{
+             "value" => status,
+             "reason" => body["status_reason"],
+             "commitment_override_reason" => body["commitment_override_reason"]
+           }) do
+      case Finance.get_member_profile(context, user_id) do
+        %{membership: membership} -> {:ok, membership}
+        nil -> {:error, :not_found}
+      end
+    end
+  end
+
+  defp maybe_override_status(_context, _user_id, _body, membership), do: {:ok, membership}
+
+  @field_parameter %Parameter{
+    name: :field,
+    in: :path,
+    required: true,
+    schema: %Schema{type: :string, enum: ["status", "ends_on"]}
+  }
+
+  @override_schema %Schema{
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      field: %Schema{type: :string},
+      subject_type: %Schema{type: :string},
+      subject_id: %Schema{type: :string, format: :uuid},
+      computed_value: %Schema{type: :string, nullable: true},
+      value: %Schema{type: :string},
+      reason: %Schema{type: :string, nullable: true},
+      set_by_id: %Schema{type: :string, format: :uuid, nullable: true},
+      set_by_name: %Schema{type: :string, nullable: true},
+      set_at: %Schema{type: :string, format: :"date-time"},
+      ended_at: %Schema{type: :string, format: :"date-time", nullable: true},
+      ended_by_name: %Schema{type: :string, nullable: true},
+      end_reason: %Schema{type: :string, nullable: true}
+    },
+    required: [:field, :id, :set_at, :subject_id, :value]
+  }
+
+  operation(:set_member_override,
+    summary: "Set a worked-out value by hand (ADR-274)",
+    parameters: [@id_parameter, @field_parameter],
+    request_body:
+      {"Override", "application/json",
+       %Schema{
+         type: :object,
+         properties: %{
+           value: %Schema{type: :string},
+           reason: %Schema{type: :string, nullable: true},
+           subscription_id: %Schema{type: :string, format: :uuid, nullable: true},
+           commitment_override_reason: %Schema{type: :string, nullable: true}
+         },
+         required: [:value]
+       }},
+    responses: [
+      ok:
+        {"Override", "application/json",
+         %Schema{type: :object, properties: %{override: @override_schema}, required: [:override]}}
+    ]
+  )
+
+  def set_member_override(conn, params) do
+    with {:ok, override} <-
+           FinanceValueOverrides.set(
              conn.assigns.tenant_context,
              param_id(params),
-             body_params(conn, params)
+             params["field"],
+             conn.body_params || %{}
            ) do
-      json(conn, %{membership: membership})
+      json(conn, %{override: override})
+    end
+  end
+
+  operation(:reset_member_override,
+    summary: "Put a value set by hand back to automatic (ADR-274)",
+    parameters: [
+      @id_parameter,
+      @field_parameter,
+      %Parameter{
+        name: :subscription_id,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :string, format: :uuid}
+      }
+    ],
+    responses: [
+      ok:
+        {"Ended override", "application/json",
+         %Schema{type: :object, properties: %{override: @override_schema}, required: [:override]}}
+    ]
+  )
+
+  def reset_member_override(conn, params) do
+    with {:ok, override} <-
+           FinanceValueOverrides.reset(
+             conn.assigns.tenant_context,
+             param_id(params),
+             params["field"],
+             Map.take(params, ["subscription_id"])
+           ) do
+      json(conn, %{override: override})
+    end
+  end
+
+  operation(:member_overrides,
+    summary: "Every value set by hand for a member, newest first (ADR-274)",
+    parameters: [@id_parameter],
+    responses: [
+      ok:
+        {"Override history", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{overrides: %Schema{type: :array, items: @override_schema}},
+           required: [:overrides]
+         }}
+    ]
+  )
+
+  def member_overrides(conn, params) do
+    with {:ok, overrides} <-
+           FinanceValueOverrides.history(conn.assigns.tenant_context, param_id(params)) do
+      json(conn, %{overrides: overrides})
     end
   end
 

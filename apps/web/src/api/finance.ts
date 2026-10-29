@@ -1,5 +1,6 @@
 import { apiRequest } from "@/api/client";
 import type { PackageCatalog } from "@/components/admin/finance/packages/package-catalog";
+import type { ValueOverride } from "@/components/admin/finance/shared/member-standing";
 import type { LocationScopePayload } from "@/lib/location-scope";
 
 export type FinanceRecord = Record<string, unknown>;
@@ -148,6 +149,37 @@ export async function updateFinanceMember(token: string, userId: string, body: F
     method: "PATCH",
     token,
     body,
+  });
+}
+
+/**
+ * ADR-274: staff set a value Palee works out by hand: the member's `status`,
+ * or a subscription's last day (`ends_on`, with `subscription_id`).
+ */
+export async function setFinanceOverride(
+  token: string,
+  userId: string,
+  field: "status" | "ends_on",
+  body: { value: string; reason?: string; subscription_id?: string; commitment_override_reason?: string },
+) {
+  return apiRequest<{ override: ValueOverride }>(`/admin/finance/members/${userId}/overrides/${field}`, {
+    method: "PUT",
+    token,
+    body,
+  });
+}
+
+/** ADR-274: puts a value set by hand back to automatic. */
+export async function resetFinanceOverride(
+  token: string,
+  userId: string,
+  field: "status" | "ends_on",
+  subscriptionId?: string,
+) {
+  const query = subscriptionId ? `?subscription_id=${encodeURIComponent(subscriptionId)}` : "";
+  return apiRequest<{ override: ValueOverride }>(`/admin/finance/members/${userId}/overrides/${field}${query}`, {
+    method: "DELETE",
+    token,
   });
 }
 

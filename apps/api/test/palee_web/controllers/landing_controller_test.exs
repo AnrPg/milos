@@ -102,8 +102,12 @@ defmodule PaleeWeb.LandingControllerTest do
         notes: "Remote coaching"
       })
 
+    # ADR-274: paid outside a charge in this test.
     {:ok, _subscription} =
-      Finance.assign_package(membership.id, package.id, %{starts_on: Date.utc_today()})
+      Finance.assign_package(membership.id, package.id, %{
+        starts_on: Date.utc_today(),
+        charge_now: false
+      })
 
     {:ok, _payment} =
       Finance.record_payment(membership.id, %{

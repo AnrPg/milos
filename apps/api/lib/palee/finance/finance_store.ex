@@ -274,6 +274,24 @@ defmodule Palee.Finance.FinanceStore do
   def refresh_entitlement_snapshots, do: adapter().refresh_entitlement_snapshots()
 
   @impl true
+  def charge_due_subscriptions(today), do: adapter().charge_due_subscriptions(today)
+
+  @impl true
+  def charge_subscription_now(subscription_id),
+    do: adapter().charge_subscription_now(subscription_id)
+
+  @impl true
+  def set_value_override(user_id, field, params),
+    do: adapter().set_value_override(user_id, field, params)
+
+  @impl true
+  def reset_value_override(user_id, field, params),
+    do: adapter().reset_value_override(user_id, field, params)
+
+  @impl true
+  def list_value_overrides(user_id), do: adapter().list_value_overrides(user_id)
+
+  @impl true
   def total_outstanding_balance_cents, do: adapter().total_outstanding_balance_cents()
 
   @impl true

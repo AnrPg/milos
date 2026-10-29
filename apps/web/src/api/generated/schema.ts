@@ -6591,6 +6591,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/finance/members/{id}/overrides": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every value set by hand for a member, newest first (ADR-274) */
+        get: operations["PaleeWeb.AdminFinanceController.member_overrides"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/finance/members/{id}/overrides/{field}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set a worked-out value by hand (ADR-274) */
+        put: operations["PaleeWeb.AdminFinanceController.set_member_override"];
+        post?: never;
+        /** Put a value set by hand back to automatic (ADR-274) */
+        delete: operations["PaleeWeb.AdminFinanceController.reset_member_override"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/members/{id}/packages": {
         parameters: {
             query?: never;
@@ -77838,6 +77873,150 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFinanceController.member_overrides": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Override history */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        overrides: {
+                            computed_value?: string | null;
+                            end_reason?: string | null;
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            ended_by_name?: string | null;
+                            field: string;
+                            /** Format: uuid */
+                            id: string;
+                            reason?: string | null;
+                            /** Format: date-time */
+                            set_at: string;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_name?: string | null;
+                            /** Format: uuid */
+                            subject_id: string;
+                            subject_type?: string;
+                            value: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFinanceController.set_member_override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                field: "status" | "ends_on";
+            };
+            cookie?: never;
+        };
+        /** @description Override */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    commitment_override_reason?: string | null;
+                    reason?: string | null;
+                    /** Format: uuid */
+                    subscription_id?: string | null;
+                    value: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Override */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        override: {
+                            computed_value?: string | null;
+                            end_reason?: string | null;
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            ended_by_name?: string | null;
+                            field: string;
+                            /** Format: uuid */
+                            id: string;
+                            reason?: string | null;
+                            /** Format: date-time */
+                            set_at: string;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_name?: string | null;
+                            /** Format: uuid */
+                            subject_id: string;
+                            subject_type?: string;
+                            value: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFinanceController.reset_member_override": {
+        parameters: {
+            query?: {
+                subscription_id?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+                field: "status" | "ends_on";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Ended override */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        override: {
+                            computed_value?: string | null;
+                            end_reason?: string | null;
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            ended_by_name?: string | null;
+                            field: string;
+                            /** Format: uuid */
+                            id: string;
+                            reason?: string | null;
+                            /** Format: date-time */
+                            set_at: string;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_name?: string | null;
+                            /** Format: uuid */
+                            subject_id: string;
+                            subject_type?: string;
+                            value: string;
+                        };
                     };
                 };
             };
