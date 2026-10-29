@@ -242,6 +242,13 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminPaymentsController, :show} => [:view_finance_reports, :manage_billing],
     {W.AdminPaymentsController, :refund} => [:manage_billing],
     {W.AdminPaymentsController, :retry} => [:manage_billing],
+    # ADR-249: Tap to Pay is taking money at the desk, like ADR-222.
+    {W.AdminTerminalPaymentsController, :availability} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :create} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :result} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :show} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :cancel} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :sandbox_complete} => [:take_payments],
     # ADR-192: shop reports read like the business statistics; the
     # reconciliation is also a finance check; targets are a setting.
     {W.AdminShopReportController, :reconciliation} => [
