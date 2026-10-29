@@ -15,15 +15,13 @@ import { useSession } from "@/components/session-provider";
 import { FollowButton } from "@/components/social/FollowButton";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
-import { BuddyBadge, CountsLine } from "@/components/social/SocialBits";
-import { postsLockKey } from "@/components/social/social-model";
-
-const TABS = ["posts", "prs", "clubs"] as const;
-type Tab = (typeof TABS)[number];
+import { MediaGrid } from "@/components/social/MediaGrid";
+import { BuddyBadge, CountsLine, LockedNote } from "@/components/social/SocialBits";
+import { PERSON_TABS, personTab, postsLockKey } from "@/components/social/social-model";
 
 /**
- * A person's profile (vision §3: «Αναρτήσεις · PRs · Clubs»; plan §5a Q9,
- * board 5 Q3). Followers posts stay hidden until you follow: at once for a
+ * A person's profile (vision §3: «Αναρτήσεις · Πολυμέσα · PRs · Clubs»; plan
+ * §5a Q9, board 5 Q3; «Πολυμέσα» is the photo and video grid, ADR-231). Followers posts stay hidden until you follow: at once for a
  * public account, once they accept you for a private one (ADR-193 §2). PRs
  * show when they share them with you (ADR-129) or show them to their
  * followers on the profile (ADR-196).
@@ -32,8 +30,7 @@ export function PersonPage({ id }: { id: string }) {
   const t = useTranslations("Social");
   const router = useRouter();
   const params = useSearchParams();
-  const requested = params.get("tab");
-  const tab: Tab = TABS.includes(requested as Tab) ? (requested as Tab) : "posts";
+  const tab = personTab(params.get("tab"));
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
   const person = useQuery({ queryKey: personKey(id), enabled: Boolean(token), queryFn: () => fetchPerson(token!, id) });
@@ -75,7 +72,7 @@ export function PersonPage({ id }: { id: string }) {
       </header>
 
       <div role="tablist" aria-label={profile.nickname ?? ""} className="flex gap-6 border-b" style={{ borderColor: "var(--border)" }}>
-        {TABS.map((value) => (
+        {PERSON_TABS.map((value) => (
           <button
             key={value}
             type="button"
@@ -94,6 +91,7 @@ export function PersonPage({ id }: { id: string }) {
       </div>
       <div role="tabpanel" className="flex flex-col gap-3">
         {tab === "posts" ? <Posts profile={profile} /> : null}
+        {tab === "media" ? <MediaGrid personId={profile.id} lock={postsLockKey(profile)} mine={profile.is_me} /> : null}
         {tab === "prs" ? <Prs profile={profile} /> : null}
         {tab === "clubs" ? <Empty text={t("personClubsEmpty")} /> : null}
       </div>
@@ -114,11 +112,10 @@ function Posts({ profile }: { profile: PersonProfile }) {
   });
   const list = posts.data?.pages.flatMap((page) => page.posts) ?? [];
   const lock = postsLockKey(profile);
-  const locked = lock !== null;
 
   return (
     <>
-      {posts.isSuccess && list.length === 0 && !locked ? <Empty text={t("personPostsEmpty")} /> : null}
+      {posts.isSuccess && list.length === 0 && !lock ? <Empty text={t("personPostsEmpty")} /> : null}
       {list.map((post) => (
         <PostCard key={post.id} post={post} />
       ))}
@@ -132,15 +129,7 @@ function Posts({ profile }: { profile: PersonProfile }) {
           {t("more")}
         </button>
       ) : null}
-      {locked ? (
-        <p className="flex items-center gap-3 rounded-3xl p-4 text-sm" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className="shrink-0">
-            <rect width="18" height="11" x="3" y="11" rx="2" />
-            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-          </svg>
-          {t(lock)}
-        </p>
-      ) : null}
+      {lock ? <LockedNote textKey={lock} /> : null}
     </>
   );
 }
