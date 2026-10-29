@@ -119,6 +119,8 @@ defmodule Mix.Tasks.Palee.Architecture do
     shop/shop_report_store
     fiscal/fiscal_store
     fiscal/transmission_store
+    fiscal/einvoice_store
+    fiscal/till_signature_store
     payments/payment_store
   )
 

@@ -15,11 +15,25 @@ defmodule Palee.Fiscal.Domain.TenantDataPolicy do
             purge_order: 85,
             disposition: :retain,
             retain_years: 10,
-            # ADR-243: the myDATA subscription key never leaves the database.
-            excluded_columns: ["subscription_key"],
+            # ADR-243, ADR-250, ADR-251: provider credentials never leave the
+            # database (myDATA key, Peppol access point key and webhook token
+            # hash, fiskaly key, secret and TSE admin PIN).
+            excluded_columns: [
+              "subscription_key",
+              "api_key",
+              "api_secret",
+              "admin_pin",
+              "webhook_token_hash"
+            ],
             basis:
-              "Fiscal documents, their lines, their reports to the tax authority, the inalterable journal and period closings are tax records (NF525, GoBD, Greek and Swiss record-keeping rules); they are archived and kept for 10 years, the longest minimum of any supported country.",
+              "Fiscal documents, their lines, their reports to the tax authority, their Peppol submissions and TSE/RKSV signatures, the inalterable journal and period closings are tax records (NF525, GoBD, Greek and Swiss record-keeping rules); they are archived and kept for 10 years, the longest minimum of any supported country.",
             tables: [
+              %{table: "fiscal_till_signature_attempts"},
+              %{table: "fiscal_till_signatures"},
+              %{table: "fiscal_till_connections"},
+              %{table: "fiscal_einvoice_attempts"},
+              %{table: "fiscal_einvoice_submissions"},
+              %{table: "fiscal_network_connections"},
               %{table: "fiscal_transmission_attempts"},
               %{table: "fiscal_transmissions"},
               %{table: "fiscal_authority_connections"},
