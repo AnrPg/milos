@@ -41,7 +41,9 @@ describe("clock formatting", () => {
   });
 
   it("gives minutes and seconds for a human sentence", () => {
-    expect(human(150)).toEqual({ key: "PlanCore.human", values: { min: 2, sec: 30 } });
+    expect(human(150)).toEqual({ key: "PlanCore.human.minSec", values: { min: 2, sec: 30 } });
+    expect(human(120)).toEqual({ key: "PlanCore.human.min", values: { min: 2 } });
+    expect(human(45)).toEqual({ key: "PlanCore.human.sec", values: { sec: 45 } });
   });
 });
 

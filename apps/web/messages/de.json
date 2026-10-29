@@ -12540,5 +12540,233 @@
       "round": "Runde",
       "slot": "Intervall"
     }
+  },
+  "PlanCore": {
+    "flow": {
+      "sets": "Sätze",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Intervalle",
+      "rest": "Pause"
+    },
+    "flowHint": {
+      "sets": "ohne Uhr: Sätze mit Pause dazwischen",
+      "for_time": "so schnell wie möglich fertig werden",
+      "amrap": "so viele Runden wie möglich in der Zeit",
+      "emom": "alle X Minuten startest du neu",
+      "intervals": "Arbeit und Pause im festen Rhythmus",
+      "rest": "eine Pause zwischen Abschnitten"
+    },
+    "param": {
+      "sets": "Sätze",
+      "rest": "Pause",
+      "restBetween": "Pause dazwischen",
+      "restWindows": "Pause zwischen den Fenstern",
+      "rounds": "Runden",
+      "cap": "Zeitlimit",
+      "dur": "Dauer",
+      "every": "Alle",
+      "times": "Mal",
+      "work": "Arbeit",
+      "off": "Pause",
+      "intEvery": "Unterbrechung alle",
+      "hrTarget": "Pause bis"
+    },
+    "struct": {
+      "single": "Einzeln",
+      "cluster": "Cluster",
+      "drop": "Drop set",
+      "restpause": "Rest-pause",
+      "superset": "Superset",
+      "complex": "Complex"
+    },
+    "structHint": {
+      "single": "eine Übung, wie sie ist",
+      "cluster": "der Satz wird mit kurzen Pausen geteilt",
+      "drop": "Gewicht senken und weitermachen",
+      "restpause": "bis zum Versagen, Pause, nochmal",
+      "superset": "alle Übungen, dann der nächste Satz",
+      "complex": "alle, ohne die Stange abzulegen"
+    },
+    "structParam": {
+      "clusters": "Teile",
+      "intra": "Pause",
+      "drops": "Reduktionen",
+      "dropby": "jedes Mal",
+      "minis": "Mini-Sätze"
+    },
+    "mod": {
+      "interrupt": "Unterbrechung alle …",
+      "hr": "Pause, bis der Puls sinkt"
+    },
+    "modHint": {
+      "interrupt": "alle X Minuten stoppst du für eine andere Übung",
+      "hr": "die Pause endet bei X Schlägen pro Minute"
+    },
+    "measure": {
+      "pace": "Tempo (Pace)",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "Pulszone",
+      "height": "Höhe / Ziel",
+      "dist": "Distanz",
+      "hold": "Halten",
+      "side": "Pro Seite"
+    },
+    "measureHint": {
+      "tempo": "Sekunden runter, Pause, hoch (X = explosiv), Pause"
+    },
+    "unit": {
+      "per500m": "/500m",
+      "outOf10": "/10",
+      "repsLeft": "Wdh. übrig",
+      "zone": "Zone",
+      "cm": "cm",
+      "m": "m",
+      "sec": "s"
+    },
+    "score": {
+      "none": "Keine Wertung",
+      "best_load": "Gewicht (bester Satz)",
+      "reps": "Wiederholungen",
+      "time": "Zeit",
+      "rounds_reps": "Runden + Wdh.",
+      "done": "Geschafft",
+      "total_reps": "Wiederholungen (gesamt)",
+      "lowest_round": "Schwächste Runde",
+      "distance": "Distanz"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "death_by": "Death by",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "hrr": "Pulserholung (HRR)",
+      "even_odd": "Abwechselnd (ungerade / gerade)",
+      "ladder": "Leiter / Pyramide",
+      "calorie_target": "Kalorienziel",
+      "to_failure": "Bis zum Versagen",
+      "superset": "Supersatz / Riesensatz",
+      "interrupt": "Mit Unterbrechung"
+    },
+    "roundWord": {
+      "set": "Satz",
+      "interval": "Intervall",
+      "round": "Runde"
+    },
+    "block": {
+      "one": "{word, select, set {Satz} interval {Intervall} other {Runde}} {n}",
+      "list": "{word, select, set {Satz} interval {Intervall} other {Runde}} {list}",
+      "slot": "{word, select, set {Satz} interval {Intervall} other {Runde}} {list} · {at}",
+      "minute": "Minute {list}"
+    },
+    "caption": {
+      "sets": "{count} Sätze",
+      "setsRange": "{min} oder {max} Sätze",
+      "max": "{unit, select, kcal {so viele Kalorien wie möglich} m {so viele Meter wie möglich} other {so viele wie möglich}}",
+      "maxWithin": "{unit, select, kcal {so viele Kalorien wie möglich} m {so viele Meter wie möglich} other {so viele wie möglich}} in {within}",
+      "setList": "{count} Sätze: {list}",
+      "perList": "pro {word, select, set {Satz} interval {Intervall} other {Runde}}: {list}",
+      "cont": "dann {step} pro {word, select, set {Satz} interval {Intervall} other {Runde}}",
+      "range": "Spanne {range}, der Athlet entscheidet",
+      "reps": "{count, plural, one {# Wiederholung} other {# Wiederholungen}}",
+      "value": "{value}",
+      "perSide": "pro Seite",
+      "badDose": "z. B. 10, 4×10, 12-10-8-8, 8-10, 3-4×12-15, 5-10-15…, 30 s, 500 m, max"
+    },
+    "loadCaption": {
+      "bw": "Körpergewicht",
+      "text": "als Text für den Athleten",
+      "zone": "Pulszone {zone}",
+      "rpe": "wie schwer (1–10)",
+      "pace": "Pace {pace} pro {per}",
+      "perSet": "pro Satz: {list}{kind, select, pct { des 1RM} other {}}",
+      "buildUp": "beginnt bei {value}{kind, select, pct { des 1RM} other {}} und steigert sich",
+      "range": "Spanne {value}{kind, select, pct { des 1RM} other {}}, der Athlet wählt",
+      "value": "{value}{kind, select, pct { des 1RM} other {}}"
+    },
+    "show": {
+      "perSide": "/Seite",
+      "within": "in",
+      "from": "ab",
+      "zone": "Zone"
+    },
+    "tempo": {
+      "down": "↓{secs}″",
+      "downExplosive": "↓explosiv",
+      "bottom": "unten {secs}″",
+      "bottomExplosive": "unten: ohne Pause",
+      "up": "↑{secs}″",
+      "upExplosive": "↑explosiv",
+      "top": "oben {secs}″",
+      "topExplosive": "oben: ohne Pause"
+    },
+    "human": {
+      "min": "{min} Min.",
+      "sec": "{sec} s",
+      "minSec": "{min} Min. {sec} s"
+    },
+    "describe": {
+      "emom": "Alle {every}, {times} Mal: {total} insgesamt.",
+      "emomOpen": "Alle {every}, bis du nicht mehr mitkommst.",
+      "amrapWindows": "{count} AMRAP-Fenster ({list}).",
+      "amrapWindowsRest": "{count} AMRAP-Fenster ({list}), {rest} Pause dazwischen.",
+      "amrap": "So viele Runden wie möglich in {dur}.",
+      "forTime": "{rounds, plural, one {Einmal} other {# Runden}}, so schnell wie möglich.",
+      "forTimeCap": "{rounds, plural, one {Einmal} other {# Runden}}, so schnell wie möglich, Limit {cap}.",
+      "intervals": "{rounds} Runden: {work} Arbeit, {off} Pause.",
+      "intervalsHr": "{rounds} Runden: {work} Arbeit, Pause, bis dein Puls auf {hr} sinkt.",
+      "sets": "{sets} Sätze.",
+      "setsRest": "{sets} Sätze, {rest} Pause dazwischen.",
+      "rest": "Pause {dur}.",
+      "interrupt": "Alle {every} stoppst du für die Unterbrechung und machst dann dort weiter, wo du aufgehört hast."
+    },
+    "summary": {
+      "emom": "alle {every} × {times}",
+      "emomOpen": "alle {every}",
+      "sets": "{sets} Sätze",
+      "windows": "{count} Fenster",
+      "dur": "{dur}",
+      "rounds": "{rounds} Runden",
+      "intervals": "{rounds} × {work}/{off}",
+      "intervalsHr": "{rounds} × {work}/Puls",
+      "interrupt": "Unterbrechung alle {every}",
+      "perSide": "(pro Seite)"
+    },
+    "error": {
+      "bad_dose": "Nicht lesbar: z. B. 10, 8-12, max, 400 m",
+      "missing_unit": "Schreib kg oder % in einen Satz der Zeile; die anderen übernehmen es",
+      "mixed_unit": "Gleiche Einheit in der ganzen Zeile: kg oder %",
+      "bad_tempo": "Tempo mit 4 Zeichen, z. B. 31X1",
+      "bad_measure_value": "Eine Zahl, +x oder a→b",
+      "rpe_over_max": "RPE geht bis 10",
+      "bad_param": "Dieser Wert ist nicht lesbar",
+      "unknown_param": "Keine Einstellung dieses Ablaufs",
+      "unknown_flow": "Unbekannter Ablauf",
+      "unknown_measure": "Unbekannter Messwert",
+      "duplicate_measure": "Dieser Messwert ist doppelt",
+      "unknown_struct": "Unbekannte Satzstruktur",
+      "struct_not_allowed": "Diese Satzstruktur passt nicht zu diesem Ablauf",
+      "bad_struct_param": "Dieser Wert ist nicht lesbar",
+      "mod_not_allowed": "Diese Ergänzung passt nicht zu diesem Ablauf",
+      "unknown_score": "Wähl eine Wertung für diesen Ablauf",
+      "bad_version": "Nicht unterstützte Planversion",
+      "bad_row_kind": "Unbekannte Zeile",
+      "duplicate_id": "Doppelte Zeile",
+      "blocks_not_allowed": "Eine Pause hat keine Übungen",
+      "too_many_blocks": "Höchstens 12 verschiedene Runden",
+      "too_many_rows": "Höchstens 60 Übungen",
+      "too_many_cells": "Höchstens 30 Sätze",
+      "too_long": "Höchstens 200 Zeichen",
+      "note_too_long": "Höchstens 2000 Zeichen"
+    }
   }
 }

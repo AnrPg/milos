@@ -12540,5 +12540,233 @@
       "round": "Рунд",
       "slot": "Интервал"
     }
+  },
+  "PlanCore": {
+    "flow": {
+      "sets": "Серии",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Интервали",
+      "rest": "Почивка"
+    },
+    "flowHint": {
+      "sets": "без часовник: серии с почивка между тях",
+      "for_time": "завърши възможно най-бързо",
+      "amrap": "колкото повече рундове за времето",
+      "emom": "на всеки X минути започваш отново",
+      "intervals": "работа и почивка в равен ритъм",
+      "rest": "пауза между частите"
+    },
+    "param": {
+      "sets": "Серии",
+      "rest": "Почивка",
+      "restBetween": "Почивка между",
+      "restWindows": "Почивка между прозорците",
+      "rounds": "Рундове",
+      "cap": "Лимит на времето",
+      "dur": "Продължителност",
+      "every": "На всеки",
+      "times": "Пъти",
+      "work": "Работа",
+      "off": "Почивка",
+      "intEvery": "Прекъсване на всеки",
+      "hrTarget": "Почивка до"
+    },
+    "struct": {
+      "single": "Обикновен",
+      "cluster": "Cluster",
+      "drop": "Drop set",
+      "restpause": "Rest-pause",
+      "superset": "Superset",
+      "complex": "Complex"
+    },
+    "structHint": {
+      "single": "едно упражнение, както е",
+      "cluster": "серията се разделя на части с кратка пауза",
+      "drop": "намаляваш тежестта и продължаваш",
+      "restpause": "до отказ, пауза, отново",
+      "superset": "всички упражнения, после следващата серия",
+      "complex": "всички, без да пускаш щангата"
+    },
+    "structParam": {
+      "clusters": "части",
+      "intra": "пауза",
+      "drops": "намаления",
+      "dropby": "всеки път",
+      "minis": "мини серии"
+    },
+    "mod": {
+      "interrupt": "Прекъсване на всеки…",
+      "hr": "Почивка, докато пулсът спадне"
+    },
+    "modHint": {
+      "interrupt": "на всеки X минути спираш за друго упражнение",
+      "hr": "почивката свършва при X удара в минута"
+    },
+    "measure": {
+      "pace": "Темпо (pace)",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "Пулсова зона",
+      "height": "Височина / цел",
+      "dist": "Разстояние",
+      "hold": "Задържане",
+      "side": "На страна"
+    },
+    "measureHint": {
+      "tempo": "секунди надолу, пауза, нагоре (X = експлозивно), пауза"
+    },
+    "unit": {
+      "per500m": "/500m",
+      "outOf10": "/10",
+      "repsLeft": "повт. в резерв",
+      "zone": "зона",
+      "cm": "cm",
+      "m": "м",
+      "sec": "с"
+    },
+    "score": {
+      "none": "Без резултат",
+      "best_load": "Тежест (най-добра серия)",
+      "reps": "Повторения",
+      "time": "Време",
+      "rounds_reps": "Рундове + повторения",
+      "done": "Завършено",
+      "total_reps": "Повторения (общо)",
+      "lowest_round": "Най-слаб рунд",
+      "distance": "Разстояние"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "death_by": "Death by",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "hrr": "Възстановяване на пулса (HRR)",
+      "even_odd": "Редуване (нечетни / четни)",
+      "ladder": "Стълба / пирамида",
+      "calorie_target": "Цел калории",
+      "to_failure": "До отказ",
+      "superset": "Суперсерия / гигантска серия",
+      "interrupt": "С прекъсвания"
+    },
+    "roundWord": {
+      "set": "Серия",
+      "interval": "Интервал",
+      "round": "Рунд"
+    },
+    "block": {
+      "one": "{word, select, set {Серия} interval {Интервал} other {Рунд}} {n}",
+      "list": "{word, select, set {Серия} interval {Интервал} other {Рунд}} {list}",
+      "slot": "{word, select, set {Серия} interval {Интервал} other {Рунд}} {list} · {at}",
+      "minute": "Минута {list}"
+    },
+    "caption": {
+      "sets": "{count} серии",
+      "setsRange": "{min} или {max} серии",
+      "max": "{unit, select, kcal {колкото повече калории} m {колкото повече метри} other {колкото повече}}",
+      "maxWithin": "{unit, select, kcal {колкото повече калории} m {колкото повече метри} other {колкото повече}} за {within}",
+      "setList": "{count} серии: {list}",
+      "perList": "на {word, select, set {серия} interval {интервал} other {рунд}}: {list}",
+      "cont": "после {step} всеки {word, select, set {серия} interval {интервал} other {рунд}}",
+      "range": "диапазон {range}, решава атлетът",
+      "reps": "{count, plural, one {# повторение} other {# повторения}}",
+      "value": "{value}",
+      "perSide": "на страна",
+      "badDose": "напр. 10, 4×10, 12-10-8-8, 8-10, 3-4×12-15, 5-10-15…, 30s, 500m, max"
+    },
+    "loadCaption": {
+      "bw": "собствено тегло",
+      "text": "като текст за атлета",
+      "zone": "пулсова зона {zone}",
+      "rpe": "колко тежко (1–10)",
+      "pace": "темпо {pace} на {per}",
+      "perSet": "по серии: {list}{kind, select, pct { от 1ПМ} other {}}",
+      "buildUp": "започва от {value}{kind, select, pct { от 1ПМ} other {}} и се покачва",
+      "range": "диапазон {value}{kind, select, pct { от 1ПМ} other {}}, избира атлетът",
+      "value": "{value}{kind, select, pct { от 1ПМ} other {}}"
+    },
+    "show": {
+      "perSide": "/страна",
+      "within": "за",
+      "from": "от",
+      "zone": "зона"
+    },
+    "tempo": {
+      "down": "↓{secs}″",
+      "downExplosive": "↓експлозивно",
+      "bottom": "долу {secs}″",
+      "bottomExplosive": "долу: без пауза",
+      "up": "↑{secs}″",
+      "upExplosive": "↑експлозивно",
+      "top": "горе {secs}″",
+      "topExplosive": "горе: без пауза"
+    },
+    "human": {
+      "min": "{min} мин",
+      "sec": "{sec} с",
+      "minSec": "{min} мин {sec} с"
+    },
+    "describe": {
+      "emom": "На всеки {every}, {times} пъти: общо {total}.",
+      "emomOpen": "На всеки {every}, докато смогваш.",
+      "amrapWindows": "{count} прозореца AMRAP ({list}).",
+      "amrapWindowsRest": "{count} прозореца AMRAP ({list}), {rest} почивка между тях.",
+      "amrap": "Колкото повече рундове за {dur}.",
+      "forTime": "{rounds, plural, one {Веднъж} other {# рунда}}, възможно най-бързо.",
+      "forTimeCap": "{rounds, plural, one {Веднъж} other {# рунда}}, възможно най-бързо, лимит {cap}.",
+      "intervals": "{rounds} рунда: {work} работа, {off} почивка.",
+      "intervalsHr": "{rounds} рунда: {work} работа, почивка, докато пулсът падне до {hr}.",
+      "sets": "{sets} серии.",
+      "setsRest": "{sets} серии, {rest} почивка между тях.",
+      "rest": "Почивка {dur}.",
+      "interrupt": "На всеки {every} спираш за прекъсването и после продължаваш оттам, докъдето си стигнал."
+    },
+    "summary": {
+      "emom": "на всеки {every} × {times}",
+      "emomOpen": "на всеки {every}",
+      "sets": "{sets} серии",
+      "windows": "{count} прозореца",
+      "dur": "{dur}",
+      "rounds": "{rounds} рунда",
+      "intervals": "{rounds} × {work}/{off}",
+      "intervalsHr": "{rounds} × {work}/пулс",
+      "interrupt": "прекъсване на всеки {every}",
+      "perSide": "(на страна)"
+    },
+    "error": {
+      "bad_dose": "Не се чете: напр. 10, 8-12, max, 400 м",
+      "missing_unit": "Напиши kg или % в една серия от реда; другите го вземат оттам",
+      "mixed_unit": "Една и съща единица в целия ред: kg или %",
+      "bad_tempo": "Темпо с 4 знака, напр. 31X1",
+      "bad_measure_value": "Число, +x или a→b",
+      "rpe_over_max": "RPE е най-много 10",
+      "bad_param": "Тази стойност не се чете",
+      "unknown_param": "Не е параметър на този формат",
+      "unknown_flow": "Непознат формат",
+      "unknown_measure": "Непознат показател",
+      "duplicate_measure": "Показателят е два пъти",
+      "unknown_struct": "Непозната структура на серията",
+      "struct_not_allowed": "Тази структура не пасва на формата",
+      "bad_struct_param": "Тази стойност не се чете",
+      "mod_not_allowed": "Тази добавка не пасва на формата",
+      "unknown_score": "Избери резултат за формата",
+      "bad_version": "Неподдържана версия на плана",
+      "bad_row_kind": "Непознат ред",
+      "duplicate_id": "Дублиран ред",
+      "blocks_not_allowed": "Почивката няма упражнения",
+      "too_many_blocks": "Най-много 12 различни рунда",
+      "too_many_rows": "Най-много 60 упражнения",
+      "too_many_cells": "Най-много 30 серии",
+      "too_long": "Най-много 200 знака",
+      "note_too_long": "Най-много 2000 знака"
+    }
   }
 }

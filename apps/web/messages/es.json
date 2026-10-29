@@ -12540,5 +12540,233 @@
       "round": "Ronda",
       "slot": "Intervalo"
     }
+  },
+  "PlanCore": {
+    "flow": {
+      "sets": "Series",
+      "for_time": "For Time",
+      "amrap": "AMRAP",
+      "emom": "EMOM",
+      "intervals": "Intervalos",
+      "rest": "Descanso"
+    },
+    "flowHint": {
+      "sets": "sin reloj: series con descanso entre ellas",
+      "for_time": "termina lo más rápido posible",
+      "amrap": "tantas rondas como puedas en el tiempo",
+      "emom": "cada X minutos empiezas de nuevo",
+      "intervals": "trabajo y descanso a ritmo fijo",
+      "rest": "una pausa entre secciones"
+    },
+    "param": {
+      "sets": "Series",
+      "rest": "Descanso",
+      "restBetween": "Descanso entre",
+      "restWindows": "Descanso entre ventanas",
+      "rounds": "Rondas",
+      "cap": "Tiempo límite",
+      "dur": "Duración",
+      "every": "Cada",
+      "times": "Veces",
+      "work": "Trabajo",
+      "off": "Descanso",
+      "intEvery": "Interrupción cada",
+      "hrTarget": "Descanso hasta"
+    },
+    "struct": {
+      "single": "Simple",
+      "cluster": "Cluster",
+      "drop": "Drop set",
+      "restpause": "Rest-pause",
+      "superset": "Superset",
+      "complex": "Complex"
+    },
+    "structHint": {
+      "single": "un ejercicio, tal cual",
+      "cluster": "la serie se divide en partes con una pausa corta",
+      "drop": "baja el peso y sigue",
+      "restpause": "hasta el fallo, pausa, otra vez",
+      "superset": "todos los ejercicios, luego la siguiente serie",
+      "complex": "todos sin soltar la barra"
+    },
+    "structParam": {
+      "clusters": "partes",
+      "intra": "pausa",
+      "drops": "bajadas",
+      "dropby": "cada vez",
+      "minis": "miniseries"
+    },
+    "mod": {
+      "interrupt": "Interrupción cada…",
+      "hr": "Descanso hasta que bajen las pulsaciones"
+    },
+    "modHint": {
+      "interrupt": "cada X minutos paras para otro ejercicio",
+      "hr": "el descanso termina a X pulsaciones por minuto"
+    },
+    "measure": {
+      "pace": "Ritmo",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "Zona de pulso",
+      "height": "Altura / objetivo",
+      "dist": "Distancia",
+      "hold": "Sostén",
+      "side": "Por lado"
+    },
+    "measureHint": {
+      "tempo": "segundos al bajar, pausa, subir (X = explosivo), pausa"
+    },
+    "unit": {
+      "per500m": "/500m",
+      "outOf10": "/10",
+      "repsLeft": "reps en reserva",
+      "zone": "zona",
+      "cm": "cm",
+      "m": "m",
+      "sec": "s"
+    },
+    "score": {
+      "none": "Sin puntuación",
+      "best_load": "Carga (mejor serie)",
+      "reps": "Repeticiones",
+      "time": "Tiempo",
+      "rounds_reps": "Rondas + reps",
+      "done": "Completado",
+      "total_reps": "Repeticiones (total)",
+      "lowest_round": "Ronda más baja",
+      "distance": "Distancia"
+    },
+    "preset": {
+      "tabata": "Tabata",
+      "billat": "Billat",
+      "death_by": "Death by",
+      "complex_emom": "Complex EMOM",
+      "edt": "EDT",
+      "chipper": "Chipper",
+      "21_15_9": "21-15-9",
+      "cluster": "Cluster",
+      "drop_set": "Drop set",
+      "rest_pause": "Rest-pause",
+      "hrr": "Recuperación del pulso (HRR)",
+      "even_odd": "Alterno (impar / par)",
+      "ladder": "Escalera / pirámide",
+      "calorie_target": "Objetivo de calorías",
+      "to_failure": "Hasta el fallo",
+      "superset": "Superserie / serie gigante",
+      "interrupt": "Con interrupciones"
+    },
+    "roundWord": {
+      "set": "Serie",
+      "interval": "Intervalo",
+      "round": "Ronda"
+    },
+    "block": {
+      "one": "{word, select, set {Serie} interval {Intervalo} other {Ronda}} {n}",
+      "list": "{word, select, set {Serie} interval {Intervalo} other {Ronda}} {list}",
+      "slot": "{word, select, set {Serie} interval {Intervalo} other {Ronda}} {list} · {at}",
+      "minute": "Minuto {list}"
+    },
+    "caption": {
+      "sets": "{count} series",
+      "setsRange": "{min} o {max} series",
+      "max": "{unit, select, kcal {tantas calorías como puedas} m {tantos metros como puedas} other {tantas como puedas}}",
+      "maxWithin": "{unit, select, kcal {tantas calorías como puedas} m {tantos metros como puedas} other {tantas como puedas}} en {within}",
+      "setList": "{count} series: {list}",
+      "perList": "por {word, select, set {serie} interval {intervalo} other {ronda}}: {list}",
+      "cont": "luego {step} cada {word, select, set {serie} interval {intervalo} other {ronda}}",
+      "range": "rango {range}, decide el atleta",
+      "reps": "{count, plural, one {# repetición} other {# repeticiones}}",
+      "value": "{value}",
+      "perSide": "por lado",
+      "badDose": "p. ej. 10, 4×10, 12-10-8-8, 8-10, 3-4×12-15, 5-10-15…, 30 s, 500 m, máx"
+    },
+    "loadCaption": {
+      "bw": "peso corporal",
+      "text": "como texto para el atleta",
+      "zone": "zona de pulso {zone}",
+      "rpe": "qué tan duro (1–10)",
+      "pace": "ritmo {pace} por {per}",
+      "perSet": "por serie: {list}{kind, select, pct { del 1RM} other {}}",
+      "buildUp": "empieza en {value}{kind, select, pct { del 1RM} other {}} y sube",
+      "range": "rango {value}{kind, select, pct { del 1RM} other {}}, elige el atleta",
+      "value": "{value}{kind, select, pct { del 1RM} other {}}"
+    },
+    "show": {
+      "perSide": "/lado",
+      "within": "en",
+      "from": "desde",
+      "zone": "zona"
+    },
+    "tempo": {
+      "down": "↓{secs}″",
+      "downExplosive": "↓explosivo",
+      "bottom": "abajo {secs}″",
+      "bottomExplosive": "abajo: sin pausa",
+      "up": "↑{secs}″",
+      "upExplosive": "↑explosivo",
+      "top": "arriba {secs}″",
+      "topExplosive": "arriba: sin pausa"
+    },
+    "human": {
+      "min": "{min} min",
+      "sec": "{sec} s",
+      "minSec": "{min} min {sec} s"
+    },
+    "describe": {
+      "emom": "Cada {every}, {times} veces: {total} en total.",
+      "emomOpen": "Cada {every}, hasta que no llegues a tiempo.",
+      "amrapWindows": "{count} ventanas AMRAP ({list}).",
+      "amrapWindowsRest": "{count} ventanas AMRAP ({list}), {rest} de descanso entre ellas.",
+      "amrap": "Tantas rondas como puedas en {dur}.",
+      "forTime": "{rounds, plural, one {Una vez} other {# rondas}}, lo más rápido posible.",
+      "forTimeCap": "{rounds, plural, one {Una vez} other {# rondas}}, lo más rápido posible, límite {cap}.",
+      "intervals": "{rounds} rondas: {work} de trabajo, {off} de descanso.",
+      "intervalsHr": "{rounds} rondas: {work} de trabajo, descanso hasta que tu pulso baje a {hr}.",
+      "sets": "{sets} series.",
+      "setsRest": "{sets} series, {rest} de descanso entre ellas.",
+      "rest": "Descanso {dur}.",
+      "interrupt": "Cada {every} paras para la interrupción y luego sigues donde lo dejaste."
+    },
+    "summary": {
+      "emom": "cada {every} × {times}",
+      "emomOpen": "cada {every}",
+      "sets": "{sets} series",
+      "windows": "{count} ventanas",
+      "dur": "{dur}",
+      "rounds": "{rounds} rondas",
+      "intervals": "{rounds} × {work}/{off}",
+      "intervalsHr": "{rounds} × {work}/pulso",
+      "interrupt": "interrupción cada {every}",
+      "perSide": "(por lado)"
+    },
+    "error": {
+      "bad_dose": "No se entiende: p. ej. 10, 8-12, máx, 400 m",
+      "missing_unit": "Escribe kg o % en una serie de la fila; las demás lo toman de ahí",
+      "mixed_unit": "Misma unidad en toda la fila: kg o %",
+      "bad_tempo": "Tempo en 4 marcas, p. ej. 31X1",
+      "bad_measure_value": "Un número, +x o a→b",
+      "rpe_over_max": "El RPE llega hasta 10",
+      "bad_param": "No se entiende este valor",
+      "unknown_param": "No es un ajuste de este formato",
+      "unknown_flow": "Formato desconocido",
+      "unknown_measure": "Medida desconocida",
+      "duplicate_measure": "Esta medida está dos veces",
+      "unknown_struct": "Estructura de serie desconocida",
+      "struct_not_allowed": "Esta estructura no encaja en este formato",
+      "bad_struct_param": "No se entiende este valor",
+      "mod_not_allowed": "Este añadido no encaja en este formato",
+      "unknown_score": "Elige una puntuación para este formato",
+      "bad_version": "Versión de plan no compatible",
+      "bad_row_kind": "Fila desconocida",
+      "duplicate_id": "Fila duplicada",
+      "blocks_not_allowed": "El descanso no tiene ejercicios",
+      "too_many_blocks": "Como máximo 12 rondas distintas",
+      "too_many_rows": "Como máximo 60 ejercicios",
+      "too_many_cells": "Como máximo 30 series",
+      "too_long": "Como máximo 200 caracteres",
+      "note_too_long": "Como máximo 2000 caracteres"
+    }
   }
 }

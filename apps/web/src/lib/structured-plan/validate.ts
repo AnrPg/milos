@@ -15,6 +15,9 @@ import { PLAN_VERSION, type PlanCell, type PlanMeasure, type PlanRow, type PlanS
 
 export type PlanIssue = { path: string; code: PlanErrorCode };
 
+/** i18n key of an error code's message. */
+export const issueKey = (code: string): string => `PlanCore.error.${code}`;
+
 /** Size bounds (the API refuses anything larger). */
 export const PLAN_LIMITS = {
   blocks: 12,
@@ -93,7 +96,7 @@ function validateRow(section: PlanSection, row: PlanRow, path: string, inInterru
       for (const [k, v] of Object.entries(c)) if (typeof v === "string" && tooLong(v)) push(`cells.${j}.${k}`, "too_long");
       if (c.d && parseDose(c.d) === "bad") push(`cells.${j}.d`, "bad_dose");
       const le = loads?.errors[j];
-      if (le) push(`cells.${j}.l`, le as PlanErrorCode);
+      if (le) push(`cells.${j}.l`, le);
       for (const k of measures) {
         const code = measureIssue(k, c[k] || "", true);
         if (code) push(`cells.${j}.${k}`, code);
