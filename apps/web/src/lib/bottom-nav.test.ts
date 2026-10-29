@@ -27,6 +27,7 @@ describe("hidden routes", () => {
       "/org/kypseli/workouts/w1/execute",
       "/class-timer/s1/display",
       "/class-timer/s1/control",
+      "/tv",
       "/admin/check-in/door/loc-1",
       "/org/kypseli/admin/check-in/poster/loc-1",
       "/c/loc-1/code",
