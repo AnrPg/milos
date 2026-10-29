@@ -58,12 +58,21 @@ defmodule Palee.Payments.Domain.TerminalPolicyTest do
       assert TerminalPolicy.validate_new(request(%{idempotency_key: "short"})) ==
                {:error, :idempotency_key_required}
 
-      assert TerminalPolicy.validate_new(request(%{user_id: nil})) ==
+      assert TerminalPolicy.validate_new(request(%{user_id: nil, purpose_type: "finance_invoice"})) ==
                {:error, :terminal_member_required}
 
-      # A walk-in may pay a shop order.
+      assert TerminalPolicy.validate_new(
+               request(%{user_id: nil, purpose_type: "membership_package"})
+             ) == {:error, :terminal_member_required}
+
+      # A walk-in may pay a shop order and (ADR-264) a free sale.
       assert TerminalPolicy.validate_new(request(%{user_id: nil, purpose_type: "shop_order"})) ==
                :ok
+
+      assert TerminalPolicy.validate_new(request(%{user_id: nil, purpose_type: "free_sale"})) ==
+               :ok
+
+      assert TerminalPolicy.walk_in_purposes() == ~w(shop_order free_sale)
     end
   end
 
@@ -271,6 +280,95 @@ defmodule Palee.Payments.Domain.TerminalPolicyTest do
                  ctx.reference,
                  @now
                )
+    end
+  end
+
+  describe "ADR-264: tips and card surcharges" do
+    setup do
+      intent = intent(%{provider_transaction_id: "tx-1"})
+
+      %{
+        intent: intent,
+        reference: TerminalPolicy.reference(intent, @key),
+        paid: %{status: :succeeded, transaction_id: "tx-1", currency: "EUR"}
+      }
+    end
+
+    test "split/2 takes the tip and surcharge out of what the card paid", ctx do
+      assert TerminalPolicy.split(ctx.intent, %{amount_cents: 4_500}) ==
+               {:ok, %{tip_cents: 0, surcharge_cents: 0}}
+
+      assert TerminalPolicy.split(ctx.intent, %{amount_cents: 5_000, tip_cents: 500}) ==
+               {:ok, %{tip_cents: 500, surcharge_cents: 0}}
+
+      assert TerminalPolicy.split(ctx.intent, %{
+               amount_cents: 4_635,
+               tip_cents: nil,
+               surcharge_cents: 135
+             }) == {:ok, %{tip_cents: 0, surcharge_cents: 135}}
+
+      assert TerminalPolicy.split(ctx.intent, %{
+               amount_cents: 5_135,
+               tip_cents: 500,
+               surcharge_cents: 135,
+               currency: "eur"
+             }) == {:ok, %{tip_cents: 500, surcharge_cents: 135}}
+
+      # Anything else the card paid is never accepted.
+      for transaction <- [
+            %{amount_cents: 5_000},
+            %{amount_cents: 4_000},
+            %{amount_cents: 5_000, tip_cents: 400},
+            %{amount_cents: 4_500, tip_cents: 500},
+            %{amount_cents: 4_400, tip_cents: -100},
+            %{amount_cents: 4_600, surcharge_cents: "100"},
+            %{amount_cents: 5_000, tip_cents: 500, currency: "GBP"}
+          ] do
+        assert TerminalPolicy.split(ctx.intent, transaction) == {:error, "amount_mismatch"}
+      end
+    end
+
+    test "a tip and a surcharge on top of the amount succeed and are kept apart", ctx do
+      transaction =
+        Map.merge(ctx.paid, %{
+          amount_cents: 5_135,
+          tip_cents: 500,
+          surcharge_cents: 135,
+          reference: ctx.reference
+        })
+
+      changes = TerminalPolicy.confirm_outcome(ctx.intent, {:ok, transaction}, ctx.reference, @now)
+
+      assert changes.status == "succeeded"
+      assert changes.tip_cents == 500
+      assert changes.surcharge_cents == 135
+      assert changes.fulfilment_status == "pending"
+    end
+
+    test "a plain sale records no tip or surcharge", ctx do
+      changes =
+        TerminalPolicy.confirm_outcome(
+          ctx.intent,
+          {:ok, Map.put(ctx.paid, :amount_cents, 4_500)},
+          ctx.reference,
+          @now
+        )
+
+      assert %{status: "succeeded", tip_cents: 0, surcharge_cents: 0} = changes
+    end
+
+    test "any other difference still fails", ctx do
+      changes =
+        TerminalPolicy.confirm_outcome(
+          ctx.intent,
+          {:ok, Map.merge(ctx.paid, %{amount_cents: 5_200, tip_cents: 500})},
+          ctx.reference,
+          @now
+        )
+
+      assert changes.status == "failed"
+      assert changes.failure_code == "amount_mismatch"
+      refute Map.has_key?(changes, :tip_cents)
     end
   end
 
