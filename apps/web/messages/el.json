@@ -12430,7 +12430,7 @@
       "nothing": "Τίποτα",
       "nothingHint": "σβήσε ένα γράμμα",
       "struct": "Δομή σετ…",
-      "structHint": "cluster, drop set, complex…",
+      "structHint": "π.χ. cluster, drop set, complex…",
       "measure": "Παράμετρος…",
       "measureHint": "ρυθμός, tempo, RPE, ύψος…",
       "perRound": "Τιμές ανά γύρο",
