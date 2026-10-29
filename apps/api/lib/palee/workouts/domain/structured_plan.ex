@@ -7,88 +7,55 @@ defmodule Palee.Workouts.Domain.StructuredPlan do
   Three levels never mix: the section's `flow` (how the clock runs), the
   `structs` of one set or round (per row or group), and the `mods` add-ons.
   Every value is the text the coach typed; `validate/1` re-reads it with the
-  editor's rules (`StructuredPlan.Notation`, the same rules as the web
-  `validate.ts`) and refuses what does not read:
+  editor's rules and returns the same codes at the same paths as the web
+  `validateSection` (`apps/web/src/lib/structured-plan/validate.ts`):
 
-  * a known `flow`, `v` = 1, and the flow's `params` read as their kind
-    (count, sets range, time, AMRAP windows);
-  * structures only where the flow allows them, add-ons likewise;
-  * known measures, tempo in four marks (digits or X), RPE at most 10;
-  * the load unit (kg or %) once per row: a row of bare numbers with no unit
-    anywhere, or a row mixing kg and %, is refused; words are fine;
-  * bounds: at most 12 blocks, 60 rows per block, 30 cells per row, strings
-    of 200 characters and notes of 2000.
+  * `bad_version`, `unknown_flow`; `mod_not_allowed`; params read per kind
+    (`bad_param`; `unknown_param` for a non-empty key the flow never has);
+    `unknown_score` (the flow's scores, plus its preset's);
+  * rows: `bad_row_kind`, `duplicate_id`, `unknown_measure`,
+    `duplicate_measure`; values per column (the sets grid, or per round)
+    or the same-every-time values: `bad_dose`, `missing_unit` /
+    `mixed_unit` (the load unit is written once per row), `bad_tempo`,
+    `bad_measure_value`, `rpe_over_max`;
+  * structures: `unknown_struct`, `struct_not_allowed`, `bad_struct_param`;
+  * bounds: `blocks_not_allowed` (a rest section), `too_many_blocks` (12),
+    `too_many_rows` (60), `too_many_cells` (30), `too_long` (200),
+    `note_too_long` (2000).
 
-  Errors are `%{path: "blocks.0.1.cells.2.l", code: "missing_unit"}`: the
-  JSON path inside the plan, segments joined by dots.
+  The API also refuses what the editor cannot produce (a value of the wrong
+  JSON type, a row without an id) with `invalid`.
+
+  Errors are `%{path: "blocks.0.1.cells.2.l", code: "missing_unit"}`: dot
+  separated keys and indexes from the section root.
   """
 
-  alias Palee.Workouts.Domain.StructuredPlan.Notation
+  alias Palee.Workouts.Domain.StructuredPlan.{Catalog, Notation}
 
   @version 1
   @max_blocks 12
   @max_rows 60
   @max_cells 30
-  @max_string 200
+  @max_text 200
   @max_note 2000
-  @max_exercise_ref 120
   @max_level_notes 20
 
-  # Level 1: each flow's params (key => kind), structures and add-ons.
-  @flows %{
-    "sets" => %{
-      params: %{"sets" => :range, "rest" => :time},
-      structs: ~w(single superset complex cluster drop restpause),
-      mods: ~w(interrupt)
-    },
-    "for_time" => %{
-      params: %{"rounds" => :count, "cap" => :time_min},
-      structs: ~w(single superset complex),
-      mods: ~w(interrupt)
-    },
-    "amrap" => %{
-      params: %{"dur" => :times, "rest" => :time},
-      structs: ~w(single superset complex),
-      mods: ~w(interrupt)
-    },
-    "emom" => %{
-      params: %{"every" => :time, "times" => :count},
-      structs: ~w(single superset complex cluster),
-      mods: []
-    },
-    "intervals" => %{
-      params: %{"work" => :time, "off" => :time, "rounds" => :count},
-      structs: ~w(single superset complex),
-      mods: ~w(hr)
-    },
-    "rest" => %{params: %{"dur" => :time_min}, structs: [], mods: []}
-  }
-  @mod_params %{"interrupt" => {"intEvery", :time}, "hr" => {"hrTarget", :count}}
-  @param_keys ~w(sets rest rounds cap dur every times work off intEvery hrTarget)
-
-  # Level 2: the fields of each structure.
-  @structs %{
-    "single" => %{},
-    "superset" => %{},
-    "complex" => %{},
-    "cluster" => %{"clusters" => :count, "intra" => :time},
-    "drop" => %{"drops" => :count, "dropby" => :text},
-    "restpause" => %{"minis" => :count, "intra" => :time}
-  }
-
-  @measures ~w(pace tempo rpe rir zone height dist hold side)
-  @cell_keys ["d", "l" | @measures -- ["side"]]
   @row_keys ~w(id kind name exerciseRef dose load x extra cells perRound group note)
   @section_keys ~w(v flow preset params mods blocks interrupt structs score note levelNotes)
 
   @type error :: %{path: String.t(), code: String.t()}
 
   def version, do: @version
-  def flows, do: @flows |> Map.keys() |> Enum.sort()
-  def measures, do: @measures
-  def max_blocks, do: @max_blocks
-  def max_rows, do: @max_rows
-  def max_cells, do: @max_cells
+  def flows, do: Catalog.flow_keys()
+
+  def limits,
+    do: %{
+      blocks: @max_blocks,
+      rows_per_block: @max_rows,
+      cells_per_row: @max_cells,
+      text: @max_text,
+      note: @max_note
+    }
 
   @doc "`:ok`, or `{:error, errors}` listing every problem with its path."
   @spec validate(term()) :: :ok | {:error, [error()]}
@@ -101,7 +68,7 @@ defmodule Palee.Workouts.Domain.StructuredPlan do
 
   @doc """
   The plan as it is kept: validated, with keys outside the contract left out
-  (so the column holds only the contract), or `{:error, errors}`.
+  of the section and its rows, or `{:error, errors}`.
   """
   @spec normalize(term()) :: {:ok, map()} | {:error, [error()]}
   def normalize(plan) do
@@ -110,49 +77,41 @@ defmodule Palee.Workouts.Domain.StructuredPlan do
     end
   end
 
-  @doc "Every problem of a plan, in document order."
+  @doc "Every problem of a plan, in the editor's order."
   @spec errors(term()) :: [error()]
   def errors(%{} = plan) do
+    version = if Map.get(plan, "v") == @version, do: [], else: [error(["v"], "bad_version")]
     flow = Map.get(plan, "flow")
 
-    if Map.has_key?(@flows, flow) do
-      spec = Map.fetch!(@flows, flow)
-
+    if Catalog.flow?(flow) do
       Enum.concat([
-        version_errors(plan),
-        params_errors(plan, spec),
-        mods_errors(plan, spec),
-        blocks_errors(plan),
-        interrupt_errors(plan),
-        structs_errors(plan, spec),
-        string_errors(plan, "score", @max_string, ["score"], required: true),
-        string_errors(plan, "preset", @max_string, ["preset"], nullable: true),
-        string_errors(plan, "note", @max_note, ["note"]),
-        level_notes_errors(plan)
+        version,
+        mods_errors(plan, flow),
+        params_errors(plan, flow),
+        score_errors(plan, flow),
+        text_errors(plan, "note", @max_note, ["note"]),
+        text_errors(plan, "preset", @max_text, ["preset"]),
+        level_notes_errors(plan),
+        blocks_errors(plan, flow),
+        interrupt_errors(plan, flow),
+        duplicate_id_errors(plan),
+        structs_errors(plan, flow)
       ])
     else
-      version_errors(plan) ++ [error(["flow"], "unknown_flow")]
+      version ++ [error(["flow"], "unknown_flow")]
     end
   end
 
   def errors(_plan), do: [error([], "invalid")]
 
-  @doc "Exercise rows of a plan in order: every block's rows, then the interruption's."
+  @doc "Rows of a plan in order: every block's rows, then the interruption's."
   @spec rows(map()) :: [map()]
   def rows(%{} = plan) do
-    blocks =
-      case Map.get(plan, "blocks") do
-        blocks when is_list(blocks) -> Enum.flat_map(blocks, &List.wrap/1)
-        _none -> []
-      end
-
-    interrupt =
-      case Map.get(plan, "interrupt") do
-        rows when is_list(rows) -> rows
-        _none -> []
-      end
-
-    Enum.filter(blocks ++ interrupt, &is_map/1)
+    plan
+    |> list("blocks")
+    |> Enum.flat_map(&List.wrap/1)
+    |> Kernel.++(list(plan, "interrupt"))
+    |> Enum.filter(&is_map/1)
   end
 
   def rows(_plan), do: []
@@ -175,86 +134,45 @@ defmodule Palee.Workouts.Domain.StructuredPlan do
     |> Enum.reverse()
   end
 
+  @doc "A unit's key in `structs`: its group id, or its only row's id."
+  @spec unit_key(%{group: String.t() | nil, rows: [map()]}) :: String.t() | nil
+  def unit_key(%{group: group}) when is_binary(group), do: group
+  def unit_key(%{rows: [row | _rest]}), do: Map.get(row, "id")
+
+  @doc "The structure of a unit: the stated one when it fits (group or not), else the plain one."
+  @spec struct_of(map(), map()) :: map()
+  def struct_of(plan, unit) do
+    group? = length(unit.rows) > 1
+
+    case plan |> Map.get("structs") |> map_get(unit_key(unit)) do
+      %{"kind" => kind} = struct when is_binary(kind) ->
+        def = Catalog.struct(kind)
+        if def && def.group == group?, do: struct, else: plain_struct(group?)
+
+      _none ->
+        plain_struct(group?)
+    end
+  end
+
+  defp plain_struct(true), do: %{"kind" => "superset"}
+  defp plain_struct(false), do: %{"kind" => "single"}
+
   @doc "How many exercise rows the plan's blocks hold (for summaries)."
   @spec exercise_count(term()) :: non_neg_integer()
   def exercise_count(%{} = plan) do
-    case Map.get(plan, "blocks") do
-      blocks when is_list(blocks) ->
-        blocks
-        |> Enum.flat_map(&List.wrap/1)
-        |> Enum.count(&(is_map(&1) and Map.get(&1, "kind") == "ex"))
-
-      _none ->
-        0
-    end
+    plan
+    |> list("blocks")
+    |> Enum.flat_map(&List.wrap/1)
+    |> Enum.count(&(is_map(&1) and Map.get(&1, "kind") == "ex"))
   end
 
   def exercise_count(_plan), do: 0
 
   # ── section ──────────────────────────────────────────
 
-  defp version_errors(plan) do
-    if Map.get(plan, "v") == @version, do: [], else: [error(["v"], "unsupported_version")]
-  end
+  defp mods_errors(plan, flow) do
+    allowed = Catalog.flow(flow).mods
 
-  defp params_errors(plan, spec) do
-    case Map.get(plan, "params") do
-      %{} = params ->
-        mods = active_mods(plan)
-
-        allowed =
-          Enum.reduce(mods, spec.params, fn mod, acc ->
-            case Map.fetch(@mod_params, mod) do
-              {:ok, {key, kind}} -> Map.put(acc, key, kind)
-              :error -> acc
-            end
-          end)
-
-        params
-        |> Enum.sort()
-        |> Enum.flat_map(fn {key, value} -> param_errors(key, value, allowed) end)
-
-      _other ->
-        [error(["params"], "invalid")]
-    end
-  end
-
-  # Keys of another flow (kept while the coach switches flows) are left alone.
-  defp param_errors(key, value, allowed) do
-    path = ["params", key]
-
-    cond do
-      key not in @param_keys -> [error(path, "unknown_param")]
-      not is_binary(value) -> [error(path, "invalid")]
-      String.length(value) > @max_string -> [error(path, "too_long")]
-      Map.has_key?(allowed, key) -> param_value_errors(Map.fetch!(allowed, key), value, path)
-      true -> []
-    end
-  end
-
-  defp param_value_errors(kind, value, path) do
-    if value_reads?(kind, value), do: [], else: [error(path, "bad_param")]
-  end
-
-  defp value_reads?(kind, value) do
-    if String.trim(value) == "", do: true, else: reads?(kind, value)
-  end
-
-  defp reads?(:count, value), do: Notation.count?(value)
-  defp reads?(:range, value), do: Notation.count_range?(value)
-  defp reads?(:time, value), do: Notation.parse_clock(value, :smart) != :bad
-  defp reads?(:time_min, value), do: Notation.parse_clock(value, :min) != :bad
-  defp reads?(:times, value), do: Notation.parse_times(value) != :bad
-  defp reads?(:text, _value), do: true
-
-  defp active_mods(plan) do
-    case Map.get(plan, "mods") do
-      %{} = mods -> for {mod, true} <- mods, do: mod
-      _none -> []
-    end
-  end
-
-  defp mods_errors(plan, spec) do
     case Map.get(plan, "mods") do
       nil ->
         []
@@ -262,13 +180,15 @@ defmodule Palee.Workouts.Domain.StructuredPlan do
       %{} = mods ->
         mods
         |> Enum.sort()
-        |> Enum.flat_map(fn {mod, on} ->
-          cond do
-            not Map.has_key?(@mod_params, mod) -> [error(["mods", mod], "unknown_mod")]
-            not is_boolean(on) -> [error(["mods", mod], "invalid")]
-            on and mod not in spec.mods -> [error(["mods", mod], "mod_not_allowed")]
-            true -> []
-          end
+        |> Enum.flat_map(fn
+          {_mod, false} ->
+            []
+
+          {mod, true} ->
+            if mod in allowed, do: [], else: [error(["mods", mod], "mod_not_allowed")]
+
+          {mod, _other} ->
+            [error(["mods", mod], "invalid")]
         end)
 
       _other ->
@@ -276,91 +196,83 @@ defmodule Palee.Workouts.Domain.StructuredPlan do
     end
   end
 
-  defp blocks_errors(plan) do
-    case Map.get(plan, "blocks") do
-      blocks when is_list(blocks) and length(blocks) > @max_blocks ->
-        [error(["blocks"], "too_many_blocks")]
+  defp params_errors(plan, flow) do
+    case Map.get(plan, "params") do
+      %{} = params ->
+        active = Map.new(Catalog.param_defs(flow, Map.get(plan, "mods")), &{&1.key, &1})
+        allowed = Catalog.allowed_params(flow)
 
-      blocks when is_list(blocks) ->
-        blocks
-        |> Enum.with_index()
-        |> Enum.flat_map(fn {block, index} -> rows_errors(block, ["blocks", index]) end)
-
-      _other ->
-        [error(["blocks"], "invalid")]
-    end
-  end
-
-  defp interrupt_errors(plan) do
-    case Map.get(plan, "interrupt") do
-      nil -> []
-      rows -> rows_errors(rows, ["interrupt"])
-    end
-  end
-
-  defp rows_errors(rows, path) when is_list(rows) and length(rows) > @max_rows,
-    do: [error(path, "too_many_rows")]
-
-  defp rows_errors(rows, path) when is_list(rows) do
-    rows
-    |> Enum.with_index()
-    |> Enum.flat_map(fn {row, index} -> row_errors(row, path ++ [index]) end)
-  end
-
-  defp rows_errors(_rows, path), do: [error(path, "invalid")]
-
-  defp structs_errors(plan, spec) do
-    case Map.get(plan, "structs") do
-      nil ->
-        []
-
-      %{} = structs ->
-        structs
+        params
         |> Enum.sort()
-        |> Enum.flat_map(fn {key, struct} -> struct_errors(key, struct, spec) end)
+        |> Enum.flat_map(fn {key, value} -> param_errors(key, value, active, allowed) end)
 
       _other ->
-        [error(["structs"], "invalid")]
+        [error(["params"], "invalid")]
     end
   end
 
-  defp struct_errors(key, %{} = struct, spec) do
-    path = ["structs", key]
-    kind = Map.get(struct, "kind")
+  defp param_errors(key, value, active, allowed) do
+    path = ["params", key]
 
     cond do
-      String.length(key) > @max_string ->
-        [error(path, "too_long")]
+      not is_binary(value) ->
+        [error(path, "invalid")]
 
-      not Map.has_key?(@structs, kind) ->
-        [error(path ++ ["kind"], "unknown_struct")]
-
-      kind not in spec.structs ->
-        [error(path ++ ["kind"], "struct_not_allowed")]
+      key not in allowed ->
+        if String.trim(value) == "", do: [], else: [error(path, "unknown_param")]
 
       true ->
-        @structs
-        |> Map.fetch!(kind)
-        |> Enum.sort()
-        |> Enum.flat_map(fn {field, field_kind} ->
-          struct_field_errors(Map.get(struct, field), field_kind, path ++ [field])
-        end)
+        too_long = if String.length(value) > @max_text, do: [error(path, "too_long")], else: []
+        too_long ++ active_param_errors(Map.get(active, key), value, path)
     end
   end
 
-  defp struct_errors(key, _struct, _spec), do: [error(["structs", key], "invalid")]
+  defp active_param_errors(nil, _value, _path), do: []
 
-  defp struct_field_errors(nil, _kind, _path), do: []
+  defp active_param_errors(def, value, path),
+    do: if(param_valid?(def, value), do: [], else: [error(path, "bad_param")])
 
-  defp struct_field_errors(value, _kind, path) when not is_binary(value),
-    do: [error(path, "invalid")]
+  @doc "A typed param reads for its kind; empty is fine. A `time` may be two ascending durations."
+  @spec param_valid?(map(), String.t()) :: boolean()
+  def param_valid?(%{kind: kind} = def, value) do
+    value = String.trim(value)
+    value == "" or kind_valid?(kind, Map.get(def, :bare, :smart), value)
+  end
 
-  defp struct_field_errors(value, kind, path) do
-    cond do
-      String.length(value) > @max_string -> [error(path, "too_long")]
-      value_reads?(kind, value) -> []
-      true -> [error(path, "bad_param")]
+  defp kind_valid?(:time, bare, value) do
+    case Notation.parse_clock(value, bare) do
+      seconds when is_integer(seconds) -> seconds > 0
+      _bad -> match?(%{range: true}, Notation.parse_times(value, bare))
     end
+  end
+
+  defp kind_valid?(:times, bare, value), do: is_map(Notation.parse_times(value, bare))
+
+  defp kind_valid?(:count, _bare, value),
+    do: Regex.match?(~r/^\d+$/, value) and String.to_integer(value) > 0
+
+  defp kind_valid?(:range, _bare, value) do
+    case Regex.run(~r/^(\d+)(?:\s*-\s*(\d+))?$/, value) do
+      [_all, min] -> String.to_integer(min) > 0
+      [_all, min, max] -> ascending_counts?(min, max)
+      nil -> false
+    end
+  end
+
+  defp kind_valid?(:text, _bare, _value), do: true
+
+  defp ascending_counts?(min, max) do
+    min = String.to_integer(min)
+    min > 0 and String.to_integer(max) >= min
+  end
+
+  defp score_errors(plan, flow) do
+    preset = Map.get(plan, "preset")
+    preset = if is_binary(preset), do: preset
+
+    if Map.get(plan, "score") in Catalog.scores(flow, preset),
+      do: [],
+      else: [error(["score"], "unknown_score")]
   end
 
   defp level_notes_errors(plan) do
@@ -369,15 +281,18 @@ defmodule Palee.Workouts.Domain.StructuredPlan do
         []
 
       %{} = notes when map_size(notes) > @max_level_notes ->
-        [error(["levelNotes"], "too_many_level_notes")]
+        [error(["levelNotes"], "invalid")]
 
       %{} = notes ->
         notes
         |> Enum.sort()
         |> Enum.flat_map(fn {level, _note} ->
-          if String.length(level) > @max_string,
-            do: [error(["levelNotes", level], "too_long")],
-            else: string_errors(notes, level, @max_note, ["levelNotes", level])
+          long =
+            if String.length(level) > @max_text,
+              do: [error(["levelNotes", level], "too_long")],
+              else: []
+
+          long ++ text_errors(notes, level, @max_note, ["levelNotes", level])
         end)
 
       _other ->
@@ -385,44 +300,181 @@ defmodule Palee.Workouts.Domain.StructuredPlan do
     end
   end
 
-  # ── rows ─────────────────────────────────────────────
+  defp blocks_errors(plan, flow) do
+    case Map.get(plan, "blocks") do
+      blocks when is_list(blocks) ->
+        rows? = Enum.any?(blocks, &(is_list(&1) and &1 != []))
 
-  defp row_errors(%{} = row, path) do
-    kind = Map.get(row, "kind")
-
-    Enum.concat([
-      row_id_errors(row, path),
-      if(kind in ["ex", "rest"], do: [], else: [error(path ++ ["kind"], "invalid")]),
-      string_errors(row, "name", @max_string, path ++ ["name"]),
-      string_errors(row, "exerciseRef", @max_exercise_ref, path ++ ["exerciseRef"],
-        nullable: true
-      ),
-      string_errors(row, "group", @max_string, path ++ ["group"], nullable: true),
-      string_errors(row, "note", @max_note, path ++ ["note"]),
-      boolean_errors(row, "perRound", path),
-      extra_errors(row, path),
-      dose_errors(Map.get(row, "dose"), path ++ ["dose"]),
-      compact_load_errors(Map.get(row, "load"), path ++ ["load"]),
-      x_errors(row, path),
-      cells_errors(row, path)
-    ])
-  end
-
-  defp row_errors(_row, path), do: [error(path, "invalid")]
-
-  defp row_id_errors(row, path) do
-    case Map.get(row, "id") do
-      id when is_binary(id) and id != "" ->
-        if String.length(id) > @max_string, do: [error(path ++ ["id"], "too_long")], else: []
+        Enum.concat([
+          if(Catalog.layout(flow) == :none and rows?,
+            do: [error(["blocks"], "blocks_not_allowed")],
+            else: []
+          ),
+          if(length(blocks) > @max_blocks, do: [error(["blocks"], "too_many_blocks")], else: []),
+          blocks
+          |> Enum.take(@max_blocks)
+          |> Enum.with_index()
+          |> Enum.flat_map(fn {block, index} ->
+            rows_errors(block, ["blocks", index], flow, false)
+          end)
+        ])
 
       _other ->
-        [error(path ++ ["id"], "required")]
+        [error(["blocks"], "invalid")]
     end
   end
 
-  defp boolean_errors(row, key, path) do
-    if Map.get(row, key) in [nil, true, false], do: [], else: [error(path ++ [key], "invalid")]
+  defp interrupt_errors(plan, flow) do
+    case Map.get(plan, "interrupt") do
+      nil -> []
+      rows -> rows_errors(rows, ["interrupt"], flow, true)
+    end
   end
+
+  defp rows_errors(rows, path, flow, interrupt?) when is_list(rows) do
+    many = if length(rows) > @max_rows, do: [error(path, "too_many_rows")], else: []
+
+    many ++
+      (rows
+       |> Enum.take(@max_rows)
+       |> Enum.with_index()
+       |> Enum.flat_map(fn {row, index} -> row_errors(row, path ++ [index], flow, interrupt?) end))
+  end
+
+  defp rows_errors(_rows, path, _flow, _interrupt?), do: [error(path, "invalid")]
+
+  defp duplicate_id_errors(plan) do
+    blocks =
+      plan
+      |> list("blocks")
+      |> Enum.with_index()
+      |> Enum.flat_map(fn {block, b} -> indexed(block, ["blocks", b]) end)
+
+    {errors, _seen} =
+      Enum.reduce(
+        blocks ++ indexed(list(plan, "interrupt"), ["interrupt"]),
+        {[], MapSet.new()},
+        fn
+          {%{"id" => id}, path}, {acc, seen} when is_binary(id) ->
+            if MapSet.member?(seen, id),
+              do: {[error(path ++ ["id"], "duplicate_id") | acc], seen},
+              else: {acc, MapSet.put(seen, id)}
+
+          _row, acc ->
+            acc
+        end
+      )
+
+    Enum.reverse(errors)
+  end
+
+  defp indexed(rows, path) when is_list(rows),
+    do: rows |> Enum.with_index() |> Enum.map(fn {row, i} -> {row, path ++ [i]} end)
+
+  defp indexed(_rows, _path), do: []
+
+  defp structs_errors(plan, flow) do
+    case Map.get(plan, "structs") do
+      nil ->
+        []
+
+      %{} = structs ->
+        structs
+        |> Enum.sort()
+        |> Enum.flat_map(fn {key, struct} -> struct_errors(key, struct, flow) end)
+
+      _other ->
+        [error(["structs"], "invalid")]
+    end
+  end
+
+  defp struct_errors(key, %{"kind" => kind} = struct, flow) when is_binary(kind) do
+    path = ["structs", key]
+
+    case Catalog.struct(kind) do
+      nil ->
+        [error(path, "unknown_struct")]
+
+      def ->
+        if kind != "single" and kind not in Catalog.flow(flow).structs do
+          [error(path, "struct_not_allowed")]
+        else
+          Enum.flat_map(def.params, fn {field, field_kind} ->
+            if struct_param_valid?(field_kind, Map.get(struct, field)),
+              do: [],
+              else: [error(path ++ [field], "bad_struct_param")]
+          end)
+        end
+    end
+  end
+
+  defp struct_errors(key, _struct, _flow), do: [error(["structs", key], "unknown_struct")]
+
+  defp struct_param_valid?(_kind, nil), do: true
+  defp struct_param_valid?(_kind, value) when not is_binary(value), do: false
+
+  defp struct_param_valid?(kind, value) do
+    String.length(value) <= @max_text and struct_value_reads?(kind, String.trim(value))
+  end
+
+  defp struct_value_reads?(_kind, ""), do: true
+  defp struct_value_reads?(:count, value), do: Regex.match?(~r/^\d+$/, value)
+  defp struct_value_reads?(:time, value), do: is_integer(Notation.parse_clock(value, :smart))
+  defp struct_value_reads?(:text, _value), do: true
+
+  # ── rows ─────────────────────────────────────────────
+
+  defp row_errors(%{} = row, path, flow, interrupt?) do
+    measures = row_measures(row)
+    cells? = not interrupt? and Catalog.uses_cells?(flow, row)
+
+    Enum.concat([
+      id_errors(row, path),
+      if(Map.get(row, "kind") in ["ex", "rest"],
+        do: [],
+        else: [error(path ++ ["kind"], "bad_row_kind")]
+      ),
+      text_errors(row, "name", @max_text, path ++ ["name"]),
+      text_errors(row, "exerciseRef", @max_text, path ++ ["exerciseRef"]),
+      text_errors(row, "group", @max_text, path ++ ["group"]),
+      text_errors(row, "note", @max_note, path ++ ["note"]),
+      if(Map.get(row, "perRound") in [nil, true, false],
+        do: [],
+        else: [error(path ++ ["perRound"], "invalid")]
+      ),
+      extra_errors(row, path),
+      cells_errors(row, path, measures, cells?),
+      if(cells?, do: [], else: compact_errors(row, path, measures))
+    ])
+  end
+
+  defp row_errors(_row, path, _flow, _interrupt?), do: [error(path, "invalid")]
+
+  defp id_errors(%{"id" => id}, _path) when is_binary(id) and id != "", do: []
+  defp id_errors(_row, path), do: [error(path ++ ["id"], "invalid")]
+
+  @doc "A row's valued measures (known, not the `side` flag), once each, in order."
+  @spec row_measures(map()) :: [String.t()]
+  def row_measures(row) do
+    case Map.get(row, "extra") do
+      extra when is_list(extra) ->
+        extra
+        |> Enum.filter(&valued_measure?/1)
+        |> Enum.uniq()
+
+      _none ->
+        []
+    end
+  end
+
+  defp valued_measure?(key) when is_binary(key) do
+    case Catalog.measure(key) do
+      nil -> false
+      measure -> not measure.flag
+    end
+  end
+
+  defp valued_measure?(_key), do: false
 
   defp extra_errors(row, path) do
     case Map.get(row, "extra") do
@@ -430,29 +482,147 @@ defmodule Palee.Workouts.Domain.StructuredPlan do
         []
 
       extra when is_list(extra) ->
-        extra
-        |> Enum.with_index()
-        |> Enum.flat_map(fn {measure, index} ->
-          if measure in @measures,
-            do: [],
-            else: [error(path ++ ["extra", index], "unknown_measure")]
-        end)
+        {errors, _seen} =
+          extra
+          |> Enum.with_index()
+          |> Enum.reduce({[], MapSet.new()}, fn {measure, i}, {acc, seen} ->
+            extra_error(measure, path ++ ["extra", i], acc, seen)
+          end)
+
+        Enum.reverse(errors)
 
       _other ->
         [error(path ++ ["extra"], "invalid")]
     end
   end
 
-  defp x_errors(row, path) do
+  defp extra_error(measure, path, acc, seen) do
+    cond do
+      not is_binary(measure) or is_nil(Catalog.measure(measure)) ->
+        {[error(path, "unknown_measure") | acc], seen}
+
+      MapSet.member?(seen, measure) ->
+        {[error(path, "duplicate_measure") | acc], seen}
+
+      true ->
+        {acc, MapSet.put(seen, measure)}
+    end
+  end
+
+  defp cells_errors(row, path, measures, cells?) do
+    case Map.get(row, "cells") do
+      cells when is_list(cells) ->
+        many =
+          if length(cells) > @max_cells,
+            do: [error(path ++ ["cells"], "too_many_cells")],
+            else: []
+
+        values =
+          if cells?,
+            do: cell_values_errors(row, cells, path, measures),
+            else: cell_types_errors(cells, path)
+
+        many ++ values
+
+      nil ->
+        []
+
+      _other ->
+        [error(path ++ ["cells"], "invalid")]
+    end
+  end
+
+  # Cells the flow does not read are still bounded and typed.
+  defp cell_types_errors(cells, path) do
+    cells
+    |> Enum.with_index()
+    |> Enum.flat_map(fn {cell, j} -> cell_shape_errors(cell, path ++ ["cells", j]) end)
+  end
+
+  defp cell_shape_errors(nil, _path), do: []
+
+  defp cell_shape_errors(%{} = cell, path) do
+    cell
+    |> Enum.sort()
+    |> Enum.flat_map(fn
+      {_key, nil} ->
+        []
+
+      {key, value} when not is_binary(value) ->
+        [error(path ++ [key], "invalid")]
+
+      {key, value} ->
+        if String.length(value) > @max_text, do: [error(path ++ [key], "too_long")], else: []
+    end)
+  end
+
+  defp cell_shape_errors(_cell, path), do: [error(path, "invalid")]
+
+  defp cell_values_errors(row, cells, path, measures) do
+    issues =
+      if Map.get(row, "kind") == "ex",
+        do: Notation.row_load_issues(Enum.map(cells, &cell_value(&1, "l"))).issues,
+        else: %{}
+
+    cells
+    |> Enum.with_index()
+    |> Enum.flat_map(fn {cell, j} ->
+      cell_path = path ++ ["cells", j]
+
+      Enum.concat([
+        cell_shape_errors(cell, cell_path),
+        dose_errors(cell_value(cell, "d"), cell_path ++ ["d"]),
+        load_issue_errors(Map.get(issues, j), cell_path ++ ["l"]),
+        Enum.flat_map(measures, fn key ->
+          measure_errors(key, cell_value(cell, key), cell_path ++ [key], true)
+        end)
+      ])
+    end)
+  end
+
+  defp load_issue_errors(nil, _path), do: []
+  defp load_issue_errors(issue, path), do: [error(path, Atom.to_string(issue))]
+
+  @doc "A cell's text value for a key (\"\" when missing)."
+  @spec cell_value(term(), String.t()) :: String.t()
+  def cell_value(%{} = cell, key) do
+    case Map.get(cell, key) do
+      value when is_binary(value) -> value
+      _none -> ""
+    end
+  end
+
+  def cell_value(_cell, _key), do: ""
+
+  defp compact_errors(row, path, measures) do
+    dose = Map.get(row, "dose")
+
+    Enum.concat([
+      text_errors(row, "dose", @max_text, path ++ ["dose"]),
+      text_errors(row, "load", @max_text, path ++ ["load"]),
+      if(is_binary(dose), do: dose_errors(dose, path ++ ["dose"]), else: []),
+      compact_load_errors(row, path),
+      x_errors(row, path, measures)
+    ])
+  end
+
+  # The same-every-time load: a bare number has no unit to inherit.
+  defp compact_load_errors(%{"kind" => "ex", "load" => load}, path) when is_binary(load) do
+    if Regex.match?(~r/^\d+(?:[.,]\d+)?$/, String.trim(load)),
+      do: [error(path ++ ["load"], "missing_unit")],
+      else: []
+  end
+
+  defp compact_load_errors(_row, _path), do: []
+
+  defp x_errors(row, path, measures) do
     case Map.get(row, "x") do
       nil ->
         []
 
       %{} = values ->
-        values
-        |> Enum.sort()
-        |> Enum.flat_map(fn {key, value} ->
-          measure_errors(key, value, path ++ ["x", key], :compact)
+        Enum.flat_map(measures, fn key ->
+          x_value_errors(Map.get(values, key), key, path ++ ["x", key])
         end)
 
       _other ->
@@ -460,141 +630,84 @@ defmodule Palee.Workouts.Domain.StructuredPlan do
     end
   end
 
-  defp cells_errors(row, path) do
-    case Map.get(row, "cells") do
-      nil ->
-        []
+  defp x_value_errors(nil, _key, _path), do: []
+  defp x_value_errors(value, _key, path) when not is_binary(value), do: [error(path, "invalid")]
 
-      cells when is_list(cells) and length(cells) > @max_cells ->
-        [error(path ++ ["cells"], "too_many_cells")]
-
-      cells when is_list(cells) ->
-        cell_errors =
-          cells
-          |> Enum.with_index()
-          |> Enum.flat_map(fn {cell, index} -> cell_errors(cell, path ++ ["cells", index]) end)
-
-        cell_errors ++ row_load_errors(cells, path)
-
-      _other ->
-        [error(path ++ ["cells"], "invalid")]
-    end
+  defp x_value_errors(value, key, path) do
+    if String.length(value) > @max_text,
+      do: [error(path, "too_long")],
+      else: measure_errors(key, value, path, false)
   end
-
-  defp cell_errors(nil, _path), do: []
-
-  defp cell_errors(%{} = cell, path) do
-    cell
-    |> Enum.sort()
-    |> Enum.flat_map(fn
-      {"d", value} -> cell_dose_errors(value, path ++ ["d"])
-      {"l", value} -> string_errors(%{"l" => value}, "l", @max_string, path ++ ["l"])
-      {key, value} -> measure_errors(key, value, path ++ [key], :cell)
-    end)
-  end
-
-  defp cell_errors(_cell, path), do: [error(path, "invalid")]
-
-  # The unit is written once per row: bare numbers take the unit another
-  # column states; none anywhere, or kg mixed with %, is refused.
-  defp row_load_errors(cells, path) do
-    loads =
-      Enum.map(cells, fn
-        %{"l" => load} when is_binary(load) -> load
-        _cell -> nil
-      end)
-
-    %{issues: issues} = Notation.row_load_issues(loads)
-
-    issues
-    |> Enum.sort()
-    |> Enum.map(fn {index, issue} ->
-      error(path ++ ["cells", index, "l"], Atom.to_string(issue))
-    end)
-  end
-
-  defp dose_errors(nil, _path), do: []
-  defp dose_errors(value, path) when not is_binary(value), do: [error(path, "invalid")]
 
   defp dose_errors(value, path) do
-    cond do
-      String.length(value) > @max_string -> [error(path, "too_long")]
-      Notation.parse_dose(value) == :bad -> [error(path, "bad_dose")]
-      true -> []
+    if String.trim(value) != "" and Notation.parse_dose(value) == :bad,
+      do: [error(path, "bad_dose")],
+      else: []
+  end
+
+  defp measure_errors(key, value, path, in_cell?) do
+    case measure_issue(key, value, in_cell?) do
+      nil -> []
+      code -> [error(path, code)]
     end
   end
 
-  # A cell may also change by x from the column before, or spread to the last.
-  defp cell_dose_errors(value, path) when is_binary(value) do
-    if Notation.relative?(value) and String.length(value) <= @max_string,
-      do: [],
-      else: dose_errors(value, path)
-  end
+  @doc """
+  A measure value's problem, or nil: tempo has 4 marks; numeric measures start
+  with a number (in per-set cells also `+x`/`-x`); RPE is at most 10.
+  """
+  @spec measure_issue(String.t(), String.t(), boolean()) :: String.t() | nil
+  def measure_issue(key, value, in_cell?) do
+    trimmed = String.trim(value)
+    measure = Catalog.measure(key)
+    numeric = if in_cell?, do: ~r/^[+-]?\d/, else: ~r/^\d/
 
-  defp cell_dose_errors(value, path), do: dose_errors(value, path)
-
-  # The same-for-every-set load: a bare number has no unit to inherit.
-  defp compact_load_errors(nil, _path), do: []
-  defp compact_load_errors(value, path) when not is_binary(value), do: [error(path, "invalid")]
-
-  defp compact_load_errors(value, path) do
     cond do
-      String.length(value) > @max_string -> [error(path, "too_long")]
-      Regex.match?(~r/^\d+(?:[.,]\d+)?$/, String.trim(value)) -> [error(path, "missing_unit")]
-      true -> []
+      trimmed == "" -> nil
+      measure.text -> if Notation.tempo?(trimmed), do: nil, else: "bad_tempo"
+      not Regex.match?(numeric, trimmed) -> "bad_measure_value"
+      measure.max && over_max?(trimmed, measure.max) -> "rpe_over_max"
+      true -> nil
     end
   end
 
-  defp measure_errors(key, value, path, place) do
-    cond do
-      key not in @cell_keys or key in ["d", "l"] -> [error(path, "unknown_measure")]
-      not is_binary(value) -> [error(path, "invalid")]
-      String.length(value) > @max_string -> [error(path, "too_long")]
-      String.trim(value) == "" -> []
-      key == "tempo" -> if Notation.tempo?(value), do: [], else: [error(path, "bad_tempo")]
-      not numeric?(value, place) -> [error(path, "bad_number")]
-      key == "rpe" and rpe_over_max?(value) -> [error(path, "rpe_max")]
-      true -> []
-    end
-  end
-
-  defp numeric?(value, :cell), do: Regex.match?(~r/^[+-]?\d/, String.trim(value))
-  defp numeric?(value, :compact), do: Regex.match?(~r/^\d/, String.trim(value))
-
-  # RPE is out of 10: a stated value (or a spread's end) above 10 is refused.
-  defp rpe_over_max?(value) do
-    value = String.trim(value)
-
+  defp over_max?(value, max) do
     if Regex.match?(~r/^[+-]/, value) do
       false
     else
-      ~r/\d+(?:[.,]\d+)?/
-      |> Regex.scan(value)
-      |> Enum.any?(fn [number] -> number |> String.replace(",", ".") |> parse_number() > 10 end)
-    end
-  end
-
-  defp parse_number(text) do
-    case Float.parse(text) do
-      {number, _rest} -> number
-      :error -> 0
+      ~r/\d+(?:\.\d+)?/
+      |> Regex.scan(String.replace(value, ",", ".", global: false))
+      |> Enum.any?(fn [number] -> elem(Float.parse(number), 0) > max end)
     end
   end
 
   # ── helpers ──────────────────────────────────────────
 
-  defp string_errors(map, key, max, path, opts \\ []) do
+  defp text_errors(map, key, max, path) do
     case Map.get(map, key) do
-      nil ->
-        if Keyword.get(opts, :required, false), do: [error(path, "required")], else: []
-
-      value when is_binary(value) ->
-        if String.length(value) > max, do: [error(path, "too_long")], else: []
-
-      _other ->
-        [error(path, "invalid")]
+      nil -> []
+      value when is_binary(value) -> length_errors(value, max, path)
+      _other -> [error(path, "invalid")]
     end
   end
+
+  defp length_errors(value, max, path) do
+    cond do
+      String.length(value) <= max -> []
+      max == @max_note -> [error(path, "note_too_long")]
+      true -> [error(path, "too_long")]
+    end
+  end
+
+  defp list(plan, key) do
+    case Map.get(plan, key) do
+      list when is_list(list) -> list
+      _none -> []
+    end
+  end
+
+  defp map_get(%{} = map, key) when is_binary(key), do: Map.get(map, key)
+  defp map_get(_map, _key), do: nil
 
   defp error(path, code), do: %{path: Enum.map_join(path, ".", &to_string/1), code: code}
 

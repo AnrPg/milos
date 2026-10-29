@@ -416,7 +416,7 @@ defmodule PaleeWeb.AdminWorkoutControllerTest do
       assert rejected["code"] == "invalid_plan_sections"
 
       assert rejected["details"]["sections"] == [
-               %{"section" => 1, "path" => "blocks.0.0.cells.1.l", "code" => "mixed_units"}
+               %{"section" => 1, "path" => "blocks.0.0.cells.1.l", "code" => "mixed_unit"}
              ]
 
       fixed = put_in(draft_payload, [:sections, Access.at(0), :plan], strength)

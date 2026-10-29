@@ -103,7 +103,8 @@ defmodule Palee.Workouts.Domain.StructuredPlanWorkout do
   end
 
   # Only the materialiser's own fixed keys are turned into atoms.
-  defp atom_keys(exercise), do: Map.new(exercise, fn {key, item} -> {String.to_existing_atom(key), item} end)
+  defp atom_keys(exercise),
+    do: Map.new(exercise, fn {key, item} -> {String.to_existing_atom(key), item} end)
 
   @doc "The legacy exercise rows of a (valid) plan, as `workout_exercises` params."
   @spec exercises(map()) :: [map()]
