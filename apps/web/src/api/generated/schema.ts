@@ -10258,6 +10258,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/packages/{id}/buy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Buy a package on the payment provider's page (and book a class once paid)
+         * @description Where the law gives 14 days to withdraw, `start_now` must be true: the member asks for the package to start at once. `book_slot_id` books that class once the package is paid.
+         */
+        post: operations["PaleeWeb.MyPaymentsController.buy_package"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/packages/{id}/purchase-terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What buying a package online costs, and the texts to agree to */
+        get: operations["PaleeWeb.MyPaymentsController.package_terms"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/payment-methods": {
         parameters: {
             query?: never;
@@ -10354,6 +10391,26 @@ export interface paths {
         get: operations["PaleeWeb.MyPaymentsController.show"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/payments/{id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Withdraw from a package bought online within 14 days
+         * @description Gives back the price less the part already used, and ends the package.
+         */
+        post: operations["PaleeWeb.MyPaymentsController.withdraw"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10648,6 +10705,23 @@ export interface paths {
         put?: never;
         /** Pay an unpaid order online (409 online_payment_unavailable until a provider exists) */
         post: operations["PaleeWeb.MyShopController.pay"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/orders/{id}/pay-online": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pay an unpaid shop order on the payment provider's page */
+        post: operations["PaleeWeb.MyPaymentsController.pay_shop_order"];
         delete?: never;
         options?: never;
         head?: never;
@@ -13738,6 +13812,23 @@ export interface paths {
         };
         /** A published box: who it is, its «Σχετικά» and its locations */
         get: operations["PaleeWeb.PublicBoxController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/boxes/{slug}/packages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The packages a published box sells online (ADR-248) */
+        get: operations["PaleeWeb.PublicBoxController.packages"];
         put?: never;
         post?: never;
         delete?: never;
@@ -71204,6 +71295,7 @@ export interface operations {
                     name: string;
                     /** @enum {string} */
                     package_type: "membership" | "class_pack" | "drop_in" | "trial" | "pt_pack" | "add_on" | "shared" | "corporate";
+                    sold_online?: boolean;
                     tags?: string[];
                 };
             };
@@ -71371,6 +71463,7 @@ export interface operations {
                     name?: string;
                     /** @enum {string} */
                     package_type?: "membership" | "class_pack" | "drop_in" | "trial" | "pt_pack" | "add_on" | "shared" | "corporate";
+                    sold_online?: boolean;
                     tags?: string[];
                 };
             };
@@ -74278,6 +74371,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -74441,6 +74537,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -74559,6 +74658,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -91510,6 +91612,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -91750,6 +91855,120 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.MyPaymentsController.buy_package": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    book_slot_id?: string;
+                    consent_accepted?: boolean;
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    language?: "el" | "en";
+                    save_card?: boolean;
+                    start_now?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.package_terms": {
+        parameters: {
+            query?: {
+                language?: "el" | "en";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Terms */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        available: boolean;
+                        consent_text: string;
+                        consent_version: string;
+                        package: {
+                            base_price_cents: number;
+                            billing_period: string;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            package_type: string;
+                        };
+                        start_now_text: string | null;
+                        withdrawal_days: number | null;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.MyPaymentsController.methods": {
         parameters: {
             query?: never;
@@ -91918,6 +92137,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -91983,6 +92205,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -92041,6 +92266,9 @@ export interface operations {
                             initiation: "payer" | "merchant";
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
                             /** Format: date-time */
                             next_attempt_at?: string | null;
                             provider: string;
@@ -92057,6 +92285,33 @@ export interface operations {
                             /** Format: uuid */
                             user_id?: string | null;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Withdrawal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        refund: {
+                            [key: string]: unknown;
+                        };
+                        refunded_cents: number;
                     };
                 };
             };
@@ -93574,6 +93829,75 @@ export interface operations {
                             status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
                             subtotal_cents?: number;
                             total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.pay_shop_order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    language?: "el" | "en";
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
@@ -108781,6 +109105,51 @@ export interface operations {
                         published_at?: string | null;
                         /** @description ADR-179: the gym's IANA zone; its classes show on this clock */
                         time_zone?: string;
+                    };
+                };
+            };
+            /** @description No published box with this slug */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.PublicBoxController.packages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The gym's slug or one of its former slugs */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Packages */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        online_payments: boolean;
+                        packages: {
+                            base_price_cents: number;
+                            billing_period: string;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            package_type: string;
+                        }[];
+                        withdrawal_days: number | null;
                     };
                 };
             };

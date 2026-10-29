@@ -186,6 +186,42 @@ defmodule PaleeWeb.OnlineSalesControllerTest do
     |> json_response(409)
   end
 
+  test "buying a package books the class the member wanted once it is paid",
+       %{conn: conn} = ctx do
+    sell_online(conn, ctx, ctx.package)
+    connect_sandbox(conn, ctx)
+
+    workout = workout_fixture(ctx.owner, %{tenant_context: ctx.context})
+
+    slot =
+      slot_fixture(workout, %{
+        tenant_context: ctx.context,
+        auto_approve: true,
+        scheduled_at:
+          DateTime.add(DateTime.truncate(DateTime.utc_now(), :second), 86_400, :second)
+      })
+
+    payment =
+      conn
+      |> put_bearer_token(ctx.member)
+      |> post(me_path(ctx, "/packages/#{ctx.package.id}/buy"), %{
+        idempotency_key: "buy-book-1",
+        start_now: true,
+        book_slot_id: slot.id
+      })
+      |> json_response(200)
+      |> Map.fetch!("payment")
+
+    assert payment["metadata"]["book_slot_id"] == slot.id
+    paid = complete(conn, ctx, payment)
+    assert paid["fulfilment_status"] == "done"
+
+    assert Palee.Repo.get_by(Palee.Scheduling.Booking,
+             scheduled_class_id: slot.id,
+             user_id: ctx.member.id
+           )
+  end
+
   defp add_tenant_member(organization, user, role) do
     {:ok, membership} =
       Organizations.add_membership(%{

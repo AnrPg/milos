@@ -18,7 +18,7 @@ defmodule Palee.Application.Payments.OnlineSales do
 
   alias Palee.Application.{PublicBox, PublicURL, SubmitBooking}
   alias Palee.Application.Shop.Checkout
-  alias Palee.{Finance, Fiscal, Organizations, Payments, Shop}
+  alias Palee.{Finance, Fiscal, Identity, Organizations, Payments, Shop}
   alias Palee.Payments.Domain.{Consent, Withdrawal}
 
   # ── Packages ────────────────────────────────────────────────────────────
@@ -200,13 +200,19 @@ defmodule Palee.Application.Payments.OnlineSales do
        when is_binary(slot_id) do
     member = context |> Map.put(:user_id, intent.user_id)
 
-    case SubmitBooking.call(member, %{id: intent.user_id}, slot_id) do
-      {:ok, _booking} ->
-        :ok
-
+    with %{} = actor <- Identity.find_by_id(intent.user_id) || {:error, :not_found},
+         {:ok, _booking} <- SubmitBooking.call(member, actor, slot_id) do
+      :ok
+    else
       {:error, reason} ->
         Logger.info("booking after package purchase #{intent.id} refused: #{inspect(reason)}")
     end
+  rescue
+    # The money and the package are recorded; a booking failure never undoes them.
+    error ->
+      Logger.error(
+        "booking after package purchase #{intent.id} failed: #{Exception.message(error)}"
+      )
   end
 
   defp book_after_purchase(_context, _intent), do: :ok
