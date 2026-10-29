@@ -7,7 +7,7 @@ defmodule Palee.Application.Documents.DocumentsAdmin do
   """
 
   alias Palee.Application.Documents.DocumentViews, as: V
-  alias Palee.{Documents, Finance, Notifications, Organizations}
+  alias Palee.{Documents, Finance, Identity, Notifications, Organizations}
 
   @client_roles ~w(member athlete)
 
@@ -85,6 +85,54 @@ defmodule Palee.Application.Documents.DocumentsAdmin do
     with {:ok, template} <- Documents.archive_template(context, template_id, context.user_id, now) do
       {:ok, %{template: V.template(template)}}
     end
+  end
+
+  @doc """
+  For each active, published document: how many clients hold a signature
+  that counts and which clients do not (status `unsigned` or
+  `resign_required`), so staff see «Λείπουν N» and who.
+  """
+  def outstanding(context) do
+    clients = Organizations.list_client_user_ids(context)
+    statuses = Documents.statuses(context, clients)
+    names = clients |> Identity.list_by_ids() |> Map.new(&{&1.id, &1})
+
+    templates =
+      context
+      |> Documents.list_templates(%{status: "active"})
+      |> Enum.filter(&(&1.current_version_number > 0))
+
+    # `clients`: everyone a new mandatory document (or a major version)
+    # would block from booking until they sign.
+    %{
+      clients: length(clients),
+      templates: Enum.map(templates, &outstanding_row(&1, clients, statuses, names))
+    }
+  end
+
+  defp outstanding_row(template, clients, statuses, names) do
+    missing =
+      clients
+      |> Enum.map(&{&1, statuses |> Map.fetch!(&1) |> Map.fetch!(template.id)})
+      |> Enum.reject(fn {_user_id, status} -> status == :signed end)
+      |> Enum.map(fn {user_id, status} ->
+        account = Map.get(names, user_id)
+
+        %{
+          user_id: user_id,
+          display_name: account && account.nickname,
+          handle: account && account.handle,
+          status: Atom.to_string(status)
+        }
+      end)
+      |> Enum.sort_by(&(&1.display_name || ""))
+
+    %{
+      template_id: template.id,
+      signed: length(clients) - length(missing),
+      outstanding: length(missing),
+      clients: missing
+    }
   end
 
   # ── Requests ────────────────────────────────────────────────────────────

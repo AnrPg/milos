@@ -15,7 +15,7 @@ defmodule Palee.Application.Setup.SetupRecipes do
   """
 
   alias Palee.{Organizations, Setup}
-  alias Palee.Setup.Domain.Recipe
+  alias Palee.Setup.Domain.{Recipe, RecipePlan}
 
   @history 20
 
@@ -31,7 +31,7 @@ defmodule Palee.Application.Setup.SetupRecipes do
     end
   end
 
-  @doc "`%{recipes, applications}`: every recipe and the business's applications."
+  @doc "`%{recipes, applications, can_apply, currency}`: every recipe, the business's applications and the currency of the suggested prices."
   def list(context) do
     with :ok <- Organizations.authorize_capability(context, :manage_settings),
          {:ok, snapshot} <- Setup.configurator().snapshot(context) do
@@ -39,7 +39,8 @@ defmodule Palee.Application.Setup.SetupRecipes do
        %{
          recipes: Enum.map(Setup.recipes(), &present_recipe(&1, snapshot.locale)),
          applications: Setup.list_applications(context, @history),
-         can_apply: owner?(context)
+         can_apply: owner?(context),
+         currency: Map.get(snapshot, :currency) || "EUR"
        }}
     end
   end
@@ -57,21 +58,39 @@ defmodule Palee.Application.Setup.SetupRecipes do
   Applies recipe `key`: `%{plan, application}` where `plan` lists what was
   changed. Owner only (the provider kind and role grants are the owner's).
   """
-  def apply_recipe(context, key, now \\ DateTime.utc_now()) do
+  def apply_recipe(context, key, now \\ DateTime.utc_now()),
+    do: apply_recipe_with_prices(context, key, nil, now)
+
+  @doc """
+  Like `apply_recipe/3`, with the owner's own prices for the recipe's
+  packages (`%{code => cents}`), as changed in the preview.
+  """
+  def apply_recipe_with_prices(context, key, prices, now \\ DateTime.utc_now()),
+    do: apply_recipe_with(context, key, %{prices: prices}, now)
+
+  @doc """
+  Applies recipe `key` with `options`: `prices` (as above) and `mode`,
+  `"all"` (default) or `"defaults_only"`, which keeps every setting the
+  owner already changed (listed in the plan's `kept`).
+  """
+  def apply_recipe_with(context, key, options, now \\ DateTime.utc_now()) do
     with :ok <- Organizations.authorize_capability(context, :manage_settings),
          :ok <- owner(context),
+         {:ok, mode} <- RecipePlan.mode(Map.get(options, :mode)),
          {:ok, recipe} <- Setup.fetch_recipe(key),
-         {:ok, result} <- Setup.transaction(context, fn -> apply_plan(context, recipe, now) end) do
+         {:ok, recipe} <- Recipe.with_prices(recipe, Map.get(options, :prices)),
+         {:ok, result} <-
+           Setup.transaction(context, fn -> apply_plan(context, recipe, mode, now) end) do
       Setup.configurator().after_apply(context)
       {:ok, result}
     end
   end
 
-  defp apply_plan(context, recipe, now) do
+  defp apply_plan(context, recipe, mode, now) do
     configurator = Setup.configurator()
 
     with {:ok, snapshot} <- configurator.snapshot(context),
-         plan = Setup.plan(recipe, snapshot),
+         plan = recipe |> Setup.plan(snapshot) |> RecipePlan.for_mode(mode),
          :ok <- apply_changes(configurator, context, plan.changes),
          {:ok, application} <-
            Setup.record_application(context, %{
@@ -143,6 +162,7 @@ defmodule Palee.Application.Setup.SetupRecipes do
       changes: Enum.map(plan.changes, &stored_change/1),
       manual: Enum.map(plan.manual, &stored_change/1),
       unchanged: plan.unchanged,
+      kept: Map.get(plan, :kept, []),
       change_count: length(plan.changes)
     }
   end
@@ -155,7 +175,8 @@ defmodule Palee.Application.Setup.SetupRecipes do
       from: change.from,
       to: change.to,
       name: change.name,
-      advanced: Map.get(change, :advanced, false)
+      advanced: Map.get(change, :advanced, false),
+      owner_changed: Map.get(change, :owner_changed, false)
     }
   end
 end

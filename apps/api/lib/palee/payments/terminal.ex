@@ -264,14 +264,18 @@ defmodule Palee.Payments.Terminal do
 
   @doc """
   Dev/test only: the transaction id the sandbox terminal app would return
-  for this payment (`outcome`: succeeded, failed, cancelled).
+  for this payment (`outcome`: succeeded, failed, cancelled). ADR-264:
+  `extras` (`tip_cents`, `surcharge_cents`, `amount_cents`) as
+  `SandboxTerminalGateway.complete/4`.
   """
-  def sandbox_transaction(context, intent_id, outcome) do
+  def sandbox_transaction(context, intent_id, outcome, extras \\ %{}) do
     with true <- sandbox_enabled?() || {:error, :not_found},
          %{initiation: "terminal", provider: "sandbox"} = intent <-
            PaymentStore.get_intent(context, intent_id) || {:error, :not_found} do
       reference = TerminalPolicy.reference(intent, key())
-      {:ok, reference, gateway("sandbox").complete(reference, outcome, intent.amount_cents)}
+
+      {:ok, reference,
+       gateway("sandbox").complete(reference, outcome, intent.amount_cents, extras)}
     else
       %{} -> {:error, :not_found}
       error -> error
@@ -291,6 +295,8 @@ defmodule Palee.Payments.Terminal do
     |> Payments.public_intent()
     |> Map.merge(%{
       reference: reference,
+      tip_cents: intent.tip_cents || 0,
+      surcharge_cents: intent.surcharge_cents || 0,
       expires_at: intent.expires_at,
       failure_message: intent.failure_message,
       app_request: app_request(intent, reference, now)

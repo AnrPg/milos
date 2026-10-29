@@ -327,6 +327,7 @@ pt-PT, nl, bg, ar and he got only these terms and the class fixes; their full re
 | Box screen | Οθόνη box | `box_screens` | A TV on the box's wall (one branch or the whole box) that shows today's classes, WODs, bookings, leaderboards and the class timer. People appear by first name only. | Wall display of one class timer; the console. |
 | Pairing code | Κωδικός σύνδεσης | `pairing_code` | The 8-character code (`ABCD-EFGH`) staff get for a box screen and type on the TV; works once, for 15 minutes. A new code moves the screen to another TV. | Join links; the member's check-in code. |
 | Automatic | Αυτόματο | `focus.source: auto` | The box screen follows the day: next class, its timer while it runs, its results for 30 minutes after. «Επιστροφή στο αυτόματο» ends a staff choice. | Pinned (`focus.source: staff`, «Καρφιτσωμένο»): what staff chose to show. |
+| On screen | Στην οθόνη | `/class-timers/:slot_id/screens` | The coach's action on their class's timer remote: pin the class's timer («Χρονόμετρο»), leaderboard or WOD on a box screen of the class's branch or the whole box, today only, and «Επιστροφή στο αυτόματο». Only the class's own coach (and staff who manage screens). | Staff › Settings › «Οθόνες box» (staff only). |
 
 ### 4.11 Documents and signatures (ADR-252)
 
@@ -388,15 +389,17 @@ pt-PT, nl, bg, ar and he got only these terms and the class fixes; their full re
 | Day closing | Κλείσιμο ημέρας | `fiscal_period_closings` | The signed totals of a finished day; a day with a closing shows «Κλειστή», today «Ανοιχτή». | Closing the till (cash count). |
 | Audit archive | Αρχείο ελέγχου | `/fiscal/archive` | The signed journal of documents, changes and closings, checked every night and downloaded as a ZIP for an auditor. | Accounting export. |
 
-### 4.15 Taking money at the desk (ADR-222, ADR-249)
+### 4.15 Taking money at the desk (ADR-222, ADR-249, ADR-264)
 
 | English | Ελληνικά | Code | What it is | Not to be confused with |
 |---|---|---|---|---|
 | Tap to Pay | Tap to Pay | `payment_intents.initiation = terminal`, `/admin/payments/terminal` | Staff take a contactless card on their own phone through the «Viva.com Terminal» app; Palee records it after Viva confirms it. The brand name stays in English in both languages. | Online payment (the payer pays on the provider's page). |
 | Card (Tap to Pay) | Κάρτα (Tap to Pay) | payment method `card_terminal` | A card payment Palee confirmed with the provider; never chosen by hand. | Card at the terminal (`card_manual`): staff's word that a standalone card machine took it. |
 | Card at the terminal | Κάρτα στο τερματικό | payment method `card_manual` | A card payment on the box's own card machine, recorded by staff. | Card (Tap to Pay). |
-| Free sale | Ελεύθερη πώληση | purpose `free_sale` | Money for something with no invoice, package or order: a description and a category, for a member. | Shop order. |
-| Walk-in | Επισκέπτης χωρίς λογαριασμό | `shop_orders.customer_name`, no `user_id` | Someone who pays at the desk without a profile in the business. Tap to Pay takes a walk-in's money for a shop order only. | Member, mock person, trial visitor. |
+| Free sale | Ελεύθερη πώληση | purpose `free_sale` | Money for something with no invoice, package or order: a description and a category, for a member or a walk-in. A walk-in's free sale is recorded with no member (`source_type = walk_in_sale`) and gets its receipt. | Shop order. |
+| Walk-in | Επισκέπτης χωρίς λογαριασμό | `shop_orders.customer_name`; no `user_id` on a payment | Someone who pays at the desk without a profile in the business. Tap to Pay takes a walk-in's money for a shop order or a free sale. | Member, mock person, trial visitor. |
+| Tip | Φιλοδώρημα | `payment_intents.tip_cents` | Money the payer adds for the staff on the card terminal. The staff's, not the box's revenue: no VAT, not on the receipt, kept apart for payroll. | Card surcharge. |
+| Card surcharge | Επιβάρυνση κάρτας | `payment_intents.surcharge_cents`, `source_type = card_surcharge` | A fee the card provider adds for some cards (business or non-EU cards). Part of the sale's price: revenue, on the same receipt as the sale. | Tip; Palee's own fees. |
 
 ### 4.16 E-invoicing and till security (ADR-250, ADR-251)
 

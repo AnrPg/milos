@@ -5808,6 +5808,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/documents/outstanding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Per active document: how many clients signed and who has not */
+        get: operations["PaleeWeb.AdminDocumentsController.outstanding"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/documents/requests": {
         parameters: {
             query?: never;
@@ -9117,7 +9134,7 @@ export interface paths {
         put?: never;
         /**
          * Apply a recipe (owner only); applying it again changes nothing
-         * @description Creates the recipe's subscription packages and class types that are missing and sets its settings through the same services as the settings screens, in one transaction, then records which recipe was applied, when and by whom. Documents are listed in `manual`.
+         * @description Creates the recipe's subscription packages and class types that are missing and sets its settings through the same services as the settings screens, in one transaction, then records which recipe was applied, when and by whom. Documents are listed in `manual`. `prices` (optional) are the owner's own prices for the recipe's packages, by code. `mode`: `all` changes every setting; `defaults_only` keeps the settings the owner already changed (the preview marks them `owner_changed`).
          */
         post: operations["PaleeWeb.AdminSetupController.apply_recipe"];
         delete?: never;
@@ -10552,6 +10569,47 @@ export interface paths {
         /** Run a class timer command (coaches and admins) */
         post: operations["PaleeWeb.ClassTimerController.command"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/class-timers/{slot_id}/screens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box screens this class can be shown on, for its coach */
+        get: operations["PaleeWeb.ClassScreenController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/class-timers/{slot_id}/screens/{screen_id}/override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Pin the class's timer, leaderboard or WOD on a box screen
+         * @description The class's own coach, today, on a screen of the class's branch or the whole box (or staff who manage screens). The TV changes at once.
+         */
+        put: operations["PaleeWeb.ClassScreenController.put_override"];
+        post?: never;
+        /**
+         * Return the screen to automatic from the class's remote
+         * @description A coach may only while the screen shows their class, or nothing pinned.
+         */
+        delete: operations["PaleeWeb.ClassScreenController.delete_override"];
         options?: never;
         head?: never;
         patch?: never;
@@ -22558,6 +22616,58 @@ export interface components {
                 /** Format: uuid */
                 user_id: string;
             }[];
+        };
+        /**
+         * ClassScreenList
+         * @description The box screens the person may change for this class: its coach (today, screens of the class's branch or the whole box) or staff who manage screens
+         */
+        ClassScreenList: {
+            screens: {
+                /** @description Who last changed what the screen shows, and when */
+                focus_changed: {
+                    /** Format: date-time */
+                    at: string;
+                    by: {
+                        /** Format: uuid */
+                        id: string;
+                        name: string | null;
+                    } | null;
+                } | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                /** Format: date-time */
+                last_seen_at: string | null;
+                /**
+                 * Format: uuid
+                 * @description The branch; null for the whole box
+                 */
+                location_id: string | null;
+                name: string;
+                /**
+                 * BoxScreenOverride
+                 * @description What staff pinned on the screen; null when it follows the day automatically
+                 */
+                override: {
+                    /** Format: uuid */
+                    slot_id: string | null;
+                    /** Format: date-time */
+                    until: string | null;
+                    /** @enum {string} */
+                    view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                } | null;
+                paired: boolean;
+                /** Format: date-time */
+                paired_at: string | null;
+                /**
+                 * Format: date-time
+                 * @description When the pending pairing code stops working; null without one
+                 */
+                pairing_expires_at: string | null;
+            }[];
+            /** @description What the person may pin: a coach `timer`, `leaderboard` and `wod` */
+            views: ("wod" | "timer" | "leaderboard" | "bookings" | "class")[];
         };
         /** ClassSlotInjuryWarnings */
         ClassSlotInjuryWarnings: {
@@ -72126,6 +72236,45 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminDocumentsController.outstanding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Outstanding */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Clients of the box: everyone a new mandatory document or a major version would block from booking until they sign */
+                        clients: number;
+                        templates: {
+                            /** @description Clients who have not signed */
+                            clients: {
+                                display_name: string | null;
+                                handle: string | null;
+                                /** @enum {string} */
+                                status: "unsigned" | "resign_required";
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                            outstanding: number;
+                            /** @description Clients whose signature counts */
+                            signed: number;
+                            /** Format: uuid */
+                            template_id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminDocumentsController.requests": {
         parameters: {
             query?: {
@@ -80832,7 +80981,10 @@ export interface operations {
                     purpose: "finance_invoice" | "membership_package" | "shop_order" | "free_sale";
                     /** Format: uuid */
                     purpose_id?: string | null;
-                    /** Format: uuid */
+                    /**
+                     * Format: uuid
+                     * @description The member; none for a walk-in (a shop order or a free sale, ADR-264).
+                     */
                     user_id?: string | null;
                 };
             };
@@ -80896,6 +81048,10 @@ export interface operations {
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
                             succeeded_at?: string | null;
+                            /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
+                            surcharge_cents: number;
+                            /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
+                            tip_cents: number;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
@@ -81002,6 +81158,10 @@ export interface operations {
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
                             succeeded_at?: string | null;
+                            /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
+                            surcharge_cents: number;
+                            /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
+                            tip_cents: number;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
@@ -81079,6 +81239,10 @@ export interface operations {
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
                             succeeded_at?: string | null;
+                            /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
+                            surcharge_cents: number;
+                            /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
+                            tip_cents: number;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
@@ -81156,6 +81320,10 @@ export interface operations {
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
                             succeeded_at?: string | null;
+                            /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
+                            surcharge_cents: number;
+                            /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
+                            tip_cents: number;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
@@ -81176,8 +81344,12 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description What the card paid in all, to try a mismatch (default: amount + extras). */
+                    amount_cents?: number | null;
                     /** @enum {string} */
                     outcome: "succeeded" | "failed" | "cancelled";
+                    surcharge_cents?: number | null;
+                    tip_cents?: number | null;
                 };
             };
         };
@@ -81240,6 +81412,10 @@ export interface operations {
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
                             succeeded_at?: string | null;
+                            /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
+                            surcharge_cents: number;
+                            /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
+                            tip_cents: number;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
@@ -86492,6 +86668,8 @@ export interface operations {
                                 from: unknown;
                                 key: string;
                                 name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
                                 /** @description A setting value: boolean, number, text, list or null */
                                 to: unknown;
                             }[];
@@ -86507,6 +86685,8 @@ export interface operations {
                                 from: unknown;
                                 key: string;
                                 name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
                                 /** @description A setting value: boolean, number, text, list or null */
                                 to: unknown;
                             }[];
@@ -86515,6 +86695,8 @@ export interface operations {
                         }[];
                         /** @description Only the owner applies a recipe */
                         can_apply: boolean;
+                        /** @description ISO currency of the suggested prices */
+                        currency: string;
                         recipes: {
                             class_types: string[];
                             documents: string[];
@@ -86566,7 +86748,21 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description all (default): change every setting; defaults_only: keep the ones the owner changed
+                     * @enum {string}
+                     */
+                    mode?: "all" | "defaults_only";
+                    /** @description The owner's prices for the recipe's packages: package code => cents */
+                    prices?: {
+                        [key: string]: number;
+                    };
+                };
+            };
+        };
         responses: {
             /** @description Applied */
             200: {
@@ -86592,6 +86788,8 @@ export interface operations {
                                 from: unknown;
                                 key: string;
                                 name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
                                 /** @description A setting value: boolean, number, text, list or null */
                                 to: unknown;
                             }[];
@@ -86607,6 +86805,8 @@ export interface operations {
                                 from: unknown;
                                 key: string;
                                 name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
                                 /** @description A setting value: boolean, number, text, list or null */
                                 to: unknown;
                             }[];
@@ -86626,9 +86826,13 @@ export interface operations {
                                 from: unknown;
                                 key: string;
                                 name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
                                 /** @description A setting value: boolean, number, text, list or null */
                                 to: unknown;
                             }[];
+                            /** @description Settings left at the owner's own value (mode defaults_only) */
+                            kept: string[];
                             manual: {
                                 /** @enum {string} */
                                 action: "add" | "create" | "manual" | "set";
@@ -86639,6 +86843,8 @@ export interface operations {
                                 from: unknown;
                                 key: string;
                                 name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
                                 /** @description A setting value: boolean, number, text, list or null */
                                 to: unknown;
                             }[];
@@ -86676,7 +86882,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description A step failed; nothing changed */
+            /** @description A step failed or a price is not valid; nothing changed */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -86720,9 +86926,13 @@ export interface operations {
                             from: unknown;
                             key: string;
                             name: string | null;
+                            /** @description The current value is the owner's own choice, not the default */
+                            owner_changed?: boolean;
                             /** @description A setting value: boolean, number, text, list or null */
                             to: unknown;
                         }[];
+                        /** @description Settings left at the owner's own value (mode defaults_only) */
+                        kept: string[];
                         manual: {
                             /** @enum {string} */
                             action: "add" | "create" | "manual" | "set";
@@ -86733,6 +86943,8 @@ export interface operations {
                             from: unknown;
                             key: string;
                             name: string | null;
+                            /** @description The current value is the owner's own choice, not the default */
+                            owner_changed?: boolean;
                             /** @description A setting value: boolean, number, text, list or null */
                             to: unknown;
                         }[];
@@ -94379,6 +94591,312 @@ export interface operations {
             };
             /** @description Invalid command */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ClassScreenController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Scheduled class ID */
+                slot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Screens of the class */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        screens: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        }[];
+                        /** @description What the person may pin: a coach `timer`, `leaderboard` and `wod` */
+                        views: ("wod" | "timer" | "leaderboard" | "bookings" | "class")[];
+                    };
+                };
+            };
+            /** @description Not this class's coach today */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description No such class */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ClassScreenController.put_override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Scheduled class ID */
+                slot_id: string;
+                screen_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: date-time
+                     * @description When the screen goes back to automatic (within 24 hours); null to keep it
+                     */
+                    until?: string | null;
+                    /** @enum {string} */
+                    view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                };
+            };
+        };
+        responses: {
+            /** @description Box screen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Not this class's coach today */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description No such class or screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Invalid choice */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ClassScreenController.delete_override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Scheduled class ID */
+                slot_id: string;
+                screen_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Box screen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Not this class's coach, or another choice is pinned */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description No such class or screen */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

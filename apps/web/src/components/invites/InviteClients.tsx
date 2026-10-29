@@ -38,6 +38,7 @@ import {
   type StaffInvite,
 } from "@/components/invites/StaffInviteFields";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { AdvancedDisclosure } from "@/components/settings/AdvancedSettings";
 import { formatClock } from "@/lib/clock";
 
 type Tab = "link" | "bulk" | "public" | "pending";
@@ -523,7 +524,10 @@ function PublicJoinLink({ t, slug, token }: { t: Translate; slug: string; token:
     <div className="space-y-4">
       <p className="text-sm leading-6" style={{ color: "var(--text-soft)" }}>{t("publicIntro")}</p>
       <JoinLinkCard t={t} slug={slug} role="member" enabled={data?.member?.enabled ?? false} save={save} />
-      <JoinLinkCard t={t} slug={slug} role="athlete" enabled={data?.athlete?.enabled ?? false} athleteKey={data?.athlete?.key} save={save} />
+      {/* ADR-255: the athlete link is off by default and few boxes need it, so it sits under «Προχωρημένα». */}
+      <AdvancedDisclosure count={1} testId="join-link-advanced">
+        <JoinLinkCard t={t} slug={slug} role="athlete" enabled={data?.athlete?.enabled ?? false} athleteKey={data?.athlete?.key} save={save} />
+      </AdvancedDisclosure>
       <p className="text-xs" style={{ color: "var(--muted)" }}>{t("publicStaffNote")}</p>
       {save.error ? <ErrorNotice>{localizeError(save.error, uiT)}</ErrorNotice> : null}
     </div>

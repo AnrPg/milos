@@ -18,6 +18,8 @@ vi.mock("@/lib/organization-slug", () => ({
   useOrganizationSlug: () => "gym",
 }));
 vi.mock("@/lib/membership-role", () => ({ useSelectedMembershipRole: () => ({ membershipRole: "coach" }) }));
+// «Στην οθόνη» has its own tests (ClassScreenPin.test.tsx).
+vi.mock("./ClassScreenPin", () => ({ ClassScreenPin: () => null }));
 
 const segments = [
   { segment_key: "s0", section_id: "a", section_name: "AMRAP 10", format: "amrap", kind: "countdown", phase: "work", duration_seconds: 600, round: null, total_rounds: null, label: "AMRAP 10", exercises: [{ id: "e1", name: "Burpees", prescription_value: 10 }] },

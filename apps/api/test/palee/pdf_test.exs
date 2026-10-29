@@ -38,6 +38,12 @@ defmodule Palee.PdfTest do
     assert length(lines) > 1
     assert Enum.all?(lines, &(Pdf.text_width(pdf, &1, size: 10) <= 60 + 0.01))
 
+    # A word longer than a line (a TSE signature) is cut in order, after a short one.
+    long = Enum.map_join(1..30, &"#{rem(&1, 10)}")
+    [first | rest] = Pdf.wrap(pdf, "Signatur: " <> long, 60, size: 10)
+    assert first == "Signatur:"
+    assert Enum.join(rest) == long
+
     pdf = Pdf.add_page(pdf)
     assert Pdf.page_count(pdf) == 2
     assert ["Τιμολόγιο Παροχής Υπηρεσιών – Grüße"] = Pdf.texts(pdf)

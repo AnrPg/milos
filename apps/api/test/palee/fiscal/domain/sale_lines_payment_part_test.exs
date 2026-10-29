@@ -48,4 +48,38 @@ defmodule Palee.Fiscal.Domain.SaleLinesPaymentPartTest do
     assert SaleLines.payment_part(lines, 0, "x") == {:error, :invalid_amount}
     assert SaleLines.payment_part(lines, 1_001, "x") == {:error, :invalid_amount}
   end
+
+  describe "follow_sale/3 (ADR-264: a card surcharge)" do
+    test "a surcharge on a single-rate sale is one line of the sale's category" do
+      lines = [line("standard", 2_400, 4_500)]
+
+      assert {:ok, [surcharge]} = SaleLines.follow_sale(lines, 135, "Επιβάρυνση κάρτας")
+      assert surcharge.unit_price_cents == 135
+      assert surcharge.tax_category == "standard"
+      assert surcharge.rate_bp == 2_400
+      assert surcharge.description == "Επιβάρυνση κάρτας"
+      assert surcharge.source_type == nil
+    end
+
+    test "on a mixed sale it follows each tax group in proportion, to the cent" do
+      lines = [line("standard", 2_400, 6_000), line("exempt", 0, 3_001, "art_22")]
+
+      assert {:ok, parts} = SaleLines.follow_sale(lines, 100, "Card surcharge")
+      assert Enum.sum(Enum.map(parts, & &1.unit_price_cents)) == 100
+      assert Enum.find(parts, &(&1.tax_category == "standard")).unit_price_cents == 67
+      assert Enum.find(parts, &(&1.tax_category == "exempt")).exemption_reason == "art_22"
+    end
+
+    test "any positive size, even the whole sale; never zero or for a free sale" do
+      lines = [line("standard", 2_400, 1_000)]
+
+      assert {:ok, [%{unit_price_cents: 1_000, description: "Card surcharge"}]} =
+               SaleLines.follow_sale(lines, 1_000, "Card surcharge")
+
+      assert SaleLines.follow_sale(lines, 0, "x") == {:error, :invalid_amount}
+
+      assert SaleLines.follow_sale([line("standard", 2_400, 0)], 10, "x") ==
+               {:error, :invalid_amount}
+    end
+  end
 end

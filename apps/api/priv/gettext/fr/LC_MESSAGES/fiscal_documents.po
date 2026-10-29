@@ -189,3 +189,9 @@ msgstr "Empreinte du document (SHA-256)"
 
 msgid "Page"
 msgstr "Page"
+
+msgid "Technical security system (TSE)"
+msgstr "Dispositif de sécurité technique (TSE)"
+
+msgid "Cash register security device (RKSV)"
+msgstr "Dispositif de sécurité de la caisse (RKSV)"

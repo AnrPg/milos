@@ -22899,6 +22899,154 @@
         "title": "CheckInVisitors",
         "type": "object"
       },
+      "ClassScreenList": {
+        "description": "The box screens the person may change for this class: its coach (today, screens of the class's branch or the whole box) or staff who manage screens",
+        "properties": {
+          "screens": {
+            "items": {
+              "properties": {
+                "focus_changed": {
+                  "description": "Who last changed what the screen shows, and when",
+                  "nullable": true,
+                  "properties": {
+                    "at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "by": {
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "at",
+                    "by"
+                  ],
+                  "type": "object"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "inserted_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "last_seen_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "location_id": {
+                  "description": "The branch; null for the whole box",
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "override": {
+                  "description": "What staff pinned on the screen; null when it follows the day automatically",
+                  "nullable": true,
+                  "properties": {
+                    "slot_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "until": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "view": {
+                      "enum": [
+                        "wod",
+                        "timer",
+                        "leaderboard",
+                        "bookings",
+                        "class"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "slot_id",
+                    "until",
+                    "view"
+                  ],
+                  "title": "BoxScreenOverride",
+                  "type": "object"
+                },
+                "paired": {
+                  "type": "boolean"
+                },
+                "paired_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "pairing_expires_at": {
+                  "description": "When the pending pairing code stops working; null without one",
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "focus_changed",
+                "id",
+                "inserted_at",
+                "last_seen_at",
+                "location_id",
+                "name",
+                "override",
+                "paired",
+                "paired_at",
+                "pairing_expires_at"
+              ],
+              "title": "BoxScreen",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "views": {
+            "description": "What the person may pin: a coach `timer`, `leaderboard` and `wod`",
+            "items": {
+              "enum": [
+                "wod",
+                "timer",
+                "leaderboard",
+                "bookings",
+                "class"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "screens",
+          "views"
+        ],
+        "title": "ClassScreenList",
+        "type": "object"
+      },
       "ClassSlotInjuryWarnings": {
         "additionalProperties": false,
         "properties": {
@@ -163670,6 +163818,103 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/documents/outstanding": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminDocumentsController.outstanding",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "clients": {
+                      "description": "Clients of the box: everyone a new mandatory document or a major version would block from booking until they sign",
+                      "type": "integer"
+                    },
+                    "templates": {
+                      "items": {
+                        "properties": {
+                          "clients": {
+                            "description": "Clients who have not signed",
+                            "items": {
+                              "properties": {
+                                "display_name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "handle": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "enum": [
+                                    "unsigned",
+                                    "resign_required"
+                                  ],
+                                  "type": "string"
+                                },
+                                "user_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "display_name",
+                                "handle",
+                                "status",
+                                "user_id"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "outstanding": {
+                            "type": "integer"
+                          },
+                          "signed": {
+                            "description": "Clients whose signature counts",
+                            "type": "integer"
+                          },
+                          "template_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "clients",
+                          "outstanding",
+                          "signed",
+                          "template_id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "clients",
+                    "templates"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Outstanding"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Per active document: how many clients signed and who has not",
+        "tags": [
+          "Documents"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/documents/requests": {
       "get": {
         "callbacks": {},
@@ -187962,6 +188207,7 @@
                     "type": "string"
                   },
                   "user_id": {
+                    "description": "The member; none for a walk-in (a shop order or a free sale, ADR-264).",
                     "format": "uuid",
                     "nullable": true,
                     "type": "string"
@@ -188134,6 +188380,16 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "surcharge_cents": {
+                          "description": "Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "tip_cents": {
+                          "description": "Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
                         "user_id": {
                           "format": "uuid",
                           "nullable": true,
@@ -188155,7 +188411,9 @@
                         "reference",
                         "refunded_cents",
                         "retries",
-                        "status"
+                        "status",
+                        "surcharge_cents",
+                        "tip_cents"
                       ],
                       "type": "object"
                     }
@@ -188414,6 +188672,16 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "surcharge_cents": {
+                          "description": "Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "tip_cents": {
+                          "description": "Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
                         "user_id": {
                           "format": "uuid",
                           "nullable": true,
@@ -188435,7 +188703,9 @@
                         "reference",
                         "refunded_cents",
                         "retries",
-                        "status"
+                        "status",
+                        "surcharge_cents",
+                        "tip_cents"
                       ],
                       "type": "object"
                     }
@@ -188632,6 +188902,16 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "surcharge_cents": {
+                          "description": "Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "tip_cents": {
+                          "description": "Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
                         "user_id": {
                           "format": "uuid",
                           "nullable": true,
@@ -188653,7 +188933,9 @@
                         "reference",
                         "refunded_cents",
                         "retries",
-                        "status"
+                        "status",
+                        "surcharge_cents",
+                        "tip_cents"
                       ],
                       "type": "object"
                     }
@@ -188850,6 +189132,16 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "surcharge_cents": {
+                          "description": "Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "tip_cents": {
+                          "description": "Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
                         "user_id": {
                           "format": "uuid",
                           "nullable": true,
@@ -188871,7 +189163,9 @@
                         "reference",
                         "refunded_cents",
                         "retries",
-                        "status"
+                        "status",
+                        "surcharge_cents",
+                        "tip_cents"
                       ],
                       "type": "object"
                     }
@@ -188917,6 +189211,12 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "amount_cents": {
+                    "description": "What the card paid in all, to try a mismatch (default: amount + extras).",
+                    "minimum": 1,
+                    "nullable": true,
+                    "type": "integer"
+                  },
                   "outcome": {
                     "enum": [
                       "succeeded",
@@ -188924,6 +189224,16 @@
                       "cancelled"
                     ],
                     "type": "string"
+                  },
+                  "surcharge_cents": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "tip_cents": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
                   }
                 },
                 "required": [
@@ -189091,6 +189401,16 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "surcharge_cents": {
+                          "description": "Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "tip_cents": {
+                          "description": "Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale.",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
                         "user_id": {
                           "format": "uuid",
                           "nullable": true,
@@ -189112,7 +189432,9 @@
                         "reference",
                         "refunded_cents",
                         "retries",
-                        "status"
+                        "status",
+                        "surcharge_cents",
+                        "tip_cents"
                       ],
                       "type": "object"
                     }
@@ -202999,6 +203321,10 @@
                                   "nullable": true,
                                   "type": "string"
                                 },
+                                "owner_changed": {
+                                  "description": "The current value is the owner's own choice, not the default",
+                                  "type": "boolean"
+                                },
                                 "to": {
                                   "description": "A setting value: boolean, number, text, list or null",
                                   "nullable": true
@@ -203059,6 +203385,10 @@
                                   "nullable": true,
                                   "type": "string"
                                 },
+                                "owner_changed": {
+                                  "description": "The current value is the owner's own choice, not the default",
+                                  "type": "boolean"
+                                },
                                 "to": {
                                   "description": "A setting value: boolean, number, text, list or null",
                                   "nullable": true
@@ -203101,6 +203431,10 @@
                     "can_apply": {
                       "description": "Only the owner applies a recipe",
                       "type": "boolean"
+                    },
+                    "currency": {
+                      "description": "ISO currency of the suggested prices",
+                      "type": "string"
                     },
                     "recipes": {
                       "items": {
@@ -203257,6 +203591,7 @@
                   "required": [
                     "applications",
                     "can_apply",
+                    "currency",
                     "recipes"
                   ],
                   "type": "object"
@@ -203280,7 +203615,7 @@
     "/api/org/{organization_slug}/admin/setup/recipes/{key}/apply": {
       "post": {
         "callbacks": {},
-        "description": "Creates the recipe's subscription packages and class types that are missing and sets its settings through the same services as the settings screens, in one transaction, then records which recipe was applied, when and by whom. Documents are listed in `manual`.",
+        "description": "Creates the recipe's subscription packages and class types that are missing and sets its settings through the same services as the settings screens, in one transaction, then records which recipe was applied, when and by whom. Documents are listed in `manual`. `prices` (optional) are the owner's own prices for the recipe's packages, by code. `mode`: `all` changes every setting; `defaults_only` keeps the settings the owner already changed (the preview marks them `owner_changed`).",
         "operationId": "PaleeWeb.AdminSetupController.apply_recipe",
         "parameters": [
           {
@@ -203293,6 +203628,35 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "mode": {
+                    "description": "all (default): change every setting; defaults_only: keep the ones the owner changed",
+                    "enum": [
+                      "all",
+                      "defaults_only"
+                    ],
+                    "type": "string"
+                  },
+                  "prices": {
+                    "additionalProperties": {
+                      "maximum": 10000000,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "description": "The owner's prices for the recipe's packages: package code => cents",
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": false
+        },
         "responses": {
           "200": {
             "content": {
@@ -203353,6 +203717,10 @@
                                 "nullable": true,
                                 "type": "string"
                               },
+                              "owner_changed": {
+                                "description": "The current value is the owner's own choice, not the default",
+                                "type": "boolean"
+                              },
                               "to": {
                                 "description": "A setting value: boolean, number, text, list or null",
                                 "nullable": true
@@ -203412,6 +203780,10 @@
                               "name": {
                                 "nullable": true,
                                 "type": "string"
+                              },
+                              "owner_changed": {
+                                "description": "The current value is the owner's own choice, not the default",
+                                "type": "boolean"
                               },
                               "to": {
                                 "description": "A setting value: boolean, number, text, list or null",
@@ -203495,6 +203867,10 @@
                                 "nullable": true,
                                 "type": "string"
                               },
+                              "owner_changed": {
+                                "description": "The current value is the owner's own choice, not the default",
+                                "type": "boolean"
+                              },
                               "to": {
                                 "description": "A setting value: boolean, number, text, list or null",
                                 "nullable": true
@@ -203510,6 +203886,13 @@
                               "to"
                             ],
                             "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "kept": {
+                          "description": "Settings left at the owner's own value (mode defaults_only)",
+                          "items": {
+                            "type": "string"
                           },
                           "type": "array"
                         },
@@ -203551,6 +203934,10 @@
                                 "nullable": true,
                                 "type": "string"
                               },
+                              "owner_changed": {
+                                "description": "The current value is the owner's own choice, not the default",
+                                "type": "boolean"
+                              },
                               "to": {
                                 "description": "A setting value: boolean, number, text, list or null",
                                 "nullable": true
@@ -203588,6 +203975,7 @@
                       "required": [
                         "change_count",
                         "changes",
+                        "kept",
                         "manual",
                         "name",
                         "recipe",
@@ -203680,7 +204068,7 @@
                 }
               }
             },
-            "description": "A step failed; nothing changed"
+            "description": "A step failed or a price is not valid; nothing changed"
           }
         },
         "security": [
@@ -203758,6 +204146,10 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "owner_changed": {
+                            "description": "The current value is the owner's own choice, not the default",
+                            "type": "boolean"
+                          },
                           "to": {
                             "description": "A setting value: boolean, number, text, list or null",
                             "nullable": true
@@ -203773,6 +204165,13 @@
                           "to"
                         ],
                         "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "kept": {
+                      "description": "Settings left at the owner's own value (mode defaults_only)",
+                      "items": {
+                        "type": "string"
                       },
                       "type": "array"
                     },
@@ -203814,6 +204213,10 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "owner_changed": {
+                            "description": "The current value is the owner's own choice, not the default",
+                            "type": "boolean"
+                          },
                           "to": {
                             "description": "A setting value: boolean, number, text, list or null",
                             "nullable": true
@@ -203851,6 +204254,7 @@
                   "required": [
                     "change_count",
                     "changes",
+                    "kept",
                     "manual",
                     "name",
                     "recipe",
@@ -225239,6 +225643,721 @@
         "summary": "Run a class timer command (coaches and admins)",
         "tags": [
           "Class Timers"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/class-timers/{slot_id}/screens": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.ClassScreenController.index",
+        "parameters": [
+          {
+            "description": "Scheduled class ID",
+            "in": "path",
+            "name": "slot_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "The box screens the person may change for this class: its coach (today, screens of the class's branch or the whole box) or staff who manage screens",
+                  "properties": {
+                    "screens": {
+                      "items": {
+                        "properties": {
+                          "focus_changed": {
+                            "description": "Who last changed what the screen shows, and when",
+                            "nullable": true,
+                            "properties": {
+                              "at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "by": {
+                                "nullable": true,
+                                "properties": {
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "name"
+                                ],
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "at",
+                              "by"
+                            ],
+                            "type": "object"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "last_seen_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "description": "The branch; null for the whole box",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "override": {
+                            "description": "What staff pinned on the screen; null when it follows the day automatically",
+                            "nullable": true,
+                            "properties": {
+                              "slot_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "until": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "view": {
+                                "enum": [
+                                  "wod",
+                                  "timer",
+                                  "leaderboard",
+                                  "bookings",
+                                  "class"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "slot_id",
+                              "until",
+                              "view"
+                            ],
+                            "title": "BoxScreenOverride",
+                            "type": "object"
+                          },
+                          "paired": {
+                            "type": "boolean"
+                          },
+                          "paired_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "pairing_expires_at": {
+                            "description": "When the pending pairing code stops working; null without one",
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "focus_changed",
+                          "id",
+                          "inserted_at",
+                          "last_seen_at",
+                          "location_id",
+                          "name",
+                          "override",
+                          "paired",
+                          "paired_at",
+                          "pairing_expires_at"
+                        ],
+                        "title": "BoxScreen",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "views": {
+                      "description": "What the person may pin: a coach `timer`, `leaderboard` and `wod`",
+                      "items": {
+                        "enum": [
+                          "wod",
+                          "timer",
+                          "leaderboard",
+                          "bookings",
+                          "class"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "screens",
+                    "views"
+                  ],
+                  "title": "ClassScreenList",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Screens of the class"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not this class's coach today"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such class"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The box screens this class can be shown on, for its coach",
+        "tags": [
+          "Box screens"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/class-timers/{slot_id}/screens/{screen_id}/override": {
+      "delete": {
+        "callbacks": {},
+        "description": "A coach may only while the screen shows their class, or nothing pinned.",
+        "operationId": "PaleeWeb.ClassScreenController.delete_override",
+        "parameters": [
+          {
+            "description": "Scheduled class ID",
+            "in": "path",
+            "name": "slot_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "screen_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "screen": {
+                      "properties": {
+                        "focus_changed": {
+                          "description": "Who last changed what the screen shows, and when",
+                          "nullable": true,
+                          "properties": {
+                            "at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "by": {
+                              "nullable": true,
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "name"
+                              ],
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "at",
+                            "by"
+                          ],
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "last_seen_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "description": "The branch; null for the whole box",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "override": {
+                          "description": "What staff pinned on the screen; null when it follows the day automatically",
+                          "nullable": true,
+                          "properties": {
+                            "slot_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "until": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "view": {
+                              "enum": [
+                                "wod",
+                                "timer",
+                                "leaderboard",
+                                "bookings",
+                                "class"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "slot_id",
+                            "until",
+                            "view"
+                          ],
+                          "title": "BoxScreenOverride",
+                          "type": "object"
+                        },
+                        "paired": {
+                          "type": "boolean"
+                        },
+                        "paired_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "pairing_expires_at": {
+                          "description": "When the pending pairing code stops working; null without one",
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "focus_changed",
+                        "id",
+                        "inserted_at",
+                        "last_seen_at",
+                        "location_id",
+                        "name",
+                        "override",
+                        "paired",
+                        "paired_at",
+                        "pairing_expires_at"
+                      ],
+                      "title": "BoxScreen",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "screen"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Box screen"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not this class's coach, or another choice is pinned"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such class or screen"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Return the screen to automatic from the class's remote",
+        "tags": [
+          "Box screens"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "description": "The class's own coach, today, on a screen of the class's branch or the whole box (or staff who manage screens). The TV changes at once.",
+        "operationId": "PaleeWeb.ClassScreenController.put_override",
+        "parameters": [
+          {
+            "description": "Scheduled class ID",
+            "in": "path",
+            "name": "slot_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "screen_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "until": {
+                    "description": "When the screen goes back to automatic (within 24 hours); null to keep it",
+                    "format": "date-time",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "view": {
+                    "enum": [
+                      "wod",
+                      "timer",
+                      "leaderboard",
+                      "bookings",
+                      "class"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "view"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "screen": {
+                      "properties": {
+                        "focus_changed": {
+                          "description": "Who last changed what the screen shows, and when",
+                          "nullable": true,
+                          "properties": {
+                            "at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "by": {
+                              "nullable": true,
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "name"
+                              ],
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "at",
+                            "by"
+                          ],
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "last_seen_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "description": "The branch; null for the whole box",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "override": {
+                          "description": "What staff pinned on the screen; null when it follows the day automatically",
+                          "nullable": true,
+                          "properties": {
+                            "slot_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "until": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "view": {
+                              "enum": [
+                                "wod",
+                                "timer",
+                                "leaderboard",
+                                "bookings",
+                                "class"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "slot_id",
+                            "until",
+                            "view"
+                          ],
+                          "title": "BoxScreenOverride",
+                          "type": "object"
+                        },
+                        "paired": {
+                          "type": "boolean"
+                        },
+                        "paired_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "pairing_expires_at": {
+                          "description": "When the pending pairing code stops working; null without one",
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "focus_changed",
+                        "id",
+                        "inserted_at",
+                        "last_seen_at",
+                        "location_id",
+                        "name",
+                        "override",
+                        "paired",
+                        "paired_at",
+                        "pairing_expires_at"
+                      ],
+                      "title": "BoxScreen",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "screen"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Box screen"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not this class's coach today"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such class or screen"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid choice"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Pin the class's timer, leaderboard or WOD on a box screen",
+        "tags": [
+          "Box screens"
         ]
       }
     },

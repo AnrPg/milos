@@ -161,7 +161,7 @@ Sources:
 - **ISV mode** (Palee's fee per sale): needs Palee to be a Viva ISV
   partner and puts its secret in every intent; out of scope.
 - **Walk-in free sales**: Finance documents hang off a membership (only
-  the shop stream may have none), so a free sale needs a member for now.
+  the shop stream may have none), so a free sale needs a member for now. (Lifted by ADR-264.)
 
 ## Consequences
 - The Viva adapter is written from Viva's public documentation and must be
@@ -179,7 +179,7 @@ Sources:
 - Tips and surcharges turned on in the Terminal app make Viva's amount
   differ from the request, which Palee refuses (`amount_mismatch`, money
   not recorded, shown to staff): boxes keep both off, or a later change
-  accepts `tipAmount`/`surchargeAmount` on top of the amount.
+  accepts `tipAmount`/`surchargeAmount` on top of the amount. (Done in ADR-264.)
 - Without a working Viva account (credentials refused, outage), results
   stay `terminal_unconfirmed` for staff; nothing is recorded on the
   phone's word.

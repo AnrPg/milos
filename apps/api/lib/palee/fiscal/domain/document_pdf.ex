@@ -265,15 +265,25 @@ defmodule Palee.Fiscal.Domain.DocumentPdf do
     %{s | y: y + length(rows) * 4}
   end
 
-  defp authority(%{view: %{authority: nil}} = s), do: s
+  # The tax authority's block (myDATA), then the till signature's (ADR-251).
+  defp authority(%{view: view} = s),
+    do: s |> block(view.authority) |> block(Map.get(view, :till))
 
-  defp authority(%{view: %{authority: authority}} = s) do
+  defp block(s, nil), do: s
+
+  defp block(s, authority) do
     qr_size = if authority.qr, do: 26, else: 0
 
     url_rows =
       if authority.qr_url, do: Pdf.wrap(s.pdf, authority.qr_url, mm(120), size: 6.5), else: []
 
-    rows = length(authority.rows) + if(authority.pending, do: 1, else: 0)
+    # Long values (a TSE signature) wrap beside the QR code.
+    row_lines =
+      Enum.flat_map(authority.rows, fn {term, value} ->
+        Pdf.wrap(s.pdf, "#{term}: #{value}", mm(@right - @left - 10 - qr_size), size: 9)
+      end)
+
+    rows = length(row_lines) + if(authority.pending, do: 1, else: 0)
     height = max(qr_size + 4, 9 + rows * 4.4 + length(url_rows) * 3)
     s = ensure(s, height + 6, & &1)
     top = s.y + 5
@@ -284,13 +294,13 @@ defmodule Palee.Fiscal.Domain.DocumentPdf do
       if authority.pending, do: text(s, @left + 3, top + 9.5, authority.pending, size: 9), else: s
 
     s =
-      authority.rows
+      row_lines
       |> Enum.with_index()
-      |> Enum.reduce(s, fn {{term, value}, index}, s ->
-        text(s, @left + 3, top + 9.5 + index * 4.4, "#{term}: #{value}", size: 9)
+      |> Enum.reduce(s, fn {row, index}, s ->
+        text(s, @left + 3, top + 9.5 + index * 4.4, row, size: 9)
       end)
 
-    url_top = top + 9.5 + length(authority.rows) * 4.4
+    url_top = top + 9.5 + length(row_lines) * 4.4
 
     s =
       url_rows

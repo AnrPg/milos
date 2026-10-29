@@ -730,6 +730,12 @@ defmodule Palee.Finance do
   @doc "The payment of a stream invoice; idempotent per `source_type` / `source_id`."
   def record_stream_payment(context, attrs), do: RevenueStreamStore.record_payment(context, attrs)
 
+  @doc """
+  ADR-264: an invoice and the payment that settles it at once (a walk-in's
+  sale, a card surcharge); idempotent per the payment's source.
+  """
+  def record_stream_sale(context, attrs), do: RevenueStreamStore.record_sale(context, attrs)
+
   @doc "A refund of a stream payment; the reversal keeps the payment's stream and source."
   def reverse_stream_payment(context, attrs),
     do: RevenueStreamStore.reverse_payment(context, attrs)

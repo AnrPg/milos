@@ -152,6 +152,48 @@ defmodule Palee.Fiscal.TillSigningTest do
                signature(context, receipt)
     end
 
+    test "an invoice paid at the till (cash or card) and its credit note are signed", %{
+      context: context,
+      owner: owner
+    } do
+      buyer = %{
+        name: "Firma",
+        street: "Weg 1",
+        postal_code: "10115",
+        city: "Berlin",
+        country_code: "DE"
+      }
+
+      cash = issue(context, owner, "k-cash", %{kind: "invoice", buyer: buyer})
+
+      card =
+        issue(context, owner, "k-card", %{kind: "invoice", payment_method: "card", buyer: buyer})
+
+      online =
+        issue(context, owner, "k-online", %{
+          kind: "invoice",
+          payment_method: "online",
+          buyer: buyer
+        })
+
+      assert %{device: "tse", kind: "receipt", status: "pending"} = signature(context, cash)
+      assert %{device: "tse", kind: "receipt"} = signature(context, card)
+      assert signature(context, online) == nil
+
+      {:ok, credit, :issued} =
+        Fiscal.credit(context, card.id, :all, ~D[2027-02-08], "credit-card", owner.id, @now)
+
+      {:ok, online_credit, :issued} =
+        Fiscal.credit(context, online.id, :all, ~D[2027-02-08], "credit-online", owner.id, @now)
+
+      assert %{device: "tse"} = signature(context, credit)
+      assert signature(context, online_credit) == nil
+
+      assert {:ok, _connection} = connect(context, owner, "tse", "sandbox")
+      assert {:ok, %{signed: 3}} = TillSigning.transmit(context, :due, later(5))
+      assert %{status: "signed"} = signature(context, cash)
+    end
+
     test "the sandbox provisions, signs, prints and journals", %{context: context, owner: owner} do
       receipt = issue(context, owner, "k-1")
       assert {:ok, connection} = connect(context, owner, "tse", "sandbox")
@@ -349,6 +391,32 @@ defmodule Palee.Fiscal.TillSigningTest do
     setup %{context: context, owner: owner} do
       identity(context, owner, @austria)
       :ok
+    end
+
+    test "an invoice paid by card at the till is a cash sale and is signed; a transfer is not", %{
+      context: context,
+      owner: owner
+    } do
+      buyer = %{
+        name: "Firma",
+        street: "Weg 1",
+        postal_code: "1010",
+        city: "Wien",
+        country_code: "AT"
+      }
+
+      card =
+        issue(context, owner, "k-card", %{kind: "invoice", payment_method: "card", buyer: buyer})
+
+      transfer =
+        issue(context, owner, "k-transfer", %{
+          kind: "invoice",
+          payment_method: "bank_transfer",
+          buyer: buyer
+        })
+
+      assert %{device: "rksv", kind: "receipt", status: "pending"} = signature(context, card)
+      assert signature(context, transfer) == nil
     end
 
     test "the sandbox signs the start receipt, receipts and null receipts", %{

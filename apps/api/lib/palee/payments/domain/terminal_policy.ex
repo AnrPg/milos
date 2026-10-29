@@ -13,13 +13,17 @@ defmodule Palee.Payments.Domain.TerminalPolicy do
   the phone. A result the provider cannot confirm yet stays open
   (`terminal_unconfirmed`), is asked about again on a schedule, and then
   waits for staff.
+
+  ADR-264: the provider's amount may be more than the request by a tip
+  and a card surcharge it names; the rest must be the requested amount
+  exactly (`split/2`). A walk-in may pay a shop order or a free sale.
   """
 
   alias Palee.Payments.Domain.IntentPolicy
 
   @purposes ~w(finance_invoice membership_package shop_order free_sale)
-  # Purposes a walk-in (no member) may pay at the terminal.
-  @walk_in_purposes ~w(shop_order)
+  # Purposes a walk-in (no member) may pay at the terminal (ADR-264).
+  @walk_in_purposes ~w(shop_order free_sale)
   @request_ttl_seconds 900
   # Asking the provider again about an unconfirmed result, or looking for a
   # lost one (seconds after the previous look).
@@ -29,6 +33,7 @@ defmodule Palee.Payments.Domain.TerminalPolicy do
   @reference_version "pt1"
 
   def purposes, do: @purposes
+  def walk_in_purposes, do: @walk_in_purposes
   def request_ttl_seconds, do: @request_ttl_seconds
   def poll_schedule, do: @poll
 
@@ -186,12 +191,14 @@ defmodule Palee.Payments.Domain.TerminalPolicy do
   """
   def confirm_outcome(intent, {:ok, %{status: :succeeded} = transaction}, reference, now) do
     case mismatch(intent, transaction, reference) do
-      nil ->
+      {:ok, extras} ->
         card = transaction[:card] || %{}
         id = transaction[:transaction_id] || intent.provider_transaction_id
 
         %{
           status: "succeeded",
+          tip_cents: extras.tip_cents,
+          surcharge_cents: extras.surcharge_cents,
           provider_ref: id,
           provider_transaction_id: id,
           succeeded_at: now,
@@ -205,7 +212,7 @@ defmodule Palee.Payments.Domain.TerminalPolicy do
           attempts: (intent.attempts || 0) + 1
         }
 
-      code ->
+      {:error, code} ->
         # Never paid in Palee's books; staff see why.
         %{
           status: "failed",
@@ -287,18 +294,43 @@ defmodule Palee.Payments.Domain.TerminalPolicy do
 
   defp mismatch(intent, transaction, reference) do
     cond do
-      IntentPolicy.amount_mismatch?(intent, transaction) ->
-        "amount_mismatch"
-
       is_binary(transaction[:reference]) and transaction[:reference] != "" and
           transaction[:reference] != reference ->
-        "reference_mismatch"
+        {:error, "reference_mismatch"}
 
       too_old?(intent, transaction[:created_at]) ->
-        "transaction_before_request"
+        {:error, "transaction_before_request"}
 
       true ->
-        nil
+        split(intent, transaction)
+    end
+  end
+
+  @doc """
+  ADR-264: splits the amount the provider confirmed into the requested
+  amount, a tip and a card surcharge. The provider's amount is everything
+  the card paid; `tip_cents` and `surcharge_cents` are the parts of it it
+  names. What is left must be the intent's amount in its currency, else
+  `{:error, "amount_mismatch"}` (an unknown extra is never accepted).
+  """
+  def split(intent, transaction) do
+    tip = transaction[:tip_cents] || 0
+    surcharge = transaction[:surcharge_cents] || 0
+    amount = transaction[:amount_cents]
+    currency = transaction[:currency]
+
+    cond do
+      not (is_integer(tip) and tip >= 0 and is_integer(surcharge) and surcharge >= 0) ->
+        {:error, "amount_mismatch"}
+
+      is_binary(currency) and String.upcase(currency) != intent.currency ->
+        {:error, "amount_mismatch"}
+
+      is_integer(amount) and amount - tip - surcharge != intent.amount_cents ->
+        {:error, "amount_mismatch"}
+
+      true ->
+        {:ok, %{tip_cents: tip, surcharge_cents: surcharge}}
     end
   end
 
