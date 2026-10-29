@@ -288,13 +288,14 @@ defmodule Palee.Application.Payments.OnlineSales do
   def fulfil_shop_order(context, intent) do
     member = Map.put(context, :user_id, intent.user_id)
 
-    with {:ok, order} <-
+    # The order's Finance payment is recorded by the shop (ADR-190 lineage).
+    with {:ok, _order} <-
            Checkout.settle_online(member, intent.purpose_id, %{
              provider: intent.provider,
              reference: intent.provider_transaction_id,
              idempotency_key: "capture:" <> intent.purpose_id
            }) do
-      {:ok, %{finance_payment_id: order[:finance_payment_id]}}
+      {:ok, %{}}
     end
   end
 
