@@ -13,6 +13,7 @@ import {
   type BoxScreenWorkout,
 } from "@/api/box-screens";
 import { ClassTimerFace } from "@/components/class-timer/ClassTimerFace";
+import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { useScreenWakeLock } from "@/hooks/useScreenWakeLock";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import {
@@ -137,9 +138,9 @@ function PairingView({ lost, onPaired }: { lost: boolean; onPaired: (pairing: Bo
             }}
           />
           {error ? (
-            <span id="tv-code-error" role="alert" className="font-semibold" style={{ ...tv.small, color: "var(--danger)" }}>
+            <ErrorNotice id="tv-code-error" variant="text" style={{ fontSize: "clamp(0.85rem, 1.6vw, 2rem)", lineHeight: 1.3 }}>
               {error}
-            </span>
+            </ErrorNotice>
           ) : null}
         </label>
         <button
