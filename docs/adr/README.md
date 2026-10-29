@@ -231,3 +231,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-243 | Reporting fiscal documents to myDATA: outbox, sandbox and AADE gateways, document mapping | Accepted |
 | ADR-246 | Online payments through the business's own provider account (Viva, Stripe, sandbox), webhooks as hints | Accepted |
 | ADR-247 | Saved cards, recurring charges within the payer's consent, autopay and dunning | Accepted |
+| ADR-255 | Setup recipes per box type and the settings catalog («Προχωρημένα») | Accepted |
