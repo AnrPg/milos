@@ -182445,6 +182445,15 @@
                           "amount_cents": {
                             "type": "integer"
                           },
+                          "attention_resolution": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "attention_resolved_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "card_brand": {
                             "nullable": true,
                             "type": "string"
@@ -182455,6 +182464,9 @@
                           },
                           "currency": {
                             "type": "string"
+                          },
+                          "declines": {
+                            "type": "integer"
                           },
                           "description": {
                             "type": "string"
@@ -182525,6 +182537,9 @@
                           "refunded_cents": {
                             "type": "integer"
                           },
+                          "retries": {
+                            "type": "integer"
+                          },
                           "status": {
                             "enum": [
                               "scheduled",
@@ -182551,6 +182566,7 @@
                         "required": [
                           "amount_cents",
                           "currency",
+                          "declines",
                           "description",
                           "environment",
                           "fulfilment_status",
@@ -182560,6 +182576,7 @@
                           "purpose_id",
                           "purpose_type",
                           "refunded_cents",
+                          "retries",
                           "status"
                         ],
                         "type": "object"
@@ -182632,6 +182649,49 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "options": {
+                          "properties": {
+                            "notify_member": {
+                              "type": "boolean"
+                            },
+                            "notify_staff": {
+                              "type": "boolean"
+                            },
+                            "purposes": {
+                              "properties": {
+                                "autopay": {
+                                  "type": "boolean"
+                                },
+                                "drop_in": {
+                                  "type": "boolean"
+                                },
+                                "packages": {
+                                  "type": "boolean"
+                                },
+                                "personal_training": {
+                                  "type": "boolean"
+                                },
+                                "shop": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "autopay",
+                                "drop_in",
+                                "packages",
+                                "personal_training",
+                                "shop"
+                              ],
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "notify_member",
+                            "notify_staff",
+                            "purposes"
+                          ],
+                          "type": "object"
+                        },
                         "provider": {
                           "enum": [
                             "sandbox",
@@ -182662,6 +182722,7 @@
                         "credentials_set",
                         "environment",
                         "id",
+                        "options",
                         "provider",
                         "settings",
                         "status",
@@ -182813,6 +182874,49 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "options": {
+                          "properties": {
+                            "notify_member": {
+                              "type": "boolean"
+                            },
+                            "notify_staff": {
+                              "type": "boolean"
+                            },
+                            "purposes": {
+                              "properties": {
+                                "autopay": {
+                                  "type": "boolean"
+                                },
+                                "drop_in": {
+                                  "type": "boolean"
+                                },
+                                "packages": {
+                                  "type": "boolean"
+                                },
+                                "personal_training": {
+                                  "type": "boolean"
+                                },
+                                "shop": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "autopay",
+                                "drop_in",
+                                "packages",
+                                "personal_training",
+                                "shop"
+                              ],
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "notify_member",
+                            "notify_staff",
+                            "purposes"
+                          ],
+                          "type": "object"
+                        },
                         "provider": {
                           "enum": [
                             "sandbox",
@@ -182843,6 +182947,7 @@
                         "credentials_set",
                         "environment",
                         "id",
+                        "options",
                         "provider",
                         "settings",
                         "status",
@@ -182886,6 +182991,384 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/payments/account/options": {
+      "put": {
+        "callbacks": {},
+        "description": "Keys left out keep their value. Every purpose is on by default.",
+        "operationId": "PaleeWeb.AdminPaymentsController.save_options",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "notify_member": {
+                    "type": "boolean"
+                  },
+                  "notify_staff": {
+                    "type": "boolean"
+                  },
+                  "purposes": {
+                    "properties": {
+                      "autopay": {
+                        "type": "boolean"
+                      },
+                      "drop_in": {
+                        "type": "boolean"
+                      },
+                      "packages": {
+                        "type": "boolean"
+                      },
+                      "personal_training": {
+                        "type": "boolean"
+                      },
+                      "shop": {
+                        "type": "boolean"
+                      }
+                    },
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "account": {
+                      "nullable": true,
+                      "properties": {
+                        "checked_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "credentials_set": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "environment": {
+                          "enum": [
+                            "test",
+                            "live"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "options": {
+                          "properties": {
+                            "notify_member": {
+                              "type": "boolean"
+                            },
+                            "notify_staff": {
+                              "type": "boolean"
+                            },
+                            "purposes": {
+                              "properties": {
+                                "autopay": {
+                                  "type": "boolean"
+                                },
+                                "drop_in": {
+                                  "type": "boolean"
+                                },
+                                "packages": {
+                                  "type": "boolean"
+                                },
+                                "personal_training": {
+                                  "type": "boolean"
+                                },
+                                "shop": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "required": [
+                                "autopay",
+                                "drop_in",
+                                "packages",
+                                "personal_training",
+                                "shop"
+                              ],
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "notify_member",
+                            "notify_staff",
+                            "purposes"
+                          ],
+                          "type": "object"
+                        },
+                        "provider": {
+                          "enum": [
+                            "sandbox",
+                            "viva",
+                            "stripe"
+                          ],
+                          "type": "string"
+                        },
+                        "settings": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "webhook_url": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "credentials_set",
+                        "environment",
+                        "id",
+                        "options",
+                        "provider",
+                        "settings",
+                        "status",
+                        "webhook_url"
+                      ],
+                      "type": "object"
+                    },
+                    "environments": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "providers": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "account",
+                    "environments",
+                    "providers"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Account"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Choose what members pay online and who hears about failed charges",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/payments/attention": {
+      "get": {
+        "callbacks": {},
+        "description": "Declined and waiting for a retry, or failed for good, until staff close them or the purpose is paid.",
+        "operationId": "PaleeWeb.AdminPaymentsController.attention",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "payments": {
+                      "items": {
+                        "properties": {
+                          "amount_cents": {
+                            "type": "integer"
+                          },
+                          "attention_resolution": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "attention_resolved_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "card_brand": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "card_last4": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "declines": {
+                            "type": "integer"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "environment": {
+                            "type": "string"
+                          },
+                          "expires_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "failure_code": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "finance_payment_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "fulfilment_status": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "initiation": {
+                            "enum": [
+                              "payer",
+                              "merchant"
+                            ],
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "metadata": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "next_attempt_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "provider": {
+                            "type": "string"
+                          },
+                          "provider_transaction_id": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "purpose_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "purpose_type": {
+                            "type": "string"
+                          },
+                          "redirect_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "refunded_cents": {
+                            "type": "integer"
+                          },
+                          "retries": {
+                            "type": "integer"
+                          },
+                          "status": {
+                            "enum": [
+                              "scheduled",
+                              "awaiting_payer",
+                              "processing",
+                              "succeeded",
+                              "failed",
+                              "cancelled",
+                              "expired"
+                            ],
+                            "type": "string"
+                          },
+                          "succeeded_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "amount_cents",
+                          "currency",
+                          "declines",
+                          "description",
+                          "environment",
+                          "fulfilment_status",
+                          "id",
+                          "initiation",
+                          "provider",
+                          "purpose_id",
+                          "purpose_type",
+                          "refunded_cents",
+                          "retries",
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "payments",
+                    "total"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Payments"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Saved-card charges that need a person (Ουρές)",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/payments/{id}": {
       "get": {
         "callbacks": {},
@@ -182914,6 +183397,15 @@
                             "amount_cents": {
                               "type": "integer"
                             },
+                            "attention_resolution": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "attention_resolved_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
                             "card_brand": {
                               "nullable": true,
                               "type": "string"
@@ -182924,6 +183416,9 @@
                             },
                             "currency": {
                               "type": "string"
+                            },
+                            "declines": {
+                              "type": "integer"
                             },
                             "description": {
                               "type": "string"
@@ -182994,6 +183489,9 @@
                             "refunded_cents": {
                               "type": "integer"
                             },
+                            "retries": {
+                              "type": "integer"
+                            },
                             "status": {
                               "enum": [
                                 "scheduled",
@@ -183020,6 +183518,7 @@
                           "required": [
                             "amount_cents",
                             "currency",
+                            "declines",
                             "description",
                             "environment",
                             "fulfilment_status",
@@ -183029,6 +183528,7 @@
                             "purpose_id",
                             "purpose_type",
                             "refunded_cents",
+                            "retries",
                             "status"
                           ],
                           "type": "object"
@@ -183110,6 +183610,374 @@
           }
         ],
         "summary": "One online payment with its refunds",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/payments/{id}/card-link": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminPaymentsController.card_link",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "payment": {
+                      "properties": {
+                        "amount_cents": {
+                          "type": "integer"
+                        },
+                        "attention_resolution": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attention_resolved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_last4": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "declines": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "environment": {
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finance_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fulfilment_status": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "initiation": {
+                          "enum": [
+                            "payer",
+                            "merchant"
+                          ],
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "provider_transaction_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purpose_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "purpose_type": {
+                          "type": "string"
+                        },
+                        "redirect_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "refunded_cents": {
+                          "type": "integer"
+                        },
+                        "retries": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "scheduled",
+                            "awaiting_payer",
+                            "processing",
+                            "succeeded",
+                            "failed",
+                            "cancelled",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "succeeded_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "amount_cents",
+                        "currency",
+                        "declines",
+                        "description",
+                        "environment",
+                        "fulfilment_status",
+                        "id",
+                        "initiation",
+                        "provider",
+                        "purpose_id",
+                        "purpose_type",
+                        "refunded_cents",
+                        "retries",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "payment"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Payment"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Send the member the link to pay with another card again",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/payments/{id}/dismiss": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminPaymentsController.dismiss_charge",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "payment": {
+                      "properties": {
+                        "amount_cents": {
+                          "type": "integer"
+                        },
+                        "attention_resolution": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attention_resolved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_last4": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "declines": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "environment": {
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finance_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fulfilment_status": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "initiation": {
+                          "enum": [
+                            "payer",
+                            "merchant"
+                          ],
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "provider_transaction_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purpose_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "purpose_type": {
+                          "type": "string"
+                        },
+                        "redirect_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "refunded_cents": {
+                          "type": "integer"
+                        },
+                        "retries": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "scheduled",
+                            "awaiting_payer",
+                            "processing",
+                            "succeeded",
+                            "failed",
+                            "cancelled",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "succeeded_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "amount_cents",
+                        "currency",
+                        "declines",
+                        "description",
+                        "environment",
+                        "fulfilment_status",
+                        "id",
+                        "initiation",
+                        "provider",
+                        "purpose_id",
+                        "purpose_type",
+                        "refunded_cents",
+                        "retries",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "payment"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Payment"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Close a failed charge (e.g. paid at the desk); stops its retries",
         "tags": [
           "Payments"
         ]
@@ -183260,6 +184128,15 @@
                         "amount_cents": {
                           "type": "integer"
                         },
+                        "attention_resolution": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attention_resolved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "card_brand": {
                           "nullable": true,
                           "type": "string"
@@ -183270,6 +184147,9 @@
                         },
                         "currency": {
                           "type": "string"
+                        },
+                        "declines": {
+                          "type": "integer"
                         },
                         "description": {
                           "type": "string"
@@ -183340,6 +184220,9 @@
                         "refunded_cents": {
                           "type": "integer"
                         },
+                        "retries": {
+                          "type": "integer"
+                        },
                         "status": {
                           "enum": [
                             "scheduled",
@@ -183366,6 +184249,7 @@
                       "required": [
                         "amount_cents",
                         "currency",
+                        "declines",
                         "description",
                         "environment",
                         "fulfilment_status",
@@ -183375,6 +184259,7 @@
                         "purpose_id",
                         "purpose_type",
                         "refunded_cents",
+                        "retries",
                         "status"
                       ],
                       "type": "object"
@@ -183396,6 +184281,190 @@
           }
         ],
         "summary": "Ask the provider about a payment now",
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/payments/{id}/retry-charge": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminPaymentsController.retry_charge",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "payment": {
+                      "properties": {
+                        "amount_cents": {
+                          "type": "integer"
+                        },
+                        "attention_resolution": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attention_resolved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_brand": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "card_last4": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "declines": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": "string"
+                        },
+                        "environment": {
+                          "type": "string"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "failure_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finance_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "fulfilment_status": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "initiation": {
+                          "enum": [
+                            "payer",
+                            "merchant"
+                          ],
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "metadata": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "next_attempt_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "provider_transaction_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purpose_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "purpose_type": {
+                          "type": "string"
+                        },
+                        "redirect_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "refunded_cents": {
+                          "type": "integer"
+                        },
+                        "retries": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "scheduled",
+                            "awaiting_payer",
+                            "processing",
+                            "succeeded",
+                            "failed",
+                            "cancelled",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "succeeded_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "amount_cents",
+                        "currency",
+                        "declines",
+                        "description",
+                        "environment",
+                        "fulfilment_status",
+                        "id",
+                        "initiation",
+                        "provider",
+                        "purpose_id",
+                        "purpose_type",
+                        "refunded_cents",
+                        "retries",
+                        "status"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "payment"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Payment"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Charge the saved card once more now",
         "tags": [
           "Payments"
         ]
@@ -231670,6 +232739,15 @@
                         "amount_cents": {
                           "type": "integer"
                         },
+                        "attention_resolution": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attention_resolved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "card_brand": {
                           "nullable": true,
                           "type": "string"
@@ -231680,6 +232758,9 @@
                         },
                         "currency": {
                           "type": "string"
+                        },
+                        "declines": {
+                          "type": "integer"
                         },
                         "description": {
                           "type": "string"
@@ -231750,6 +232831,9 @@
                         "refunded_cents": {
                           "type": "integer"
                         },
+                        "retries": {
+                          "type": "integer"
+                        },
                         "status": {
                           "enum": [
                             "scheduled",
@@ -231776,6 +232860,7 @@
                       "required": [
                         "amount_cents",
                         "currency",
+                        "declines",
                         "description",
                         "environment",
                         "fulfilment_status",
@@ -231785,6 +232870,7 @@
                         "purpose_id",
                         "purpose_type",
                         "refunded_cents",
+                        "retries",
                         "status"
                       ],
                       "type": "object"
@@ -232302,6 +233388,15 @@
                         "amount_cents": {
                           "type": "integer"
                         },
+                        "attention_resolution": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attention_resolved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "card_brand": {
                           "nullable": true,
                           "type": "string"
@@ -232312,6 +233407,9 @@
                         },
                         "currency": {
                           "type": "string"
+                        },
+                        "declines": {
+                          "type": "integer"
                         },
                         "description": {
                           "type": "string"
@@ -232382,6 +233480,9 @@
                         "refunded_cents": {
                           "type": "integer"
                         },
+                        "retries": {
+                          "type": "integer"
+                        },
                         "status": {
                           "enum": [
                             "scheduled",
@@ -232408,6 +233509,7 @@
                       "required": [
                         "amount_cents",
                         "currency",
+                        "declines",
                         "description",
                         "environment",
                         "fulfilment_status",
@@ -232417,6 +233519,7 @@
                         "purpose_id",
                         "purpose_type",
                         "refunded_cents",
+                        "retries",
                         "status"
                       ],
                       "type": "object"
@@ -232919,6 +234022,15 @@
                         "amount_cents": {
                           "type": "integer"
                         },
+                        "attention_resolution": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attention_resolved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "card_brand": {
                           "nullable": true,
                           "type": "string"
@@ -232929,6 +234041,9 @@
                         },
                         "currency": {
                           "type": "string"
+                        },
+                        "declines": {
+                          "type": "integer"
                         },
                         "description": {
                           "type": "string"
@@ -232999,6 +234114,9 @@
                         "refunded_cents": {
                           "type": "integer"
                         },
+                        "retries": {
+                          "type": "integer"
+                        },
                         "status": {
                           "enum": [
                             "scheduled",
@@ -233025,6 +234143,7 @@
                       "required": [
                         "amount_cents",
                         "currency",
+                        "declines",
                         "description",
                         "environment",
                         "fulfilment_status",
@@ -233034,6 +234153,7 @@
                         "purpose_id",
                         "purpose_type",
                         "refunded_cents",
+                        "retries",
                         "status"
                       ],
                       "type": "object"
@@ -233107,6 +234227,15 @@
                         "amount_cents": {
                           "type": "integer"
                         },
+                        "attention_resolution": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attention_resolved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "card_brand": {
                           "nullable": true,
                           "type": "string"
@@ -233117,6 +234246,9 @@
                         },
                         "currency": {
                           "type": "string"
+                        },
+                        "declines": {
+                          "type": "integer"
                         },
                         "description": {
                           "type": "string"
@@ -233187,6 +234319,9 @@
                         "refunded_cents": {
                           "type": "integer"
                         },
+                        "retries": {
+                          "type": "integer"
+                        },
                         "status": {
                           "enum": [
                             "scheduled",
@@ -233213,6 +234348,7 @@
                       "required": [
                         "amount_cents",
                         "currency",
+                        "declines",
                         "description",
                         "environment",
                         "fulfilment_status",
@@ -233222,6 +234358,7 @@
                         "purpose_id",
                         "purpose_type",
                         "refunded_cents",
+                        "retries",
                         "status"
                       ],
                       "type": "object"
@@ -233274,6 +234411,15 @@
                         "amount_cents": {
                           "type": "integer"
                         },
+                        "attention_resolution": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attention_resolved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "card_brand": {
                           "nullable": true,
                           "type": "string"
@@ -233284,6 +234430,9 @@
                         },
                         "currency": {
                           "type": "string"
+                        },
+                        "declines": {
+                          "type": "integer"
                         },
                         "description": {
                           "type": "string"
@@ -233354,6 +234503,9 @@
                         "refunded_cents": {
                           "type": "integer"
                         },
+                        "retries": {
+                          "type": "integer"
+                        },
                         "status": {
                           "enum": [
                             "scheduled",
@@ -233380,6 +234532,7 @@
                       "required": [
                         "amount_cents",
                         "currency",
+                        "declines",
                         "description",
                         "environment",
                         "fulfilment_status",
@@ -233389,6 +234542,7 @@
                         "purpose_id",
                         "purpose_type",
                         "refunded_cents",
+                        "retries",
                         "status"
                       ],
                       "type": "object"
@@ -237765,6 +238919,15 @@
                         "amount_cents": {
                           "type": "integer"
                         },
+                        "attention_resolution": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attention_resolved_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "card_brand": {
                           "nullable": true,
                           "type": "string"
@@ -237775,6 +238938,9 @@
                         },
                         "currency": {
                           "type": "string"
+                        },
+                        "declines": {
+                          "type": "integer"
                         },
                         "description": {
                           "type": "string"
@@ -237845,6 +239011,9 @@
                         "refunded_cents": {
                           "type": "integer"
                         },
+                        "retries": {
+                          "type": "integer"
+                        },
                         "status": {
                           "enum": [
                             "scheduled",
@@ -237871,6 +239040,7 @@
                       "required": [
                         "amount_cents",
                         "currency",
+                        "declines",
                         "description",
                         "environment",
                         "fulfilment_status",
@@ -237880,6 +239050,7 @@
                         "purpose_id",
                         "purpose_type",
                         "refunded_cents",
+                        "retries",
                         "status"
                       ],
                       "type": "object"

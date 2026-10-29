@@ -7635,6 +7635,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/payments/account/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Choose what members pay online and who hears about failed charges
+         * @description Keys left out keep their value. Every purpose is on by default.
+         */
+        put: operations["PaleeWeb.AdminPaymentsController.save_options"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/attention": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Saved-card charges that need a person (Ουρές)
+         * @description Declined and waiting for a retry, or failed for good, until staff close them or the purpose is paid.
+         */
+        get: operations["PaleeWeb.AdminPaymentsController.attention"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/payments/{id}": {
         parameters: {
             query?: never;
@@ -7646,6 +7686,40 @@ export interface paths {
         get: operations["PaleeWeb.AdminPaymentsController.show"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/{id}/card-link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send the member the link to pay with another card again */
+        post: operations["PaleeWeb.AdminPaymentsController.card_link"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/{id}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Close a failed charge (e.g. paid at the desk); stops its retries */
+        post: operations["PaleeWeb.AdminPaymentsController.dismiss_charge"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7680,6 +7754,23 @@ export interface paths {
         put?: never;
         /** Ask the provider about a payment now */
         post: operations["PaleeWeb.AdminPaymentsController.retry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/{id}/retry-charge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Charge the saved card once more now */
+        post: operations["PaleeWeb.AdminPaymentsController.retry_charge"];
         delete?: never;
         options?: never;
         head?: never;
@@ -78445,9 +78536,13 @@ export interface operations {
                     "application/json": {
                         payments: {
                             amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
                             card_brand?: string | null;
                             card_last4?: string | null;
                             currency: string;
+                            declines: number;
                             description: string;
                             environment: string;
                             /** Format: date-time */
@@ -78474,6 +78569,7 @@ export interface operations {
                             purpose_type: string;
                             redirect_url?: string | null;
                             refunded_cents: number;
+                            retries: number;
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
@@ -78512,6 +78608,17 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             last_error?: string | null;
+                            options: {
+                                notify_member: boolean;
+                                notify_staff: boolean;
+                                purposes: {
+                                    autopay: boolean;
+                                    drop_in: boolean;
+                                    packages: boolean;
+                                    personal_training: boolean;
+                                    shop: boolean;
+                                };
+                            };
                             /** @enum {string} */
                             provider: "sandbox" | "viva" | "stripe";
                             settings: {
@@ -78574,6 +78681,17 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             last_error?: string | null;
+                            options: {
+                                notify_member: boolean;
+                                notify_staff: boolean;
+                                purposes: {
+                                    autopay: boolean;
+                                    drop_in: boolean;
+                                    packages: boolean;
+                                    personal_training: boolean;
+                                    shop: boolean;
+                                };
+                            };
                             /** @enum {string} */
                             provider: "sandbox" | "viva" | "stripe";
                             settings: {
@@ -78591,29 +78709,98 @@ export interface operations {
             };
         };
     };
-    "PaleeWeb.AdminPaymentsController.show": {
+    "PaleeWeb.AdminPaymentsController.save_options": {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                id: string;
-            };
+            path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": {
+                    notify_member?: boolean;
+                    notify_staff?: boolean;
+                    purposes?: {
+                        autopay?: boolean;
+                        drop_in?: boolean;
+                        packages?: boolean;
+                        personal_training?: boolean;
+                        shop?: boolean;
+                    };
+                };
+            };
+        };
         responses: {
-            /** @description Payment */
+            /** @description Account */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        payment: {
+                        account: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            credentials_set: string[];
+                            /** @enum {string} */
+                            environment: "test" | "live";
+                            /** Format: uuid */
+                            id: string;
+                            last_error?: string | null;
+                            options: {
+                                notify_member: boolean;
+                                notify_staff: boolean;
+                                purposes: {
+                                    autopay: boolean;
+                                    drop_in: boolean;
+                                    packages: boolean;
+                                    personal_training: boolean;
+                                    shop: boolean;
+                                };
+                            };
+                            /** @enum {string} */
+                            provider: "sandbox" | "viva" | "stripe";
+                            settings: {
+                                [key: string]: string;
+                            };
+                            status: string;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            webhook_url: string;
+                        } | null;
+                        environments: string[];
+                        providers: string[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.attention": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payments */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payments: {
                             amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
                             card_brand?: string | null;
                             card_last4?: string | null;
                             currency: string;
+                            declines: number;
                             description: string;
                             environment: string;
                             /** Format: date-time */
@@ -78640,6 +78827,74 @@ export interface operations {
                             purpose_type: string;
                             redirect_url?: string | null;
                             refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
@@ -78661,6 +78916,138 @@ export interface operations {
                                 /** @enum {string} */
                                 status: "pending" | "succeeded" | "failed";
                             }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.card_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.dismiss_charge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
                         };
                     };
                 };
@@ -78732,9 +79119,13 @@ export interface operations {
                     "application/json": {
                         payment: {
                             amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
                             card_brand?: string | null;
                             card_last4?: string | null;
                             currency: string;
+                            declines: number;
                             description: string;
                             environment: string;
                             /** Format: date-time */
@@ -78761,6 +79152,73 @@ export interface operations {
                             purpose_type: string;
                             redirect_url?: string | null;
                             refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.retry_charge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
@@ -96496,9 +96954,13 @@ export interface operations {
                     "application/json": {
                         payment: {
                             amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
                             card_brand?: string | null;
                             card_last4?: string | null;
                             currency: string;
+                            declines: number;
                             description: string;
                             environment: string;
                             /** Format: date-time */
@@ -96525,6 +96987,7 @@ export interface operations {
                             purpose_type: string;
                             redirect_url?: string | null;
                             refunded_cents: number;
+                            retries: number;
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
@@ -96789,9 +97252,13 @@ export interface operations {
                     "application/json": {
                         payment: {
                             amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
                             card_brand?: string | null;
                             card_last4?: string | null;
                             currency: string;
+                            declines: number;
                             description: string;
                             environment: string;
                             /** Format: date-time */
@@ -96818,6 +97285,7 @@ export interface operations {
                             purpose_type: string;
                             redirect_url?: string | null;
                             refunded_cents: number;
+                            retries: number;
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
@@ -97021,9 +97489,13 @@ export interface operations {
                     "application/json": {
                         payment: {
                             amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
                             card_brand?: string | null;
                             card_last4?: string | null;
                             currency: string;
+                            declines: number;
                             description: string;
                             environment: string;
                             /** Format: date-time */
@@ -97050,6 +97522,7 @@ export interface operations {
                             purpose_type: string;
                             redirect_url?: string | null;
                             refunded_cents: number;
+                            retries: number;
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
@@ -97089,9 +97562,13 @@ export interface operations {
                     "application/json": {
                         payment: {
                             amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
                             card_brand?: string | null;
                             card_last4?: string | null;
                             currency: string;
+                            declines: number;
                             description: string;
                             environment: string;
                             /** Format: date-time */
@@ -97118,6 +97595,7 @@ export interface operations {
                             purpose_type: string;
                             redirect_url?: string | null;
                             refunded_cents: number;
+                            retries: number;
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
@@ -97150,9 +97628,13 @@ export interface operations {
                     "application/json": {
                         payment: {
                             amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
                             card_brand?: string | null;
                             card_last4?: string | null;
                             currency: string;
+                            declines: number;
                             description: string;
                             environment: string;
                             /** Format: date-time */
@@ -97179,6 +97661,7 @@ export interface operations {
                             purpose_type: string;
                             redirect_url?: string | null;
                             refunded_cents: number;
+                            retries: number;
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
@@ -98766,9 +99249,13 @@ export interface operations {
                     "application/json": {
                         payment: {
                             amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
                             card_brand?: string | null;
                             card_last4?: string | null;
                             currency: string;
+                            declines: number;
                             description: string;
                             environment: string;
                             /** Format: date-time */
@@ -98795,6 +99282,7 @@ export interface operations {
                             purpose_type: string;
                             redirect_url?: string | null;
                             refunded_cents: number;
+                            retries: number;
                             /** @enum {string} */
                             status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
                             /** Format: date-time */
