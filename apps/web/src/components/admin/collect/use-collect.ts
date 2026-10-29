@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 import { fetchTerminalAvailability, postTerminalResult, type TerminalPayment } from "@/api/desk-collect";
 import { useSession } from "@/components/session-provider";
@@ -20,6 +20,13 @@ export function useTerminalAvailability(enabled = true) {
     staleTime: FRESHNESS.reference,
     queryFn: () => fetchTerminalAvailability(token!),
   });
+}
+
+const subscribeNever = () => () => undefined;
+
+/** Whether this device is the store app with the terminal plugin (false on the server). */
+export function useTapToPaySupported(): boolean {
+  return useSyncExternalStore(subscribeNever, tapToPaySupported, () => false);
 }
 
 /** Whether this phone has the «Viva.com Terminal» app (null while asking). */

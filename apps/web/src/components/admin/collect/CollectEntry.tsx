@@ -8,11 +8,11 @@ import { formatTime } from "@/components/client/format";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { nativePlatform } from "@/lib/platform";
-import { tapToPaySupported } from "@/lib/platform/viva-terminal";
+
 
 import { BigLink, CollectIcon } from "./collect-ui";
 import { cardTotalCents } from "./collect-flow";
-import { useRecoveredPayment, useTerminalAppInstalled, useTerminalAvailability } from "./use-collect";
+import { useRecoveredPayment, useTapToPaySupported, useTerminalAppInstalled, useTerminalAvailability } from "./use-collect";
 
 // Where the «Viva.com Terminal» app is found (a store search: the listing
 // differs by country).
@@ -27,7 +27,7 @@ const STORE_URL = {
  * payment that came back from Viva after iOS reset the app.
  */
 export function CollectEntry() {
-  const supported = tapToPaySupported();
+  const supported = useTapToPaySupported();
   if (!supported) return null;
   return <CollectEntryOnPhone />;
 }

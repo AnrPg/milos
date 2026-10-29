@@ -28,7 +28,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
-import { parseTerminalCallback, launchTerminalSale, tapToPaySupported, vivaTerminalPlugin } from "@/lib/platform/viva-terminal";
+import { launchTerminalSale, parseTerminalCallback, vivaTerminalPlugin } from "@/lib/platform/viva-terminal";
 import { can } from "@/lib/role-navigation";
 
 import { CollectResult } from "./CollectResult";
@@ -51,7 +51,7 @@ import {
   type Step,
 } from "./collect-flow";
 import { Avatar, BigButton, BigLink, BigMark, CollectIcon, Crumb, FieldError, fieldInputClass, fieldInputStyle } from "./collect-ui";
-import { useRecoveredPayment, useTerminalAvailability } from "./use-collect";
+import { useRecoveredPayment, useTapToPaySupported, useTerminalAvailability } from "./use-collect";
 
 const EMPTY_FREE: FreeSale = { description: "", amount: "", category: "other" };
 
@@ -64,10 +64,11 @@ const EMPTY_FREE: FreeSale = { description: "", amount: "", category: "other" };
 export function CollectFlow() {
   const t = useTranslations("Collect");
   const { membership, isLoading } = useSelectedMembershipRole();
+  const supported = useTapToPaySupported();
 
   if (isLoading) return <Frame><StatusText tone="muted">{t("loading")}</StatusText></Frame>;
   if (!can(membership, "take_payments")) return <Frame><StatusText tone="muted">{t("noAccess")}</StatusText></Frame>;
-  if (!tapToPaySupported()) return <Frame><StatusText tone="muted">{t("notOnPhone")}</StatusText></Frame>;
+  if (!supported) return <Frame><StatusText tone="muted">{t("notOnPhone")}</StatusText></Frame>;
   return <Flow />;
 }
 

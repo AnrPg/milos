@@ -223,5 +223,18 @@ test.describe("public box page", () => {
     await signedIn(page, { member: true });
     await page.goto(`/b/${box.slug}`);
     await expect(page.getByRole("link", { name: "Member · Open the club" }).first()).toHaveAttribute("href", "/clubs/club-1");
+    await expect(page.getByTestId("box-guest-banner")).toHaveCount(0);
+  });
+
+  test("a guest of the box (ADR-272) sees it, with becoming a box member as the next step", async ({ page }) => {
+    await signedIn(page);
+    await page.route("**/api/memberships/guest-boxes", (route) =>
+      route.fulfill(json({ boxes: [{ id: box.organization_id, name: box.name, slug: box.slug }] })),
+    );
+    await page.goto(`/b/${box.slug}`);
+    const banner = page.getByTestId("box-guest-banner");
+    await expect(banner.getByRole("heading", { name: `You're a guest of ${box.name}` })).toBeVisible();
+    await expect(banner).toContainText("Become a box member to book classes and see the workouts.");
+    await expect(banner.getByRole("link", { name: "Become a box member" })).toHaveAttribute("href", `/b/${box.slug}/packages`);
   });
 });
