@@ -100,7 +100,9 @@ defmodule PaleeWeb.AdminFiscalComplianceControllerTest do
       assert "sandbox" in environments
 
       assert %{"errors" => errors} =
-               ctx.owner |> send_json(:put, path, %{"environment" => "production"}) |> json_response(422)
+               ctx.owner
+               |> send_json(:put, path, %{"environment" => "production"})
+               |> json_response(422)
 
       assert Map.keys(errors) |> Enum.sort() == ["api_key", "legal_entity_id"]
 
@@ -117,8 +119,12 @@ defmodule PaleeWeb.AdminFiscalComplianceControllerTest do
                connection
 
       refute inspect(connection) =~ "sc-secret-key"
-      refute ctx.accountant |> get_json(path) |> json_response(200) |> inspect() =~ "sc-secret-key"
-      refute ctx.accountant |> get_json(path) |> json_response(200) |> inspect() =~ "/api/webhooks"
+
+      refute ctx.accountant |> get_json(path) |> json_response(200) |> inspect() =~
+               "sc-secret-key"
+
+      refute ctx.accountant |> get_json(path) |> json_response(200) |> inspect() =~
+               "/api/webhooks"
 
       # Back to the sandbox for the delivery itself.
       ctx.owner |> send_json(:put, path, %{"environment" => "sandbox"}) |> json_response(200)
@@ -156,7 +162,10 @@ defmodule PaleeWeb.AdminFiscalComplianceControllerTest do
                |> json_response(200)
 
       retry = "#{ctx.admin}/fiscal/documents/#{document.id}/einvoice/retry"
-      assert %{"code" => "not_retryable"} = ctx.owner |> send_json(:post, retry, %{}) |> json_response(409)
+
+      assert %{"code" => "not_retryable"} =
+               ctx.owner |> send_json(:post, retry, %{}) |> json_response(409)
+
       assert ctx.desk |> send_json(:post, retry, %{}) |> json_response(403)
       assert ctx.coach |> get_json("#{ctx.admin}/fiscal/einvoices") |> json_response(403)
 
@@ -198,16 +207,22 @@ defmodule PaleeWeb.AdminFiscalComplianceControllerTest do
 
       assert %{"errors" => %{"device" => ["not_for_country"]}} =
                ctx.owner
-               |> send_json(:put, "#{ctx.admin}/fiscal/till-connections/rksv", %{"environment" => "sandbox"})
+               |> send_json(:put, "#{ctx.admin}/fiscal/till-connections/rksv", %{
+                 "environment" => "sandbox"
+               })
                |> json_response(422)
 
       assert %{"connection" => %{"status" => "active", "provider" => "sandbox"} = connection} =
-               ctx.owner |> send_json(:put, path, %{"environment" => "sandbox"}) |> json_response(200)
+               ctx.owner
+               |> send_json(:put, path, %{"environment" => "sandbox"})
+               |> json_response(200)
 
       refute Map.has_key?(connection, "admin_pin")
       refute Map.has_key?(connection, "api_secret")
 
-      assert ctx.desk |> send_json(:put, path, %{"environment" => "sandbox"}) |> json_response(403)
+      assert ctx.desk
+             |> send_json(:put, path, %{"environment" => "sandbox"})
+             |> json_response(403)
 
       document = issue(ctx, %{kind: "receipt", idempotency_key: "sale-1", payment_method: "cash"})
       Palee.Application.Fiscal.FiscalTillSigning.transmit(ctx.context)
@@ -230,7 +245,10 @@ defmodule PaleeWeb.AdminFiscalComplianceControllerTest do
                |> json_response(200)
 
       retry = "#{ctx.admin}/fiscal/till-signatures/#{id}/retry"
-      assert %{"code" => "not_retryable"} = ctx.owner |> send_json(:post, retry, %{}) |> json_response(409)
+
+      assert %{"code" => "not_retryable"} =
+               ctx.owner |> send_json(:post, retry, %{}) |> json_response(409)
+
       assert ctx.desk |> send_json(:post, retry, %{}) |> json_response(403)
       assert ctx.coach |> get_json("#{ctx.admin}/fiscal/till-signatures") |> json_response(403)
 
