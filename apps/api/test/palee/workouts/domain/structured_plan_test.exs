@@ -72,7 +72,7 @@ defmodule Palee.Workouts.Domain.StructuredPlanTest do
   # The same cases, codes and paths as the web `validate.test.ts`.
   describe "errors" do
     test "not a map, an unknown flow and a wrong version" do
-      assert codes("plan") == [":invalid"]
+      assert codes("plan") == [":bad_shape"]
       assert codes(section("sets", %{}, []) |> Map.put("flow", "yoga")) == ["flow:unknown_flow"]
       assert codes(section("sets", %{}, []) |> Map.put("v", 2)) == ["v:bad_version"]
     end
@@ -101,8 +101,10 @@ defmodule Palee.Workouts.Domain.StructuredPlanTest do
                })
              ) == ["params.intEvery:bad_param"]
 
-      assert codes(section("intervals", %{"rounds" => 8}, [])) == ["params.rounds:invalid"]
-      assert codes(Map.delete(section("rest", %{}, []), "params")) == ["params:invalid"]
+      assert codes(section("intervals", %{"rounds" => 8}, [])) == ["params.rounds:bad_shape"]
+      # as on the web: missing params read as none, a non-map is bad_shape
+      assert codes(Map.delete(section("rest", %{"dur" => "2:00"}, []), "params")) == []
+      assert codes(Map.put(section("rest", %{}, []), "params", "x")) == ["params:bad_shape"]
     end
 
     test "add-ons and structures only where the flow allows them" do
@@ -262,11 +264,11 @@ defmodule Palee.Workouts.Domain.StructuredPlanTest do
              ]
 
       assert codes(section("for_time", %{}, [[Map.delete(row(), "id")]])) == [
-               "blocks.0.0.id:invalid"
+               "blocks.0.0.id:bad_shape"
              ]
 
-      assert codes(section("rest", %{}, "none")) == ["blocks:invalid"]
-      assert codes(section("for_time", %{}, ["none"])) == ["blocks.0:invalid"]
+      assert codes(section("rest", %{}, "none")) == ["blocks:bad_shape"]
+      assert codes(section("for_time", %{}, ["none"])) == ["blocks.0:bad_shape"]
     end
   end
 
@@ -286,28 +288,29 @@ defmodule Palee.Workouts.Domain.StructuredPlanTest do
     end
 
     test "doses" do
-      assert %{entries: [%{min: 12, max: 12}], unit: :reps} = Notation.parse_dose("12")
+      assert %{entries: [%{min: 12, max: 12}], unit: "reps"} = Notation.parse_dose("12")
       assert %{sets: %{min: 4, max: 4}, entries: [%{min: 10}]} = Notation.parse_dose("4×10")
       assert %{entries: [_, _, _, _]} = Notation.parse_dose("12-10-8-8")
       assert %{entries: [%{min: 8, max: 12}]} = Notation.parse_dose("8-12")
       assert %{entries: [_, _, _], cont: true} = Notation.parse_dose("5-10-15…")
-      assert %{entries: [%{min: 400}], unit: :m} = Notation.parse_dose("400 m")
-      assert %{entries: [%{min: 1000}], unit: :m} = Notation.parse_dose("1 km")
-      assert %{entries: [%{min: 15}], unit: :kcal} = Notation.parse_dose("15 cal")
-      assert %{entries: [%{min: 120}], unit: :secs} = Notation.parse_dose("2:00")
-      assert %{max: %{within: 60}, unit: :kcal} = Notation.parse_dose("60s max cal")
+      assert %{entries: [%{min: 400}], unit: "m"} = Notation.parse_dose("400 m")
+      assert %{entries: [%{min: 1000}], unit: "m"} = Notation.parse_dose("1 km")
+      assert %{entries: [%{min: 15}], unit: "kcal"} = Notation.parse_dose("15 cal")
+      assert %{entries: [%{min: 120}], unit: "secs"} = Notation.parse_dose("2:00")
+      assert %{max: %{within: 60}, unit: "kcal"} = Notation.parse_dose("60s max cal")
       assert %{per_side: true} = Notation.parse_dose("10/πλευρά")
       assert Notation.parse_dose("") == nil
       assert Notation.parse_dose("lots") == :bad
     end
 
-    test "first load of a row" do
-      assert Notation.first_load("60", "kg") == %{value: 60, mode: :absolute}
-      assert Notation.first_load("70%", nil) == %{value: 70, mode: :pct_1rm}
-      assert Notation.first_load("22.5kg", nil) == %{value: 22.5, mode: :absolute}
-      assert Notation.first_load("BW", nil) == %{value: nil, mode: :bw}
-      assert Notation.first_load("βαρύ", "kg") == nil
-      assert Notation.first_load("+5", "kg") == nil
+    test "loads of a row" do
+      assert %{values: ["60 kg", "65 kg", "70 kg"], unit: "kg"} =
+               Notation.set_loads(%{"cells" => [%{"l" => "60kg"}, %{"l" => "+5"}]}, 3)
+
+      assert %{kind: "pct", entries: [%{min: 70}]} = Notation.parse_load("70%")
+      assert %{kind: "kg", entries: [%{min: 22.5}]} = Notation.parse_load("22,5kg")
+      assert Notation.parse_load("BW") == %{kind: "bw"}
+      assert %{kind: "text"} = Notation.parse_load("βαρύ")
     end
   end
 end

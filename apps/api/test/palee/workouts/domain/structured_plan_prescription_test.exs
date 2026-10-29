@@ -31,7 +31,7 @@ defmodule Palee.Workouts.Domain.StructuredPlan.PrescriptionTest do
 
   test "spread loads, decimals and per-side doses" do
     bench = row(build(15), "r30")
-    assert loads(bench) == [d(60), d("66.7"), d("73.3"), d(80)]
+    assert loads(bench) == [d(60), d("66.67"), d("73.33"), d(80)]
 
     bulgarian = row(build(13), "r28")
     assert bulgarian.per_side
@@ -150,7 +150,7 @@ defmodule Palee.Workouts.Domain.StructuredPlan.PrescriptionTest do
   test "a rest section has no rows; JSON turns decimals into numbers" do
     assert %{rows: [], clock: %{flow: "rest", dur_secs: 120}} = build(11)
     json = Prescription.to_json(build(15))
-    assert [60, 66.7, 73.3, 80] == Enum.map(hd(json.rows).sets, & &1.load.value)
+    assert [60, 66.67, 73.33, 80] == Enum.map(hd(json.rows).sets, & &1.load.value)
     assert Prescription.build(%{"flow" => "yoga"}) == nil
   end
 end

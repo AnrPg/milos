@@ -118,26 +118,13 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Prescription do
   defp total_rounds("rest", _params, false), do: 0
   defp total_rounds(_flow, params, false), do: count(params["rounds"]) || 1
 
-  defp sets_range(text) do
-    case Regex.run(~r/^(\d+)(?:\s*-\s*(\d+))?$/, String.trim(string(text) || "")) do
-      [_all, min] -> %{min: String.to_integer(min), max: String.to_integer(min)}
-      [_all, min, max] -> %{min: String.to_integer(min), max: String.to_integer(max)}
-      nil -> %{min: 1, max: 1}
-    end
-  end
+  defp sets_range(text), do: Notation.parse_count_range(text) || %{min: 1, max: 1}
 
-  defp count(text) when is_binary(text) do
-    case Integer.parse(String.trim(text)) do
-      {number, ""} when number > 0 -> number
-      _other -> nil
-    end
-  end
-
-  defp count(_text), do: nil
+  defp count(text), do: Notation.parse_count(text)
 
   defp seconds(text, bare) when is_binary(text) do
     case Notation.parse_clock(text, bare) do
-      secs when is_integer(secs) and secs > 0 -> secs
+      secs when is_number(secs) and secs > 0 -> round_number(secs)
       _other -> nil
     end
   end
@@ -145,15 +132,10 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Prescription do
   defp seconds(_text, _bare), do: nil
 
   defp time_range(text, bare) when is_binary(text) do
-    case seconds(text, bare) do
-      nil ->
-        case Notation.parse_times(text, bare) do
-          %{range: true, secs: [min, max]} -> %{min: min, max: max}
-          _other -> nil
-        end
-
-      secs ->
-        %{min: secs, max: secs}
+    case Notation.parse_times(text, bare) do
+      %{range: true, secs: [min, max]} -> %{min: round_number(min), max: round_number(max)}
+      %{secs: [secs]} when secs > 0 -> %{min: round_number(secs), max: round_number(secs)}
+      _other -> nil
     end
   end
 
@@ -161,7 +143,7 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Prescription do
 
   defp windows(text) when is_binary(text) do
     case Notation.parse_times(text, :min) do
-      %{secs: secs} -> secs
+      %{secs: secs} -> Enum.map(secs, &round_number/1)
       _other -> []
     end
   end
@@ -227,7 +209,7 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Prescription do
   end
 
   defp written?(%{} = cell),
-    do: Enum.any?(cell, fn {_key, value} -> String.trim(to_string(value || "")) != "" end)
+    do: Enum.any?(cell, fn {_key, value} -> is_binary(value) and String.trim(value) != "" end)
 
   defp written?(_cell), do: false
 
@@ -272,10 +254,9 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Prescription do
   # Per set / per round: the cells, with the editor's column rules.
   defp cell_columns(row, measures, rounds) do
     n = length(rounds)
-    cells = list(row, "cells")
-    doses = repeat(cells, "d", n)
-    loads = cell_loads(cells, n)
-    measure_values = Map.new(measures, fn key -> {key, measure_column(cells, key, n)} end)
+    doses = row |> Notation.repeat_text("d", n) |> Enum.map(&blank_to_nil/1)
+    loads = cell_loads(row, n)
+    measure_values = Map.new(measures, fn key -> {key, measure_column(row, key, n)} end)
 
     sets =
       rounds
@@ -302,7 +283,7 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Prescription do
 
     values =
       Enum.reduce(measures, empty_measures(), fn key, acc ->
-        put_measure(acc, key, canonical(key, string(x[key]) || ""))
+        put_measure(acc, key, canonical(key, x[key]))
       end)
 
     sets =
@@ -313,7 +294,7 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Prescription do
           index: i + 1,
           rounds: round_numbers,
           reps: reps(dose, i),
-          load: compact_load(load, i),
+          load: load && compact_load(load, i),
           measures: values
         }
       end)
@@ -351,9 +332,9 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Prescription do
       else: %{rule: "repeat", reps_step: nil, load_step: nil}
   end
 
-  defp dose_step(%{cont: true, entries: entries}) when length(entries) >= 2 do
+  defp dose_step(%{cont: true, entries: [_, _ | _] = entries}) do
     [a, b] = Enum.take(entries, -2)
-    b.min - a.min
+    round_number(b.min - a.min)
   end
 
   defp dose_step(_dose), do: nil
@@ -378,18 +359,18 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Prescription do
       max: nil,
       unit: unit(dose.unit),
       max_effort: true,
-      within_secs: within,
+      within_secs: within && round_number(within),
       sets: dose.sets,
       text: nil
     }
   end
 
-  defp reps(%{entries: entries} = dose, i) when is_list(entries) do
-    entry = entry_at(dose, i)
+  defp reps(%{entries: [_ | _]} = dose, i) do
+    entry = Notation.entry_at(dose, i)
 
     %{
-      min: number(entry.min),
-      max: number(entry.max),
+      min: round_number(entry.min),
+      max: round_number(entry.max),
       unit: unit(dose.unit),
       max_effort: false,
       within_secs: nil,
@@ -400,242 +381,76 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Prescription do
 
   defp reps(_dose, _i), do: nil
 
-  defp entry_at(%{entries: [only]}, _i), do: only
-
-  defp entry_at(%{entries: entries, cont: cont}, i) do
-    cond do
-      i < length(entries) ->
-        Enum.at(entries, i)
-
-      cont ->
-        [a, b] = Enum.take(entries, -2)
-        value = b.min + (b.min - a.min) * (i - length(entries) + 1)
-        %{min: value, max: value}
-
-      true ->
-        List.last(entries)
-    end
-  end
-
-  defp unit(:reps), do: "reps"
-  defp unit(:secs), do: "secs"
-  defp unit(:kcal), do: "kcal"
-  defp unit(:m), do: "meters"
+  defp unit("m"), do: "meters"
+  defp unit(unit), do: unit
 
   # ── load ─────────────────────────────────────────────
 
-  @load_num ~r/^([+-]?\d+(?:\.\d+)?)\s*(%|kg)?(?:\s*(?:→|->|ως|έως)\s*(\d+(?:\.\d+)?)\s*(%|kg)?)?$/u
-
-  # The editor's `setLoads`, with numbers: empty repeats (or keeps adding
-  # the last +x, or keeps spreading a→b), words pass through.
-  defp cell_loads(cells, n) do
-    raws =
-      Enum.map(0..(n - 1)//1, fn i ->
-        load_raw(StructuredPlan.cell_value(Enum.at(cells, i), "l"))
-      end)
-
-    matches = Enum.map(raws, fn raw -> raw != "" && Regex.run(@load_num, raw) end)
-    unit = Enum.find_value(matches, &stated_unit/1)
-
-    {values, state} =
-      raws
-      |> Enum.zip(matches)
-      |> Enum.with_index()
-      |> Enum.map_reduce(%{prev: nil, delta: nil, spread: nil, last: nil}, fn {{raw, match}, i},
-                                                                              state ->
-        {value, state} = load_step(raw, match, i, n, unit, Enum.at(cells, i), state)
-        {value, %{state | last: value}}
-      end)
-
-    %{values: values, step: if(state.delta, do: decimal(state.delta))}
+  # The editor's `setLoads` as numbers: empty repeats (or keeps adding the
+  # last +x, or keeps spreading a→b), words pass through.
+  defp cell_loads(row, n) do
+    %{readings: readings, step: step} = Notation.set_load_readings(row, n)
+    %{values: Enum.map(readings, &reading_load/1), step: step && decimal(step)}
   end
 
-  defp load_step("", _match, i, n, unit, _cell, state) do
-    prev =
-      cond do
-        # Spread loads read as the editor shows them (one decimal).
-        state.spread -> Float.round(spread_at(state.spread, i, n) / 1, 1)
-        state.delta && state.prev -> state.prev + state.delta
-        true -> state.prev
-      end
+  defp reading_load(%{kind: :value, value: value, unit: unit}),
+    do: numeric_load(value, nil, unit, nil)
 
-    value = if prev && unit, do: numeric_load(prev, unit), else: state.last
-    {value, %{state | prev: prev}}
-  end
+  defp reading_load(%{kind: :up, value: value, unit: unit}),
+    do: numeric_load(value, nil, unit, "up")
 
-  defp load_step(_raw, match, _i, _n, _unit, cell, state) when match in [nil, false] do
-    {qualitative(StructuredPlan.cell_value(cell, "l")),
-     %{state | prev: nil, delta: nil, spread: nil}}
-  end
+  defp reading_load(%{kind: :range, min: min, max: max, unit: unit}),
+    do: numeric_load(min, max, unit, nil)
 
-  defp load_step(_raw, [_all, number | rest], i, _n, unit, _cell, state) do
-    to = Enum.at(rest, 1)
-    value = to_number(number)
+  defp reading_load(%{kind: :words, text: text}), do: qualitative(text)
+  defp reading_load(_none), do: nil
 
-    cond do
-      is_nil(unit) ->
-        {nil, state}
-
-      String.starts_with?(number, ["+", "-"]) and state.prev != nil and to in [nil, ""] ->
-        prev = state.prev + value
-        {numeric_load(prev, unit), %{state | prev: prev, delta: value, spread: nil}}
-
-      to not in [nil, ""] ->
-        prev = abs(value)
-        spread = %{a: prev, b: to_number(to), i: i}
-        {numeric_load(prev, unit), %{state | prev: prev, delta: nil, spread: spread}}
-
-      true ->
-        prev = abs(value)
-        {numeric_load(prev, unit), %{state | prev: prev, delta: nil, spread: nil}}
-    end
-  end
-
-  defp spread_at(%{a: a, b: b, i: from}, i, n),
-    do: a + (b - a) * (i - from) / max(1, n - 1 - from)
-
-  defp numeric_load(nil, _unit), do: nil
-  defp numeric_load(_value, nil), do: nil
-
-  defp numeric_load(value, unit) do
+  defp numeric_load(value, value_max, unit, text) do
     %{
-      kind: if(unit == "%", do: "pct_1rm", else: "kg"),
+      kind: if(unit in ["%", "pct"], do: "pct_1rm", else: "kg"),
       value: decimal(value),
-      value_max: nil,
-      text: nil
+      value_max: value_max && decimal(value_max),
+      text: text
     }
   end
 
-  defp qualitative(""), do: nil
+  defp qualitative(text) when is_binary(text) do
+    case String.trim(text) do
+      "" -> nil
+      trimmed -> %{kind: "qualitative", value: nil, value_max: nil, text: trimmed}
+    end
+  end
 
-  defp qualitative(text),
-    do: %{kind: "qualitative", value: nil, value_max: nil, text: String.trim(text)}
+  defp qualitative(_text), do: nil
 
-  defp compact_load(nil, _i), do: nil
-
-  defp compact_load(%{kind: :bw}, _i),
+  defp compact_load(%{kind: "bw"}, _i),
     do: %{kind: "bodyweight", value: nil, value_max: nil, text: nil}
 
-  defp compact_load(%{kind: kind, entries: entries} = load, i) when kind in [:kg, :pct] do
+  defp compact_load(%{kind: kind, entries: [_ | _] = entries} = load, i)
+       when kind in ["kg", "pct"] do
     entry = Enum.at(entries, i) || List.last(entries)
-
-    %{
-      kind: if(kind == :pct, do: "pct_1rm", else: "kg"),
-      value: decimal(entry.min),
-      value_max: if(entry.max != entry.min, do: decimal(entry.max)),
-      text: if(load.up, do: "up")
-    }
+    value_max = if entry.max != entry.min, do: entry.max
+    numeric_load(entry.min, value_max, kind, if(load.up, do: "up"))
   end
 
-  defp compact_load(%{kind: :text, text: text}, _i), do: qualitative(text)
-
-  defp compact_load(%{kind: _other}, _i), do: nil
-
-  defp load_raw(text) do
-    text
-    |> String.trim()
-    |> String.downcase()
-    |> String.replace(",", ".", global: false)
-    |> String.replace(~r/κιλ[άα]?/u, "kg", global: false)
-  end
-
-  defp stated_unit([_all | groups]) do
-    case Enum.at(groups, 3) do
-      unit when unit in ["kg", "%"] -> unit
-      _none -> if Enum.at(groups, 1) in ["kg", "%"], do: Enum.at(groups, 1)
-    end
-  end
-
-  defp stated_unit(_match), do: nil
+  defp compact_load(%{kind: "text", text: text}, _i), do: qualitative(text)
+  defp compact_load(_load, _i), do: nil
 
   # ── measures ─────────────────────────────────────────
 
-  defp measure_column(cells, "tempo", n),
-    do: cells |> repeat("tempo", n) |> Enum.map(&canonical("tempo", &1 || ""))
+  defp measure_column(row, "tempo", n),
+    do: row |> Notation.repeat_text("tempo", n) |> Enum.map(&Notation.tempo_parts/1)
 
-  defp measure_column(cells, key, n) do
+  defp measure_column(row, key, n) do
     clock? = Catalog.measure(key).clock
 
-    texts =
-      Enum.map(0..(n - 1)//1, fn i ->
-        text = StructuredPlan.cell_value(Enum.at(cells, i), key)
-        # "z2" is zone 2.
-        if key == "zone",
-          do: String.replace(text, ~r/^\s*(z|zone|ζώνη|ζωνη)\s*/iu, ""),
-          else: text
-      end)
-
-    {values, _state} =
-      Enum.map_reduce(texts, %{prev: nil, delta: nil, spread: nil, suffix: ""}, fn text, state ->
-        measure_step(
-          String.trim(text) |> String.replace(",", ".", global: false),
-          texts,
-          n,
-          clock?,
-          state
-        )
-      end)
-
-    Enum.map(values, fn
-      nil -> nil
-      {value, suffix} -> canonical_number(key, value, suffix)
+    row
+    |> Notation.progress_readings(key, n, clock?)
+    |> Enum.map(fn
+      %{value: value, suffix: suffix} -> canonical_number(key, value, suffix)
+      _text_or_nil -> nil
     end)
   end
-
-  defp measure_step("", texts, n, _clock?, state) do
-    i = state_index(state, texts)
-
-    prev =
-      cond do
-        state.spread -> spread_at(state.spread, i, n)
-        state.delta && state.prev -> state.prev + state.delta
-        true -> state.prev
-      end
-
-    {prev && {prev, state.suffix}, Map.merge(state, %{prev: prev, i: i + 1})}
-  end
-
-  defp measure_step(text, texts, _n, clock?, state) do
-    i = state_index(state, texts)
-    state = Map.put(state, :i, i + 1)
-
-    cond do
-      (match = Regex.run(~r/^([+-])(\d+(?::\d\d)?(?:\.\d+)?)$/, text)) && state.prev != nil ->
-        [_all, sign, amount] = match
-        delta = if(sign == "-", do: -1, else: 1) * measure_number(amount, clock?)
-        prev = state.prev + delta
-        {{prev, state.suffix}, %{state | prev: prev, delta: delta, spread: nil}}
-
-      match =
-          Regex.run(
-            ~r/^(\d+(?::\d\d)?(?:\.\d+)?)\s*(?:→|->)\s*(\d+(?::\d\d)?(?:\.\d+)?)(.*)$/u,
-            text
-          ) ->
-        [_all, from, to, suffix] = match
-        prev = measure_number(from, clock?)
-        spread = %{a: prev, b: measure_number(to, clock?), i: i}
-        {{prev, suffix}, %{state | prev: prev, delta: nil, spread: spread, suffix: suffix}}
-
-      match = Regex.run(~r/^(\d+(?::\d\d)?(?:\.\d+)?)(.*)$/u, text) ->
-        [_all, number, suffix] = match
-        prev = measure_number(number, clock?)
-        {{prev, suffix}, %{state | prev: prev, delta: nil, spread: nil, suffix: suffix}}
-
-      true ->
-        {nil, %{state | prev: nil, delta: nil, spread: nil}}
-    end
-  end
-
-  defp state_index(state, _texts), do: Map.get(state, :i, 0)
-
-  defp measure_number(text, true) do
-    case String.split(text, ":") do
-      [minutes, seconds] -> String.to_integer(minutes) * 60 + String.to_integer(seconds)
-      [number] -> to_number(number)
-    end
-  end
-
-  defp measure_number(text, false), do: to_number(text)
 
   defp measures_at(values, i) do
     Enum.reduce(values, empty_measures(), fn {key, column}, acc ->
@@ -668,19 +483,12 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Prescription do
   defp measure_field("dist"), do: :distance_m
   defp measure_field("hold"), do: :hold_secs
 
-  # One typed value ("2:00", "31X1", "z2", "1.2 m", "2 km") in canonical units.
-  defp canonical(_key, ""), do: nil
-  defp canonical("tempo", text), do: Notation.tempo_parts(text)
+  # One typed value ("2:00", "31X1", "z2", "1.2 m", "2 km") in canonical
+  # units, read as one column of the editor.
+  defp canonical(key, text) when key in @measure_keys and is_binary(text),
+    do: %{"cells" => [%{key => text}]} |> measure_column(key, 1) |> hd()
 
-  defp canonical(key, text) when key in @measure_keys do
-    clock? = Catalog.measure(key).clock
-    text = text |> String.trim() |> String.replace(",", ".", global: false)
-
-    case Regex.run(~r/^z?\s*(\d+(?::\d\d)?(?:\.\d+)?)(.*)$/iu, text) do
-      [_all, number, suffix] -> canonical_number(key, measure_number(number, clock?), suffix)
-      nil -> nil
-    end
-  end
+  defp canonical(_key, _text), do: nil
 
   defp canonical_number("pace", secs, suffix) do
     suffix = String.downcase(suffix)
@@ -727,31 +535,9 @@ defmodule Palee.Workouts.Domain.StructuredPlan.Prescription do
     }
   end
 
+  defp structure(_struct), do: nil
+
   # ── helpers ──────────────────────────────────────────
-
-  defp repeat(cells, key, n) do
-    {values, _last} =
-      Enum.map_reduce(0..(n - 1)//1, nil, fn i, last ->
-        case String.trim(StructuredPlan.cell_value(Enum.at(cells, i), key)) do
-          "" -> {last, last}
-          text -> {text, text}
-        end
-      end)
-
-    values
-  end
-
-  defp to_number(text) do
-    text = String.trim_leading(text, "+")
-
-    case Float.parse(text) do
-      {value, ""} -> round_number(value)
-      _other -> 0
-    end
-  end
-
-  defp number(value) when is_float(value), do: round_number(value)
-  defp number(value), do: value
 
   defp round_number(value) when is_integer(value), do: value
 
