@@ -5808,6 +5808,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/documents/outstanding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Per active document: how many clients signed and who has not */
+        get: operations["PaleeWeb.AdminDocumentsController.outstanding"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/documents/requests": {
         parameters: {
             query?: never;
@@ -71837,6 +71854,43 @@ export interface operations {
                         }[];
                         /** Format: uuid */
                         user_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.outstanding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Outstanding */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        templates: {
+                            /** @description Clients who have not signed */
+                            clients: {
+                                display_name: string | null;
+                                handle: string | null;
+                                /** @enum {string} */
+                                status: "unsigned" | "resign_required";
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                            outstanding: number;
+                            /** @description Clients whose signature counts */
+                            signed: number;
+                            /** Format: uuid */
+                            template_id: string;
+                        }[];
                     };
                 };
             };
