@@ -135,7 +135,11 @@ defmodule PaleeWeb.Schemas.Setup do
         from: @any,
         to: @any,
         name: %Schema{type: :string, nullable: true},
-        advanced: %Schema{type: :boolean}
+        advanced: %Schema{type: :boolean},
+        owner_changed: %Schema{
+          type: :boolean,
+          description: "The current value is the owner's own choice, not the default"
+        }
       },
       required: [:action, :advanced, :area, :from, :key, :name, :to]
     }
@@ -152,9 +156,14 @@ defmodule PaleeWeb.Schemas.Setup do
         changes: %Schema{type: :array, items: change()},
         manual: %Schema{type: :array, items: change()},
         unchanged: %Schema{type: :array, items: %Schema{type: :string}},
+        kept: %Schema{
+          type: :array,
+          items: %Schema{type: :string},
+          description: "Settings left at the owner's own value (mode defaults_only)"
+        },
         change_count: %Schema{type: :integer, minimum: 0}
       },
-      required: [:change_count, :changes, :manual, :name, :recipe, :unchanged, :version]
+      required: [:change_count, :changes, :kept, :manual, :name, :recipe, :unchanged, :version]
     }
   end
 
@@ -191,9 +200,37 @@ defmodule PaleeWeb.Schemas.Setup do
       properties: %{
         recipes: %Schema{type: :array, items: recipe()},
         applications: %Schema{type: :array, items: application()},
-        can_apply: %Schema{type: :boolean, description: "Only the owner applies a recipe"}
+        can_apply: %Schema{type: :boolean, description: "Only the owner applies a recipe"},
+        currency: %Schema{type: :string, description: "ISO currency of the suggested prices"}
       },
-      required: [:applications, :can_apply, :recipes]
+      required: [:applications, :can_apply, :currency, :recipes]
+    }
+  end
+
+  def apply_body do
+    %OpenApiSpex.RequestBody{
+      required: false,
+      content: %{
+        "application/json" => %OpenApiSpex.MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{
+              prices: %Schema{
+                type: :object,
+                description:
+                  "The owner's prices for the recipe's packages: package code => cents",
+                additionalProperties: %Schema{type: :integer, minimum: 0, maximum: 10_000_000}
+              },
+              mode: %Schema{
+                type: :string,
+                enum: ["all", "defaults_only"],
+                description:
+                  "all (default): change every setting; defaults_only: keep the ones the owner changed"
+              }
+            }
+          }
+        }
+      }
     }
   end
 

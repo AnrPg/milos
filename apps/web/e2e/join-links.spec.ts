@@ -84,6 +84,7 @@ test.describe("join links per role", () => {
     await dialog.getByRole("tab", { name: "Join links" }).click();
 
     const member = dialog.getByRole("region", { name: "Link for box members" });
+    await dialog.getByTestId("join-link-advanced").getByRole("button", { name: /Advanced/ }).click();
     const athlete = dialog.getByRole("region", { name: "Link for athletes" });
     await expect(member.getByRole("textbox")).toHaveValue(/\/join\/kypseli$/);
     await expect(athlete).toContainText("Off.");

@@ -27,7 +27,9 @@ import {
   type DirectoryRole,
   type DirectorySort,
 } from "@/lib/users-directory";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { can } from "@/lib/role-navigation";
 import { Select } from "@/components/ui/Select";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
@@ -57,6 +59,7 @@ export function AdminUsersDirectory() {
   const i18n = useUiTranslations();
   const locale = useUiLocale();
   const organizationSlug = useOrganizationSlug();
+  const { membership } = useSelectedMembershipRole();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -133,7 +136,21 @@ export function AdminUsersDirectory() {
               ) : null}
             </span>
           }
-          actions={<InviteClientsButton />}
+          actions={
+            <>
+              {/* ADR-254: bringing clients in from another system (mockup s9). */}
+              {can(membership, "manage_settings") ? (
+                <Link
+                  href={adminHref("/admin/users/import", organizationSlug)}
+                  className="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold"
+                  style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+                >
+                  {t("importLink")}
+                </Link>
+              ) : null}
+              <InviteClientsButton />
+            </>
+          }
         />
 
         <CollapsibleFilterBar

@@ -57,6 +57,7 @@ defmodule PaleeWeb.AdminSetupControllerTest do
     assert "crossfit_box" in keys and "independent_coach" in keys
     assert body["can_apply"] == true
     assert body["applications"] == []
+    assert body["currency"] =~ ~r/^[A-Z]{3}$/
 
     crossfit = Enum.find(body["recipes"], &(&1["key"] == "crossfit_box"))
     assert crossfit["names"] == %{"en" => "CrossFit box", "el" => "CrossFit box"}
@@ -81,6 +82,72 @@ defmodule PaleeWeb.AdminSetupControllerTest do
 
     history = owner |> get(base <> "/setup/recipes") |> json_response(200)
     assert [%{"change_count" => 0}, %{"recipe_key" => "open_gym"}] = history["applications"]
+  end
+
+  test "apply takes the owner's prices from the preview", %{owner: owner, base: base} do
+    body = Jason.encode!(%{prices: %{"setup_unlimited" => 7_500}})
+
+    applied =
+      owner
+      |> recycle()
+      |> put_req_header("content-type", "application/json")
+      |> post(base <> "/setup/recipes/crossfit_box/apply", body)
+      |> json_response(200)
+
+    unlimited = Enum.find(applied["plan"]["changes"], &(&1["key"] == "package.setup_unlimited"))
+    assert unlimited["to"] == 7_500
+
+    bad = Jason.encode!(%{prices: %{"setup_bowling" => 100}})
+
+    assert %{"code" => "invalid_recipe_prices"} =
+             owner
+             |> recycle()
+             |> put_req_header("content-type", "application/json")
+             |> post(base <> "/setup/recipes/functional_hyrox/apply", bad)
+             |> json_response(422)
+  end
+
+  test "the preview marks the owner's own values; defaults_only keeps them", %{
+    owner: owner,
+    base: base
+  } do
+    owner
+    |> recycle()
+    |> put_req_header("content-type", "application/json")
+    |> patch(base <> "/settings", Jason.encode!(%{scheduling: %{default_capacity: 20}}))
+    |> json_response(200)
+
+    preview =
+      owner
+      |> recycle()
+      |> post_json(base <> "/setup/recipes/crossfit_box/preview")
+      |> json_response(200)
+
+    capacity = Enum.find(preview["changes"], &(&1["key"] == "scheduling.default_capacity"))
+    assert %{"from" => 20, "to" => 16, "owner_changed" => true} = capacity
+    assert preview["kept"] == []
+
+    applied =
+      owner
+      |> recycle()
+      |> put_req_header("content-type", "application/json")
+      |> post(
+        base <> "/setup/recipes/crossfit_box/apply",
+        Jason.encode!(%{mode: "defaults_only"})
+      )
+      |> json_response(200)
+
+    assert applied["plan"]["kept"] == ["scheduling.default_capacity"]
+    refute Enum.any?(applied["plan"]["changes"], &(&1["key"] == "scheduling.default_capacity"))
+
+    settings = owner |> recycle() |> get(base <> "/settings") |> json_response(200)
+    assert settings["scheduling"]["default_capacity"] == 20
+
+    assert owner
+           |> recycle()
+           |> put_req_header("content-type", "application/json")
+           |> post(base <> "/setup/recipes/crossfit_box/apply", Jason.encode!(%{mode: "some"}))
+           |> json_response(422)
   end
 
   test "only the owner applies; a coach cannot see recipes", %{

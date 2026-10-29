@@ -457,6 +457,7 @@ test.describe("staff community", () => {
 
     await page.goto("/org/kypseli/admin/community");
     await expect(page.getByRole("heading", { name: "Community" })).toBeVisible();
+    await page.getByTestId("community-advanced").getByRole("button", { name: /Advanced/ }).click();
     await expect(page.getByRole("radio", { name: /With approval/ })).toHaveAttribute("aria-checked", "true");
     await expect(page.getByText("Mobility club")).toBeVisible();
     await page.getByRole("button", { name: "Approve" }).click();

@@ -17,6 +17,43 @@ defmodule Palee.Setup.Domain.RecipesTest do
     assert {:error, :recipe_not_found} = Recipes.fetch(nil)
   end
 
+  describe "with_prices/2 (the owner's prices from the preview, mockup s10 A)" do
+    setup do
+      {:ok, recipe} = Recipes.fetch("crossfit_box")
+      %{recipe: recipe}
+    end
+
+    test "replaces the prices of the named packages only", %{recipe: recipe} do
+      assert {:ok, priced} = Recipe.with_prices(recipe, %{"setup_unlimited" => 7_500})
+      prices = Map.new(priced.packages, &{&1.code, &1.base_price_cents})
+      assert prices["setup_unlimited"] == 7_500
+
+      for package <- recipe.packages, package.code != "setup_unlimited" do
+        assert prices[package.code] == package.base_price_cents
+      end
+    end
+
+    test "keeps the recipe without prices", %{recipe: recipe} do
+      assert {:ok, ^recipe} = Recipe.with_prices(recipe, nil)
+      assert {:ok, ^recipe} = Recipe.with_prices(recipe, %{})
+    end
+
+    test "refuses unknown codes and prices that are not whole non-negative cents", %{
+      recipe: recipe
+    } do
+      for prices <- [
+            %{"setup_bowling" => 100},
+            %{"setup_unlimited" => -1},
+            %{"setup_unlimited" => 12.5},
+            %{"setup_unlimited" => "80"},
+            %{"setup_unlimited" => 10_000_001},
+            ["setup_unlimited"]
+          ] do
+        assert {:error, :invalid_recipe_prices} = Recipe.with_prices(recipe, prices)
+      end
+    end
+  end
+
   for recipe <- Palee.Setup.Domain.Recipes.all() do
     @recipe recipe
 
