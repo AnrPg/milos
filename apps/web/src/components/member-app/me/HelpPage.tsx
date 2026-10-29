@@ -15,8 +15,8 @@ import { adminHref } from "@/lib/organization-slug";
 import { ownsCoachPractice } from "@/lib/solo-coach";
 import { clientExtraLinks } from "@/lib/role-navigation";
 
-/** Where «Αναφορά προβλήματος» writes; without one configured the row stays out. */
-const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? "";
+/** Where «Αναφορά προβλήματος» writes (the vendor's support inbox); a build can point it elsewhere. */
+const SUPPORT_EMAIL = process.env.NEXT_PUBLIC_SUPPORT_EMAIL || "support@palee.app";
 
 /**
  * Εγώ › Βοήθεια & ξενάγηση (vision §7.11, mockup «help», ADR-196): the
