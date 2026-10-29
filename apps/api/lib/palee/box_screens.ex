@@ -47,7 +47,7 @@ defmodule Palee.BoxScreens do
                created_by_id: actor_id
              })
            ) do
-      {:ok, screen, %{code: code, expires_at: code_attrs.pairing_code_expires_at}}
+      {:ok, screen, %{code: code, expires_at: screen.pairing_code_expires_at}}
     end
   end
 
@@ -76,7 +76,7 @@ defmodule Palee.BoxScreens do
     {code, attrs} = new_code(now)
 
     with {:ok, screen} <- BoxScreenStore.update(context, id, attrs) do
-      {:ok, screen, %{code: code, expires_at: attrs.pairing_code_expires_at}}
+      {:ok, screen, %{code: code, expires_at: screen.pairing_code_expires_at}}
     end
   end
 

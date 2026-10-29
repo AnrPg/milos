@@ -35,7 +35,7 @@ defmodule Palee.BoxScreensTest do
     assert screen.name == "Αίθουσα 1"
     assert screen.organization_id == ctx.organization.id
     assert screen.token_version == 0
-    assert expires_at == ~U[2027-02-09 10:15:00Z]
+    assert DateTime.compare(expires_at, ~U[2027-02-09 10:15:00Z]) == :eq
     assert screen.pairing_code_hash == :crypto.hash(:sha256, String.replace(code, "-", ""))
 
     %{rows: [[stored]]} =

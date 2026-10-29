@@ -29,7 +29,7 @@ defmodule Palee.BoxScreens.Domain.ScreenPrivacy do
     approved =
       bookings
       |> Enum.filter(&(&1.status in [:approved, "approved"]))
-      |> Enum.sort_by(& &1.inserted_at, DateTime)
+      |> Enum.sort_by(& &1.inserted_at, &not_later?/2)
 
     names =
       approved
@@ -45,6 +45,13 @@ defmodule Palee.BoxScreens.Domain.ScreenPrivacy do
       unnamed: length(approved) - length(names)
     }
   end
+
+  defp not_later?(%DateTime{} = a, %DateTime{} = b), do: DateTime.compare(a, b) != :gt
+
+  defp not_later?(%NaiveDateTime{} = a, %NaiveDateTime{} = b),
+    do: NaiveDateTime.compare(a, b) != :gt
+
+  defp not_later?(a, b), do: a <= b
 
   @doc "Whom a booking names (members only), for loading their names."
   def nameable_user_ids(bookings) do

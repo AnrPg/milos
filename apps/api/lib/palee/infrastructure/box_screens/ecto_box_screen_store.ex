@@ -64,6 +64,8 @@ defmodule Palee.Infrastructure.BoxScreens.EctoBoxScreenStore do
 
   @impl true
   def find_pairing(hash, %DateTime{} = now) when is_binary(hash) do
+    now = usec(now)
+
     case Repo.query!(
            "SELECT organization_id, screen_id FROM palee_box_screen_pairing($1, $2)",
            [hash, now]
@@ -78,6 +80,8 @@ defmodule Palee.Infrastructure.BoxScreens.EctoBoxScreenStore do
 
   @impl true
   def claim(%{organization_id: organization_id}, id, hash, %DateTime{} = now) do
+    now = usec(now)
+
     Repo.transaction(fn ->
       BoxScreen
       |> where([s], s.id == ^id and s.organization_id == ^organization_id)
@@ -105,6 +109,7 @@ defmodule Palee.Infrastructure.BoxScreens.EctoBoxScreenStore do
 
   @impl true
   def touch(%{organization_id: organization_id}, id, %DateTime{} = now) do
+    now = usec(now)
     stale = DateTime.add(now, -@touch_every_seconds, :second)
 
     BoxScreen
@@ -125,6 +130,9 @@ defmodule Palee.Infrastructure.BoxScreens.EctoBoxScreenStore do
       true -> :invalid_box_screen
     end
   end
+
+  defp usec(%DateTime{microsecond: {value, _precision}} = at),
+    do: %{at | microsecond: {value, 6}}
 
   defp to_map(%BoxScreen{} = screen), do: screen |> Map.from_struct() |> Map.delete(:__meta__)
 end
