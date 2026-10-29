@@ -11,7 +11,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 
-import { completeExecution, fetchExecution, type SectionScore } from "@/api/executions";
+import { completeExecution, fetchExecution, type PlanSetActual, type SectionScore } from "@/api/executions";
 import type { JournalComment } from "@/api/journal-comments";
 import { fetchWorkout } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
@@ -22,12 +22,14 @@ import { changeDraft, finishWrites, type FinishComments } from "@/lib/journal-co
 
 import { FinishWizard } from "../FinishWizard";
 import { PlanExecution, type PlanRunLog, type PlanRunResult } from "./PlanExecution";
+import { decimal } from "./actuals";
 import { planSections, type RunnablePlanSection } from "./plan-workout";
 import { scoreSegment } from "./score";
 
 type Loaded = { title: string; sections: RunnablePlanSection[] };
 
-const asValue = (text: string): string | number => (/^\d+(?:\.\d+)?$/.test(text) ? Number(text) : text);
+/** A logged or prescribed value: a decimal number when it reads as one ("22,5", "65 kg"), else the text. */
+const asValue = (text: string): string | number => decimal(text) ?? text;
 
 export function PlanExecutionMode({ executionId }: { executionId: string }) {
   const t = useTranslations("PlanRun");
@@ -39,6 +41,7 @@ export function PlanExecutionMode({ executionId }: { executionId: string }) {
   const [index, setIndex] = useState(0);
   const [scores, setScores] = useState<SectionScore[]>([]);
   const [elapsed, setElapsed] = useState<Record<string, number>>({});
+  const [actuals, setActuals] = useState<Record<string, PlanSetActual[]>>({});
   const [comments, setComments] = useState<JournalComment[]>([]);
   const [finishing, setFinishing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -53,9 +56,12 @@ export function PlanExecutionMode({ executionId }: { executionId: string }) {
     (async () => {
       try {
         const execution = await fetchExecution(accessToken, executionId);
-        if (!execution.master_workout_id) throw new Error("no workout");
-        const workout = await fetchWorkout(accessToken, execution.master_workout_id);
+        const workout = execution.master_workout_id ? await fetchWorkout(accessToken, execution.master_workout_id) : null;
         if (cancelled) return;
+        if (!workout) {
+          setFailed(true);
+          return;
+        }
         setLoaded({ title: workout.title, sections: planSections(workout) });
         setComments(execution.comments ?? []);
       } catch {
@@ -79,7 +85,7 @@ export function PlanExecutionMode({ executionId }: { executionId: string }) {
   async function log(section: RunnablePlanSection, entry: PlanRunLog) {
     const { step, field, actual, canonical } = entry;
     const draft = changeDraft("execution", executionId, {
-      patch_id: ["plan", section.id, step.rowId, step.round, step.part?.index ?? 0, field].join(":"),
+      patch_id: ["plan", section.id, step.rowId, step.block, step.round, step.part?.index ?? 0, field].join(":"),
       field: field === "reps" ? "reps" : "load",
       type: field === "reps" ? "reps_changed" : "weight_changed",
       section_id: section.id,
@@ -90,6 +96,7 @@ export function PlanExecutionMode({ executionId }: { executionId: string }) {
       round_index: step.round,
       actual_value: asValue(actual),
       canonical_value: asValue(canonical),
+      ...(field === "load" ? { unit: "kg" } : {}),
     });
     try {
       const { comment } = await commentWriter.save(draft);
@@ -102,6 +109,7 @@ export function PlanExecutionMode({ executionId }: { executionId: string }) {
   function completeSection(section: RunnablePlanSection, result: PlanRunResult) {
     if (result.score) setScores((current) => [...current.filter((s) => s.section_id !== section.id), result.score!]);
     setElapsed((current) => ({ ...current, [section.id]: result.elapsedMs }));
+    setActuals((current) => ({ ...current, [section.id]: result.actuals }));
     if (loaded && index + 1 < loaded.sections.length) setIndex(index + 1);
     else setFinishing(true);
   }
@@ -121,6 +129,7 @@ export function PlanExecutionMode({ executionId }: { executionId: string }) {
         total_elapsed_ms: Math.round(Object.values(elapsed).reduce((a, b) => a + b, 0)),
         section_elapsed_ms: elapsed,
         segment_cycle_counts: {},
+        plan_actuals: (loaded?.sections ?? []).flatMap((s) => actuals[s.id] ?? []),
       });
       router.push("/");
     } catch {

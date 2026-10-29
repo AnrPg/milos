@@ -26,6 +26,7 @@ import {
   type RunState,
   upcomingStep,
 } from "./runner";
+import { planActuals, type PlanSetActual } from "./actuals";
 import { measuredScore, type RunLogs, scoreSegment, type StepLog } from "./score";
 import { buildSequence, type RunRest, type RunSequence, type RunStep, type RunWork } from "./sequence";
 
@@ -34,7 +35,7 @@ const TICK_MS = 250;
 /** One value the athlete logged that differs from the target. */
 export type PlanRunLog = { step: RunWork; field: "reps" | "load"; actual: string; canonical: string };
 
-export type PlanRunResult = { score: SectionScore | null; elapsedMs: number };
+export type PlanRunResult = { score: SectionScore | null; elapsedMs: number; actuals: PlanSetActual[] };
 
 type Props = {
   section: PlanSection;
@@ -207,7 +208,7 @@ export function PlanExecution({ section, sectionId, sectionName, existingScore, 
 
   function complete(score: SectionScore | null) {
     setScoreOpen(false);
-    onComplete({ score, elapsedMs: state.finishedAtMs ?? state.elapsedMs });
+    onComplete({ score, elapsedMs: state.finishedAtMs ?? state.elapsedMs, actuals: planActuals(seq, state, logs, sectionId) });
   }
 
   // ── clock ──────────────────────────────────────────────────────────────

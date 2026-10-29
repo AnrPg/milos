@@ -96,7 +96,16 @@ describe("PlanExecutionMode", () => {
       expect.objectContaining({
         entry_kind: "execution",
         entry_id: "exe-1",
-        change: expect.objectContaining({ type: "reps_changed", actual_value: 8, canonical_value: 10, section_id: "a", exercise_name: "Burpee" }),
+        change: expect.objectContaining({
+          patch_id: "plan:a:Burpee-row:0:1:0:reps",
+          type: "reps_changed",
+          actual_value: 8,
+          canonical_value: 10,
+          section_id: "a",
+          exercise_id: "Burpee-row",
+          exercise_name: "Burpee",
+          set_index: 1,
+        }),
       }),
     );
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "2:10" } });
@@ -119,7 +128,14 @@ describe("PlanExecutionMode", () => {
     expect(api.completeExecution).toHaveBeenCalledWith(
       "token",
       "exe-1",
-      expect.objectContaining({ section_scores: [expect.objectContaining({ section_id: "a", value: "2:10" })], section_elapsed_ms: expect.objectContaining({ a: expect.any(Number), b: expect.any(Number) }) }),
+      expect.objectContaining({
+        section_scores: [expect.objectContaining({ section_id: "a", value: "2:10" })],
+        section_elapsed_ms: expect.objectContaining({ a: expect.any(Number), b: expect.any(Number) }),
+        plan_actuals: [
+          expect.objectContaining({ section_id: "a", row_id: "Burpee-row", round_index: 1, prescribed_reps: 10, actual_reps: 8, logged: true }),
+          expect.objectContaining({ section_id: "b", row_id: "Squat-row", prescribed_reps: 5, prescribed_load_kg: 100, actual_load_kg: 100, logged: false }),
+        ],
+      }),
     );
     expect(api.push).toHaveBeenCalledWith("/");
   });
