@@ -67,6 +67,7 @@ export function BoxScreensSettings() {
   const ui = useUiTranslations();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
+  const queryClient = useQueryClient();
   const [adding, setAdding] = useState(false);
   // The code on show, and when that screen had last paired before it (a change means the TV paired).
   const [code, setCode] = useState<{ screenId: string; pairedBefore: string | null; pairing: BoxScreenPairingCode } | null>(null);
@@ -133,6 +134,7 @@ export function BoxScreensSettings() {
           onCreated={(screen, pairing) => {
             setAdding(false);
             setCode({ screenId: screen.id, pairedBefore: null, pairing });
+            void queryClient.invalidateQueries({ queryKey: BOX_SCREENS_KEY });
           }}
         />
       ) : null}
