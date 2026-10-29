@@ -99343,6 +99343,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description With save_card: pay what falls due with this card */
+                    autopay?: boolean;
                     consent_accepted?: boolean;
                     idempotency_key: string;
                     /** @enum {string} */
@@ -99432,6 +99434,8 @@ export interface operations {
                         consent_text: string;
                         consent_version: string;
                         currency: string;
+                        /** @description The provider members pay through, or null when online payment is off */
+                        provider: string | null;
                     };
                 };
             };
@@ -99638,6 +99642,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description With save_card: pay what falls due with this card */
+                    autopay?: boolean;
                     /** Format: uuid */
                     book_slot_id?: string;
                     consent_accepted?: boolean;
@@ -99709,6 +99715,8 @@ export interface operations {
         parameters: {
             query?: {
                 language?: "el" | "en";
+                /** @description The class bought for: a drop-in or trial for it has no withdrawal */
+                book_slot_id?: string;
             };
             header?: never;
             path: {
@@ -99737,7 +99745,13 @@ export interface operations {
                             id: string;
                             name: string;
                             package_type: string;
+                            /** @description The package's in-person services (ADR-256): the store apps sell only packages with one */
+                            services: {
+                                [key: string]: unknown;
+                            };
                         };
+                        /** @description The provider members pay through, or null when online payment is off */
+                        provider: string | null;
                         start_now_text: string | null;
                         withdrawal_days: number | null;
                     };
@@ -117127,7 +117141,13 @@ export interface operations {
                             id: string;
                             name: string;
                             package_type: string;
+                            /** @description The package's in-person services (ADR-256): the store apps sell only packages with one */
+                            services: {
+                                [key: string]: unknown;
+                            };
                         }[];
+                        /** @description The provider members pay through, or null when online payment is off */
+                        provider: string | null;
                         withdrawal_days: number | null;
                     };
                 };

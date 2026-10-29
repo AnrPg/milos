@@ -245,3 +245,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-260 | What members pay online (per-purpose switches), failed saved-card charges: member and staff notices, Ουρές queue | Accepted |
 | ADR-261 | One-button connection of the business's Stripe (Connect OAuth) or Viva (ISV) account; platform credentials, signed state, disconnect | Accepted |
 | ADR-262 | Every recorded payment (desk or online) issues its fiscal receipt once the fiscal identity is complete; part payments split per tax group; idempotent per payment | Accepted |
+| ADR-263 | Member payment screens: buy a subscription package, pay an invoice, saved cards and autopay, withdrawal, /pay/return with the sandbox page, the box's sales page; API adds provider, services, autopay at checkout, dated visits without withdrawal | Accepted |

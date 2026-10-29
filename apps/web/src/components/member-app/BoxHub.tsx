@@ -12,6 +12,7 @@ import { gymClubFor } from "@/components/community/community";
 import { useMyClubs } from "@/components/community/use-community";
 import { AccessNotice, EntitlementCard } from "@/components/finance/MembershipEntitlement";
 import { BoxToday } from "@/components/member-app/box/BoxToday";
+import { RenewButton } from "@/components/payments/BoxSales";
 import { boxExtensionsFor } from "@/components/member-app/box/box-extensions";
 import { CoachActions, NextCoachSession, SessionPackageSummary } from "@/components/member-app/box/CoachBox";
 import { HubActionTile, HubButton, HubCard, HubIcons, HubPage } from "@/components/member-app/HubParts";
@@ -81,7 +82,9 @@ export function BoxHub() {
             <SeasonsEntry />
           </Suspense>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          {/* ADR-248, mockup s4 B: renew online where the box sells packages. */}
+          {membership ? <RenewButton slug={membership.organization.slug} /> : null}
           {hasBillingProviders ? (
             <HubButton href={membership ? `/me/payments?box=${encodeURIComponent(membership.organization.slug)}` : "/me/payments"}>
               {t("membershipOpen")}

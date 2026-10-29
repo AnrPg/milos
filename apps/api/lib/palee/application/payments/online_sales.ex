@@ -30,6 +30,7 @@ defmodule Palee.Application.Payments.OnlineSales do
        %{
          packages: context |> sold_online() |> Enum.map(&public_package/1),
          online_payments: Payments.available?(context, "packages"),
+         provider: Payments.provider(context),
          withdrawal_days: if(withdrawal_applies?(context), do: Withdrawal.days())
        }}
     end
@@ -56,8 +57,14 @@ defmodule Palee.Application.Payments.OnlineSales do
   defp online_purpose(%{package_type: type}) when type in ["drop_in", "trial"], do: "drop_in"
   defp online_purpose(_package), do: "packages"
 
+  # ADR-256: the store apps sell only packages with something used in
+  # person; `services` carries the contract fields that decide it.
+  @service_fields ~w(group_classes.included personal_training.included
+                     personal_training.assessments facility.open_gym perks.events)
+
   defp public_package(package) do
-    Map.take(package, [
+    package
+    |> Map.take([
       :id,
       :name,
       :description,
@@ -66,18 +73,24 @@ defmodule Palee.Application.Payments.OnlineSales do
       :base_price_cents,
       :currency
     ])
+    |> Map.put(:services, Map.take(package[:fields] || %{}, @service_fields))
   end
 
-  @doc "What buying `package_id` costs and the texts the member agrees to."
-  def package_terms(context, package_id, language) do
+  @doc """
+  What buying `package_id` costs and the texts the member agrees to.
+  `book_slot_id`: the class the purchase books, when it is bought while
+  booking (a drop-in or trial for that class has no withdrawal).
+  """
+  def package_terms(context, package_id, language, book_slot_id \\ nil) do
     with {:ok, package} <- package_for_sale(context, package_id) do
       language = language(language)
-      applies = withdrawal_applies?(context)
+      applies = withdrawal_applies?(context) and not dated_visit?(package, book_slot_id)
 
       {:ok,
        %{
          package: public_package(package),
          available: Payments.available?(context, online_purpose(package)),
+         provider: Payments.provider(context),
          withdrawal_days: if(applies, do: Withdrawal.days()),
          start_now_text: if(applies, do: Withdrawal.text(language)),
          consent_text: Consent.text(language, card_terms(context, package, language)),
@@ -90,7 +103,8 @@ defmodule Palee.Application.Payments.OnlineSales do
   Opens a checkout for a package (and, with `book_slot_id`, the class to
   book once it is paid). `params`: idempotency_key, save_card,
   consent_accepted, start_now (required where withdrawal applies),
-  language, book_slot_id.
+  language, book_slot_id, autopay (with save_card: pay what falls due
+  with the saved card).
   """
   def buy_package(context, package_id, params) do
     language = language(params[:language])
@@ -102,7 +116,7 @@ defmodule Palee.Application.Payments.OnlineSales do
              {:error, :online_payments_unavailable},
          {:ok, withdrawal} <-
            Withdrawal.record(
-             withdrawal_applies?(context),
+             withdrawal_applies?(context) and not dated_visit?(package, params[:book_slot_id]),
              %{start_now: params[:start_now], language: language},
              now
            ) do
@@ -130,7 +144,8 @@ defmodule Palee.Application.Payments.OnlineSales do
           consent_terms: card_terms(context, package, language),
           metadata:
             %{"withdrawal" => withdrawal, "package_name" => package.name}
-            |> put_if("book_slot_id", params[:book_slot_id]),
+            |> put_if("book_slot_id", params[:book_slot_id])
+            |> put_if("autopay", autopay(params)),
           idempotency_key: params[:idempotency_key],
           created_by_id: context.user_id
         },
@@ -324,6 +339,19 @@ defmodule Palee.Application.Payments.OnlineSales do
   end
 
   # ── helpers ─────────────────────────────────────────────────────────────
+
+  # A single visit or trial bought for one class on a set day and time is a
+  # leisure service for a specific date: no right of withdrawal (Directive
+  # 2011/83/EU art. 16(l)).
+  defp dated_visit?(%{package_type: type}, slot_id)
+       when type in ["drop_in", "trial"] and is_binary(slot_id),
+       do: true
+
+  defp dated_visit?(_package, _slot_id), do: false
+
+  # Autopay needs the saved card it pays with.
+  defp autopay(%{save_card: true, autopay: true}), do: true
+  defp autopay(_params), do: nil
 
   defp withdrawal_applies?(context) do
     case Fiscal.identity_status(context) do

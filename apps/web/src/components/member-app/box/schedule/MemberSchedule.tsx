@@ -37,6 +37,9 @@ import { ScheduleFiltersPage } from "./ScheduleFiltersPage";
 import { useSchedulePreferences } from "./use-schedule-preferences";
 import { WeekStrip } from "./WeekStrip";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { useBoxSales } from "@/components/payments/BoxSales";
+import { BuyPackageSheet } from "@/components/payments/BuyPackageSheet";
+import { bookingOffer, needsPackage } from "@/components/payments/checkout-flow";
 
 /**
  * Both views read the six-week month grid around the selected date, so
@@ -71,6 +74,10 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  // Mockup s4 B: booking without a package offers to pay for the visit.
+  const [payFor, setPayFor] = useState<ScheduleSlot | null>(null);
+  const sales = useBoxSales(membership?.organization.slug);
+  const offer = bookingOffer(sales.packages);
 
   // The grid starts on the Monday of the 1st, so the selected day's week is always inside it.
   const windowStart = monthGridStart(selectedDate);
@@ -232,7 +239,12 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
       setOpenSlotId(null);
       if (outcome.status === "delivered") reload();
     } catch (error) {
-      setActionError(localizeMemberBookingError(error, i18n, locale, "book"));
+      if (needsPackage(error) && (offer.visit || offer.pack)) {
+        setOpenSlotId(null);
+        setPayFor(slot);
+      } else {
+        setActionError(localizeMemberBookingError(error, i18n, locale, "book"));
+      }
     } finally {
       setBusy(false);
     }
@@ -383,6 +395,22 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
             setOpenSlotId(null);
             reload();
           }}
+        />
+      ) : null}
+
+      {payFor && membership ? (
+        <BuyPackageSheet
+          slug={membership.organization.slug}
+          packages={sales.packages}
+          mode={{
+            kind: "booking",
+            booking: {
+              id: payFor.id,
+              label: `${payFor.name} · ${formatInZone(payFor.scheduled_at, gymZone, locale, { weekday: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}`,
+            },
+          }}
+          origin="schedule"
+          onClose={() => setPayFor(null)}
         />
       ) : null}
     </main>

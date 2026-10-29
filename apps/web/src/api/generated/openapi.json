@@ -238474,6 +238474,10 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "autopay": {
+                    "description": "With save_card: pay what falls due with this card",
+                    "type": "boolean"
+                  },
                   "consent_accepted": {
                     "type": "boolean"
                   },
@@ -238719,6 +238723,11 @@
                     },
                     "currency": {
                       "type": "string"
+                    },
+                    "provider": {
+                      "description": "The provider members pay through, or null when online payment is off",
+                      "nullable": true,
+                      "type": "string"
                     }
                   },
                   "required": [
@@ -238726,7 +238735,8 @@
                     "available",
                     "consent_text",
                     "consent_version",
-                    "currency"
+                    "currency",
+                    "provider"
                   ],
                   "type": "object"
                 }
@@ -239117,6 +239127,10 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "autopay": {
+                    "description": "With save_card: pay what falls due with this card",
+                    "type": "boolean"
+                  },
                   "book_slot_id": {
                     "format": "uuid",
                     "type": "string"
@@ -239347,6 +239361,16 @@
               ],
               "type": "string"
             }
+          },
+          {
+            "description": "The class bought for: a drop-in or trial for it has no withdrawal",
+            "in": "query",
+            "name": "book_slot_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -239388,6 +239412,11 @@
                         },
                         "package_type": {
                           "type": "string"
+                        },
+                        "services": {
+                          "additionalProperties": true,
+                          "description": "The package's in-person services (ADR-256): the store apps sell only packages with one",
+                          "type": "object"
                         }
                       },
                       "required": [
@@ -239396,9 +239425,15 @@
                         "currency",
                         "id",
                         "name",
-                        "package_type"
+                        "package_type",
+                        "services"
                       ],
                       "type": "object"
+                    },
+                    "provider": {
+                      "description": "The provider members pay through, or null when online payment is off",
+                      "nullable": true,
+                      "type": "string"
                     },
                     "start_now_text": {
                       "nullable": true,
@@ -239414,6 +239449,7 @@
                     "consent_text",
                     "consent_version",
                     "package",
+                    "provider",
                     "start_now_text",
                     "withdrawal_days"
                   ],
@@ -288015,6 +288051,11 @@
                           },
                           "package_type": {
                             "type": "string"
+                          },
+                          "services": {
+                            "additionalProperties": true,
+                            "description": "The package's in-person services (ADR-256): the store apps sell only packages with one",
+                            "type": "object"
                           }
                         },
                         "required": [
@@ -288023,11 +288064,17 @@
                           "currency",
                           "id",
                           "name",
-                          "package_type"
+                          "package_type",
+                          "services"
                         ],
                         "type": "object"
                       },
                       "type": "array"
+                    },
+                    "provider": {
+                      "description": "The provider members pay through, or null when online payment is off",
+                      "nullable": true,
+                      "type": "string"
                     },
                     "withdrawal_days": {
                       "nullable": true,
@@ -288037,6 +288084,7 @@
                   "required": [
                     "online_payments",
                     "packages",
+                    "provider",
                     "withdrawal_days"
                   ],
                   "type": "object"

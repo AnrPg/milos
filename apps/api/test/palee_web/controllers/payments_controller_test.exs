@@ -230,6 +230,38 @@ defmodule PaleeWeb.PaymentsControllerTest do
     |> then(&assert(&1["payment_method"]["status"] == "revoked"))
   end
 
+  test "paying with a new card and autopay moves autopay to that card", %{conn: conn} = ctx do
+    connect_sandbox(conn, ctx)
+
+    terms =
+      conn
+      |> as(ctx.member)
+      |> get(me_path(ctx, "/invoices/#{ctx.invoice.id}/payment-terms"))
+      |> json_response(200)
+
+    assert terms["provider"] == "sandbox"
+
+    payment =
+      conn
+      |> pay(ctx, ctx.member, ctx.invoice, %{
+        idempotency_key: "autopay-pay-1",
+        save_card: true,
+        consent_accepted: true,
+        autopay: true
+      })
+      |> json_response(200)
+      |> Map.fetch!("payment")
+
+    assert complete(conn, ctx, ctx.member, payment, "succeeded")["status"] == "succeeded"
+
+    assert [%{"autopay" => true}] =
+             conn
+             |> as(ctx.member)
+             |> get(me_path(ctx, "/payment-methods"))
+             |> json_response(200)
+             |> Map.fetch!("payment_methods")
+  end
+
   test "a declined saved card is retried on the dunning schedule", %{conn: conn} = ctx do
     connect_sandbox(conn, ctx)
 

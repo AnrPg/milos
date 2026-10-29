@@ -46,6 +46,11 @@ defmodule Palee.Payments do
     end
   end
 
+  @doc "The provider members pay through now (`viva`, `stripe`, `sandbox`), or nil."
+  def provider(context) do
+    if available?(context), do: PaymentStore.get_account(context).provider
+  end
+
   @doc """
   Whether members may pay `purpose` online now (ADR-260): the account is
   active and the business left that purpose on.
@@ -678,7 +683,14 @@ defmodule Palee.Payments do
           currency: consent["currency"] || intent.currency
         })
 
-      method
+      # The payer chose to pay what falls due with this card (one card at a time).
+      if (intent.metadata || %{})["autopay"] == true do
+        :ok = PaymentStore.clear_autopay(context, intent.user_id, method.id)
+        {:ok, method} = PaymentStore.update_method(context, method.id, %{autopay: true})
+        method
+      else
+        method
+      end
     else
       _none -> nil
     end

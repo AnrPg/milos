@@ -145,6 +145,13 @@ defmodule PaleeWeb.MyPaymentsController do
         in: :query,
         required: false,
         schema: %Schema{type: :string, enum: ["el", "en"]}
+      },
+      %Parameter{
+        name: :book_slot_id,
+        in: :query,
+        required: false,
+        description: "The class bought for: a drop-in or trial for it has no withdrawal",
+        schema: P.uuid()
       }
     ],
     responses: [ok: {"Terms", "application/json", P.package_terms()}]
@@ -152,7 +159,12 @@ defmodule PaleeWeb.MyPaymentsController do
 
   def package_terms(conn, %{id: id} = params) do
     with {:ok, terms} <-
-           OnlineSales.package_terms(conn.assigns.tenant_context, id, params[:language]) do
+           OnlineSales.package_terms(
+             conn.assigns.tenant_context,
+             id,
+             params[:language],
+             params[:book_slot_id]
+           ) do
       json(conn, terms)
     end
   end
