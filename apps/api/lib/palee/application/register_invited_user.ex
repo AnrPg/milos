@@ -46,7 +46,9 @@ defmodule Palee.Application.RegisterInvitedUser do
       role: self_registration_role(account_role),
       # Carried through so an email-bound invitation can be matched against the
       # account being created in this same request (F-10).
-      email: value(params, :email)
+      email: value(params, :email),
+      # ADR-267: checked by RegisterProfile like any other sign-up.
+      age_confirmed: value(params, :age_confirmed)
     }
     |> maybe_put(:preferred_locale, value(params, :preferred_locale))
   end

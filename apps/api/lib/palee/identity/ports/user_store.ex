@@ -34,6 +34,8 @@ defmodule Palee.Identity.Ports.UserStore do
               {:ok, Account.t()} | {:error, :not_found | Ecto.Changeset.t()}
   @callback mark_email_verified(Ecto.UUID.t(), String.t(), DateTime.t()) ::
               :ok | {:error, :email_mismatch}
+  @doc "ADR-267: records when the login confirmed the minimum age (kept once set)."
+  @callback confirm_age(Ecto.UUID.t(), DateTime.t()) :: :ok
   @callback reset_login_password(Ecto.UUID.t(), String.t()) ::
               :ok | {:error, :not_found | Ecto.Changeset.t()}
   @callback delete_user(Account.t()) :: :ok | {:error, term()}

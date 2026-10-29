@@ -20,7 +20,8 @@ defmodule PaleeWeb.AccountDeletionControllerTest do
           handle: "leaver#{unique}",
           password: @password,
           role: "member",
-          email: email
+          email: email,
+          age_confirmed: true
         }),
         201
       )

@@ -42,6 +42,9 @@ defmodule Palee.Identity.UserStore do
     do: impl().mark_email_verified(login_id, email, now)
 
   @impl true
+  def confirm_age(login_id, now), do: impl().confirm_age(login_id, now)
+
+  @impl true
   def reset_login_password(login_id, password),
     do: impl().reset_login_password(login_id, password)
 
