@@ -69,6 +69,9 @@ describe("Join links, one per role (ADR-216)", () => {
     const member = await screen.findByRole("region", { name: "Link for box members" });
     expect(member).toHaveTextContent("Whoever uses it becomes a box member");
     expect(screen.getByDisplayValue(/\/join\/kypseli$/)).toBeInTheDocument();
+    // ADR-255: the athlete link sits under «Advanced», closed by default.
+    expect(screen.queryByRole("region", { name: "Link for athletes" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /Advanced/ }));
     expect(screen.getByRole("region", { name: "Link for athletes" })).toHaveTextContent("Off.");
     expect(screen.queryByRole("radio", { name: /Athlete/ })).not.toBeInTheDocument();
 
@@ -84,6 +87,7 @@ describe("Join links, one per role (ADR-216)", () => {
     vi.mocked(updateJoinLink).mockResolvedValue({ member: { enabled: false }, athlete: { enabled: true, key: "new-key" } });
     renderDialog("public");
 
+    fireEvent.click(await screen.findByRole("button", { name: /Advanced/ }));
     fireEvent.click(await screen.findByRole("button", { name: "New athletes’ link" }));
     expect(updateJoinLink).not.toHaveBeenCalled();
     expect(screen.getByText(/The current link stops working right away/)).toBeInTheDocument();
