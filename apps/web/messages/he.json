@@ -12333,5 +12333,212 @@
       "keyDeleteRow": "⌫ על שם ריק"
     },
     "perSide": "לכל צד"
+  },
+  "PlanGrid": {
+    "head": {
+      "exercise": "תרגיל",
+      "amrap": "↻ סבב, שוב ושוב עד שנגמר הזמן",
+      "emomEvery": "כל {every}",
+      "emom": "כל אינטרוול",
+      "intervals": "בכל אינטרוול עבודה ({work})",
+      "rounds": "↻ סבב × {rounds}",
+      "once": "לפי הסדר, פעם אחת"
+    },
+    "round": {
+      "set": "סט {list}",
+      "round": "סבב {list}",
+      "slot": "אינטרוול {list}",
+      "minute": "דקה {list}",
+      "slotAt": "אינטרוול {list} · {at}"
+    },
+    "col": {
+      "d": "חזרות",
+      "l": "משקל"
+    },
+    "line": {
+      "d": "חזרות",
+      "rest": "זמן",
+      "l": "משקל",
+      "lUnit": "משקל {unit}"
+    },
+    "measure": {
+      "pace": "קצב",
+      "tempo": "טמפו",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "אזור דופק",
+      "height": "גובה / יעד",
+      "dist": "מרחק",
+      "hold": "החזקה",
+      "side": "לכל צד"
+    },
+    "measureHint": {
+      "pace": "זמן ביניים · למשל 2:00/500m",
+      "tempo": "הורדה, עצירה, הרמה, עצירה · למשל 31X1",
+      "rpe": "כמה קשה, 1–10 · למשל 8",
+      "rir": "חזרות ברזרבה · למשל 2",
+      "zone": "אזור דופק · למשל 2",
+      "height": "קופסה, יעד · למשל 60 cm",
+      "dist": "למשל 400 m",
+      "hold": "החזקה איזומטרית · למשל 3 שנ׳",
+      "side": "בלי ערך: תגית ליד השם"
+    },
+    "tag": {
+      "side": "לכל צד"
+    },
+    "unit": {
+      "sec": "שנ׳",
+      "min": "דק׳"
+    },
+    "struct": {
+      "single": "בודד",
+      "superset": "סופרסט",
+      "complex": "קומפלקס",
+      "cluster": "קלאסטר",
+      "drop": "דרופ סט",
+      "restpause": "רסט-פוז"
+    },
+    "structHint": {
+      "single": "תרגיל אחד, כמו שהוא",
+      "superset": "כל התרגילים, ואז הסט הבא",
+      "complex": "כל התרגילים בלי להניח את המוט",
+      "cluster": "הסט מתחלק לחלקים עם עצירה קצרה",
+      "drop": "מורידים משקל וממשיכים",
+      "restpause": "עד כשל, עצירה, שוב"
+    },
+    "structField": {
+      "clusters": "חלקים",
+      "intra": "עצירה",
+      "drops": "הורדות",
+      "dropby": "בכל פעם",
+      "minis": "מיני סטים"
+    },
+    "structChip": "מבנה הסט (Alt+T)",
+    "rest": "מנוחה",
+    "name": {
+      "placeholder": "תרגיל",
+      "inWod": "ב-WOD הזה",
+      "suggestions": "הצעות לתרגילים"
+    },
+    "note": {
+      "placeholder": "הערה לתרגיל"
+    },
+    "menu": {
+      "button": "פעולות לתרגיל",
+      "title": "פעולות (Alt+M)",
+      "filter": "הקלד כדי לסנן",
+      "nothing": "אין התאמות",
+      "nothingHint": "מחק אות אחת",
+      "struct": "מבנה הסט…",
+      "structHint": "קלאסטר, דרופ סט, קומפלקס…",
+      "measure": "מדד…",
+      "measureHint": "קצב, טמפו, RPE, גובה…",
+      "perRound": "ערכים לכל סבב",
+      "sameEachRound": "אותם ערכים בכל סבב",
+      "note": "הערה",
+      "addNote": "הוספת הערה",
+      "superset": "סופרסט עם השורה שמעל",
+      "unsuperset": "הוצאה מהסופרסט",
+      "restAfter": "מנוחה אחרי",
+      "remove": "הסרה: {measure}",
+      "delete": "מחיקה",
+      "deleteHint": "⌫ על שם ריק",
+      "structTitle": "מבנה הסט",
+      "measureTitle": "מדד"
+    },
+    "add": {
+      "exercise": "+ תרגיל",
+      "exerciseHere": "+ תרגיל בקופסה הזו",
+      "exerciseSets": "+ תרגיל בסטים האלה",
+      "exerciseInterrupt": "+ תרגיל בהפסקה",
+      "round": {
+        "set": "+ סט שונה",
+        "round": "+ סבב שונה",
+        "slot": "+ אינטרוול שונה"
+      }
+    },
+    "how": {
+      "alternate": "הקופסאות מתחלפות: {cycle}, {cycle} …",
+      "own": {
+        "set": "לכל סט התרגילים שלו, לפי הסדר.",
+        "round": "לכל סבב התרגילים שלו, לפי הסדר.",
+        "slot": "לכל אינטרוול התרגילים שלו, לפי הסדר."
+      },
+      "emomOne": "כל מה שבקופסה קורה באותו אינטרוול.",
+      "amrapMax": "בשביל \"כמה שמספיקים בזמן שנשאר\" כתוב max בחזרות של התרגיל האחרון.",
+      "optionalSets": "* אם אפשר: הסטים הם {sets}."
+    },
+    "optionalSet": "אם אפשר (הסטים הם {sets})",
+    "interrupt": {
+      "title": "הפסקה · כל {every} עוצרים ועושים"
+    },
+    "aria": {
+      "reps": "חזרות או כמות",
+      "load": "משקל",
+      "rest": "מנוחה",
+      "cell": "{column} {n}: {what}"
+    },
+    "error": {
+      "dose": "לא קריא: למשל 10, 8-12, 5-10-15…, max, 400 m, 60s",
+      "tempo": "טמפו ב-4 סימנים, למשל 31X1",
+      "number": "מספר, +x או a→b",
+      "numberExample": "מספר, למשל {example}",
+      "max": "לכל היותר {max}",
+      "loadUnitCompact": "כתוב kg או %, למשל 60kg או 70%",
+      "loadMissingUnit": "כתוב kg או % בסט אחד של השורה; השאר לוקחים משם",
+      "loadMixedUnits": "אותה יחידה בכל השורה: {unit}"
+    },
+    "mean": {
+      "equals": "= {value}",
+      "max": "כמה שיותר",
+      "maxCal": "כמה שיותר קלוריות",
+      "maxM": "כמה שיותר מטרים",
+      "sets": "{sets} סטים",
+      "ladder": "לכל {word}: {list}, ואז {step} בכל {word}",
+      "perRound": "לכל {word}: {list}",
+      "range": "טווח {range}, המתאמן מחליט",
+      "rangeSide": "טווח {range}, המתאמן מחליט · לכל צד",
+      "reps": "{value} חזרות",
+      "repsSide": "{value} חזרות · לכל צד",
+      "amount": "{value}",
+      "amountSide": "{value} · לכל צד",
+      "bw": "משקל גוף",
+      "kg": "{value} kg",
+      "pct": "{value}% מ-1RM",
+      "words": "כטקסט למתאמן",
+      "tempo": "↓{down} הורדה · {bottom} למטה · ↑{up} הרמה · {top} למעלה (שניות, X = מתפרץ)"
+    },
+    "word": {
+      "set": "סט",
+      "round": "סבב",
+      "slot": "אינטרוול"
+    },
+    "tip": {
+      "range": "טווח",
+      "ladder": "עולה בכל סבב",
+      "max": "כמה שהוא מסוגל",
+      "emptyCode": "ריק",
+      "asBefore": "כמו הקודם",
+      "kg": "קילו",
+      "pct": "מ-1RM",
+      "heavyCode": "כבד",
+      "words": "במילים",
+      "plusEach": "עולה בכל פעם",
+      "spread": "עד האחרון",
+      "unitCode": "kg או %",
+      "unitOnce": "פעם אחת בשורה",
+      "changeEach": "משתנה בכל פעם",
+      "tempo": "שניות הורדה · עצירה למטה · הרמה (X = מתפרץ) · עצירה למעלה",
+      "seconds": "שניות",
+      "minSec": "דקות:שניות",
+      "minutes": "דקות, עד 10",
+      "afterLastCode": "אחרי הסבב האחרון",
+      "afterLast": "אותו ערך, או אותו שינוי אם כותבים +x"
+    },
+    "colWord": {
+      "set": "סט",
+      "round": "סבב",
+      "slot": "אינטרוול"
+    }
   }
 }

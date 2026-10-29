@@ -12333,5 +12333,212 @@
       "keyDeleteRow": "⌫ on an empty name"
     },
     "perSide": "per side"
+  },
+  "PlanGrid": {
+    "head": {
+      "exercise": "Exercise",
+      "amrap": "↻ Round, again and again until time runs out",
+      "emomEvery": "Every {every}",
+      "emom": "Every slot",
+      "intervals": "In each work interval ({work})",
+      "rounds": "↻ Round × {rounds}",
+      "once": "In order, once"
+    },
+    "round": {
+      "set": "Set {list}",
+      "round": "Round {list}",
+      "slot": "Slot {list}",
+      "minute": "Minute {list}",
+      "slotAt": "Slot {list} · {at}"
+    },
+    "col": {
+      "d": "Reps",
+      "l": "Load"
+    },
+    "line": {
+      "d": "Reps",
+      "rest": "Time",
+      "l": "Load",
+      "lUnit": "Load {unit}"
+    },
+    "measure": {
+      "pace": "Pace",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "HR zone",
+      "height": "Height / target",
+      "dist": "Distance",
+      "hold": "Hold",
+      "side": "Per side"
+    },
+    "measureHint": {
+      "pace": "split time · e.g. 2:00/500m",
+      "tempo": "lowering, pause, lifting, pause · e.g. 31X1",
+      "rpe": "how hard, 1–10 · e.g. 8",
+      "rir": "reps left in reserve · e.g. 2",
+      "zone": "heart-rate zone · e.g. 2",
+      "height": "box, target · e.g. 60 cm",
+      "dist": "e.g. 400 m",
+      "hold": "isometric hold · e.g. 3 s",
+      "side": "no value: a tag next to the name"
+    },
+    "tag": {
+      "side": "per side"
+    },
+    "unit": {
+      "sec": "s",
+      "min": "min"
+    },
+    "struct": {
+      "single": "Single",
+      "superset": "Superset",
+      "complex": "Complex",
+      "cluster": "Cluster",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
+    },
+    "structHint": {
+      "single": "one exercise, as it is",
+      "superset": "every exercise, then the next set",
+      "complex": "every exercise without putting the bar down",
+      "cluster": "the set breaks into pieces with a short pause",
+      "drop": "lower the weight and keep going",
+      "restpause": "to failure, pause, again"
+    },
+    "structField": {
+      "clusters": "pieces",
+      "intra": "pause",
+      "drops": "drops",
+      "dropby": "each time",
+      "minis": "mini sets"
+    },
+    "structChip": "Set structure (Alt+T)",
+    "rest": "Rest",
+    "name": {
+      "placeholder": "Exercise",
+      "inWod": "in this WOD",
+      "suggestions": "Exercise suggestions"
+    },
+    "note": {
+      "placeholder": "Note for the exercise"
+    },
+    "menu": {
+      "button": "Exercise actions",
+      "title": "Actions (Alt+M)",
+      "filter": "Type to filter",
+      "nothing": "Nothing matches",
+      "nothingHint": "delete a letter",
+      "struct": "Set structure…",
+      "structHint": "cluster, drop set, complex…",
+      "measure": "Parameter…",
+      "measureHint": "pace, tempo, RPE, height…",
+      "perRound": "Values per round",
+      "sameEachRound": "Same values every round",
+      "note": "Note",
+      "addNote": "Add a note",
+      "superset": "Superset with the row above",
+      "unsuperset": "Out of the superset",
+      "restAfter": "Rest after",
+      "remove": "Remove: {measure}",
+      "delete": "Delete",
+      "deleteHint": "⌫ on an empty name",
+      "structTitle": "Set structure",
+      "measureTitle": "Parameter"
+    },
+    "add": {
+      "exercise": "+ Exercise",
+      "exerciseHere": "+ Exercise in this box",
+      "exerciseSets": "+ Exercise in these sets",
+      "exerciseInterrupt": "+ Exercise in the interruption",
+      "round": {
+        "set": "+ different set",
+        "round": "+ different round",
+        "slot": "+ different slot"
+      }
+    },
+    "how": {
+      "alternate": "The boxes alternate: {cycle}, {cycle} …",
+      "own": {
+        "set": "Each set has its own exercises, in order.",
+        "round": "Each round has its own exercises, in order.",
+        "slot": "Each slot has its own exercises, in order."
+      },
+      "emomOne": "Everything in the box happens in the same slot.",
+      "amrapMax": "For “as many as you can in the time left”, write max in the reps of the last exercise.",
+      "optionalSets": "* if they can: the sets are {sets}."
+    },
+    "optionalSet": "If they can (the sets are {sets})",
+    "interrupt": {
+      "title": "Interruption · every {every} stop and do"
+    },
+    "aria": {
+      "reps": "Reps or quantity",
+      "load": "Load",
+      "rest": "Rest",
+      "cell": "{column} {n}: {what}"
+    },
+    "error": {
+      "dose": "Can't read this: e.g. 10, 8-12, 5-10-15…, max, 400 m, 60s",
+      "tempo": "Tempo in 4 marks, e.g. 31X1",
+      "number": "A number, +x or a→b",
+      "numberExample": "A number, e.g. {example}",
+      "max": "At most {max}",
+      "loadUnitCompact": "Write kg or %, e.g. 60kg or 70%",
+      "loadMissingUnit": "Write kg or % in one set of the row; the others take it from there",
+      "loadMixedUnits": "Same unit on the whole row: {unit}"
+    },
+    "mean": {
+      "equals": "= {value}",
+      "max": "as many as possible",
+      "maxCal": "as many calories as possible",
+      "maxM": "as many metres as possible",
+      "sets": "{sets} sets",
+      "ladder": "per {word}: {list}, then {step} every {word}",
+      "perRound": "per {word}: {list}",
+      "range": "range {range}, the athlete decides",
+      "rangeSide": "range {range}, the athlete decides · per side",
+      "reps": "{value} reps",
+      "repsSide": "{value} reps · per side",
+      "amount": "{value}",
+      "amountSide": "{value} · per side",
+      "bw": "bodyweight",
+      "kg": "{value} kg",
+      "pct": "{value}% of 1RM",
+      "words": "as text for the athlete",
+      "tempo": "↓{down} lowering · {bottom} at the bottom · ↑{up} lifting · {top} at the top (seconds, X = explosive)"
+    },
+    "word": {
+      "set": "set",
+      "round": "round",
+      "slot": "slot"
+    },
+    "tip": {
+      "range": "range",
+      "ladder": "goes up every round",
+      "max": "as many as they can",
+      "emptyCode": "empty",
+      "asBefore": "same as the one before",
+      "kg": "kilos",
+      "pct": "of 1RM",
+      "heavyCode": "heavy",
+      "words": "in words",
+      "plusEach": "goes up every time",
+      "spread": "up to the last one",
+      "unitCode": "kg or %",
+      "unitOnce": "once per row",
+      "changeEach": "changes every time",
+      "tempo": "seconds lowering · pause at the bottom · lifting (X = explosive) · pause at the top",
+      "seconds": "seconds",
+      "minSec": "minutes:seconds",
+      "minutes": "minutes, up to 10",
+      "afterLastCode": "after the last round",
+      "afterLast": "same value, or the same change if you write +x"
+    },
+    "colWord": {
+      "set": "Set",
+      "round": "Round",
+      "slot": "Slot"
+    }
   }
 }
