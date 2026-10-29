@@ -30,9 +30,13 @@ defmodule Palee.Fiscal.Domain.ExportEntries do
   reversals; payments reversed in full are left out.
   """
 
-  @doc "Builds the entries. `lines_by_document` maps a document id to its lines."
-  def build(documents, lines_by_document, payments \\ []) do
-    numbers = Map.new(documents, &{field(&1, :id), field(&1, :number)})
+  @doc """
+  Builds the entries. `lines_by_document` maps a document id to its lines;
+  `numbers` maps the ids of corrected documents outside the period to
+  their numbers.
+  """
+  def build(documents, lines_by_document, payments \\ [], numbers \\ %{}) do
+    numbers = Map.merge(numbers, Map.new(documents, &{field(&1, :id), field(&1, :number)}))
 
     %{
       documents:
@@ -68,7 +72,7 @@ defmodule Palee.Fiscal.Domain.ExportEntries do
       sign: sign,
       prices_include_tax: field(document, :prices_include_tax) != false,
       payment_method: field(document, :payment_method),
-      corrects_number: corrects && Map.get(numbers, corrects, field(document, :corrects_number)),
+      corrects_number: corrects && Map.get(numbers, corrects),
       buyer: buyer(field(document, :buyer)),
       net_cents: sign * (field(document, :net_cents) || 0),
       tax_cents: sign * (field(document, :tax_cents) || 0),
