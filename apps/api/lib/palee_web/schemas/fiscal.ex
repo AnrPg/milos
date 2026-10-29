@@ -196,7 +196,12 @@ defmodule PaleeWeb.Schemas.Fiscal do
         content_hash: %Schema{type: :string},
         journal_position: %Schema{type: :integer},
         lines: %Schema{type: :array, items: line()},
-        transmission: %Schema{transmission() | nullable: true}
+        transmission: %Schema{transmission() | nullable: true},
+        einvoice: %Schema{PaleeWeb.Schemas.FiscalCompliance.einvoice() | nullable: true},
+        till_signature: %Schema{
+          PaleeWeb.Schemas.FiscalCompliance.till_signature()
+          | nullable: true
+        }
       },
       required: [
         :content_hash,
