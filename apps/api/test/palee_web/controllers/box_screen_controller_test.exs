@@ -81,12 +81,14 @@ defmodule PaleeWeb.BoxScreenControllerTest do
 
   test "a code pairs one TV once; the token opens only this screen's endpoints", ctx do
     {id, code} = new_screen(ctx)
+    box_id = ctx.organization.id
 
+    # The box id is the TV's realtime topic (`box_screen:<id>`).
     assert %{
              "token" => token,
              "expires_at" => expires_at,
              "screen" => %{"id" => ^id, "name" => "Αίθουσα"},
-             "box" => %{"name" => _name}
+             "box" => %{"id" => ^box_id, "name" => _name}
            } = ctx |> pair(String.downcase(code)) |> json_response(201)
 
     {:ok, expires_at, 0} = DateTime.from_iso8601(expires_at)
@@ -95,7 +97,7 @@ defmodule PaleeWeb.BoxScreenControllerTest do
     assert %{"code" => "invalid_pairing_code"} = ctx |> pair(code) |> json_response(422)
     assert %{"code" => "invalid_pairing_code"} = ctx |> pair("AAAA-AAAA") |> json_response(422)
 
-    assert %{"screen" => %{"id" => ^id}} =
+    assert %{"screen" => %{"id" => ^id}, "box" => %{"id" => ^box_id}} =
              ctx.tv |> with_token(token) |> get("/api/box-screen/today") |> json_response(200)
 
     assert %{"code" => "invalid_screen_token"} =

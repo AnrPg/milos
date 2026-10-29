@@ -211,8 +211,9 @@ defmodule PaleeWeb.Schemas.BoxScreens do
         },
         box: %Schema{
           type: :object,
-          properties: %{name: %Schema{type: :string}},
-          required: [:name]
+          description: "The box; `id` is the topic of `box_screen:<id>` on `/box_screen_socket`",
+          properties: %{id: @uuid, name: %Schema{type: :string}},
+          required: [:id, :name]
         }
       },
       required: [:box, :expires_at, :screen, :token]
@@ -343,8 +344,9 @@ defmodule PaleeWeb.Schemas.BoxScreens do
       properties: %{
         box: %Schema{
           type: :object,
-          properties: %{name: @nullable_text},
-          required: [:name]
+          description: "The box; `id` is the topic of `box_screen:<id>` on `/box_screen_socket`",
+          properties: %{id: @uuid, name: @nullable_text},
+          required: [:id, :name]
         },
         screen: %Schema{
           type: :object,

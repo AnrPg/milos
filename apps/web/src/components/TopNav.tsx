@@ -46,7 +46,8 @@ import { ProfileSwitcherMenu } from "@/components/account/ProfileSwitcherMenu";
 export { adminHref } from "@/lib/organization-slug";
 
 // The public box page draws its own header over the cover (ADR-142).
-const CANVAS_PATHS = ["/login", "/b"];
+// ADR-253: "/tv" is the box screen on a TV, with no one signed in.
+const CANVAS_PATHS = ["/login", "/b", "/tv"];
 // Screens that fill the whole display (ADR-155): the door kiosk and the printed poster.
 const CANVAS_PATTERNS = [/^\/admin\/check-in\/(?:door|poster)\/[^/]+\/?$/];
 

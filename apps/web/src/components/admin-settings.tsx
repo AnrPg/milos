@@ -35,6 +35,7 @@ import { CommunitySettingsLink } from "@/components/admin/community/CommunitySet
 import { CheckInSettingsLink } from "@/components/check-in/CheckInSettings";
 import { FiscalIdentityLink } from "@/components/fiscal/FiscalIdentityLink";
 import { SpacesSettingsLink } from "@/components/spaces/SpacesSettings";
+import { BoxScreensSettingsLink } from "@/components/box-screen/BoxScreensSettings";
 import { RoleAccessSettings } from "@/components/admin/RoleAccessSettings";
 import { OrganizationOwnerSettings } from "@/components/admin/OrganizationOwnerSettings";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
@@ -1131,6 +1132,9 @@ export function AdminSettingsHub() {
               <div className="mt-3">
                 <SpacesSettingsLink />
               </div>
+              <div className="mt-3">
+                <BoxScreensSettingsLink />
+              </div>
             </CollapsibleSection>
           ) : (
             <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
@@ -1231,6 +1235,9 @@ export function AdminSettingsHub() {
               <LocationSettings token={token} />
               <div className="mt-3">
                 <SpacesSettingsLink />
+              </div>
+              <div className="mt-3">
+                <BoxScreensSettingsLink />
               </div>
             </CollapsibleSection>
 

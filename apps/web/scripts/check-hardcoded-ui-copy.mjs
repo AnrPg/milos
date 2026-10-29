@@ -103,7 +103,7 @@ function isUtilityClassList(value) {
 function isTechnicalValue(value) {
   const trimmed = value.trim();
   return /^(?:use client|https?:|\/|\.\/|\.\.\/|@\/)/.test(trimmed)
-    || /^(?:var|rgb|rgba|hsl|color-mix|linear-gradient|conic-gradient|calc)\(/.test(trimmed)
+    || /^(?:var|rgb|rgba|hsl|color-mix|linear-gradient|conic-gradient|calc|clamp|min|max)\(/.test(trimmed)
     || /(?:^|\s)(?:\d+(?:\.\d+)?(?:px|rem|em|vh|vw)|solid var\(|transparent)(?:\s|$)/.test(trimmed)
     || /^[a-z]{2}(?:-[A-Z]{2})?$/.test(trimmed)
     || /^[A-Z]{3}$/.test(trimmed)

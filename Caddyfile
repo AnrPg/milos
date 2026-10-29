@@ -19,6 +19,10 @@
 	reverse_proxy /socket/* api:4000 {
 		header_up Host {host}
 	}
+	# ADR-253: the box screen's own socket (display token only).
+	reverse_proxy /box_screen_socket/* api:4000 {
+		header_up Host {host}
+	}
 	reverse_proxy web:3000
 }
 

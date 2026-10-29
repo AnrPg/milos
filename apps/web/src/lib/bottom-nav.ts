@@ -39,6 +39,8 @@ export const BOTTOM_NAV_HIDDEN_ROUTES: ReadonlyArray<{ id: string; pattern: RegE
   { id: "freeTextExecution", pattern: /^\/workouts\/free-text\/execute(?:\/|$)/ },
   // The class timer on the gym's screen and the coach's remote.
   { id: "classTimer", pattern: /^\/class-timer\/[^/]+\/(?:display|control)(?:\/|$)/ },
+  // The box screen on the box's TV (ADR-253).
+  { id: "boxScreen", pattern: /^\/tv(?:\/|$)/ },
   // The check-in desk: the door kiosk, the printed poster, and the scan landing.
   { id: "checkInKiosk", pattern: /^\/admin\/check-in\/(?:door|poster)\/[^/]+\/?$/ },
   { id: "checkInScan", pattern: /^\/c\/[^/]+(?:\/|$)/ },
