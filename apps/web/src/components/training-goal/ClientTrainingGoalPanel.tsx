@@ -16,7 +16,7 @@ import { useUiTranslations } from "@/i18n/ui";
 /**
  * A client's weekly goal on their profile (ADR-229), for their coach or an
  * owner/admin who may coach every client. Saving tells the client, who can
- * change it back. ADR-274: the stepper is a draft saved with the profile's
+ * change it back. ADR-276: the stepper is a draft saved with the profile's
  * «Αποθήκευση» bar.
  */
 export function ClientTrainingGoalPanel({ userId, nickname }: { userId: string; nickname: string }) {

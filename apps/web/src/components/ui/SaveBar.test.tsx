@@ -17,7 +17,7 @@ function renderBar(props: Partial<Parameters<typeof SaveBar>[0]> = {}) {
   return { ...handlers, ...view };
 }
 
-describe("SaveBar (ADR-274)", () => {
+describe("SaveBar (ADR-276)", () => {
   it("stays hidden with nothing to save", () => {
     renderBar({ changes: 0, canUndo: false });
     expect(screen.queryByTestId("save-bar")).toBeNull();

@@ -18,7 +18,7 @@ const subscriptions = [
   { id: "s-4", status: "active" },
 ];
 
-describe("membership draft (ADR-274)", () => {
+describe("membership draft (ADR-276)", () => {
   it("reads the editable fields and only the renewable packages", () => {
     expect(membershipDraftFrom(membership, subscriptions)).toEqual({
       status: "trial",

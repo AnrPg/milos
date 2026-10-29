@@ -16,7 +16,7 @@ import {
 
 const saved = { status: "trial", starts_on: "2026-10-29", expires_on: "" };
 
-describe("draft history (ADR-274)", () => {
+describe("draft history (ADR-276)", () => {
   it("keeps edits apart from the saved copy and lists only what changed", () => {
     const history = editDraft(createDraftHistory(saved), { expires_on: "2026-11-28" });
     expect(history.saved).toEqual(saved);

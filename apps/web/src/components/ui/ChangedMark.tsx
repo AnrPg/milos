@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 
-/** «● Αλλαγμένο» next to a field edited but not saved yet (ADR-274). */
+/** «● Αλλαγμένο» next to a field edited but not saved yet (ADR-276). */
 export function ChangedMark() {
   const t = useTranslations("SaveBar");
   return (

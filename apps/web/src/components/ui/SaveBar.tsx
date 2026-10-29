@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 /**
- * The bar that holds a form's unsaved edits (ADR-274). It shows only while
+ * The bar that holds a form's unsaved edits (ADR-276). It shows only while
  * something changed: how many fields, undo, redo, «Ακύρωση» and
  * «Αποθήκευση». After a save it says so once, then goes away. It sticks to
  * the bottom of the screen inside its panel, so the actions stay in reach

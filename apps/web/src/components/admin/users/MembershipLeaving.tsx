@@ -27,7 +27,7 @@ const fieldStyle = { background: "var(--panel)", color: "var(--text)", border: "
  * the box. Leaving cancels only unpaid invoices for later periods and for
  * packages that never started; anything already used stays owed.
  *
- * ADR-274: the renewal switches are part of the Finance tab's unsaved edits;
+ * ADR-276: the renewal switches are part of the Finance tab's unsaved edits;
  * the parent holds them and saves them with «Αποθήκευση». Leaving and its
  * undo stay their own confirmed steps.
  */

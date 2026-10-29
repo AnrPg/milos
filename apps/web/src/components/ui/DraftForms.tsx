@@ -28,7 +28,7 @@ import {
 } from "@/lib/draft-history";
 
 /**
- * Unsaved edits on a page of forms (ADR-274). Each form keeps a draft with
+ * Unsaved edits on a page of forms (ADR-276). Each form keeps a draft with
  * `useDraftForm`; the page shows ONE SaveBar for all of them (`PageSaveBar`):
  * the change count adds up, undo and redo walk the edits in the order they
  * were made across forms, «Ακύρωση» drops every draft and «Αποθήκευση» saves

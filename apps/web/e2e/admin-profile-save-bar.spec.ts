@@ -1,7 +1,7 @@
 import { expect, test, type Page, type Request } from "./support/test";
 import { chooseDate, chooseOption } from "./support/select";
 
-// ADR-274: on a box member's profile (Finance tab) staff edits stay a draft
+// ADR-276: on a box member's profile (Finance tab) staff edits stay a draft
 // until «Save». The save bar shows only while something changed, with undo,
 // redo, cancel and save; leaving the tab with unsaved edits asks first; a
 // save sends only the changed fields. The API is stubbed; every route not

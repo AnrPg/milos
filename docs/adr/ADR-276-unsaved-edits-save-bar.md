@@ -1,4 +1,4 @@
-# ADR-274: Unsaved edits, the save bar and undo/redo on staff forms
+# ADR-276: Unsaved edits, the save bar and undo/redo on staff forms
 Date: 2026-10-29
 Status: Accepted (ANR picked option A of the save-bar mockups, 2026-10-29)
 

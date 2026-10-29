@@ -119,7 +119,7 @@ function Panel({ id, title, children }: { id: string; title: string; children: R
         <span className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--primary)" }}>{title}</span>
         <span className="text-sm font-semibold" style={{ color: "var(--dim)" }}>{open ? i18n("hide34d8b60") : i18n("showd97d1ee")}</span>
       </button>
-      {/* Hidden, not unmounted: hiding a panel keeps its unsaved edits (ADR-274). */}
+      {/* Hidden, not unmounted: hiding a panel keeps its unsaved edits (ADR-276). */}
       <div id={`${id}-content`} hidden={!open} className="border-t px-6 pb-6 pt-4 text-sm leading-6" style={{ borderColor: "var(--border)", color: "var(--text-soft)" }}>
         {children}
       </div>
@@ -315,7 +315,7 @@ function FinanceDetails({
   const claims = finance.details.referral_claims;
   const referredMembers = finance.details.referred_members;
   const rewards = finance.details.referral_rewards;
-  // ADR-274: edits stay a draft until «Αποθήκευση» in the page's bar.
+  // ADR-276: edits stay a draft until «Αποθήκευση» in the page's bar.
   const [commitment, setCommitment] = useState<{ endsOn: string | null } | null>(null);
   const form = useDraftForm<MembershipDraft, string>({
     server: membershipDraftFrom(membership, subscriptions),
@@ -567,7 +567,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const queryClient = useQueryClient();
   const { membership: actor } = useSelectedMembershipRole();
   const [hashSection, setHashSection] = useState<string | null>(null);
-  // ADR-274: a tab with unsaved edits asks before it is left.
+  // ADR-276: a tab with unsaved edits asks before it is left.
   const drafts = useDraftForms();
   const guardRef = useRef(drafts.guard);
   useEffect(() => {
@@ -910,7 +910,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
 
 /**
  * The account-wide role, for someone with no membership in this box. A
- * draft like every profile field (ADR-274), saved with the page's bar.
+ * draft like every profile field (ADR-276), saved with the page's bar.
  */
 function AccountRoleEditor({ token, userId, role }: { token: string; userId: string; role: AdminUserDirectoryEntry["role"] }) {
   const i18n = useUiTranslations();

@@ -2,7 +2,7 @@ import { expect, test, type Page, type Request } from "./support/test";
 import { chooseOption } from "./support/select";
 
 // ADR-220, staff side: on a box member's profile (Finance tab) staff see the
-// member's own automatic renewal, can change it for them (ADR-274: saved
+// member's own automatic renewal, can change it for them (ADR-276: saved
 // with the tab's «Save», not on the click), mark them as
 // leaving (end of the paid period, today or a date) and undo it. The API is
 // stubbed; every route not listed answers an empty object.

@@ -3,7 +3,7 @@ import { changedPatch, type DraftHistory } from "@/lib/draft-history";
 import { renewableSubscriptions } from "./membership-leaving";
 
 /**
- * ADR-274: what staff can edit on a box member's Finance tab before pressing
+ * ADR-276: what staff can edit on a box member's Finance tab before pressing
  * «Αποθήκευση»: the membership's status and dates, and each running
  * package's automatic renewal (ADR-220).
  */

@@ -1,5 +1,5 @@
 /**
- * Unsaved edits with undo and redo (ADR-274). A form keeps what the server
+ * Unsaved edits with undo and redo (ADR-276). A form keeps what the server
  * last said (`saved`) apart from what staff typed (`draft`); nothing reaches
  * the server until they press «Αποθήκευση». `past` and `future` hold whole
  * drafts, so undo and redo never replay partial patches.

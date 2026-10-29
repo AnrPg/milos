@@ -68,7 +68,7 @@ export function MemberRolesEditor({
     queryFn: () => listAdminLocations(token),
   });
 
-  // ADR-274: roles, branches and the head coach switch are one draft, saved
+  // ADR-276: roles, branches and the head coach switch are one draft, saved
   // with the profile's «Αποθήκευση» bar.
   const form = useDraftForm<RolesDraft>({
     server: { roles: canonicalRoles(current), scope: presetScope, head_coach: currentHeadCoach },
