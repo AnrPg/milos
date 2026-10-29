@@ -121,11 +121,35 @@ defmodule PaleeWeb.ExecutionPlanActualsTest do
       })
     ]
 
+    # What the web plan runner sends: its scores and elapsed time per plan
+    # section, keyed by section id, next to the actuals.
     completed =
       athlete_conn
-      |> json(:patch, path, %{plan_actuals: actuals})
+      |> json(:patch, path, %{
+        timezone: "Europe/Athens",
+        checked_exercise_ids: [],
+        section_scores: [
+          %{
+            section_id: engine["id"],
+            section_name: "Engine",
+            value: 754,
+            score_type: "time",
+            source: "user",
+            kind: "final"
+          }
+        ],
+        total_elapsed_ms: 1_500_000,
+        section_elapsed_ms: %{strength["id"] => 900_000, engine["id"] => 600_000},
+        segment_cycle_counts: %{},
+        plan_actuals: actuals
+      })
       |> json_response(200)
       |> Map.fetch!("execution")
+
+    assert [%{"section_id" => engine_id, "value" => 754, "score_type" => "time"}] =
+             completed["section_scores"]
+
+    assert engine_id == engine["id"]
 
     assert [first, second, burpee] = completed["plan_sets"]
 
