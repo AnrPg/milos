@@ -12717,7 +12717,7 @@
     "load": "Load",
     "logTitle": "What you actually did (optional)",
     "logReps": "Reps done",
-    "logLoad": "Load used (kg)",
+    "logLoad": "Load used",
     "pctOfMax": "≈ {kg} kg of your 1RM",
     "cap": "Cap {time}",
     "clock": "Section clock",
@@ -12797,7 +12797,10 @@
       "cluster": "Cluster",
       "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
-      "interrupt": "With interruptions"
+      "interrupt": "With interruptions",
+      "kcal_target": "Calorie target",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
     },
     "params": {
       "sets": "{sets} sets",
@@ -12847,7 +12850,8 @@
       "done": "Completed",
       "total_reps": "Reps (total)",
       "lowest_round": "Lowest round",
-      "distance": "Distance"
+      "distance": "Distance",
+      "load": "Load (best set)"
     },
     "levelNotes": "Notes per level",
     "sectionNote": "Section note",

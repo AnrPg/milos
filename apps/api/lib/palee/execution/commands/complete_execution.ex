@@ -82,7 +82,10 @@ defmodule Palee.Execution.Commands.CompleteExecution do
                 params[:duration_adjustments] || params["duration_adjustments"],
                 Map.get(params, :segments, Map.get(params, "segments", [])),
                 execution[:duration_adjustments]
-              )
+              ),
+            # ADR-270: plan actuals, already checked against the plan by the
+            # caller; the store writes them next to the completion.
+            plan_sets: Keyword.get(opts, :plan_sets, [])
           }
 
           persist_completion(execution_id, completed_params, opts)

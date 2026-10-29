@@ -15,6 +15,7 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
     Workouts.AssignedWorkoutAthlete,
     Workouts.Domain.AssignmentAudiencePolicy,
     Workouts.Domain.SectionedText,
+    Workouts.Domain.StructuredPlan.Prescription,
     Workouts.Domain.StructuredPlanWorkout,
     Workouts.Domain.WorkoutAuthoring,
     Workouts.Domain.WorkoutBody,
@@ -1664,6 +1665,8 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
         free_text_document: section.free_text_document,
         timer_preset: section.timer_preset,
         plan: section.plan,
+        # ADR-270: the plan's canonical read model, for every consumer.
+        prescription: section.plan |> Prescription.build() |> Prescription.to_json(),
         exercises:
           section.exercises
           |> Enum.sort_by(& &1.order)

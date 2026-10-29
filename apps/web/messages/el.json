@@ -12495,17 +12495,6 @@
       "l": "Φορτίο",
       "lUnit": "Φορτίο {unit}"
     },
-    "measure": {
-      "pace": "Ρυθμός",
-      "tempo": "Tempo",
-      "rpe": "RPE",
-      "rir": "RIR",
-      "zone": "Ζώνη παλμών",
-      "height": "Ύψος / στόχος",
-      "dist": "Απόσταση",
-      "hold": "Κράτημα",
-      "side": "Ανά πλευρά"
-    },
     "measureHint": {
       "pace": "χρόνος ανά διάστημα · π.χ. 2:00/500m",
       "tempo": "κατέβασμα, παύση, ανέβασμα, παύση · π.χ. 31X1",
@@ -12521,31 +12510,8 @@
       "side": "ανά πλευρά"
     },
     "unit": {
-      "sec": "δευτ.",
-      "min": "λεπτά"
-    },
-    "struct": {
-      "single": "Απλό",
-      "superset": "Superset",
-      "complex": "Complex",
-      "cluster": "Cluster",
-      "drop": "Drop set",
-      "restpause": "Rest-pause"
-    },
-    "structHint": {
-      "single": "μία άσκηση, όπως είναι",
-      "superset": "όλες οι ασκήσεις, μετά το επόμενο σετ",
-      "complex": "όλες χωρίς να αφήσεις τη μπάρα",
-      "cluster": "το σετ σπάει σε κομμάτια με μικρή παύση",
-      "drop": "μειώνεις το βάρος και συνεχίζεις",
-      "restpause": "μέχρι αποτυχία, παύση, ξανά"
-    },
-    "structField": {
-      "clusters": "κομμάτια",
-      "intra": "παύση",
-      "drops": "μειώσεις",
-      "dropby": "κάθε φορά",
-      "minis": "μίνι σετ"
+      "min": "λεπτά",
+      "sec": "δευτ."
     },
     "structChip": "Δομή σετ (Alt+T)",
     "rest": "Ξεκούραση",
@@ -12564,7 +12530,7 @@
       "nothing": "Τίποτα",
       "nothingHint": "σβήσε ένα γράμμα",
       "struct": "Δομή σετ…",
-      "structHint": "cluster, drop set, complex…",
+      "structHint": "π.χ. cluster, drop set, complex…",
       "measure": "Παράμετρος…",
       "measureHint": "ρυθμός, tempo, RPE, ύψος…",
       "perRound": "Τιμές ανά γύρο",
@@ -12675,6 +12641,40 @@
       "set": "Σετ",
       "round": "Γύρος",
       "slot": "Διάστημα"
+    },
+    "measure": {
+      "pace": "Ρυθμός",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "Ζώνη παλμών",
+      "height": "Ύψος / στόχος",
+      "dist": "Απόσταση",
+      "hold": "Κράτημα",
+      "side": "Ανά πλευρά"
+    },
+    "struct": {
+      "single": "Απλό",
+      "superset": "Superset",
+      "complex": "Complex",
+      "cluster": "Cluster",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
+    },
+    "structHint": {
+      "single": "μία άσκηση, όπως είναι",
+      "superset": "όλες οι ασκήσεις, μετά το επόμενο σετ",
+      "complex": "όλες χωρίς να αφήσεις τη μπάρα",
+      "cluster": "το σετ σπάει σε κομμάτια με μικρή παύση",
+      "drop": "μειώνεις το βάρος και συνεχίζεις",
+      "restpause": "μέχρι αποτυχία, παύση, ξανά"
+    },
+    "structField": {
+      "clusters": "κομμάτια",
+      "intra": "παύση",
+      "drops": "μειώσεις",
+      "dropby": "κάθε φορά",
+      "minis": "μίνι σετ"
     }
   },
   "PlanRun": {
@@ -12717,7 +12717,7 @@
     "load": "Φορτίο",
     "logTitle": "Τι έκανες τελικά (προαιρετικό)",
     "logReps": "Επαναλήψεις που έκανες",
-    "logLoad": "Φορτίο που σήκωσες (kg)",
+    "logLoad": "Φορτίο που σήκωσες",
     "pctOfMax": "≈ {kg} kg από το 1RM σου",
     "cap": "Όριο {time}",
     "clock": "Ρολόι ενότητας",
@@ -12797,7 +12797,10 @@
       "cluster": "Cluster",
       "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
-      "interrupt": "Με διακοπή"
+      "interrupt": "Με διακοπή",
+      "kcal_target": "Στόχος θερμίδων",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
     },
     "params": {
       "sets": "{sets} σετ",
@@ -12847,7 +12850,8 @@
       "done": "Ολοκληρώθηκε",
       "total_reps": "Επαναλήψεις (σύνολο)",
       "lowest_round": "Χαμηλότερος γύρος",
-      "distance": "Απόσταση"
+      "distance": "Απόσταση",
+      "load": "Φορτίο (καλύτερο σετ)"
     },
     "levelNotes": "Σημειώσεις ανά επίπεδο",
     "sectionNote": "Σημείωση ενότητας",

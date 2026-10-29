@@ -97,7 +97,9 @@ defmodule Palee.Gamification.RecordWorkoutCompletionTest do
       end)
 
     assert leaderboard_entry.workouts_this_week == 2
-    assert leaderboard_entry.prs_this_month == 1
+    # Both times are PRs: the first has no history and 4:40 beats 5:00 (a
+    # stored "time" config ranks lower first; it used to read as reps).
+    assert leaderboard_entry.prs_this_month == 2
   end
 
   defp tenant_context_fixture(owner, name) do

@@ -12361,17 +12361,6 @@
       "l": "Gewicht",
       "lUnit": "Gewicht {unit}"
     },
-    "measure": {
-      "pace": "Tempo per afstand",
-      "tempo": "Tempo",
-      "rpe": "RPE",
-      "rir": "RIR",
-      "zone": "Hartslagzone",
-      "height": "Hoogte / doel",
-      "dist": "Afstand",
-      "hold": "Vasthouden",
-      "side": "Per kant"
-    },
     "measureHint": {
       "pace": "tussentijd · bijv. 2:00/500m",
       "tempo": "zakken, pauze, omhoog, pauze · bijv. 31X1",
@@ -12387,31 +12376,8 @@
       "side": "per kant"
     },
     "unit": {
-      "sec": "s",
-      "min": "min"
-    },
-    "struct": {
-      "single": "Enkel",
-      "superset": "Superset",
-      "complex": "Complex",
-      "cluster": "Cluster",
-      "drop": "Dropset",
-      "restpause": "Rest-pause"
-    },
-    "structHint": {
-      "single": "één oefening, zoals hij is",
-      "superset": "alle oefeningen, dan de volgende set",
-      "complex": "alle oefeningen zonder de stang neer te leggen",
-      "cluster": "de set wordt in delen opgeknipt met een korte pauze",
-      "drop": "gewicht omlaag en doorgaan",
-      "restpause": "tot falen, pauze, opnieuw"
-    },
-    "structField": {
-      "clusters": "delen",
-      "intra": "pauze",
-      "drops": "keer minder",
-      "dropby": "per keer",
-      "minis": "minisets"
+      "min": "min",
+      "sec": "s"
     },
     "structChip": "Setstructuur (Alt+T)",
     "rest": "Rust",
@@ -12444,7 +12410,8 @@
       "delete": "Verwijderen",
       "deleteHint": "⌫ bij een lege naam",
       "structTitle": "Setstructuur",
-      "measureTitle": "Meting"
+      "measureTitle": "Meting",
+      "withKey": "{key} · {hint}"
     },
     "add": {
       "exercise": "+ Oefening",
@@ -12506,7 +12473,8 @@
       "kg": "{value} kg",
       "pct": "{value}% van de 1RM",
       "words": "als tekst voor de atleet",
-      "tempo": "↓{down} zakken · {bottom} onderin · ↑{up} omhoog · {top} bovenin (seconden, X = explosief)"
+      "tempo": "↓{down} zakken · {bottom} onderin · ↑{up} omhoog · {top} bovenin (seconden, X = explosief)",
+      "equalsUnit": "= {value} {unit}"
     },
     "word": {
       "set": "set",
@@ -12539,6 +12507,40 @@
       "set": "Set",
       "round": "Ronde",
       "slot": "Interval"
+    },
+    "measure": {
+      "pace": "Tempo per afstand",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "Hartslagzone",
+      "height": "Hoogte / doel",
+      "dist": "Afstand",
+      "hold": "Vasthouden",
+      "side": "Per kant"
+    },
+    "struct": {
+      "single": "Enkel",
+      "superset": "Superset",
+      "complex": "Complex",
+      "cluster": "Cluster",
+      "drop": "Dropset",
+      "restpause": "Rest-pause"
+    },
+    "structHint": {
+      "single": "één oefening, zoals hij is",
+      "superset": "alle oefeningen, dan de volgende set",
+      "complex": "alle oefeningen zonder de stang neer te leggen",
+      "cluster": "de set wordt in delen opgeknipt met een korte pauze",
+      "drop": "gewicht omlaag en doorgaan",
+      "restpause": "tot falen, pauze, opnieuw"
+    },
+    "structField": {
+      "clusters": "delen",
+      "intra": "pauze",
+      "drops": "keer minder",
+      "dropby": "per keer",
+      "minis": "minisets"
     }
   },
   "PlanCore": {
@@ -12818,7 +12820,7 @@
     "load": "Gewicht",
     "logTitle": "Wat je echt hebt gedaan (optioneel)",
     "logReps": "Gedane herhalingen",
-    "logLoad": "Gebruikt gewicht (kg)",
+    "logLoad": "Gebruikt gewicht",
     "pctOfMax": "≈ {kg} kg van je 1RM",
     "cap": "Limiet {time}",
     "clock": "Klok van het onderdeel",

@@ -12361,17 +12361,6 @@
       "l": "Carga",
       "lUnit": "Carga {unit}"
     },
-    "measure": {
-      "pace": "Ritmo",
-      "tempo": "Tempo",
-      "rpe": "RPE",
-      "rir": "RIR",
-      "zone": "Zona de FC",
-      "height": "Altura / alvo",
-      "dist": "Distância",
-      "hold": "Manter",
-      "side": "Por lado"
-    },
     "measureHint": {
       "pace": "tempo parcial · p. ex. 2:00/500m",
       "tempo": "descida, pausa, subida, pausa · p. ex. 31X1",
@@ -12387,31 +12376,8 @@
       "side": "por lado"
     },
     "unit": {
-      "sec": "s",
-      "min": "min"
-    },
-    "struct": {
-      "single": "Simples",
-      "superset": "Supersérie",
-      "complex": "Complex",
-      "cluster": "Cluster",
-      "drop": "Drop set",
-      "restpause": "Rest-pause"
-    },
-    "structHint": {
-      "single": "um exercício, tal como está",
-      "superset": "todos os exercícios, depois a série seguinte",
-      "complex": "todos os exercícios sem largar a barra",
-      "cluster": "a série divide-se em blocos com uma pausa curta",
-      "drop": "baixas o peso e continuas",
-      "restpause": "até à falha, pausa, outra vez"
-    },
-    "structField": {
-      "clusters": "blocos",
-      "intra": "pausa",
-      "drops": "descidas",
-      "dropby": "de cada vez",
-      "minis": "minisséries"
+      "min": "min",
+      "sec": "s"
     },
     "structChip": "Estrutura da série (Alt+T)",
     "rest": "Descanso",
@@ -12444,7 +12410,8 @@
       "delete": "Eliminar",
       "deleteHint": "⌫ com o nome vazio",
       "structTitle": "Estrutura da série",
-      "measureTitle": "Medida"
+      "measureTitle": "Medida",
+      "withKey": "{key} · {hint}"
     },
     "add": {
       "exercise": "+ Exercício",
@@ -12506,7 +12473,8 @@
       "kg": "{value} kg",
       "pct": "{value} % do 1RM",
       "words": "como texto para o atleta",
-      "tempo": "↓{down} descida · {bottom} em baixo · ↑{up} subida · {top} em cima (segundos, X = explosivo)"
+      "tempo": "↓{down} descida · {bottom} em baixo · ↑{up} subida · {top} em cima (segundos, X = explosivo)",
+      "equalsUnit": "= {value} {unit}"
     },
     "word": {
       "set": "série",
@@ -12539,6 +12507,40 @@
       "set": "Série",
       "round": "Ronda",
       "slot": "Intervalo"
+    },
+    "measure": {
+      "pace": "Ritmo",
+      "tempo": "Tempo",
+      "rpe": "RPE",
+      "rir": "RIR",
+      "zone": "Zona de FC",
+      "height": "Altura / alvo",
+      "dist": "Distância",
+      "hold": "Manter",
+      "side": "Por lado"
+    },
+    "struct": {
+      "single": "Simples",
+      "superset": "Supersérie",
+      "complex": "Complex",
+      "cluster": "Cluster",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
+    },
+    "structHint": {
+      "single": "um exercício, tal como está",
+      "superset": "todos os exercícios, depois a série seguinte",
+      "complex": "todos os exercícios sem largar a barra",
+      "cluster": "a série divide-se em blocos com uma pausa curta",
+      "drop": "baixas o peso e continuas",
+      "restpause": "até à falha, pausa, outra vez"
+    },
+    "structField": {
+      "clusters": "blocos",
+      "intra": "pausa",
+      "drops": "descidas",
+      "dropby": "de cada vez",
+      "minis": "minisséries"
     }
   },
   "PlanCore": {
@@ -12818,7 +12820,7 @@
     "load": "Carga",
     "logTitle": "O que fizeste de facto (opcional)",
     "logReps": "Repetições feitas",
-    "logLoad": "Carga usada (kg)",
+    "logLoad": "Carga usada",
     "pctOfMax": "≈ {kg} kg do teu 1RM",
     "cap": "Limite {time}",
     "clock": "Relógio da secção",

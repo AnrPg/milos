@@ -26,10 +26,18 @@ defmodule Palee.StructuredPlanFixtures do
 
   def section(flow, params, blocks, more \\ %{}) do
     Map.merge(
-      %{"v" => 1, "flow" => flow, "params" => params, "blocks" => blocks, "score" => "none"},
+      %{"v" => 1, "flow" => flow, "params" => params, "blocks" => blocks, "score" => score(flow)},
       more
     )
   end
+
+  # The flow's default score (the first of its list).
+  def score("sets"), do: "none"
+  def score("for_time"), do: "time"
+  def score("amrap"), do: "rounds_reps"
+  def score("emom"), do: "none"
+  def score("intervals"), do: "total_reps"
+  def score("rest"), do: "none"
 
   def program do
     [
@@ -129,7 +137,21 @@ defmodule Palee.StructuredPlanFixtures do
           "levelNotes" => %{"rx" => "Ως τους 120 παλμούς", "scaled" => ""}
         }
       ),
-      section("rest", %{"dur" => "2:00"}, [])
+      section("rest", %{"dur" => "2:00"}, []),
+      # The web reference program's further cases (validate.test.ts).
+      section("amrap", %{"dur" => "12"}, [[ex("r27", "Thruster", "5-10-15…", "22.5kg")]]),
+      section("sets", %{"sets" => "4", "rest" => "90-120″"}, [
+        [
+          ex("r28", "Bulgarian Split Squat", "", "", %{
+            "extra" => ["side", "rpe"],
+            "cells" => [%{"d" => "4 x 8-10 each side", "l" => "22.5kg", "rpe" => "8"}]
+          })
+        ]
+      ]),
+      section("amrap", %{"dur" => "3'-3'-3'-4'", "rest" => "1:00"}, [[ex("r29", "Row", "250 m")]]),
+      section("sets", %{"sets" => "4"}, [
+        [ex("r30", "Bench Press", "", "", %{"cells" => cells([{"8", "60→80%"}])})]
+      ])
     ]
   end
 end
