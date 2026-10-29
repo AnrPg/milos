@@ -30,14 +30,13 @@ defmodule Palee.Workers.SendEInvoicesJob do
     :ok
   end
 
+  # Transmission always answers with counts; a crash is logged, never retried here.
   defp transmit(organization_id, which) do
-    case FiscalEInvoicing.transmit(%{organization_id: organization_id}, which) do
-      {:ok, _counts} ->
-        :ok
-
-      error ->
-        Logger.error("Peppol sending failed for #{organization_id}: #{inspect(error)}")
-        :ok
-    end
+    {:ok, _counts} = FiscalEInvoicing.transmit(%{organization_id: organization_id}, which)
+    :ok
+  rescue
+    error ->
+      Logger.error("Peppol sending failed for #{organization_id}: #{Exception.message(error)}")
+      :ok
   end
 end

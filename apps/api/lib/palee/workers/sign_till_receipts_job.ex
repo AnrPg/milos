@@ -31,14 +31,13 @@ defmodule Palee.Workers.SignTillReceiptsJob do
     :ok
   end
 
+  # Transmission always answers with counts; a crash is logged, never retried here.
   defp sign(organization_id, which) do
-    case FiscalTillSigning.transmit(%{organization_id: organization_id}, which) do
-      {:ok, _counts} ->
-        :ok
-
-      error ->
-        Logger.error("till signing failed for #{organization_id}: #{inspect(error)}")
-        :ok
-    end
+    {:ok, _counts} = FiscalTillSigning.transmit(%{organization_id: organization_id}, which)
+    :ok
+  rescue
+    error ->
+      Logger.error("till signing failed for #{organization_id}: #{Exception.message(error)}")
+      :ok
   end
 end

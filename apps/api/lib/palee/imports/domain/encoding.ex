@@ -130,9 +130,6 @@ defmodule Palee.Imports.Domain.Encoding do
 
       {_error, good, _rest} ->
         {good <> "�", [:undecodable_bytes]}
-
-      _other ->
-        {"", [:undecodable_bytes]}
     end
   end
 

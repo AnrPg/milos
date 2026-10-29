@@ -299,8 +299,6 @@ defmodule Palee.Fiscal.Domain.TillSigningPolicy do
     |> String.slice(0, 1_000)
   end
 
-  defp errors_text(other), do: text(other)
-
   defp text(nil), do: nil
   defp text(reason) when is_binary(reason), do: String.slice(reason, 0, 1_000)
   defp text(reason), do: reason |> inspect() |> String.slice(0, 1_000)
