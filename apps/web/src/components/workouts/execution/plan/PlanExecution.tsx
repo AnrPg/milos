@@ -544,7 +544,8 @@ function Value({ label, value, big = false, hint }: { label: string; value: stri
       <dt className="text-xs" style={{ color: "var(--dim)" }}>
         {label}
       </dt>
-      <dd className={big ? "text-3xl font-bold tabular-nums" : "text-lg font-semibold tabular-nums"}>{value}</dd>
+      {/* A small value (tempo, a measure) sits on the line of the big ones, not under their labels. */}
+      <dd className={big ? "text-3xl font-bold tabular-nums" : "flex min-h-9 items-end pb-0.5 text-lg font-semibold tabular-nums"}>{value}</dd>
       {hint ? (
         <dd className="text-xs tabular-nums" style={{ color: "var(--muted)" }}>
           {hint}

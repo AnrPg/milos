@@ -129,14 +129,14 @@ export function StepFlow({ section }: { section: PlanEditorSection }) {
           setPick(null);
         }}
         onKeyDown={onKeyDown}
-        className="w-full rounded-xl border px-3 py-2.5 text-base outline-none focus:border-[var(--primary)]"
-        style={{ background: "var(--control-bg)", borderColor: "var(--control-border)", color: "var(--text)" }}
+        className="w-full text-ellipsis rounded-xl border border-[var(--control-border)] px-3 py-2.5 text-base outline-none focus:border-[var(--primary)] focus:shadow-[0_0_0_1px_var(--primary)]"
+        style={{ background: "var(--control-bg)", color: "var(--text)" }}
       />
       <div id={listId} role="listbox" aria-label={t("flowInput")} className="flex flex-col gap-3">
         {flows.length ? (
           <div className="flex flex-col gap-1.5">
             <span className="text-xs font-bold uppercase tracking-wide" style={{ color: "var(--muted)" }}>{t("flowsHeading")}</span>
-            <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,12rem),1fr))] gap-1.5">
               {flows.map((r) =>
                 r.item.type === "flow"
                   ? option(
@@ -160,15 +160,15 @@ export function StepFlow({ section }: { section: PlanEditorSection }) {
               <span className="text-xs" style={{ color: "var(--muted)" }}>{t("presetsSub")}</span>
             </div>
             {presetGroups.map(([flow, xs]) => (
-              <div key={flow} className="flex flex-wrap items-center gap-2">
-                <span className="w-24 shrink-0 text-xs font-bold uppercase" style={{ color: "var(--primary)" }}>{k(FLOWS[flow].labelKey)}</span>
+              <div key={flow} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+                <span className="shrink-0 text-xs font-bold uppercase sm:w-24" style={{ color: "var(--primary)" }}>{k(FLOWS[flow].labelKey)}</span>
                 <div className="flex min-w-0 flex-1 flex-wrap gap-1.5">
                   {xs.map((r) =>
                     r.item.type === "preset"
                       ? option(
                           r,
                           <Marked text={k(r.item.preset.labelKey)} marks={r.onLabel ? r.marks : []} />,
-                          "rounded-full border border-dashed px-3 py-1 text-sm font-semibold",
+                          "flex min-h-10 items-center rounded-full border border-dashed px-3 py-1 text-sm font-semibold sm:min-h-0",
                           { background: "var(--panel)", borderColor: "var(--border-strong)" },
                         )
                       : null,

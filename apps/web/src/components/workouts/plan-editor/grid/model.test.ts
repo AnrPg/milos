@@ -4,7 +4,7 @@ import type { PlanRow } from "@/lib/structured-plan/types";
 
 import { SAMPLE } from "./fixtures";
 import { occurrences } from "./lib";
-import { blockTitle, cellTestId, compactField, hintFor, parseFieldKey, perSummary, rowCells, tableColumns } from "./model";
+import { ambiguityOf, blockTitle, cellTestId, compactField, hintFor, parseFieldKey, perSummary, rowCells, tableColumns } from "./model";
 import { addRound, deleteRow, dropMeasure, setStruct, toggleSuperset, togglePerRound } from "./mutations";
 
 const row = (cells: PlanRow["cells"], more: Partial<PlanRow> = {}): PlanRow => ({ id: "r", kind: "ex", name: "", dose: "", load: "", cells, group: null, ...more });
@@ -109,5 +109,15 @@ describe("mutations", () => {
     const out = dropMeasure(SAMPLE.sets!, "sq", "tempo");
     expect(out.blocks[0]![0]!.extra).toEqual([]);
     expect(out.blocks[0]![0]!.cells[0]).toEqual({ d: "12", l: "60%" });
+  });
+});
+
+describe("ambiguityOf", () => {
+  it("names the other reading of a dose or a load, as a PlanCore message", () => {
+    expect(ambiguityOf("d", "10-12")).toEqual({ key: "ambiguous.rangeOrList", values: expect.objectContaining({ write: "10, 12" }) });
+    expect(ambiguityOf("d", "5-10-15")?.key).toBe("ambiguous.listOrLadder");
+    expect(ambiguityOf("d", "10")).toBeNull();
+    expect(ambiguityOf("d", "")).toBeNull();
+    expect(ambiguityOf("l", "60kg")).toBeNull();
   });
 });

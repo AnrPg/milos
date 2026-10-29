@@ -12131,7 +12131,10 @@
       "cluster": "Cluster",
       "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
-      "interrupt": "Met onderbrekingen"
+      "interrupt": "Met onderbrekingen",
+      "kcal_target": "Caloriedoel",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
     },
     "params": {
       "sets": "{sets} sets",
@@ -12181,7 +12184,8 @@
       "done": "Voltooid",
       "total_reps": "Herhalingen (totaal)",
       "lowest_round": "Laagste ronde",
-      "distance": "Afstand"
+      "distance": "Afstand",
+      "load": "Gewicht (beste set)"
     },
     "levelNotes": "Notities per niveau",
     "sectionNote": "Notitie bij het onderdeel",
@@ -12820,7 +12824,7 @@
     "load": "Gewicht",
     "logTitle": "Wat je echt hebt gedaan (optioneel)",
     "logReps": "Gedane herhalingen",
-    "logLoad": "Gebruikt gewicht",
+    "logLoad": "Gebruikt gewicht (kg)",
     "pctOfMax": "≈ {kg} kg van je 1RM",
     "cap": "Limiet {time}",
     "clock": "Klok van het onderdeel",

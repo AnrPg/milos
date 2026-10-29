@@ -12131,7 +12131,10 @@
       "cluster": "Cluster",
       "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
-      "interrupt": "עם הפסקות"
+      "interrupt": "עם הפסקות",
+      "kcal_target": "יעד קלוריות",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
     },
     "params": {
       "sets": "{sets} סטים",
@@ -12181,7 +12184,8 @@
       "done": "הושלם",
       "total_reps": "חזרות (סה״כ)",
       "lowest_round": "הסבב החלש",
-      "distance": "מרחק"
+      "distance": "מרחק",
+      "load": "משקל (הסט הטוב)"
     },
     "levelNotes": "הערות לפי רמה",
     "sectionNote": "הערה לחלק",
@@ -12820,7 +12824,7 @@
     "load": "משקל",
     "logTitle": "מה עשית בפועל (רשות)",
     "logReps": "חזרות שבוצעו",
-    "logLoad": "משקל בשימוש",
+    "logLoad": "משקל בשימוש (ק״ג)",
     "pctOfMax": "≈ {kg} ק״ג מה־1RM שלך",
     "cap": "מגבלה {time}",
     "clock": "שעון המקטע",

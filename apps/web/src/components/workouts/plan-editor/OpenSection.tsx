@@ -6,6 +6,7 @@ import { FLOWS } from "@/lib/structured-plan";
 import { stepAvailable, usePlanEditorStore, type PlanEditorSection, type PlanWizardStep } from "@/stores/structured-plan";
 
 import { PlanGrid } from "./grid";
+import { KEYS, stepKey } from "./keymap";
 import { useKeyText } from "./plan-text";
 import { sectionLetter } from "./SectionCard";
 import { StepFlow } from "./StepFlow";
@@ -14,8 +15,9 @@ import { StepTime } from "./StepTime";
 
 export const STEP_IDS = ["flow", "time", "exercises", "score"] as const;
 
+// Keyboard hints are hidden on phones, where they only push the buttons onto more lines.
 const Kbd = ({ children }: { children: string }) => (
-  <kbd className="rounded border px-1 font-mono text-[0.7rem]" style={{ borderColor: "var(--border-strong)", color: "var(--muted)" }}>
+  <kbd className="rounded border px-1 font-mono text-[0.7rem] max-sm:hidden" style={{ borderColor: "var(--border-strong)", color: "var(--muted)" }}>
     {children}
   </kbd>
 );
@@ -56,7 +58,7 @@ export function OpenSection({ section, index, step, levels }: { section: PlanEdi
           placeholder={t("sectionName")}
           aria-label={t("sectionName")}
           onChange={(e) => renameSection(section.id, e.target.value)}
-          className="min-w-0 flex-[1_1_8rem] rounded-lg border border-transparent bg-transparent px-1.5 py-1 font-bold outline-none focus:border-[var(--primary)]"
+          className="field-sizing-content min-w-32 max-w-full flex-auto rounded-lg border border-transparent bg-transparent px-1.5 py-1 font-bold outline-none focus:border-[var(--primary)]"
           style={{ color: "var(--text)" }}
         />
         <nav aria-label={t("steps")} className="flex flex-wrap gap-1">
@@ -70,9 +72,9 @@ export function OpenSection({ section, index, step, levels }: { section: PlanEdi
                 data-testid={`plan-step-${id}`}
                 aria-current={current ? "step" : undefined}
                 disabled={!stepAvailable(plan.flow, s)}
-                title={`Alt+${n + 1}`}
+                title={stepKey(n + 1)}
                 onClick={() => setStep(s)}
-                className="rounded-full px-2.5 py-1 text-sm font-semibold disabled:opacity-40"
+                className="rounded-full px-2.5 py-1 text-sm font-semibold disabled:opacity-40 max-sm:min-h-10"
                 style={current ? { background: "var(--selection)", color: "var(--primary)" } : { color: "var(--muted)" }}
               >
                 {n + 1} {t(`step.${id}`)}
@@ -90,18 +92,18 @@ export function OpenSection({ section, index, step, levels }: { section: PlanEdi
       <footer className="flex flex-wrap items-center justify-between gap-2">
         <span className="flex flex-wrap items-center gap-1.5">
           {step > 0 ? (
-            <button type="button" onClick={prevStep} className="rounded-full border px-3 py-1.5 text-sm font-semibold" style={{ borderColor: "var(--border)", color: "var(--text)" }}>
+            <button type="button" onClick={prevStep} className="rounded-full border px-3 py-1.5 text-sm font-semibold max-sm:min-h-10" style={{ borderColor: "var(--border)", color: "var(--text)" }}>
               {t("back")}
             </button>
           ) : null}
-          <Kbd>Alt+←</Kbd>
-          <Kbd>Alt+→</Kbd>
+          <Kbd>{KEYS.back}</Kbd>
+          <Kbd>{KEYS.next}</Kbd>
           {!fresh ? (
             <button
               type="button"
               data-testid="plan-section-delete"
               onClick={() => deleteSection(section.id)}
-              className="ms-2 text-xs underline-offset-2 hover:underline"
+              className="ms-2 text-xs underline-offset-2 hover:underline max-sm:min-h-10"
               style={{ color: "var(--muted)" }}
             >
               {t("deleteSection")}
@@ -109,15 +111,15 @@ export function OpenSection({ section, index, step, levels }: { section: PlanEdi
           ) : null}
         </span>
         {step === 0 ? (
-          <span className="flex items-center gap-1.5 text-xs" style={{ color: "var(--muted)" }}>
-            {t("pickHelp")} <Kbd>↑ ↓</Kbd> <Kbd>Enter</Kbd>
+          <span className="flex items-center gap-1.5 text-xs max-sm:hidden" style={{ color: "var(--muted)" }}>
+            {t("pickHelp")} <Kbd>{KEYS.arrows}</Kbd> <Kbd>{KEYS.enter}</Kbd>
           </span>
         ) : (
           <button
             type="button"
             data-testid="plan-step-next"
             onClick={nextStep}
-            className="rounded-full px-4 py-1.5 text-sm font-bold"
+            className="ms-auto rounded-full px-4 py-1.5 text-sm font-bold max-sm:min-h-10"
             style={{ background: "var(--text)", color: "var(--bg)" }}
           >
             {step === 3 ? t("finish") : t("next")}

@@ -12131,7 +12131,10 @@
       "cluster": "Cluster",
       "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
-      "interrupt": "Con interruzioni"
+      "interrupt": "Con interruzioni",
+      "kcal_target": "Obiettivo calorie",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
     },
     "params": {
       "sets": "{sets} serie",
@@ -12181,7 +12184,8 @@
       "done": "Completato",
       "total_reps": "Ripetizioni (totale)",
       "lowest_round": "Giro più basso",
-      "distance": "Distanza"
+      "distance": "Distanza",
+      "load": "Carico (serie migliore)"
     },
     "levelNotes": "Note per livello",
     "sectionNote": "Nota della sezione",
@@ -12820,7 +12824,7 @@
     "load": "Carico",
     "logTitle": "Cosa hai fatto davvero (facoltativo)",
     "logReps": "Ripetizioni fatte",
-    "logLoad": "Carico usato",
+    "logLoad": "Carico usato (kg)",
     "pctOfMax": "≈ {kg} kg del tuo 1RM",
     "cap": "Limite {time}",
     "clock": "Cronometro della sezione",

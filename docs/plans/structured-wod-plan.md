@@ -111,5 +111,5 @@ with real translations (not English copies) or leave them to the i18n pass, but 
 
 Shared test ids (`data-testid`): `authoring-toggle`, `plan-editor`, `plan-section-card`,
 `plan-step-flow|time|exercises|score`, `plan-flow-input`, `plan-param-<key>`, `plan-row-<rowId>`,
-`plan-cell-<rowId>-<col>-<key>`, `plan-row-menu`, `plan-hint`, `plan-add-exercise`, `plan-add-round`,
+`plan-cell-<rowId>-<col>-<key>`, `plan-row-menu`, `plan-hint` (the grid's hint line; the shell's key bar is `plan-hint-bar`), `plan-add-exercise`, `plan-add-round`,
 `plan-view`, `plan-run`, `plan-run-next`.

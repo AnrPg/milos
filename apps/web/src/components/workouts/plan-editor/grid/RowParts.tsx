@@ -30,13 +30,18 @@ export function MoreButton({ row }: { row: PlanRow }) {
   );
 }
 
-/** The quiet note line under a row, once it has a note or Alt+N opened it. */
+/**
+ * The quiet note line under a row, once it has a note or Alt+N opened it. A
+ * one-line text area that grows with the note, so a long note wraps instead of
+ * being cut off in the narrow name column (Enter still adds a row).
+ */
 export function NoteLine({ row }: { row: PlanRow }) {
   const { write, notesOpen } = useGrid();
   const { t } = useGridT();
   if (row.kind !== "ex" || (!row.note && !notesOpen.has(row.id))) return null;
   return (
-    <input
+    <textarea
+      rows={1}
       className={s.note}
       data-key={fieldKey.note(row.id)}
       data-testid={`plan-note-${row.id}`}

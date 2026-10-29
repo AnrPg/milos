@@ -28,6 +28,7 @@ export {
   occurrences,
   parseClock,
   parseDose,
+  parseLoad,
   setsRange,
   structOf,
   totalRounds,
@@ -68,3 +69,6 @@ export const flowStructs = (flow: PlanSection["flow"]): PlanStructureKind[] => F
 export const isGroupStructure = (kind: PlanStructureKind) => STRUCTS[kind].group;
 export const structureDefaults = newStructure;
 export const measureAliases = (k: keyof typeof MEASURES) => MEASURES[k].aliases.join(" ");
+
+/** The fields ↑ ↓ move between, row to row (value fields, names and notes). */
+export const NAV_FIELDS = "input[data-key], textarea[data-key]";

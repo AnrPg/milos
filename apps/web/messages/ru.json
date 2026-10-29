@@ -12131,7 +12131,10 @@
       "cluster": "Cluster",
       "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
-      "interrupt": "С прерываниями"
+      "interrupt": "С прерываниями",
+      "kcal_target": "Цель по калориям",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
     },
     "params": {
       "sets": "подходов: {sets}",
@@ -12181,7 +12184,8 @@
       "done": "Выполнено",
       "total_reps": "Повторения (всего)",
       "lowest_round": "Худший раунд",
-      "distance": "Дистанция"
+      "distance": "Дистанция",
+      "load": "Вес (лучший подход)"
     },
     "levelNotes": "Заметки по уровням",
     "sectionNote": "Заметка к разделу",
@@ -12820,7 +12824,7 @@
     "load": "Вес",
     "logTitle": "Что ты сделал на самом деле (необязательно)",
     "logReps": "Сделано повторений",
-    "logLoad": "Использованный вес",
+    "logLoad": "Использованный вес (кг)",
     "pctOfMax": "≈ {kg} кг от твоего 1ПМ",
     "cap": "Лимит {time}",
     "clock": "Часы раздела",

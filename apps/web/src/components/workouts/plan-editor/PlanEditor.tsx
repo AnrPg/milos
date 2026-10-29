@@ -6,8 +6,9 @@ import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type Ke
 import { focusKey, hasExercises, usePlanEditorStore } from "@/stores/structured-plan";
 
 import { HintBar } from "./HintBar";
-import { isMacPlatform, keyLabel, matchPlanShortcut } from "./keymap";
+import { isMacPlatform, KEYS, keyLabel, matchPlanShortcut } from "./keymap";
 import { OpenSection } from "./OpenSection";
+import { SEL } from "./selectors";
 import { SectionCard } from "./SectionCard";
 import { ShortcutsSheet } from "./ShortcutsSheet";
 import { noteFieldClass, noteFieldStyle, type PlanLevel } from "./StepScore";
@@ -66,7 +67,7 @@ export function PlanEditor({ levels }: { levels?: PlanLevel[] }) {
     const root = rootRef.current;
     if (!pendingFocus || !root) return;
     // The grid marks its fields with `data-key`, the shell with `data-k`; both use the store's focus keys.
-    const el = [...root.querySelectorAll<HTMLElement>("[data-k], [data-key]")].find((x) => (x.dataset.k ?? x.dataset.key) === pendingFocus);
+    const el = [...root.querySelectorAll<HTMLElement>(SEL.focusKeys)].find((x) => (x.dataset.k ?? x.dataset.key) === pendingFocus);
     if (!el) return;
     usePlanEditorStore.getState().consumeFocus(pendingFocus);
     el.focus();
@@ -84,9 +85,9 @@ export function PlanEditor({ levels }: { levels?: PlanLevel[] }) {
     // Closed cards: ↑ ↓ move between them (and into the open section).
     if (k.startsWith("card:") && (e.key === "ArrowDown" || e.key === "ArrowUp") && !e.altKey && root) {
       e.preventDefault();
-      const stops = [...root.querySelectorAll<HTMLElement>("[data-k^='card:'], [data-sec]")];
+      const stops = [...root.querySelectorAll<HTMLElement>(SEL.cardStops)];
       const next = stops[stops.indexOf(target) + (e.key === "ArrowDown" ? 1 : -1)];
-      (next?.dataset.sec ? focusables(next, "input, button")[0] : next)?.focus();
+      (next?.dataset.sec ? focusables(next, SEL.controls)[0] : next)?.focus();
       return;
     }
 
@@ -131,7 +132,7 @@ export function PlanEditor({ levels }: { levels?: PlanLevel[] }) {
     }
 
     const open = store.sections.find((s) => s.id === store.openId);
-    if (!open || !target.closest(`[data-sec="${open.id}"]`)) return;
+    if (!open || !target.closest(SEL.section(open.id))) return;
 
     switch (hit.id) {
       case "close":
@@ -161,7 +162,7 @@ export function PlanEditor({ levels }: { levels?: PlanLevel[] }) {
     // Wizard fields: Enter goes to the next field, then the next step.
     if (STEP_FIELD.test(k) && hit.id === "newExercise") {
       done();
-      const fields = root ? focusables(root.querySelector(`[data-sec="${open.id}"]`) ?? root, "[data-k^='p:'], [data-k^='score:'], [data-k^='snote:'], [data-k^='lnote:']") : [];
+      const fields = root ? focusables(root.querySelector(SEL.section(open.id)) ?? root, SEL.stepFields) : [];
       const next = fields[fields.indexOf(target) + 1];
       if (next) {
         next.focus();
@@ -247,8 +248,8 @@ export function PlanEditor({ levels }: { levels?: PlanLevel[] }) {
           type="button"
           data-testid="plan-add-section"
           onClick={() => addSection(openId ?? sections.at(-1)?.id ?? null)}
-          title={keyLabel("Shift+Enter", mac)}
-          className="rounded-full border border-dashed px-4 py-1.5 text-sm font-semibold"
+          title={keyLabel(KEYS.newSection, mac)}
+          className="rounded-full border border-dashed px-4 py-1.5 text-sm font-semibold max-sm:min-h-10"
           style={{ borderColor: "var(--border-strong)", color: "var(--text-soft)" }}
         >
           {t("addSection")}

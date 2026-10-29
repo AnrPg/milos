@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 
-import { FLOWS, MODS, describe, human, parseClock, parseTimes, type ParamDef } from "@/lib/structured-plan";
+import { FLOWS, MODS, describe, human, parseClock, parseTimes, readParam, type ParamDef } from "@/lib/structured-plan";
 import { focusKey, usePlanEditorStore, type PlanEditorSection } from "@/stores/structured-plan";
 
 import { useKeyText, usePlanText } from "./plan-text";
@@ -20,13 +20,20 @@ export function paramUnit(def: ParamDef, value: string): "rounds" | "times" | "s
   return def.kind === "times" || def.bare === "min" || Number(v.split(/[-,]/)[0]) <= 10 ? "min" : "sec";
 }
 
-/** How the value reads ("= 1 λεπτό 30 δευτ."), or null when it is empty; "bad" when it does not read. */
+/**
+ * How the value reads ("= 1 λεπτό 30 δευτ."), or null when it is empty; "bad"
+ * when it does not read. An ambiguous value says its other reading instead
+ * («διαβάζεται 10:00 · για την άλλη μονάδα γράψε 10″»).
+ */
 function useReading() {
   const t = useTranslations("PlanEditor");
+  const core = useTranslations("PlanCore");
   const words = usePlanText();
   return (def: ParamDef, value: string): string | "bad" | null => {
     const v = value.trim();
     if (!v) return null;
+    const read = readParam(def, v);
+    if (read.ok && "ambiguous" in read && read.ambiguous) return core(read.ambiguous.hint.key.replace(/^PlanCore\./, ""), read.ambiguous.hint.values);
     if (def.kind === "count") return /^\d+$/.test(v) ? null : "bad";
     if (def.kind === "range") return /^\d+(\s*-\s*\d+)?$/.test(v) ? null : "bad";
     if (def.kind === "time") {
@@ -69,8 +76,8 @@ function ParamField({ section, def }: { section: PlanEditorSection; def: ParamDe
           autoComplete="off"
           placeholder={def.kind === "time" || def.kind === "times" ? t("unit.clock") : ""}
           onChange={(e) => setParam(section.id, def.key, e.target.value)}
-          className={`${def.kind === "times" ? "w-36" : "w-24"} rounded-lg border px-2.5 py-1.5 text-base font-bold outline-none focus:border-[var(--primary)]`}
-          style={{ background: "var(--control-bg)", borderColor: bad ? "var(--danger)" : "var(--control-border)", color: "var(--text)" }}
+          className={`${def.kind === "times" ? "w-36" : "w-24"} rounded-lg border px-2.5 py-1.5 text-base font-bold outline-none ${bad ? "border-[var(--danger)] focus:shadow-[0_0_0_1px_var(--danger)]" : "border-[var(--control-border)] focus:border-[var(--primary)] focus:shadow-[0_0_0_1px_var(--primary)]"}`}
+          style={{ background: "var(--control-bg)", color: "var(--text)" }}
         />
         {unit ? <span className="text-sm font-normal" aria-hidden="true" style={{ color: "var(--muted)" }}>{t(`unit.${unit}`)}</span> : null}
       </span>
@@ -109,7 +116,7 @@ export function StepTime({ section }: { section: PlanEditorSection }) {
                 data-testid={`plan-mod-remove-${m}`}
                 title={t("removeModTitle")}
                 onClick={() => toggleMod(section.id, m)}
-                className="mt-6 rounded-full border border-dashed px-3 py-1 text-sm"
+                className="mt-6 rounded-full border border-dashed px-3 py-1 text-sm max-sm:min-h-10"
                 style={{ borderColor: "var(--border-strong)", color: "var(--muted)" }}
               >
                 {t("removeMod", { label: k(MODS[m].labelKey) })}
@@ -126,7 +133,7 @@ export function StepTime({ section }: { section: PlanEditorSection }) {
               data-testid={`plan-mod-add-${m}`}
               title={k(MODS[m].hintKey)}
               onClick={() => toggleMod(section.id, m)}
-              className="rounded-full border border-dashed px-3 py-1 text-sm"
+              className="rounded-full border border-dashed px-3 py-1 text-sm max-sm:min-h-10"
               style={{ borderColor: "var(--border-strong)", color: "var(--text-soft)" }}
             >
               {t("addMod", { label: k(MODS[m].labelKey) })}

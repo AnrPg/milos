@@ -205,6 +205,11 @@
   border-radius: 8px;
   padding: 0.2rem 0.45rem;
   width: 100%;
+  display: block;
+  line-height: 1.35;
+  resize: none;
+  overflow-wrap: anywhere;
+  field-sizing: content;
 }
 .note:focus {
   border-color: var(--primary);
@@ -429,15 +434,17 @@
 .grid tr:last-child td {
   border-bottom: 0;
 }
+/* The focused row: a soft tint across, the name column in full (as the mockup), so a +5 badge still shows. */
 .grid tr[data-nav-row]:focus-within {
-  background: var(--selection);
+  background: color-mix(in srgb, var(--selection) 50%, transparent);
 }
 .first {
   min-width: 13rem;
   padding: 2px 6px 2px 8px !important;
   position: sticky;
   inset-inline-start: 0;
-  background: var(--panel);
+  /* the open section's own surface, so the pinned column does not read as a separate panel in dark mode */
+  background: var(--card);
   z-index: 1;
 }
 .grid tr:focus-within .first {
@@ -486,6 +493,26 @@ td.labs {
 }
 .c .vf {
   width: 100%;
+}
+/*
+ * The Σετ table fits its column: set columns share what the name column and
+ * the ⋯ column leave (up to 6.4rem each, down to 4.4rem); only past that,
+ * e.g. ten sets on a narrow screen, does the table scroll, with the name
+ * column pinned.
+ */
+.sets {
+  container-type: inline-size;
+}
+.sets .c {
+  width: clamp(4.4rem, calc((100cqi - 16.75rem) / var(--cols, 4) - 0.25rem), 6.4rem);
+}
+/* Set columns stay as wide as their fields; the space left goes to the name column. */
+.sets td:has(> .c) {
+  width: 1px;
+}
+/* The name and its note take the column's width, never set it (a long note wraps). */
+.sets .fname {
+  contain: inline-size;
 }
 .moreCell {
   width: 2.4rem;
@@ -656,4 +683,21 @@ td.labs {
 .root[data-layout="phone"] .slot,
 .root[data-layout="phone"] .lane {
   padding: 6px 8px;
+}
+/* Touch targets: at least 40px on phones; ⋯ is always shown (no hover to reveal it). */
+.root[data-layout="phone"] .more {
+  width: 2.5rem;
+  height: 2.5rem;
+  opacity: 1;
+}
+.root[data-layout="phone"] .add,
+.root[data-layout="phone"] .schip {
+  min-height: 2.5rem;
+  padding-inline: 0.9rem;
+}
+.root[data-layout="phone"] .vf {
+  height: 2.5rem;
+}
+.root[data-layout="phone"] .name {
+  min-height: 2.5rem;
 }

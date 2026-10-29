@@ -7,7 +7,7 @@ import type { PlanSection } from "@/lib/structured-plan/types";
 import { useGridActions } from "./actions";
 import { GridContext, SHORTCUT, useGrid, useGridT, type GridContextValue, type PickerState } from "./context";
 import { HintLine } from "./HintLine";
-import { occurrences, setsRange, totalRounds } from "./lib";
+import { NAV_FIELDS, occurrences, setsRange, totalRounds } from "./lib";
 import { attr, blockTitle, parseFieldKey, roundWordKey } from "./model";
 import { findRow } from "./mutations";
 import { RowMenu } from "./RowMenu";
@@ -84,7 +84,12 @@ export function PlanGrid({ sectionId }: { sectionId: string }) {
         className={s.root}
         data-layout={phone ? "phone" : "wide"}
         data-testid="plan-grid"
-        onFocus={(event) => setFocused((event.target as HTMLElement).dataset.key ?? null)}
+        onFocus={(event) => {
+          // Only a field changes the hint line. A button keeps it as it was: on mousedown
+          // on «+ Άσκηση» the line emptying would move the button and lose the tap.
+          const key = (event.target as HTMLElement).dataset.key;
+          if (key) setFocused(key);
+        }}
         onBlur={(event) => {
           if (!rootRef.current?.contains(event.relatedTarget as Node | null)) setFocused(null);
         }}
@@ -339,13 +344,13 @@ function GridKeys({ picker, rootRef, children }: { picker: PickerState | null; r
 }
 
 /** The field in the row above / below that sits in the same column (or its first field). */
-export function neighbourField(root: HTMLElement | null, from: HTMLElement, key: string, dir: -1 | 1): HTMLInputElement | null {
+export function neighbourField(root: HTMLElement | null, from: HTMLElement, key: string, dir: -1 | 1): HTMLInputElement | HTMLTextAreaElement | null {
   if (!root) return null;
   const rows = [...root.querySelectorAll<HTMLElement>("[data-nav-row]")];
   const cur = from.closest<HTMLElement>("[data-nav-row]");
   const next = cur ? rows[rows.indexOf(cur) + dir] : null;
   if (!next) return null;
-  const inputs = [...next.querySelectorAll<HTMLInputElement>("input[data-key]")];
+  const inputs = [...next.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(NAV_FIELDS)];
   const here = columnOf(key);
   return (
     inputs.find((x) => { const c = columnOf(x.dataset.key); return c.k === here.k && c.col === here.col; }) ??

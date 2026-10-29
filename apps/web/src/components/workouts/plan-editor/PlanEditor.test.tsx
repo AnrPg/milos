@@ -149,6 +149,16 @@ describe("PlanEditor", () => {
     expect(screen.getByTestId("plan-sentence")).toBeInTheDocument();
   });
 
+  it("says the other reading of an ambiguous time under its field", () => {
+    renderEditor();
+    act(() => store().openSection("s1", 1));
+    const rest = screen.getByTestId("plan-param-rest") as HTMLInputElement;
+    fireEvent.change(rest, { target: { value: "10" } });
+    expect(rest.closest("label")).toHaveTextContent(/for the other unit write 10″/);
+    fireEvent.change(rest, { target: { value: "1:30" } });
+    expect(rest.closest("label")).not.toHaveTextContent(/other unit/);
+  });
+
   it("adds and removes an add-on with its field", () => {
     renderEditor();
     act(() => store().openSection("s2", 1));
@@ -214,12 +224,12 @@ describe("PlanEditor", () => {
 
   it("opens the shortcut sheet with ? and shows the hint line", () => {
     renderEditor();
-    expect(screen.getByTestId("plan-hint")).toHaveTextContent("Shift+Enter");
+    expect(screen.getByTestId("plan-hint-bar")).toHaveTextContent("Shift+Enter");
     screen.getAllByTestId("plan-section-card")[0].focus();
     key({ key: "?" });
     expect(screen.getByRole("dialog")).toHaveTextContent(en.PlanEditor.sheet.superset);
     act(() => store().openSection("s1"));
-    expect(screen.getByTestId("plan-hint")).toHaveTextContent("Alt+M");
+    expect(screen.getByTestId("plan-hint-bar")).toHaveTextContent("Alt+M");
   });
 
   it("does not open the sheet when ? is typed in a field", () => {

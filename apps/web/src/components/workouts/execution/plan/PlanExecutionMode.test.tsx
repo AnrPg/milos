@@ -83,6 +83,21 @@ describe("PlanExecutionMode", () => {
     api.save.mockImplementation(async (draft: { id: string; change: unknown }) => ({ comment: { id: draft.id, change: draft.change }, synced: true }));
   });
 
+  it("keeps running when the PRs come back in an unexpected shape", async () => {
+    api.listPRs.mockResolvedValue(undefined);
+    render(
+      <NextIntlClientProvider locale="en" messages={en}>
+        <PlanExecutionMode executionId="exe-1" />
+      </NextIntlClientProvider>,
+    );
+    expect(await screen.findByText("Section 1 of 2")).toBeInTheDocument();
+    await act(async () => {
+      await Promise.resolve();
+    });
+    fireEvent.click(screen.getByTestId("plan-run-next"));
+    expect(screen.getByText("Section 1 of 2")).toBeInTheDocument();
+  });
+
   it("runs every section in turn, logs changes and completes the execution with the scores", async () => {
     render(
       <NextIntlClientProvider locale="en" messages={en}>

@@ -12131,7 +12131,10 @@
       "cluster": "Cluster",
       "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
-      "interrupt": "Avec interruptions"
+      "interrupt": "Avec interruptions",
+      "kcal_target": "Objectif calories",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
     },
     "params": {
       "sets": "{sets} séries",
@@ -12181,7 +12184,8 @@
       "done": "Terminé",
       "total_reps": "Répétitions (total)",
       "lowest_round": "Tour le plus faible",
-      "distance": "Distance"
+      "distance": "Distance",
+      "load": "Charge (meilleure série)"
     },
     "levelNotes": "Notes par niveau",
     "sectionNote": "Note de la section",
@@ -12820,7 +12824,7 @@
     "load": "Charge",
     "logTitle": "Ce que tu as vraiment fait (facultatif)",
     "logReps": "Répétitions faites",
-    "logLoad": "Charge utilisée",
+    "logLoad": "Charge utilisée (kg)",
     "pctOfMax": "≈ {kg} kg de ton 1RM",
     "cap": "Limite {time}",
     "clock": "Chrono de la partie",

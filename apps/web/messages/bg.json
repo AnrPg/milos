@@ -12131,7 +12131,10 @@
       "cluster": "Cluster",
       "drop_set": "Drop set",
       "rest_pause": "Rest-pause",
-      "interrupt": "С прекъсвания"
+      "interrupt": "С прекъсвания",
+      "kcal_target": "Цел калории",
+      "drop": "Drop set",
+      "restpause": "Rest-pause"
     },
     "params": {
       "sets": "{sets} серии",
@@ -12181,7 +12184,8 @@
       "done": "Завършено",
       "total_reps": "Повторения (общо)",
       "lowest_round": "Най-слаб рунд",
-      "distance": "Разстояние"
+      "distance": "Разстояние",
+      "load": "Тежест (най-добра серия)"
     },
     "levelNotes": "Бележки по нива",
     "sectionNote": "Бележка към раздела",
@@ -12820,7 +12824,7 @@
     "load": "Тежест",
     "logTitle": "Какво направи всъщност (по избор)",
     "logReps": "Направени повторения",
-    "logLoad": "Използвана тежест",
+    "logLoad": "Използвана тежест (кг)",
     "pctOfMax": "≈ {kg} кг от твоя 1ПМ",
     "cap": "Лимит {time}",
     "clock": "Часовник на секцията",

@@ -60,7 +60,7 @@ function PlanSectionCard({ name, view }: { name: string; view: PlanViewSection }
           {view.flow}
         </span>
         {view.preset ? (
-          <span className="rounded-md px-1.5 py-0.5 text-[11px] font-semibold" style={{ background: "var(--card)", color: "var(--muted)" }}>
+          <span className="rounded-md px-1.5 py-0.5 text-[11px] font-semibold" style={{ background: "var(--panel-muted)", color: "var(--muted)" }}>
             {view.preset}
           </span>
         ) : null}
@@ -88,7 +88,7 @@ function PlanSectionCard({ name, view }: { name: string; view: PlanViewSection }
 
       {view.interrupt ? (
         <section
-          className="mt-3 min-w-0 rounded-xl border-s-2 ps-3"
+          className="mt-3 min-w-0 border-s-2 ps-3"
           style={{ borderColor: "var(--heat)" }}
           aria-label={view.interrupt.label}
           data-testid="plan-view-interrupt"
@@ -167,7 +167,7 @@ function RowItem({ row }: { row: PlanViewRow }) {
           {row.name}
         </span>
         {row.perSide ? (
-          <span className="rounded-md px-1.5 text-[11px] font-semibold" style={{ background: "var(--card)", color: "var(--muted)" }}>
+          <span className="rounded-md px-1.5 text-[11px] font-semibold" style={{ background: "var(--panel-muted)", color: "var(--muted)" }}>
             {t("perSide")}
           </span>
         ) : null}
