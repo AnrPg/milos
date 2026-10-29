@@ -12504,7 +12504,15 @@
     "tvDayDone": "Τα σημερινά τμήματα τελείωσαν.",
     "tvNoClasses": "Σήμερα δεν έχει τμήματα.",
     "codePlaceholder": "ABCD-EFGH",
-    "pageTitle": "Palee TV"
+    "pageTitle": "Palee TV",
+    "onScreen": "Στην οθόνη",
+    "onScreenTitle": "Δείξε το τμήμα στην οθόνη",
+    "onScreenHint": "Μόνο σήμερα, στις οθόνες του τμήματός σου. Η οθόνη επιστρέφει στο αυτόματο όταν τελειώσει η μέρα του τμήματος.",
+    "classView": {
+      "timer": "Χρονόμετρο τμήματος",
+      "leaderboard": "Leaderboard τμήματος",
+      "wod": "WOD τμήματος"
+    }
   },
   "Pay": {
     "loading": "Φόρτωση…",

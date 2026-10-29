@@ -12504,7 +12504,15 @@
     "tvDayDone": "Die heutigen Kurse sind vorbei.",
     "tvNoClasses": "Heute keine Kurse.",
     "codePlaceholder": "ABCD-EFGH",
-    "pageTitle": "Palee TV"
+    "pageTitle": "Palee TV",
+    "onScreen": "Auf den Bildschirm",
+    "onScreenTitle": "Diesen Kurs auf einem Bildschirm zeigen",
+    "onScreenHint": "Nur heute, auf den Bildschirmen deines Kurses. Der Bildschirm kehrt zu automatisch zurück, wenn der Tag des Kurses endet.",
+    "classView": {
+      "timer": "Kurs-Timer",
+      "leaderboard": "Kurs-Leaderboard",
+      "wod": "Kurs-WOD"
+    }
   },
   "Pay": {
     "loading": "Wird geladen…",

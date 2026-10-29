@@ -12504,7 +12504,15 @@
     "tvDayDone": "As aulas de hoje terminaram.",
     "tvNoClasses": "Hoje não há aulas.",
     "codePlaceholder": "ABCD-EFGH",
-    "pageTitle": "Palee TV"
+    "pageTitle": "Palee TV",
+    "onScreen": "No ecrã",
+    "onScreenTitle": "Mostrar esta aula num ecrã",
+    "onScreenHint": "Só hoje, nos ecrãs da tua aula. O ecrã volta ao automático quando termina o dia da aula.",
+    "classView": {
+      "timer": "Cronómetro da aula",
+      "leaderboard": "Classificação da aula",
+      "wod": "WOD da aula"
+    }
   },
   "Pay": {
     "loading": "A carregar…",

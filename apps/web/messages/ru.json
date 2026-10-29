@@ -12504,7 +12504,15 @@
     "tvDayDone": "Сегодняшние занятия закончились.",
     "tvNoClasses": "Сегодня занятий нет.",
     "codePlaceholder": "ABCD-EFGH",
-    "pageTitle": "Palee TV"
+    "pageTitle": "Palee TV",
+    "onScreen": "На экран",
+    "onScreenTitle": "Показать это занятие на экране",
+    "onScreenHint": "Только сегодня, на экранах твоего занятия. Экран вернётся в автоматический режим, когда закончится день занятия.",
+    "classView": {
+      "timer": "Таймер занятия",
+      "leaderboard": "Рейтинг занятия",
+      "wod": "WOD занятия"
+    }
   },
   "Pay": {
     "loading": "Загрузка…",

@@ -12504,7 +12504,15 @@
     "tvDayDone": "השיעורים של היום הסתיימו.",
     "tvNoClasses": "אין שיעורים היום.",
     "codePlaceholder": "ABCD-EFGH",
-    "pageTitle": "Palee TV"
+    "pageTitle": "Palee TV",
+    "onScreen": "על המסך",
+    "onScreenTitle": "הצגת השיעור על מסך",
+    "onScreenHint": "רק היום, במסכים של השיעור שלך. המסך חוזר לאוטומטי כשהיום של השיעור מסתיים.",
+    "classView": {
+      "timer": "טיימר השיעור",
+      "leaderboard": "טבלת הדירוג של השיעור",
+      "wod": "ה-WOD של השיעור"
+    }
   },
   "Pay": {
     "loading": "טוען…",
