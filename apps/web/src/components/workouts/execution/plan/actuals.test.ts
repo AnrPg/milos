@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { PlanRow, PlanSection } from "@/lib/structured-plan/types";
 
 import { decimal, planActuals } from "./actuals";
-import { initialRunState, type RunAction, runReducer } from "./runner";
+import { initialRunState, logKeyOf, type RunAction, runReducer } from "./runner";
 import { buildSequence } from "./sequence";
 
 const row = (id: string, name: string, more: Partial<PlanRow> = {}): PlanRow => ({ id, kind: "ex", name, dose: "", load: "", cells: [], ...more });
@@ -57,5 +57,44 @@ describe("planActuals", () => {
       ["b", 1, 2, 0],
       ["a", 0, 1, 1],
     ]);
+  });
+
+  it("includes the rows done at every interruption, each with its own log", () => {
+    const section: PlanSection = {
+      v: 1,
+      flow: "for_time",
+      params: { rounds: "1", intEvery: "2:00" },
+      mods: { interrupt: true },
+      blocks: [[row("thr", "Thruster", { dose: "75" })]],
+      interrupt: [row("bur", "Burpee over Bar", { dose: "10" })],
+      score: "time",
+    };
+    const seq = buildSequence(section);
+    const tick = (s: number): RunAction => ({ type: "tick", elapsedMs: s * 1000 });
+    const state = [{ type: "start" } as RunAction, tick(120), NEXT, tick(240), NEXT, tick(300), NEXT].reduce((s, a) => runReducer(seq, s, a), initialRunState());
+    expect(state.status).toBe("done");
+    const burpee = seq.interrupt!.steps[0];
+    const logs = { [logKeyOf(burpee, 2)]: { reps: "8" } };
+    expect(planActuals(seq, state, logs, "s").map((a) => [a.row_id, a.interrupt, a.block_index, a.round_index, a.actual_reps, a.logged])).toEqual([
+      ["thr", false, 0, 1, 75, false],
+      ["bur", true, -1, 1, 10, false],
+      ["bur", true, -1, 2, 8, true],
+    ]);
+  });
+
+  it("turns a % load into kg with the athlete's 1RM, else keeps kg null", () => {
+    const section: PlanSection = {
+      v: 1,
+      flow: "sets",
+      params: { sets: "1" },
+      blocks: [[row("sq", "Back Squat", { cells: [{ d: "5", l: "70%" }] })]],
+      score: "none",
+    };
+    const seq = buildSequence(section);
+    const state = [{ type: "start" } as RunAction, NEXT].reduce((s, a) => runReducer(seq, s, a), initialRunState());
+    const [known] = planActuals(seq, state, {}, "s", { oneRepMaxKg: (name) => (name === "Back Squat" ? 142.5 : null) });
+    expect(known).toMatchObject({ prescribed_load_pct: 70, one_rep_max_kg: 142.5, prescribed_load_kg: 99.75, actual_load_kg: 99.75 });
+    const [unknown] = planActuals(seq, state, {}, "s");
+    expect(unknown).toMatchObject({ prescribed_load_pct: 70, one_rep_max_kg: null, prescribed_load_kg: null, actual_load_kg: null });
   });
 });

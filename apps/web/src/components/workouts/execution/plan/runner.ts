@@ -24,11 +24,20 @@ export type RunState = {
   interruptsFired: number;
   /** Keys of the main-work steps done, in order. */
   completed: string[];
+  /** Interrupt work steps done: which interruption (1-based), in which phase. */
+  completedInterrupts: InterruptDone[];
   /** When the athlete finished every step (For Time), in clock ms. */
   finishedAtMs: number | null;
   /** The clock ran out before the work was done (cap, last window or slot). */
   timeUp: boolean;
 };
+
+/** One interrupt row done at one interruption. */
+export type InterruptDone = { key: string; fire: number; phase: number };
+
+/** Where the athlete's log for a step lives: interrupt rows repeat, so each interruption has its own. */
+export const logKeyOf = (step: { key: string; interrupt: boolean }, fire: number): string =>
+  step.interrupt ? `i${fire}:${step.key}` : step.key;
 
 export type RunAction =
   | { type: "start" }
@@ -49,6 +58,7 @@ export const initialRunState = (): RunState => ({
   interrupt: null,
   interruptsFired: 0,
   completed: [],
+  completedInterrupts: [],
   finishedAtMs: null,
   timeUp: false,
 });
@@ -140,9 +150,14 @@ function onClock(seq: RunSequence, state: RunState): RunState {
 
 function advanceInterrupt(seq: RunSequence, state: RunState, at = state.elapsedMs): RunState {
   if (!state.interrupt || !seq.interrupt) return state;
+  const step = seq.interrupt.steps[state.interrupt.step];
+  const completedInterrupts =
+    step?.kind === "work"
+      ? [...state.completedInterrupts, { key: step.key, fire: state.interruptsFired, phase: state.phase }]
+      : state.completedInterrupts;
   const next = state.interrupt.step + 1;
-  if (next >= seq.interrupt.steps.length) return { ...state, interrupt: null };
-  return { ...state, interrupt: { step: next, stepStartMs: at } };
+  if (next >= seq.interrupt.steps.length) return { ...state, completedInterrupts, interrupt: null };
+  return { ...state, completedInterrupts, interrupt: { step: next, stepStartMs: at } };
 }
 
 export function runReducer(seq: RunSequence, state: RunState, action: RunAction): RunState {
@@ -170,9 +185,11 @@ export function runReducer(seq: RunSequence, state: RunState, action: RunAction)
     case "prev": {
       if (state.status !== "running" && state.status !== "paused") return state;
       if (state.interrupt) {
-        return state.interrupt.step > 0
-          ? { ...state, interrupt: { step: state.interrupt.step - 1, stepStartMs: state.elapsedMs } }
-          : state;
+        if (state.interrupt.step === 0 || !seq.interrupt) return state;
+        const back = seq.interrupt.steps[state.interrupt.step - 1];
+        const fire = state.interruptsFired;
+        const completedInterrupts = state.completedInterrupts.filter((d) => !(d.key === back.key && d.fire === fire));
+        return { ...state, completedInterrupts, interrupt: { step: state.interrupt.step - 1, stepStartMs: state.elapsedMs } };
       }
       if (state.step === 0) return state;
       const phase = seq.phases[state.phase];
