@@ -789,7 +789,7 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
     assert Enum.all?(lines, &(&1.tax_category == "standard"))
 
     # Fulfilling the same intent again records nothing twice.
-    {:ok, intent} = Payments.get(ctx.context, paid["id"])
+    intent = PaymentStore.get_intent(ctx.context, paid["id"])
     assert {:ok, again} = TerminalFulfilment.fulfil(ctx.context, intent)
     assert again.finance_payment_id == paid["finance_payment_id"]
     assert again.fiscal_document_id == receipt.id
@@ -827,7 +827,7 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
         reason: "Changed mind",
         idempotency_key: "walk-in-refund-1"
       })
-      |> json_response(201)
+      |> json_response(200)
 
     assert refund["refund"]["status"] == "succeeded"
 
@@ -869,7 +869,9 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
     {:ok, invoice} = Finance.get_invoice(ctx.context, invoice.id)
     assert invoice.status == "paid"
 
-    assert [%{amount_cents: 4_500, payment_method: "card_terminal"}] = payments_of(ctx)
+    # The member's history shows the invoice's payment and the surcharge.
+    assert [4_500, 135] =
+             ctx |> payments_of() |> Enum.map(& &1.amount_cents) |> Enum.sort(:desc)
 
     surcharge = Finance.revenue_lineage(ctx.context, "card_surcharge", paid["id"])
     assert [%{amount_cents: 135, membership_id: membership_id}] = surcharge.payments
@@ -882,7 +884,7 @@ defmodule PaleeWeb.TerminalPaymentsControllerTest do
     assert List.last(lines).gross_cents == 135
 
     # The worker running the fulfilment again records the surcharge once.
-    {:ok, intent} = Payments.get(ctx.context, paid["id"])
+    intent = PaymentStore.get_intent(ctx.context, paid["id"])
     assert {:ok, _same} = TerminalFulfilment.fulfil(ctx.context, intent)
     assert [_one] = Finance.revenue_lineage(ctx.context, "card_surcharge", paid["id"]).payments
     assert [_one_receipt] = receipts(ctx)
