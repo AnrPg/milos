@@ -112,3 +112,5 @@ config :palee, Palee.Infrastructure.Fiscal.Ed25519JournalSigner,
 # ADR-246: the sandbox payment provider and stubbed provider HTTP in tests.
 config :palee, :payments_sandbox, true
 config :palee, :payments_http, req_options: [plug: {Req.Test, Palee.PaymentsHttp}]
+# ADR-250/251: Storecove and fiskaly calls go to a test plug.
+config :palee, :fiscal_http, req_options: [plug: {Req.Test, Palee.FiscalHttp}]

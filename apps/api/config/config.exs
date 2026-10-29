@@ -170,6 +170,24 @@ config :palee, :fiscal_authority_gateways, %{
   "production" => Palee.Infrastructure.Fiscal.MyDataGateway
 }
 
+# ADR-250: Peppol e-invoicing, the access point per connection provider.
+config :palee, :fiscal_einvoice_store, Palee.Infrastructure.Fiscal.EctoEInvoiceStore
+
+config :palee, :fiscal_einvoice_networks, %{
+  "sandbox" => Palee.Infrastructure.Fiscal.SandboxEInvoiceNetwork,
+  "storecove" => Palee.Infrastructure.Fiscal.StorecoveNetwork
+}
+
+# ADR-251: TSE (DE) and RKSV (AT) signing, the provider per connection.
+config :palee, :fiscal_till_store, Palee.Infrastructure.Fiscal.EctoTillSignatureStore
+
+config :palee, :fiscal_cash_register_security, %{
+  {"tse", "sandbox"} => Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity,
+  {"rksv", "sandbox"} => Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity,
+  {"tse", "fiskaly"} => Palee.Infrastructure.Fiscal.FiskalySignDe,
+  {"rksv", "fiskaly"} => Palee.Infrastructure.Fiscal.FiskalySignAt
+}
+
 # ADR-246/247: online payments through the business's own provider account.
 config :palee, :payment_store, Palee.Infrastructure.Payments.EctoPaymentStore
 config :palee, :payment_fulfilment, Palee.Application.Payments.FinanceFulfilment
