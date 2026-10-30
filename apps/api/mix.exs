@@ -90,6 +90,7 @@ defmodule Palee.MixProject do
       {:hackney, "~> 4.7.2"},
       # ADR-245: Swiss QR-bill and myDATA QR codes (pure Elixir, no NIFs).
       {:eqrcode, "~> 0.2.1"},
+      {:stream_data, "~> 1.1", only: :test},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]

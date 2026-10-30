@@ -1,7 +1,7 @@
 defmodule Palee.Partners.Match do
   @moduledoc """
-  Two people who liked each other in a club (ADR-169): the pair ordered
-  `user_a_id < user_b_id`, at most one active per gym; how it ended; each
+  Two people who liked each other (ADR-169, ADR-280): the pair ordered
+  `user_a_id < user_b_id`, at most one active per pair; how it ended; each
   side's read mark of the conversation.
   """
 
@@ -16,8 +16,6 @@ defmodule Palee.Partners.Match do
   @type t :: %__MODULE__{}
 
   schema "partner_matches" do
-    field :organization_id, :binary_id, read_after_writes: true
-    field :club_id, :binary_id
     field :user_a_id, :binary_id
     field :user_b_id, :binary_id
     field :status, :string, default: "active"
@@ -34,8 +32,8 @@ defmodule Palee.Partners.Match do
 
   def create_changeset(attrs) do
     %__MODULE__{}
-    |> cast(attrs, [:organization_id, :club_id, :user_a_id, :user_b_id, :matched_at])
-    |> validate_required([:club_id, :user_a_id, :user_b_id, :matched_at])
+    |> cast(attrs, [:user_a_id, :user_b_id, :matched_at])
+    |> validate_required([:user_a_id, :user_b_id, :matched_at])
     |> check_constraint(:user_b_id, name: :partner_matches_pair_check)
     |> unique_constraint([:user_a_id, :user_b_id], name: :partner_matches_active_pair_index)
   end

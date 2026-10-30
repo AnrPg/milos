@@ -22,12 +22,11 @@ defmodule PaleeWeb.Schemas.CommunityGroups do
       "CommunityGroupSettings",
       %{
         member_groups: string(enum: Palee.Community.member_group_options()),
-        partners_enabled: %Schema{type: :boolean},
         can_propose: %Schema{type: :boolean},
         needs_approval: %Schema{type: :boolean},
         lifecycle: lifecycle()
       },
-      [:member_groups, :partners_enabled, :can_propose, :needs_approval, :lifecycle]
+      [:member_groups, :can_propose, :needs_approval, :lifecycle]
     )
   end
 
@@ -202,11 +201,7 @@ defmodule PaleeWeb.Schemas.CommunityGroups do
     object(
       "CommunitySettingsRequest",
       %{
-        member_groups: string(enum: Palee.Community.member_group_options()),
-        partners_enabled: %Schema{
-          type: :boolean,
-          description: "Whether the gym's verified clubs offer Partners (ADR-169)"
-        }
+        member_groups: string(enum: Palee.Community.member_group_options())
       },
       []
     )
@@ -217,10 +212,9 @@ defmodule PaleeWeb.Schemas.CommunityGroups do
       "CommunitySettingsResponse",
       %{
         member_groups: string(enum: Palee.Community.member_group_options()),
-        partners_enabled: %Schema{type: :boolean},
         lifecycle: lifecycle()
       },
-      [:member_groups, :partners_enabled, :lifecycle]
+      [:member_groups, :lifecycle]
     )
   end
 

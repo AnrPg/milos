@@ -1,157 +1,165 @@
 defmodule Palee.Application.Partners do
   @moduledoc """
-  Partners in one club (ADR-169, vision §7.3): the member's profile there,
-  the deck, swiping and undo; also the Ρυθμίσεις switch across clubs and the
-  report and staff sides of a profile.
+  Public Partners (ADR-280, ADR-169, vision §7.3): one account-level profile
+  per person, one deck for all of Palee, swiping and undo, the Ρυθμίσεις
+  switch, reporting a person, and the Palee team's reports queue.
 
-  Eligibility is the gym's word on every call: the club must offer Partners
-  (a verified club, the gym's switch on), the viewer and everyone shown must
-  be members of the club right now and not hidden from members, and nobody
-  blocked either way ever shows. Every write runs in the session of the
-  club's gym.
+  Who may take part is the verification side's word on every call
+  (`PartnerEligibility`): the viewer must be verified, and everyone shown
+  is verified and not suspended. Nobody blocked either way ever shows, and
+  mock people of a demo business reach only its staff (ADR-184). Rows are
+  personal: every call runs in the acting person's own session.
   """
 
   alias Palee.Application.{
-    ClubMembers,
-    ClubScope,
     CommunityPeople,
+    PartnerEligibility,
     PartnerMatches,
     PartnerRealtime,
-    SocialProfile
+    PeopleBlocks
   }
 
   alias Palee.{Community, Identity, Notifications, Organizations, Partners, Places}
 
-  # ------------------------------------------------------------- the club
+  # ------------------------------------------------------------- overview
 
-  @doc "Partners in a club as it applies to the viewer: offered?, their profile, the options."
-  def overview(%{user_id: user_id} = context, club_id, now \\ DateTime.utc_now()) do
-    with {:ok, club, scope} <- club(context, club_id) do
-      offered = offered(club, scope)
-      profile = Partners.get_profile(scope, club.id, user_id)
-      used = Partners.count_swipes_since(scope, user_id, Partners.swipe_window_start(now))
+  @doc "Partners as it applies to the viewer: eligibility, their profile, the options."
+  def overview(%{user_id: user_id} = context, now \\ DateTime.utc_now()) do
+    eligibility = PartnerEligibility.status(context)
+    profile = Partners.get_profile(context, user_id)
+    used = Partners.count_swipes_since(context, user_id, Partners.swipe_window_start(now))
 
-      {:ok,
-       %{
-         club_id: club.id,
-         offered: offered == :ok,
-         unavailable_reason: unavailable_reason(offered),
-         member: member?(scope, club, user_id),
-         profile: profile && present_profile(profile),
-         swipes_remaining: Partners.swipes_remaining(used),
-         distance: distance(context, club),
-         options: options()
-       }}
-    end
+    {:ok,
+     %{
+       eligibility: present_eligibility(eligibility),
+       profile: profile && present_profile(profile),
+       swipes_remaining: Partners.swipes_remaining(used),
+       distance: distance(user_id),
+       options: options()
+     }}
   end
 
-  # ADR-197: «Απόσταση» only in open clubs (a gym's club is one place), and
-  # only for someone who shows in Γύρω μου themselves, since the filter
-  # reads others' neighbourhoods the same way.
-  defp distance(%{user_id: user_id} = context, %{kind: "open"}) do
-    case SocialProfile.around_visibility(context, user_id) do
-      %{visible: true, has_area: true} -> "available"
-      _hidden -> "needs_area"
-    end
+  # «Απόσταση» needs the viewer's own «Η περιοχή μου» (neighbourhood
+  # centroids only, never live location).
+  defp distance(user_id) do
+    if Places.home_area(%{user_id: user_id}) != [], do: "available", else: "needs_area"
   end
 
-  defp distance(_context, _club), do: nil
-
-  @doc "Creates or updates the viewer's profile in the club (opting in)."
-  def put_profile(%{user_id: user_id} = context, club_id, params) do
-    with {:ok, club, scope} <- club(context, club_id),
-         :ok <- offered(club, scope),
-         :ok <- member(scope, club, user_id),
-         current = Partners.get_profile(scope, club.id, user_id),
+  @doc """
+  Creates or updates the viewer's profile. Only a verified person; the first
+  save needs `adult_confirmed: true` (ADR-280).
+  """
+  def put_profile(%{user_id: user_id} = context, params, now \\ DateTime.utc_now()) do
+    with :ok <- PartnerEligibility.require_verified(context),
+         current = Partners.get_profile(context, user_id),
          {:ok, attrs} <-
            Partners.normalize_profile(params, current, Organizations.box_disciplines()),
-         :ok <- Partners.check_activation(current || %{}, attrs.active),
-         {:ok, profile} <- save_profile(scope, club, user_id, current, attrs) do
+         {:ok, confirmed_at} <- Partners.adult_confirmation(current, params, now),
+         {:ok, profile} <- save_profile(context, user_id, current, attrs, confirmed_at) do
       {:ok, present_profile(profile)}
     end
   end
 
-  defp save_profile(scope, club, user_id, nil, attrs),
-    do: Partners.create_profile(scope, Map.merge(attrs, %{club_id: club.id, user_id: user_id}))
+  defp save_profile(context, user_id, nil, attrs, confirmed_at),
+    do:
+      Partners.create_profile(
+        context,
+        Map.merge(attrs, %{user_id: user_id, adult_confirmed_at: confirmed_at})
+      )
 
-  defp save_profile(scope, _club, _user_id, current, attrs),
-    do: Partners.update_profile(scope, current, attrs)
+  defp save_profile(context, _user_id, current, attrs, _confirmed_at),
+    do: Partners.update_profile(context, current, attrs)
 
-  @doc "The next cards of the deck, best fit first."
-  def deck(%{user_id: user_id} = context, club_id, params, now \\ DateTime.utc_now()) do
-    with {:ok, club, scope} <- club(context, club_id),
-         :ok <- offered(club, scope),
-         {:ok, viewer} <- live_profile(scope, club, user_id) do
-      # ADR-184: mock people only ever reach their demo business's staff.
-      members = Identity.visible_user_ids(eligible_ids(scope, club) -- [user_id], user_id)
-      excluded = excluded_ids(scope, club, user_id, now)
+  # ------------------------------------------------------------- the deck
+
+  @doc "The next cards of the public deck, best fit first."
+  def deck(%{user_id: user_id} = context, params, now \\ DateTime.utc_now()) do
+    with :ok <- PartnerEligibility.require_verified(context),
+         {:ok, viewer} <- live_profile(context, user_id) do
+      excluded = excluded_ids(context, user_id, now)
       filters = Partners.deck_filters(params)
-      members = within(context, club, members, filters.within_km)
-      candidates = Partners.list_live_profiles(scope, club.id, members)
-      cards = Partners.deck(viewer, candidates, excluded, filters)
 
-      people =
-        CommunityPeople.by_ids(Enum.map(cards, fn {profile, _shared} -> profile.user_id end))
+      candidates =
+        Partners.list_live_profiles(context, [user_id | MapSet.to_list(excluded)])
 
-      used = Partners.count_swipes_since(scope, user_id, Partners.swipe_window_start(now))
+      allowed =
+        candidates
+        |> Enum.map(& &1.user_id)
+        # ADR-184: mock people only ever reach their demo business's staff.
+        |> Identity.visible_user_ids(user_id)
+        |> PartnerEligibility.verified_user_ids()
+        |> within(user_id, filters.within_km)
+        |> MapSet.new()
+
+      cards =
+        Partners.deck(
+          viewer,
+          Enum.filter(candidates, &MapSet.member?(allowed, &1.user_id)),
+          excluded,
+          filters
+        )
+
+      ids = Enum.map(cards, fn {profile, _shared} -> profile.user_id end)
+      people = CommunityPeople.by_ids(ids)
+      badges = PartnerEligibility.verification_badges(ids)
+      used = Partners.count_swipes_since(context, user_id, Partners.swipe_window_start(now))
 
       {:ok,
        %{
-         club_id: club.id,
-         cards: Enum.map(cards, &present_card(&1, people)),
-         swipes_remaining: Partners.swipes_remaining(used)
+         cards: Enum.map(cards, &present_card(&1, people, badges)),
+         swipes_remaining: Partners.swipes_remaining(used),
+         within_km: filters.within_km
        }}
     end
   end
 
-  # «Απόσταση» narrows an open club's deck to people near the viewer.
-  defp within(_context, _club, members, nil), do: members
+  # «Απόσταση» narrows the deck to people whose neighbourhood is near the
+  # viewer's; without an area of their own nothing is narrowed.
+  defp within(ids, _user_id, nil), do: ids
+  defp within([], _user_id, _km), do: []
 
-  defp within(context, club, members, km) do
-    if distance(context, club) == "available",
-      do: Places.people_within(context, members, km * 1000),
-      else: members
+  defp within(ids, user_id, km) do
+    if distance(user_id) == "available",
+      do: Places.people_within(%{user_id: user_id}, ids, km * 1000),
+      else: ids
   end
 
   @doc """
   A like or a pass. A like answered by a like makes the match (or returns
   the pair's existing one) and tells both people once.
   """
-  def swipe(%{user_id: user_id} = context, club_id, params, now \\ DateTime.utc_now()) do
-    with {:ok, club, scope} <- club(context, club_id),
-         :ok <- offered(club, scope),
+  def swipe(%{user_id: user_id} = context, params, now \\ DateTime.utc_now()) do
+    with :ok <- PartnerEligibility.require_verified(context),
          {:ok, direction} <- Partners.normalize_direction(param(params, "direction")),
          {:ok, target_id} <- cast_id(param(params, "target_id")),
-         {:ok, viewer} <- live_profile(scope, club, user_id),
-         {:ok, target} <- swipeable(scope, club, viewer, target_id, now),
-         :ok <- rate(scope, user_id, now),
+         {:ok, viewer} <- live_profile(context, user_id),
+         {:ok, _target} <- swipeable(context, viewer, target_id),
+         :ok <- rate(context, user_id, now),
          {:ok, result} <-
            Partners.record_swipe(
-             scope,
-             %{club_id: club.id, swiper_id: user_id, target_id: target_id, direction: direction},
+             context,
+             %{swiper_id: user_id, target_id: target_id, direction: direction},
              &Partners.mutual?(direction, &1),
              now
            ) do
-      if result.new_match, do: matched(club, result.match)
-      used = Partners.count_swipes_since(scope, user_id, Partners.swipe_window_start(now))
+      if result.new_match, do: matched(result.match)
+      used = Partners.count_swipes_since(context, user_id, Partners.swipe_window_start(now))
 
       {:ok,
        %{
          target_id: target_id,
          direction: direction,
-         match:
-           result.match && PartnerMatches.present_summary(context, club, result.match, target.id),
+         match: result.match && PartnerMatches.present_summary(context, result.match),
          swipes_remaining: Partners.swipes_remaining(used)
        }}
     end
   end
 
   @doc "Takes back a swipe that made no match."
-  def undo(%{user_id: user_id} = context, club_id, target_id) do
-    with {:ok, club, scope} <- club(context, club_id),
-         {:ok, target_id} <- cast_id(target_id),
-         nil <- Partners.active_match_between(scope, user_id, target_id),
-         count when count > 0 <- Partners.delete_swipe(scope, club.id, user_id, target_id) do
+  def undo(%{user_id: user_id} = context, target_id) do
+    with {:ok, target_id} <- cast_id(target_id),
+         nil <- Partners.active_match_between(context, user_id, target_id),
+         count when count > 0 <- Partners.delete_swipe(context, user_id, target_id) do
       {:ok, %{target_id: target_id, undone: true}}
     else
       %{id: _match_id} -> {:error, :partner_already_matched}
@@ -160,127 +168,158 @@ defmodule Palee.Application.Partners do
     end
   end
 
-  # ------------------------------------------------------ across clubs
+  # ------------------------------------------------------------- settings
 
-  @doc "Ρυθμίσεις: whether any profile is on, and in how many clubs one exists."
-  def settings(context) do
-    with {:ok, profiles} <- my_profiles(context) do
-      {:ok, settings_of(profiles)}
-    end
+  @doc "Ρυθμίσεις: whether the viewer shows in the deck."
+  def settings(%{user_id: user_id} = context) do
+    {:ok, settings_of(Partners.get_profile(context, user_id))}
   end
 
   @doc """
-  Ρυθμίσεις switch: off pauses every profile in every club at once; on
-  resumes them (suspended ones stay off). Opting in the first time happens
-  in a club.
+  Ρυθμίσεις switch: off pauses the profile (out of the deck at once), on
+  resumes it. Resuming needs a verified, not suspended person; opting in
+  the first time happens with the profile.
   """
-  def put_settings(%{user_id: user_id} = context, params) do
+  def put_settings(%{user_id: user_id} = context, params, now \\ DateTime.utc_now()) do
     with {:ok, visible} <- boolean(param(params, "visible")),
-         {:ok, scopes} <- scopes(context) do
-      Enum.each(scopes, &Partners.set_active_for_user(&1, user_id, visible))
-      settings(context)
+         :ok <- if(visible, do: PartnerEligibility.require_verified(context), else: :ok) do
+      case Partners.get_profile(context, user_id) do
+        nil ->
+          {:ok, settings_of(nil)}
+
+        profile ->
+          changes =
+            profile
+            |> Partners.pause_changes(visible, now)
+            |> then(&if(visible, do: Map.put(&1, :active, true), else: &1))
+
+          with {:ok, profile} <- Partners.update_profile(context, profile, changes),
+               do: {:ok, settings_of(profile)}
+      end
     end
   end
 
-  defp settings_of(profiles) do
-    %{
-      visible: Enum.any?(profiles, &Partners.profile_live?/1),
-      clubs: length(profiles),
-      club_ids: Enum.map(profiles, & &1.club_id)
-    }
-  end
+  defp settings_of(nil), do: %{visible: false, has_profile: false}
 
-  defp my_profiles(%{user_id: user_id} = context) do
-    with {:ok, scopes} <- scopes(context),
-         do: {:ok, Enum.flat_map(scopes, &Partners.list_profiles_of(&1, user_id))}
-  end
+  defp settings_of(profile),
+    do: %{visible: Partners.profile_live?(profile), has_profile: true}
 
-  @doc "One session per gym of the viewer's clubs (Partners rows are the gym's)."
-  def scopes(context) do
-    with {:ok, clubs} <- ClubScope.call(context) do
-      {:ok,
-       clubs
-       |> Enum.map(& &1.organization_id)
-       |> Enum.uniq()
-       |> Enum.map(&%{organization_id: &1, user_id: context.user_id})}
-    end
-  end
-
-  # ------------------------------------------------- reports and staff
+  # ------------------------------------------------------------- reports
 
   @doc """
-  A report's target (ADR-169 §6): a profile in a club the reporter can reach,
-  not their own. Returns the club as `ClubScope` presents it.
+  Reports a person (ADR-280): someone the reporter can reach (a live profile
+  of the deck, or a match of theirs). Reporting also blocks them, so the
+  two never meet again (ADR-169 §5); the Palee team decides.
   """
-  def report_target(context, profile_id) do
-    with {:ok, clubs} <- ClubScope.reachable(context),
-         {:ok, club, profile} <- find_profile(context, clubs, profile_id) do
-      {:ok, club,
+  def report(%{user_id: user_id} = context, params) do
+    with {:ok, attrs} <- Partners.normalize_report(user_id, params),
+         :ok <- reachable(context, user_id, attrs.target_id),
+         {:ok, _report} <- Partners.insert_report(context, attrs),
+         {:ok, _blocked} <- PeopleBlocks.block(context, attrs.target_id, "reported") do
+      {:ok, %{target_id: attrs.target_id, reported: true, blocked: true}}
+    end
+  end
+
+  defp reachable(context, user_id, target_id) do
+    cond do
+      not Identity.visible_to?(target_id, user_id) ->
+        {:error, :not_found}
+
+      Partners.get_profile(context, target_id) != nil ->
+        :ok
+
+      Enum.any?(Partners.list_matches(context, user_id), &Partners.match_party?(&1, target_id)) ->
+        :ok
+
+      true ->
+        {:error, :not_found}
+    end
+  end
+
+  @doc "The Palee team's queue (ADR-280): reports by status, newest first."
+  def platform_reports(platform_context, params) do
+    status = param(params, "status") || "open"
+
+    if status in Partners.report_statuses() do
+      reports = Partners.list_reports(platform_context, status)
+
+      people =
+        CommunityPeople.by_ids(Enum.flat_map(reports, &[&1.reporter_id, &1.target_id]))
+
+      per_target = Enum.frequencies_by(reports, & &1.target_id)
+
+      {:ok,
        %{
-         type: "partner",
-         id: profile.id,
-         author_id: profile.user_id,
-         club_id: club.id,
-         channel_id: nil
+         reports:
+           Enum.map(reports, &present_report(&1, people, Map.get(per_target, &1.target_id, 1)))
+       }}
+    else
+      {:error, :invalid_partner_report_status}
+    end
+  end
+
+  @doc """
+  The Palee team decides a report, for every open report on that person:
+  `suspend` (profile off, verification suspended, sponsors penalised,
+  matches end with `suspended`) or `dismiss`.
+  """
+  def decide_report(
+        %{user_id: vendor_id} = platform_context,
+        report_id,
+        params,
+        now \\ DateTime.utc_now()
+      ) do
+    with {:ok, %{decision: decision, note: note}} <- Partners.normalize_report_decision(params),
+         %{} = report <- Partners.get_report(platform_context, report_id) || {:error, :not_found},
+         {:ok, changes} <-
+           Partners.report_decision_changes(report, decision, vendor_id, note, now),
+         {:ok, penalized} <- maybe_suspend(platform_context, report.target_id, decision, now) do
+      decided = Partners.decide_reports(platform_context, report.target_id, changes)
+
+      {:ok,
+       %{
+         id: report.id,
+         target_id: report.target_id,
+         decision: decision,
+         resolved: length(decided),
+         penalized_sponsors: length(penalized)
        }}
     end
   end
 
-  defp find_profile(context, clubs, profile_id) do
-    clubs
-    |> Enum.map(& &1.organization_id)
-    |> Enum.uniq()
-    |> Enum.find_value({:error, :not_found}, fn organization_id ->
-      scope = %{organization_id: organization_id, user_id: context.user_id}
-
-      with %{} = profile <- Partners.get_profile_by_id(scope, profile_id),
-           %{} = club <- Enum.find(clubs, &(&1.id == profile.club_id)) do
-        {:ok, club, profile}
-      else
-        _none -> nil
+  defp maybe_suspend(platform_context, target_id, decision, now) do
+    if Partners.report_suspends?(decision) do
+      with {:ok, %{penalized_sponsor_ids: penalized}} <-
+             PartnerEligibility.suspend(platform_context, target_id, now) do
+        suspend_partners(platform_context, target_id, now)
+        {:ok, penalized}
       end
-    end)
+    else
+      {:ok, []}
+    end
   end
 
-  @doc "What staff see of a reported profile in the queue."
-  def report_preview(staff_context, profile_id) do
-    case Partners.get_profile_by_id(staff_context, profile_id) do
-      %{} = profile ->
-        %{
-          author_id: profile.user_id,
-          body: profile.about,
-          hidden: not is_nil(profile.suspended_at)
-        }
-
+  # The suspended person's profile goes off and every active match of theirs
+  # ends (`suspended`, by nobody the other side knows).
+  defp suspend_partners(platform_context, target_id, now) do
+    case Partners.get_profile(platform_context, target_id) do
       nil ->
-        nil
-    end
-  end
+        :ok
 
-  @doc """
-  Staff hide a reported profile (ADR-169 §6): suspended in its club, out of
-  every deck there, and its active matches in that club end.
-  """
-  def suspend(%{user_id: staff_id} = staff_context, profile_id, now \\ DateTime.utc_now()) do
-    with %{} = profile <-
-           Partners.get_profile_by_id(staff_context, profile_id) || {:error, :not_found},
-         {:ok, _profile} <-
-           Partners.update_profile(staff_context, profile, %{
-             active: false,
-             suspended_at: profile.suspended_at || now,
-             suspended_by_id: staff_id
-           }) do
-      staff_context
-      |> Partners.end_matches(%{club_id: profile.club_id, user_id: profile.user_id}, %{
-        status: "ended",
-        end_reason: "hidden",
-        ended_by_id: staff_id,
-        ended_at: now
-      })
-      |> Enum.each(&PartnerRealtime.match_changed/1)
-
-      :ok
+      profile ->
+        Partners.update_profile(platform_context, profile, Partners.suspension_profile_changes())
     end
+
+    platform_context
+    |> Partners.end_matches(%{user_id: target_id}, %{
+      status: "ended",
+      end_reason: Partners.suspension_end_reason(),
+      ended_by_id: nil,
+      ended_at: now
+    })
+    |> Enum.each(&PartnerRealtime.match_changed/1)
+
+    :ok
   end
 
   # ------------------------------------------------------------- internals
@@ -296,82 +335,68 @@ defmodule Palee.Application.Partners do
       disciplines: Organizations.box_disciplines(),
       max_disciplines: Partners.max_disciplines(),
       distances_km: Partners.distances_km(),
+      default_within_km: Partners.default_within_km(),
       about_max: Partners.about_max(),
-      daily_swipes: Partners.swipe_daily_limit()
+      daily_swipes: Partners.swipe_daily_limit(),
+      report_reasons: Partners.report_reasons()
     }
   end
 
-  @doc false
-  def club(context, club_id) do
-    with {:ok, club} <- ClubScope.club(context, club_id),
-         do: {:ok, club, ClubScope.write_context(club, context)}
+  defp present_eligibility(%{} = eligibility) do
+    %{
+      status: to_text(Map.get(eligibility, :status)),
+      method: to_text(Map.get(eligibility, :method)),
+      next_step: to_text(Map.get(eligibility, :next_step))
+    }
   end
 
-  @doc false
-  def offered(club, scope),
-    do:
-      Partners.check_club(
-        club,
-        Map.get(Community.community_settings(scope), :partners_enabled, true)
-      )
+  defp to_text(nil), do: nil
+  defp to_text(value) when is_atom(value), do: Atom.to_string(value)
+  defp to_text(value), do: value
 
-  defp unavailable_reason(:ok), do: nil
-  defp unavailable_reason({:error, :partners_disabled}), do: "disabled"
-  defp unavailable_reason({:error, _not_offered}), do: "not_offered"
+  defp live_profile(context, user_id) do
+    case Partners.get_profile(context, user_id) do
+      nil ->
+        {:error, :partner_profile_required}
 
-  @doc "The club's members who may take part: members now, not hidden from members."
-  def eligible_ids(scope, club) do
-    ids = ClubMembers.member_ids(scope, club)
-    ids -- Community.hidden_member_ids(ids)
-  end
-
-  defp member?(scope, club, user_id), do: user_id in ClubMembers.member_ids(scope, club)
-
-  defp member(scope, club, user_id),
-    do: if(member?(scope, club, user_id), do: :ok, else: {:error, :not_club_member})
-
-  defp live_profile(scope, club, user_id) do
-    with :ok <- member(scope, club, user_id) do
-      case Partners.get_profile(scope, club.id, user_id) do
-        nil ->
-          {:error, :partner_profile_required}
-
-        profile ->
-          if Partners.profile_live?(profile),
-            do: {:ok, profile},
-            else: {:error, :partner_profile_required}
-      end
+      profile ->
+        if Partners.profile_live?(profile),
+          do: {:ok, profile},
+          else: {:error, :partner_profile_required}
     end
   end
 
-  defp excluded_ids(scope, club, user_id, now) do
-    swiped = Partners.swiped_ids(Partners.list_swipes_by(scope, club.id, user_id), now)
+  defp excluded_ids(context, user_id, now) do
+    swiped = Partners.swiped_ids(Partners.list_swipes_by(context, user_id), now)
 
     swiped
     |> MapSet.union(MapSet.new(Community.blocked_user_ids(%{user_id: user_id})))
-    |> MapSet.union(MapSet.new(Partners.active_partner_ids(scope, user_id)))
+    |> MapSet.union(MapSet.new(Partners.active_partner_ids(context, user_id)))
   end
 
-  # The deck's rules for one person, re-checked at the swipe: still a
-  # member, not hidden, live, compatible, not blocked or matched.
-  defp swipeable(scope, club, viewer, target_id, _now) do
+  # The deck's rules for one person, re-checked at the swipe: verified,
+  # discoverable, live, compatible, not blocked either way.
+  defp swipeable(context, viewer, target_id) do
     blocked = MapSet.new(Community.blocked_user_ids(%{user_id: viewer.user_id}))
 
-    with true <- target_id in eligible_ids(scope, club) || {:error, :not_found},
+    with true <- verified?(target_id) || {:error, :not_found},
          true <- Identity.visible_to?(target_id, viewer.user_id) || {:error, :not_found},
-         %{} = target <- Partners.get_profile(scope, club.id, target_id) || {:error, :not_found},
+         %{} = target <- Partners.get_profile(context, target_id) || {:error, :not_found},
          true <- Partners.swipeable?(viewer, target, blocked) || {:error, :not_found} do
       {:ok, target}
     end
   end
 
-  defp rate(scope, user_id, now),
+  defp verified?(user_id),
+    do: Enum.member?(PartnerEligibility.verified_user_ids([user_id]), user_id)
+
+  defp rate(context, user_id, now),
     do:
       Partners.check_swipe_rate(
-        Partners.count_swipes_since(scope, user_id, Partners.swipe_window_start(now))
+        Partners.count_swipes_since(context, user_id, Partners.swipe_window_start(now))
       )
 
-  defp matched(club, match) do
+  defp matched(match) do
     PartnerRealtime.match_changed(match)
     people = CommunityPeople.by_ids([match.user_a_id, match.user_b_id])
 
@@ -381,10 +406,7 @@ defmodule Palee.Application.Partners do
         ] do
       Notifications.dispatch_event(:partner_match, %{
         user_id: user_id,
-        organization_id: club.organization_id,
         match_id: match.id,
-        club_id: club.id,
-        club_name: club.name,
         partner_nickname: CommunityPeople.person(people, other_id).nickname,
         dedupe_key: "partner_match:#{match.id}:#{user_id}"
       })
@@ -397,9 +419,10 @@ defmodule Palee.Application.Partners do
   def present_profile(profile) do
     %{
       id: profile.id,
-      club_id: profile.club_id,
       active: profile.active,
-      suspended: not is_nil(profile.suspended_at),
+      paused: not is_nil(profile.paused_at),
+      show_box: profile.show_box,
+      adult_confirmed_at: profile.adult_confirmed_at,
       level: profile.level,
       times: profile.times,
       goals: profile.goals,
@@ -411,16 +434,32 @@ defmodule Palee.Application.Partners do
     }
   end
 
-  defp present_card({profile, shared}, people) do
+  defp present_card({profile, shared}, people, badges) do
     %{
       profile_id: profile.id,
       person: CommunityPeople.person(people, profile.user_id),
+      badge: Partners.badge(Map.get(badges, profile.user_id), profile.show_box),
       level: profile.level,
       times: profile.times,
       goals: profile.goals,
       disciplines: profile.disciplines,
       about: profile.about,
       shared: shared
+    }
+  end
+
+  defp present_report(report, people, open_on_target) do
+    %{
+      id: report.id,
+      reporter: CommunityPeople.person(people, report.reporter_id),
+      target: CommunityPeople.person(people, report.target_id),
+      reason: report.reason,
+      note: report.note,
+      status: report.status,
+      reports_on_target: open_on_target,
+      decided_at: report.decided_at,
+      decision_note: report.decision_note,
+      created_at: report.inserted_at
     }
   end
 

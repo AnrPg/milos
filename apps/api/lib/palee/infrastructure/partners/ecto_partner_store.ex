@@ -1,64 +1,37 @@
 defmodule Palee.Infrastructure.Partners.EctoPartnerStore do
   @moduledoc """
-  Ecto adapter of the Partners store (ADR-169). Runs in a session of the
-  club's gym; queries name the club and the people explicitly, the gym's
-  tenant policy is the outer wall. A like and the match it may make are one
-  transaction under an advisory lock on the pair, so two crossing likes
-  make exactly one match.
+  Ecto adapter of the Partners store (ADR-169, ADR-280). Runs in the acting
+  person's own session; queries name the people explicitly and row security
+  is the outer wall. A like and the match it may make are one transaction
+  under an advisory lock on the pair, so two crossing likes make exactly one
+  match.
   """
 
   @behaviour Palee.Partners.Ports.PartnerStore
 
   import Ecto.Query
 
-  alias Palee.Partners.{Match, Message, Profile, Swipe}
+  alias Palee.Partners.{Match, Message, Profile, Report, Swipe}
   alias Palee.Partners.Domain.MatchPolicy
   alias Palee.Repo
 
   # Profiles.
 
   @impl true
-  def get_profile(_context, club_id, user_id),
-    do: Repo.get_by(Profile, club_id: club_id, user_id: user_id)
+  def get_profile(_context, user_id), do: Repo.get_by(Profile, user_id: user_id)
 
   @impl true
-  def get_profile_by_id(_context, id) do
-    case Ecto.UUID.cast(id) do
-      {:ok, id} -> Repo.get(Profile, id)
-      :error -> nil
-    end
-  end
-
-  @impl true
-  def list_profiles_of(_context, user_id) do
+  def get_profiles(_context, user_ids) do
     Profile
-    |> where([p], p.user_id == ^user_id)
-    |> order_by([p], asc: p.inserted_at)
+    |> where([p], p.user_id in ^Enum.uniq(user_ids))
     |> Repo.all()
   end
 
   @impl true
-  def profile_ids_for(_context, []), do: %{}
-
-  def profile_ids_for(_context, pairs) do
-    wanted = MapSet.new(pairs)
-    {club_ids, user_ids} = pairs |> Enum.unzip()
-
+  def list_live_profiles(_context, excluded_ids) do
     Profile
-    |> where([p], p.club_id in ^Enum.uniq(club_ids) and p.user_id in ^Enum.uniq(user_ids))
-    |> select([p], {{p.club_id, p.user_id}, p.id})
-    |> Repo.all()
-    |> Enum.filter(fn {pair, _id} -> MapSet.member?(wanted, pair) end)
-    |> Map.new()
-  end
-
-  @impl true
-  def list_live_profiles(_context, _club_id, []), do: []
-
-  def list_live_profiles(_context, club_id, user_ids) do
-    Profile
-    |> where([p], p.club_id == ^club_id and p.user_id in ^user_ids)
-    |> where([p], p.active and is_nil(p.suspended_at))
+    |> where([p], p.active and is_nil(p.paused_at))
+    |> where([p], p.user_id not in ^Enum.uniq(excluded_ids))
     |> Repo.all()
   end
 
@@ -69,22 +42,12 @@ defmodule Palee.Infrastructure.Partners.EctoPartnerStore do
   def update_profile(_context, %Profile{} = profile, changes),
     do: profile |> Profile.changeset(changes) |> Repo.update()
 
-  @impl true
-  def set_active_for_user(_context, user_id, active) do
-    {count, _rows} =
-      Profile
-      |> where([p], p.user_id == ^user_id and is_nil(p.suspended_at) and p.active != ^active)
-      |> Repo.update_all(set: [active: active, updated_at: DateTime.utc_now()])
-
-    count
-  end
-
   # Swipes.
 
   @impl true
-  def list_swipes_by(_context, club_id, swiper_id) do
+  def list_swipes_by(_context, swiper_id) do
     Swipe
-    |> where([s], s.club_id == ^club_id and s.swiper_id == ^swiper_id)
+    |> where([s], s.swiper_id == ^swiper_id)
     |> Repo.all()
   end
 
@@ -103,8 +66,8 @@ defmodule Palee.Infrastructure.Partners.EctoPartnerStore do
       advisory_lock(MatchPolicy.pair_key(pair))
 
       with {:ok, swipe} <- upsert_swipe(attrs, now),
-           reverse = get_swipe(attrs.club_id, attrs.target_id, attrs.swiper_id),
-           {:ok, match, new?} <- maybe_match(mutual?.(reverse), attrs, pair, now) do
+           reverse = get_swipe(attrs.target_id, attrs.swiper_id),
+           {:ok, match, new?} <- maybe_match(mutual?.(reverse), pair, now) do
         %{swipe: swipe, match: match, new_match: new?}
       else
         {:error, reason} -> Repo.rollback(reason)
@@ -119,7 +82,7 @@ defmodule Palee.Infrastructure.Partners.EctoPartnerStore do
     |> Ecto.Changeset.force_change(:updated_at, now)
     |> Repo.insert(
       on_conflict: [set: [direction: attrs.direction, updated_at: now]],
-      conflict_target: [:club_id, :swiper_id, :target_id],
+      conflict_target: [:swiper_id, :target_id],
       returning: true
     )
     |> case do
@@ -128,19 +91,18 @@ defmodule Palee.Infrastructure.Partners.EctoPartnerStore do
     end
   end
 
-  defp get_swipe(club_id, swiper_id, target_id),
-    do: Repo.get_by(Swipe, club_id: club_id, swiper_id: swiper_id, target_id: target_id)
+  defp get_swipe(swiper_id, target_id),
+    do: Repo.get_by(Swipe, swiper_id: swiper_id, target_id: target_id)
 
-  defp maybe_match(false, _attrs, _pair, _now), do: {:ok, nil, false}
+  defp maybe_match(false, _pair, _now), do: {:ok, nil, false}
 
-  defp maybe_match(true, attrs, {a, b}, now) do
+  defp maybe_match(true, {a, b}, now) do
     case active_between(a, b) do
       %Match{} = match ->
         {:ok, match, false}
 
       nil ->
-        %{club_id: attrs.club_id, user_a_id: a, user_b_id: b, matched_at: now}
-        |> Map.merge(Map.take(attrs, [:organization_id]))
+        %{user_a_id: a, user_b_id: b, matched_at: now}
         |> Match.create_changeset()
         |> Repo.insert()
         |> case do
@@ -151,13 +113,10 @@ defmodule Palee.Infrastructure.Partners.EctoPartnerStore do
   end
 
   @impl true
-  def delete_swipe(_context, club_id, swiper_id, target_id) do
+  def delete_swipe(_context, swiper_id, target_id) do
     {count, _rows} =
       Swipe
-      |> where(
-        [s],
-        s.club_id == ^club_id and s.swiper_id == ^swiper_id and s.target_id == ^target_id
-      )
+      |> where([s], s.swiper_id == ^swiper_id and s.target_id == ^target_id)
       |> Repo.delete_all()
 
     count
@@ -233,13 +192,8 @@ defmodule Palee.Infrastructure.Partners.EctoPartnerStore do
     where(query, [m], m.user_a_id == ^a and m.user_b_id == ^b)
   end
 
-  defp end_filter(query, %{club_id: club_id, user_id: user_id}),
-    do:
-      where(
-        query,
-        [m],
-        m.club_id == ^club_id and (m.user_a_id == ^user_id or m.user_b_id == ^user_id)
-      )
+  defp end_filter(query, %{user_id: user_id}),
+    do: where(query, [m], m.user_a_id == ^user_id or m.user_b_id == ^user_id)
 
   defp end_filter(query, _filter), do: where(query, [m], false)
 
@@ -295,6 +249,54 @@ defmodule Palee.Infrastructure.Partners.EctoPartnerStore do
       |> select([m], {m.match_id, count(m.id)})
       |> Repo.all()
       |> Map.new()
+    end)
+  end
+
+  # Reports.
+
+  @impl true
+  def insert_report(_context, attrs) do
+    attrs
+    |> Report.create_changeset()
+    |> Repo.insert()
+    |> case do
+      {:ok, report} ->
+        {:ok, report}
+
+      {:error, %Ecto.Changeset{errors: errors} = changeset} ->
+        if Keyword.has_key?(errors, :reporter_id),
+          do: {:ok, :already_reported},
+          else: {:error, changeset}
+    end
+  end
+
+  @impl true
+  def get_report(_context, id) do
+    case Ecto.UUID.cast(id) do
+      {:ok, id} -> Repo.get(Report, id)
+      :error -> nil
+    end
+  end
+
+  @impl true
+  def list_reports(_context, status) do
+    Report
+    |> where([r], r.status == ^status)
+    |> order_by([r], desc: r.inserted_at, desc: r.id)
+    |> limit(500)
+    |> Repo.all()
+  end
+
+  @impl true
+  def decide_reports(_context, target_id, changes) do
+    Report
+    |> where([r], r.target_id == ^target_id and r.status == "open")
+    |> Repo.all()
+    |> Enum.flat_map(fn report ->
+      case report |> Report.decision_changeset(changes) |> Repo.update() do
+        {:ok, decided} -> [decided]
+        {:error, _changeset} -> []
+      end
     end)
   end
 

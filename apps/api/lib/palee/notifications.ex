@@ -474,14 +474,12 @@ defmodule Palee.Notifications do
         url: "/me/buddies/#{field(payload, :link_id)}/messages"
       })
 
-  # ADR-169: a mutual like in a club; a message in the pair's conversation
-  # (the push names who wrote, never what).
+  # ADR-169/ADR-280: a mutual like in the public deck; a message in the
+  # pair's conversation (the push names who wrote, never what).
   def process_event("partner_match", payload),
     do:
       enqueue_simple(:partner_match, payload, %{
         match_id: field(payload, :match_id),
-        club_id: field(payload, :club_id),
-        club_name: field(payload, :club_name),
         nickname: field(payload, :partner_nickname),
         dedupe_key: field(payload, :dedupe_key),
         url: partner_url(field(payload, :match_id))

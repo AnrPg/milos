@@ -231,10 +231,7 @@ defmodule Palee.Application.CommunityGroups do
     with {:ok, club} <- ClubScope.gym_club(context),
          :ok <- staff(club),
          {:ok, settings} <-
-           Community.put_community_settings(context, %{
-             member_groups: params[:member_groups],
-             partners_enabled: params[:partners_enabled]
-           }) do
+           Community.put_community_settings(context, %{member_groups: params[:member_groups]}) do
       announce(club)
       {:ok, Map.put(settings, :lifecycle, Community.group_lifecycle())}
     end
@@ -281,7 +278,6 @@ defmodule Palee.Application.CommunityGroups do
 
     %{
       member_groups: settings.member_groups,
-      partners_enabled: Map.get(settings, :partners_enabled, true),
       can_propose: club.role == "staff" or settings.member_groups != "none",
       needs_approval: club.role != "staff" and settings.member_groups == "approval",
       lifecycle: Community.group_lifecycle()

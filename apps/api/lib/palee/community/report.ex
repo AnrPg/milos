@@ -1,15 +1,15 @@
 defmodule Palee.Community.Report do
   @moduledoc """
   Something a member flagged in a club (ADR-143, board 7 Q4–Q5): a post, a
-  comment, a whole group, or a person's Partners profile (ADR-169). It stays `open` until staff act on the item or
+  comment or a whole group. It stays `open` until staff act on the item or
   decide nothing is needed; every open report on the same item closes
-  together.
+  together. (Partners reports are the Palee team's since ADR-280.)
   """
 
   use Ecto.Schema
   import Ecto.Changeset
 
-  @target_types ~w(post comment channel partner)
+  @target_types ~w(post comment channel)
   @reasons ~w(spam harassment inappropriate other)
   @statuses ~w(open actioned dismissed)
   @resolutions ~w(hidden deleted archived none)
