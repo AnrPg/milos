@@ -5584,7 +5584,19 @@
       "notePlaceholder": "איך זה מתקדם? (רשות)",
       "save": "שמירת עדכון",
       "saving": "שומר…",
-      "cancel": "ביטול"
+      "cancel": "ביטול",
+      "accessTitle": "מי ראה את הפציעות שלי",
+      "accessEmpty": "אף אחד עדיין.",
+      "aStaffMember": "איש צוות",
+      "accessProfile": "{reader} בפרופיל שלך · {date}",
+      "accessBoxList": "{reader} ברשימת הבוקס · {date}",
+      "accessSafetyWarning": "{reader} באזהרת בטיחות של WOD · {date}",
+      "fromMember": "מהחבר/ה",
+      "staffOnly": "לצוות בלבד",
+      "shareLabel": "שהבוקס שלי יראה",
+      "shareHint": "ההנהלה והמאמנים שמאמנים אותך, בכל בוקס שבו את/ה חבר/ה, כדי להתאים את האימון.",
+      "sharingTitle": "הפציעות שלי",
+      "sharingNote": "לכל פציעה שאת/ה רושם/ת יש מתג «שהבוקס שלי יראה»: משנים אותו בפציעה עצמה, ברווחה. מה שהבוקס רושם בעצמו, הבוקס תמיד רואה."
     },
     "mePosts": "פוסטים",
     "mePostsHint": "כל מה שפרסמת במועדונים שלך",
@@ -5828,7 +5840,6 @@
     "sharing": {
       "coachSeesTitle": "המאמן שלי רואה",
       "coachSeesHint": "מה מגיע למאמנים שלך בלי שתשלח בכל פעם.",
-      "injuriesAlways": "פציעות תמיד גלויות למאמן, למען בטיחותך.",
       "communityTitle": "קהילה",
       "communityHint": "היכן אתה מופיע במועדונים ולאחרים.",
       "prCelebrations": "חגיגת שיאים",

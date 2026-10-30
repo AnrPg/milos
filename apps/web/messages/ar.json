@@ -5584,7 +5584,19 @@
       "notePlaceholder": "كيف تسير الأمور؟ (اختياري)",
       "save": "حفظ التحديث",
       "saving": "جارٍ الحفظ…",
-      "cancel": "إلغاء"
+      "cancel": "إلغاء",
+      "accessTitle": "من رأى إصاباتي",
+      "accessEmpty": "لا أحد بعد.",
+      "aStaffMember": "أحد الموظفين",
+      "accessProfile": "{reader} في ملفك الشخصي · {date}",
+      "accessBoxList": "{reader} في قائمة الصالة · {date}",
+      "accessSafetyWarning": "{reader} في تحذير سلامة للتمرين · {date}",
+      "fromMember": "من العضو",
+      "staffOnly": "للموظفين فقط",
+      "shareLabel": "اسمح لصالتي برؤيتها",
+      "shareHint": "الإدارة والمدربون الذين يدربونك، في كل صالة أنت عضو فيها، لتكييف تدريبك.",
+      "sharingTitle": "إصاباتي",
+      "sharingNote": "لكل إصابة تسجلها مفتاح «اسمح لصالتي برؤيتها»: غيّره من الإصابة نفسها في العافية. ما تسجله الصالة بنفسها تراه الصالة دائمًا."
     },
     "mePosts": "المنشورات",
     "mePostsHint": "كل ما نشرته في أنديتك",
@@ -5828,7 +5840,6 @@
     "sharing": {
       "coachSeesTitle": "ما يراه مدرّبي",
       "coachSeesHint": "ما يصل إلى مدرّبيك دون أن ترسله في كل مرة.",
-      "injuriesAlways": "تظهر الإصابات دائمًا لمدرّبك، حفاظًا على سلامتك.",
       "communityTitle": "المجتمع",
       "communityHint": "أين تظهر في الأندية وللآخرين.",
       "prCelebrations": "الاحتفال بالأرقام القياسية",

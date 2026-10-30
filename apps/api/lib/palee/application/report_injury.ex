@@ -1,5 +1,5 @@
 defmodule Palee.Application.ReportInjury do
-  alias Palee.Application.{BroadcastUserSync, RecordAnalyticsEvent, TenantStaffRecipients}
+  alias Palee.Application.{BroadcastUserSync, RecordAnalyticsEvent, StaffInjuryAccess}
   alias Palee.Wellbeing
   alias Palee.Wellbeing.Domain.InjuryPolicy
 
@@ -42,7 +42,8 @@ defmodule Palee.Application.ReportInjury do
 
   defp broadcast_injury_reported(context, user_id, injury) do
     injury_id = injury.id
-    admin_ids = TenantStaffRecipients.user_ids([context, injury])
+    # ADR-286: a shared self-report reaches the staff of the member's boxes.
+    admin_ids = StaffInjuryAccess.staff_user_ids(context, injury)
 
     BroadcastUserSync.for_user(user_id, ["my_wellbeing"],
       reason: "injury_reported",

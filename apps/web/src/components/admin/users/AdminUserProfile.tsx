@@ -19,6 +19,7 @@ import {
   updateAdminUserRole,
   type AdminUserDirectoryEntry,
   type AdminUserFinance,
+  type AdminUserIncident,
   type AdminUserPR,
   type AdminUserPRMember,
 } from "@/api/admin-users";
@@ -249,6 +250,14 @@ function PRCard({ pr }: { pr: AdminUserPR }) {
       ) : null}
     </DetailCard>
   );
+}
+
+/** ADR-286: who keeps the report, and whether the member sees it. */
+function IncidentSource({ incident }: { incident: AdminUserIncident }) {
+  const t = useTranslations("MemberApp.injury");
+  if (incident.owned_by_member) return <> · {t("fromMember")}</>;
+  if (incident.visibility === "admin_only") return <> · {t("staffOnly")}</>;
+  return null;
 }
 
 function GenericRecordCard({ title, meta, detail, value, href }: { title: React.ReactNode; meta?: React.ReactNode; detail?: React.ReactNode; value?: React.ReactNode; href?: string }) {
@@ -863,7 +872,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
             </Panel>
           ) : null}
 
-          {inTab("health_incidents") ? <Panel id="health_incidents" title={i18n("healthIncidentse3ca869")} href={adminHref("/admin/metrics#health-incidents", organizationSlug)}><p>{incidents.data?.summary.active ?? 0} {i18n("active4c71073")} {incidents.data?.summary.total ?? 0} {i18n("total5a537e2")}</p><div className="mt-3 grid gap-3">{incidents.data?.incidents.length ? incidents.data.incidents.map((incident) => <GenericRecordCard key={incident.id} title={incident.body_area} meta={<><SemanticLabel value={incident.severity} /> · <SemanticLabel value={incident.status} /> · {date(incident.started_on)}</>} detail={incident.training_limitations ? <p style={{ color: "var(--muted)" }}>{incident.training_limitations}</p> : null} href={adminHref("/admin/metrics#health-incidents", organizationSlug)} />) : <Empty>{i18n("noHealthIncidentsRecorded91c9d4e")}</Empty>}</div></Panel> : null}
+          {inTab("health_incidents") ? <Panel id="health_incidents" title={i18n("healthIncidentse3ca869")} href={adminHref("/admin/metrics#health-incidents", organizationSlug)}><p>{incidents.data?.summary.active ?? 0} {i18n("active4c71073")} {incidents.data?.summary.total ?? 0} {i18n("total5a537e2")}</p><div className="mt-3 grid gap-3">{incidents.data?.incidents.length ? incidents.data.incidents.map((incident) => <GenericRecordCard key={incident.id} title={incident.body_area} meta={<><SemanticLabel value={incident.severity} /> · <SemanticLabel value={incident.status} /> · {date(incident.started_on)}<IncidentSource incident={incident} /></>} detail={incident.training_limitations ? <p style={{ color: "var(--muted)" }}>{incident.training_limitations}</p> : null} href={adminHref("/admin/metrics#health-incidents", organizationSlug)} />) : <Empty>{i18n("noHealthIncidentsRecorded91c9d4e")}</Empty>}</div></Panel> : null}
 
           {token && showCoachNotes && tab === "wellbeing" ? (
             <Panel id="wellbeing_notes" title={i18n("rhCoachNotes")}>

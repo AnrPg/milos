@@ -76,7 +76,7 @@ Owner has every right of an admin.
 | Branches someone works at (within your own) | ✔ | ✔ | — | — | — | — | — |
 | People directory | ✔ | ✔ | own | ✔ contact + status | billing contacts | — | — |
 | Client profile: training, PRs, history | ✔ | ✔ | own | — | — | — | own |
-| Health and injuries | ✔ | ✔ | own (safety) | — | — | — | own |
+| Health and injuries (a member's own injuries while their per-injury switch is on, read-only for staff; every read logged, ADR-286) | ✔ | ✔ | own (safety) | — | — | — | own |
 | Documents to sign: write them, mandatory or optional, booking gate (ADR-252) | ✔ | ✔ | — | — | — | — | sign own |
 | Ask clients to sign, see who has not — `request_signatures` (ADR-252) | ✔ | ✔ | — | ✔ | — | — | — |
 | Health certificates: dates and file — `view_health_certificates` (ADR-252) | ✔ | ✔ | valid / expired (own) | ✔ | — | — | own |

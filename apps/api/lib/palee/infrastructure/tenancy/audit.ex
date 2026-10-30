@@ -33,6 +33,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     journal_coach_reads
     body_access_log
     wellness_access_log
+    injury_access_log
     community_clubs community_channels community_club_memberships
     community_channel_memberships community_posts community_post_reactions
     community_post_comments community_reports community_settings

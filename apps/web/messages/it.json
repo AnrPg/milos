@@ -5584,7 +5584,19 @@
       "notePlaceholder": "Come va? (facoltativo)",
       "save": "Salva aggiornamento",
       "saving": "Salvataggio…",
-      "cancel": "Annulla"
+      "cancel": "Annulla",
+      "accessTitle": "Chi ha visto i miei infortuni",
+      "accessEmpty": "Nessuno per ora.",
+      "aStaffMember": "Un membro dello staff",
+      "accessProfile": "{reader} sul tuo profilo · {date}",
+      "accessBoxList": "{reader} nell'elenco del box · {date}",
+      "accessSafetyWarning": "{reader} in un avviso di sicurezza del WOD · {date}",
+      "fromMember": "Dal membro",
+      "staffOnly": "Solo staff",
+      "shareLabel": "Fallo vedere al mio box",
+      "shareHint": "La direzione e i coach che ti allenano, in ogni box di cui fai parte, per adattare l'allenamento.",
+      "sharingTitle": "I miei infortuni",
+      "sharingNote": "Ogni infortunio che registri ha l'interruttore «Fallo vedere al mio box»: lo cambi sull'infortunio, in Benessere. Quelli registrati dal box stesso il box li vede sempre."
     },
     "mePosts": "Post",
     "mePostsHint": "Tutto ciò che hai pubblicato nei tuoi club",
@@ -5828,7 +5840,6 @@
     "sharing": {
       "coachSeesTitle": "Il mio coach vede",
       "coachSeesHint": "Cosa arriva ai tuoi coach senza doverlo inviare ogni volta.",
-      "injuriesAlways": "Gli infortuni sono sempre visibili al coach, per la tua sicurezza.",
       "communityTitle": "Community",
       "communityHint": "Dove compari nei club e agli altri.",
       "prCelebrations": "Celebrazione dei PR",

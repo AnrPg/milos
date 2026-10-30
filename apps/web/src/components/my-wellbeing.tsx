@@ -21,6 +21,7 @@ import {
   type ReportInjuryRequest,
 } from "@/api/wellbeing";
 import { useSession } from "@/components/session-provider";
+import { InjuryShareField, InjuryShareToggle } from "@/components/member-app/wellbeing/InjurySharing";
 import { SemanticLabel } from "@/components/semantic-label";
 import { PageHeader } from "@/components/PageHeader";
 import { CheckInPanel } from "@/components/member-app/wellbeing/CheckInPanel";
@@ -40,6 +41,8 @@ export function MyWellbeing() {
   const [bodyArea, setBodyArea] = useState("");
   const [severity, setSeverity] = useState<ReportInjuryRequest["severity"]>("mild");
   const [limitations, setLimitations] = useState("");
+  // ADR-286: «Να το δει το box μου», on unless the member turns it off.
+  const [shareWithBox, setShareWithBox] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   // «Πώς πήγε;» and Νέα καταχώρηση › Λιγούρα arrive as ?craving=<id|new>.
   const search = useSearchParams();
@@ -75,10 +78,12 @@ export function MyWellbeing() {
         body_area: bodyArea,
         severity,
         training_limitations: limitations,
+        shared_with_box: shareWithBox,
       }),
     onSuccess: () => {
       setBodyArea("");
       setLimitations("");
+      setShareWithBox(true);
       setReporting(false);
       injuriesQuery.refetch();
     },
@@ -171,6 +176,7 @@ export function MyWellbeing() {
                 value={limitations}
                 onChange={(event) => setLimitations(event.target.value)}
               />
+              <InjuryShareField checked={shareWithBox} onChange={setShareWithBox} />
               <ErrorText error={reportMutation.error} />
             </div>
           </Dialog>
@@ -224,6 +230,7 @@ export function MyWellbeing() {
                   onCancel={() => setUpdatingId(null)}
                 />
               ) : null}
+              <InjuryShareToggle injury={injury} />
               <InjuryTimeline injury={injury} />
             </article>
           ))}

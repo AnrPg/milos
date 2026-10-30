@@ -46089,6 +46089,81 @@
         "title": "HealthConsents",
         "type": "object"
       },
+      "InjuryAccessLog": {
+        "properties": {
+          "entries": {
+            "items": {
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "injury_ids": {
+                  "items": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "organization": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "read_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "reader": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "surface": {
+                  "enum": [
+                    "profile",
+                    "box_list",
+                    "safety_warning"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "read_at",
+                "surface",
+                "injury_ids",
+                "reader",
+                "organization"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "entries"
+        ],
+        "title": "InjuryAccessLog",
+        "type": "object"
+      },
       "Insight": {
         "properties": {
           "params": {
@@ -226420,6 +226495,9 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "owned_by_member": {
+                            "type": "boolean"
+                          },
                           "params": {
                             "additionalProperties": true,
                             "type": "object"
@@ -226442,6 +226520,9 @@
                               "severe"
                             ],
                             "type": "string"
+                          },
+                          "shared_with_box": {
+                            "type": "boolean"
                           },
                           "started_on": {
                             "format": "date",
@@ -226685,6 +226766,9 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "owned_by_member": {
+                          "type": "boolean"
+                        },
                         "params": {
                           "additionalProperties": true,
                           "type": "object"
@@ -226707,6 +226791,9 @@
                             "severe"
                           ],
                           "type": "string"
+                        },
+                        "shared_with_box": {
+                          "type": "boolean"
                         },
                         "started_on": {
                           "format": "date",
@@ -226923,6 +227010,9 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "owned_by_member": {
+                          "type": "boolean"
+                        },
                         "params": {
                           "additionalProperties": true,
                           "type": "object"
@@ -226945,6 +227035,9 @@
                             "severe"
                           ],
                           "type": "string"
+                        },
+                        "shared_with_box": {
+                          "type": "boolean"
                         },
                         "started_on": {
                           "format": "date",
@@ -227143,6 +227236,9 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "owned_by_member": {
+                          "type": "boolean"
+                        },
                         "params": {
                           "additionalProperties": true,
                           "type": "object"
@@ -227165,6 +227261,9 @@
                             "severe"
                           ],
                           "type": "string"
+                        },
+                        "shared_with_box": {
+                          "type": "boolean"
                         },
                         "started_on": {
                           "format": "date",
@@ -227747,6 +227846,9 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "owned_by_member": {
+                          "type": "boolean"
+                        },
                         "params": {
                           "additionalProperties": true,
                           "type": "object"
@@ -227769,6 +227871,9 @@
                             "severe"
                           ],
                           "type": "string"
+                        },
+                        "shared_with_box": {
+                          "type": "boolean"
                         },
                         "started_on": {
                           "format": "date",
@@ -328320,6 +328425,9 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "owned_by_member": {
+                            "type": "boolean"
+                          },
                           "params": {
                             "additionalProperties": true,
                             "type": "object"
@@ -328342,6 +328450,9 @@
                               "severe"
                             ],
                             "type": "string"
+                          },
+                          "shared_with_box": {
+                            "type": "boolean"
                           },
                           "started_on": {
                             "format": "date",
@@ -328450,6 +328561,10 @@
                       "severe"
                     ],
                     "type": "string"
+                  },
+                  "shared_with_box": {
+                    "nullable": true,
+                    "type": "boolean"
                   },
                   "started_on": {
                     "format": "date",
@@ -328583,6 +328698,9 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "owned_by_member": {
+                          "type": "boolean"
+                        },
                         "params": {
                           "additionalProperties": true,
                           "type": "object"
@@ -328605,6 +328723,9 @@
                             "severe"
                           ],
                           "type": "string"
+                        },
+                        "shared_with_box": {
+                          "type": "boolean"
                         },
                         "started_on": {
                           "format": "date",
@@ -328678,6 +328799,106 @@
           }
         ],
         "summary": "Report an injury for the current user",
+        "tags": [
+          "Wellbeing"
+        ]
+      }
+    },
+    "/api/wellbeing/injuries/access-log": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.WellbeingController.access_log",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entries": {
+                      "items": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "injury_ids": {
+                            "items": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "organization": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "read_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "reader": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "surface": {
+                            "enum": [
+                              "profile",
+                              "box_list",
+                              "safety_warning"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "read_at",
+                          "surface",
+                          "injury_ids",
+                          "reader",
+                          "organization"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "entries"
+                  ],
+                  "title": "InjuryAccessLog",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Access log"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Which staff of your boxes read your injuries, and when (ADR-286)",
         "tags": [
           "Wellbeing"
         ]
@@ -328846,6 +329067,9 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "owned_by_member": {
+                          "type": "boolean"
+                        },
                         "params": {
                           "additionalProperties": true,
                           "type": "object"
@@ -328868,6 +329092,9 @@
                             "severe"
                           ],
                           "type": "string"
+                        },
+                        "shared_with_box": {
+                          "type": "boolean"
                         },
                         "started_on": {
                           "format": "date",
@@ -329084,6 +329311,9 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "owned_by_member": {
+                          "type": "boolean"
+                        },
                         "params": {
                           "additionalProperties": true,
                           "type": "object"
@@ -329106,6 +329336,9 @@
                             "severe"
                           ],
                           "type": "string"
+                        },
+                        "shared_with_box": {
+                          "type": "boolean"
                         },
                         "started_on": {
                           "format": "date",
@@ -329304,6 +329537,9 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "owned_by_member": {
+                          "type": "boolean"
+                        },
                         "params": {
                           "additionalProperties": true,
                           "type": "object"
@@ -329326,6 +329562,9 @@
                             "severe"
                           ],
                           "type": "string"
+                        },
+                        "shared_with_box": {
+                          "type": "boolean"
                         },
                         "started_on": {
                           "format": "date",
@@ -329399,6 +329638,251 @@
           }
         ],
         "summary": "Reopen a healed injury",
+        "tags": [
+          "Wellbeing"
+        ]
+      }
+    },
+    "/api/wellbeing/injuries/{id}/sharing": {
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.WellbeingController.share",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "shared_with_box": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "shared_with_box"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "injury": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "body_area": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "events": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "actor_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "event_type": {
+                                "enum": [
+                                  "reported",
+                                  "updated",
+                                  "marked_healed",
+                                  "reopened"
+                                ],
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "occurred_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "payload": {
+                                "additionalProperties": true,
+                                "properties": {
+                                  "changes": {
+                                    "items": {
+                                      "properties": {
+                                        "field": {
+                                          "type": "string"
+                                        },
+                                        "from": {
+                                          "nullable": true
+                                        },
+                                        "to": {
+                                          "nullable": true
+                                        }
+                                      },
+                                      "required": [
+                                        "field",
+                                        "from",
+                                        "to"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "note": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "event_type",
+                              "actor_id",
+                              "occurred_at",
+                              "payload"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "healed_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "owned_by_member": {
+                          "type": "boolean"
+                        },
+                        "params": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "reported_by_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reported_by_role": {
+                          "enum": [
+                            "self",
+                            "admin"
+                          ],
+                          "type": "string"
+                        },
+                        "severity": {
+                          "enum": [
+                            "mild",
+                            "moderate",
+                            "severe"
+                          ],
+                          "type": "string"
+                        },
+                        "shared_with_box": {
+                          "type": "boolean"
+                        },
+                        "started_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "healed"
+                          ],
+                          "type": "string"
+                        },
+                        "tags": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "training_limitations": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "visibility": {
+                          "enum": [
+                            "admin_only",
+                            "user_and_admin"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "reported_by_id",
+                        "reported_by_role",
+                        "body_area",
+                        "severity",
+                        "status",
+                        "tags",
+                        "visibility",
+                        "params",
+                        "events",
+                        "inserted_at",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "injury"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Injury report"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Share one of your own injuries with your boxes, or stop (ADR-286)",
         "tags": [
           "Wellbeing"
         ]

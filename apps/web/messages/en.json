@@ -5584,7 +5584,19 @@
       "notePlaceholder": "How is it going? (optional)",
       "save": "Save update",
       "saving": "Saving…",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "accessTitle": "Who saw my injuries",
+      "accessEmpty": "Nobody yet.",
+      "aStaffMember": "A staff member",
+      "accessProfile": "{reader} on your profile · {date}",
+      "accessBoxList": "{reader} in the box list · {date}",
+      "accessSafetyWarning": "{reader} in a WOD safety warning · {date}",
+      "fromMember": "From the member",
+      "staffOnly": "Staff only",
+      "shareLabel": "Let my box see it",
+      "shareHint": "Management and the coaches who train you, at every box you belong to, so they can adapt your training.",
+      "sharingTitle": "My injuries",
+      "sharingNote": "Every injury you record has the switch «Let my box see it»: change it on the injury, in Wellbeing. Injuries your box records itself are always visible to the box."
     },
     "mePosts": "Posts",
     "mePostsHint": "Everything you posted in your clubs",
@@ -5828,7 +5840,6 @@
     "sharing": {
       "coachSeesTitle": "My coach sees",
       "coachSeesHint": "What reaches your coaches without you sending it each time.",
-      "injuriesAlways": "Injuries are always visible to your coach, for your safety.",
       "communityTitle": "Community",
       "communityHint": "Where you appear in clubs and to other people.",
       "prCelebrations": "PR celebrations",

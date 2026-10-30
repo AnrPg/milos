@@ -14,7 +14,13 @@ type AdminReportInjuryResponse =
 type AdminHealInjuryResponse =
   operations["PaleeWeb.AdminWellbeingController.heal"]["responses"][200]["content"]["application/json"];
 
+type InjuryAccessLogResponse =
+  operations["PaleeWeb.WellbeingController.access_log"]["responses"][200]["content"]["application/json"];
+
 export type InjuryRecord = MyInjuriesResponse["injuries"][number];
+/** ADR-286: one staff read of the member's injuries. */
+export type InjuryAccessEntry = InjuryAccessLogResponse["entries"][number];
+export const INJURY_ACCESS_LOG_KEY = ["my", "wellbeing", "injuries", "access-log"] as const;
 export type ReportInjuryRequest =
   operations["PaleeWeb.WellbeingController.create"]["requestBody"]["content"]["application/json"];
 export type AdminInjuryFilters = NonNullable<
@@ -25,6 +31,19 @@ export type AdminReportInjuryRequest =
 
 export async function fetchMyInjuries(token: string) {
   return apiRequest<MyInjuriesResponse>("/wellbeing/injuries", { token });
+}
+
+export async function fetchMyInjuryAccessLog(token: string) {
+  return (await apiRequest<InjuryAccessLogResponse>("/wellbeing/injuries/access-log", { token })).entries;
+}
+
+/** ADR-286: «Να το δει το box μου» on one of the member's own injuries. */
+export async function setMyInjurySharing(token: string, injuryId: string, shared: boolean) {
+  return apiRequest<HealMyInjuryResponse>(`/wellbeing/injuries/${injuryId}/sharing`, {
+    method: "PUT",
+    token,
+    body: { shared_with_box: shared },
+  });
 }
 
 export async function reportInjury(token: string, body: ReportInjuryRequest) {

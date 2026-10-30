@@ -5584,7 +5584,19 @@
       "notePlaceholder": "Hoe gaat het? (optioneel)",
       "save": "Update opslaan",
       "saving": "Opslaan…",
-      "cancel": "Annuleren"
+      "cancel": "Annuleren",
+      "accessTitle": "Wie mijn blessures zag",
+      "accessEmpty": "Nog niemand.",
+      "aStaffMember": "Iemand van het team",
+      "accessProfile": "{reader} op je profiel · {date}",
+      "accessBoxList": "{reader} in de lijst van de box · {date}",
+      "accessSafetyWarning": "{reader} in een veiligheidswaarschuwing bij een WOD · {date}",
+      "fromMember": "Van het lid",
+      "staffOnly": "Alleen team",
+      "shareLabel": "Mijn box mag het zien",
+      "shareHint": "De leiding en de coaches die je trainen, in elke box waar je lid bent, zodat ze je training aanpassen.",
+      "sharingTitle": "Mijn blessures",
+      "sharingNote": "Elke blessure die je noteert heeft de schakelaar «Mijn box mag het zien»: wijzig hem bij de blessure, onder Welzijn. Wat de box zelf noteert, ziet de box altijd."
     },
     "mePosts": "Berichten",
     "mePostsHint": "Alles wat je in je clubs plaatste",
@@ -5828,7 +5840,6 @@
     "sharing": {
       "coachSeesTitle": "Mijn coach ziet",
       "coachSeesHint": "Wat je coaches bereikt zonder dat je het elke keer stuurt.",
-      "injuriesAlways": "Blessures zijn altijd zichtbaar voor je coach, voor je veiligheid.",
       "communityTitle": "Community",
       "communityHint": "Waar je verschijnt in clubs en voor anderen.",
       "prCelebrations": "PR-vieringen",

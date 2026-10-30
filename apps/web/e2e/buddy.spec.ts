@@ -361,7 +361,22 @@ test.describe("Buddy για στήριξη", () => {
       ),
     );
 
+    // ADR-286: who of the boxes' staff read the member's injuries.
+    await page.route("**/api/wellbeing/injuries/access-log", (route) =>
+      route.fulfill(
+        json({
+          entries: [
+            { id: "a-1", read_at: new Date().toISOString(), surface: "profile", injury_ids: ["i-1"], reader: { id: "o-1", nickname: "Maria" }, organization: { id: "org-1", name: "Box Kypseli" } },
+          ],
+        }),
+      ),
+    );
+
     await page.goto("/me/sharing");
+    await expect(page.locator("#injuries")).toContainText("Let my box see it");
+    await page.locator("#injuries").getByText("Who saw my injuries").click();
+    await expect(page.getByTestId("injury-access-log")).toContainText("Maria on your profile");
+    await expect(page.getByTestId("injury-access-log")).toContainText("Box Kypseli");
     const section = page.getByTestId("wellness-summary-sharing");
     const wellness = section.getByRole("switch", { name: /Wellness · weekly summary/ });
     const cravings = section.getByRole("switch", { name: /Cravings in the summary/ });

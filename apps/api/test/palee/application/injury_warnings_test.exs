@@ -129,12 +129,14 @@ defmodule Palee.Application.InjuryWarningsTest do
     injury
   end
 
+  # A self-report the member keeps to themselves (ADR-286 switch off); shared
+  # ones are covered in InjuryWarningControllerTest.
   defp personal_injury!(athlete_context, athlete, attrs) do
     {:ok, injury} =
       ReportInjury.call(
         athlete_context,
         athlete.id,
-        Map.merge(%{"severity" => "moderate"}, attrs)
+        Map.merge(%{"severity" => "moderate", "shared_with_box" => false}, attrs)
       )
 
     injury
