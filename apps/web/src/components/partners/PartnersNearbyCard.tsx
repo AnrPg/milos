@@ -18,7 +18,7 @@ import { usePartnerDeck, usePartnersOverview } from "./use-partners";
 export function PartnersNearbyCard() {
   const t = useTranslations("Partners");
   const overview = usePartnersOverview();
-  const inDeck = overview.data ? partnersStage(overview.data) === "deck" : false;
+  const inDeck = overview.data?.eligibility ? partnersStage(overview.data) === "deck" : false;
   // The same request as the deck without filters, so opening it is instant.
   const deck = usePartnerDeck({}, inDeck);
   const card = nearbyCard(overview.data, inDeck ? deck.data : undefined);

@@ -118,6 +118,8 @@ describe("nearbyCard (Γύρω μου, vision §4.2)", () => {
 
   it("is hidden while in review, after a rejection or suspension, while paused, and before anything is known", () => {
     expect(nearbyCard(undefined, undefined).kind).toBe("hidden");
+    // An answer it can't read hides the card instead of breaking Γύρω μου.
+    expect(nearbyCard({} as PartnersOverview, undefined).kind).toBe("hidden");
     expect(nearbyCard(overview("in_review"), undefined).kind).toBe("hidden");
     expect(nearbyCard(overview("rejected"), undefined).kind).toBe("hidden");
     expect(nearbyCard(overview("suspended"), undefined).kind).toBe("hidden");

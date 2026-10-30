@@ -60,7 +60,8 @@ export type NearbyCard = { kind: "hidden" } | { kind: "start" } | { kind: "peopl
  * with nobody new or no swipes left today.
  */
 export function nearbyCard(overview: PartnersOverview | undefined, deck: PartnerDeck | undefined): NearbyCard {
-  if (!overview) return { kind: "hidden" };
+  // A side card on Γύρω μου: an answer it can't read hides it, never the page.
+  if (!overview?.eligibility) return { kind: "hidden" };
   const stage = partnersStage(overview);
   if (stage === "verify" || stage === "setup") return { kind: "start" };
   if (stage !== "deck" || !deck || deck.swipes_remaining <= 0) return { kind: "hidden" };

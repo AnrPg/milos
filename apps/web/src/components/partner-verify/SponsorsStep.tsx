@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
@@ -197,7 +197,11 @@ function SponsorLinkDialog({ token, minutes, startVouches, onClose }: { token: s
     },
   });
   const { mutate: createLink } = create;
+  // One link per opening, even when React runs the effect twice in dev.
+  const requested = useRef(false);
   useEffect(() => {
+    if (requested.current) return;
+    requested.current = true;
     createLink();
   }, [createLink]);
   useEffect(() => {
