@@ -614,8 +614,10 @@ export function ExecutionMode() {
 
     const rest = wasChecked || finishesSegment ? null : setRestSeconds(currentSegment, stepId);
     if (rest !== null) {
-      setCountdownNow(Date.now());
-      setSetRest({ endsAt: Date.now() + rest * 1000, total: rest, segmentIndex: currentSegmentIndex });
+      // One clock read, so the first frame shows the full rest (two reads a millisecond apart showed 1:31 for 1:30).
+      const now = Date.now();
+      setCountdownNow(now);
+      setSetRest({ endsAt: now + rest * 1000, total: rest, segmentIndex: currentSegmentIndex });
     } else if (wasChecked) {
       setSetRest(null);
     }
