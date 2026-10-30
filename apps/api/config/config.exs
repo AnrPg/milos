@@ -472,6 +472,11 @@ config :palee, :partner_verification_store, Palee.Infrastructure.Partners.EctoVe
 config :palee, :sms_sender, Palee.Infrastructure.Sms.UnavailableSmsSender
 config :palee, Palee.Infrastructure.Sms.BrevoSmsSender, api_key: nil, sender: "Palee"
 
+# ADR-280 §4: «Κλείστε μαζί» suggestions (feedback and anonymous counters).
+config :palee,
+       :partner_suggestion_store,
+       Palee.Infrastructure.Partners.EctoSuggestionStore
+
 config :palee,
        :support_scheduler,
        Palee.Infrastructure.Buddies.ObanSupportScheduler
