@@ -14473,5 +14473,295 @@
     "leaveStay": "Rester ici",
     "leaveDiscard": "Abandonner",
     "changed": "Modifié"
+  },
+  "PartnerVerify": {
+    "back": "Partenaires d'entraînement",
+    "title": "Vérification",
+    "loading": "Chargement…",
+    "someone": "Quelqu'un",
+    "intro": "Les Partenaires d'entraînement sont réservés aux personnes vérifiées. Sans abonnement dans une box ou chez un coach, tu es vérifié par {count} parrains et un contrôle de l'équipe Palee. Cela se fait une seule fois.",
+    "stepsLabel": "Étapes de la vérification",
+    "stepOf": "Étape {step} sur {total}",
+    "state": {
+      "done": "Fait",
+      "open": "À faire",
+      "locked": "Pas encore"
+    },
+    "selfieExpired": "Ta photo a été supprimée sans contrôle après {days} jours. Prends un nouveau selfie pour terminer.",
+    "verified": {
+      "title": "Tu es vérifié",
+      "byMembership": "Vérifié grâce à ton abonnement dans une box ou chez un coach. Cela reste valable même si l'abonnement se termine.",
+      "bySponsors": "Vérifié par tes parrains et l'équipe Palee. C'est définitif.",
+      "open": "Aller aux Partenaires d'entraînement"
+    },
+    "suspended": {
+      "title": "Ton accès aux Partenaires d'entraînement est suspendu",
+      "body": "L'équipe Palee l'a suspendu après des signalements. Le reste de Palee n'est pas concerné."
+    },
+    "review": {
+      "title": "En contrôle par l'équipe Palee",
+      "body": "Une personne de l'équipe Palee compare ton selfie à ton avatar. Nous te préviendrons. La photo est supprimée dès la décision, au plus tard après {days} jours."
+    },
+    "rejected": {
+      "title": "Ta vérification n'a pas été approuvée",
+      "reason": "Motif :",
+      "again": "Si tu penses que c'est une erreur, demande un second examen. Une nouvelle demande s'ouvre et tu refais les étapes qui manquent.",
+      "ask": "Demander un second examen"
+    },
+    "steps": {
+      "consent": {
+        "title": "Consentement",
+        "locked": "Donne d'abord ton consentement.",
+        "doneShort": "Tu as accepté le contrôle de l'équipe Palee."
+      },
+      "sponsors": {
+        "title": "Parrains",
+        "locked": "S'ouvre après ton consentement.",
+        "doneShort": "Tes parrains se sont portés garants de toi.",
+        "done": "Garants : {names}"
+      },
+      "phone": {
+        "title": "Numéro de mobile",
+        "locked": "S'ouvre après ton consentement.",
+        "doneShort": "Ton numéro est confirmé.",
+        "done": "Confirmé : {phone}"
+      },
+      "selfie": {
+        "title": "Selfie avec un code",
+        "locked": "S'ouvre quand tes parrains se sont portés garants et que ton numéro est confirmé.",
+        "doneShort": "Envoyé."
+      }
+    },
+    "consent": {
+      "what": "Nous demandons {count} parrains parmi tes Potes, un numéro de mobile et un selfie.",
+      "phone": "Ton numéro est stocké chiffré et sert seulement à empêcher la création d'un second compte. Personne d'autre ne le voit.",
+      "selfie": "Une seule personne de l'équipe Palee voit ton selfie, à côté de ton avatar. Nous le supprimons dès sa décision, au plus tard après {days} jours. Aucune reconnaissance faciale.",
+      "human": "C'est toujours une personne qui décide, jamais une machine. Si tu n'es pas approuvé, tu sauras pourquoi et pourras demander un second examen.",
+      "keep": "Nous gardons seulement le fait que tu as été vérifié, quand, comment et par qui.",
+      "withdraw": "Tu peux annuler à tout moment ; tes données sont alors supprimées.",
+      "privacy": "Comment nous utilisons tes données",
+      "agree": "J'accepte, continuer"
+    },
+    "withdraw": {
+      "button": "Annuler et supprimer mes données",
+      "confirmTitle": "Annuler la vérification ?",
+      "confirmBody": "Nous supprimons ton mobile, ton selfie, tes demandes sans réponse aux parrains et tes liens. Tu pourras recommencer plus tard.",
+      "confirm": "Oui, annuler et supprimer",
+      "keep": "Non, retour"
+    },
+    "sponsors": {
+      "lead": "Demande à {count} Potes qui te connaissent de se porter garants de toi.",
+      "count": "{vouches}/{required} garanties",
+      "meaning": "Un parrain confirme qu'il te connaît personnellement. Seules les personnes vérifiées par une box ou un coach peuvent se porter garantes.",
+      "noBuddies": "Tu n'as pas encore de Potes. Ce sont les personnes que tu suis et qui te suivent en retour.",
+      "listLabel": "Tes Potes",
+      "viaLink": "Garant via le QR code",
+      "othersTitle": "La personne qui te connaît n'est pas ici ?",
+      "othersBody": "Si elle te connaît personnellement, par exemple du parc, elle peut scanner un QR code sur ton téléphone.",
+      "showQr": "Afficher le QR code ou le lien",
+      "state": {
+        "vouched": "S'est porté garant",
+        "requested": "En attente de réponse",
+        "declined": "Ne s'est pas porté garant",
+        "eligible": "Vérifié, peut se porter garant"
+      },
+      "reason": {
+        "not_verified": "Pas vérifié par une box ou un coach",
+        "blocked": "Ne peut pas se porter garant de toi",
+        "quota": "S'est porté garant de beaucoup de monde récemment",
+        "penalty": "Ne peut pas se porter garant pour l'instant",
+        "self": "C'est toi"
+      },
+      "ask": "Demander",
+      "askLabel": "Demander à {name} de se porter garant",
+      "cancel": "Annuler",
+      "cancelLabel": "Annuler ta demande à {name}"
+    },
+    "link": {
+      "title": "Garantie en personne",
+      "body": "Montre ce QR code à quelqu'un qui te connaît. Cette personne doit être membre vérifié d'une box ou d'un coach.",
+      "vouched": "Quelqu'un vient de se porter garant de toi.",
+      "qrLabel": "QR code pour ton parrain",
+      "expiresIn": "Expire dans {time}",
+      "singleUse": "Valable pour un seul parrain.",
+      "copy": "Copier le lien",
+      "copied": "Lien copié",
+      "expired": "Le lien a expiré.",
+      "renew": "Nouveau lien"
+    },
+    "phone": {
+      "lead": "Nous t'envoyons un code à 6 chiffres par SMS. Un numéro par compte.",
+      "label": "Numéro de mobile",
+      "placeholder": "+33… ou 06…",
+      "private": "Stocké chiffré ; personne d'autre ne le voit.",
+      "send": "Envoyer le code",
+      "back": "Retour au code",
+      "sentTo": "Nous avons envoyé un code au {phone}. Il est valable {minutes} minutes.",
+      "codeLabel": "Code à 6 chiffres",
+      "attempts": "Tu as {count} essais par code.",
+      "confirm": "Confirmer",
+      "resendIn": "Renvoyer dans {seconds} s",
+      "resend": "Renvoyer",
+      "change": "Changer de numéro"
+    },
+    "selfie": {
+      "write": "Écris ce code sur une feuille de papier :",
+      "codeLabel": "Ton code : {code}",
+      "hold": "Tiens-la à côté de ton visage et prends un selfie. Ton visage et le code doivent être bien visibles.",
+      "previewAlt": "Ton selfie",
+      "take": "Prendre un selfie",
+      "retake": "Reprendre",
+      "choose": "Choisir une photo",
+      "tooBig": "La photo dépasse {mb} Mo.",
+      "wrongType": "Choisis une photo JPEG, PNG, WebP ou HEIC.",
+      "privacy": "Une seule personne de l'équipe Palee la voit, et nous la supprimons dès sa décision (au plus tard après {days} jours). Nous ne l'utilisons pas pour la reconnaissance faciale.",
+      "uploading": "Envoi… {percent} %",
+      "sending": "Envoi en cours…",
+      "submit": "Envoyer pour contrôle"
+    },
+    "vouch": {
+      "title": "Demandes de garantie",
+      "didVouch": "Tu t'es porté garant de {name}.",
+      "didDecline": "Tu nous as dit que tu ne connais pas {name}.",
+      "none": "Personne ne te demande de garantie pour le moment.",
+      "paused": "Tu pourras te porter garant à nouveau à partir du {date}.",
+      "notVerified": "Seules les personnes vérifiées par un abonnement dans une box ou chez un coach peuvent se porter garantes.",
+      "quotaUsed": "Tu t'es porté garant {quota} fois ces {days} derniers jours. Tu pourras recommencer plus tard.",
+      "quotaLeft": "Tu peux encore te porter garant de {left} personnes sur {quota} en {days} jours.",
+      "asks": "{name} te demande d'être son parrain",
+      "forPartners": "pour les Partenaires d'entraînement",
+      "meaning": "Tu confirmes que tu connais cette personne personnellement et qu'elle est digne de confiance. Si nous la suspendons après des signalements, nous te préviendrons et tu ne pourras te porter garant de personne pendant 60 jours.",
+      "meaningLink": "Tu confirmes que tu connais cette personne personnellement et qu'elle est digne de confiance. Si nous la suspendons après des signalements, nous te préviendrons et tu ne pourras te porter garant de personne pendant 60 jours.",
+      "vouch": "Je me porte garant",
+      "decline": "Je ne la connais pas"
+    },
+    "vouchLink": {
+      "title": "Se porter garant",
+      "missing": "Ce lien est incomplet. Demande un nouveau QR code."
+    },
+    "error": {
+      "partner_verification_required": "Vérifie ton compte pour utiliser les Partenaires d'entraînement.",
+      "partner_suspended": "Ton accès aux Partenaires d'entraînement est suspendu.",
+      "partner_already_verified": "Ton compte est déjà vérifié.",
+      "partner_verification_in_review": "Ta demande est en contrôle par l'équipe Palee.",
+      "partner_verification_request_open": "Tu as déjà une demande ouverte.",
+      "partner_consent_required": "Donne d'abord ton consentement.",
+      "partner_sponsor_not_eligible": "Cette personne ne peut pas se porter garante de toi.",
+      "partner_sponsor_quota": "Cette personne s'est portée garante de beaucoup de monde récemment. Demande à quelqu'un d'autre.",
+      "partner_sponsor_penalty": "Les garanties sont en pause pour l'instant.",
+      "partner_sponsor_declined": "Cette personne ne s'est pas portée garante de toi.",
+      "partner_sponsor_already_asked": "Tu as déjà demandé à cette personne.",
+      "partner_vouch_request_closed": "Cette demande a déjà reçu une réponse.",
+      "partner_link_expired": "Ce lien a expiré ou a déjà servi. Demande un nouveau QR code.",
+      "partner_phone_invalid": "Saisis un numéro de mobile.",
+      "partner_phone_taken": "Ce numéro vérifie déjà un autre compte.",
+      "partner_phone_rate_limited": "Trop de codes. Réessaie plus tard.",
+      "partner_code_invalid": "Ce code n'est pas bon.",
+      "partner_code_expired": "Le code a expiré. Demandes-en un nouveau.",
+      "partner_selfie_missing": "Prends d'abord le selfie.",
+      "partner_selfie_invalid": "Le selfie doit être une photo de 8 Mo maximum.",
+      "partner_verification_incomplete": "Il manque encore des étapes.",
+      "partner_verification_closed": "Cette demande n'attend plus de décision.",
+      "partner_decision_reason_required": "Indique un motif pour refuser.",
+      "partner_decision_reason_too_long": "500 caractères maximum.",
+      "sms_unavailable": "Les SMS ne sont pas disponibles pour le moment. Réessaie plus tard."
+    },
+    "notif": {
+      "vouchRequest_title": "{name} te demande d'être son parrain",
+      "vouchRequest_body": "Pour les Partenaires d'entraînement. Regarde ce que cela implique avant de répondre.",
+      "vouched_title": "{name} s'est porté garant de toi",
+      "vouched_body": "Un pas de plus vers les Partenaires d'entraînement.",
+      "decided_approved_title": "Tu es vérifié",
+      "decided_approved_body": "Tu peux maintenant utiliser les Partenaires d'entraînement.",
+      "decided_rejected_title": "Ta vérification n'a pas été approuvée",
+      "decided_rejected_body": "Regarde le motif et demande un second examen.",
+      "decided_rejected_reason": "Motif : {reason}",
+      "decided_expired_title": "Ta photo a expiré",
+      "decided_expired_body": "Prends un nouveau selfie pour terminer ta vérification.",
+      "penalty_title": "Tes garanties sont en pause",
+      "penalty_body": "Une personne dont tu t'es porté garant a été suspendue après des signalements. Tu pourras te porter garant à nouveau à partir du {date}.",
+      "penalty_bodyNoDate": "Une personne dont tu t'es porté garant a été suspendue après des signalements. Tu pourras te porter garant à nouveau plus tard."
+    }
+  },
+  "PlatformPartners": {
+    "back": "Console de la plateforme",
+    "forbidden": "Seule l'équipe Palee peut voir cette page.",
+    "loading": "Chargement…",
+    "someone": "Quelqu'un",
+    "cancel": "Annuler",
+    "verifications": {
+      "title": "Vérifications des Partenaires d'entraînement",
+      "subtitle": "Des personnes venues avec des parrains. Compare le selfie et son code avec l'avatar, puis approuve ou refuse.",
+      "queue": "En attente",
+      "queueCount": "{count, plural, one {# en attente} other {# en attente}}",
+      "empty": "Aucune demande en attente.",
+      "pick": "Choisis une demande à contrôler.",
+      "submitted": "Envoyée {date}",
+      "overdue": "La photo sera bientôt supprimée sans contrôle",
+      "approved": "{name} est vérifié.",
+      "rejected": "{name} a été refusé.",
+      "codeToFind": "Code qui doit figurer sur le papier",
+      "selfie": "Selfie",
+      "selfieAlt": "Selfie de {name}",
+      "linkExpired": "Le lien de la photo a expiré. Actualise-le.",
+      "noSelfie": "Pas de photo.",
+      "linkLeft": "Lien valable {seconds} s",
+      "refreshLink": "Actualiser le lien",
+      "avatar": "Avatar",
+      "avatarAlt": "Avatar de {name}",
+      "noAvatar": "Pas d'avatar.",
+      "sponsors": "Parrains",
+      "channel": {
+        "buddy": "Pote",
+        "link": "QR code"
+      },
+      "phone": "Mobile",
+      "phoneVerified": "confirmé",
+      "deletedNote": "La photo est supprimée dès ta décision. Seul le résultat est conservé.",
+      "reason": "Motif (la personne le verra)",
+      "reasonHint": "Des mots simples : ce qui manquait et quoi faire pour un second examen. 500 caractères maximum.",
+      "reasonRequired": "Écris un motif pour refuser.",
+      "confirmReject": "Refuser",
+      "approve": "Approuver",
+      "reject": "Refuser…"
+    },
+    "reports": {
+      "title": "Signalements des Partenaires d'entraînement",
+      "subtitle": "Signalements ouverts, par personne. La suspension ferme son accès aux Partenaires d'entraînement et met ses parrains en pause pendant 60 jours.",
+      "empty": "Aucun signalement ouvert.",
+      "suspended": "{name} a été suspendu. {sponsors, plural, one {# parrain mis en pause} other {# parrains mis en pause}}.",
+      "dismissed": "Les signalements sur {name} ont été classés ({count}).",
+      "count": "{count, plural, one {# signalement ouvert} other {# signalements ouverts}}",
+      "by": "Par {name} · {date}",
+      "note": "Note (interne, facultative)",
+      "suspend": "Suspendre",
+      "suspendConfirm": "Suspendre {name} ? Son profil est masqué, ses matchs prennent fin et ses parrains ne peuvent plus se porter garants pendant 60 jours.",
+      "suspendYes": "Oui, suspendre",
+      "dismiss": "Classer",
+      "alreadyDecided": "Ces signalements ont déjà été tranchés."
+    },
+    "reason": {
+      "unsafe": "Je ne me suis pas senti en sécurité",
+      "fake": "Faux compte",
+      "minor": "Mineur",
+      "harassment": "Harcèlement",
+      "other": "Autre"
+    },
+    "stats": {
+      "title": "Qualité des suggestions",
+      "since": "30 derniers jours, depuis le {date}",
+      "shown": "Affichées",
+      "proposed": "Proposées",
+      "proposedShare": "Proposées parmi les affichées",
+      "feedback": "« Ne convient pas »",
+      "reasons": "Pourquoi cela ne convenait pas",
+      "reason": {
+        "not_near": "Pas proche",
+        "bad_time": "Mauvais horaire",
+        "wrong_level": "Autre niveau",
+        "other": "Autre"
+      },
+      "note": "Uniquement des compteurs anonymes ; aucune personne n'est enregistrée."
+    }
   }
 }

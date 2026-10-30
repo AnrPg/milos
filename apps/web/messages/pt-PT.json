@@ -14473,5 +14473,295 @@
     "leaveStay": "Ficar aqui",
     "leaveDiscard": "Descartar",
     "changed": "Alterado"
+  },
+  "PartnerVerify": {
+    "back": "Parceiros de treino",
+    "title": "Verificação",
+    "loading": "A carregar…",
+    "someone": "Alguém",
+    "intro": "Os Parceiros de treino são só para pessoas verificadas. Sem subscrição numa box ou com um coach, és verificado por {count} fiadores e por uma verificação da equipa Palee. Faz-se uma única vez.",
+    "stepsLabel": "Passos da verificação",
+    "stepOf": "Passo {step} de {total}",
+    "state": {
+      "done": "Feito",
+      "open": "Por fazer",
+      "locked": "Ainda não"
+    },
+    "selfieExpired": "A tua foto foi apagada sem verificação ao fim de {days} dias. Tira uma nova selfie para terminar.",
+    "verified": {
+      "title": "Estás verificado",
+      "byMembership": "Verificado pela tua subscrição numa box ou com um coach. Mantém-se mesmo que a subscrição termine.",
+      "bySponsors": "Verificado pelos teus fiadores e pela equipa Palee. É para sempre.",
+      "open": "Ir para Parceiros de treino"
+    },
+    "suspended": {
+      "title": "O teu acesso aos Parceiros de treino está suspenso",
+      "body": "A equipa Palee suspendeu-o após denúncias. O resto do Palee não é afetado."
+    },
+    "review": {
+      "title": "Em verificação pela equipa Palee",
+      "body": "Uma pessoa da equipa Palee compara a tua selfie com o teu avatar. Avisamos-te. A foto é apagada assim que houver decisão, no máximo ao fim de {days} dias."
+    },
+    "rejected": {
+      "title": "A tua verificação não foi aprovada",
+      "reason": "Motivo:",
+      "again": "Se achas que foi um erro, pede uma segunda análise. Abre-se um novo pedido e repetes os passos que faltam.",
+      "ask": "Pedir segunda análise"
+    },
+    "steps": {
+      "consent": {
+        "title": "Consentimento",
+        "locked": "Primeiro dá o teu consentimento.",
+        "doneShort": "Aceitaste a verificação da equipa Palee."
+      },
+      "sponsors": {
+        "title": "Fiadores",
+        "locked": "Abre depois do teu consentimento.",
+        "doneShort": "Os teus fiadores responderam por ti.",
+        "done": "Responderam por ti: {names}"
+      },
+      "phone": {
+        "title": "Número de telemóvel",
+        "locked": "Abre depois do teu consentimento.",
+        "doneShort": "O teu número está confirmado.",
+        "done": "Confirmado: {phone}"
+      },
+      "selfie": {
+        "title": "Selfie com código",
+        "locked": "Abre quando os teus fiadores responderem por ti e o número estiver confirmado.",
+        "doneShort": "Enviada."
+      }
+    },
+    "consent": {
+      "what": "Pedimos {count} fiadores dos teus Amigalhaços, um número de telemóvel e uma selfie.",
+      "phone": "O número fica guardado cifrado e só serve para ninguém criar uma segunda conta. Mais ninguém o vê.",
+      "selfie": "Só uma pessoa da equipa Palee vê a tua selfie, ao lado do teu avatar. Apagamo-la assim que decide, no máximo ao fim de {days} dias. Sem reconhecimento facial.",
+      "human": "Decide sempre uma pessoa, nunca uma máquina. Se não fores aprovado, sabes porquê e podes pedir uma segunda análise.",
+      "keep": "Guardamos apenas que foste verificado, quando, como e quem verificou.",
+      "withdraw": "Podes cancelar quando quiseres; os teus dados são então apagados.",
+      "privacy": "Como usamos os teus dados",
+      "agree": "Aceito, continuar"
+    },
+    "withdraw": {
+      "button": "Cancelar e apagar os meus dados",
+      "confirmTitle": "Cancelar a verificação?",
+      "confirmBody": "Apagamos o teu telemóvel, a tua selfie, os pedidos a fiadores sem resposta e as tuas ligações. Podes começar de novo mais tarde.",
+      "confirm": "Sim, cancelar e apagar",
+      "keep": "Não, voltar"
+    },
+    "sponsors": {
+      "lead": "Pede a {count} Amigalhaços que te conheçam para responderem por ti.",
+      "count": "{vouches}/{required} fianças",
+      "meaning": "Um fiador confirma que te conhece pessoalmente. Só pode ser fiador quem está verificado por uma box ou um coach.",
+      "noBuddies": "Ainda não tens Amigalhaços. São as pessoas que segues e que te seguem de volta.",
+      "listLabel": "Os teus Amigalhaços",
+      "viaLink": "Respondeu por ti com o código QR",
+      "othersTitle": "Quem te conhece não está aqui?",
+      "othersBody": "Se te conhece pessoalmente, por exemplo do parque, pode ler um código QR no teu telemóvel.",
+      "showQr": "Mostrar QR ou ligação",
+      "state": {
+        "vouched": "Respondeu por ti",
+        "requested": "À espera de resposta",
+        "declined": "Não respondeu por ti",
+        "eligible": "Verificado, pode ser fiador"
+      },
+      "reason": {
+        "not_verified": "Não está verificado por uma box ou um coach",
+        "blocked": "Não pode responder por ti",
+        "quota": "Respondeu por muitas pessoas recentemente",
+        "penalty": "Não pode ser fiador por agora",
+        "self": "És tu"
+      },
+      "ask": "Pedir",
+      "askLabel": "Pedir a {name} que responda por ti",
+      "cancel": "Cancelar",
+      "cancelLabel": "Cancelar o teu pedido a {name}"
+    },
+    "link": {
+      "title": "Fiança em pessoa",
+      "body": "Mostra este código QR a alguém que te conheça. Tem de ser membro verificado de uma box ou de um coach.",
+      "vouched": "Alguém acabou de responder por ti.",
+      "qrLabel": "Código QR para o teu fiador",
+      "expiresIn": "Expira em {time}",
+      "singleUse": "Serve para um só fiador.",
+      "copy": "Copiar ligação",
+      "copied": "Ligação copiada",
+      "expired": "A ligação expirou.",
+      "renew": "Nova ligação"
+    },
+    "phone": {
+      "lead": "Enviamos-te um código de 6 dígitos por SMS. Um número por conta.",
+      "label": "Número de telemóvel",
+      "placeholder": "+351… ou 9…",
+      "private": "Guardado cifrado; mais ninguém o vê.",
+      "send": "Enviar código",
+      "back": "Voltar ao código",
+      "sentTo": "Enviámos um código para {phone}. É válido durante {minutes} minutos.",
+      "codeLabel": "Código de 6 dígitos",
+      "attempts": "Tens {count} tentativas por código.",
+      "confirm": "Confirmar",
+      "resendIn": "Reenviar em {seconds} s",
+      "resend": "Reenviar",
+      "change": "Mudar de número"
+    },
+    "selfie": {
+      "write": "Escreve este código numa folha de papel:",
+      "codeLabel": "O teu código: {code}",
+      "hold": "Segura-o junto à cara e tira uma selfie. A cara e o código têm de se ver bem.",
+      "previewAlt": "A tua selfie",
+      "take": "Tirar selfie",
+      "retake": "Tirar outra",
+      "choose": "Escolher foto",
+      "tooBig": "A foto tem mais de {mb} MB.",
+      "wrongType": "Escolhe uma foto JPEG, PNG, WebP ou HEIC.",
+      "privacy": "Só uma pessoa da equipa Palee a vê, e apagamo-la assim que decide (no máximo ao fim de {days} dias). Não a usamos para reconhecimento facial.",
+      "uploading": "A carregar… {percent}%",
+      "sending": "A enviar…",
+      "submit": "Enviar para verificação"
+    },
+    "vouch": {
+      "title": "Pedidos de fiança",
+      "didVouch": "Respondeste por {name}.",
+      "didDecline": "Disseste-nos que não conheces {name}.",
+      "none": "Neste momento ninguém te pede para seres fiador.",
+      "paused": "Podes voltar a ser fiador a partir de {date}.",
+      "notVerified": "Só pode ser fiador quem está verificado por uma subscrição numa box ou com um coach.",
+      "quotaUsed": "Foste fiador {quota} vezes nos últimos {days} dias. Mais tarde poderás voltar a sê-lo.",
+      "quotaLeft": "Podes ainda responder por {left} de {quota} pessoas em {days} dias.",
+      "asks": "{name} pede-te para seres fiador",
+      "forPartners": "para os Parceiros de treino",
+      "meaning": "Confirmas que conheces esta pessoa pessoalmente e que é de confiança. Se a suspendermos após denúncias, avisamos-te e não poderás ser fiador de ninguém durante 60 dias.",
+      "meaningLink": "Confirmas que conheces esta pessoa pessoalmente e que é de confiança. Se a suspendermos após denúncias, avisamos-te e não poderás ser fiador de ninguém durante 60 dias.",
+      "vouch": "Respondo por esta pessoa",
+      "decline": "Não a conheço"
+    },
+    "vouchLink": {
+      "title": "Ser fiador",
+      "missing": "Esta ligação está incompleta. Pede um novo código QR."
+    },
+    "error": {
+      "partner_verification_required": "Verifica a tua conta para usar os Parceiros de treino.",
+      "partner_suspended": "O teu acesso aos Parceiros de treino está suspenso.",
+      "partner_already_verified": "A tua conta já está verificada.",
+      "partner_verification_in_review": "O teu pedido está em verificação pela equipa Palee.",
+      "partner_verification_request_open": "Já tens um pedido aberto.",
+      "partner_consent_required": "Primeiro dá o teu consentimento.",
+      "partner_sponsor_not_eligible": "Esta pessoa não pode responder por ti.",
+      "partner_sponsor_quota": "Esta pessoa respondeu por muitas recentemente. Pede a outra.",
+      "partner_sponsor_penalty": "As fianças estão em pausa por agora.",
+      "partner_sponsor_declined": "Esta pessoa não respondeu por ti.",
+      "partner_sponsor_already_asked": "Já pediste a esta pessoa.",
+      "partner_vouch_request_closed": "Este pedido já tem resposta.",
+      "partner_link_expired": "A ligação expirou ou já foi usada. Pede um novo código QR.",
+      "partner_phone_invalid": "Escreve um número de telemóvel.",
+      "partner_phone_taken": "Este número já verifica outra conta.",
+      "partner_phone_rate_limited": "Demasiados códigos. Tenta mais tarde.",
+      "partner_code_invalid": "O código não está certo.",
+      "partner_code_expired": "O código expirou. Pede um novo.",
+      "partner_selfie_missing": "Primeiro tira a selfie.",
+      "partner_selfie_invalid": "A selfie tem de ser uma foto com 8 MB no máximo.",
+      "partner_verification_incomplete": "Ainda faltam passos.",
+      "partner_verification_closed": "Este pedido já não aguarda decisão.",
+      "partner_decision_reason_required": "Indica um motivo para recusar.",
+      "partner_decision_reason_too_long": "No máximo 500 caracteres.",
+      "sms_unavailable": "Os SMS não estão disponíveis neste momento. Tenta mais tarde."
+    },
+    "notif": {
+      "vouchRequest_title": "{name} pede-te para seres fiador",
+      "vouchRequest_body": "Para os Parceiros de treino. Vê o que significa ser fiador antes de responderes.",
+      "vouched_title": "{name} respondeu por ti",
+      "vouched_body": "Mais um passo para os Parceiros de treino.",
+      "decided_approved_title": "Estás verificado",
+      "decided_approved_body": "Já podes usar os Parceiros de treino.",
+      "decided_rejected_title": "A tua verificação não foi aprovada",
+      "decided_rejected_body": "Vê o motivo e pede uma segunda análise.",
+      "decided_rejected_reason": "Motivo: {reason}",
+      "decided_expired_title": "A tua foto expirou",
+      "decided_expired_body": "Tira uma nova selfie para terminar a verificação.",
+      "penalty_title": "As tuas fianças estão em pausa",
+      "penalty_body": "Alguém por quem respondeste foi suspenso após denúncias. Podes voltar a ser fiador a partir de {date}.",
+      "penalty_bodyNoDate": "Alguém por quem respondeste foi suspenso após denúncias. Podes voltar a ser fiador mais tarde."
+    }
+  },
+  "PlatformPartners": {
+    "back": "Consola da plataforma",
+    "forbidden": "Só a equipa Palee pode ver esta página.",
+    "loading": "A carregar…",
+    "someone": "Alguém",
+    "cancel": "Cancelar",
+    "verifications": {
+      "title": "Verificações de Parceiros de treino",
+      "subtitle": "Pessoas que vieram com fiadores. Compara a selfie e o seu código com o avatar e depois aprova ou recusa.",
+      "queue": "Em espera",
+      "queueCount": "{count, plural, one {# em espera} other {# em espera}}",
+      "empty": "Não há pedidos em espera.",
+      "pick": "Escolhe um pedido para verificar.",
+      "submitted": "Enviado {date}",
+      "overdue": "A foto vai ser apagada em breve sem verificação",
+      "approved": "{name} está verificado.",
+      "rejected": "{name} foi recusado.",
+      "codeToFind": "Código que tem de aparecer no papel",
+      "selfie": "Selfie",
+      "selfieAlt": "Selfie de {name}",
+      "linkExpired": "A ligação da foto expirou. Atualiza-a.",
+      "noSelfie": "Sem foto.",
+      "linkLeft": "Ligação válida durante {seconds} s",
+      "refreshLink": "Atualizar ligação",
+      "avatar": "Avatar",
+      "avatarAlt": "Avatar de {name}",
+      "noAvatar": "Sem avatar.",
+      "sponsors": "Fiadores",
+      "channel": {
+        "buddy": "Amigalhaço",
+        "link": "Código QR"
+      },
+      "phone": "Telemóvel",
+      "phoneVerified": "confirmado",
+      "deletedNote": "A foto é apagada assim que decidires. Fica só o resultado.",
+      "reason": "Motivo (a pessoa vê-o)",
+      "reasonHint": "Palavras simples: o que faltou e o que fazer para uma segunda análise. No máximo 500 caracteres.",
+      "reasonRequired": "Escreve um motivo para recusar.",
+      "confirmReject": "Recusar",
+      "approve": "Aprovar",
+      "reject": "Recusar…"
+    },
+    "reports": {
+      "title": "Denúncias de Parceiros de treino",
+      "subtitle": "Denúncias abertas, por pessoa. A suspensão fecha o acesso aos Parceiros de treino e põe os seus fiadores em pausa durante 60 dias.",
+      "empty": "Não há denúncias abertas.",
+      "suspended": "{name} foi suspenso. {sponsors, plural, one {# fiador em pausa} other {# fiadores em pausa}}.",
+      "dismissed": "As denúncias sobre {name} foram arquivadas ({count}).",
+      "count": "{count, plural, one {# denúncia aberta} other {# denúncias abertas}}",
+      "by": "De {name} · {date}",
+      "note": "Nota (interna, opcional)",
+      "suspend": "Suspender",
+      "suspendConfirm": "Suspender {name}? O perfil fica oculto, os matches terminam e os fiadores não podem ser fiadores durante 60 dias.",
+      "suspendYes": "Sim, suspender",
+      "dismiss": "Arquivar",
+      "alreadyDecided": "Já foi tomada uma decisão sobre estas denúncias."
+    },
+    "reason": {
+      "unsafe": "Senti-me inseguro",
+      "fake": "Conta falsa",
+      "minor": "Menor de idade",
+      "harassment": "Assédio",
+      "other": "Outro"
+    },
+    "stats": {
+      "title": "Qualidade das sugestões",
+      "since": "Últimos 30 dias, desde {date}",
+      "shown": "Mostradas",
+      "proposed": "Propostas",
+      "proposedShare": "Propostas entre as mostradas",
+      "feedback": "«Não serve»",
+      "reasons": "Porque não serviu",
+      "reason": {
+        "not_near": "Não é perto",
+        "bad_time": "Má hora",
+        "wrong_level": "Outro nível",
+        "other": "Outro"
+      },
+      "note": "Apenas contadores anónimos; nenhuma pessoa é registada."
+    }
   }
 }

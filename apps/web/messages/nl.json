@@ -14473,5 +14473,295 @@
     "leaveStay": "Hier blijven",
     "leaveDiscard": "Weggooien",
     "changed": "Gewijzigd"
+  },
+  "PartnerVerify": {
+    "back": "Trainingsmaatjes",
+    "title": "Verificatie",
+    "loading": "Laden…",
+    "someone": "Iemand",
+    "intro": "Trainingsmaatjes is alleen voor geverifieerde mensen. Zonder lidmaatschap bij een box of coach verifiëren {count} borgen en een controle door het Palee-team je. Dat doe je één keer.",
+    "stepsLabel": "Stappen van de verificatie",
+    "stepOf": "Stap {step} van {total}",
+    "state": {
+      "done": "Klaar",
+      "open": "Te doen",
+      "locked": "Nog niet"
+    },
+    "selfieExpired": "Je foto is na {days} dagen ongecontroleerd verwijderd. Maak een nieuwe selfie om af te ronden.",
+    "verified": {
+      "title": "Je bent geverifieerd",
+      "byMembership": "Geverifieerd via je lidmaatschap bij een box of coach. Dat blijft, ook als je abonnement afloopt.",
+      "bySponsors": "Geverifieerd door je borgen en het Palee-team. Dat blijft voorgoed.",
+      "open": "Naar Trainingsmaatjes"
+    },
+    "suspended": {
+      "title": "Je toegang tot Trainingsmaatjes is geschorst",
+      "body": "Het Palee-team heeft die na meldingen geschorst. De rest van Palee blijft gewoon werken."
+    },
+    "review": {
+      "title": "In controle bij het Palee-team",
+      "body": "Iemand van het Palee-team vergelijkt je selfie met je avatar. We laten het je weten. De foto wordt verwijderd zodra er besloten is, uiterlijk na {days} dagen."
+    },
+    "rejected": {
+      "title": "Je verificatie is niet goedgekeurd",
+      "reason": "Reden:",
+      "again": "Denk je dat dit een vergissing is, vraag dan een tweede beoordeling. Er opent een nieuw verzoek en je doet de ontbrekende stappen opnieuw.",
+      "ask": "Tweede beoordeling vragen"
+    },
+    "steps": {
+      "consent": {
+        "title": "Toestemming",
+        "locked": "Geef eerst je toestemming.",
+        "doneShort": "Je ging akkoord met de controle door het Palee-team."
+      },
+      "sponsors": {
+        "title": "Borgen",
+        "locked": "Opent na je toestemming.",
+        "doneShort": "Je borgen hebben voor je ingestaan.",
+        "done": "Ingestaan: {names}"
+      },
+      "phone": {
+        "title": "Mobiel nummer",
+        "locked": "Opent na je toestemming.",
+        "doneShort": "Je nummer is bevestigd.",
+        "done": "Bevestigd: {phone}"
+      },
+      "selfie": {
+        "title": "Selfie met code",
+        "locked": "Opent zodra je borgen voor je instaan en je nummer bevestigd is.",
+        "doneShort": "Verstuurd."
+      }
+    },
+    "consent": {
+      "what": "We vragen {count} borgen uit je Maatjes, een mobiel nummer en een selfie.",
+      "phone": "Je nummer wordt versleuteld bewaard en alleen gebruikt zodat niemand een tweede account maakt. Niemand anders ziet het.",
+      "selfie": "Alleen iemand van het Palee-team ziet je selfie, naast je avatar. We verwijderen hem zodra er besloten is, uiterlijk na {days} dagen. Geen gezichtsherkenning.",
+      "human": "Er beslist altijd een mens, nooit een machine. Word je niet goedgekeurd, dan hoor je waarom en kun je een tweede beoordeling vragen.",
+      "keep": "We bewaren alleen dat je geverifieerd bent, wanneer, hoe en wie het controleerde.",
+      "withdraw": "Je kunt op elk moment stoppen; dan worden je gegevens verwijderd.",
+      "privacy": "Hoe we je gegevens gebruiken",
+      "agree": "Akkoord, verder"
+    },
+    "withdraw": {
+      "button": "Annuleren en mijn gegevens verwijderen",
+      "confirmTitle": "Verificatie annuleren?",
+      "confirmBody": "We verwijderen je mobiele nummer, je selfie, je onbeantwoorde verzoeken aan borgen en je links. Je kunt later opnieuw beginnen.",
+      "confirm": "Ja, annuleren en verwijderen",
+      "keep": "Nee, terug"
+    },
+    "sponsors": {
+      "lead": "Vraag {count} Maatjes die je kennen om voor je in te staan.",
+      "count": "{vouches}/{required} ingestaan",
+      "meaning": "Een borg bevestigt dat hij je persoonlijk kent. Alleen wie via een box of coach geverifieerd is, kan borg staan.",
+      "noBuddies": "Je hebt nog geen Maatjes. Dat zijn mensen die je volgt en die jou terugvolgen.",
+      "listLabel": "Je Maatjes",
+      "viaLink": "Ingestaan via de QR-code",
+      "othersTitle": "Staat wie je kent hier niet tussen?",
+      "othersBody": "Kent iemand je persoonlijk, bijvoorbeeld uit het park, dan kan die een QR-code op je telefoon scannen.",
+      "showQr": "QR-code of link tonen",
+      "state": {
+        "vouched": "Staat voor je in",
+        "requested": "Wacht op antwoord",
+        "declined": "Stond niet voor je in",
+        "eligible": "Geverifieerd, kan borg staan"
+      },
+      "reason": {
+        "not_verified": "Niet geverifieerd via een box of coach",
+        "blocked": "Kan niet voor je instaan",
+        "quota": "Stond onlangs voor veel mensen in",
+        "penalty": "Kan voorlopig niet borg staan",
+        "self": "Dat ben jij"
+      },
+      "ask": "Vragen",
+      "askLabel": "{name} vragen om voor je in te staan",
+      "cancel": "Intrekken",
+      "cancelLabel": "Je verzoek aan {name} intrekken"
+    },
+    "link": {
+      "title": "Persoonlijk instaan",
+      "body": "Laat deze QR-code zien aan iemand die je kent. Die moet geverifieerd lid zijn van een box of coach.",
+      "vouched": "Er stond net iemand voor je in.",
+      "qrLabel": "QR-code voor je borg",
+      "expiresIn": "Verloopt over {time}",
+      "singleUse": "Geldt voor één borg.",
+      "copy": "Link kopiëren",
+      "copied": "Link gekopieerd",
+      "expired": "De link is verlopen.",
+      "renew": "Nieuwe link"
+    },
+    "phone": {
+      "lead": "We sturen je een code van 6 cijfers per sms. Eén nummer per account.",
+      "label": "Mobiel nummer",
+      "placeholder": "+31… of 06…",
+      "private": "Versleuteld bewaard; niemand anders ziet het.",
+      "send": "Code sturen",
+      "back": "Terug naar de code",
+      "sentTo": "We stuurden een code naar {phone}. Die is {minutes} minuten geldig.",
+      "codeLabel": "Code van 6 cijfers",
+      "attempts": "Je hebt {count} pogingen per code.",
+      "confirm": "Bevestigen",
+      "resendIn": "Opnieuw sturen over {seconds} s",
+      "resend": "Opnieuw sturen",
+      "change": "Nummer wijzigen"
+    },
+    "selfie": {
+      "write": "Schrijf deze code op een papiertje:",
+      "codeLabel": "Je code: {code}",
+      "hold": "Houd het naast je gezicht en maak een selfie. Je gezicht en de code moeten goed te zien zijn.",
+      "previewAlt": "Je selfie",
+      "take": "Selfie maken",
+      "retake": "Opnieuw maken",
+      "choose": "Foto kiezen",
+      "tooBig": "De foto is groter dan {mb} MB.",
+      "wrongType": "Kies een JPEG-, PNG-, WebP- of HEIC-foto.",
+      "privacy": "Alleen iemand van het Palee-team ziet hem, en we verwijderen hem zodra er besloten is (uiterlijk na {days} dagen). We gebruiken hem niet voor gezichtsherkenning.",
+      "uploading": "Uploaden… {percent}%",
+      "sending": "Versturen…",
+      "submit": "Versturen ter controle"
+    },
+    "vouch": {
+      "title": "Verzoeken om borg te staan",
+      "didVouch": "Je stond in voor {name}.",
+      "didDecline": "Je liet ons weten dat je {name} niet kent.",
+      "none": "Niemand vraagt je nu om borg te staan.",
+      "paused": "Je kunt vanaf {date} weer borg staan.",
+      "notVerified": "Alleen wie via een lidmaatschap bij een box of coach geverifieerd is, kan borg staan.",
+      "quotaUsed": "Je stond de afgelopen {days} dagen {quota} keer borg. Later kun je weer borg staan.",
+      "quotaLeft": "Je kunt nog voor {left} van {quota} mensen borg staan in {days} dagen.",
+      "asks": "{name} vraagt je om borg te staan",
+      "forPartners": "voor Trainingsmaatjes",
+      "meaning": "Je bevestigt dat je deze persoon persoonlijk kent en dat die te vertrouwen is. Schorsen we die na meldingen, dan laten we het je weten en kun je 60 dagen voor niemand borg staan.",
+      "meaningLink": "Je bevestigt dat je deze persoon persoonlijk kent en dat die te vertrouwen is. Schorsen we die na meldingen, dan laten we het je weten en kun je 60 dagen voor niemand borg staan.",
+      "vouch": "Ik sta borg",
+      "decline": "Ik ken deze persoon niet"
+    },
+    "vouchLink": {
+      "title": "Borg staan",
+      "missing": "Deze link is onvolledig. Vraag om een nieuwe QR-code."
+    },
+    "error": {
+      "partner_verification_required": "Verifieer je account om Trainingsmaatjes te gebruiken.",
+      "partner_suspended": "Je toegang tot Trainingsmaatjes is geschorst.",
+      "partner_already_verified": "Je account is al geverifieerd.",
+      "partner_verification_in_review": "Je verzoek ligt ter controle bij het Palee-team.",
+      "partner_verification_request_open": "Je hebt al een open verzoek.",
+      "partner_consent_required": "Geef eerst je toestemming.",
+      "partner_sponsor_not_eligible": "Deze persoon kan niet voor je instaan.",
+      "partner_sponsor_quota": "Deze persoon stond onlangs voor veel mensen in. Vraag iemand anders.",
+      "partner_sponsor_penalty": "Borg staan is voorlopig gepauzeerd.",
+      "partner_sponsor_declined": "Deze persoon stond niet voor je in.",
+      "partner_sponsor_already_asked": "Je hebt deze persoon al gevraagd.",
+      "partner_vouch_request_closed": "Dit verzoek is al beantwoord.",
+      "partner_link_expired": "Deze link is verlopen of al gebruikt. Vraag om een nieuwe QR-code.",
+      "partner_phone_invalid": "Vul een mobiel nummer in.",
+      "partner_phone_taken": "Dit nummer verifieert al een ander account.",
+      "partner_phone_rate_limited": "Te veel codes. Probeer het later opnieuw.",
+      "partner_code_invalid": "Die code klopt niet.",
+      "partner_code_expired": "De code is verlopen. Vraag een nieuwe.",
+      "partner_selfie_missing": "Maak eerst de selfie.",
+      "partner_selfie_invalid": "De selfie moet een foto van hooguit 8 MB zijn.",
+      "partner_verification_incomplete": "Er ontbreken nog stappen.",
+      "partner_verification_closed": "Dit verzoek wacht niet meer op een besluit.",
+      "partner_decision_reason_required": "Geef een reden om af te wijzen.",
+      "partner_decision_reason_too_long": "Hooguit 500 tekens.",
+      "sms_unavailable": "Sms'jes zijn nu niet beschikbaar. Probeer het later opnieuw."
+    },
+    "notif": {
+      "vouchRequest_title": "{name} vraagt je om borg te staan",
+      "vouchRequest_body": "Voor Trainingsmaatjes. Bekijk wat borg staan betekent voordat je antwoordt.",
+      "vouched_title": "{name} staat voor je in",
+      "vouched_body": "Een stap dichter bij Trainingsmaatjes.",
+      "decided_approved_title": "Je bent geverifieerd",
+      "decided_approved_body": "Je kunt nu Trainingsmaatjes gebruiken.",
+      "decided_rejected_title": "Je verificatie is niet goedgekeurd",
+      "decided_rejected_body": "Bekijk de reden en vraag een tweede beoordeling.",
+      "decided_rejected_reason": "Reden: {reason}",
+      "decided_expired_title": "Je foto is verlopen",
+      "decided_expired_body": "Maak een nieuwe selfie om je verificatie af te ronden.",
+      "penalty_title": "Borg staan is voor jou gepauzeerd",
+      "penalty_body": "Iemand voor wie je borg stond, is na meldingen geschorst. Je kunt vanaf {date} weer borg staan.",
+      "penalty_bodyNoDate": "Iemand voor wie je borg stond, is na meldingen geschorst. Je kunt later weer borg staan."
+    }
+  },
+  "PlatformPartners": {
+    "back": "Platformconsole",
+    "forbidden": "Alleen het Palee-team kan deze pagina zien.",
+    "loading": "Laden…",
+    "someone": "Iemand",
+    "cancel": "Annuleren",
+    "verifications": {
+      "title": "Verificaties voor Trainingsmaatjes",
+      "subtitle": "Mensen die met borgen kwamen. Vergelijk de selfie en de code erop met de avatar, en keur dan goed of wijs af.",
+      "queue": "Wachtend",
+      "queueCount": "{count, plural, one {# wachtend} other {# wachtend}}",
+      "empty": "Er wachten geen verzoeken.",
+      "pick": "Kies een verzoek om te controleren.",
+      "submitted": "Verstuurd {date}",
+      "overdue": "De foto wordt binnenkort ongecontroleerd verwijderd",
+      "approved": "{name} is geverifieerd.",
+      "rejected": "{name} is afgewezen.",
+      "codeToFind": "Code die op het papier moet staan",
+      "selfie": "Selfie",
+      "selfieAlt": "Selfie van {name}",
+      "linkExpired": "De link naar de foto is verlopen. Vernieuw hem.",
+      "noSelfie": "Geen foto.",
+      "linkLeft": "Link nog {seconds} s geldig",
+      "refreshLink": "Link vernieuwen",
+      "avatar": "Avatar",
+      "avatarAlt": "Avatar van {name}",
+      "noAvatar": "Geen avatar.",
+      "sponsors": "Borgen",
+      "channel": {
+        "buddy": "Maatje",
+        "link": "QR-code"
+      },
+      "phone": "Mobiel",
+      "phoneVerified": "bevestigd",
+      "deletedNote": "De foto wordt verwijderd zodra je beslist. Alleen de uitkomst blijft bewaard.",
+      "reason": "Reden (de persoon ziet die)",
+      "reasonHint": "Eenvoudige woorden: wat ontbrak en wat te doen voor een tweede beoordeling. Hooguit 500 tekens.",
+      "reasonRequired": "Schrijf een reden om af te wijzen.",
+      "confirmReject": "Afwijzen",
+      "approve": "Goedkeuren",
+      "reject": "Afwijzen…"
+    },
+    "reports": {
+      "title": "Meldingen over Trainingsmaatjes",
+      "subtitle": "Open meldingen, per persoon. Schorsen sluit de toegang tot Trainingsmaatjes en pauzeert de borgen van die persoon 60 dagen.",
+      "empty": "Geen open meldingen.",
+      "suspended": "{name} is geschorst. {sponsors, plural, one {# borg gepauzeerd} other {# borgen gepauzeerd}}.",
+      "dismissed": "Meldingen over {name} zijn afgewezen ({count}).",
+      "count": "{count, plural, one {# open melding} other {# open meldingen}}",
+      "by": "Door {name} · {date}",
+      "note": "Notitie (intern, optioneel)",
+      "suspend": "Schorsen",
+      "suspendConfirm": "{name} schorsen? Het profiel wordt verborgen, matches eindigen en de borgen kunnen 60 dagen niet borg staan.",
+      "suspendYes": "Ja, schorsen",
+      "dismiss": "Afwijzen",
+      "alreadyDecided": "Over deze meldingen is al beslist."
+    },
+    "reason": {
+      "unsafe": "Ik voelde me onveilig",
+      "fake": "Nepaccount",
+      "minor": "Minderjarig",
+      "harassment": "Intimidatie",
+      "other": "Anders"
+    },
+    "stats": {
+      "title": "Kwaliteit van de voorstellen",
+      "since": "Laatste 30 dagen, sinds {date}",
+      "shown": "Getoond",
+      "proposed": "Voorgesteld",
+      "proposedShare": "Voorgesteld van getoond",
+      "feedback": "‘Past niet’",
+      "reasons": "Waarom het niet paste",
+      "reason": {
+        "not_near": "Niet dichtbij",
+        "bad_time": "Slecht tijdstip",
+        "wrong_level": "Ander niveau",
+        "other": "Anders"
+      },
+      "note": "Alleen anonieme tellers; er wordt geen persoon vastgelegd."
+    }
   }
 }

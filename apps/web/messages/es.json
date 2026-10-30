@@ -14473,5 +14473,295 @@
     "leaveStay": "Quedarme aquí",
     "leaveDiscard": "Descartar",
     "changed": "Cambiado"
+  },
+  "PartnerVerify": {
+    "back": "Compañeros de entrenamiento",
+    "title": "Verificación",
+    "loading": "Cargando…",
+    "someone": "Alguien",
+    "intro": "Compañeros de entrenamiento es solo para personas verificadas. Si no tienes suscripción en un box o con un coach, te verifican {count} avalistas y una revisión del equipo de Palee. Se hace una sola vez.",
+    "stepsLabel": "Pasos de la verificación",
+    "stepOf": "Paso {step} de {total}",
+    "state": {
+      "done": "Hecho",
+      "open": "Pendiente",
+      "locked": "Todavía no"
+    },
+    "selfieExpired": "Tu foto se borró sin revisar tras {days} días. Hazte un selfie nuevo para terminar.",
+    "verified": {
+      "title": "Estás verificado",
+      "byMembership": "Verificado por tu suscripción en un box o con un coach. Sigue valiendo aunque termine la suscripción.",
+      "bySponsors": "Verificado por tus avalistas y el equipo de Palee. Es para siempre.",
+      "open": "Ir a Compañeros de entrenamiento"
+    },
+    "suspended": {
+      "title": "Tu acceso a Compañeros de entrenamiento está suspendido",
+      "body": "El equipo de Palee lo suspendió tras varios reportes. El resto de Palee no se ve afectado."
+    },
+    "review": {
+      "title": "En revisión por el equipo de Palee",
+      "body": "Una persona del equipo de Palee compara tu selfie con tu avatar. Te avisaremos. La foto se borra en cuanto se decide, como máximo a los {days} días."
+    },
+    "rejected": {
+      "title": "Tu verificación no fue aprobada",
+      "reason": "Motivo:",
+      "again": "Si crees que es un error, pide una segunda revisión. Se abre una nueva solicitud y repites los pasos que falten.",
+      "ask": "Pedir una segunda revisión"
+    },
+    "steps": {
+      "consent": {
+        "title": "Consentimiento",
+        "locked": "Primero da tu consentimiento.",
+        "doneShort": "Aceptaste la revisión del equipo de Palee."
+      },
+      "sponsors": {
+        "title": "Avalistas",
+        "locked": "Se abre tras tu consentimiento.",
+        "doneShort": "Tus avalistas respondieron por ti.",
+        "done": "Te avalaron: {names}"
+      },
+      "phone": {
+        "title": "Número de móvil",
+        "locked": "Se abre tras tu consentimiento.",
+        "doneShort": "Tu número está confirmado.",
+        "done": "Confirmado: {phone}"
+      },
+      "selfie": {
+        "title": "Selfie con código",
+        "locked": "Se abre cuando tus avalistas te avalen y tu número esté confirmado.",
+        "doneShort": "Enviado."
+      }
+    },
+    "consent": {
+      "what": "Te pedimos {count} avalistas de entre tus Colegas, un número de móvil y un selfie.",
+      "phone": "Tu número se guarda cifrado y solo sirve para que nadie cree una segunda cuenta. Nadie más lo ve.",
+      "selfie": "Solo una persona del equipo de Palee ve tu selfie, junto a tu avatar. Lo borramos en cuanto decide, como máximo a los {days} días. Sin reconocimiento facial.",
+      "human": "Siempre decide una persona, nunca una máquina. Si no se aprueba, sabrás por qué y podrás pedir una segunda revisión.",
+      "keep": "Solo guardamos que te verificaste, cuándo, cómo y quién lo revisó.",
+      "withdraw": "Puedes cancelarlo cuando quieras; entonces se borran tus datos.",
+      "privacy": "Cómo usamos tus datos",
+      "agree": "Acepto, continuar"
+    },
+    "withdraw": {
+      "button": "Cancelar y borrar mis datos",
+      "confirmTitle": "¿Cancelar la verificación?",
+      "confirmBody": "Borramos tu móvil, tu selfie, las peticiones a avalistas sin responder y tus enlaces. Puedes empezar de nuevo más adelante.",
+      "confirm": "Sí, cancelar y borrar",
+      "keep": "No, volver"
+    },
+    "sponsors": {
+      "lead": "Pide a {count} Colegas que te conozcan que te avalen.",
+      "count": "{vouches}/{required} avales",
+      "meaning": "Un avalista confirma que te conoce en persona. Solo puede avalar quien está verificado por un box o un coach.",
+      "noBuddies": "Aún no tienes Colegas. Son las personas a las que sigues y que te siguen.",
+      "listLabel": "Tus Colegas",
+      "viaLink": "Te avaló con el código QR",
+      "othersTitle": "¿Quien te conoce no está aquí?",
+      "othersBody": "Si te conoce en persona, por ejemplo del parque, puede escanear un código QR en tu móvil.",
+      "showQr": "Mostrar QR o enlace",
+      "state": {
+        "vouched": "Te avaló",
+        "requested": "Esperando respuesta",
+        "declined": "No te avaló",
+        "eligible": "Verificado, puede avalar"
+      },
+      "reason": {
+        "not_verified": "No está verificado por un box o un coach",
+        "blocked": "No puede avalarte",
+        "quota": "Ha avalado a muchas personas últimamente",
+        "penalty": "No puede avalar por ahora",
+        "self": "Eres tú"
+      },
+      "ask": "Pedir",
+      "askLabel": "Pedir a {name} que te avale",
+      "cancel": "Cancelar",
+      "cancelLabel": "Cancelar tu petición a {name}"
+    },
+    "link": {
+      "title": "Aval en persona",
+      "body": "Muestra este código QR a alguien que te conozca. Debe ser miembro verificado de un box o de un coach.",
+      "vouched": "Alguien acaba de avalarte.",
+      "qrLabel": "Código QR para tu avalista",
+      "expiresIn": "Caduca en {time}",
+      "singleUse": "Vale para un solo avalista.",
+      "copy": "Copiar enlace",
+      "copied": "Enlace copiado",
+      "expired": "El enlace ha caducado.",
+      "renew": "Nuevo enlace"
+    },
+    "phone": {
+      "lead": "Te enviamos un código de 6 cifras por SMS. Un número por cuenta.",
+      "label": "Número de móvil",
+      "placeholder": "+34… o 6…",
+      "private": "Se guarda cifrado; nadie más lo ve.",
+      "send": "Enviar código",
+      "back": "Volver al código",
+      "sentTo": "Enviamos un código a {phone}. Vale durante {minutes} minutos.",
+      "codeLabel": "Código de 6 cifras",
+      "attempts": "Tienes {count} intentos por código.",
+      "confirm": "Confirmar",
+      "resendIn": "Reenviar en {seconds} s",
+      "resend": "Reenviar",
+      "change": "Cambiar número"
+    },
+    "selfie": {
+      "write": "Escribe este código en un papel:",
+      "codeLabel": "Tu código: {code}",
+      "hold": "Sostenlo junto a tu cara y hazte un selfie. Tu cara y el código deben verse con claridad.",
+      "previewAlt": "Tu selfie",
+      "take": "Hacer selfie",
+      "retake": "Repetir",
+      "choose": "Elegir foto",
+      "tooBig": "La foto pesa más de {mb} MB.",
+      "wrongType": "Elige una foto JPEG, PNG, WebP o HEIC.",
+      "privacy": "Solo la ve una persona del equipo de Palee y la borramos en cuanto decide (como máximo a los {days} días). No la usamos para reconocimiento facial.",
+      "uploading": "Subiendo… {percent} %",
+      "sending": "Enviando…",
+      "submit": "Enviar a revisión"
+    },
+    "vouch": {
+      "title": "Peticiones de aval",
+      "didVouch": "Avalaste a {name}.",
+      "didDecline": "Nos dijiste que no conoces a {name}.",
+      "none": "Ahora mismo nadie te pide un aval.",
+      "paused": "Podrás avalar de nuevo a partir del {date}.",
+      "notVerified": "Solo puede avalar quien está verificado por una suscripción en un box o con un coach.",
+      "quotaUsed": "Has avalado {quota} veces en los últimos {days} días. Podrás avalar más adelante.",
+      "quotaLeft": "Puedes avalar a {left} de {quota} personas más en {days} días.",
+      "asks": "{name} te pide que seas su avalista",
+      "forPartners": "para Compañeros de entrenamiento",
+      "meaning": "Confirmas que conoces a esta persona en persona y que es de confianza. Si la suspendemos tras reportes, te avisaremos y no podrás avalar a nadie durante 60 días.",
+      "meaningLink": "Confirmas que conoces a esta persona en persona y que es de confianza. Si la suspendemos tras reportes, te avisaremos y no podrás avalar a nadie durante 60 días.",
+      "vouch": "La avalo",
+      "decline": "No la conozco"
+    },
+    "vouchLink": {
+      "title": "Avalar",
+      "missing": "Este enlace está incompleto. Pide un código QR nuevo."
+    },
+    "error": {
+      "partner_verification_required": "Verifica tu cuenta para usar Compañeros de entrenamiento.",
+      "partner_suspended": "Tu acceso a Compañeros de entrenamiento está suspendido.",
+      "partner_already_verified": "Tu cuenta ya está verificada.",
+      "partner_verification_in_review": "Tu solicitud está en revisión por el equipo de Palee.",
+      "partner_verification_request_open": "Ya tienes una solicitud abierta.",
+      "partner_consent_required": "Primero da tu consentimiento.",
+      "partner_sponsor_not_eligible": "Esta persona no puede avalarte.",
+      "partner_sponsor_quota": "Esta persona ha avalado a muchas últimamente. Pídeselo a otra.",
+      "partner_sponsor_penalty": "Los avales están en pausa por ahora.",
+      "partner_sponsor_declined": "Esta persona no te avaló.",
+      "partner_sponsor_already_asked": "Ya se lo pediste a esta persona.",
+      "partner_vouch_request_closed": "Esta petición ya tiene respuesta.",
+      "partner_link_expired": "El enlace caducó o ya se usó. Pide un código QR nuevo.",
+      "partner_phone_invalid": "Escribe un número de móvil.",
+      "partner_phone_taken": "Este número ya verifica otra cuenta.",
+      "partner_phone_rate_limited": "Demasiados códigos. Inténtalo más tarde.",
+      "partner_code_invalid": "El código no es correcto.",
+      "partner_code_expired": "El código caducó. Pide uno nuevo.",
+      "partner_selfie_missing": "Primero hazte el selfie.",
+      "partner_selfie_invalid": "El selfie debe ser una foto de 8 MB como máximo.",
+      "partner_verification_incomplete": "Todavía faltan pasos.",
+      "partner_verification_closed": "Esta solicitud ya no espera una decisión.",
+      "partner_decision_reason_required": "Indica un motivo para rechazar.",
+      "partner_decision_reason_too_long": "Como máximo 500 caracteres.",
+      "sms_unavailable": "Los SMS no están disponibles ahora. Inténtalo más tarde."
+    },
+    "notif": {
+      "vouchRequest_title": "{name} te pide que seas su avalista",
+      "vouchRequest_body": "Para Compañeros de entrenamiento. Mira qué significa avalar antes de responder.",
+      "vouched_title": "{name} te avaló",
+      "vouched_body": "Un paso más cerca de Compañeros de entrenamiento.",
+      "decided_approved_title": "Estás verificado",
+      "decided_approved_body": "Ya puedes usar Compañeros de entrenamiento.",
+      "decided_rejected_title": "Tu verificación no fue aprobada",
+      "decided_rejected_body": "Mira el motivo y pide una segunda revisión.",
+      "decided_rejected_reason": "Motivo: {reason}",
+      "decided_expired_title": "Tu foto caducó",
+      "decided_expired_body": "Hazte un selfie nuevo para terminar tu verificación.",
+      "penalty_title": "Tus avales están en pausa",
+      "penalty_body": "Alguien a quien avalaste fue suspendido tras reportes. Podrás avalar de nuevo a partir del {date}.",
+      "penalty_bodyNoDate": "Alguien a quien avalaste fue suspendido tras reportes. Podrás avalar de nuevo más adelante."
+    }
+  },
+  "PlatformPartners": {
+    "back": "Consola de la plataforma",
+    "forbidden": "Solo el equipo de Palee puede ver esta página.",
+    "loading": "Cargando…",
+    "someone": "Alguien",
+    "cancel": "Cancelar",
+    "verifications": {
+      "title": "Verificaciones de Compañeros de entrenamiento",
+      "subtitle": "Personas que llegaron con avalistas. Compara el selfie y su código con el avatar y después aprueba o rechaza.",
+      "queue": "En espera",
+      "queueCount": "{count, plural, one {# en espera} other {# en espera}}",
+      "empty": "No hay solicitudes en espera.",
+      "pick": "Elige una solicitud para revisarla.",
+      "submitted": "Enviada {date}",
+      "overdue": "La foto se borrará pronto sin revisar",
+      "approved": "{name} está verificado.",
+      "rejected": "{name} fue rechazado.",
+      "codeToFind": "Código que debe verse en el papel",
+      "selfie": "Selfie",
+      "selfieAlt": "Selfie de {name}",
+      "linkExpired": "El enlace de la foto caducó. Actualízalo.",
+      "noSelfie": "Sin foto.",
+      "linkLeft": "Enlace válido {seconds} s",
+      "refreshLink": "Actualizar enlace",
+      "avatar": "Avatar",
+      "avatarAlt": "Avatar de {name}",
+      "noAvatar": "Sin avatar.",
+      "sponsors": "Avalistas",
+      "channel": {
+        "buddy": "Colega",
+        "link": "Código QR"
+      },
+      "phone": "Móvil",
+      "phoneVerified": "confirmado",
+      "deletedNote": "La foto se borra en cuanto decides. Solo se guarda el resultado.",
+      "reason": "Motivo (la persona lo verá)",
+      "reasonHint": "Palabras sencillas: qué faltó y qué hacer para una segunda revisión. Como máximo 500 caracteres.",
+      "reasonRequired": "Escribe un motivo para rechazar.",
+      "confirmReject": "Rechazar",
+      "approve": "Aprobar",
+      "reject": "Rechazar…"
+    },
+    "reports": {
+      "title": "Reportes de Compañeros de entrenamiento",
+      "subtitle": "Reportes abiertos, por persona. Suspender cierra su acceso a Compañeros de entrenamiento y pausa a sus avalistas durante 60 días.",
+      "empty": "No hay reportes abiertos.",
+      "suspended": "{name} fue suspendido. {sponsors, plural, one {# avalista en pausa} other {# avalistas en pausa}}.",
+      "dismissed": "Se descartaron los reportes sobre {name} ({count}).",
+      "count": "{count, plural, one {# reporte abierto} other {# reportes abiertos}}",
+      "by": "De {name} · {date}",
+      "note": "Nota (interna, opcional)",
+      "suspend": "Suspender",
+      "suspendConfirm": "¿Suspender a {name}? Su perfil se oculta, sus coincidencias terminan y sus avalistas no podrán avalar durante 60 días.",
+      "suspendYes": "Sí, suspender",
+      "dismiss": "Descartar",
+      "alreadyDecided": "Ya se decidió sobre estos reportes."
+    },
+    "reason": {
+      "unsafe": "Me sentí inseguro",
+      "fake": "Cuenta falsa",
+      "minor": "Menor de edad",
+      "harassment": "Acoso",
+      "other": "Otro"
+    },
+    "stats": {
+      "title": "Calidad de las sugerencias",
+      "since": "Últimos 30 días, desde el {date}",
+      "shown": "Mostradas",
+      "proposed": "Propuestas",
+      "proposedShare": "Propuestas sobre mostradas",
+      "feedback": "«No encaja»",
+      "reasons": "Por qué no encajó",
+      "reason": {
+        "not_near": "No está cerca",
+        "bad_time": "Mala hora",
+        "wrong_level": "Otro nivel",
+        "other": "Otro"
+      },
+      "note": "Solo contadores anónimos; no se registra a ninguna persona."
+    }
   }
 }
