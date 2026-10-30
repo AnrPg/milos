@@ -2040,8 +2040,8 @@
     "instructionEdt": "EDT {duration} · maximale Wiederholungen sammeln, bei Bedarf reduzieren",
     "instructionDeathByWithMax": "EMOM · +N/Runde pro Übung bis zum Versagen · max. {rounds} Runden",
     "instructionDeathBy": "EMOM · +N/Runde pro Übung bis zum Versagen",
-    "instructionTabata": "Tabata · {work} an / {rest} aus × {rounds} Runden",
-    "instructionCustomHiit": "{work} an / {rest} aus × {rounds} Runden",
+    "instructionTabata": "Tabata · {work} Belastung / {rest} Pause × {rounds} Runden",
+    "instructionCustomHiit": "{work} Belastung / {rest} Pause × {rounds} Runden",
     "instructionClusterWithRest": "Cluster-Sätze · {rest} Pause innerhalb des Satzes",
     "instructionCluster": "Cluster-Sätze",
     "instructionHrrWithCycles": "Belastung → Pause bis {floor} bpm · weiter bei {ceiling} bpm · {cycles} Zyklen",
@@ -13670,8 +13670,8 @@
       "every": "alle {time}",
       "times": "× {count}",
       "untilFailure": "bis du nicht mehr mitkommst",
-      "intervals": "{rounds} × {work} Arbeit / {off} Pause",
-      "intervalsHr": "{rounds} × {work} Arbeit, Pause bis der Puls auf {bpm} fällt"
+      "intervals": "{rounds} × {work} Belastung / {off} Pause",
+      "intervalsHr": "{rounds} × {work} Belastung, Pause bis der Puls auf {bpm} fällt"
     },
     "roundWord": {
       "set": "Satz {numbers}",
@@ -13794,7 +13794,7 @@
     "timeline": "Zeitleiste",
     "timelineInterrupt": "Unterbrechung alle {every}",
     "timelineSlot": "Intervall {n}",
-    "timelineWork": "Arbeit",
+    "timelineWork": "Belastung",
     "timelineRest": "Pause",
     "score": "Score",
     "scoreHelp": "Das Übliche ist schon ausgewählt. ← → zum Ändern.",
@@ -13867,7 +13867,7 @@
       "amrap": "↻ Runde, immer wieder, bis die Zeit um ist",
       "emomEvery": "Alle {every}",
       "emom": "Jedes Intervall",
-      "intervals": "In jedem Arbeitsintervall ({work})",
+      "intervals": "In jedem Belastungsintervall ({work})",
       "rounds": "↻ Runde × {rounds}",
       "once": "Der Reihe nach, einmal"
     },
@@ -14084,7 +14084,7 @@
       "for_time": "so schnell wie möglich fertig werden",
       "amrap": "so viele Runden wie möglich in der Zeit",
       "emom": "alle X Minuten startest du neu",
-      "intervals": "Arbeit und Pause im festen Rhythmus",
+      "intervals": "Belastung und Pause im festen Rhythmus",
       "rest": "eine Pause zwischen Abschnitten"
     },
     "param": {
@@ -14097,7 +14097,7 @@
       "dur": "Dauer",
       "every": "Alle",
       "times": "Mal",
-      "work": "Arbeit",
+      "work": "Belastung",
       "off": "Pause",
       "intEvery": "Unterbrechung alle",
       "hrTarget": "Pause bis"
@@ -14251,8 +14251,8 @@
       "amrap": "So viele Runden wie möglich in {dur}.",
       "forTime": "{rounds, plural, one {Einmal} other {# Runden}}, so schnell wie möglich.",
       "forTimeCap": "{rounds, plural, one {Einmal} other {# Runden}}, so schnell wie möglich, Limit {cap}.",
-      "intervals": "{rounds} Runden: {work} Arbeit, {off} Pause.",
-      "intervalsHr": "{rounds} Runden: {work} Arbeit, Pause, bis dein Puls auf {hr} sinkt.",
+      "intervals": "{rounds} Runden: {work} Belastung, {off} Pause.",
+      "intervalsHr": "{rounds} Runden: {work} Belastung, Pause, bis dein Puls auf {hr} sinkt.",
       "sets": "{sets} Sätze.",
       "setsRest": "{sets} Sätze, {rest} Pause dazwischen.",
       "rest": "Pause {dur}.",
