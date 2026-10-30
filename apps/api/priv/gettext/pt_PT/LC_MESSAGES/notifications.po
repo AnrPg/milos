@@ -752,3 +752,41 @@ msgstr "Uma ligação fiscal precisa de atenção"
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr "%{connection} deixou de funcionar. Abra Dados de faturação › Ligações para corrigir."
+
+# ADR-280 verification: sponsors and the Palee check of Partners.
+
+msgid "Vouch for %{nickname}?"
+msgstr "Garantes por %{nickname}?"
+
+msgid "%{nickname} asks you to vouch for them for Training partners."
+msgstr "%{nickname} pede-te que garantas por si em Parceiros de treino."
+
+msgid "%{nickname} vouched for you"
+msgstr "%{nickname} garantiu por ti"
+
+msgid "One step closer to Training partners."
+msgstr "Mais um passo para os Parceiros de treino."
+
+msgid "You are verified"
+msgstr "A tua conta está verificada"
+
+msgid "You can now use Training partners."
+msgstr "Já podes usar os Parceiros de treino."
+
+msgid "Take a new selfie"
+msgstr "Tira uma nova selfie"
+
+msgid "Your selfie was deleted after 7 days without a check. Take a new one to finish."
+msgstr "A tua selfie foi apagada após 7 dias sem verificação. Tira uma nova para terminar."
+
+msgid "Verification not approved"
+msgstr "Verificação não aprovada"
+
+msgid "The Palee team could not verify your account. You can try again."
+msgstr "A equipa Palee não conseguiu verificar a tua conta. Podes tentar outra vez."
+
+msgid "Someone you vouched for was suspended"
+msgstr "Alguém por quem garantiste foi suspenso"
+
+msgid "You can vouch again from %{date}. Your own access stays."
+msgstr "Podes voltar a garantir a partir de %{date}. O teu próprio acesso mantém-se."

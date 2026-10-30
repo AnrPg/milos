@@ -752,3 +752,41 @@ msgstr "Фискална връзка се нуждае от внимание"
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr "%{connection} спря да работи. Отворете Данни за фактуриране › Връзки, за да го оправите."
+
+# ADR-280 verification: sponsors and the Palee check of Partners.
+
+msgid "Vouch for %{nickname}?"
+msgstr "Ще гарантираш ли за %{nickname}?"
+
+msgid "%{nickname} asks you to vouch for them for Training partners."
+msgstr "%{nickname} те моли да гарантираш за него/нея за партньори за тренировки."
+
+msgid "%{nickname} vouched for you"
+msgstr "%{nickname} гарантира за теб"
+
+msgid "One step closer to Training partners."
+msgstr "Още една стъпка към партньорите за тренировки."
+
+msgid "You are verified"
+msgstr "Потвърден си"
+
+msgid "You can now use Training partners."
+msgstr "Вече можеш да използваш партньори за тренировки."
+
+msgid "Take a new selfie"
+msgstr "Направи ново селфи"
+
+msgid "Your selfie was deleted after 7 days without a check. Take a new one to finish."
+msgstr "Селфито ти беше изтрито след 7 дни без проверка. Направи ново, за да завършиш."
+
+msgid "Verification not approved"
+msgstr "Потвърждението не е одобрено"
+
+msgid "The Palee team could not verify your account. You can try again."
+msgstr "Екипът на Palee не успя да потвърди профила ти. Можеш да опиташ отново."
+
+msgid "Someone you vouched for was suspended"
+msgstr "Някой, за когото гарантира, беше спрян"
+
+msgid "You can vouch again from %{date}. Your own access stays."
+msgstr "Можеш да гарантираш отново от %{date}. Твоят достъп остава."

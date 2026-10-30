@@ -752,3 +752,41 @@ msgstr "A fiscal connection needs attention"
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr "%{connection} stopped working. Open Billing details › Connections to fix it."
+
+# ADR-280 verification: sponsors and the Palee check of Partners.
+
+msgid "Vouch for %{nickname}?"
+msgstr "Vouch for %{nickname}?"
+
+msgid "%{nickname} asks you to vouch for them for Training partners."
+msgstr "%{nickname} asks you to vouch for them for Training partners."
+
+msgid "%{nickname} vouched for you"
+msgstr "%{nickname} vouched for you"
+
+msgid "One step closer to Training partners."
+msgstr "One step closer to Training partners."
+
+msgid "You are verified"
+msgstr "You are verified"
+
+msgid "You can now use Training partners."
+msgstr "You can now use Training partners."
+
+msgid "Take a new selfie"
+msgstr "Take a new selfie"
+
+msgid "Your selfie was deleted after 7 days without a check. Take a new one to finish."
+msgstr "Your selfie was deleted after 7 days without a check. Take a new one to finish."
+
+msgid "Verification not approved"
+msgstr "Verification not approved"
+
+msgid "The Palee team could not verify your account. You can try again."
+msgstr "The Palee team could not verify your account. You can try again."
+
+msgid "Someone you vouched for was suspended"
+msgstr "Someone you vouched for was suspended"
+
+msgid "You can vouch again from %{date}. Your own access stays."
+msgstr "You can vouch again from %{date}. Your own access stays."

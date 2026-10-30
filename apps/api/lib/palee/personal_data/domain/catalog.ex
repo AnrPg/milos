@@ -151,6 +151,13 @@ defmodule Palee.PersonalData.Domain.Catalog do
       tenant("community", "community_post_comments", {:eq, "author_id"}),
       tenant("community", "community_post_reactions", @me),
       tenant("community", "partner_profiles", @me),
+      # ADR-280 verification: the outcome and the person's own request; the
+      # phone and selfie never leave, nor who else is named.
+      account("community", "partner_verifications", @me, drop: ~w(source_organization_id)),
+      account("community", "partner_verification_requests", @me,
+        drop: ~w(phone_ciphertext phone_hash selfie_key)
+      ),
+      account("community", "partner_sponsorships", {:eq, "candidate_id"}, drop: ~w(sponsor_id)),
 
       # -- payments, packages and invoices ---------------------------------------
       tenant("payments", "memberships", @me, drop: ~w(referred_by_user_id)),

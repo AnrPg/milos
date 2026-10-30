@@ -752,3 +752,41 @@ msgstr "Eine Steuerverbindung braucht Aufmerksamkeit"
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr "%{connection} funktioniert nicht mehr. Öffne Rechnungsdaten › Verbindungen, um es zu beheben."
+
+# ADR-280 verification: sponsors and the Palee check of Partners.
+
+msgid "Vouch for %{nickname}?"
+msgstr "Für %{nickname} bürgen?"
+
+msgid "%{nickname} asks you to vouch for them for Training partners."
+msgstr "%{nickname} bittet dich, für Trainingspartner für sie oder ihn zu bürgen."
+
+msgid "%{nickname} vouched for you"
+msgstr "%{nickname} hat für dich gebürgt"
+
+msgid "One step closer to Training partners."
+msgstr "Ein Schritt näher an den Trainingspartnern."
+
+msgid "You are verified"
+msgstr "Du bist verifiziert"
+
+msgid "You can now use Training partners."
+msgstr "Du kannst jetzt Trainingspartner nutzen."
+
+msgid "Take a new selfie"
+msgstr "Mach ein neues Selfie"
+
+msgid "Your selfie was deleted after 7 days without a check. Take a new one to finish."
+msgstr "Dein Selfie wurde nach 7 Tagen ohne Prüfung gelöscht. Mach ein neues, um abzuschließen."
+
+msgid "Verification not approved"
+msgstr "Verifizierung nicht bestätigt"
+
+msgid "The Palee team could not verify your account. You can try again."
+msgstr "Das Palee-Team konnte dein Konto nicht verifizieren. Du kannst es erneut versuchen."
+
+msgid "Someone you vouched for was suspended"
+msgstr "Jemand, für den du gebürgt hast, wurde gesperrt"
+
+msgid "You can vouch again from %{date}. Your own access stays."
+msgstr "Du kannst ab %{date} wieder bürgen. Dein eigener Zugang bleibt."

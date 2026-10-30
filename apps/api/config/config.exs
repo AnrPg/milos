@@ -79,7 +79,9 @@ config :palee, Oban,
        {"*/3 * * * *", Palee.Workers.ProcessPaymentsJob},
        {"11 * * * *", Palee.Workers.ProcessPaymentsJob, args: %{"autopay" => true}},
        # ADR-252: reminders before a client's health certificate expires.
-       {"45 8 * * *", Palee.Workers.HealthCertificateRemindersJob}
+       {"45 8 * * *", Palee.Workers.HealthCertificateRemindersJob},
+       # ADR-280 verification: unreviewed selfies after 7 days, SMS codes after a day.
+       {"5 4 * * *", Palee.Workers.PartnerVerificationRetention}
      ]}
   ],
   queues: [
@@ -463,6 +465,12 @@ config :palee,
 config :palee, :body_store, Palee.Infrastructure.Body.EctoBodyStore
 config :palee, :buddy_store, Palee.Infrastructure.Buddies.EctoBuddyStore
 config :palee, :partner_store, Palee.Infrastructure.Partners.EctoPartnerStore
+
+# ADR-280 verification: verification rows and the SMS step. Prod picks the
+# SMS adapter in runtime.exs (Brevo with BREVO_API_KEY, else unavailable).
+config :palee, :partner_verification_store, Palee.Infrastructure.Partners.EctoVerificationStore
+config :palee, :sms_sender, Palee.Infrastructure.Sms.UnavailableSmsSender
+config :palee, Palee.Infrastructure.Sms.BrevoSmsSender, api_key: nil, sender: "Palee"
 
 config :palee,
        :support_scheduler,

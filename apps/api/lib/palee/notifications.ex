@@ -498,6 +498,46 @@ defmodule Palee.Notifications do
         url: partner_url(field(payload, :match_id))
       })
 
+  # ADR-280 verification: a sponsor is asked, a candidate got a vouch, the
+  # Palee check was decided (or its selfie expired), a sponsor's pause.
+  def process_event("partner_vouch_request", payload),
+    do:
+      enqueue_simple(:partner_vouch_request, payload, %{
+        sponsorship_id: field(payload, :sponsorship_id),
+        candidate_id: field(payload, :candidate_id),
+        nickname: field(payload, :candidate_nickname),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/partners/vouch-requests"
+      })
+
+  def process_event("partner_vouched", payload),
+    do:
+      enqueue_simple(:partner_vouched, payload, %{
+        sponsorship_id: field(payload, :sponsorship_id),
+        sponsor_id: field(payload, :sponsor_id),
+        nickname: field(payload, :sponsor_nickname),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/partners/verify"
+      })
+
+  def process_event("partner_verification_decided", payload),
+    do:
+      enqueue_simple(:partner_verification_decided, payload, %{
+        request_id: field(payload, :request_id),
+        outcome: field(payload, :outcome),
+        reason: field(payload, :reason),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/partners/verify"
+      })
+
+  def process_event("partner_sponsor_penalty", payload),
+    do:
+      enqueue_simple(:partner_sponsor_penalty, payload, %{
+        until: field(payload, :until),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/partners/vouch-requests"
+      })
+
   # ADR-160 §4: the coach's Sunday wellness summary of a client who shares
   # it. Counts only; the craving moments stay on the client page.
   def process_event("coach_wellness_summary", payload),

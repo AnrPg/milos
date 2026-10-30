@@ -14,6 +14,9 @@ defmodule Palee.Application.Ports.TenantObjectStore do
   @callback delete_objects(bucket(), [String.t()]) ::
               {:ok, non_neg_integer()} | {:error, term()}
   @callback presigned_object_url(bucket(), String.t()) :: {:ok, String.t()} | {:error, term()}
+  @doc "ADR-280: a presigned GET that lives `expires_seconds` (the selfie check's 5 minutes)."
+  @callback presigned_object_url(bucket(), String.t(), pos_integer()) ::
+              {:ok, String.t()} | {:error, term()}
 
   # ADR-121 tenant logo uploads (`:branding` lives in the public media bucket).
   @doc "Presigned PUT constrained to `content_type`; returns url and required headers."

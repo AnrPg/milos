@@ -1807,6 +1807,50 @@ defmodule PaleeWeb.Router do
     post("/business/activation-request", AdminBusinessController, :request_activation)
   end
 
+  # ADR-280 verification: the Partners check's queue and decisions (vendors).
+  scope "/api/platform", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :vendor,
+      :platform_write_rate_limited
+    ])
+
+    get("/partner-verifications", PlatformPartnerVerificationController, :index)
+    get("/partner-verifications/:id", PlatformPartnerVerificationController, :show)
+    post("/partner-verifications/:id/decision", PlatformPartnerVerificationController, :decide)
+  end
+
+  # ADR-280 verification: the person's sponsor path and the sponsor's side.
+  scope "/api/me/partners", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :notification_write_rate_limited,
+      :tenant_write_rate_limited
+    ])
+
+    get("/verification", PartnerVerificationController, :show)
+    delete("/verification", PartnerVerificationController, :withdraw)
+    post("/verification/consent", PartnerVerificationController, :consent)
+    get("/verification/sponsor-candidates", PartnerVerificationController, :sponsor_candidates)
+    post("/verification/sponsors", PartnerVerificationController, :request_sponsor)
+    delete("/verification/sponsors/:id", PartnerVerificationController, :cancel_sponsor)
+    post("/verification/link", PartnerVerificationController, :create_link)
+    post("/verification/phone", PartnerVerificationController, :send_phone_code)
+    post("/verification/phone/confirm", PartnerVerificationController, :confirm_phone)
+    post("/verification/selfie/upload-url", PartnerVerificationController, :selfie_upload_url)
+    post("/verification/submit", PartnerVerificationController, :submit)
+    get("/vouch-requests", PartnerVerificationController, :vouch_requests)
+    post("/vouch-requests/:id", PartnerVerificationController, :decide_vouch)
+    post("/vouch-links/inspect", PartnerVerificationController, :inspect_link)
+    post("/vouch-links/vouch", PartnerVerificationController, :vouch_by_link)
+    get("/vouching", PartnerVerificationController, :vouching)
+  end
+
   # ADR-184: the vendors' queue and activation links.
   scope "/api/platform", PaleeWeb do
     pipe_through([
