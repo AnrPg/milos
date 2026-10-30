@@ -3623,6 +3623,8 @@
     "admPublicPageDescription": "Texto, fotografias e o que o ginásio oferece, como se vê antes de aderir",
     "admLocationsTitle": "Locais",
     "admLocationsDescription": "Só para ginásios com mais de um local",
+    "admOnSiteTitle": "Na box",
+    "admOnSiteDescription": "Televisores na parede e check-in à porta",
     "admLocationsEmpty": "Os locais são opcionais. Se o seu ginásio tem um só espaço, não precisa de nenhum. Adicione-os apenas se tiver aulas ou treino livre em mais de um sítio.",
     "admLocationName": "Nome do local",
     "admLocationAddressOptional": "Morada (opcional)",
@@ -13156,6 +13158,8 @@
       "paymentsHint": "Um botão, com Viva",
       "import": "Traz os teus membros",
       "importHint": "Importar de Wodify, PushPress, Excel…",
+      "screens": "Ecrãs da box",
+      "screensHint": "A televisão da box mostra as aulas sozinha",
       "soldOnline": "O que se vende online",
       "soldOnlineHint": "Página de venda · {count} de {total} pacotes de subscrição",
       "soldOnlineLater": "Depois de ligares os pagamentos online, os pacotes de subscrição pagos ficam à venda online sozinhos"
@@ -13246,7 +13250,8 @@
       "payments": "Pagamentos e documentos",
       "motivation": "Motivação",
       "training": "Treino",
-      "community": "Comunidade"
+      "community": "Comunidade",
+      "onSite": "Na box"
     },
     "keywords": {
       "bookings": "reserva reservas aprovação espera cancelamento lugares check-in entrada",
@@ -13254,7 +13259,8 @@
       "motivation": "escudo escudos sequência leaderboard níveis dificuldade",
       "training": "WOD objetivos assistente IA AI escalonamento",
       "community": "comunidade discussão mensagens",
-      "access": "funções acesso permissões"
+      "access": "funções acesso permissões",
+      "onSite": "televisor televisores televisão ecrã ecrãs parede check-in porta entrada TV"
     }
   },
   "Documents": {
