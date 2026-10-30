@@ -25,7 +25,7 @@ import { useUiTranslations } from "@/i18n/ui";
  * everything that decides who sees what of me, in one place, grouped as the
  * mockup does (ADR-196): «Ο coach μου βλέπει» (PRs, the weekly wellness
  * summary of ADR-160, measurements; injuries always), «Κοινότητα»
- * (leaderboards, PR celebrations, challenges, Partners of ADR-169), the PRs on
+ * (leaderboards, PR celebrations, challenges, Partners of ADR-280), the PRs on
  * my profile, PRs shared with accounts (ADR-129), the default for new entries
  * (ADR-139 §3), then the account and people-search switches of ADR-193 and
  * the people I blocked. Rest days moved to Ρυθμίσεις (ADR-196).

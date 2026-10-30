@@ -26,7 +26,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { can } from "@/lib/role-navigation";
 
-import { MemberGroupsSetting, PartnersSetting } from "./CommunitySettings";
+import { MemberGroupsSetting } from "./CommunitySettings";
 import { AdvancedDisclosure } from "@/components/settings/AdvancedSettings";
 import { EventsTab } from "./EventsTab";
 import { OpenClubsTab } from "./OpenClubsTab";
@@ -102,10 +102,9 @@ function GroupsTab() {
   return (
     <>
       {can(membership, "manage_community") ? (
-        // ADR-255: both settings have a good default, so they sit under «Προχωρημένα».
-        <AdvancedDisclosure count={2} testId="community-advanced">
+        // ADR-255: the setting has a good default, so it sits under «Προχωρημένα».
+        <AdvancedDisclosure count={1} testId="community-advanced">
           <MemberGroupsSetting current={settings.member_groups} />
-          <PartnersSetting current={settings.partners_enabled} />
         </AdvancedDisclosure>
       ) : null}
       {pending.length > 0 ? (

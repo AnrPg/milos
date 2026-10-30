@@ -7,14 +7,13 @@ import { useTranslations } from "next-intl";
 
 import { fetchClubMembers, membersKey, type CommunityClub } from "@/api/community";
 import { HubCard } from "@/components/member-app/HubParts";
-import { PartnersSection } from "@/components/partners/PartnersSection";
 import { useSession } from "@/components/session-provider";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
 
 /**
  * Μέλη (board 7 Q1): everyone in the club but you, coaches first, with a
  * search. People who chose to stay off the list (Κοινοποίηση & ορατότητα)
- * don't show. Partners (ADR-169) sits on top where the gym offers it.
+ * don't show. Partners moved to Γύρω μου (ADR-280).
  */
 export function MembersTab({ club }: { club: Pick<CommunityClub, "id"> }) {
   const t = useTranslations("Clubs");
@@ -32,7 +31,6 @@ export function MembersTab({ club }: { club: Pick<CommunityClub, "id"> }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <PartnersSection clubId={club.id} />
       <HubCard eyebrow={members.data ? t("membersCount", { count: members.data.count }) : t("membersTitle")}>
         <label className="sr-only" htmlFor={`members-${club.id}`}>{t("membersSearch")}</label>
         <input
