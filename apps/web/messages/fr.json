@@ -3615,6 +3615,8 @@
     "admPublicPageDescription": "Texte, photos et offre de la box, tels qu’on les voit avant de s’inscrire",
     "admLocationsTitle": "Sites",
     "admLocationsDescription": "Uniquement pour les box qui ont plusieurs sites",
+    "admOnSiteTitle": "Dans la box",
+    "admOnSiteDescription": "Téléviseurs au mur et check-in à la porte",
     "admLocationsEmpty": "Les sites sont facultatifs. Si ta box n’a qu’un seul lieu, tu n’en as pas besoin. Ajoutes-en seulement si tu proposes des cours ou de l’open gym à plusieurs endroits.",
     "admLocationName": "Nom du site",
     "admLocationAddressOptional": "Adresse (facultatif)",
@@ -13106,6 +13108,8 @@
       "paymentsHint": "Un bouton, avec Viva",
       "import": "Fais venir tes membres",
       "importHint": "Import depuis Wodify, PushPress, Excel…",
+      "screens": "Écrans de la box",
+      "screensHint": "La télé de la box affiche les cours toute seule",
       "soldOnline": "Ce qui est vendu en ligne",
       "soldOnlineHint": "Page de vente · {count} forfaits d'abonnement sur {total}",
       "soldOnlineLater": "Une fois les paiements en ligne connectés, les forfaits d'abonnement payants sont mis en vente en ligne tout seuls"
@@ -13196,7 +13200,8 @@
       "payments": "Paiements et documents",
       "motivation": "Motivation",
       "training": "Entraînement",
-      "community": "Communauté"
+      "community": "Communauté",
+      "onSite": "Dans la box"
     },
     "keywords": {
       "bookings": "réservation réservations validation attente annulation places check-in entrée",
@@ -13204,7 +13209,8 @@
       "motivation": "bouclier boucliers série leaderboard niveaux difficulté",
       "training": "WOD objectifs assistant IA AI adaptation",
       "community": "communauté discussion messages",
-      "access": "rôles accès droits"
+      "access": "rôles accès droits",
+      "onSite": "téléviseur télé écran écrans mur check-in porte entrée TV"
     }
   },
   "Documents": {

@@ -3615,6 +3615,8 @@
     "admPublicPageDescription": "Text, photos and what the box offers, as people see them before joining",
     "admLocationsTitle": "Branches",
     "admLocationsDescription": "Only for boxes with more than one branch",
+    "admOnSiteTitle": "At the box",
+    "admOnSiteDescription": "TVs on the wall and check-in at the door",
     "admLocationsEmpty": "Branches are optional. If your box has one site, you don't need any. Add them only if you run classes or open gym in more than one place.",
     "admLocationName": "Branch name",
     "admLocationAddressOptional": "Address (optional)",
@@ -13106,6 +13108,8 @@
       "paymentsHint": "One button, with Viva",
       "import": "Bring your members",
       "importHint": "Import from Wodify, PushPress, Excel…",
+      "screens": "Box screens",
+      "screensHint": "The box TV shows the classes by itself",
       "soldOnline": "What is sold online",
       "soldOnlineHint": "Sales page · {count} of {total} subscription packages",
       "soldOnlineLater": "Once online payments are connected, paid subscription packages go on sale online by themselves"
@@ -13196,7 +13200,8 @@
       "payments": "Payments and documents",
       "motivation": "Motivation",
       "training": "Training",
-      "community": "Community"
+      "community": "Community",
+      "onSite": "At the box"
     },
     "keywords": {
       "bookings": "booking bookings approval waitlist cancellation places check-in entry",
@@ -13204,7 +13209,8 @@
       "motivation": "shield shields streak leaderboard levels difficulty",
       "training": "WOD goals assistant AI scaling",
       "community": "community discussion messages",
-      "access": "roles access permissions"
+      "access": "roles access permissions",
+      "onSite": "TV TVs television screen screens display wall check-in door entry"
     }
   },
   "Documents": {

@@ -3615,6 +3615,8 @@
     "admPublicPageDescription": "טקסט, תמונות ומה שהמכון מציע, כפי שרואים לפני ההצטרפות",
     "admLocationsTitle": "מיקומים",
     "admLocationsDescription": "רק למכונים עם יותר ממיקום אחד",
+    "admOnSiteTitle": "בבוקס",
+    "admOnSiteDescription": "טלוויזיות על הקיר וצ׳ק-אין בכניסה",
     "admLocationsEmpty": "מיקומים הם אופציונליים. אם למכון שלכם יש מיקום אחד, אין צורך להוסיף. הוסיפו רק אם יש שיעורים או אימון חופשי ביותר ממקום אחד.",
     "admLocationName": "שם המיקום",
     "admLocationAddressOptional": "כתובת (לא חובה)",
@@ -13106,6 +13108,8 @@
       "paymentsHint": "כפתור אחד, עם Viva",
       "import": "הבא את החברים שלך",
       "importHint": "ייבוא מ-Wodify, PushPress, Excel…",
+      "screens": "מסכי הבוקס",
+      "screensHint": "הטלוויזיה בבוקס מציגה את השיעורים לבד",
       "soldOnline": "מה נמכר אונליין",
       "soldOnlineHint": "דף המכירה · {count} מתוך {total} חבילות מנוי",
       "soldOnlineLater": "אחרי חיבור תשלומים אונליין, חבילות מנוי בתשלום עולות למכירה אונליין לבד"
@@ -13196,7 +13200,8 @@
       "payments": "תשלומים ומסמכים",
       "motivation": "מוטיבציה",
       "training": "אימון",
-      "community": "קהילה"
+      "community": "קהילה",
+      "onSite": "בבוקס"
     },
     "keywords": {
       "bookings": "הזמנה הזמנות אישור המתנה ביטול מקומות צ'ק-אין כניסה",
@@ -13204,7 +13209,8 @@
       "motivation": "מגן מגינים רצף לוח מובילים רמות קושי",
       "training": "WOD יעדים עוזר AI התאמה",
       "community": "קהילה דיון הודעות",
-      "access": "תפקידים גישה הרשאות"
+      "access": "תפקידים גישה הרשאות",
+      "onSite": "טלוויזיה טלוויזיות מסך מסכים קיר צ׳ק-אין דלת כניסה TV"
     }
   },
   "Documents": {

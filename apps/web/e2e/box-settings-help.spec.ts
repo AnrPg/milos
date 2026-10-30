@@ -158,3 +158,18 @@ test("a box owner opening the push page is told it is not theirs", async ({ page
   await page.goto("/platform/push");
   await expect(page.getByText("Only the platform team manages browser alerts.")).toBeVisible();
 });
+
+test("a box without branches finds Box screens under «At the box» and in the Advanced search", async ({ page }) => {
+  await stub(page, person("owner-1", false), []);
+  await page.goto("/admin/settings");
+
+  // Box screens used to sit only under Branches, closed by default and "only for boxes with more than one branch".
+  // «At the box» is open like the other sections.
+  const onSite = page.locator("#on-site");
+  await expect(onSite.getByTestId("box-screens-settings-link")).toHaveAttribute("href", /\/admin\/settings\/box-screens$/);
+  await expect(onSite.getByRole("link", { name: /Check-in/ })).toHaveAttribute("href", /\/admin\/check-in\/settings$/);
+
+  await page.getByTestId("advanced-settings").getByRole("button", { name: /Advanced/ }).click();
+  await page.getByTestId("advanced-settings-search").fill("TV");
+  await expect(page.getByTestId("advanced-group-on-site").getByTestId("box-screens-settings-link")).toBeVisible();
+});
