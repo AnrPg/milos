@@ -27,7 +27,7 @@ Native capabilities and the AI layer come last, on top of data that already exis
 - **Seasons:** sellable fixed-length programmes (Hyrox prep, 12-week challenge) with a `#season`
   channel created on sale, the programme in the journal, `Box › Συνδρομή › seasons` (§6.2, §7.1).
 - **PT squads:** invite-only coach + clients channel, from `Box › Πελάτες μου` (§7.1, §7.10).
-- **Partners:** swipe only inside a club, mutual match → message → «Κλείστε μαζί», report/block,
+- **Partners** (club scope superseded by ADR-280 on 2026-10-30, now one public deck of verified people): swipe only inside a club, mutual match → message → «Κλείστε μαζί», report/block,
   optional gender preference, framed as training partner (§7.3, §8.6).
 - **Solo-coach tier:** the independent trainer as a one-person organization with its own
   onboarding, Box layout «Νίκος Π. · Personal coach ▾», session packages and a smaller SaaS tier
@@ -65,7 +65,7 @@ payments, a fifth `Clubs` tab (brief §9 validation rule), AI that writes whole 
 | D3 | Goal suggestions | Deterministic from the catalog (sets × role weights); the AI layer may refine later, never required | ADR-163 |
 | D4 | Insight threshold | ≥4 weeks and a minimum sample per insight; every insight carries «Ένδειξη, όχι ιατρική συμβουλή» | ADR-166 |
 | D5 | Season sale | A season is a package with dates and capacity; purchase is a request the staff confirm, like today's packages (no card processor) | ADR-167 |
-| D6 | Partners visibility | Opt-in per club, hidden by default; profile shows first name, level, times, goal; no photos beyond the avatar | ADR-169 |
+| D6 | Partners visibility | Opt-in per club, hidden by default; profile shows first name, level, times, goal; no photos beyond the avatar. 2026-10-30: one public opt-in deck of verified adults instead (ADR-280) | ADR-169, ADR-280 |
 | D7 | Solo-coach pricing | Tier as a platform entitlement on the organization; prices are a config table that ANR fills (brief §10 Q2) | ADR-170 |
 | D8 | Native wrapper | Capacitor around the existing Next.js app (same code, same deploy), native plugins only for what web can't do | ADR-171 |
 | D9 | AI provider | Provider-agnostic ports, reusing the per-gym key and `ai_usage` metering; off unless the gym enabled the assistant | ADR-174 |
@@ -260,6 +260,12 @@ Built without a board (decisions recorded in ADR-167 «Decisions»); the least-c
    be clutter without an action). Revisit if gyms ask.
 
 ### Partners (2026-10-21, ADR-169)
+> **Superseded in scope (ANR 2026-10-30, ADR-280).** Partners is no longer per club: one public deck for all of
+> Palee, opened from a «Συναθλητές κοντά σου» card in Γύρω μου. Taking part needs a verification, once per account:
+> an active membership, or two sponsors plus a check by the Palee team. Reports go to the Palee team, not box staff.
+> The Club › Μέλη card, the gym's switch and the per-club profiles below are gone; the opt-in sheet, deck gestures,
+> match, conversation and block rules still apply. See ADR-280.
+
 No board; decided for least clutter (owner's standing instruction), full list in ADR-169 «Decisions».
 1. **Where:** Club › Μέλη, a «Partners» card above the members list, only in clubs whose members the gym verified
    (gym, PT squad, season, or an open club with approval or invite) and only while the gym's switch is on.

@@ -1,6 +1,6 @@
 # ADR-169: Partners: training partners inside a club, mutual match, «Κλείστε μαζί»
 Date: 2026-10-21
-Status: Accepted
+Status: Accepted; partly superseded by ADR-280 (2026-10-30): the club scope (§1 tenant rows, §2 club eligibility, the club deck, the gym's `partners_enabled` switch, §6 staff moderation and the matches per gym) is replaced by one public deck with account-level rows and a Palee review. Blocking (§5), the own conversation (§7) and the copy rules still hold.
 
 ## Context
 Plan §5 P3-M7 and vision §7.3 / §8.6 add Partners: swipe only among
