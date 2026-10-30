@@ -26,18 +26,30 @@ defmodule Palee.Housekeeping do
 
   def get_entry(context, id), do: HousekeepingStore.get_entry(context, id)
 
-  @doc "Finishes the caller's own cleaning of `area`, keeping only the area's tasks."
+  @doc """
+  Finishes the caller's own cleaning of `area`, keeping only the area's
+  tasks, and the answer for each of its cleaning points (`area.points`,
+  ADR-290) when it has any.
+  """
   def finish(context, user_id, entry, area, params, now \\ DateTime.utc_now()) do
     with true <- entry.user_id == user_id || {:error, :forbidden},
          {:ok, tasks_done} <-
-           CleaningPolicy.finish(entry, area, Map.get(params, :tasks_done), now) do
+           CleaningPolicy.finish(entry, area, Map.get(params, :tasks_done), now),
+         {:ok, results} <-
+           CleaningPolicy.point_results(
+             Map.get(area, :points, []),
+             Map.get(params, :point_results, [])
+           ) do
       HousekeepingStore.finish_entry(context, entry.id, %{
         finished_at: now,
         tasks_done: tasks_done,
-        note: Map.get(params, :note)
+        note: Map.get(params, :note),
+        point_results: results
       })
     end
   end
+
+  defdelegate not_cleaned(results), to: CleaningPolicy
 
   def list_entries(context, filters \\ %{}), do: HousekeepingStore.list_entries(context, filters)
 

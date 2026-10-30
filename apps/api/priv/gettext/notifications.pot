@@ -205,6 +205,12 @@ msgstr ""
 msgid "A machine needs attention"
 msgstr ""
 
+msgid "A room was not fully cleaned"
+msgstr ""
+
+msgid "%{space}: %{notes}"
+msgstr ""
+
 msgid "%{machine}: %{note}"
 msgstr ""
 

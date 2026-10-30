@@ -12997,6 +12997,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/schedule/slots/{id}/space": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The room of a class: floor plan with the room coloured, directions, photos (ADR-290)
+         * @description Staff who see the spaces always may; members and athletes only when the gym shows its floor plans in classes (403 otherwise). `floor_plan` is null when the room is on no plan or its floor is hidden.
+         */
+        get: operations["PaleeWeb.ScheduleController.slot_space"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/staff/appointment-slots": {
         parameters: {
             query?: never;
@@ -13081,6 +13101,58 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/cleaning-photos/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reserve a cleaning point or after photo (cleaning_photo) and get a presigned upload for it */
+        post: operations["PaleeWeb.SpacesController.cleaning_photo_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/cleaning-photos/uploads/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify an uploaded cleaning_photo image and mark it ready */
+        post: operations["PaleeWeb.SpacesController.complete_cleaning_photo_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/cleaning-points/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a cleaning point (its image is deleted) */
+        delete: operations["PaleeWeb.SpacesController.delete_point"];
+        options?: never;
+        head?: never;
+        /** Change a cleaning point */
+        patch: operations["PaleeWeb.SpacesController.update_point"];
         trace?: never;
     };
     "/api/org/{organization_slug}/staff/cleaning/areas": {
@@ -13551,6 +13623,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/inventory/machine-photos/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reserve a machine log photo (machine_photo) and get a presigned upload for it */
+        post: operations["PaleeWeb.InventoryController.machine_photo_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/inventory/machine-photos/uploads/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify an uploaded machine_photo image and mark it ready */
+        post: operations["PaleeWeb.InventoryController.complete_machine_photo_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/staff/inventory/machines": {
         parameters: {
             query?: never;
@@ -13610,7 +13716,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** A machine's log */
+        /** A machine's log, and where it stands (ADR-290: places on the floor plans) */
         get: operations["PaleeWeb.InventoryController.machine_events"];
         put?: never;
         /** Log a note, issue, outage, repair call, service or repair */
@@ -14313,6 +14419,76 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/space-photos/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reserve a room photo (space_photo) and get a presigned upload for it */
+        post: operations["PaleeWeb.SpacesController.space_photo_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/space-photos/uploads/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify an uploaded space_photo image and mark it ready */
+        post: operations["PaleeWeb.SpacesController.complete_space_photo_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/space-photos/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a room photo (its image is deleted) */
+        delete: operations["PaleeWeb.SpacesController.delete_photo"];
+        options?: never;
+        head?: never;
+        /** Change a room photo */
+        patch: operations["PaleeWeb.SpacesController.update_photo"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/space-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The gym's choices about its spaces */
+        get: operations["PaleeWeb.SpacesController.settings"];
+        /** Show the floor plans in classes, or stop */
+        put: operations["PaleeWeb.SpacesController.put_settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/staff/spaces": {
         parameters: {
             query?: never;
@@ -14360,6 +14536,74 @@ export interface paths {
         put?: never;
         /** Archive a space (its history and cleaning log are kept) */
         post: operations["PaleeWeb.SpacesController.archive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/spaces/{id}/cleaning-points": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add a cleaning point to a space from a ready upload */
+        post: operations["PaleeWeb.SpacesController.add_point"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/spaces/{id}/cleaning-points/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Order a space's cleaning points */
+        put: operations["PaleeWeb.SpacesController.order_points"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/spaces/{id}/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add a room photo to a space from a ready upload */
+        post: operations["PaleeWeb.SpacesController.add_photo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/spaces/{id}/photos/order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Order a space's room photos */
+        put: operations["PaleeWeb.SpacesController.order_photos"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -21090,7 +21334,7 @@ export interface components {
                 /** @description A tiny blurred WebP data URI to show while the image loads */
                 placeholder?: string | null;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                 rejection_reason?: string | null;
                 /**
                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -21124,7 +21368,7 @@ export interface components {
                 /** @description A tiny blurred WebP data URI to show while the image loads */
                 placeholder?: string | null;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                 rejection_reason?: string | null;
                 /**
                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -21194,7 +21438,7 @@ export interface components {
                     /** @description A tiny blurred WebP data URI to show while the image loads */
                     placeholder?: string | null;
                     /** @enum {string} */
-                    purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                    purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                     rejection_reason?: string | null;
                     /**
                      * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -21228,7 +21472,7 @@ export interface components {
                     /** @description A tiny blurred WebP data URI to show while the image loads */
                     placeholder?: string | null;
                     /** @enum {string} */
-                    purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                    purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                     rejection_reason?: string | null;
                     /**
                      * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -23567,6 +23811,54 @@ export interface components {
                 user_id: string;
             }[];
         };
+        /** ClassRoom */
+        ClassRoom: {
+            /**
+             * SpaceArea
+             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+             */
+            area?: {
+                points: number[][];
+            } | null;
+            /** FloorPlan */
+            floor_plan: {
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                image_url?: string | null;
+                /** Format: uuid */
+                location_id?: string | null;
+                /** Format: uuid */
+                media_id: string;
+                name: string;
+                /** @description ADR-290: this floor shows in the class view when the gym shows its floor plans. */
+                shown_in_classes?: boolean;
+                sort_order: number;
+                width?: number | null;
+            } | null;
+            photos: {
+                caption?: string | null;
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                media_id: string;
+                /** @description Shown on the public box page. */
+                public: boolean;
+                sort_order: number;
+                /** Format: uuid */
+                space_id: string;
+                url?: string | null;
+                width?: number | null;
+            }[];
+            space: {
+                description?: string | null;
+                directions?: string | null;
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
+        };
         /**
          * ClassScreenList
          * @description The box screens the person may change for this class: its coach (today, screens of the class's branch or the whole box) or staff who manage screens
@@ -23679,6 +23971,19 @@ export interface components {
             /** Format: uuid */
             location_id?: string | null;
             name: string;
+            points?: {
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                instruction: string;
+                /** Format: uuid */
+                media_id: string;
+                sort_order: number;
+                /** Format: uuid */
+                space_id: string;
+                url?: string | null;
+                width?: number | null;
+            }[];
             tasks: string[];
         };
         /** CleaningDue */
@@ -23699,6 +24004,19 @@ export interface components {
             /** Format: uuid */
             location_id?: string | null;
             name: string;
+            points?: {
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                instruction: string;
+                /** Format: uuid */
+                media_id: string;
+                sort_order: number;
+                /** Format: uuid */
+                space_id: string;
+                url?: string | null;
+                width?: number | null;
+            }[];
             /** Format: uuid */
             space_id: string;
             tasks: string[];
@@ -23714,11 +24032,54 @@ export interface components {
             id: string;
             nickname?: string | null;
             note?: string | null;
+            point_results?: {
+                /** Format: uuid */
+                after_media_id?: string | null;
+                after_url?: string | null;
+                instruction: string;
+                /** Format: uuid */
+                media_id?: string;
+                note?: string | null;
+                /** Format: uuid */
+                point_id: string;
+                /** @enum {string} */
+                status: "cleaned" | "not_cleaned";
+                url?: string | null;
+            }[];
             /** Format: date-time */
             started_at: string;
             tasks_done: string[];
             /** Format: uuid */
             user_id?: string | null;
+        };
+        /** CleaningPoint */
+        CleaningPoint: {
+            height?: number | null;
+            /** Format: uuid */
+            id: string;
+            instruction: string;
+            /** Format: uuid */
+            media_id: string;
+            sort_order: number;
+            /** Format: uuid */
+            space_id: string;
+            url?: string | null;
+            width?: number | null;
+        };
+        /** CleaningPointResult */
+        CleaningPointResult: {
+            /** Format: uuid */
+            after_media_id?: string | null;
+            after_url?: string | null;
+            instruction: string;
+            /** Format: uuid */
+            media_id?: string;
+            note?: string | null;
+            /** Format: uuid */
+            point_id: string;
+            /** @enum {string} */
+            status: "cleaned" | "not_cleaned";
+            url?: string | null;
         };
         /** CleaningSchedule */
         CleaningSchedule: {
@@ -29733,6 +30094,8 @@ export interface components {
             /** Format: uuid */
             media_id: string;
             name: string;
+            /** @description ADR-290: this floor shows in the class view when the gym shows its floor plans. */
+            shown_in_classes?: boolean;
             sort_order: number;
             width?: number | null;
         };
@@ -30459,6 +30822,8 @@ export interface components {
             next_service_on?: string | null;
             notes?: string | null;
             placements?: {
+                /** @description ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1). */
+                positions?: number[][];
                 quantity: number;
                 /** Format: uuid */
                 space_id: string;
@@ -30487,9 +30852,18 @@ export interface components {
             kind: "note" | "issue" | "out_of_order" | "repair_requested" | "maintenance" | "repaired" | "retired";
             /** Format: uuid */
             machine_id: string;
+            media_ids?: string[];
             nickname?: string | null;
             /** Format: date-time */
             occurred_at: string;
+            /** @description ADR-290: the line's photos, with signed URLs. */
+            photos?: {
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                url?: string | null;
+                width?: number | null;
+            }[];
             /** @enum {string|null} */
             severity?: "low" | "medium" | "high" | "safety" | null;
             /** @enum {string|null} */
@@ -30497,6 +30871,37 @@ export interface components {
             usable?: boolean | null;
             /** Format: uuid */
             user_id?: string | null;
+        };
+        /** InventoryMachinePlace */
+        InventoryMachinePlace: {
+            /**
+             * SpaceArea
+             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+             */
+            area?: {
+                points: number[][];
+            } | null;
+            /** FloorPlan */
+            floor_plan: {
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                image_url?: string | null;
+                /** Format: uuid */
+                location_id?: string | null;
+                /** Format: uuid */
+                media_id: string;
+                name: string;
+                /** @description ADR-290: this floor shows in the class view when the gym shows its floor plans. */
+                shown_in_classes?: boolean;
+                sort_order: number;
+                width?: number | null;
+            } | null;
+            positions: number[][];
+            quantity: number;
+            /** Format: uuid */
+            space_id: string;
+            space_name: string;
         };
         /** InventoryReport */
         InventoryReport: {
@@ -31030,6 +31435,8 @@ export interface components {
         };
         /** MachinePlacement */
         MachinePlacement: {
+            /** @description ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1). */
+            positions?: number[][];
             quantity: number;
             /** Format: uuid */
             space_id: string;
@@ -31049,7 +31456,7 @@ export interface components {
             /** @description A tiny blurred WebP data URI to show while the image loads */
             placeholder?: string | null;
             /** @enum {string} */
-            purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+            purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
             rejection_reason?: string | null;
             /**
              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -31093,7 +31500,7 @@ export interface components {
                 /** @description A tiny blurred WebP data URI to show while the image loads */
                 placeholder?: string | null;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                 rejection_reason?: string | null;
                 /**
                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -36563,6 +36970,21 @@ export interface components {
             };
             /** Format: date-time */
             published_at?: string | null;
+            /** @description ADR-290: rooms with the photos their staff put on the public page */
+            rooms: {
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                name: string;
+                photos: {
+                    caption?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    url?: string | null;
+                    width?: number | null;
+                }[];
+            }[];
             /** @description ADR-179: the gym's IANA zone; its classes show on this clock */
             time_zone?: string;
         };
@@ -39586,6 +40008,34 @@ export interface components {
             /** Format: uuid */
             location_id?: string | null;
             name: string;
+            photos: {
+                caption?: string | null;
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                media_id: string;
+                /** @description Shown on the public box page. */
+                public: boolean;
+                sort_order: number;
+                /** Format: uuid */
+                space_id: string;
+                url?: string | null;
+                width?: number | null;
+            }[];
+            points: {
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                instruction: string;
+                /** Format: uuid */
+                media_id: string;
+                sort_order: number;
+                /** Format: uuid */
+                space_id: string;
+                url?: string | null;
+                width?: number | null;
+            }[];
             tasks: string[];
             unavailability: {
                 /** Format: uuid */
@@ -39608,6 +40058,27 @@ export interface components {
             name: string;
             quantity: number;
             status: string;
+        };
+        /** SpacePhoto */
+        SpacePhoto: {
+            caption?: string | null;
+            height?: number | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            media_id: string;
+            /** @description Shown on the public box page. */
+            public: boolean;
+            sort_order: number;
+            /** Format: uuid */
+            space_id: string;
+            url?: string | null;
+            width?: number | null;
+        };
+        /** SpaceSettings */
+        SpaceSettings: {
+            /** @description Members and athletes open the floor plan with the class's room coloured, and the room's photos. */
+            floor_plans_in_classes: boolean;
         };
         /** SpaceUnavailability */
         SpaceUnavailability: {
@@ -62275,7 +62746,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                            purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -62354,7 +62825,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                            purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -62437,7 +62908,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                            purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -87727,7 +88198,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                                purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -87761,7 +88232,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                                purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -87857,7 +88328,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                                purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -87891,7 +88362,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                                purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -88009,7 +88480,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                            purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -88084,7 +88555,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                                purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -88118,7 +88589,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                                purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -88263,7 +88734,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                                purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -88297,7 +88768,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                                purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -111498,6 +111969,8 @@ export interface operations {
                                 /** Format: uuid */
                                 id: string;
                                 name: string;
+                                /** @description ADR-290: the room view (GET /schedule/slots/{id}/space) has a floor plan, photos or directions for this viewer. */
+                                viewable: boolean;
                             } | null;
                             /** Format: uuid */
                             space_id?: string | null;
@@ -111522,6 +111995,92 @@ export interface operations {
                         /** Format: date */
                         start_date: string;
                     };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ScheduleController.slot_space": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Class room */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * SpaceArea
+                         * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+                         */
+                        area?: {
+                            points: number[][];
+                        } | null;
+                        /** FloorPlan */
+                        floor_plan: {
+                            height?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            image_url?: string | null;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            /** Format: uuid */
+                            media_id: string;
+                            name: string;
+                            /** @description ADR-290: this floor shows in the class view when the gym shows its floor plans. */
+                            shown_in_classes?: boolean;
+                            sort_order: number;
+                            width?: number | null;
+                        } | null;
+                        photos: {
+                            caption?: string | null;
+                            height?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            media_id: string;
+                            /** @description Shown on the public box page. */
+                            public: boolean;
+                            sort_order: number;
+                            /** Format: uuid */
+                            space_id: string;
+                            url?: string | null;
+                            width?: number | null;
+                        }[];
+                        space: {
+                            description?: string | null;
+                            directions?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not shown in classes */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description No such class or room */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -111939,6 +112498,164 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.SpacesController.cleaning_photo_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    byte_size: number;
+                    /**
+                     * @description Images are re-encoded in the browser (drops EXIF/GPS) before upload.
+                     * @enum {string}
+                     */
+                    content_type: "image/jpeg" | "image/webp";
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        expires_in: number;
+                        max_bytes: number;
+                        /** Format: uuid */
+                        media_id: string;
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.complete_cleaning_photo_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Media */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Media */
+                        media: {
+                            alt_text?: string | null;
+                            content_type: string;
+                            duration_ms?: number | null;
+                            feed_url?: string | null;
+                            full_url?: string | null;
+                            height: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind?: "image" | "video";
+                            /** @description A tiny blurred WebP data URI to show while the image loads */
+                            placeholder?: string | null;
+                            /** @enum {string} */
+                            purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
+                            rejection_reason?: string | null;
+                            /**
+                             * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                             * @enum {string}
+                             */
+                            status: "pending" | "processing" | "ready" | "rejected";
+                            thumb_url?: string | null;
+                            /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
+                            url: string | null;
+                            video_url?: string | null;
+                            width: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.delete_point": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.update_point": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    instruction?: string;
+                    /** Format: uuid */
+                    media_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Changed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CleaningPoint */
+                        point: {
+                            height?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            instruction: string;
+                            /** Format: uuid */
+                            media_id: string;
+                            sort_order: number;
+                            /** Format: uuid */
+                            space_id: string;
+                            url?: string | null;
+                            width?: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.CleaningController.areas": {
         parameters: {
             query?: never;
@@ -111974,6 +112691,19 @@ export interface operations {
                             /** Format: uuid */
                             location_id?: string | null;
                             name: string;
+                            points?: {
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                instruction: string;
+                                /** Format: uuid */
+                                media_id: string;
+                                sort_order: number;
+                                /** Format: uuid */
+                                space_id: string;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
                             tasks: string[];
                         }[];
                     };
@@ -112026,6 +112756,19 @@ export interface operations {
                             /** Format: uuid */
                             location_id?: string | null;
                             name: string;
+                            points?: {
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                instruction: string;
+                                /** Format: uuid */
+                                media_id: string;
+                                sort_order: number;
+                                /** Format: uuid */
+                                space_id: string;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
                             tasks: string[];
                         };
                     };
@@ -112080,6 +112823,19 @@ export interface operations {
                             /** Format: uuid */
                             location_id?: string | null;
                             name: string;
+                            points?: {
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                instruction: string;
+                                /** Format: uuid */
+                                media_id: string;
+                                sort_order: number;
+                                /** Format: uuid */
+                                space_id: string;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
                             tasks: string[];
                         };
                     };
@@ -112125,6 +112881,19 @@ export interface operations {
                             /** Format: uuid */
                             location_id?: string | null;
                             name: string;
+                            points?: {
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                instruction: string;
+                                /** Format: uuid */
+                                media_id: string;
+                                sort_order: number;
+                                /** Format: uuid */
+                                space_id: string;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
                             tasks: string[];
                         };
                     };
@@ -112159,6 +112928,20 @@ export interface operations {
                             id: string;
                             nickname?: string | null;
                             note?: string | null;
+                            point_results?: {
+                                /** Format: uuid */
+                                after_media_id?: string | null;
+                                after_url?: string | null;
+                                instruction: string;
+                                /** Format: uuid */
+                                media_id?: string;
+                                note?: string | null;
+                                /** Format: uuid */
+                                point_id: string;
+                                /** @enum {string} */
+                                status: "cleaned" | "not_cleaned";
+                                url?: string | null;
+                            }[];
                             /** Format: date-time */
                             started_at: string;
                             tasks_done: string[];
@@ -112203,6 +112986,20 @@ export interface operations {
                             id: string;
                             nickname?: string | null;
                             note?: string | null;
+                            point_results?: {
+                                /** Format: uuid */
+                                after_media_id?: string | null;
+                                after_url?: string | null;
+                                instruction: string;
+                                /** Format: uuid */
+                                media_id?: string;
+                                note?: string | null;
+                                /** Format: uuid */
+                                point_id: string;
+                                /** @enum {string} */
+                                status: "cleaned" | "not_cleaned";
+                                url?: string | null;
+                            }[];
                             /** Format: date-time */
                             started_at: string;
                             tasks_done: string[];
@@ -112227,6 +113024,15 @@ export interface operations {
             content: {
                 "application/json": {
                     note?: string | null;
+                    point_results?: {
+                        /** Format: uuid */
+                        after_media_id?: string | null;
+                        note?: string | null;
+                        /** Format: uuid */
+                        point_id: string;
+                        /** @enum {string} */
+                        status: "cleaned" | "not_cleaned";
+                    }[];
                     tasks_done?: string[];
                 };
             };
@@ -112249,6 +113055,20 @@ export interface operations {
                             id: string;
                             nickname?: string | null;
                             note?: string | null;
+                            point_results?: {
+                                /** Format: uuid */
+                                after_media_id?: string | null;
+                                after_url?: string | null;
+                                instruction: string;
+                                /** Format: uuid */
+                                media_id?: string;
+                                note?: string | null;
+                                /** Format: uuid */
+                                point_id: string;
+                                /** @enum {string} */
+                                status: "cleaned" | "not_cleaned";
+                                url?: string | null;
+                            }[];
                             /** Format: date-time */
                             started_at: string;
                             tasks_done: string[];
@@ -112388,6 +113208,19 @@ export interface operations {
                             /** Format: uuid */
                             location_id?: string | null;
                             name: string;
+                            points?: {
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                instruction: string;
+                                /** Format: uuid */
+                                media_id: string;
+                                sort_order: number;
+                                /** Format: uuid */
+                                space_id: string;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
                             /** Format: uuid */
                             space_id: string;
                             tasks: string[];
@@ -112403,6 +113236,8 @@ export interface operations {
                             /** Format: uuid */
                             media_id: string;
                             name: string;
+                            /** @description ADR-290: this floor shows in the class view when the gym shows its floor plans. */
+                            shown_in_classes?: boolean;
                             sort_order: number;
                             width?: number | null;
                         }[];
@@ -112415,6 +113250,20 @@ export interface operations {
                             id: string;
                             nickname?: string | null;
                             note?: string | null;
+                            point_results?: {
+                                /** Format: uuid */
+                                after_media_id?: string | null;
+                                after_url?: string | null;
+                                instruction: string;
+                                /** Format: uuid */
+                                media_id?: string;
+                                note?: string | null;
+                                /** Format: uuid */
+                                point_id: string;
+                                /** @enum {string} */
+                                status: "cleaned" | "not_cleaned";
+                                url?: string | null;
+                            }[];
                             /** Format: date-time */
                             started_at: string;
                             tasks_done: string[];
@@ -113484,6 +114333,7 @@ export interface operations {
                     /** Format: uuid */
                     media_id?: string;
                     name?: string;
+                    shown_in_classes?: boolean;
                     sort_order?: number;
                 };
             };
@@ -113507,6 +114357,8 @@ export interface operations {
                             /** Format: uuid */
                             media_id: string;
                             name: string;
+                            /** @description ADR-290: this floor shows in the class view when the gym shows its floor plans. */
+                            shown_in_classes?: boolean;
                             sort_order: number;
                             width?: number | null;
                         };
@@ -113588,7 +114440,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                            purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -113635,6 +114487,8 @@ export interface operations {
                             /** Format: uuid */
                             media_id: string;
                             name: string;
+                            /** @description ADR-290: this floor shows in the class view when the gym shows its floor plans. */
+                            shown_in_classes?: boolean;
                             sort_order: number;
                             width?: number | null;
                         };
@@ -113660,6 +114514,7 @@ export interface operations {
                     /** Format: uuid */
                     media_id?: string;
                     name?: string;
+                    shown_in_classes?: boolean;
                     sort_order?: number;
                 };
             };
@@ -113683,6 +114538,8 @@ export interface operations {
                             /** Format: uuid */
                             media_id: string;
                             name: string;
+                            /** @description ADR-290: this floor shows in the class view when the gym shows its floor plans. */
+                            shown_in_classes?: boolean;
                             sort_order: number;
                             width?: number | null;
                         };
@@ -113797,6 +114654,97 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.InventoryController.machine_photo_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    byte_size: number;
+                    /**
+                     * @description Images are re-encoded in the browser (drops EXIF/GPS) before upload.
+                     * @enum {string}
+                     */
+                    content_type: "image/jpeg" | "image/webp";
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        expires_in: number;
+                        max_bytes: number;
+                        /** Format: uuid */
+                        media_id: string;
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.InventoryController.complete_machine_photo_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Media */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Media */
+                        media: {
+                            alt_text?: string | null;
+                            content_type: string;
+                            duration_ms?: number | null;
+                            feed_url?: string | null;
+                            full_url?: string | null;
+                            height: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind?: "image" | "video";
+                            /** @description A tiny blurred WebP data URI to show while the image loads */
+                            placeholder?: string | null;
+                            /** @enum {string} */
+                            purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
+                            rejection_reason?: string | null;
+                            /**
+                             * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                             * @enum {string}
+                             */
+                            status: "pending" | "processing" | "ready" | "rejected";
+                            thumb_url?: string | null;
+                            /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
+                            url: string | null;
+                            video_url?: string | null;
+                            width: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.InventoryController.machines": {
         parameters: {
             query?: never;
@@ -113831,6 +114779,8 @@ export interface operations {
                             next_service_on?: string | null;
                             notes?: string | null;
                             placements?: {
+                                /** @description ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1). */
+                                positions?: number[][];
                                 quantity: number;
                                 /** Format: uuid */
                                 space_id: string;
@@ -113913,6 +114863,8 @@ export interface operations {
                             next_service_on?: string | null;
                             notes?: string | null;
                             placements?: {
+                                /** @description ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1). */
+                                positions?: number[][];
                                 quantity: number;
                                 /** Format: uuid */
                                 space_id: string;
@@ -113997,6 +114949,8 @@ export interface operations {
                             next_service_on?: string | null;
                             notes?: string | null;
                             placements?: {
+                                /** @description ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1). */
+                                positions?: number[][];
                                 quantity: number;
                                 /** Format: uuid */
                                 space_id: string;
@@ -114057,6 +115011,8 @@ export interface operations {
                             next_service_on?: string | null;
                             notes?: string | null;
                             placements?: {
+                                /** @description ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1). */
+                                positions?: number[][];
                                 quantity: number;
                                 /** Format: uuid */
                                 space_id: string;
@@ -114107,9 +115063,18 @@ export interface operations {
                             kind: "note" | "issue" | "out_of_order" | "repair_requested" | "maintenance" | "repaired" | "retired";
                             /** Format: uuid */
                             machine_id: string;
+                            media_ids?: string[];
                             nickname?: string | null;
                             /** Format: date-time */
                             occurred_at: string;
+                            /** @description ADR-290: the line's photos, with signed URLs. */
+                            photos?: {
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
                             /** @enum {string|null} */
                             severity?: "low" | "medium" | "high" | "safety" | null;
                             /** @enum {string|null} */
@@ -114117,6 +115082,36 @@ export interface operations {
                             usable?: boolean | null;
                             /** Format: uuid */
                             user_id?: string | null;
+                        }[];
+                        places: {
+                            /**
+                             * SpaceArea
+                             * @description A polygon on the floor plan in normalized coordinates (0..1, origin top-left).
+                             */
+                            area?: {
+                                points: number[][];
+                            } | null;
+                            /** FloorPlan */
+                            floor_plan: {
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                image_url?: string | null;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                media_id: string;
+                                name: string;
+                                /** @description ADR-290: this floor shows in the class view when the gym shows its floor plans. */
+                                shown_in_classes?: boolean;
+                                sort_order: number;
+                                width?: number | null;
+                            } | null;
+                            positions: number[][];
+                            quantity: number;
+                            /** Format: uuid */
+                            space_id: string;
+                            space_name: string;
                         }[];
                     };
                 };
@@ -114139,6 +115134,8 @@ export interface operations {
                     cost_cents?: number | null;
                     /** @enum {string} */
                     kind: "note" | "issue" | "out_of_order" | "repair_requested" | "maintenance" | "repaired" | "retired";
+                    /** @description ADR-290: ready machine_photo uploads. */
+                    media_ids?: string[];
                     /** Format: date-time */
                     occurred_at?: string | null;
                     /** @enum {string|null} */
@@ -114167,9 +115164,18 @@ export interface operations {
                             kind: "note" | "issue" | "out_of_order" | "repair_requested" | "maintenance" | "repaired" | "retired";
                             /** Format: uuid */
                             machine_id: string;
+                            media_ids?: string[];
                             nickname?: string | null;
                             /** Format: date-time */
                             occurred_at: string;
+                            /** @description ADR-290: the line's photos, with signed URLs. */
+                            photos?: {
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
                             /** @enum {string|null} */
                             severity?: "low" | "medium" | "high" | "safety" | null;
                             /** @enum {string|null} */
@@ -114197,6 +115203,8 @@ export interface operations {
                             next_service_on?: string | null;
                             notes?: string | null;
                             placements?: {
+                                /** @description ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1). */
+                                positions?: number[][];
                                 quantity: number;
                                 /** Format: uuid */
                                 space_id: string;
@@ -114233,6 +115241,8 @@ export interface operations {
             content: {
                 "application/json": {
                     placements: {
+                        /** @description ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1). */
+                        positions?: number[][];
                         quantity: number;
                         /** Format: uuid */
                         space_id: string;
@@ -114251,6 +115261,8 @@ export interface operations {
                         /** Format: uuid */
                         machine_id: string;
                         placements: {
+                            /** @description ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1). */
+                            positions?: number[][];
                             quantity: number;
                             /** Format: uuid */
                             space_id: string;
@@ -116547,7 +117559,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "floor_plan" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                            purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -118344,6 +119356,225 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.SpacesController.space_photo_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    byte_size: number;
+                    /**
+                     * @description Images are re-encoded in the browser (drops EXIF/GPS) before upload.
+                     * @enum {string}
+                     */
+                    content_type: "image/jpeg" | "image/webp";
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        expires_in: number;
+                        max_bytes: number;
+                        /** Format: uuid */
+                        media_id: string;
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.complete_space_photo_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Media */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Media */
+                        media: {
+                            alt_text?: string | null;
+                            content_type: string;
+                            duration_ms?: number | null;
+                            feed_url?: string | null;
+                            full_url?: string | null;
+                            height: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind?: "image" | "video";
+                            /** @description A tiny blurred WebP data URI to show while the image loads */
+                            placeholder?: string | null;
+                            /** @enum {string} */
+                            purpose: "body_photo" | "box_photo" | "cleaning_photo" | "floor_plan" | "machine_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo" | "space_photo";
+                            rejection_reason?: string | null;
+                            /**
+                             * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                             * @enum {string}
+                             */
+                            status: "pending" | "processing" | "ready" | "rejected";
+                            thumb_url?: string | null;
+                            /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
+                            url: string | null;
+                            video_url?: string | null;
+                            width: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.delete_photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.update_photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    caption?: string | null;
+                    /** Format: uuid */
+                    media_id?: string;
+                    public?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Changed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** SpacePhoto */
+                        photo: {
+                            caption?: string | null;
+                            height?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            media_id: string;
+                            /** @description Shown on the public box page. */
+                            public: boolean;
+                            sort_order: number;
+                            /** Format: uuid */
+                            space_id: string;
+                            url?: string | null;
+                            width?: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** SpaceSettings */
+                        settings: {
+                            /** @description Members and athletes open the floor plan with the class's room coloured, and the room's photos. */
+                            floor_plans_in_classes: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.put_settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    floor_plans_in_classes: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** SpaceSettings */
+                        settings: {
+                            /** @description Members and athletes open the floor plan with the class's room coloured, and the room's photos. */
+                            floor_plans_in_classes: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.SpacesController.index": {
         parameters: {
             query?: {
@@ -118373,9 +119604,16 @@ export interface operations {
                             /** Format: uuid */
                             media_id: string;
                             name: string;
+                            /** @description ADR-290: this floor shows in the class view when the gym shows its floor plans. */
+                            shown_in_classes?: boolean;
                             sort_order: number;
                             width?: number | null;
                         }[];
+                        /** SpaceSettings */
+                        settings: {
+                            /** @description Members and athletes open the floor plan with the class's room coloured, and the room's photos. */
+                            floor_plans_in_classes: boolean;
+                        };
                         spaces: {
                             /** Format: date-time */
                             archived_at?: string | null;
@@ -118548,6 +119786,34 @@ export interface operations {
                             /** Format: uuid */
                             location_id?: string | null;
                             name: string;
+                            photos: {
+                                caption?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                media_id: string;
+                                /** @description Shown on the public box page. */
+                                public: boolean;
+                                sort_order: number;
+                                /** Format: uuid */
+                                space_id: string;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
+                            points: {
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                instruction: string;
+                                /** Format: uuid */
+                                media_id: string;
+                                sort_order: number;
+                                /** Format: uuid */
+                                space_id: string;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
                             tasks: string[];
                             unavailability: {
                                 /** Format: uuid */
@@ -118699,6 +119965,185 @@ export interface operations {
                                 starts_at: string;
                             }[];
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.add_point": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    instruction?: string;
+                    /** Format: uuid */
+                    media_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Added */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CleaningPoint */
+                        point: {
+                            height?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            instruction: string;
+                            /** Format: uuid */
+                            media_id: string;
+                            sort_order: number;
+                            /** Format: uuid */
+                            space_id: string;
+                            url?: string | null;
+                            width?: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.order_points": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    ids: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Ordered */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        points: {
+                            height?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            instruction: string;
+                            /** Format: uuid */
+                            media_id: string;
+                            sort_order: number;
+                            /** Format: uuid */
+                            space_id: string;
+                            url?: string | null;
+                            width?: number | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.add_photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    caption?: string | null;
+                    /** Format: uuid */
+                    media_id?: string;
+                    public?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Added */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** SpacePhoto */
+                        photo: {
+                            caption?: string | null;
+                            height?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            media_id: string;
+                            /** @description Shown on the public box page. */
+                            public: boolean;
+                            sort_order: number;
+                            /** Format: uuid */
+                            space_id: string;
+                            url?: string | null;
+                            width?: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.SpacesController.order_photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    ids: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Ordered */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        photos: {
+                            caption?: string | null;
+                            height?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            media_id: string;
+                            /** @description Shown on the public box page. */
+                            public: boolean;
+                            sort_order: number;
+                            /** Format: uuid */
+                            space_id: string;
+                            url?: string | null;
+                            width?: number | null;
+                        }[];
                     };
                 };
             };
@@ -128352,6 +129797,21 @@ export interface operations {
                         };
                         /** Format: date-time */
                         published_at?: string | null;
+                        /** @description ADR-290: rooms with the photos their staff put on the public page */
+                        rooms: {
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            photos: {
+                                caption?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
+                        }[];
                         /** @description ADR-179: the gym's IANA zone; its classes show on this clock */
                         time_zone?: string;
                     };

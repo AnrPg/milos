@@ -98,7 +98,7 @@ defmodule Palee.Notifications.Domain.NotificationCategories do
         booking_pending booking_timeout check_in_visitor member_leaving
         trial_requested trial_booked trial_cancelled season_requested class_workout_missing
         community_group_proposed community_report_created referral_review
-        inventory_repair_needed inventory_stock_low inventory_digest
+        inventory_repair_needed inventory_stock_low inventory_digest cleaning_point_not_cleaned
         shop_stock_low shop_order_placed payment_needs_attention fiscal_connection_failed
       )
     },

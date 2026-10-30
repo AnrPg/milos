@@ -95,6 +95,9 @@ function phaseCUrl(notification: LinkableNotification, role: string | null | und
     // ADR-104: inventory alerts and the daily summary open the right tab.
     case "inventory_repair_needed":
       return "/admin/inventory?tab=machines";
+    // ADR-290: a cleaning point left not cleaned opens the cleaning log.
+    case "cleaning_point_not_cleaned":
+      return "/admin/cleaning";
     case "inventory_stock_low":
       return "/admin/inventory?tab=supplies";
     case "inventory_digest":

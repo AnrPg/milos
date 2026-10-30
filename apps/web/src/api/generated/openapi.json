@@ -16181,11 +16181,14 @@
                 "enum": [
                   "body_photo",
                   "box_photo",
+                  "cleaning_photo",
                   "floor_plan",
+                  "machine_photo",
                   "meal_photo",
                   "post_photo",
                   "post_video",
-                  "shop_product_photo"
+                  "shop_product_photo",
+                  "space_photo"
                 ],
                 "type": "string"
               },
@@ -16358,11 +16361,14 @@
                   "enum": [
                     "body_photo",
                     "box_photo",
+                    "cleaning_photo",
                     "floor_plan",
+                    "machine_photo",
                     "meal_photo",
                     "post_photo",
                     "post_video",
-                    "shop_product_photo"
+                    "shop_product_photo",
+                    "space_photo"
                   ],
                   "type": "string"
                 },
@@ -16645,11 +16651,14 @@
                     "enum": [
                       "body_photo",
                       "box_photo",
+                      "cleaning_photo",
                       "floor_plan",
+                      "machine_photo",
                       "meal_photo",
                       "post_photo",
                       "post_video",
-                      "shop_product_photo"
+                      "shop_product_photo",
+                      "space_photo"
                     ],
                     "type": "string"
                   },
@@ -16822,11 +16831,14 @@
                       "enum": [
                         "body_photo",
                         "box_photo",
+                        "cleaning_photo",
                         "floor_plan",
+                        "machine_photo",
                         "meal_photo",
                         "post_photo",
                         "post_video",
-                        "shop_product_photo"
+                        "shop_product_photo",
+                        "space_photo"
                       ],
                       "type": "string"
                     },
@@ -25002,6 +25014,166 @@
         "title": "CheckInVisitors",
         "type": "object"
       },
+      "ClassRoom": {
+        "properties": {
+          "area": {
+            "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+            "nullable": true,
+            "properties": {
+              "points": {
+                "items": {
+                  "items": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array"
+                },
+                "maxItems": 32,
+                "minItems": 3,
+                "type": "array"
+              }
+            },
+            "required": [
+              "points"
+            ],
+            "title": "SpaceArea",
+            "type": "object"
+          },
+          "floor_plan": {
+            "nullable": true,
+            "properties": {
+              "height": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "image_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "location_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "media_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "shown_in_classes": {
+                "description": "ADR-290: this floor shows in the class view when the gym shows its floor plans.",
+                "type": "boolean"
+              },
+              "sort_order": {
+                "type": "integer"
+              },
+              "width": {
+                "nullable": true,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "media_id",
+              "sort_order"
+            ],
+            "title": "FloorPlan",
+            "type": "object"
+          },
+          "photos": {
+            "items": {
+              "properties": {
+                "caption": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "height": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "media_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "public": {
+                  "description": "Shown on the public box page.",
+                  "type": "boolean"
+                },
+                "sort_order": {
+                  "type": "integer"
+                },
+                "space_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "width": {
+                  "nullable": true,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "space_id",
+                "media_id",
+                "public",
+                "sort_order"
+              ],
+              "title": "SpacePhoto",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "space": {
+            "properties": {
+              "description": {
+                "nullable": true,
+                "type": "string"
+              },
+              "directions": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "space",
+          "floor_plan",
+          "photos"
+        ],
+        "title": "ClassRoom",
+        "type": "object"
+      },
       "ClassScreenList": {
         "description": "The box screens the person may change for this class: its coach (today, screens of the class's branch or the whole box) or staff who manage screens",
         "properties": {
@@ -25384,6 +25556,52 @@
           "name": {
             "type": "string"
           },
+          "points": {
+            "items": {
+              "properties": {
+                "height": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "instruction": {
+                  "type": "string"
+                },
+                "media_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "sort_order": {
+                  "type": "integer"
+                },
+                "space_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "width": {
+                  "nullable": true,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "space_id",
+                "media_id",
+                "instruction",
+                "sort_order"
+              ],
+              "title": "CleaningPoint",
+              "type": "object"
+            },
+            "type": "array"
+          },
           "tasks": {
             "items": {
               "type": "string"
@@ -25453,6 +25671,52 @@
           "name": {
             "type": "string"
           },
+          "points": {
+            "items": {
+              "properties": {
+                "height": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "instruction": {
+                  "type": "string"
+                },
+                "media_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "sort_order": {
+                  "type": "integer"
+                },
+                "space_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "width": {
+                  "nullable": true,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "space_id",
+                "media_id",
+                "instruction",
+                "sort_order"
+              ],
+              "title": "CleaningPoint",
+              "type": "object"
+            },
+            "type": "array"
+          },
           "space_id": {
             "format": "uuid",
             "type": "string"
@@ -25506,6 +25770,55 @@
             "nullable": true,
             "type": "string"
           },
+          "point_results": {
+            "items": {
+              "properties": {
+                "after_media_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "after_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "instruction": {
+                  "type": "string"
+                },
+                "media_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "note": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "point_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "cleaned",
+                    "not_cleaned"
+                  ],
+                  "type": "string"
+                },
+                "url": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "point_id",
+                "instruction",
+                "status"
+              ],
+              "title": "CleaningPointResult",
+              "type": "object"
+            },
+            "type": "array"
+          },
           "started_at": {
             "format": "date-time",
             "type": "string"
@@ -25529,6 +25842,95 @@
           "tasks_done"
         ],
         "title": "CleaningEntry",
+        "type": "object"
+      },
+      "CleaningPoint": {
+        "properties": {
+          "height": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "instruction": {
+            "type": "string"
+          },
+          "media_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "sort_order": {
+            "type": "integer"
+          },
+          "space_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "width": {
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "space_id",
+          "media_id",
+          "instruction",
+          "sort_order"
+        ],
+        "title": "CleaningPoint",
+        "type": "object"
+      },
+      "CleaningPointResult": {
+        "properties": {
+          "after_media_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "after_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "instruction": {
+            "type": "string"
+          },
+          "media_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "note": {
+            "nullable": true,
+            "type": "string"
+          },
+          "point_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "cleaned",
+              "not_cleaned"
+            ],
+            "type": "string"
+          },
+          "url": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "point_id",
+          "instruction",
+          "status"
+        ],
+        "title": "CleaningPointResult",
         "type": "object"
       },
       "CleaningSchedule": {
@@ -44250,6 +44652,10 @@
           "name": {
             "type": "string"
           },
+          "shown_in_classes": {
+            "description": "ADR-290: this floor shows in the class view when the gym shows its floor plans.",
+            "type": "boolean"
+          },
           "sort_order": {
             "type": "integer"
           },
@@ -46491,6 +46897,21 @@
           "placements": {
             "items": {
               "properties": {
+                "positions": {
+                  "description": "ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1).",
+                  "items": {
+                    "items": {
+                      "maximum": 1,
+                      "minimum": 0,
+                      "type": "number"
+                    },
+                    "maxItems": 2,
+                    "minItems": 2,
+                    "type": "array"
+                  },
+                  "maxItems": 500,
+                  "type": "array"
+                },
                 "quantity": {
                   "minimum": 1,
                   "type": "integer"
@@ -46596,6 +47017,13 @@
             "format": "uuid",
             "type": "string"
           },
+          "media_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
           "nickname": {
             "nullable": true,
             "type": "string"
@@ -46603,6 +47031,34 @@
           "occurred_at": {
             "format": "date-time",
             "type": "string"
+          },
+          "photos": {
+            "description": "ADR-290: the line's photos, with signed URLs.",
+            "items": {
+              "properties": {
+                "height": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "width": {
+                  "nullable": true,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
           },
           "severity": {
             "enum": [
@@ -46645,6 +47101,112 @@
           "occurred_at"
         ],
         "title": "InventoryMachineEvent",
+        "type": "object"
+      },
+      "InventoryMachinePlace": {
+        "properties": {
+          "area": {
+            "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+            "nullable": true,
+            "properties": {
+              "points": {
+                "items": {
+                  "items": {
+                    "maximum": 1,
+                    "minimum": 0,
+                    "type": "number"
+                  },
+                  "maxItems": 2,
+                  "minItems": 2,
+                  "type": "array"
+                },
+                "maxItems": 32,
+                "minItems": 3,
+                "type": "array"
+              }
+            },
+            "required": [
+              "points"
+            ],
+            "title": "SpaceArea",
+            "type": "object"
+          },
+          "floor_plan": {
+            "nullable": true,
+            "properties": {
+              "height": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "image_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "location_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "media_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "shown_in_classes": {
+                "description": "ADR-290: this floor shows in the class view when the gym shows its floor plans.",
+                "type": "boolean"
+              },
+              "sort_order": {
+                "type": "integer"
+              },
+              "width": {
+                "nullable": true,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "media_id",
+              "sort_order"
+            ],
+            "title": "FloorPlan",
+            "type": "object"
+          },
+          "positions": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array"
+          },
+          "quantity": {
+            "type": "integer"
+          },
+          "space_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "space_name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "space_id",
+          "space_name",
+          "quantity",
+          "positions",
+          "floor_plan"
+        ],
+        "title": "InventoryMachinePlace",
         "type": "object"
       },
       "InventoryReport": {
@@ -48509,6 +49071,21 @@
       },
       "MachinePlacement": {
         "properties": {
+          "positions": {
+            "description": "ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1).",
+            "items": {
+              "items": {
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            "maxItems": 500,
+            "type": "array"
+          },
           "quantity": {
             "minimum": 1,
             "type": "integer"
@@ -48570,11 +49147,14 @@
             "enum": [
               "body_photo",
               "box_photo",
+              "cleaning_photo",
               "floor_plan",
+              "machine_photo",
               "meal_photo",
               "post_photo",
               "post_video",
-              "shop_product_photo"
+              "shop_product_photo",
+              "space_photo"
             ],
             "type": "string"
           },
@@ -48706,11 +49286,14 @@
                 "enum": [
                   "body_photo",
                   "box_photo",
+                  "cleaning_photo",
                   "floor_plan",
+                  "machine_photo",
                   "meal_photo",
                   "post_photo",
                   "post_video",
-                  "shop_product_photo"
+                  "shop_product_photo",
+                  "space_photo"
                 ],
                 "type": "string"
               },
@@ -67676,6 +68259,62 @@
             "nullable": true,
             "type": "string"
           },
+          "rooms": {
+            "description": "ADR-290: rooms with the photos their staff put on the public page",
+            "items": {
+              "properties": {
+                "description": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "photos": {
+                  "items": {
+                    "properties": {
+                      "caption": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "height": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "url": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "width": {
+                        "nullable": true,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "photos"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
           "time_zone": {
             "description": "ADR-179: the gym's IANA zone; its classes show on this clock",
             "type": "string"
@@ -67686,7 +68325,8 @@
           "profile",
           "followers_count",
           "locations",
-          "open_clubs"
+          "open_clubs",
+          "rooms"
         ],
         "title": "PublicBoxResponse",
         "type": "object"
@@ -77295,6 +77935,103 @@
           "name": {
             "type": "string"
           },
+          "photos": {
+            "items": {
+              "properties": {
+                "caption": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "height": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "media_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "public": {
+                  "description": "Shown on the public box page.",
+                  "type": "boolean"
+                },
+                "sort_order": {
+                  "type": "integer"
+                },
+                "space_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "width": {
+                  "nullable": true,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "space_id",
+                "media_id",
+                "public",
+                "sort_order"
+              ],
+              "title": "SpacePhoto",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "points": {
+            "items": {
+              "properties": {
+                "height": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "instruction": {
+                  "type": "string"
+                },
+                "media_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "sort_order": {
+                  "type": "integer"
+                },
+                "space_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "width": {
+                  "nullable": true,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "space_id",
+                "media_id",
+                "instruction",
+                "sort_order"
+              ],
+              "title": "CleaningPoint",
+              "type": "object"
+            },
+            "type": "array"
+          },
           "tasks": {
             "items": {
               "type": "string"
@@ -77348,7 +78085,9 @@
           "tasks",
           "unavailability",
           "classes",
-          "equipment"
+          "equipment",
+          "photos",
+          "points"
         ],
         "title": "SpaceDetail",
         "type": "object"
@@ -77376,6 +78115,67 @@
           "quantity"
         ],
         "title": "SpaceEquipment",
+        "type": "object"
+      },
+      "SpacePhoto": {
+        "properties": {
+          "caption": {
+            "nullable": true,
+            "type": "string"
+          },
+          "height": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "media_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "public": {
+            "description": "Shown on the public box page.",
+            "type": "boolean"
+          },
+          "sort_order": {
+            "type": "integer"
+          },
+          "space_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "width": {
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "space_id",
+          "media_id",
+          "public",
+          "sort_order"
+        ],
+        "title": "SpacePhoto",
+        "type": "object"
+      },
+      "SpaceSettings": {
+        "properties": {
+          "floor_plans_in_classes": {
+            "description": "Members and athletes open the floor plan with the class's room coloured, and the room's photos.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "floor_plans_in_classes"
+        ],
+        "title": "SpaceSettings",
         "type": "object"
       },
       "SpaceUnavailability": {
@@ -139888,11 +140688,14 @@
                           "enum": [
                             "body_photo",
                             "box_photo",
+                            "cleaning_photo",
                             "floor_plan",
+                            "machine_photo",
                             "meal_photo",
                             "post_photo",
                             "post_video",
-                            "shop_product_photo"
+                            "shop_product_photo",
+                            "space_photo"
                           ],
                           "type": "string"
                         },
@@ -140048,11 +140851,14 @@
                           "enum": [
                             "body_photo",
                             "box_photo",
+                            "cleaning_photo",
                             "floor_plan",
+                            "machine_photo",
                             "meal_photo",
                             "post_photo",
                             "post_video",
-                            "shop_product_photo"
+                            "shop_product_photo",
+                            "space_photo"
                           ],
                           "type": "string"
                         },
@@ -140254,11 +141060,14 @@
                           "enum": [
                             "body_photo",
                             "box_photo",
+                            "cleaning_photo",
                             "floor_plan",
+                            "machine_photo",
                             "meal_photo",
                             "post_photo",
                             "post_video",
-                            "shop_product_photo"
+                            "shop_product_photo",
+                            "space_photo"
                           ],
                           "type": "string"
                         },
@@ -208271,11 +209080,14 @@
                               "enum": [
                                 "body_photo",
                                 "box_photo",
+                                "cleaning_photo",
                                 "floor_plan",
+                                "machine_photo",
                                 "meal_photo",
                                 "post_photo",
                                 "post_video",
-                                "shop_product_photo"
+                                "shop_product_photo",
+                                "space_photo"
                               ],
                               "type": "string"
                             },
@@ -208448,11 +209260,14 @@
                                 "enum": [
                                   "body_photo",
                                   "box_photo",
+                                  "cleaning_photo",
                                   "floor_plan",
+                                  "machine_photo",
                                   "meal_photo",
                                   "post_photo",
                                   "post_video",
-                                  "shop_product_photo"
+                                  "shop_product_photo",
+                                  "space_photo"
                                 ],
                                 "type": "string"
                               },
@@ -208899,11 +209714,14 @@
                               "enum": [
                                 "body_photo",
                                 "box_photo",
+                                "cleaning_photo",
                                 "floor_plan",
+                                "machine_photo",
                                 "meal_photo",
                                 "post_photo",
                                 "post_video",
-                                "shop_product_photo"
+                                "shop_product_photo",
+                                "space_photo"
                               ],
                               "type": "string"
                             },
@@ -209076,11 +209894,14 @@
                                 "enum": [
                                   "body_photo",
                                   "box_photo",
+                                  "cleaning_photo",
                                   "floor_plan",
+                                  "machine_photo",
                                   "meal_photo",
                                   "post_photo",
                                   "post_video",
-                                  "shop_product_photo"
+                                  "shop_product_photo",
+                                  "space_photo"
                                 ],
                                 "type": "string"
                               },
@@ -209378,11 +210199,14 @@
                           "enum": [
                             "body_photo",
                             "box_photo",
+                            "cleaning_photo",
                             "floor_plan",
+                            "machine_photo",
                             "meal_photo",
                             "post_photo",
                             "post_video",
-                            "shop_product_photo"
+                            "shop_product_photo",
+                            "space_photo"
                           ],
                           "type": "string"
                         },
@@ -209629,11 +210453,14 @@
                               "enum": [
                                 "body_photo",
                                 "box_photo",
+                                "cleaning_photo",
                                 "floor_plan",
+                                "machine_photo",
                                 "meal_photo",
                                 "post_photo",
                                 "post_video",
-                                "shop_product_photo"
+                                "shop_product_photo",
+                                "space_photo"
                               ],
                               "type": "string"
                             },
@@ -209806,11 +210633,14 @@
                                 "enum": [
                                   "body_photo",
                                   "box_photo",
+                                  "cleaning_photo",
                                   "floor_plan",
+                                  "machine_photo",
                                   "meal_photo",
                                   "post_photo",
                                   "post_video",
-                                  "shop_product_photo"
+                                  "shop_product_photo",
+                                  "space_photo"
                                 ],
                                 "type": "string"
                               },
@@ -210225,11 +211055,14 @@
                               "enum": [
                                 "body_photo",
                                 "box_photo",
+                                "cleaning_photo",
                                 "floor_plan",
+                                "machine_photo",
                                 "meal_photo",
                                 "post_photo",
                                 "post_video",
-                                "shop_product_photo"
+                                "shop_product_photo",
+                                "space_photo"
                               ],
                               "type": "string"
                             },
@@ -210402,11 +211235,14 @@
                                 "enum": [
                                   "body_photo",
                                   "box_photo",
+                                  "cleaning_photo",
                                   "floor_plan",
+                                  "machine_photo",
                                   "meal_photo",
                                   "post_photo",
                                   "post_video",
-                                  "shop_product_photo"
+                                  "shop_product_photo",
+                                  "space_photo"
                                 ],
                                 "type": "string"
                               },
@@ -276532,11 +277368,16 @@
                               },
                               "name": {
                                 "type": "string"
+                              },
+                              "viewable": {
+                                "description": "ADR-290: the room view (GET /schedule/slots/{id}/space) has a floor plan, photos or directions for this viewer.",
+                                "type": "boolean"
                               }
                             },
                             "required": [
                               "id",
-                              "name"
+                              "name",
+                              "viewable"
                             ],
                             "type": "object"
                           },
@@ -276617,6 +277458,222 @@
           }
         ],
         "summary": "Get the schedule window",
+        "tags": [
+          "Schedule"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/schedule/slots/{id}/space": {
+      "get": {
+        "callbacks": {},
+        "description": "Staff who see the spaces always may; members and athletes only when the gym shows its floor plans in classes (403 otherwise). `floor_plan` is null when the room is on no plan or its floor is hidden.",
+        "operationId": "PaleeWeb.ScheduleController.slot_space",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "area": {
+                      "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+                      "nullable": true,
+                      "properties": {
+                        "points": {
+                          "items": {
+                            "items": {
+                              "maximum": 1,
+                              "minimum": 0,
+                              "type": "number"
+                            },
+                            "maxItems": 2,
+                            "minItems": 2,
+                            "type": "array"
+                          },
+                          "maxItems": 32,
+                          "minItems": 3,
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "points"
+                      ],
+                      "title": "SpaceArea",
+                      "type": "object"
+                    },
+                    "floor_plan": {
+                      "nullable": true,
+                      "properties": {
+                        "height": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "image_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "media_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "shown_in_classes": {
+                          "description": "ADR-290: this floor shows in the class view when the gym shows its floor plans.",
+                          "type": "boolean"
+                        },
+                        "sort_order": {
+                          "type": "integer"
+                        },
+                        "width": {
+                          "nullable": true,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "media_id",
+                        "sort_order"
+                      ],
+                      "title": "FloorPlan",
+                      "type": "object"
+                    },
+                    "photos": {
+                      "items": {
+                        "properties": {
+                          "caption": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "height": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "media_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "public": {
+                            "description": "Shown on the public box page.",
+                            "type": "boolean"
+                          },
+                          "sort_order": {
+                            "type": "integer"
+                          },
+                          "space_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "width": {
+                            "nullable": true,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "space_id",
+                          "media_id",
+                          "public",
+                          "sort_order"
+                        ],
+                        "title": "SpacePhoto",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "space": {
+                      "properties": {
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "directions": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "space",
+                    "floor_plan",
+                    "photos"
+                  ],
+                  "title": "ClassRoom",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Class room"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not shown in classes"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such class or room"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The room of a class: floor plan with the room coloured, directions, photos (ADR-290)",
         "tags": [
           "Schedule"
         ]
@@ -277663,6 +278720,381 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/cleaning-photos/uploads": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.cleaning_photo_upload",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "byte_size": {
+                    "maximum": 8388608,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "content_type": {
+                    "description": "Images are re-encoded in the browser (drops EXIF/GPS) before upload.",
+                    "enum": [
+                      "image/jpeg",
+                      "image/webp"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content_type",
+                  "byte_size"
+                ],
+                "title": "MediaUploadRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_in": {
+                      "type": "integer"
+                    },
+                    "max_bytes": {
+                      "type": "integer"
+                    },
+                    "media_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "required_headers": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "upload_url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "media_id",
+                    "upload_url",
+                    "required_headers",
+                    "expires_in",
+                    "max_bytes"
+                  ],
+                  "title": "MediaUpload",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Upload"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Reserve a cleaning point or after photo (cleaning_photo) and get a presigned upload for it",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/cleaning-photos/uploads/{id}/complete": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.complete_cleaning_photo_upload",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "media": {
+                      "properties": {
+                        "alt_text": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "content_type": {
+                          "type": "string"
+                        },
+                        "duration_ms": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "feed_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "full_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "height": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "image",
+                            "video"
+                          ],
+                          "type": "string"
+                        },
+                        "placeholder": {
+                          "description": "A tiny blurred WebP data URI to show while the image loads",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purpose": {
+                          "enum": [
+                            "body_photo",
+                            "box_photo",
+                            "cleaning_photo",
+                            "floor_plan",
+                            "machine_photo",
+                            "meal_photo",
+                            "post_photo",
+                            "post_video",
+                            "shop_product_photo",
+                            "space_photo"
+                          ],
+                          "type": "string"
+                        },
+                        "rejection_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "description": "Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)",
+                          "enum": [
+                            "pending",
+                            "processing",
+                            "ready",
+                            "rejected"
+                          ],
+                          "type": "string"
+                        },
+                        "thumb_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "url": {
+                          "description": "Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition.",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "video_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "width": {
+                          "nullable": true,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "purpose",
+                        "status",
+                        "content_type",
+                        "width",
+                        "height",
+                        "url"
+                      ],
+                      "title": "Media",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "media"
+                  ],
+                  "title": "MediaResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Media"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Verify an uploaded cleaning_photo image and mark it ready",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/cleaning-points/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.delete_point",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Removed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove a cleaning point (its image is deleted)",
+        "tags": [
+          "Spaces"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.update_point",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "instruction": {
+                    "maxLength": 500,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "media_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "point": {
+                      "properties": {
+                        "height": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "instruction": {
+                          "type": "string"
+                        },
+                        "media_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "sort_order": {
+                          "type": "integer"
+                        },
+                        "space_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "width": {
+                          "nullable": true,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "space_id",
+                        "media_id",
+                        "instruction",
+                        "sort_order"
+                      ],
+                      "title": "CleaningPoint",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "point"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Changed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Change a cleaning point",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/staff/cleaning/areas": {
       "get": {
         "callbacks": {},
@@ -277729,6 +279161,52 @@
                           },
                           "name": {
                             "type": "string"
+                          },
+                          "points": {
+                            "items": {
+                              "properties": {
+                                "height": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "instruction": {
+                                  "type": "string"
+                                },
+                                "media_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "sort_order": {
+                                  "type": "integer"
+                                },
+                                "space_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "width": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "space_id",
+                                "media_id",
+                                "instruction",
+                                "sort_order"
+                              ],
+                              "title": "CleaningPoint",
+                              "type": "object"
+                            },
+                            "type": "array"
                           },
                           "tasks": {
                             "items": {
@@ -277863,6 +279341,52 @@
                         },
                         "name": {
                           "type": "string"
+                        },
+                        "points": {
+                          "items": {
+                            "properties": {
+                              "height": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "instruction": {
+                                "type": "string"
+                              },
+                              "media_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "sort_order": {
+                                "type": "integer"
+                              },
+                              "space_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "width": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "space_id",
+                              "media_id",
+                              "instruction",
+                              "sort_order"
+                            ],
+                            "title": "CleaningPoint",
+                            "type": "object"
+                          },
+                          "type": "array"
                         },
                         "tasks": {
                           "items": {
@@ -278008,6 +279532,52 @@
                         "name": {
                           "type": "string"
                         },
+                        "points": {
+                          "items": {
+                            "properties": {
+                              "height": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "instruction": {
+                                "type": "string"
+                              },
+                              "media_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "sort_order": {
+                                "type": "integer"
+                              },
+                              "space_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "width": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "space_id",
+                              "media_id",
+                              "instruction",
+                              "sort_order"
+                            ],
+                            "title": "CleaningPoint",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "tasks": {
                           "items": {
                             "type": "string"
@@ -278121,6 +279691,52 @@
                         "name": {
                           "type": "string"
                         },
+                        "points": {
+                          "items": {
+                            "properties": {
+                              "height": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "instruction": {
+                                "type": "string"
+                              },
+                              "media_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "sort_order": {
+                                "type": "integer"
+                              },
+                              "space_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "width": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "space_id",
+                              "media_id",
+                              "instruction",
+                              "sort_order"
+                            ],
+                            "title": "CleaningPoint",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "tasks": {
                           "items": {
                             "type": "string"
@@ -278202,6 +279818,55 @@
                           "note": {
                             "nullable": true,
                             "type": "string"
+                          },
+                          "point_results": {
+                            "items": {
+                              "properties": {
+                                "after_media_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "after_url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "instruction": {
+                                  "type": "string"
+                                },
+                                "media_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "note": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "point_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "enum": [
+                                    "cleaned",
+                                    "not_cleaned"
+                                  ],
+                                  "type": "string"
+                                },
+                                "url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "point_id",
+                                "instruction",
+                                "status"
+                              ],
+                              "title": "CleaningPointResult",
+                              "type": "object"
+                            },
+                            "type": "array"
                           },
                           "started_at": {
                             "format": "date-time",
@@ -278303,6 +279968,55 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "point_results": {
+                          "items": {
+                            "properties": {
+                              "after_media_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "after_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "instruction": {
+                                "type": "string"
+                              },
+                              "media_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "note": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "point_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "cleaned",
+                                  "not_cleaned"
+                                ],
+                                "type": "string"
+                              },
+                              "url": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "point_id",
+                              "instruction",
+                              "status"
+                            ],
+                            "title": "CleaningPointResult",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "started_at": {
                           "format": "date-time",
                           "type": "string"
@@ -278375,6 +280089,41 @@
                     "nullable": true,
                     "type": "string"
                   },
+                  "point_results": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "after_media_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "note": {
+                          "maxLength": 1000,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "point_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "cleaned",
+                            "not_cleaned"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "point_id",
+                        "status"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 30,
+                    "type": "array"
+                  },
                   "tasks_done": {
                     "items": {
                       "type": "string"
@@ -278416,6 +280165,55 @@
                         "note": {
                           "nullable": true,
                           "type": "string"
+                        },
+                        "point_results": {
+                          "items": {
+                            "properties": {
+                              "after_media_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "after_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "instruction": {
+                                "type": "string"
+                              },
+                              "media_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "note": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "point_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "cleaned",
+                                  "not_cleaned"
+                                ],
+                                "type": "string"
+                              },
+                              "url": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "point_id",
+                              "instruction",
+                              "status"
+                            ],
+                            "title": "CleaningPointResult",
+                            "type": "object"
+                          },
+                          "type": "array"
                         },
                         "started_at": {
                           "format": "date-time",
@@ -278766,6 +280564,52 @@
                           "name": {
                             "type": "string"
                           },
+                          "points": {
+                            "items": {
+                              "properties": {
+                                "height": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "instruction": {
+                                  "type": "string"
+                                },
+                                "media_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "sort_order": {
+                                  "type": "integer"
+                                },
+                                "space_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "width": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "space_id",
+                                "media_id",
+                                "instruction",
+                                "sort_order"
+                              ],
+                              "title": "CleaningPoint",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
                           "space_id": {
                             "format": "uuid",
                             "type": "string"
@@ -278825,6 +280669,10 @@
                           "name": {
                             "type": "string"
                           },
+                          "shown_in_classes": {
+                            "description": "ADR-290: this floor shows in the class view when the gym shows its floor plans.",
+                            "type": "boolean"
+                          },
                           "sort_order": {
                             "type": "integer"
                           },
@@ -278867,6 +280715,55 @@
                           "note": {
                             "nullable": true,
                             "type": "string"
+                          },
+                          "point_results": {
+                            "items": {
+                              "properties": {
+                                "after_media_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "after_url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "instruction": {
+                                  "type": "string"
+                                },
+                                "media_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "note": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "point_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "enum": [
+                                    "cleaned",
+                                    "not_cleaned"
+                                  ],
+                                  "type": "string"
+                                },
+                                "url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "point_id",
+                                "instruction",
+                                "status"
+                              ],
+                              "title": "CleaningPointResult",
+                              "type": "object"
+                            },
+                            "type": "array"
                           },
                           "started_at": {
                             "format": "date-time",
@@ -281777,6 +283674,9 @@
                     "minLength": 1,
                     "type": "string"
                   },
+                  "shown_in_classes": {
+                    "type": "boolean"
+                  },
                   "sort_order": {
                     "maximum": 999,
                     "minimum": 0,
@@ -281820,6 +283720,10 @@
                         },
                         "name": {
                           "type": "string"
+                        },
+                        "shown_in_classes": {
+                          "description": "ADR-290: this floor shows in the class view when the gym shows its floor plans.",
+                          "type": "boolean"
                         },
                         "sort_order": {
                           "type": "integer"
@@ -282013,11 +283917,14 @@
                           "enum": [
                             "body_photo",
                             "box_photo",
+                            "cleaning_photo",
                             "floor_plan",
+                            "machine_photo",
                             "meal_photo",
                             "post_photo",
                             "post_video",
-                            "shop_product_photo"
+                            "shop_product_photo",
+                            "space_photo"
                           ],
                           "type": "string"
                         },
@@ -282135,6 +284042,10 @@
                         "name": {
                           "type": "string"
                         },
+                        "shown_in_classes": {
+                          "description": "ADR-290: this floor shows in the class view when the gym shows its floor plans.",
+                          "type": "boolean"
+                        },
                         "sort_order": {
                           "type": "integer"
                         },
@@ -282207,6 +284118,9 @@
                     "minLength": 1,
                     "type": "string"
                   },
+                  "shown_in_classes": {
+                    "type": "boolean"
+                  },
                   "sort_order": {
                     "maximum": 999,
                     "minimum": 0,
@@ -282250,6 +284164,10 @@
                         },
                         "name": {
                           "type": "string"
+                        },
+                        "shown_in_classes": {
+                          "description": "ADR-290: this floor shows in the class view when the gym shows its floor plans.",
+                          "type": "boolean"
                         },
                         "sort_order": {
                           "type": "integer"
@@ -282548,6 +284466,237 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/inventory/machine-photos/uploads": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.InventoryController.machine_photo_upload",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "byte_size": {
+                    "maximum": 8388608,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "content_type": {
+                    "description": "Images are re-encoded in the browser (drops EXIF/GPS) before upload.",
+                    "enum": [
+                      "image/jpeg",
+                      "image/webp"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content_type",
+                  "byte_size"
+                ],
+                "title": "MediaUploadRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_in": {
+                      "type": "integer"
+                    },
+                    "max_bytes": {
+                      "type": "integer"
+                    },
+                    "media_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "required_headers": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "upload_url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "media_id",
+                    "upload_url",
+                    "required_headers",
+                    "expires_in",
+                    "max_bytes"
+                  ],
+                  "title": "MediaUpload",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Upload"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Reserve a machine log photo (machine_photo) and get a presigned upload for it",
+        "tags": [
+          "Inventory"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/inventory/machine-photos/uploads/{id}/complete": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.InventoryController.complete_machine_photo_upload",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "media": {
+                      "properties": {
+                        "alt_text": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "content_type": {
+                          "type": "string"
+                        },
+                        "duration_ms": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "feed_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "full_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "height": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "image",
+                            "video"
+                          ],
+                          "type": "string"
+                        },
+                        "placeholder": {
+                          "description": "A tiny blurred WebP data URI to show while the image loads",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purpose": {
+                          "enum": [
+                            "body_photo",
+                            "box_photo",
+                            "cleaning_photo",
+                            "floor_plan",
+                            "machine_photo",
+                            "meal_photo",
+                            "post_photo",
+                            "post_video",
+                            "shop_product_photo",
+                            "space_photo"
+                          ],
+                          "type": "string"
+                        },
+                        "rejection_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "description": "Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)",
+                          "enum": [
+                            "pending",
+                            "processing",
+                            "ready",
+                            "rejected"
+                          ],
+                          "type": "string"
+                        },
+                        "thumb_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "url": {
+                          "description": "Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition.",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "video_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "width": {
+                          "nullable": true,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "purpose",
+                        "status",
+                        "content_type",
+                        "width",
+                        "height",
+                        "url"
+                      ],
+                      "title": "Media",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "media"
+                  ],
+                  "title": "MediaResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Media"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Verify an uploaded machine_photo image and mark it ready",
+        "tags": [
+          "Inventory"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/staff/inventory/machines": {
       "get": {
         "callbacks": {},
@@ -282611,6 +284760,21 @@
                           "placements": {
                             "items": {
                               "properties": {
+                                "positions": {
+                                  "description": "ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1).",
+                                  "items": {
+                                    "items": {
+                                      "maximum": 1,
+                                      "minimum": 0,
+                                      "type": "number"
+                                    },
+                                    "maxItems": 2,
+                                    "minItems": 2,
+                                    "type": "array"
+                                  },
+                                  "maxItems": 500,
+                                  "type": "array"
+                                },
                                 "quantity": {
                                   "minimum": 1,
                                   "type": "integer"
@@ -282853,6 +285017,21 @@
                         "placements": {
                           "items": {
                             "properties": {
+                              "positions": {
+                                "description": "ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1).",
+                                "items": {
+                                  "items": {
+                                    "maximum": 1,
+                                    "minimum": 0,
+                                    "type": "number"
+                                  },
+                                  "maxItems": 2,
+                                  "minItems": 2,
+                                  "type": "array"
+                                },
+                                "maxItems": 500,
+                                "type": "array"
+                              },
                               "quantity": {
                                 "minimum": 1,
                                 "type": "integer"
@@ -283105,6 +285284,21 @@
                         "placements": {
                           "items": {
                             "properties": {
+                              "positions": {
+                                "description": "ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1).",
+                                "items": {
+                                  "items": {
+                                    "maximum": 1,
+                                    "minimum": 0,
+                                    "type": "number"
+                                  },
+                                  "maxItems": 2,
+                                  "minItems": 2,
+                                  "type": "array"
+                                },
+                                "maxItems": 500,
+                                "type": "array"
+                              },
                               "quantity": {
                                 "minimum": 1,
                                 "type": "integer"
@@ -283273,6 +285467,21 @@
                         "placements": {
                           "items": {
                             "properties": {
+                              "positions": {
+                                "description": "ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1).",
+                                "items": {
+                                  "items": {
+                                    "maximum": 1,
+                                    "minimum": 0,
+                                    "type": "number"
+                                  },
+                                  "maxItems": 2,
+                                  "minItems": 2,
+                                  "type": "array"
+                                },
+                                "maxItems": 500,
+                                "type": "array"
+                              },
                               "quantity": {
                                 "minimum": 1,
                                 "type": "integer"
@@ -283422,6 +285631,13 @@
                             "format": "uuid",
                             "type": "string"
                           },
+                          "media_ids": {
+                            "items": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
                           "nickname": {
                             "nullable": true,
                             "type": "string"
@@ -283429,6 +285645,34 @@
                           "occurred_at": {
                             "format": "date-time",
                             "type": "string"
+                          },
+                          "photos": {
+                            "description": "ADR-290: the line's photos, with signed URLs.",
+                            "items": {
+                              "properties": {
+                                "height": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "width": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
                           },
                           "severity": {
                             "enum": [
@@ -283474,10 +285718,120 @@
                         "type": "object"
                       },
                       "type": "array"
+                    },
+                    "places": {
+                      "items": {
+                        "properties": {
+                          "area": {
+                            "description": "A polygon on the floor plan in normalized coordinates (0..1, origin top-left).",
+                            "nullable": true,
+                            "properties": {
+                              "points": {
+                                "items": {
+                                  "items": {
+                                    "maximum": 1,
+                                    "minimum": 0,
+                                    "type": "number"
+                                  },
+                                  "maxItems": 2,
+                                  "minItems": 2,
+                                  "type": "array"
+                                },
+                                "maxItems": 32,
+                                "minItems": 3,
+                                "type": "array"
+                              }
+                            },
+                            "required": [
+                              "points"
+                            ],
+                            "title": "SpaceArea",
+                            "type": "object"
+                          },
+                          "floor_plan": {
+                            "nullable": true,
+                            "properties": {
+                              "height": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "image_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "location_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "media_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "shown_in_classes": {
+                                "description": "ADR-290: this floor shows in the class view when the gym shows its floor plans.",
+                                "type": "boolean"
+                              },
+                              "sort_order": {
+                                "type": "integer"
+                              },
+                              "width": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "media_id",
+                              "sort_order"
+                            ],
+                            "title": "FloorPlan",
+                            "type": "object"
+                          },
+                          "positions": {
+                            "items": {
+                              "items": {
+                                "type": "number"
+                              },
+                              "type": "array"
+                            },
+                            "type": "array"
+                          },
+                          "quantity": {
+                            "type": "integer"
+                          },
+                          "space_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "space_name": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "space_id",
+                          "space_name",
+                          "quantity",
+                          "positions",
+                          "floor_plan"
+                        ],
+                        "title": "InventoryMachinePlace",
+                        "type": "object"
+                      },
+                      "type": "array"
                     }
                   },
                   "required": [
-                    "events"
+                    "events",
+                    "places"
                   ],
                   "type": "object"
                 }
@@ -283491,7 +285845,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "A machine's log",
+        "summary": "A machine's log, and where it stands (ADR-290: places on the floor plans)",
         "tags": [
           "Inventory"
         ]
@@ -283537,6 +285891,15 @@
                       "retired"
                     ],
                     "type": "string"
+                  },
+                  "media_ids": {
+                    "description": "ADR-290: ready machine_photo uploads.",
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 10,
+                    "type": "array"
                   },
                   "occurred_at": {
                     "format": "date-time",
@@ -283618,6 +285981,13 @@
                           "format": "uuid",
                           "type": "string"
                         },
+                        "media_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
                         "nickname": {
                           "nullable": true,
                           "type": "string"
@@ -283625,6 +285995,34 @@
                         "occurred_at": {
                           "format": "date-time",
                           "type": "string"
+                        },
+                        "photos": {
+                          "description": "ADR-290: the line's photos, with signed URLs.",
+                          "items": {
+                            "properties": {
+                              "height": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "width": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
                         },
                         "severity": {
                           "enum": [
@@ -283720,6 +286118,21 @@
                         "placements": {
                           "items": {
                             "properties": {
+                              "positions": {
+                                "description": "ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1).",
+                                "items": {
+                                  "items": {
+                                    "maximum": 1,
+                                    "minimum": 0,
+                                    "type": "number"
+                                  },
+                                  "maxItems": 2,
+                                  "minItems": 2,
+                                  "type": "array"
+                                },
+                                "maxItems": 500,
+                                "type": "array"
+                              },
                               "quantity": {
                                 "minimum": 1,
                                 "type": "integer"
@@ -283842,6 +286255,21 @@
                   "placements": {
                     "items": {
                       "properties": {
+                        "positions": {
+                          "description": "ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1).",
+                          "items": {
+                            "items": {
+                              "maximum": 1,
+                              "minimum": 0,
+                              "type": "number"
+                            },
+                            "maxItems": 2,
+                            "minItems": 2,
+                            "type": "array"
+                          },
+                          "maxItems": 500,
+                          "type": "array"
+                        },
                         "quantity": {
                           "minimum": 1,
                           "type": "integer"
@@ -283884,6 +286312,21 @@
                     "placements": {
                       "items": {
                         "properties": {
+                          "positions": {
+                            "description": "ADR-290: a pin per item on the space's floor plan, `[x, y]` normalized (0..1).",
+                            "items": {
+                              "items": {
+                                "maximum": 1,
+                                "minimum": 0,
+                                "type": "number"
+                              },
+                              "maxItems": 2,
+                              "minItems": 2,
+                              "type": "array"
+                            },
+                            "maxItems": 500,
+                            "type": "array"
+                          },
                           "quantity": {
                             "minimum": 1,
                             "type": "integer"
@@ -290657,11 +293100,14 @@
                           "enum": [
                             "body_photo",
                             "box_photo",
+                            "cleaning_photo",
                             "floor_plan",
+                            "machine_photo",
                             "meal_photo",
                             "post_photo",
                             "post_video",
-                            "shop_product_photo"
+                            "shop_product_photo",
+                            "space_photo"
                           ],
                           "type": "string"
                         },
@@ -296185,6 +298631,498 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/space-photos/uploads": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.space_photo_upload",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "byte_size": {
+                    "maximum": 8388608,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "content_type": {
+                    "description": "Images are re-encoded in the browser (drops EXIF/GPS) before upload.",
+                    "enum": [
+                      "image/jpeg",
+                      "image/webp"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content_type",
+                  "byte_size"
+                ],
+                "title": "MediaUploadRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_in": {
+                      "type": "integer"
+                    },
+                    "max_bytes": {
+                      "type": "integer"
+                    },
+                    "media_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "required_headers": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "upload_url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "media_id",
+                    "upload_url",
+                    "required_headers",
+                    "expires_in",
+                    "max_bytes"
+                  ],
+                  "title": "MediaUpload",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Upload"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Reserve a room photo (space_photo) and get a presigned upload for it",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/space-photos/uploads/{id}/complete": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.complete_space_photo_upload",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "media": {
+                      "properties": {
+                        "alt_text": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "content_type": {
+                          "type": "string"
+                        },
+                        "duration_ms": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "feed_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "full_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "height": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "image",
+                            "video"
+                          ],
+                          "type": "string"
+                        },
+                        "placeholder": {
+                          "description": "A tiny blurred WebP data URI to show while the image loads",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "purpose": {
+                          "enum": [
+                            "body_photo",
+                            "box_photo",
+                            "cleaning_photo",
+                            "floor_plan",
+                            "machine_photo",
+                            "meal_photo",
+                            "post_photo",
+                            "post_video",
+                            "shop_product_photo",
+                            "space_photo"
+                          ],
+                          "type": "string"
+                        },
+                        "rejection_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "description": "Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)",
+                          "enum": [
+                            "pending",
+                            "processing",
+                            "ready",
+                            "rejected"
+                          ],
+                          "type": "string"
+                        },
+                        "thumb_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "url": {
+                          "description": "Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition.",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "video_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "width": {
+                          "nullable": true,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "purpose",
+                        "status",
+                        "content_type",
+                        "width",
+                        "height",
+                        "url"
+                      ],
+                      "title": "Media",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "media"
+                  ],
+                  "title": "MediaResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Media"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Verify an uploaded space_photo image and mark it ready",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/space-photos/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.delete_photo",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Removed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove a room photo (its image is deleted)",
+        "tags": [
+          "Spaces"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.update_photo",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "caption": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "media_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "public": {
+                    "type": "boolean"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "photo": {
+                      "properties": {
+                        "caption": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "height": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "media_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "public": {
+                          "description": "Shown on the public box page.",
+                          "type": "boolean"
+                        },
+                        "sort_order": {
+                          "type": "integer"
+                        },
+                        "space_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "width": {
+                          "nullable": true,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "space_id",
+                        "media_id",
+                        "public",
+                        "sort_order"
+                      ],
+                      "title": "SpacePhoto",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "photo"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Changed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Change a room photo",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/space-settings": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.settings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "settings": {
+                      "properties": {
+                        "floor_plans_in_classes": {
+                          "description": "Members and athletes open the floor plan with the class's room coloured, and the room's photos.",
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "floor_plans_in_classes"
+                      ],
+                      "title": "SpaceSettings",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "settings"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Settings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The gym's choices about its spaces",
+        "tags": [
+          "Spaces"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.put_settings",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "floor_plans_in_classes": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "floor_plans_in_classes"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "settings": {
+                      "properties": {
+                        "floor_plans_in_classes": {
+                          "description": "Members and athletes open the floor plan with the class's room coloured, and the room's photos.",
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "floor_plans_in_classes"
+                      ],
+                      "title": "SpaceSettings",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "settings"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Settings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Show the floor plans in classes, or stop",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/staff/spaces": {
       "get": {
         "callbacks": {},
@@ -296241,6 +299179,10 @@
                           "name": {
                             "type": "string"
                           },
+                          "shown_in_classes": {
+                            "description": "ADR-290: this floor shows in the class view when the gym shows its floor plans.",
+                            "type": "boolean"
+                          },
                           "sort_order": {
                             "type": "integer"
                           },
@@ -296259,6 +299201,19 @@
                         "type": "object"
                       },
                       "type": "array"
+                    },
+                    "settings": {
+                      "properties": {
+                        "floor_plans_in_classes": {
+                          "description": "Members and athletes open the floor plan with the class's room coloured, and the room's photos.",
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "floor_plans_in_classes"
+                      ],
+                      "title": "SpaceSettings",
+                      "type": "object"
                     },
                     "spaces": {
                       "items": {
@@ -296379,7 +299334,8 @@
                   },
                   "required": [
                     "spaces",
-                    "floor_plans"
+                    "floor_plans",
+                    "settings"
                   ],
                   "type": "object"
                 }
@@ -296762,6 +299718,103 @@
                         "name": {
                           "type": "string"
                         },
+                        "photos": {
+                          "items": {
+                            "properties": {
+                              "caption": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "height": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "media_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "public": {
+                                "description": "Shown on the public box page.",
+                                "type": "boolean"
+                              },
+                              "sort_order": {
+                                "type": "integer"
+                              },
+                              "space_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "width": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "space_id",
+                              "media_id",
+                              "public",
+                              "sort_order"
+                            ],
+                            "title": "SpacePhoto",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "points": {
+                          "items": {
+                            "properties": {
+                              "height": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "instruction": {
+                                "type": "string"
+                              },
+                              "media_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "sort_order": {
+                                "type": "integer"
+                              },
+                              "space_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "width": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "space_id",
+                              "media_id",
+                              "instruction",
+                              "sort_order"
+                            ],
+                            "title": "CleaningPoint",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "tasks": {
                           "items": {
                             "type": "string"
@@ -296815,7 +299868,9 @@
                         "tasks",
                         "unavailability",
                         "classes",
-                        "equipment"
+                        "equipment",
+                        "photos",
+                        "points"
                       ],
                       "title": "SpaceDetail",
                       "type": "object"
@@ -297219,6 +300274,461 @@
           }
         ],
         "summary": "Archive a space (its history and cleaning log are kept)",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/spaces/{id}/cleaning-points": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.add_point",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "instruction": {
+                    "maxLength": 500,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "media_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "point": {
+                      "properties": {
+                        "height": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "instruction": {
+                          "type": "string"
+                        },
+                        "media_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "sort_order": {
+                          "type": "integer"
+                        },
+                        "space_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "width": {
+                          "nullable": true,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "space_id",
+                        "media_id",
+                        "instruction",
+                        "sort_order"
+                      ],
+                      "title": "CleaningPoint",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "point"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Added"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Add a cleaning point to a space from a ready upload",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/spaces/{id}/cleaning-points/order": {
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.order_points",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "ids": {
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 100,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "ids"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "points": {
+                      "items": {
+                        "properties": {
+                          "height": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "instruction": {
+                            "type": "string"
+                          },
+                          "media_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "sort_order": {
+                            "type": "integer"
+                          },
+                          "space_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "width": {
+                            "nullable": true,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "space_id",
+                          "media_id",
+                          "instruction",
+                          "sort_order"
+                        ],
+                        "title": "CleaningPoint",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "points"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Ordered"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Order a space's cleaning points",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/spaces/{id}/photos": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.add_photo",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "caption": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "media_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "public": {
+                    "type": "boolean"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "photo": {
+                      "properties": {
+                        "caption": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "height": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "media_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "public": {
+                          "description": "Shown on the public box page.",
+                          "type": "boolean"
+                        },
+                        "sort_order": {
+                          "type": "integer"
+                        },
+                        "space_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "width": {
+                          "nullable": true,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "space_id",
+                        "media_id",
+                        "public",
+                        "sort_order"
+                      ],
+                      "title": "SpacePhoto",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "photo"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Added"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Add a room photo to a space from a ready upload",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/spaces/{id}/photos/order": {
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.SpacesController.order_photos",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "ids": {
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 100,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "ids"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "photos": {
+                      "items": {
+                        "properties": {
+                          "caption": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "height": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "media_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "public": {
+                            "description": "Shown on the public box page.",
+                            "type": "boolean"
+                          },
+                          "sort_order": {
+                            "type": "integer"
+                          },
+                          "space_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "width": {
+                            "nullable": true,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "space_id",
+                          "media_id",
+                          "public",
+                          "sort_order"
+                        ],
+                        "title": "SpacePhoto",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "photos"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Ordered"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Order a space's room photos",
         "tags": [
           "Spaces"
         ]
@@ -327693,6 +331203,62 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "rooms": {
+                      "description": "ADR-290: rooms with the photos their staff put on the public page",
+                      "items": {
+                        "properties": {
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "photos": {
+                            "items": {
+                              "properties": {
+                                "caption": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "height": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "width": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "photos"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
                     "time_zone": {
                       "description": "ADR-179: the gym's IANA zone; its classes show on this clock",
                       "type": "string"
@@ -327703,7 +331269,8 @@
                     "profile",
                     "followers_count",
                     "locations",
-                    "open_clubs"
+                    "open_clubs",
+                    "rooms"
                   ],
                   "title": "PublicBoxResponse",
                   "type": "object"

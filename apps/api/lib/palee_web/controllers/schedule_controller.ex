@@ -7,6 +7,7 @@ defmodule PaleeWeb.ScheduleController do
   alias Palee.Application.{
     CheckInOpenGym,
     CheckInToClass,
+    ClassRoom,
     GetScheduleCalendar,
     JoinClassWaitlist,
     SubmitBooking,
@@ -32,7 +33,8 @@ defmodule PaleeWeb.ScheduleController do
               :join_waitlist,
               :create_guest_booking,
               :check_in,
-              :check_in_class
+              :check_in_class,
+              :slot_space
             ]
 
   @location_schema FacilitySchemas.location_schema()
@@ -163,9 +165,14 @@ defmodule PaleeWeb.ScheduleController do
                      description: "ADR-202: the room or area of the branch the class is held in.",
                      properties: %{
                        id: %Schema{type: :string, format: :uuid},
-                       name: %Schema{type: :string}
+                       name: %Schema{type: :string},
+                       viewable: %Schema{
+                         type: :boolean,
+                         description:
+                           "ADR-290: the room view (GET /schedule/slots/{id}/space) has a floor plan, photos or directions for this viewer."
+                       }
                      },
-                     required: [:id, :name]
+                     required: [:id, :name, :viewable]
                    },
                    space_overlap: %Schema{
                      type: :boolean,
@@ -276,6 +283,34 @@ defmodule PaleeWeb.ScheduleController do
       unprocessable_entity: {"Invalid request", "application/json", @error_response}
     ]
   )
+
+  operation(:slot_space,
+    summary:
+      "The room of a class: floor plan with the room coloured, directions, photos (ADR-290)",
+    description:
+      "Staff who see the spaces always may; members and athletes only when the gym shows its " <>
+        "floor plans in classes (403 otherwise). `floor_plan` is null when the room is on no plan " <>
+        "or its floor is hidden.",
+    parameters: [
+      %Parameter{
+        name: :id,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      }
+    ],
+    responses: [
+      ok: {"Class room", "application/json", PaleeWeb.Schemas.Spaces.class_room()},
+      forbidden: {"Not shown in classes", "application/json", %Schema{type: :object}},
+      not_found: {"No such class or room", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def slot_space(conn, %{id: id}) do
+    with {:ok, room} <- ClassRoom.call(conn.assigns.tenant_context, id) do
+      json(conn, room)
+    end
+  end
 
   def index(conn, params) do
     actor = GuardianPlug.current_resource(conn)

@@ -21,7 +21,9 @@ defmodule PaleeWeb.Schemas.Cleaning do
         last_cleaned_at: @time,
         # ADR-202: an area is a space; where it is drawn on a floor plan.
         floor_plan_id: %Schema{type: :string, format: :uuid, nullable: true},
-        area: PaleeWeb.Schemas.Spaces.area()
+        area: PaleeWeb.Schemas.Spaces.area(),
+        # ADR-290: the room's visual cleaning checklist.
+        points: %Schema{type: :array, items: PaleeWeb.Schemas.Spaces.cleaning_point()}
       },
       required: [:id, :name, :tasks]
     }
@@ -39,9 +41,44 @@ defmodule PaleeWeb.Schemas.Cleaning do
         started_at: %Schema{type: :string, format: :"date-time"},
         finished_at: @time,
         tasks_done: %Schema{type: :array, items: %Schema{type: :string}},
-        note: %Schema{type: :string, nullable: true}
+        note: %Schema{type: :string, nullable: true},
+        point_results: %Schema{type: :array, items: point_result()}
       },
       required: [:id, :area_id, :started_at, :tasks_done]
+    }
+  end
+
+  @doc "ADR-290: what the janitor answered for a cleaning point, as the point read then."
+  def point_result do
+    %Schema{
+      title: "CleaningPointResult",
+      type: :object,
+      properties: %{
+        point_id: @uuid,
+        instruction: %Schema{type: :string},
+        media_id: @uuid,
+        url: %Schema{type: :string, nullable: true},
+        status: %Schema{type: :string, enum: ["cleaned", "not_cleaned"]},
+        note: %Schema{type: :string, nullable: true},
+        after_media_id: %Schema{type: :string, format: :uuid, nullable: true},
+        after_url: %Schema{type: :string, nullable: true}
+      },
+      required: [:point_id, :instruction, :status]
+    }
+  end
+
+  @doc "ADR-290: one answer when finishing a cleaning."
+  def point_answer do
+    %Schema{
+      type: :object,
+      additionalProperties: false,
+      properties: %{
+        point_id: @uuid,
+        status: %Schema{type: :string, enum: ["cleaned", "not_cleaned"]},
+        note: %Schema{type: :string, maxLength: 1000, nullable: true},
+        after_media_id: %Schema{type: :string, format: :uuid, nullable: true}
+      },
+      required: [:point_id, :status]
     }
   end
 

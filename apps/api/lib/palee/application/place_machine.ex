@@ -1,6 +1,7 @@
 defmodule Palee.Application.PlaceMachine do
   @moduledoc """
-  Where a machine stands (ADR-202): how many of it are in which space.
+  Where a machine stands (ADR-202): how many of it are in which space, and
+  (ADR-290) optionally a pin per item on the space's floor plan.
   Every space must be a usable space the caller works at, of the machine's
   own branch (a space without a branch fits any machine); the quantities
   placed never exceed the quantity owned (`placement_exceeds_quantity`).
@@ -18,7 +19,7 @@ defmodule Palee.Application.PlaceMachine do
       {:ok,
        %{
          machine_id: machine.id,
-         placements: Enum.map(placed, &Map.take(&1, [:space_id, :quantity])),
+         placements: Enum.map(placed, &Map.take(&1, [:space_id, :quantity, :positions])),
          unassigned: Inventory.unassigned(machine.quantity, placed)
        }}
     end
@@ -26,11 +27,17 @@ defmodule Palee.Application.PlaceMachine do
 
   def call(_context, _machine_id, _placements), do: {:error, :invalid_placement}
 
+  # ADR-290: pins are drawn on the space's floor plan.
+  defp on_plan(_space, %{positions: []}), do: :ok
+  defp on_plan(%{floor_plan_id: plan_id}, _row) when is_binary(plan_id), do: :ok
+  defp on_plan(_space, _row), do: {:error, :space_not_on_plan}
+
   defp check_spaces(context, rows, location_id) do
-    Enum.reduce_while(rows, :ok, fn %{space_id: id}, :ok ->
+    Enum.reduce_while(rows, :ok, fn %{space_id: id} = row, :ok ->
       with {:ok, space} <- SpaceDirectory.fetch(context, id),
            :ok <- Spaces.usable(space),
-           :ok <- Spaces.same_branch(space, location_id) do
+           :ok <- Spaces.same_branch(space, location_id),
+           :ok <- on_plan(space, row) do
         {:cont, :ok}
       else
         error -> {:halt, error}

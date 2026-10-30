@@ -793,6 +793,7 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/schedule", ScheduleController, :index)
+    get("/schedule/slots/:id/space", ScheduleController, :slot_space)
     get("/landing", LandingController, :show)
     post("/landing/leaderboard-opt-in", LandingController, :update_leaderboard_preference)
     post("/bookings", ScheduleController, :create_booking)
@@ -943,6 +944,8 @@ defmodule PaleeWeb.Router do
     # ADR-202: Settings › Spaces.
     get("/spaces", SpacesController, :index)
     post("/spaces", SpacesController, :create)
+    get("/space-settings", SpacesController, :settings)
+    put("/space-settings", SpacesController, :put_settings)
     get("/spaces/:id", SpacesController, :show)
     patch("/spaces/:id", SpacesController, :update)
     post("/spaces/:id/archive", SpacesController, :archive)
@@ -955,6 +958,25 @@ defmodule PaleeWeb.Router do
       :delete_unavailability
     )
 
+    # ADR-290: room photos, cleaning points, the gym's space settings.
+    post("/space-photos/uploads", SpacesController, :space_photo_upload)
+    post("/space-photos/uploads/:id/complete", SpacesController, :complete_space_photo_upload)
+    post("/cleaning-photos/uploads", SpacesController, :cleaning_photo_upload)
+
+    post(
+      "/cleaning-photos/uploads/:id/complete",
+      SpacesController,
+      :complete_cleaning_photo_upload
+    )
+
+    post("/spaces/:id/photos", SpacesController, :add_photo)
+    put("/spaces/:id/photos/order", SpacesController, :order_photos)
+    patch("/space-photos/:id", SpacesController, :update_photo)
+    delete("/space-photos/:id", SpacesController, :delete_photo)
+    post("/spaces/:id/cleaning-points", SpacesController, :add_point)
+    put("/spaces/:id/cleaning-points/order", SpacesController, :order_points)
+    patch("/cleaning-points/:id", SpacesController, :update_point)
+    delete("/cleaning-points/:id", SpacesController, :delete_point)
     post("/floor-plans/uploads", SpacesController, :floor_plan_upload)
     post("/floor-plans/uploads/:id/complete", SpacesController, :complete_floor_plan_upload)
     post("/floor-plans", SpacesController, :create_floor_plan)
@@ -967,6 +989,14 @@ defmodule PaleeWeb.Router do
     get("/inventory/machines/:id/events", InventoryController, :machine_events)
     put("/inventory/machines/:id/placements", InventoryController, :place_machine)
     post("/inventory/machines/:id/events", InventoryController, :log_machine_event)
+    post("/inventory/machine-photos/uploads", InventoryController, :machine_photo_upload)
+
+    post(
+      "/inventory/machine-photos/uploads/:id/complete",
+      InventoryController,
+      :complete_machine_photo_upload
+    )
+
     get("/inventory/supplies", InventoryController, :supplies)
     post("/inventory/supplies", InventoryController, :create_supply)
     patch("/inventory/supplies/:id", InventoryController, :update_supply)

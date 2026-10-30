@@ -205,6 +205,12 @@ msgstr "قرأ %{reader} ملاحظتك عن %{client} في %{time}."
 msgid "A machine needs attention"
 msgstr "جهاز يحتاج إلى انتباه"
 
+msgid "A room was not fully cleaned"
+msgstr "لم يُنظَّف مكان بالكامل"
+
+msgid "%{space}: %{notes}"
+msgstr "%{space}: %{notes}"
+
 msgid "%{machine}: %{note}"
 msgstr "%{machine}: %{note}"
 

@@ -4,7 +4,7 @@ defmodule PaleeWeb.SpacesController do
   use PaleeWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias Palee.Application.{CompleteMediaUpload, RequestMediaUpload, SpaceDirectory}
+  alias Palee.Application.{CompleteMediaUpload, RequestMediaUpload, SpaceDirectory, SpacePhotos}
   alias PaleeWeb.Schemas.Cleaning, as: C
   alias PaleeWeb.Schemas.Spaces, as: S
   alias OpenApiSpex.{Parameter, Schema}
@@ -36,9 +36,10 @@ defmodule PaleeWeb.SpacesController do
            type: :object,
            properties: %{
              spaces: %Schema{type: :array, items: S.space()},
-             floor_plans: %Schema{type: :array, items: S.floor_plan()}
+             floor_plans: %Schema{type: :array, items: S.floor_plan()},
+             settings: S.settings()
            },
-           required: [:spaces, :floor_plans]
+           required: [:spaces, :floor_plans, :settings]
          }}
     ]
   )
@@ -224,6 +225,183 @@ defmodule PaleeWeb.SpacesController do
   def delete_floor_plan(conn, %{id: id}) do
     with {:ok, plan} <- SpaceDirectory.delete_floor_plan(conn.assigns.tenant_context, id) do
       json(conn, %{floor_plan: plan})
+    end
+  end
+
+  # ── Settings, room photos and cleaning points (ADR-290) ─────────────────
+
+  operation(:settings,
+    summary: "The gym's choices about its spaces",
+    responses: [ok: {"Settings", "application/json", C.one(:settings, S.settings())}]
+  )
+
+  def settings(conn, _params) do
+    json(conn, %{settings: SpaceDirectory.settings(conn.assigns.tenant_context)})
+  end
+
+  operation(:put_settings,
+    summary: "Show the floor plans in classes, or stop",
+    request_body: C.body(S.settings_body()),
+    responses: [ok: {"Settings", "application/json", C.one(:settings, S.settings())}]
+  )
+
+  def put_settings(conn, _params) do
+    with {:ok, settings} <-
+           SpaceDirectory.put_settings(conn.assigns.tenant_context, conn.body_params) do
+      json(conn, %{settings: settings})
+    end
+  end
+
+  operation(:space_photo_upload,
+    summary: "Reserve a room photo (space_photo) and get a presigned upload for it",
+    request_body: C.body(PaleeWeb.Schemas.Media.upload_request()),
+    responses: [ok: {"Upload", "application/json", PaleeWeb.Schemas.Media.upload()}]
+  )
+
+  def space_photo_upload(conn, _params), do: reserve_upload(conn, "space_photo")
+
+  operation(:complete_space_photo_upload,
+    summary: "Verify an uploaded space_photo image and mark it ready",
+    parameters: [@id],
+    responses: [ok: {"Media", "application/json", PaleeWeb.Schemas.Media.media_response()}]
+  )
+
+  def complete_space_photo_upload(conn, %{id: id}), do: complete_upload(conn, "space_photo", id)
+
+  operation(:cleaning_photo_upload,
+    summary:
+      "Reserve a cleaning point or after photo (cleaning_photo) and get a presigned upload for it",
+    request_body: C.body(PaleeWeb.Schemas.Media.upload_request()),
+    responses: [ok: {"Upload", "application/json", PaleeWeb.Schemas.Media.upload()}]
+  )
+
+  def cleaning_photo_upload(conn, _params), do: reserve_upload(conn, "cleaning_photo")
+
+  operation(:complete_cleaning_photo_upload,
+    summary: "Verify an uploaded cleaning_photo image and mark it ready",
+    parameters: [@id],
+    responses: [ok: {"Media", "application/json", PaleeWeb.Schemas.Media.media_response()}]
+  )
+
+  def complete_cleaning_photo_upload(conn, %{id: id}),
+    do: complete_upload(conn, "cleaning_photo", id)
+
+  operation(:add_photo,
+    summary: "Add a room photo to a space from a ready upload",
+    parameters: [@id],
+    request_body: C.body(S.photo_body()),
+    responses: [created: {"Added", "application/json", C.one(:photo, S.photo())}]
+  )
+
+  def add_photo(conn, %{id: id}) do
+    with {:ok, row} <- SpacePhotos.add(conn.assigns.tenant_context, :photos, id, conn.body_params) do
+      conn |> put_status(:created) |> json(%{photo: row})
+    end
+  end
+
+  operation(:update_photo,
+    summary: "Change a room photo",
+    parameters: [@id],
+    request_body: C.body(S.photo_body()),
+    responses: [ok: {"Changed", "application/json", C.one(:photo, S.photo())}]
+  )
+
+  def update_photo(conn, %{id: id}) do
+    with {:ok, row} <-
+           SpacePhotos.update(conn.assigns.tenant_context, :photos, id, conn.body_params) do
+      json(conn, %{photo: row})
+    end
+  end
+
+  operation(:delete_photo,
+    summary: "Remove a room photo (its image is deleted)",
+    parameters: [@id],
+    responses: [no_content: {"Removed", "application/json", %Schema{type: :object}}]
+  )
+
+  def delete_photo(conn, %{id: id}) do
+    with {:ok, _row} <- SpacePhotos.delete(conn.assigns.tenant_context, :photos, id) do
+      send_resp(conn, :no_content, "")
+    end
+  end
+
+  operation(:order_photos,
+    summary: "Order a space's room photos",
+    parameters: [@id],
+    request_body: C.body(S.order_body()),
+    responses: [ok: {"Ordered", "application/json", C.many(:photos, S.photo())}]
+  )
+
+  def order_photos(conn, %{id: id}) do
+    with {:ok, rows} <-
+           SpacePhotos.order(conn.assigns.tenant_context, :photos, id, conn.body_params.ids) do
+      json(conn, %{photos: rows})
+    end
+  end
+
+  operation(:add_point,
+    summary: "Add a cleaning point to a space from a ready upload",
+    parameters: [@id],
+    request_body: C.body(S.cleaning_point_body()),
+    responses: [created: {"Added", "application/json", C.one(:point, S.cleaning_point())}]
+  )
+
+  def add_point(conn, %{id: id}) do
+    with {:ok, row} <- SpacePhotos.add(conn.assigns.tenant_context, :points, id, conn.body_params) do
+      conn |> put_status(:created) |> json(%{point: row})
+    end
+  end
+
+  operation(:update_point,
+    summary: "Change a cleaning point",
+    parameters: [@id],
+    request_body: C.body(S.cleaning_point_body()),
+    responses: [ok: {"Changed", "application/json", C.one(:point, S.cleaning_point())}]
+  )
+
+  def update_point(conn, %{id: id}) do
+    with {:ok, row} <-
+           SpacePhotos.update(conn.assigns.tenant_context, :points, id, conn.body_params) do
+      json(conn, %{point: row})
+    end
+  end
+
+  operation(:delete_point,
+    summary: "Remove a cleaning point (its image is deleted)",
+    parameters: [@id],
+    responses: [no_content: {"Removed", "application/json", %Schema{type: :object}}]
+  )
+
+  def delete_point(conn, %{id: id}) do
+    with {:ok, _row} <- SpacePhotos.delete(conn.assigns.tenant_context, :points, id) do
+      send_resp(conn, :no_content, "")
+    end
+  end
+
+  operation(:order_points,
+    summary: "Order a space's cleaning points",
+    parameters: [@id],
+    request_body: C.body(S.order_body()),
+    responses: [ok: {"Ordered", "application/json", C.many(:points, S.cleaning_point())}]
+  )
+
+  def order_points(conn, %{id: id}) do
+    with {:ok, rows} <-
+           SpacePhotos.order(conn.assigns.tenant_context, :points, id, conn.body_params.ids) do
+      json(conn, %{points: rows})
+    end
+  end
+
+  defp reserve_upload(conn, purpose) do
+    with {:ok, upload} <-
+           RequestMediaUpload.call(conn.assigns.tenant_context, purpose, conn.body_params) do
+      json(conn, upload)
+    end
+  end
+
+  defp complete_upload(conn, purpose, id) do
+    with {:ok, media} <- CompleteMediaUpload.call(conn.assigns.tenant_context, purpose, id) do
+      json(conn, %{media: media})
     end
   end
 end

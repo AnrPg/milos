@@ -41,6 +41,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     partner_profiles partner_swipes partner_matches partner_messages
     media_tenant_objects organization_public_profiles profile_tag_suggestions
     spaces space_floor_plans space_unavailabilities
+    space_settings space_photos space_cleaning_points
     housekeeping_entries housekeeping_schedules
     inventory_machines
     inventory_machine_events

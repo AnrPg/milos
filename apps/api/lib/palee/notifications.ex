@@ -870,6 +870,18 @@ defmodule Palee.Notifications do
         url: "/admin/inventory?tab=machines"
       })
 
+  # ADR-290: a janitor left points of a room's visual checklist not cleaned.
+  def process_event("cleaning_point_not_cleaned", payload),
+    do:
+      enqueue_simple(:cleaning_point_not_cleaned, payload, %{
+        entry_id: field(payload, :entry_id),
+        space_id: field(payload, :space_id),
+        space_name: field(payload, :space_name),
+        count: field(payload, :count),
+        notes: field(payload, :notes),
+        url: "/admin/cleaning"
+      })
+
   def process_event("inventory_stock_low", payload),
     do:
       enqueue_simple(:inventory_stock_low, payload, %{

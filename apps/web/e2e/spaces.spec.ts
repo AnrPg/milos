@@ -358,8 +358,8 @@ test.describe("Equipment › where it stands", () => {
     await placement.getByTestId("placement-save-m1").click();
 
     await expect.poll(() => sent?.placements).toEqual([
-      { space_id: "space-cardio", quantity: 4 },
-      { space_id: "space-up", quantity: 2 },
+      { space_id: "space-cardio", quantity: 4, positions: [] },
+      { space_id: "space-up", quantity: 2, positions: [] },
     ]);
   });
 });

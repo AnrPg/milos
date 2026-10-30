@@ -205,6 +205,12 @@ msgstr "%{reader} прочитал(а) вашу заметку о %{client} в %
 msgid "A machine needs attention"
 msgstr "Тренажёр требует внимания"
 
+msgid "A room was not fully cleaned"
+msgstr "Помещение убрано не полностью"
+
+msgid "%{space}: %{notes}"
+msgstr "%{space}: %{notes}"
+
 msgid "%{machine}: %{note}"
 msgstr "%{machine}: %{note}"
 
