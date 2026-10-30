@@ -62,7 +62,14 @@ export default async function PrivacyPage() {
 
       <LegalSection id="sub-processors" title={p("recipientsTitle")}>
         <p>{p("recipientsIntro")}</p>
-        <div className="overflow-x-auto rounded-2xl border" style={{ borderColor: "var(--border)" }}>
+        {/* Focusable so keyboard users can scroll the table on narrow screens (axe scrollable-region-focusable). */}
+        <div
+          role="region"
+          aria-label={p("recipientsTitle")}
+          tabIndex={0}
+          className="overflow-x-auto rounded-2xl border"
+          style={{ borderColor: "var(--border)" }}
+        >
           <table className="w-full min-w-[32rem] text-start text-sm">
             <thead style={{ background: "var(--panel-muted)", color: "var(--text)" }}>
               <tr>
