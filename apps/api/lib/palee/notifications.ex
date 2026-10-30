@@ -491,14 +491,12 @@ defmodule Palee.Notifications do
         url: "/me/buddies/#{field(payload, :link_id)}/messages"
       })
 
-  # ADR-169: a mutual like in a club; a message in the pair's conversation
-  # (the push names who wrote, never what).
+  # ADR-169/ADR-280: a mutual like in the public deck; a message in the
+  # pair's conversation (the push names who wrote, never what).
   def process_event("partner_match", payload),
     do:
       enqueue_simple(:partner_match, payload, %{
         match_id: field(payload, :match_id),
-        club_id: field(payload, :club_id),
-        club_name: field(payload, :club_name),
         nickname: field(payload, :partner_nickname),
         dedupe_key: field(payload, :dedupe_key),
         url: partner_url(field(payload, :match_id))
@@ -513,6 +511,46 @@ defmodule Palee.Notifications do
         nickname: field(payload, :author_nickname),
         dedupe_key: field(payload, :dedupe_key),
         url: partner_url(field(payload, :match_id))
+      })
+
+  # ADR-280 verification: a sponsor is asked, a candidate got a vouch, the
+  # Palee check was decided (or its selfie expired), a sponsor's pause.
+  def process_event("partner_vouch_request", payload),
+    do:
+      enqueue_simple(:partner_vouch_request, payload, %{
+        sponsorship_id: field(payload, :sponsorship_id),
+        candidate_id: field(payload, :candidate_id),
+        nickname: field(payload, :candidate_nickname),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/partners/vouch-requests"
+      })
+
+  def process_event("partner_vouched", payload),
+    do:
+      enqueue_simple(:partner_vouched, payload, %{
+        sponsorship_id: field(payload, :sponsorship_id),
+        sponsor_id: field(payload, :sponsor_id),
+        nickname: field(payload, :sponsor_nickname),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/partners/verify"
+      })
+
+  def process_event("partner_verification_decided", payload),
+    do:
+      enqueue_simple(:partner_verification_decided, payload, %{
+        request_id: field(payload, :request_id),
+        outcome: field(payload, :outcome),
+        reason: field(payload, :reason),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/partners/verify"
+      })
+
+  def process_event("partner_sponsor_penalty", payload),
+    do:
+      enqueue_simple(:partner_sponsor_penalty, payload, %{
+        until: field(payload, :until),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/partners/vouch-requests"
       })
 
   # ADR-160 §4: the coach's Sunday wellness summary of a client who shares
@@ -868,6 +906,18 @@ defmodule Palee.Notifications do
         symptom: field(payload, :symptom),
         body: field(payload, :body),
         url: "/admin/inventory?tab=machines"
+      })
+
+  # ADR-290: a janitor left points of a room's visual checklist not cleaned.
+  def process_event("cleaning_point_not_cleaned", payload),
+    do:
+      enqueue_simple(:cleaning_point_not_cleaned, payload, %{
+        entry_id: field(payload, :entry_id),
+        space_id: field(payload, :space_id),
+        space_name: field(payload, :space_name),
+        count: field(payload, :count),
+        notes: field(payload, :notes),
+        url: "/admin/cleaning"
       })
 
   def process_event("inventory_stock_low", payload),

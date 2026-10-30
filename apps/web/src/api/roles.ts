@@ -222,7 +222,16 @@ export async function startCleaning(token: string, areaId: string) {
   return response.entry;
 }
 
-export async function finishCleaning(token: string, id: string, body: { tasks_done: string[]; note?: string | null }) {
+export async function finishCleaning(
+  token: string,
+  id: string,
+  body: {
+    tasks_done: string[];
+    note?: string | null;
+    /** ADR-290: an answer per cleaning point of the room. */
+    point_results?: { point_id: string; status: "cleaned" | "not_cleaned"; note?: string | null; after_media_id?: string | null }[];
+  },
+) {
   const response = await apiRequest<EntryResponse>(`/staff/cleaning/entries/${id}/finish`, { method: "POST", token, body });
   return response.entry;
 }

@@ -11,8 +11,8 @@ defmodule Palee.Application.PublicBox do
   """
 
   alias Palee.Application.Shop.ProductCards
-  alias Palee.Application.{MediaUrls, OpenClubs, PostPresenter, Trials}
-  alias Palee.{Community, Facility, Identity, Media, Organizations, Scheduling}
+  alias Palee.Application.{MediaUrls, OpenClubs, PostPresenter, SpacePhotos, Trials}
+  alias Palee.{Community, Facility, Identity, Media, Organizations, Scheduling, Spaces}
 
   @max_window_days 31
 
@@ -33,6 +33,7 @@ defmodule Palee.Application.PublicBox do
          followers_count: box_followers(box.organization_id),
          time_zone: Organizations.organization_timezone(box.organization_id),
          open_clubs: OpenClubs.for_box(context),
+         rooms: rooms(context),
          locations:
            context
            |> Facility.list_locations()
@@ -176,6 +177,31 @@ defmodule Palee.Application.PublicBox do
       cover: cover_id && by_id[cover_id],
       photos: photo_ids |> Enum.map(&by_id[&1]) |> Enum.reject(&is_nil/1)
     }
+  end
+
+  # ADR-290: the rooms whose staff put photos on the public page, with only
+  # those photos; archived rooms never show.
+  defp rooms(context) do
+    case Spaces.list_photos(context, :photos, %{public: true}) do
+      [] ->
+        []
+
+      photos ->
+        shown = context |> SpacePhotos.present(:photos, photos) |> Enum.group_by(& &1.space_id)
+
+        context
+        |> Spaces.list_spaces(%{ids: Map.keys(shown)})
+        |> Enum.filter(&Map.has_key?(shown, &1.id))
+        |> Enum.map(fn space ->
+          %{
+            id: space.id,
+            name: space.name,
+            description: space.description,
+            photos:
+              Enum.map(shown[space.id], &Map.take(&1, [:id, :url, :width, :height, :caption]))
+          }
+        end)
+    end
   end
 
   # Board 4 Q4: the coaches the owner picked who are still on staff, with the

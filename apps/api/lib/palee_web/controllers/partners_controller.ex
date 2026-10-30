@@ -1,8 +1,9 @@
 defmodule PaleeWeb.PartnersController do
   @moduledoc """
-  Partners (ADR-169): a member's profile, the deck and swipes in one club;
-  their matches across clubs, each match's conversation and «Κλείστε μαζί»;
-  the Ρυθμίσεις switch; blocking a person.
+  Public Partners (ADR-280, ADR-169): the overview, a person's profile, the
+  deck and swipes; their matches, each match's conversation; the Ρυθμίσεις
+  switch; reporting and blocking a person. «Κλείστε μαζί» suggestions and
+  plans have their own controller (the suggestions side).
   """
 
   use PaleeWeb, :controller
@@ -20,38 +21,34 @@ defmodule PaleeWeb.PartnersController do
   plug OpenApiSpex.Plug.CastAndValidate, json_render_error_v2: true
 
   @id %Parameter{name: :id, in: :path, required: true, schema: S.uuid()}
-  @club_id %Parameter{name: :club_id, in: :path, required: true, schema: S.uuid()}
 
   defp ctx(conn), do: conn.assigns.user_context
 
-  # ------------------------------------------------------------- one club
+  # ------------------------------------------------------------- the deck
 
-  operation(:club,
-    summary: "Partners in a club as it applies to you: offered?, your profile, the options",
-    parameters: [@club_id],
+  operation(:overview,
+    summary: "Partners as it applies to you: verification, your profile, the options",
     responses: [ok: {"Overview", "application/json", S.overview()}]
   )
 
-  def club(conn, %{club_id: club_id}) do
-    with {:ok, overview} <- Partners.overview(ctx(conn), club_id), do: json(conn, overview)
+  def overview(conn, _params) do
+    with {:ok, overview} <- Partners.overview(ctx(conn)), do: json(conn, overview)
   end
 
   operation(:put_profile,
-    summary: "Opt in or change your Partners profile in a club (a member of the club only)",
-    parameters: [@club_id],
+    summary: "Opt in or change your Partners profile (verified people; 18+ on the first save)",
     request_body: S.body(S.profile_request()),
     responses: [ok: {"Profile", "application/json", S.profile_response()}]
   )
 
-  def put_profile(conn, %{club_id: club_id}) do
-    with {:ok, profile} <- Partners.put_profile(ctx(conn), club_id, conn.body_params),
+  def put_profile(conn, _params) do
+    with {:ok, profile} <- Partners.put_profile(ctx(conn), conn.body_params),
          do: json(conn, %{profile: profile})
   end
 
   operation(:deck,
-    summary: "The next people of the club who opted in, best fit first",
+    summary: "The next verified people near you who opted in, best fit first",
     parameters: [
-      @club_id,
       %Parameter{
         name: :time,
         in: :query,
@@ -82,45 +79,40 @@ defmodule PaleeWeb.PartnersController do
         in: :query,
         required: false,
         description:
-          "Open clubs only (ADR-197): people who show in Γύρω μου with a main neighbourhood this close to yours",
+          "People whose main neighbourhood is this close to yours (default 10); needs «Η περιοχή μου»",
         schema: %Schema{type: :integer, enum: Palee.Partners.distances_km()}
       }
     ],
     responses: [ok: {"Deck", "application/json", S.deck()}]
   )
 
-  def deck(conn, %{club_id: club_id} = params) do
+  def deck(conn, params) do
     filters =
       params
       |> Map.take([:time, :level, :goal, :discipline, :within_km])
       |> Map.new(fn {k, v} -> {Atom.to_string(k), v} end)
 
-    with {:ok, deck} <- Partners.deck(ctx(conn), club_id, filters), do: json(conn, deck)
+    with {:ok, deck} <- Partners.deck(ctx(conn), filters), do: json(conn, deck)
   end
 
   operation(:swipe,
     summary: "Like or pass; a like answered by a like makes a match",
-    parameters: [@club_id],
     request_body: S.body(S.swipe_request()),
     responses: [ok: {"Swipe", "application/json", S.swipe_response()}]
   )
 
-  def swipe(conn, %{club_id: club_id}) do
-    with {:ok, result} <- Partners.swipe(ctx(conn), club_id, conn.body_params),
-         do: json(conn, result)
+  def swipe(conn, _params) do
+    with {:ok, result} <- Partners.swipe(ctx(conn), conn.body_params), do: json(conn, result)
   end
 
   operation(:undo,
     summary: "Take back a swipe that made no match",
-    parameters: [
-      @club_id,
-      %Parameter{name: :target_id, in: :path, required: true, schema: S.uuid()}
-    ],
+    parameters: [%Parameter{name: :target_id, in: :path, required: true, schema: S.uuid()}],
     responses: [ok: {"Undone", "application/json", S.undo_response()}]
   )
 
-  def undo(conn, %{club_id: club_id, target_id: target_id}) do
-    with {:ok, result} <- Partners.undo(ctx(conn), club_id, target_id), do: json(conn, result)
+  def undo(conn, %{target_id: target_id}) do
+    with {:ok, result} <- Partners.undo(ctx(conn), target_id), do: json(conn, result)
   end
 
   # ------------------------------------------------------------- matches
@@ -187,33 +179,10 @@ defmodule PaleeWeb.PartnersController do
     with {:ok, result} <- PartnerMatches.mark_read(ctx(conn), id), do: json(conn, result)
   end
 
-  operation(:sessions,
-    summary: "«Κλείστε μαζί»: the gym's next classes that suit you both",
-    parameters: [@id],
-    responses: [ok: {"Sessions", "application/json", S.sessions_response()}]
-  )
-
-  def sessions(conn, %{id: id}) do
-    with {:ok, result} <- PartnerMatches.sessions(ctx(conn), id), do: json(conn, result)
-  end
-
-  operation(:plan,
-    summary: "Suggest a class in the conversation («Κλείστε μαζί»)",
-    parameters: [@id],
-    request_body: S.body(S.plan_request()),
-    responses: [created: {"Message", "application/json", S.message_response()}]
-  )
-
-  def plan(conn, %{id: id}) do
-    with {:ok, message} <- PartnerMatches.plan(ctx(conn), id, conn.body_params) do
-      conn |> put_status(:created) |> json(%{message: message})
-    end
-  end
-
   # ------------------------------------------------------------- settings
 
   operation(:settings,
-    summary: "Ρυθμίσεις › Partners: whether others in your clubs see you",
+    summary: "Ρυθμίσεις › Partners: whether you show in the deck",
     responses: [ok: {"Settings", "application/json", S.settings()}]
   )
 
@@ -222,7 +191,7 @@ defmodule PaleeWeb.PartnersController do
   end
 
   operation(:put_settings,
-    summary: "Pause or resume every Partners profile at once",
+    summary: "Pause or resume your Partners profile",
     request_body: S.body(S.settings_request()),
     responses: [ok: {"Settings", "application/json", S.settings()}]
   )
@@ -230,6 +199,20 @@ defmodule PaleeWeb.PartnersController do
   def put_settings(conn, _params) do
     with {:ok, settings} <- Partners.put_settings(ctx(conn), conn.body_params),
          do: json(conn, settings)
+  end
+
+  # ------------------------------------------------------------- reports
+
+  operation(:report,
+    summary: "Report a person to the Palee team; it also blocks them",
+    request_body: S.body(S.report_request()),
+    responses: [created: {"Reported", "application/json", S.report_response()}]
+  )
+
+  def report(conn, _params) do
+    with {:ok, result} <- Partners.report(ctx(conn), conn.body_params) do
+      conn |> put_status(:created) |> json(result)
+    end
   end
 
   # ------------------------------------------------------------- blocks

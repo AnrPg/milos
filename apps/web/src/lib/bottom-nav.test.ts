@@ -46,6 +46,7 @@ describe("hidden routes", () => {
       "/set-admin",
       "/activate-business",
       "/platform/organizations",
+      "/partners",
     ]) {
       expect(routeShowsBottomNav(path), path).toBe(false);
     }
@@ -53,7 +54,7 @@ describe("hidden routes", () => {
   });
 
   it("shows it on every member page", () => {
-    for (const path of ["/", "/around", "/box", "/box/schedule", "/workouts", "/workouts/w1", "/journal", "/journal/progress", "/me", "/me/settings", "/b/kypseli", "/clubs/c1"]) {
+    for (const path of ["/", "/around", "/box", "/box/schedule", "/workouts", "/workouts/w1", "/journal", "/journal/progress", "/me", "/me/settings", "/b/kypseli", "/clubs/c1", "/partners/m-1"]) {
       expect(routeShowsBottomNav(path), path).toBe(true);
     }
   });

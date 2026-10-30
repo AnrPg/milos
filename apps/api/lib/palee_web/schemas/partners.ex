@@ -1,9 +1,11 @@
 defmodule PaleeWeb.Schemas.Partners do
   @moduledoc """
-  OpenAPI schemas of Partners (ADR-169): a member's profile in a club, the
-  deck, swipes, matches and their conversation, «Κλείστε μαζί», the
-  Ρυθμίσεις switch and blocked people. Nothing here says who liked whom
-  before it is mutual, and a person's gender never leaves their own profile.
+  OpenAPI schemas of public Partners (ADR-280, ADR-169): the overview with
+  eligibility, a person's profile, the deck and its badges, swipes, matches
+  and their conversation (with «Κλείστε μαζί» plan messages), the
+  Ρυθμίσεις switch, reports, the Palee team's reports queue and blocked
+  people. Nothing here says who liked whom before it is mutual, and a
+  person's gender never leaves their own profile.
   """
 
   alias Palee.Partners
@@ -58,10 +60,12 @@ defmodule PaleeWeb.Schemas.Partners do
         distances_km: %Schema{
           type: :array,
           items: %Schema{type: :integer},
-          description: "The «Απόσταση» choices of an open club's deck (ADR-197)"
+          description: "The «Απόσταση» choices of the deck (ADR-197, ADR-280)"
         },
+        default_within_km: %Schema{type: :integer},
         about_max: %Schema{type: :integer},
-        daily_swipes: %Schema{type: :integer}
+        daily_swipes: %Schema{type: :integer},
+        report_reasons: enum_list(Partners.report_reasons())
       },
       [
         :levels,
@@ -73,8 +77,10 @@ defmodule PaleeWeb.Schemas.Partners do
         :disciplines,
         :max_disciplines,
         :distances_km,
+        :default_within_km,
         :about_max,
-        :daily_swipes
+        :daily_swipes,
+        :report_reasons
       ]
     )
   end
@@ -84,9 +90,13 @@ defmodule PaleeWeb.Schemas.Partners do
       "PartnerProfile",
       %{
         id: @uuid,
-        club_id: @uuid,
         active: %Schema{type: :boolean},
-        suspended: %Schema{type: :boolean, description: "Staff hid it after a report"},
+        paused: %Schema{type: :boolean, description: "Switched off in Ρυθμίσεις"},
+        show_box: %Schema{
+          type: :boolean,
+          description: "«Δείξε το box μου»: the card names the box of an active membership"
+        },
+        adult_confirmed_at: @datetime,
         level: enum(Partners.levels()),
         times: enum_list(Partners.times()),
         goals: enum_list(Partners.goals()),
@@ -103,9 +113,10 @@ defmodule PaleeWeb.Schemas.Partners do
       },
       [
         :id,
-        :club_id,
         :active,
-        :suspended,
+        :paused,
+        :show_box,
+        :adult_confirmed_at,
         :level,
         :times,
         :goals,
@@ -117,42 +128,33 @@ defmodule PaleeWeb.Schemas.Partners do
     )
   end
 
+  def eligibility do
+    object(
+      "PartnersEligibility",
+      %{
+        status: enum(~w(verified needs_verification in_review rejected suspended)),
+        method: %Schema{type: :string, enum: ~w(membership sponsors), nullable: true},
+        next_step: %Schema{
+          type: :string,
+          nullable: true,
+          description: "What the verification flow asks for next (the verification side's word)"
+        }
+      },
+      [:status, :method, :next_step]
+    )
+  end
+
   def overview do
     object(
-      "PartnersClubOverview",
+      "PartnersOverview",
       %{
-        club_id: @uuid,
-        offered: %Schema{type: :boolean},
-        unavailable_reason: %Schema{
-          type: :string,
-          enum: ["disabled", "not_offered"],
-          nullable: true
-        },
-        member: %Schema{
-          type: :boolean,
-          description: "Whether the viewer is a member of the club now"
-        },
+        eligibility: eligibility(),
         profile: %Schema{allOf: [profile()], nullable: true},
         swipes_remaining: %Schema{type: :integer},
-        distance: %Schema{
-          type: :string,
-          enum: ["available", "needs_area"],
-          nullable: true,
-          description:
-            "Open clubs only (ADR-197): «Απόσταση» works once the viewer has «Η περιοχή μου» and shows in Γύρω μου"
-        },
+        distance: enum(["available", "needs_area"]),
         options: options()
       },
-      [
-        :club_id,
-        :offered,
-        :unavailable_reason,
-        :member,
-        :profile,
-        :swipes_remaining,
-        :distance,
-        :options
-      ]
+      [:eligibility, :profile, :swipes_remaining, :distance, :options]
     )
   end
 
@@ -161,6 +163,11 @@ defmodule PaleeWeb.Schemas.Partners do
       "PartnerProfileRequest",
       %{
         active: %Schema{type: :boolean},
+        adult_confirmed: %Schema{
+          type: :boolean,
+          description: "«Είμαι 18 ετών ή μεγαλύτερος/η»: required true on the first save"
+        },
+        show_box: %Schema{type: :boolean},
         level: enum(Partners.levels()),
         times: enum_list(Partners.times()),
         goals: enum_list(Partners.goals()),
@@ -188,12 +195,28 @@ defmodule PaleeWeb.Schemas.Partners do
     )
   end
 
+  def badge do
+    object(
+      "PartnerBadge",
+      %{
+        kind: enum(Partners.badge_kinds()),
+        box_name: %Schema{
+          type: :string,
+          nullable: true,
+          description: "Set for `box` only: the box of an active membership"
+        }
+      },
+      [:kind, :box_name]
+    )
+  end
+
   def card do
     object(
       "PartnerCard",
       %{
         profile_id: @uuid,
         person: person(),
+        badge: %Schema{allOf: [badge()], nullable: true},
         level: enum(Partners.levels()),
         times: enum_list(Partners.times()),
         goals: enum_list(Partners.goals()),
@@ -201,15 +224,19 @@ defmodule PaleeWeb.Schemas.Partners do
         about: %Schema{type: :string, nullable: true},
         shared: shared()
       },
-      [:profile_id, :person, :level, :times, :goals, :disciplines, :about, :shared]
+      [:profile_id, :person, :badge, :level, :times, :goals, :disciplines, :about, :shared]
     )
   end
 
   def deck do
     object(
       "PartnerDeck",
-      %{club_id: @uuid, cards: list(card()), swipes_remaining: %Schema{type: :integer}},
-      [:club_id, :cards, :swipes_remaining]
+      %{
+        cards: list(card()),
+        swipes_remaining: %Schema{type: :integer},
+        within_km: %Schema{type: :integer, enum: Partners.distances_km()}
+      },
+      [:cards, :swipes_remaining, :within_km]
     )
   end
 
@@ -226,35 +253,28 @@ defmodule PaleeWeb.Schemas.Partners do
       "PartnerMatch",
       %{
         id: @uuid,
-        club_id: @uuid,
-        club_name: %Schema{type: :string, nullable: true},
         person: person(),
-        partner_profile_id: %Schema{
+        partner_id: %Schema{
           type: :string,
           format: :uuid,
-          nullable: true,
-          description: "The other person's profile in the club, what a report names"
+          description: "The other person, what a report names (`target_id`)"
         },
         status: enum(Partners.match_statuses()),
         end_reason: %Schema{type: :string, enum: Partners.end_reasons(), nullable: true},
         ended_by_me: %Schema{type: :boolean},
         read_only: %Schema{type: :boolean},
-        plannable: %Schema{type: :boolean, description: "«Κλείστε μαζί» offers the gym's classes"},
         unread: %Schema{type: :integer},
         matched_at: @datetime,
         last_message_at: @nullable_datetime
       },
       [
         :id,
-        :club_id,
-        :club_name,
         :person,
-        :partner_profile_id,
+        :partner_id,
         :status,
         :end_reason,
         :ended_by_me,
         :read_only,
-        :plannable,
         :unread,
         :matched_at,
         :last_message_at
@@ -299,12 +319,13 @@ defmodule PaleeWeb.Schemas.Partners do
     object(
       "PartnerPlan",
       %{
-        class_id: @uuid,
-        name: %Schema{type: :string, nullable: true},
-        scheduled_at: @datetime,
-        duration_minutes: %Schema{type: :integer, nullable: true}
+        kind: enum(Partners.plan_kinds()),
+        id: @uuid,
+        title: %Schema{type: :string},
+        starts_at: @datetime,
+        place: %Schema{type: :string, nullable: true}
       },
-      [:class_id, :name, :scheduled_at, :duration_minutes]
+      [:kind, :id, :title, :starts_at, :place]
     )
   end
 
@@ -350,69 +371,104 @@ defmodule PaleeWeb.Schemas.Partners do
 
   def read_response, do: object("PartnerMessagesRead", %{read: %Schema{type: :integer}}, [:read])
 
-  def session do
-    object(
-      "PartnerSession",
-      %{
-        class_id: @uuid,
-        name: %Schema{type: :string, nullable: true},
-        scheduled_at: @datetime,
-        duration_minutes: %Schema{type: :integer, nullable: true},
-        spots_remaining: %Schema{type: :integer},
-        booked_by_me: %Schema{type: :boolean},
-        booked_by_partner: %Schema{type: :boolean},
-        shared_time: %Schema{type: :boolean, description: "In a time both of you chose"}
-      },
-      [
-        :class_id,
-        :name,
-        :scheduled_at,
-        :duration_minutes,
-        :spots_remaining,
-        :booked_by_me,
-        :booked_by_partner,
-        :shared_time
-      ]
-    )
-  end
-
-  def sessions_response do
-    object(
-      "PartnerSessions",
-      %{
-        available: %Schema{type: :boolean},
-        timezone: %Schema{type: :string, nullable: true},
-        sessions: list(session())
-      },
-      [:available, :timezone, :sessions]
-    )
-  end
-
-  def plan_request do
-    object(
-      "PartnerPlanRequest",
-      %{
-        class_id: @uuid,
-        body: %Schema{type: :string, nullable: true, maxLength: Partners.message_body_max()}
-      },
-      [:class_id]
-    )
-  end
-
   def settings do
     object(
       "PartnerSettings",
       %{
-        visible: %Schema{type: :boolean, description: "Whether any of your profiles is on"},
-        clubs: %Schema{type: :integer, description: "Clubs where you have a profile"},
-        club_ids: list(@uuid)
+        visible: %Schema{type: :boolean, description: "Whether you show in the deck"},
+        has_profile: %Schema{type: :boolean}
       },
-      [:visible, :clubs, :club_ids]
+      [:visible, :has_profile]
     )
   end
 
   def settings_request,
     do: object("PartnerSettingsRequest", %{visible: %Schema{type: :boolean}}, [:visible])
+
+  def report_request do
+    object(
+      "PartnerReportRequest",
+      %{
+        target_id: @uuid,
+        reason: enum(Partners.report_reasons()),
+        note: %Schema{type: :string, nullable: true, maxLength: Partners.report_note_max()}
+      },
+      [:target_id, :reason]
+    )
+  end
+
+  def report_response do
+    object(
+      "PartnerReportResponse",
+      %{
+        target_id: @uuid,
+        reported: %Schema{type: :boolean},
+        blocked: %Schema{type: :boolean}
+      },
+      [:target_id, :reported, :blocked]
+    )
+  end
+
+  def platform_report do
+    object(
+      "PlatformPartnerReport",
+      %{
+        id: @uuid,
+        reporter: person(),
+        target: person(),
+        reason: enum(Partners.report_reasons()),
+        note: %Schema{type: :string, nullable: true},
+        status: enum(Partners.report_statuses()),
+        reports_on_target: %Schema{
+          type: :integer,
+          description: "Reports of this status on the same person"
+        },
+        decided_at: @nullable_datetime,
+        decision_note: %Schema{type: :string, nullable: true},
+        created_at: @datetime
+      },
+      [
+        :id,
+        :reporter,
+        :target,
+        :reason,
+        :note,
+        :status,
+        :reports_on_target,
+        :decided_at,
+        :decision_note,
+        :created_at
+      ]
+    )
+  end
+
+  def platform_reports,
+    do: object("PlatformPartnerReports", %{reports: list(platform_report())}, [:reports])
+
+  def report_decision_request do
+    object(
+      "PlatformPartnerReportDecisionRequest",
+      %{
+        decision: enum(Partners.report_decisions()),
+        note: %Schema{type: :string, nullable: true, maxLength: Partners.report_note_max()}
+      },
+      [:decision]
+    )
+  end
+
+  def report_decision_response do
+    object(
+      "PlatformPartnerReportDecision",
+      %{
+        id: @uuid,
+        target_id: @uuid,
+        decision: enum(Partners.report_decisions()),
+        resolved: %Schema{type: :integer, description: "Open reports on the person it closed"},
+        penalized_sponsors: %Schema{type: :integer}
+      },
+      [:id, :target_id, :decision, :resolved, :penalized_sponsors]
+    )
+  end
 
   def block_request, do: object("BlockPersonRequest", %{user_id: @uuid}, [:user_id])
 

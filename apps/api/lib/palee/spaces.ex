@@ -5,7 +5,7 @@ defmodule Palee.Spaces do
   place in a space; the cleaning log (ADR-102) cleans them.
   """
 
-  alias Palee.Spaces.Domain.{SpacePolicy, TenantDataPolicy}
+  alias Palee.Spaces.Domain.{PhotoPolicy, SpacePolicy, TenantDataPolicy}
   alias Palee.Spaces.SpaceStore
 
   @doc "Spaces of the gym; filters: `include_archived`, `location_id` (nil for none), `ids`."
@@ -61,6 +61,49 @@ defmodule Palee.Spaces do
     |> list_unavailabilities([space_id], starts_at)
     |> SpacePolicy.check_available(starts_at, duration_minutes)
   end
+
+  # ── Settings, room photos and cleaning points (ADR-290) ─────────────────
+
+  @doc "The gym's choices about its spaces: `%{floor_plans_in_classes}`."
+  def get_settings(context), do: SpaceStore.get_settings(context)
+  def put_settings(context, attrs), do: SpaceStore.put_settings(context, attrs)
+
+  @doc """
+  Room photos (`:photos`) or cleaning points (`:points`), ordered per space;
+  filters: `space_ids`, `public` (photos shown on the public box page).
+  """
+  def list_photos(context, kind, filters \\ %{}),
+    do: SpaceStore.list_photos(context, kind, filters)
+
+  def get_photo(context, kind, id), do: SpaceStore.get_photo(context, kind, id)
+
+  @doc "Adds a photo or cleaning point to a space, last in its list."
+  def add_photo(context, kind, space_id, attrs) do
+    current = list_photos(context, kind, %{space_ids: [space_id]})
+
+    with :ok <- PhotoPolicy.check_room(length(current)) do
+      next = current |> Enum.map(& &1.sort_order) |> Enum.max(fn -> -1 end)
+
+      SpaceStore.save_photo(
+        context,
+        kind,
+        nil,
+        Map.merge(attrs, %{space_id: space_id, sort_order: min(next + 1, 999)})
+      )
+    end
+  end
+
+  def update_photo(context, kind, id, attrs), do: SpaceStore.save_photo(context, kind, id, attrs)
+  def delete_photo(context, kind, id), do: SpaceStore.delete_photo(context, kind, id)
+
+  @doc "Puts a space's photos (or points) in the order of `ids`; the rest follow."
+  def order_photos(context, kind, space_id, ids) do
+    entries = list_photos(context, kind, %{space_ids: [space_id]})
+    :ok = SpaceStore.order_photos(context, kind, PhotoPolicy.reorder(entries, ids))
+    list_photos(context, kind, %{space_ids: [space_id]})
+  end
+
+  defdelegate class_view(settings, plan, sees_spaces), to: PhotoPolicy
 
   defdelegate check_fields(params, rights), to: SpacePolicy
   defdelegate overlapping_ids(classes), to: SpacePolicy

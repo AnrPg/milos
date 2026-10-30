@@ -36,6 +36,7 @@ import { seasonNotificationText } from "@/components/seasons/season-links";
 import { shopNotificationText } from "@/components/shop/shop-links";
 import { passwordResetNotificationText } from "@/components/password-resets/reset-notifications";
 import { socialNotificationText } from "@/components/social/social-model";
+import { dateAtNoon, verifyNotificationText } from "@/components/partner-verify/verify-notifications";
 import {
   notificationOrigin,
   type NotificationOrigin,
@@ -89,6 +90,13 @@ function NotificationCard({
     const nickname = notification.payload.nickname;
     const name = typeof nickname === "string" && nickname ? nickname : tPartners("someone");
     return tPartners(["notif", notification.type, part].join("_"), { name });
+  }
+  const tVerify = useTranslations("PartnerVerify");
+  // ADR-280: a vouch request, a vouch, the Palee check's outcome and a sponsor's pause.
+  function verifyText(notification: NotificationRecord, part: "title" | "body") {
+    return verifyNotificationText(notification.type, notification.payload, part, (key, values) => tVerify(key, values), (isoDate) =>
+      new Intl.DateTimeFormat(uiLocale, { dateStyle: "long" }).format(dateAtNoon(isoDate)),
+    );
   }
   const tResets = useTranslations("passwordResets");
   // ADR-187: a password reset request (handlers) and the reset itself (the person).
@@ -241,6 +249,8 @@ function NotificationCard({
     if (shop !== null) return shop;
     const partner = partnerText(notification, "body");
     if (partner !== null) return partner;
+    const verify = verifyText(notification, "body");
+    if (verify !== null) return verify;
     const conversation = conversationText(notification, "body");
     if (conversation !== null) return conversation;
     const boxInbox = boxInboxNotificationText(notification.type, notification.payload, "body", i18n);
@@ -509,6 +519,8 @@ function NotificationCard({
         });
       case "inventory_repair_needed":
         return [text("machine_name"), text("body")].filter(Boolean).join(" · ");
+      case "cleaning_point_not_cleaned":
+        return [text("space_name"), text("notes")].filter(Boolean).join(" · ");
       case "inventory_stock_low":
         return text("status") === "reported"
           ? [text("supply_name"), text("place"), text("note")].filter(Boolean).join(" · ")
@@ -539,6 +551,8 @@ function NotificationCard({
     if (shop !== null) return shop;
     const partner = partnerText(notification, "title");
     if (partner !== null) return partner;
+    const verify = verifyText(notification, "title");
+    if (verify !== null) return verify;
     const conversation = conversationText(notification, "title");
     if (conversation !== null) return conversation;
     const boxInbox = boxInboxNotificationText(notification.type, notification.payload, "title", i18n);
@@ -640,6 +654,8 @@ function NotificationCard({
         return i18n("ntfCoachNoteViewedTitle");
       case "inventory_repair_needed":
         return i18n("ntfRepairNeededTitle");
+      case "cleaning_point_not_cleaned":
+        return i18n("ntfCleaningPointNotCleanedTitle");
       case "inventory_stock_low":
         return i18n("ntfStockLowTitle");
       case "inventory_digest":

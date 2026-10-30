@@ -73,7 +73,6 @@ export const DEFAULT_VERDICTS: Record<string, SettingVerdict> = {
   "check_in.member_code_mode": "advanced",
   "check_in.geofence_reminder": "advanced",
   "community.member_groups": "advanced",
-  "community.partners_enabled": "advanced",
   "trials.enabled": "basic",
   "trials.seats_per_class": "basic",
   "trials.bring_note": "basic",

@@ -37,6 +37,7 @@ defmodule Palee.Notifications.Notification do
     :class_cancelled,
     :coach_client_assigned,
     :inventory_repair_needed,
+    :cleaning_point_not_cleaned,
     :inventory_stock_low,
     :inventory_digest,
     :shop_stock_low,
@@ -118,7 +119,12 @@ defmodule Palee.Notifications.Notification do
     :member_leaving,
     # ADR-252: documents to sign and health certificates.
     :document_signature_requested,
-    :health_certificate_expiring
+    :health_certificate_expiring,
+    # ADR-280 verification: sponsors and the Palee check of Partners.
+    :partner_vouch_request,
+    :partner_vouched,
+    :partner_verification_decided,
+    :partner_sponsor_penalty
   ]
 
   schema "notifications" do

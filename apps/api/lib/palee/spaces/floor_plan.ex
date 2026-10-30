@@ -13,20 +13,29 @@ defmodule Palee.Spaces.FloorPlan do
     field :name, :string
     field :media_id, :binary_id
     field :sort_order, :integer, default: 0
+    # ADR-290: hidden from the class view even when the gym shows its plans.
+    field :shown_in_classes, :boolean, default: true
 
     timestamps(type: :utc_datetime_usec)
   end
 
   def create_changeset(attrs) do
     %__MODULE__{}
-    |> cast(attrs, [:organization_id, :location_id, :name, :media_id, :sort_order])
+    |> cast(attrs, [
+      :organization_id,
+      :location_id,
+      :name,
+      :media_id,
+      :sort_order,
+      :shown_in_classes
+    ])
     |> validate()
     |> validate_required([:media_id])
   end
 
   def update_changeset(plan, attrs) do
     plan
-    |> cast(attrs, [:name, :media_id, :sort_order])
+    |> cast(attrs, [:name, :media_id, :sort_order, :shown_in_classes])
     |> validate()
   end
 

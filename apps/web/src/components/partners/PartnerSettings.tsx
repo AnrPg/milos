@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormatter, useTranslations } from "next-intl";
 
@@ -10,12 +11,13 @@ import { PersonAvatar } from "@/components/social/PersonAvatar";
 import { useUiTranslations } from "@/i18n/ui";
 
 import { partnerErrorMessage } from "./errors";
+import { PARTNERS_HREF } from "./partners-model";
 import { useBlocks, usePartnerSettings, usePartnersToken } from "./use-partners";
 
 /**
- * Ρυθμίσεις › Partners (ADR-169 §9): one switch pauses or resumes every
- * profile at once; your profiles and matches stay. Off by default: there is
- * nothing to switch until you opt in from a club's Μέλη.
+ * Κοινοποίηση & ορατότητα › Συναθλητές (ADR-280): one switch takes me out of
+ * the public deck or brings me back; my profile and matches stay. Nothing to
+ * switch until I have a profile, which starts from Γύρω μου.
  */
 export function PartnerVisibilitySetting() {
   const t = useTranslations("Partners");
@@ -31,19 +33,23 @@ export function PartnerVisibilitySetting() {
     },
   });
   if (!settings.data) return null;
-  const clubs = settings.data.clubs ?? 0;
   const visible = save.isPending && save.variables !== undefined ? save.variables : Boolean(settings.data.visible);
   return (
     <div className="flex flex-col gap-2" data-testid="partner-visibility">
-      {clubs === 0 ? (
-        <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("settingsNone")}</p>
+      {!settings.data.has_profile ? (
+        <p className="text-sm" style={{ color: "var(--text-soft)" }}>
+          {t("settingsNone")}{" "}
+          <Link href={PARTNERS_HREF} className="font-semibold underline" style={{ color: "var(--primary)" }}>
+            {t("settingsStart")}
+          </Link>
+        </p>
       ) : (
         <SwitchRow
           checked={visible}
           disabled={save.isPending}
           onChange={(next) => save.mutate(next)}
           label={t("settingsSwitch")}
-          hint={t("settingsSwitchHint", { count: clubs })}
+          hint={t("settingsSwitchHint")}
         />
       )}
       <ErrorLine message={partnerErrorMessage(save.error, t, tUi)} />
@@ -51,7 +57,7 @@ export function PartnerVisibilitySetting() {
   );
 }
 
-/** People you blocked (ADR-169 §5), across the app; unblocking doesn't bring back what ended. */
+/** People you blocked (ADR-169 §5, ADR-280), across the app; unblocking doesn't bring back what ended. */
 export function BlockedPeople() {
   const t = useTranslations("Partners");
   const tUi = useUiTranslations();

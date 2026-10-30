@@ -15,6 +15,10 @@ defmodule Palee.Housekeeping.Entry do
     field :finished_at, :utc_datetime_usec
     field :tasks_done, {:array, :string}, default: []
     field :note, :string
+    # ADR-290: what was answered for each point of the room's visual
+    # checklist: point_id, instruction and media_id (as they were), status
+    # ("cleaned" | "not_cleaned"), note, after_media_id. A jsonb array.
+    field :point_results, {:array, :map}, default: []
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -27,7 +31,7 @@ defmodule Palee.Housekeeping.Entry do
 
   def finish_changeset(entry, attrs) do
     entry
-    |> cast(attrs, [:finished_at, :tasks_done, :note])
+    |> cast(attrs, [:finished_at, :tasks_done, :note, :point_results])
     |> validate_required([:finished_at])
     |> validate_length(:note, max: 1_000)
   end

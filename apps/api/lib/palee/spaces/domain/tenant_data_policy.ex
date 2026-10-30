@@ -14,11 +14,14 @@ defmodule Palee.Spaces.Domain.TenantDataPolicy do
             purge_order: 105,
             disposition: :purge,
             basis:
-              "Spaces, floor plans and unavailability windows are operational data with no retention obligation.",
+              "Spaces, floor plans, unavailability windows, room photos, cleaning points and the gym's space settings are operational data with no retention obligation.",
             tables: [
               %{table: "space_unavailabilities"},
+              %{table: "space_photos"},
+              %{table: "space_cleaning_points"},
               %{table: "spaces"},
-              %{table: "space_floor_plans"}
+              %{table: "space_floor_plans"},
+              %{table: "space_settings"}
             ]
           })
 

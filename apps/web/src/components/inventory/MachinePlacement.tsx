@@ -7,6 +7,8 @@ import { useTranslations } from "next-intl";
 import { placeMachine, type Machine } from "@/api/inventory";
 import { fetchSpaces } from "@/api/spaces";
 import { placementSummary } from "@/components/spaces/cleaning-today";
+import { FloorPlanCanvas } from "@/components/spaces/FloorPlanCanvas";
+import { validArea } from "@/components/spaces/floor-plan";
 import { StatusText, captionClass, captionStyle, inputClass, inputStyle, secondaryButtonClass, secondaryButtonStyle, dangerButtonStyle } from "@/components/staff/staff-ui";
 import { Select } from "@/components/ui/Select";
 import { localizeError } from "@/i18n/presentation";
@@ -16,7 +18,7 @@ import { can } from "@/lib/role-navigation";
 
 const SPACE_RIGHTS = ["view_spaces", "manage_spaces", "edit_space_details", "set_space_unavailable"];
 
-type Row = { space_id: string; quantity: number };
+type Row = { space_id: string; quantity: number; positions?: number[][] };
 
 /**
  * Where a machine stands (ADR-202): how many in which space, the rest
@@ -34,8 +36,14 @@ export function MachinePlacement({ token, machine, machinesKey }: { token: strin
   const placements: Row[] = machine.placements ?? [];
   const [editing, setEditing] = useState(false);
   const [rows, setRows] = useState<Row[]>(placements);
+  const [pinning, setPinning] = useState<number | null>(null);
   const save = useMutation({
-    mutationFn: () => placeMachine(token, machine.id, rows.filter((row) => row.space_id && row.quantity > 0)),
+    mutationFn: () =>
+      placeMachine(
+        token,
+        machine.id,
+        rows.filter((row) => row.space_id && row.quantity > 0).map((row) => ({ ...row, positions: (row.positions ?? []).slice(0, row.quantity) })),
+      ),
     onSuccess: async () => {
       setEditing(false);
       await Promise.all([queryClient.invalidateQueries({ queryKey: machinesKey }), queryClient.invalidateQueries({ queryKey: ["staff", "spaces"] })]);
@@ -45,6 +53,14 @@ export function MachinePlacement({ token, machine, machinesKey }: { token: strin
   if (!visible) return null;
   const all = spaces.data?.spaces ?? [];
   const nameOf = (id: string) => all.find((space) => space.id === id)?.name ?? "—";
+  // ADR-290: a space drawn on a floor plan can take a pin per item.
+  const planOf = (id: string) => {
+    const space = all.find((item) => item.id === id);
+    const plan = space?.floor_plan_id ? (spaces.data?.floor_plans ?? []).find((item) => item.id === space.floor_plan_id) : null;
+    return space && plan && validArea(space.area) ? { space, plan, area: space.area } : null;
+  };
+  const setPositions = (index: number, positions: number[][]) =>
+    setRows((current) => current.map((item, at) => (at === index ? { ...item, positions } : item)));
   const unassigned = machine.unassigned ?? placementSummary(machine.quantity, placements).unassigned;
   const draft = placementSummary(machine.quantity, rows);
 
@@ -87,9 +103,28 @@ export function MachinePlacement({ token, machine, machinesKey }: { token: strin
                   }}
                 />
               </label>
+              {planOf(row.space_id) ? (
+                <button
+                  type="button"
+                  className={secondaryButtonClass}
+                  style={pinning === index ? { ...secondaryButtonStyle, borderColor: "var(--primary)", color: "var(--primary)" } : secondaryButtonStyle}
+                  aria-pressed={pinning === index}
+                  data-testid={`placement-pin-${index}`}
+                  onClick={() => setPinning(pinning === index ? null : index)}
+                >
+                  📍 {t("placementPins", { count: (row.positions ?? []).length })}
+                </button>
+              ) : null}
               <button type="button" className={secondaryButtonClass} style={dangerButtonStyle} onClick={() => setRows((current) => current.filter((_, at) => at !== index))}>
                 {t("placementRemove")}
               </button>
+              {pinning === index && planOf(row.space_id) ? (
+                <PinEditor
+                  row={row}
+                  target={planOf(row.space_id)!}
+                  onChange={(positions) => setPositions(index, positions)}
+                />
+              ) : null}
             </div>
           ))}
           <div className="flex flex-wrap items-center gap-2">
@@ -161,5 +196,33 @@ export function MachinePlacement({ token, machine, machinesKey }: { token: strin
         </>
       )}
     </section>
+  );
+}
+
+/** ADR-290: tap the plan to pin where each item of the row stands; tap a pin to take it off. */
+function PinEditor({
+  row,
+  target,
+  onChange,
+}: {
+  row: Row;
+  target: { space: { id: string; name: string }; plan: { id: string; name: string; image_url?: string | null }; area: { points: number[][] } };
+  onChange: (positions: number[][]) => void;
+}) {
+  const t = useTranslations("Spaces");
+  const positions = row.positions ?? [];
+  const room = Math.max(0, (Number.isFinite(row.quantity) ? row.quantity : 0) - positions.length);
+  return (
+    <div className="flex w-full flex-col gap-1" data-testid={`pin-editor-${target.space.id}`}>
+      <p className="text-xs" style={{ color: "var(--dim)" }}>{room > 0 ? t("placementPinHint", { count: room }) : t("placementPinFull")}</p>
+      <FloorPlanCanvas
+        imageUrl={target.plan.image_url}
+        alt={t("planAlt", { name: target.plan.name })}
+        areas={[{ id: target.space.id, label: target.space.name, points: target.area.points, tone: "selected" }]}
+        pins={positions.map((at, index) => ({ id: String(index), at, label: t("placementPinRemove") }))}
+        onPin={room > 0 ? (at) => onChange([...positions, at]) : undefined}
+        onPinClick={(id) => onChange(positions.filter((_, index) => String(index) !== id))}
+      />
+    </div>
   );
 }

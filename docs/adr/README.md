@@ -169,7 +169,7 @@ must have an ADR. See `template.md` for the format.
 | ADR-166 | Insights in Πρόοδος: rules, nightly job, sufficiency and dismissal | Accepted |
 | ADR-167 | Seasons: fixed-length programmes a gym sells | Accepted |
 | ADR-168 | PT squads | Accepted |
-| ADR-169 | Partners: training partners within a club, matches, «Κλείστε μαζί» and blocking | Accepted |
+| ADR-169 | Partners: training partners within a club, matches, «Κλείστε μαζί» and blocking | Accepted (club scope, club deck, staff moderation and the gym's switch superseded by ADR-280; blocking kept) |
 | ADR-170 | Solo-coach tier, platform plans and the coach-centred Box | Accepted |
 | ADR-171 | Native wrapper: Capacitor store apps, app links and native push | Accepted |
 | ADR-172 | Phone health data: Apple Health and Health Connect | Accepted |
@@ -194,7 +194,7 @@ must have an ADR. See `template.md` for the format.
 | ADR-195 | One red error notice everywhere, and a language picker on the signed-out pages | Accepted |
 | ADR-196 | One inbox, the fixed Εγώ list, and a home for every sharing choice | Accepted |
 | ADR-193 | In-app walkthroughs: one guide engine over real screens | Accepted |
-| ADR-197 | One filter pattern on every list; feed types, Around level, partner disciplines and distance | Accepted |
+| ADR-197 | One filter pattern on every list; feed types, Around level, partner disciplines and distance | Accepted (partner distance in open clubs superseded by ADR-280) |
 | ADR-198 | Box › «Πελάτες μου»: the coach's home in the member app | Accepted |
 | ADR-199 | Notification preferences per category and channel, checked at the bell and push chokepoints | Accepted |
 | ADR-200 | Series edits, pause / cancel / delete reach this class, all upcoming classes or a date range, every nth; duplicate a class | Accepted |
@@ -260,7 +260,9 @@ must have an ADR. See `template.md` for the format.
 | ADR-275 | Workout types: one fixed list grouped in families (martial arts and dance included), the gym chooses which its editors offer; stats, badges and colours read the family | Accepted |
 | ADR-276 | Unsaved edits on staff forms: draft with undo/redo, save bar, ask before leaving a tab | Accepted |
 | ADR-277 | The server makes and keeps the Web Push keys (encrypted); the platform console shows status, contact and «new keys» only | Accepted |
+| ADR-280 | Public Partners («Συναθλητές»): one deck for all of Palee in Feed › Γύρω μου; account-level rows; verification once per account through an active membership or two sponsors plus a Palee check (SMS code, selfie with a code seen by a person, no face recognition, deleted within 7 days); 18+; Palee-level report queue; deterministic «Κλείστε μαζί» suggestions; SMS port with a Brevo adapter | Accepted |
 | ADR-282 | Anyone writes to a box; the box answers from one shared inbox worked out from roles at read time, «Προπόνηση» and «Φέρε τον coach» bring in coaches, newcomers limited and blockable, notify all until someone answers | Accepted |
 | ADR-286 | Injuries a member records reach their boxes per injury («Να το δει το box μου», on by default); coaches reach own clients only on every injury action; staff profile shows admin_only reports; every staff read logged in injury_access_log | Accepted |
+| ADR-290 | Floor plans grow: the room of a class coloured on the plan from the class details (gym switch, per-floor when >1 floor), room photos (each off the public page until 🌐), a visual cleaning checklist answered point by point (note required when not cleaned, front desk told), up to 10 photos per machine log line, machine pins on the plan under the log | Accepted |
 | ADR-300 | Operation registry: one spec per use case generates REST, MCP and LLM tools; previewable commands, problem details, idempotency keys, ETags (v4) | Proposed |
 | ADR-301 | AI agents as delegated principals: rights intersected on every call, durable runs, Rule-of-Two policy, approvals, one LLM provider port, multi-agent via delegation (v4) | Proposed |

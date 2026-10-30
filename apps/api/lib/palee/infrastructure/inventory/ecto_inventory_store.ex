@@ -29,7 +29,8 @@ defmodule Palee.Infrastructure.Inventory.EctoInventoryStore do
     :usable,
     :body,
     :cost_cents,
-    :occurred_at
+    :occurred_at,
+    :media_ids
   ]
   @supply_fields [:id, :quantity, :stock_status, :archived_at | Supply.editable()]
   @report_fields [
@@ -309,7 +310,7 @@ defmodule Palee.Infrastructure.Inventory.EctoInventoryStore do
     end)
     |> order_by([p], asc: p.inserted_at)
     |> Repo.all()
-    |> Enum.map(&Map.take(&1, [:machine_id, :space_id, :quantity]))
+    |> Enum.map(&Map.take(&1, [:machine_id, :space_id, :quantity, :positions]))
   end
 
   # ADR-202: the machine row is locked so two edits cannot both pass the
@@ -330,7 +331,7 @@ defmodule Palee.Infrastructure.Inventory.EctoInventoryStore do
           |> MachinePlacement.changeset()
           |> Repo.insert()
           |> case do
-            {:ok, row} -> Map.take(row, [:machine_id, :space_id, :quantity])
+            {:ok, row} -> Map.take(row, [:machine_id, :space_id, :quantity, :positions])
             {:error, reason} -> Repo.rollback(reason)
           end
         end)

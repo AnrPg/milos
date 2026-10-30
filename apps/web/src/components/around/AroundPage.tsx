@@ -9,6 +9,7 @@ import { ComposeButton } from "@/components/community/ComposeSheet";
 import { ErrorLine, Sheet } from "@/components/community/Sheet";
 import { useMyClubs } from "@/components/community/use-community";
 import { FeedPage, HubCard } from "@/components/member-app/HubParts";
+import { PartnersNearbyCard } from "@/components/partners/PartnersNearbyCard";
 import { useDebounced } from "@/hooks/useDebounced";
 
 import {
@@ -154,6 +155,8 @@ export function AroundPage() {
                   }
                 />
               ) : null}
+              {/* ADR-280: always in this place, above the kinds; hidden when it has nothing to offer. */}
+              {listedKind ? null : <PartnersNearbyCard />}
               <div
                 id={AROUND_RESULTS_ID}
                 style={{

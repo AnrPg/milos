@@ -205,6 +205,12 @@ msgstr "%{reader} a lu votre note sur %{client} à %{time}."
 msgid "A machine needs attention"
 msgstr "Une machine nécessite une intervention"
 
+msgid "A room was not fully cleaned"
+msgstr "Une salle n'a pas été entièrement nettoyée"
+
+msgid "%{space}: %{notes}"
+msgstr "%{space}: %{notes}"
+
 msgid "%{machine}: %{note}"
 msgstr "%{machine}: %{note}"
 
@@ -752,6 +758,44 @@ msgstr "Une connexion fiscale demande votre attention"
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr "%{connection} ne fonctionne plus. Ouvrez Données de facturation › Connexions pour corriger."
+
+# ADR-280 verification: sponsors and the Palee check of Partners.
+
+msgid "Vouch for %{nickname}?"
+msgstr "Se porter garant de %{nickname} ?"
+
+msgid "%{nickname} asks you to vouch for them for Training partners."
+msgstr "%{nickname} te demande de te porter garant pour les Partenaires d'entraînement."
+
+msgid "%{nickname} vouched for you"
+msgstr "%{nickname} s'est porté garant pour toi"
+
+msgid "One step closer to Training partners."
+msgstr "Une étape de plus vers les Partenaires d'entraînement."
+
+msgid "You are verified"
+msgstr "Ton compte est vérifié"
+
+msgid "You can now use Training partners."
+msgstr "Tu peux maintenant utiliser les Partenaires d'entraînement."
+
+msgid "Take a new selfie"
+msgstr "Prends un nouveau selfie"
+
+msgid "Your selfie was deleted after 7 days without a check. Take a new one to finish."
+msgstr "Ton selfie a été supprimé après 7 jours sans vérification. Prends-en un nouveau pour terminer."
+
+msgid "Verification not approved"
+msgstr "Vérification non approuvée"
+
+msgid "The Palee team could not verify your account. You can try again."
+msgstr "L'équipe Palee n'a pas pu vérifier ton compte. Tu peux réessayer."
+
+msgid "Someone you vouched for was suspended"
+msgstr "Une personne dont tu t'es porté garant a été suspendue"
+
+msgid "You can vouch again from %{date}. Your own access stays."
+msgstr "Tu pourras de nouveau te porter garant à partir du %{date}. Ton propre accès reste."
 
 msgid "%{by} brought you into a conversation"
 msgstr "%{by} t'a ajouté à une conversation"

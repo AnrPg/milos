@@ -4,7 +4,7 @@ defmodule PaleeWeb.InventoryController do
   use PaleeWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias Palee.Application.{ManageInventory, PlaceMachine}
+  alias Palee.Application.{CompleteMediaUpload, ManageInventory, PlaceMachine, RequestMediaUpload}
   alias Palee.{Identity, Inventory, Organizations}
   alias PaleeWeb.Schemas.Inventory, as: S
   alias OpenApiSpex.{Parameter, Schema}
@@ -95,15 +95,60 @@ defmodule PaleeWeb.InventoryController do
   end
 
   operation(:machine_events,
-    summary: "A machine's log",
+    summary: "A machine's log, and where it stands (ADR-290: places on the floor plans)",
     parameters: [@id],
-    responses: [ok: {"Events", "application/json", S.many(:events, S.machine_event())}]
+    responses: [
+      ok:
+        {"Events", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             events: %Schema{type: :array, items: S.machine_event()},
+             places: %Schema{type: :array, items: S.machine_place()}
+           },
+           required: [:events, :places]
+         }}
+    ]
   )
 
   def machine_events(conn, %{id: id}) do
-    with :ok <- machine_in_scope(conn.assigns.tenant_context, id) do
-      events = Inventory.list_machine_events(conn.assigns.tenant_context, id)
-      json(conn, %{events: with_nicknames(events)})
+    context = conn.assigns.tenant_context
+
+    with :ok <- machine_in_scope(context, id),
+         %{} = machine <- Inventory.get_machine(context, id) || {:error, :not_found} do
+      events = context |> Inventory.list_machine_events(id) |> with_nicknames()
+
+      json(conn, %{
+        events: ManageInventory.present_events(context, events),
+        places: ManageInventory.places(context, machine)
+      })
+    end
+  end
+
+  operation(:machine_photo_upload,
+    summary: "Reserve a machine log photo (machine_photo) and get a presigned upload for it",
+    request_body: S.body(PaleeWeb.Schemas.Media.upload_request()),
+    responses: [ok: {"Upload", "application/json", PaleeWeb.Schemas.Media.upload()}]
+  )
+
+  # ADR-290: up to 10 photos on a machine log line.
+  def machine_photo_upload(conn, _params) do
+    with {:ok, upload} <-
+           RequestMediaUpload.call(conn.assigns.tenant_context, "machine_photo", conn.body_params) do
+      json(conn, upload)
+    end
+  end
+
+  operation(:complete_machine_photo_upload,
+    summary: "Verify an uploaded machine_photo image and mark it ready",
+    parameters: [@id],
+    responses: [ok: {"Media", "application/json", PaleeWeb.Schemas.Media.media_response()}]
+  )
+
+  def complete_machine_photo_upload(conn, %{id: id}) do
+    with {:ok, media} <-
+           CompleteMediaUpload.call(conn.assigns.tenant_context, "machine_photo", id) do
+      json(conn, %{media: media})
     end
   end
 
@@ -133,7 +178,10 @@ defmodule PaleeWeb.InventoryController do
              Inventory.get_machine(context, id) do
       conn
       |> put_status(:created)
-      |> json(%{machine: redact(machine, context), event: hd(with_nicknames([event]))})
+      |> json(%{
+        machine: redact(machine, context),
+        event: hd(ManageInventory.present_events(context, with_nicknames([event])))
+      })
     end
   end
 

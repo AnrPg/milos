@@ -10,9 +10,8 @@ import { sortMatches } from "./partners-model";
 import { usePartnerMatches } from "./use-partners";
 
 /**
- * Μηνύματα › Partners (ADR-169 §7): each match's conversation beside the
- * gym's threads, active first, with its unread count. Nothing shows
- * without a match.
+ * Μηνύματα › Partners (ADR-169 §7, ADR-280): each match's conversation,
+ * active first, with its unread count. Nothing shows without a match.
  */
 export function PartnerThreads({ onNavigate }: { onNavigate?: () => void }) {
   const t = useTranslations("Partners");
@@ -39,11 +38,7 @@ export function PartnerThreads({ onNavigate }: { onNavigate?: () => void }) {
                   <span className="min-w-0">
                     <span className="block truncate text-sm font-semibold" style={{ color: "var(--text)" }}>{name}</span>
                     <span className="block truncate text-xs" style={{ color: "var(--dim)" }}>
-                      {match.status === "active"
-                        ? match.club_name
-                          ? t("threadSubtitle", { club: match.club_name })
-                          : t("title")
-                        : t("threadEnded")}
+                      {match.status === "active" ? t("threadSubtitle") : t("threadEnded")}
                     </span>
                   </span>
                 </span>

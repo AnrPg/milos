@@ -20,6 +20,8 @@ defmodule Palee.Inventory.MachineEvent do
     field :body, :string
     field :cost_cents, :integer
     field :occurred_at, :utc_datetime_usec
+    # ADR-290: up to 10 ready `machine_photo` uploads.
+    field :media_ids, {:array, :binary_id}, default: []
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -36,9 +38,11 @@ defmodule Palee.Inventory.MachineEvent do
       :usable,
       :body,
       :cost_cents,
-      :occurred_at
+      :occurred_at,
+      :media_ids
     ])
     |> validate_required([:machine_id, :kind, :occurred_at])
+    |> validate_length(:media_ids, max: 10)
     |> validate_length(:body, max: 4000)
     |> validate_number(:cost_cents, greater_than_or_equal_to: 0)
   end

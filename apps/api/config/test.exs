@@ -85,6 +85,8 @@ config :palee, :meilisearch,
 
 # ADR-117: tenant export/purge object operations run against an in-memory store.
 config :palee, :tenant_object_store, Palee.TestSupport.MemoryObjectStore
+# ADR-280 verification: text messages are kept in memory.
+config :palee, :sms_sender, Palee.TestSupport.MemorySmsSender
 config :palee, :workout_text_analyzer, Palee.Test.FakeWorkoutTextAnalyzer
 
 # ADR-155: Wallet platforms are told about changes through recording fakes;

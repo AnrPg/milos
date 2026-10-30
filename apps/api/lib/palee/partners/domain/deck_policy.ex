@@ -1,13 +1,15 @@
 defmodule Palee.Partners.Domain.DeckPolicy do
   @moduledoc """
-  Who shows in a club's Partners deck and in which order (ADR-169 §3). Pure.
+  Who shows in the public Partners deck and in which order (ADR-169 §3,
+  ADR-280). Pure.
 
-  A candidate is a live profile of a current member, not the viewer, not
+  A candidate is a live profile of a verified person, not the viewer, not
   blocked either way, not already liked, passed in the last 30 days or
   matched. Gender preferences hold both ways; a preference other than `any`
   excludes people whose gender is unset. Filters narrow by time, level, goal and
-  discipline (ADR-197); `within_km` (open clubs only) is applied by the
-  caller, which knows where people are. The order is what the two share:
+  discipline (ADR-197); `within_km` (2, 5, 10 or 25, default 10) is applied
+  by the caller, which knows where people are (neighbourhood centroids
+  only). The order is what the two share:
   each common time, goal and discipline weighs 2, the same level 1, an
   adjacent level ½; ties by id, so the deck is stable.
   """
@@ -17,12 +19,14 @@ defmodule Palee.Partners.Domain.DeckPolicy do
   @page_size 20
   @pass_cooldown_days 30
   @distances_km [2, 5, 10, 25]
+  @default_within_km 10
 
   def page_size, do: @page_size
   def pass_cooldown_days, do: @pass_cooldown_days
   def distances_km, do: @distances_km
+  def default_within_km, do: @default_within_km
 
-  @doc "The filters of a deck request; unknown values are ignored."
+  @doc "The filters of a deck request; unknown values are ignored, the distance defaults to 10 km."
   def filters(params) when is_map(params) do
     %{
       time: pick(params, "time", ProfilePolicy.times()),
@@ -34,7 +38,7 @@ defmodule Palee.Partners.Domain.DeckPolicy do
   end
 
   def filters(_params),
-    do: %{time: nil, level: nil, goal: nil, discipline: nil, within_km: nil}
+    do: %{time: nil, level: nil, goal: nil, discipline: nil, within_km: @default_within_km}
 
   @doc """
   The people the viewer's swipes keep out of the deck: everyone liked, and
@@ -99,7 +103,7 @@ defmodule Palee.Partners.Domain.DeckPolicy do
   end
 
   @doc """
-  The deck: `candidates` are live profiles of current members; `excluded`
+  The deck: `candidates` are live profiles of verified people; `excluded`
   is a set of user ids (blocked, swiped, matched). Returns
   `[{profile, shared}]`, best fit first, at most a page.
   """
@@ -136,7 +140,7 @@ defmodule Palee.Partners.Domain.DeckPolicy do
         value -> value
       end
 
-    if value in @distances_km, do: value
+    if value in @distances_km, do: value, else: @default_within_km
   end
 
   defp parsed({value, ""}), do: value

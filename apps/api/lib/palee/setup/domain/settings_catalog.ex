@@ -61,7 +61,6 @@ defmodule Palee.Setup.Domain.SettingsCatalog do
     {"check_in.geofence_reminder", :advanced, true, false},
     # F. Community
     {"community.member_groups", :advanced, "approval", true},
-    {"community.partners_enabled", :advanced, true, true},
     # G. Trial visitors
     {"trials.enabled", :basic, false, true},
     {"trials.seats_per_class", :basic, 2, true},
