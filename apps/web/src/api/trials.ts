@@ -1,5 +1,6 @@
 import { apiRequest } from "@/api/client";
 import type { components } from "@/api/generated/schema";
+import type { MessageTopic } from "@/api/messaging";
 
 /**
  * Trials (ADR-144, P2-M3, board 6): a visitor asks for or books a trial at a
@@ -76,11 +77,17 @@ export async function fetchBoxConversation(token: string, slug: string) {
   return data.conversation;
 }
 
-export async function sendBoxMessage(token: string, slug: string, body: string, clientOperationId: string) {
+export async function sendBoxMessage(
+  token: string,
+  slug: string,
+  body: string,
+  clientOperationId: string,
+  topic: MessageTopic | null = null,
+) {
   const data = await apiRequest<{ message: BoxConversationMessage }>(`${box(slug)}/conversation/messages`, {
     method: "POST",
     token,
-    body: { body, client_operation_id: clientOperationId },
+    body: { body, client_operation_id: clientOperationId, ...(topic ? { topic } : {}) },
   });
   return data.message;
 }

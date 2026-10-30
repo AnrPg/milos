@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 
 import { ApiError } from "@/api/client";
+import { MESSAGE_TOPICS, type MessageTopic } from "@/api/messaging";
 import {
   BOX_CONVERSATIONS_KEY,
   boxConversationKey,
@@ -15,7 +16,9 @@ import {
   sendBoxMessage,
   type BoxConversation,
 } from "@/api/trials";
+import { TOPIC_KEYS } from "@/components/chat/message-topics";
 import { useSession } from "@/components/session-provider";
+import { useUiTranslations } from "@/i18n/ui";
 
 import { newOperationId } from "./trial-ui";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
@@ -25,14 +28,33 @@ const POLL_MS = 5_000;
 const PERIODS = ["monthly", "quarterly", "semiannual", "annual"] as const;
 type Period = (typeof PERIODS)[number];
 
+/** What stops the person writing (ADR-282): blocked by the box, or waiting for its answer. */
+function sendErrorKey(error: unknown) {
+  if (error instanceof ApiError && error.payload?.code === "blocked_by_box") return "chatBlocked";
+  if (error instanceof ApiError && error.payload?.code === "awaiting_box_reply") return "chatAwaitingReply";
+  return "sendFailed";
+}
+
 /**
- * Talking to a box you're not a member of (board 6 Q6): the same thread the
- * staff see in their chats, opened from the trial follow-up («Θέλω να
- * γραφτώ», prefilled) or the trial page. The box's join offer sits on top.
- * Polls while open; live updates are for members of the gym.
+ * Talking to a box (board 6 Q6, ADR-282): anyone writes to a published box,
+ * a member to their own box even unpublished. The same thread the box's
+ * inbox answers, opened from «Επικοινωνία με το box» (the topic preset from
+ * where it was pressed), Μηνύματα › Box, the box page or the trial
+ * follow-up («Θέλω να γραφτώ», prefilled). A newcomer sees the box's join
+ * offer on top. Polls while open.
  */
-export function BoxChat({ slug, draft }: { slug: string; draft: string | null }) {
+export function BoxChat({
+  slug,
+  draft,
+  topic: initialTopic = null,
+}: {
+  slug: string;
+  draft: string | null;
+  topic?: MessageTopic | null;
+}) {
   const t = useTranslations("Trials");
+  const i18n = useUiTranslations();
+  const [topic, setTopic] = useState<MessageTopic | null>(initialTopic);
   const locale = useLocale();
   const queryClient = useQueryClient();
   const { tokens, currentUser } = useSession();
@@ -69,7 +91,7 @@ export function BoxChat({ slug, draft }: { slug: string; draft: string | null })
   }, [last, currentUser?.id, token, slug, queryClient]);
 
   const send = useMutation({
-    mutationFn: (text: string) => sendBoxMessage(token, slug, text, newOperationId()),
+    mutationFn: (text: string) => sendBoxMessage(token, slug, text, newOperationId(), topic),
     onSuccess: (message) => {
       setBody("");
       queryClient.setQueryData<BoxConversation>(boxConversationKey(slug), (current) =>
@@ -98,7 +120,7 @@ export function BoxChat({ slug, draft }: { slug: string; draft: string | null })
       <header className="flex items-center gap-3 px-4 py-3" style={{ borderBottom: "1px solid var(--border)" }}>
         <Link href={`/b/${data.box.slug}`} className="flex min-w-0 flex-col">
           <span className="truncate text-lg font-extrabold" style={{ color: "var(--text)" }}>{data.box.name}</span>
-          <span className="text-xs" style={{ color: "var(--dim)" }}>{t("chatSubtitle")}</span>
+          <span className="text-xs" style={{ color: "var(--dim)" }}>{t("chatTeamAnswers")}</span>
         </Link>
       </header>
 
@@ -115,29 +137,62 @@ export function BoxChat({ slug, draft }: { slug: string; draft: string | null })
 
       <ol className="flex flex-1 flex-col gap-2 overflow-y-auto px-4 py-4" aria-live="polite">
         {messages.length === 0 ? (
-          <li className="py-6 text-center text-sm" style={{ color: "var(--dim)" }}>{t("chatEmpty")}</li>
+          <li className="py-6 text-center text-sm" style={{ color: "var(--dim)" }}>{t("chatEmptyBox")}</li>
         ) : null}
         {messages.map((message) => {
           const mine = message.sender_id === currentUser?.id;
           return (
             <li key={message.id} className={`flex max-w-[85%] flex-col gap-0.5 ${mine ? "self-end items-end" : "self-start items-start"}`}>
-              {!mine ? <span className="px-1 text-[11px] font-semibold" style={{ color: "var(--dim)" }}>{staff.get(message.sender_id) ?? data.box.name}</span> : null}
+              {!mine ? (
+                <span className="px-1 text-[11px] font-semibold" style={{ color: "var(--dim)" }}>
+                  {staff.has(message.sender_id)
+                    ? t("chatFrom", { name: staff.get(message.sender_id) ?? data.box.name, box: data.box.name })
+                    : data.box.name}
+                </span>
+              ) : null}
               <p
                 className="whitespace-pre-line rounded-2xl px-3.5 py-2 text-sm"
                 style={mine ? { background: "var(--primary)", color: "var(--primary-contrast)" } : { background: "var(--panel-raised)", color: "var(--text)" }}
               >
                 {message.body}
               </p>
-              <span className="px-1 text-[10px]" style={{ color: "var(--dim)" }}>{clock(message.inserted_at)}</span>
+              <span className="px-1 text-[10px]" style={{ color: "var(--dim)" }}>
+                {[message.topic && message.topic in TOPIC_KEYS ? i18n(TOPIC_KEYS[message.topic as MessageTopic]) : null, clock(message.inserted_at)]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </span>
             </li>
           );
         })}
         <div ref={endRef} />
       </ol>
 
+      {data.blocked ? (
+        <p role="status" className="px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 text-center text-sm" style={{ borderTop: "1px solid var(--border)", color: "var(--text-soft)" }}>
+          {t("chatBlocked")}
+        </p>
+      ) : (
+      <div style={{ borderTop: "1px solid var(--border)" }}>
+      <div role="group" aria-label={t("chatTopicLabel")} className="flex gap-1.5 overflow-x-auto px-4 pt-2" data-testid="box-chat-topics">
+        {MESSAGE_TOPICS.map((value) => (
+          <button
+            key={value}
+            type="button"
+            aria-pressed={topic === value}
+            onClick={() => setTopic(topic === value ? null : value)}
+            className="min-h-8 shrink-0 rounded-full px-3 text-xs font-semibold"
+            style={
+              topic === value
+                ? { background: "var(--primary)", color: "var(--primary-contrast)", border: "1px solid var(--primary)" }
+                : { background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border)" }
+            }
+          >
+            {i18n(TOPIC_KEYS[value])}
+          </button>
+        ))}
+      </div>
       <form
         className="flex items-end gap-2 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2"
-        style={{ borderTop: "1px solid var(--border)" }}
         onSubmit={(event) => {
           event.preventDefault();
           if (text && !send.isPending) send.mutate(text);
@@ -163,7 +218,9 @@ export function BoxChat({ slug, draft }: { slug: string; draft: string | null })
           {t("send")}
         </button>
       </form>
-      {send.isError ? <ErrorNotice className="mx-4 mb-2">{t("sendFailed")}</ErrorNotice> : null}
+      </div>
+      )}
+      {send.isError ? <ErrorNotice className="mx-4 mb-2">{t(sendErrorKey(send.error))}</ErrorNotice> : null}
     </main>
   );
 }

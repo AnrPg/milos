@@ -28,14 +28,15 @@ export function MessageBubble({
   const i18n = useUiTranslations();
   const uiLocale = useUiLocale();
   // ADR-140 §6: a coaching message and a message from the box are marked;
-  // chat is not.
+  // chat is not, unless the person wrote to the box about a topic (ADR-282).
   const topic = "topic" in message ? message.topic : null;
+  const topicLabel = topic && topic in TOPIC_KEYS ? i18n(TOPIC_KEYS[topic as MessageTopic]) : null;
   const kindLabel =
     message.message_type === "coaching_message"
       ? i18n("msgKindCoaching")
       : message.message_type === "box_message"
-        ? [i18n("msgKindBox"), topic ? i18n(TOPIC_KEYS[topic as MessageTopic]) : null].filter(Boolean).join(" · ")
-        : null;
+        ? [i18n("msgKindBox"), topicLabel].filter(Boolean).join(" · ")
+        : topicLabel;
   const failedOperationId =
     "delivery_status" in message && message.delivery_status === "failed"
       ? (message.client_operation_id ?? null)

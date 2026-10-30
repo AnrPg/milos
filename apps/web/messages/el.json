@@ -4794,7 +4794,31 @@
     "semanticWorkoutDanceFitness": "Χορευτική γυμναστική (Zumba)",
     "semanticWorkoutPoleAerial": "Pole & εναέρια",
     "semanticWorkoutOutdoorTraining": "Υπαίθρια προπόνηση",
-    "semanticWorkoutClimbingBouldering": "Αναρρίχηση & bouldering"
+    "semanticWorkoutClimbingBouldering": "Αναρρίχηση & bouldering",
+    "msgTopicTraining": "Προπόνηση",
+    "inboxBringCoach": "Φέρε τον coach",
+    "inboxBringCoachHint": "Ο coach μπαίνει στη συζήτηση και μπορεί να απαντήσει για το box.",
+    "inboxLoadingCoaches": "Φόρτωση coaches…",
+    "inboxNoCoaches": "Το box δεν έχει ακόμα coaches.",
+    "inboxCoachInThread": "Στη συζήτηση",
+    "inboxCoachTheirs": "Ο coach του ατόμου",
+    "inboxMoreActions": "Περισσότερες ενέργειες",
+    "inboxBlock": "Αποκλεισμός",
+    "inboxUnblock": "Άρση αποκλεισμού",
+    "inboxBlockTitle": "Αποκλεισμός: {name};",
+    "inboxBlockHint": "Δεν θα μπορεί πια να γράψει στο box. Μπορείς να άρεις τον αποκλεισμό αργότερα από εδώ.",
+    "inboxCancel": "Άκυρο",
+    "inboxActionFailed": "Δεν έγινε. Δοκίμασε ξανά.",
+    "inboxBlockedNote": "Το box δεν δέχεται πια μηνύματα από αυτό το άτομο.",
+    "inboxBoxFilter": "Μηνύματα στο box",
+    "inboxUnanswered": "Αναπάντητα · {count}",
+    "inboxAllBox": "Όλα",
+    "inboxNewcomer": "Νέος",
+    "inboxNewcomerHint": "Δεν είναι πελάτης του box",
+    "inboxAwaitsReply": "Περιμένει απάντηση",
+    "ntfBoxInboxTitle": "{name} έγραψε στο {box}",
+    "ntfBoxInboxBroughtIn": "{by} σε έφερε σε μια συζήτηση",
+    "ntfBoxInboxBody": "{name} έστειλε μήνυμα στο box."
   },
   "PrSharing": {
     "gymLabel": "Πού πέτυχες αυτό το PR;",
@@ -5847,7 +5871,8 @@
       },
       "saveError": "Δεν αποθηκεύτηκε. Δοκίμασε ξανά."
     },
-    "boxFindByName": "Ή ψάξε με το όνομα"
+    "boxFindByName": "Ή ψάξε με το όνομα",
+    "membershipContactBox": "Επικοινωνία με το box"
   },
   "Community": {
     "all": "Όλα",
@@ -6488,7 +6513,8 @@
     "openClubMembers": "{count, plural, one {# μέλος club} other {# μέλη club}}",
     "guestTitle": "Είσαι επισκέπτης του {box}",
     "guestBody": "Πληρώνεις στην υποδοχή όποτε έρχεσαι. Γίνε μέλος box για να κλείνεις θέση στα τμήματα και να βλέπεις τις προπονήσεις.",
-    "guestAction": "Γίνε μέλος box"
+    "guestAction": "Γίνε μέλος box",
+    "messageBox": "Μήνυμα στο box"
   },
   "Trials": {
     "ask": "Ζήτα δοκιμαστικό",
@@ -6657,7 +6683,14 @@
     "error_trial_already_open": "Έχεις ήδη κλείσει δοκιμαστικό εδώ.",
     "error_invalid_trial_transition": "Το δοκιμαστικό έχει ήδη αλλάξει. Ανανέωσε τη σελίδα.",
     "error_class_not_found": "Αυτό το τμήμα δεν είναι πια διαθέσιμο.",
-    "error_package_not_found": "Διάλεξε ένα ενεργό πακέτο συνδρομής."
+    "error_package_not_found": "Διάλεξε ένα ενεργό πακέτο συνδρομής.",
+    "chatTeamAnswers": "Απαντά η ομάδα του box",
+    "chatEmptyBox": "Γράψε στο box. Θα σου απαντήσει όποιος από την ομάδα είναι διαθέσιμος.",
+    "chatFrom": "{name} · {box}",
+    "chatTopicLabel": "Για τι είναι;",
+    "chatBlocked": "Αυτό το box δεν δέχεται πια μηνύματα από εσένα.",
+    "chatAwaitingReply": "Περίμενε να σου απαντήσει το box πριν στείλεις κι άλλα.",
+    "writeToBox": "Γράψε στο {box}"
   },
   "Clubs": {
     "loading": "Φόρτωση…",

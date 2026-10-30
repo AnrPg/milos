@@ -4794,7 +4794,31 @@
     "semanticWorkoutDanceFitness": "פיטנס ריקודי (זומבה)",
     "semanticWorkoutPoleAerial": "פול ואקרובטיקה אווירית",
     "semanticWorkoutOutdoorTraining": "אימון בחוץ",
-    "semanticWorkoutClimbingBouldering": "טיפוס ובולדרינג"
+    "semanticWorkoutClimbingBouldering": "טיפוס ובולדרינג",
+    "msgTopicTraining": "אימון",
+    "inboxBringCoach": "צרף מאמן",
+    "inboxBringCoachHint": "המאמן מצטרף לשיחה ויכול לענות בשם הבוקס.",
+    "inboxLoadingCoaches": "טוען מאמנים…",
+    "inboxNoCoaches": "עדיין אין מאמנים בבוקס.",
+    "inboxCoachInThread": "בשיחה",
+    "inboxCoachTheirs": "המאמן שלו/ה",
+    "inboxMoreActions": "פעולות נוספות",
+    "inboxBlock": "חסום",
+    "inboxUnblock": "בטל חסימה",
+    "inboxBlockTitle": "לחסום את {name}?",
+    "inboxBlockHint": "לא יוכל/תוכל עוד לכתוב לבוקס. אפשר לבטל את החסימה מכאן בהמשך.",
+    "inboxCancel": "ביטול",
+    "inboxActionFailed": "זה לא הצליח. נסה/י שוב.",
+    "inboxBlockedNote": "הבוקס כבר לא מקבל הודעות מהאדם הזה.",
+    "inboxBoxFilter": "הודעות לבוקס",
+    "inboxUnanswered": "ללא מענה · {count}",
+    "inboxAllBox": "הכול",
+    "inboxNewcomer": "חדש",
+    "inboxNewcomerHint": "לא לקוח של הבוקס",
+    "inboxAwaitsReply": "ממתין לתשובה",
+    "ntfBoxInboxTitle": "{name} כתב/ה ל{box}",
+    "ntfBoxInboxBroughtIn": "{by} צירף/ה אותך לשיחה",
+    "ntfBoxInboxBody": "{name} שלח/ה הודעה לבוקס."
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",
@@ -5847,7 +5871,8 @@
       },
       "saveError": "השינוי לא נשמר. נסה שוב."
     },
-    "boxFindByName": "או חפשו לפי שם"
+    "boxFindByName": "או חפשו לפי שם",
+    "membershipContactBox": "יצירת קשר עם הבוקס"
   },
   "Community": {
     "all": "הכול",
@@ -6488,7 +6513,8 @@
     "openClubMembers": "{count, plural, one {חבר אחד} other {# חברים}}",
     "guestTitle": "אתה אורח ב-{box}",
     "guestBody": "אתה משלם בקבלה בכל פעם שאתה מגיע. הצטרף כחבר ב-Box כדי להזמין שיעורים ולראות את האימונים.",
-    "guestAction": "הצטרף כחבר ב-Box"
+    "guestAction": "הצטרף כחבר ב-Box",
+    "messageBox": "הודעה לבוקס"
   },
   "Trials": {
     "ask": "בקשת שיעור ניסיון",
@@ -6657,7 +6683,14 @@
     "error_trial_already_open": "כבר קבעתם כאן שיעור ניסיון.",
     "error_invalid_trial_transition": "שיעור הניסיון הזה כבר השתנה. רעננו את הדף.",
     "error_class_not_found": "השיעור הזה כבר לא זמין.",
-    "error_package_not_found": "בחר חבילת מנוי פעילה."
+    "error_package_not_found": "בחר חבילת מנוי פעילה.",
+    "chatTeamAnswers": "צוות הבוקס עונה",
+    "chatEmptyBox": "כתוב/כתבי לבוקס. מי שפנוי בצוות יענה.",
+    "chatFrom": "{name} · {box}",
+    "chatTopicLabel": "במה מדובר?",
+    "chatBlocked": "הבוקס הזה כבר לא מקבל את ההודעות שלך.",
+    "chatAwaitingReply": "חכה/י לתשובת הבוקס לפני שתשלח/י עוד.",
+    "writeToBox": "כתוב/כתבי ל{box}"
   },
   "Clubs": {
     "loading": "טוען…",

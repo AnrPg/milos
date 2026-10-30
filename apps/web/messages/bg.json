@@ -4794,7 +4794,31 @@
     "semanticWorkoutDanceFitness": "Танцов фитнес (Zumba)",
     "semanticWorkoutPoleAerial": "Пилон и въздушна акробатика",
     "semanticWorkoutOutdoorTraining": "Тренировки на открито",
-    "semanticWorkoutClimbingBouldering": "Катерене и боулдър"
+    "semanticWorkoutClimbingBouldering": "Катерене и боулдър",
+    "msgTopicTraining": "Тренировки",
+    "inboxBringCoach": "Повикай треньор",
+    "inboxBringCoachHint": "Треньорът влиза в разговора и може да отговаря от името на бокса.",
+    "inboxLoadingCoaches": "Зареждане на треньорите…",
+    "inboxNoCoaches": "Боксът още няма треньори.",
+    "inboxCoachInThread": "В разговора",
+    "inboxCoachTheirs": "Неговият треньор",
+    "inboxMoreActions": "Още действия",
+    "inboxBlock": "Блокирай",
+    "inboxUnblock": "Отблокирай",
+    "inboxBlockTitle": "Да блокираш ли {name}?",
+    "inboxBlockHint": "Повече няма да може да пише на бокса. Можеш да го отблокираш по-късно оттук.",
+    "inboxCancel": "Отказ",
+    "inboxActionFailed": "Не стана. Опитай пак.",
+    "inboxBlockedNote": "Боксът вече не получава съобщения от този човек.",
+    "inboxBoxFilter": "Съобщения до бокса",
+    "inboxUnanswered": "Без отговор · {count}",
+    "inboxAllBox": "Всички",
+    "inboxNewcomer": "Нов",
+    "inboxNewcomerHint": "Не е клиент на бокса",
+    "inboxAwaitsReply": "Чака отговор",
+    "ntfBoxInboxTitle": "{name} писа на {box}",
+    "ntfBoxInboxBroughtIn": "{by} те включи в разговор",
+    "ntfBoxInboxBody": "{name} изпрати съобщение на бокса."
   },
   "PrSharing": {
     "gymLabel": "Къде постигна този рекорд?",
@@ -5847,7 +5871,8 @@
       },
       "saveError": "Не се запази. Опитайте отново."
     },
-    "boxFindByName": "Или търси по име"
+    "boxFindByName": "Или търси по име",
+    "membershipContactBox": "Връзка с бокса"
   },
   "Community": {
     "all": "Всички",
@@ -6488,7 +6513,8 @@
     "openClubMembers": "{count, plural, one {# член} other {# членове}}",
     "guestTitle": "Ти си гост на {box}",
     "guestBody": "Плащаш на рецепцията всеки път, когато дойдеш. Стани член на box-а, за да записваш часове и да виждаш тренировките.",
-    "guestAction": "Стани член на box-а"
+    "guestAction": "Стани член на box-а",
+    "messageBox": "Съобщение до бокса"
   },
   "Trials": {
     "ask": "Заяви пробна тренировка",
@@ -6657,7 +6683,14 @@
     "error_trial_already_open": "Вече имаш запазена проба тук.",
     "error_invalid_trial_transition": "Тази проба вече се е променила. Обнови страницата.",
     "error_class_not_found": "Това занятие вече не е налично.",
-    "error_package_not_found": "Избери активен абонаментен пакет."
+    "error_package_not_found": "Избери активен абонаментен пакет.",
+    "chatTeamAnswers": "Отговаря екипът на бокса",
+    "chatEmptyBox": "Пиши на бокса. Ще ти отговори който от екипа е свободен.",
+    "chatFrom": "{name} · {box}",
+    "chatTopicLabel": "За какво става дума?",
+    "chatBlocked": "Този бокс вече не получава съобщенията ти.",
+    "chatAwaitingReply": "Изчакай бокса да отговори, преди да пратиш още.",
+    "writeToBox": "Пиши на {box}"
   },
   "Clubs": {
     "loading": "Зареждане…",

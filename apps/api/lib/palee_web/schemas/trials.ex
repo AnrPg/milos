@@ -302,6 +302,8 @@ defmodule PaleeWeb.Schemas.Trials do
 
   # Talking to a box -----------------------------------------------------------
 
+  @box_topics ~w(booking payment membership facility training)
+
   defp message do
     %Schema{
       title: "BoxConversationMessage",
@@ -312,6 +314,7 @@ defmodule PaleeWeb.Schemas.Trials do
         sender_id: @uuid,
         body: %Schema{type: :string},
         message_type: %Schema{type: :string},
+        topic: %Schema{type: :string, enum: @box_topics, nullable: true},
         client_operation_id: %Schema{type: :string, format: :uuid, nullable: true},
         inserted_at: @datetime
       },
@@ -327,6 +330,10 @@ defmodule PaleeWeb.Schemas.Trials do
         thread_id: @uuid,
         box: Social.box(),
         member: %Schema{type: :boolean},
+        blocked: %Schema{
+          type: :boolean,
+          description: "ADR-282: the box no longer receives your messages"
+        },
         staff: %Schema{
           type: :array,
           items: %Schema{
@@ -370,6 +377,12 @@ defmodule PaleeWeb.Schemas.Trials do
       type: :object,
       properties: %{
         body: %Schema{type: :string, minLength: 1, maxLength: 4000},
+        topic: %Schema{
+          type: :string,
+          enum: @box_topics,
+          nullable: true,
+          description: "ADR-282: what it is about; training also reaches your coach"
+        },
         client_operation_id: @uuid
       },
       required: [:body]

@@ -13,8 +13,8 @@ export type ChatParticipant = ChatThread["participants"][number];
 export type ChatMessage = MessagesResponse["messages"][number];
 export type MessageType = ChatMessage["message_type"];
 export type ThreadContextType = ChatThread["context_type"];
-/** What a message from the box is about (ADR-140 §6). */
-export const MESSAGE_TOPICS = ["booking", "payment", "membership", "facility"] as const;
+/** What a message to or from the box is about (ADR-140 §6, ADR-282: «Προπόνηση» brings in a coach). */
+export const MESSAGE_TOPICS = ["booking", "payment", "membership", "training", "facility"] as const;
 export type MessageTopic = (typeof MESSAGE_TOPICS)[number];
 
 export type SendMessageOptions = {
@@ -81,6 +81,38 @@ export async function sendMessage(
       ...(topic ? { topic } : {}),
     },
   }).then((response) => response.message);
+}
+
+/** ADR-282: a coach the box's inbox may bring into a box thread. */
+export type CoachCandidate = {
+  id: string;
+  nickname: string | null;
+  avatar_url: string | null;
+  coaches_person: boolean;
+  in_thread: boolean;
+};
+
+export async function fetchCoachCandidates(token: string, threadId: string) {
+  return apiRequest<{ coaches: CoachCandidate[] }>(`/me/threads/${threadId}/coaches`, { token }).then(
+    (response) => response.coaches,
+  );
+}
+
+/** «Φέρε τον coach» (ADR-282). */
+export async function bringCoach(token: string, threadId: string, userId: string) {
+  return apiRequest<{ thread: ChatThread }>(`/me/threads/${threadId}/coaches`, {
+    method: "POST",
+    token,
+    body: { user_id: userId },
+  }).then((response) => response.thread);
+}
+
+/** ADR-282: the box stops (or starts again) hearing from a newcomer. */
+export async function setBoxSenderBlocked(token: string, threadId: string, blocked: boolean) {
+  return apiRequest<{ blocked: boolean }>(`/me/threads/${threadId}/block`, {
+    method: blocked ? "PUT" : "DELETE",
+    token,
+  });
 }
 
 export async function markThreadRead(token: string, threadId: string, lastMessageId: string) {

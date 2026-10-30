@@ -31,7 +31,19 @@ import { MessageBubble } from "../MessageBubble";
 import { MessageComposer } from "../MessageComposer";
 import { TOPIC_KEYS } from "../message-topics";
 import { TypingIndicator } from "../TypingIndicator";
-import { showsIn, visibleSegments, threadSegment, threadsIn, type InboxSegment, type ThreadSegmentContext } from "./inbox-model";
+import { BoxThreadActions } from "./BoxThreadActions";
+import {
+  awaitsBoxReply,
+  boxInboxThreads,
+  isBoxInboxThread,
+  showsIn,
+  visibleSegments,
+  threadSegment,
+  threadsIn,
+  type BoxFilter,
+  type InboxSegment,
+  type ThreadSegmentContext,
+} from "./inbox-model";
 import { INBOX_SOURCES, useHasPartners } from "./inbox-sections";
 import { BackButton } from "@/components/ui/BackLink";
 
@@ -96,6 +108,9 @@ export function InboxView({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { membership } = useSelectedMembershipRole();
   const coaches = can(membership, "manage_coaching");
+  // ADR-282: the box's shared inbox reads Μηνύματα › Box as «Αναπάντητα · Όλα».
+  const boxInbox = can(membership, "message_from_box");
+  const [boxFilter, setBoxFilter] = useState<BoxFilter | null>(null);
 
   // ADR-140 §6: a coaching message goes only to the coach's own clients.
   const clients = useQuery({
@@ -195,7 +210,12 @@ export function InboxView({
   };
 
   const threadKind = (thread: ChatThread) => {
-    if (thread.context_type === "box") return i18n("msgKindBox");
+    if (thread.context_type === "box") {
+      const topic = thread.last_message?.topic;
+      return [i18n("msgKindBox"), topic && topic in TOPIC_KEYS ? i18n(TOPIC_KEYS[topic as MessageTopic]) : null]
+        .filter(Boolean)
+        .join(" · ");
+    }
     return threadSegment(thread, segmentContext) === "coach" ? t("segment.coach") : null;
   };
 
@@ -221,11 +241,22 @@ export function InboxView({
     }
   };
 
-  const visibleThreads = threadsIn(
+  const segmentThreads = threadsIn(
     (threads ?? []).filter((t) => !isThreadHidden(currentUserId ?? "", t.id)),
     segment,
     segmentContext,
   );
+  const inboxThreads = segmentThreads.filter((thread) => isBoxInboxThread(thread, currentUserId));
+  const unanswered = inboxThreads.filter(awaitsBoxReply).length;
+  // «Αναπάντητα» first while something waits; the choice sticks once made.
+  const activeBoxFilter: BoxFilter = boxFilter ?? (unanswered > 0 ? "unanswered" : "all");
+  const showBoxFilter = segment === "clubs" && boxInbox && inboxThreads.length > 0;
+  const visibleThreads = showBoxFilter
+    ? [
+        ...boxInboxThreads(inboxThreads, activeBoxFilter),
+        ...(activeBoxFilter === "all" ? segmentThreads.filter((thread) => !isBoxInboxThread(thread, currentUserId)) : []),
+      ]
+    : segmentThreads;
   const sources = INBOX_SOURCES.filter((source) => showsIn(source.segments, segment));
   const topSources = sources.filter((source) => source.placement === "top");
   const bottomSources = sources.filter((source) => source.placement === "bottom");
@@ -236,11 +267,26 @@ export function InboxView({
     return (
       <div className="flex min-h-0 flex-1 flex-col" data-testid="inbox-thread">
         <div className="flex items-center justify-between gap-3 border-b px-4 py-3" style={{ borderColor: "var(--border)" }}>
-          <BackButton onClick={() => onThreadChange(null)} className="min-h-11 text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
+          <BackButton onClick={() => onThreadChange(null)} className="min-h-11 min-w-0 truncate text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
             {threadName(activeThread)}
           </BackButton>
+          {fromBox && boxInbox && accessToken ? (
+            <BoxThreadActions
+              thread={activeThread}
+              token={accessToken}
+              personName={threadName(activeThread)}
+              onChanged={(updated) =>
+                setThreads((current) => (current ?? []).map((thread) => (thread.id === updated.id ? { ...thread, ...updated } : thread)))
+              }
+            />
+          ) : null}
           {end}
         </div>
+        {fromBox && activeThread.box_person?.blocked ? (
+          <p role="status" className="border-b px-4 py-2 text-xs" style={{ borderColor: "var(--border)", color: "var(--text-soft)" }}>
+            {i18n("inboxBlockedNote")}
+          </p>
+        ) : null}
         <div className="scroll-area flex flex-1 flex-col gap-2 overflow-y-auto p-4">
           {messages.map((msg) => (
             <MessageBubble
@@ -334,6 +380,26 @@ export function InboxView({
             stretch
           />
         ) : null}
+        {!searching && showBoxFilter ? (
+          <div role="group" aria-label={i18n("inboxBoxFilter")} className="flex gap-1.5" data-testid="box-inbox-filter">
+            {(["unanswered", "all"] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={activeBoxFilter === value}
+                onClick={() => setBoxFilter(value)}
+                className="min-h-9 rounded-full px-3 text-xs font-semibold"
+                style={
+                  activeBoxFilter === value
+                    ? { background: "var(--primary)", color: "var(--primary-contrast)", border: "1px solid var(--primary)" }
+                    : { background: "var(--card)", color: "var(--text-soft)", border: "1px solid var(--border-strong)" }
+                }
+              >
+                {value === "unanswered" ? i18n("inboxUnanswered", { count: unanswered }) : i18n("inboxAllBox")}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       <div
@@ -392,9 +458,26 @@ export function InboxView({
                     >
                       <Initial letter={threadName(thread)[0]} />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium" style={{ color: "var(--text)" }}>{threadName(thread)}</p>
+                        <p className="flex min-w-0 items-center gap-1.5 text-sm font-medium" style={{ color: "var(--text)" }}>
+                          <span className="truncate">{threadName(thread)}</span>
+                          {isBoxInboxThread(thread, currentUserId) && thread.box_person?.newcomer ? (
+                            <span
+                              className="shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-bold"
+                              style={{ background: "color-mix(in srgb, var(--warning) 18%, var(--card))", color: "var(--text)" }}
+                              title={i18n("inboxNewcomerHint")}
+                            >
+                              {i18n("inboxNewcomer")}
+                            </span>
+                          ) : null}
+                        </p>
                         {kind ? <p className="text-xs" style={{ color: "var(--dim)" }}>{kind}</p> : null}
+                        {isBoxInboxThread(thread, currentUserId) && thread.last_message ? (
+                          <p className="truncate text-xs" style={{ color: "var(--text-soft)" }}>{thread.last_message.body}</p>
+                        ) : null}
                       </div>
+                      {awaitsBoxReply(thread) && isBoxInboxThread(thread, currentUserId) ? (
+                        <span aria-label={i18n("inboxAwaitsReply")} className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: "var(--primary)" }} />
+                      ) : null}
                     </button>
                     <button
                       type="button"

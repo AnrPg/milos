@@ -127,7 +127,7 @@ defmodule Palee.Application.MyBilling do
   defp header(provider, chat_slugs) do
     provider
     |> Map.take([:organization_id, :name, :slug, :kind, :logo_url, :primary_color])
-    |> Map.put(:contact, %{box_chat_slug: Map.get(chat_slugs, provider.organization_id)})
+    |> Map.put(:contact, %{box_chat_slug: chat_slug(provider, chat_slugs)})
     |> Map.put(:actions, %{
       self_service_purchase: false,
       self_service_cancel_auto_renew: false,
@@ -407,6 +407,14 @@ defmodule Palee.Application.MyBilling do
       Logger.warning("billing trials failed error=#{inspect(error)}")
       %{}
   end
+
+  # ADR-282: a client reaches their box's chat whether or not its page is
+  # published; an independent coach keeps the published slug only.
+  defp chat_slug(%{kind: kind, slug: slug}, _chat_slugs)
+       when kind not in ["coach", :coach] and is_binary(slug),
+       do: slug
+
+  defp chat_slug(provider, chat_slugs), do: Map.get(chat_slugs, provider.organization_id)
 
   defp chat_slugs([]), do: %{}
 

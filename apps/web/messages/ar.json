@@ -4794,7 +4794,31 @@
     "semanticWorkoutDanceFitness": "لياقة الرقص (زومبا)",
     "semanticWorkoutPoleAerial": "البول والرياضات الهوائية",
     "semanticWorkoutOutdoorTraining": "التدريب في الهواء الطلق",
-    "semanticWorkoutClimbingBouldering": "التسلق والبولدرينغ"
+    "semanticWorkoutClimbingBouldering": "التسلق والبولدرينغ",
+    "msgTopicTraining": "التدريب",
+    "inboxBringCoach": "أضف مدرّبًا",
+    "inboxBringCoachHint": "ينضم المدرّب إلى المحادثة ويمكنه الرد باسم الصالة.",
+    "inboxLoadingCoaches": "جارٍ تحميل المدرّبين…",
+    "inboxNoCoaches": "لا يوجد مدرّبون في الصالة بعد.",
+    "inboxCoachInThread": "في المحادثة",
+    "inboxCoachTheirs": "مدرّبه",
+    "inboxMoreActions": "إجراءات أخرى",
+    "inboxBlock": "حظر",
+    "inboxUnblock": "إلغاء الحظر",
+    "inboxBlockTitle": "حظر {name}؟",
+    "inboxBlockHint": "لن يتمكن من الكتابة إلى الصالة بعد الآن. يمكنك إلغاء الحظر لاحقًا من هنا.",
+    "inboxCancel": "إلغاء",
+    "inboxActionFailed": "لم ينجح ذلك. حاول مرة أخرى.",
+    "inboxBlockedNote": "لم تعد الصالة تستقبل رسائل من هذا الشخص.",
+    "inboxBoxFilter": "رسائل إلى الصالة",
+    "inboxUnanswered": "بلا رد · {count}",
+    "inboxAllBox": "الكل",
+    "inboxNewcomer": "جديد",
+    "inboxNewcomerHint": "ليس عميلًا للصالة",
+    "inboxAwaitsReply": "بانتظار الرد",
+    "ntfBoxInboxTitle": "كتب {name} إلى {box}",
+    "ntfBoxInboxBroughtIn": "أضافك {by} إلى محادثة",
+    "ntfBoxInboxBody": "أرسل {name} رسالة إلى الصالة."
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",
@@ -5847,7 +5871,8 @@
       },
       "saveError": "لم يُحفظ ذلك. حاول مرة أخرى."
     },
-    "boxFindByName": "أو ابحث بالاسم"
+    "boxFindByName": "أو ابحث بالاسم",
+    "membershipContactBox": "تواصل مع الصالة"
   },
   "Community": {
     "all": "الكل",
@@ -6488,7 +6513,8 @@
     "openClubMembers": "{count, plural, zero {لا أعضاء} one {عضو واحد} two {عضوان} few {# أعضاء} many {# عضوًا} other {# عضو}}",
     "guestTitle": "أنت زائر في {box}",
     "guestBody": "تدفع في الاستقبال كلما أتيت. كن عضوًا في الـBox لتحجز الحصص وترى التمارين.",
-    "guestAction": "كن عضوًا في الـBox"
+    "guestAction": "كن عضوًا في الـBox",
+    "messageBox": "راسل الصالة"
   },
   "Trials": {
     "ask": "اطلب حصة تجريبية",
@@ -6657,7 +6683,14 @@
     "error_trial_already_open": "لديك تجربة محجوزة هنا بالفعل.",
     "error_invalid_trial_transition": "تغيّرت هذه التجربة بالفعل. حدّث الصفحة.",
     "error_class_not_found": "هذه الحصة لم تعد متاحة.",
-    "error_package_not_found": "اختر باقة اشتراك نشطة."
+    "error_package_not_found": "اختر باقة اشتراك نشطة.",
+    "chatTeamAnswers": "يرد فريق الصالة",
+    "chatEmptyBox": "اكتب إلى الصالة. سيرد عليك من يتوفر من الفريق.",
+    "chatFrom": "{name} · {box}",
+    "chatTopicLabel": "بخصوص ماذا؟",
+    "chatBlocked": "لم تعد هذه الصالة تستقبل رسائلك.",
+    "chatAwaitingReply": "انتظر رد الصالة قبل أن ترسل المزيد.",
+    "writeToBox": "اكتب إلى {box}"
   },
   "Clubs": {
     "loading": "جارٍ التحميل…",

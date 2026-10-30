@@ -4794,7 +4794,31 @@
     "semanticWorkoutDanceFitness": "Dança fitness (Zumba)",
     "semanticWorkoutPoleAerial": "Pole e aéreos",
     "semanticWorkoutOutdoorTraining": "Treino ao ar livre",
-    "semanticWorkoutClimbingBouldering": "Escalada e boulder"
+    "semanticWorkoutClimbingBouldering": "Escalada e boulder",
+    "msgTopicTraining": "Treino",
+    "inboxBringCoach": "Chamar um coach",
+    "inboxBringCoachHint": "O coach entra na conversa e pode responder pela box.",
+    "inboxLoadingCoaches": "A carregar coaches…",
+    "inboxNoCoaches": "A box ainda não tem coaches.",
+    "inboxCoachInThread": "Na conversa",
+    "inboxCoachTheirs": "O seu coach",
+    "inboxMoreActions": "Mais ações",
+    "inboxBlock": "Bloquear",
+    "inboxUnblock": "Desbloquear",
+    "inboxBlockTitle": "Bloquear {name}?",
+    "inboxBlockHint": "Deixa de poder escrever à box. Podes desbloquear mais tarde aqui.",
+    "inboxCancel": "Cancelar",
+    "inboxActionFailed": "Não resultou. Tenta outra vez.",
+    "inboxBlockedNote": "A box já não recebe mensagens desta pessoa.",
+    "inboxBoxFilter": "Mensagens para a box",
+    "inboxUnanswered": "Por responder · {count}",
+    "inboxAllBox": "Todas",
+    "inboxNewcomer": "Novo",
+    "inboxNewcomerHint": "Não é cliente da box",
+    "inboxAwaitsReply": "À espera de resposta",
+    "ntfBoxInboxTitle": "{name} escreveu para {box}",
+    "ntfBoxInboxBroughtIn": "{by} trouxe-te para uma conversa",
+    "ntfBoxInboxBody": "{name} enviou uma mensagem à box."
   },
   "PrSharing": {
     "gymLabel": "Onde fizeste este PR?",
@@ -5847,7 +5871,8 @@
       },
       "saveError": "Não foi guardado. Tenta novamente."
     },
-    "boxFindByName": "Ou procura pelo nome"
+    "boxFindByName": "Ou procura pelo nome",
+    "membershipContactBox": "Contactar a box"
   },
   "Community": {
     "all": "Tudo",
@@ -6488,7 +6513,8 @@
     "openClubMembers": "{count, plural, one {# membro} other {# membros}}",
     "guestTitle": "És visitante da {box}",
     "guestBody": "Pagas na receção sempre que vens. Torna-te membro da box para reservar aulas e ver os treinos.",
-    "guestAction": "Tornar-me membro da box"
+    "guestAction": "Tornar-me membro da box",
+    "messageBox": "Escrever à box"
   },
   "Trials": {
     "ask": "Pedir uma aula experimental",
@@ -6657,7 +6683,14 @@
     "error_trial_already_open": "Já tens uma aula experimental reservada aqui.",
     "error_invalid_trial_transition": "Esta aula experimental já mudou. Atualiza a página.",
     "error_class_not_found": "Esta aula já não está disponível.",
-    "error_package_not_found": "Escolhe um pacote de subscrição ativo."
+    "error_package_not_found": "Escolhe um pacote de subscrição ativo.",
+    "chatTeamAnswers": "Responde a equipa da box",
+    "chatEmptyBox": "Escreve à box. Responde quem da equipa estiver livre.",
+    "chatFrom": "{name} · {box}",
+    "chatTopicLabel": "É sobre o quê?",
+    "chatBlocked": "Esta box já não recebe as tuas mensagens.",
+    "chatAwaitingReply": "Espera que a box responda antes de enviares mais.",
+    "writeToBox": "Escrever para {box}"
   },
   "Clubs": {
     "loading": "A carregar…",

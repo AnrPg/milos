@@ -4794,7 +4794,31 @@
     "semanticWorkoutDanceFitness": "Dance fitness (Zumba)",
     "semanticWorkoutPoleAerial": "Pole & aerial",
     "semanticWorkoutOutdoorTraining": "Outdoor training",
-    "semanticWorkoutClimbingBouldering": "Climbing & bouldering"
+    "semanticWorkoutClimbingBouldering": "Climbing & bouldering",
+    "msgTopicTraining": "Training",
+    "inboxBringCoach": "Bring in a coach",
+    "inboxBringCoachHint": "The coach joins this conversation and can answer for the box.",
+    "inboxLoadingCoaches": "Loading coaches…",
+    "inboxNoCoaches": "The box has no coaches yet.",
+    "inboxCoachInThread": "In the conversation",
+    "inboxCoachTheirs": "Their coach",
+    "inboxMoreActions": "More actions",
+    "inboxBlock": "Block",
+    "inboxUnblock": "Unblock",
+    "inboxBlockTitle": "Block {name}?",
+    "inboxBlockHint": "They will no longer be able to write to the box. You can unblock them later from here.",
+    "inboxCancel": "Cancel",
+    "inboxActionFailed": "That didn't work. Try again.",
+    "inboxBlockedNote": "The box no longer receives messages from this person.",
+    "inboxBoxFilter": "Messages to the box",
+    "inboxUnanswered": "Unanswered · {count}",
+    "inboxAllBox": "All",
+    "inboxNewcomer": "New",
+    "inboxNewcomerHint": "Not a client of the box",
+    "inboxAwaitsReply": "Waiting for an answer",
+    "ntfBoxInboxTitle": "{name} wrote to {box}",
+    "ntfBoxInboxBroughtIn": "{by} brought you into a conversation",
+    "ntfBoxInboxBody": "{name} sent the box a message."
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",
@@ -5847,7 +5871,8 @@
       },
       "saveError": "That didn't save. Try again."
     },
-    "boxFindByName": "Or search by name"
+    "boxFindByName": "Or search by name",
+    "membershipContactBox": "Contact the box"
   },
   "Community": {
     "all": "All",
@@ -6488,7 +6513,8 @@
     "openClubMembers": "{count, plural, one {# club member} other {# club members}}",
     "guestTitle": "You're a guest of {box}",
     "guestBody": "You pay at the front desk whenever you come. Become a box member to book classes and see the workouts.",
-    "guestAction": "Become a box member"
+    "guestAction": "Become a box member",
+    "messageBox": "Message the box"
   },
   "Trials": {
     "ask": "Ask for a trial",
@@ -6657,7 +6683,14 @@
     "error_trial_already_open": "You already have a trial booked here.",
     "error_invalid_trial_transition": "This trial has already changed. Refresh the page.",
     "error_class_not_found": "This class isn't available anymore.",
-    "error_package_not_found": "Pick an active subscription package."
+    "error_package_not_found": "Pick an active subscription package.",
+    "chatTeamAnswers": "The box's team answers",
+    "chatEmptyBox": "Write to the box. Whoever on the team is free will answer.",
+    "chatFrom": "{name} · {box}",
+    "chatTopicLabel": "What is it about?",
+    "chatBlocked": "This box no longer receives your messages.",
+    "chatAwaitingReply": "Wait for the box to answer before you send more.",
+    "writeToBox": "Write to {box}"
   },
   "Clubs": {
     "loading": "Loading…",
