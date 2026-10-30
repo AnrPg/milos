@@ -26,7 +26,7 @@ import type { PRSupportingMetrics } from "@/api/gamification";
 import type { EffectiveEntitlement } from "@/api/my-finance";
 import { setFinanceMemberAutoRenew, updateFinanceMember } from "@/api/finance";
 import { shouldShowAllowanceQuota } from "@/components/finance/billing-entitlement-visibility";
-import { dossierMode, grantableAllowances, packageSubscriptionLabel, prSectionContentCount, visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
+import { dossierMode, grantableAllowances, membershipDateCards, packageSubscriptionLabel, prSectionContentCount, visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
 import { MembershipFreezes } from "@/components/admin/users/MembershipFreezes";
 import { MembershipLeaving } from "@/components/admin/users/MembershipLeaving";
 import {
@@ -371,25 +371,32 @@ function FinanceDetails({
                 value={<MemberStatusCell userId={userId} status={valueText(membership.status_shown) === "—" ? draft.status : valueText(membership.status_shown)} override={overrideFor(finance.details.overrides, "status")} />}
               />
               <EditableFinanceCard label={i18n("packageSubscriptions09a33f1")} value={packageContent || "—"} />
-              {currentSubscription ? (
-                <EditableFinanceCard
-                  label={i18n("expiresOn549cabe")}
-                  value={
-                    <SubscriptionEndCell
-                      userId={userId}
-                      subscriptionId={valueText(currentSubscription.id)}
-                      endsOn={currentEnds}
-                      renews={currentPeriod?.renews === true}
-                      override={overrideFor(finance.details.overrides, "ends_on", valueText(currentSubscription.id))}
+              {/* Start comes before end, so it sits first (left). */}
+              {membershipDateCards(Boolean(currentSubscription)).map((key) => {
+                if (key === "subscription_end") {
+                  return (
+                    <EditableFinanceCard
+                      key={key}
+                      label={i18n("expiresOn549cabe")}
+                      value={
+                        <SubscriptionEndCell
+                          userId={userId}
+                          subscriptionId={valueText(currentSubscription?.id)}
+                          endsOn={currentEnds}
+                          renews={currentPeriod?.renews === true}
+                          override={overrideFor(finance.details.overrides, "ends_on", valueText(currentSubscription?.id))}
+                        />
+                      }
                     />
-                  }
-                />
-              ) : null}
-              {(currentSubscription ? ([['starts_on', i18n("startsOn6d888f7")]] as const) : ([['starts_on', i18n("startsOn6d888f7")], ['expires_on', i18n("expiresOn549cabe")]] as const)).map(([key, label]) => (
-                <EditableFinanceCard key={key} label={label} changed={changed.has(key)}>
-                  <DateInput aria-label={label} className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft[key]} disabled={form.saving} onValueChange={(value) => edit({ [key]: value })} data-testid={`membership-${key}`} />
-                </EditableFinanceCard>
-              ))}
+                  );
+                }
+                const label = key === "starts_on" ? i18n("startsOn6d888f7") : i18n("expiresOn549cabe");
+                return (
+                  <EditableFinanceCard key={key} label={label} changed={changed.has(key)}>
+                    <DateInput aria-label={label} className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft[key]} disabled={form.saving} onValueChange={(value) => edit({ [key]: value })} data-testid={`membership-${key}`} />
+                  </EditableFinanceCard>
+                );
+              })}
             </div>
             {commitment ? (
               <CommitmentOverridePrompt
