@@ -193,13 +193,13 @@ test.describe("Settings › Spaces › floor plans in classes and room photos", 
     await page.goto("/admin/spaces");
     // Off: no per-floor switches yet.
     await expect(page.getByTestId("spaces-loc-1-floors-in-classes")).toHaveCount(0);
-    await page.getByTestId("plans-in-classes").check();
+    await page.getByTestId("plans-in-classes").click();
     await expect.poll(() => puts).toEqual([{ floor_plans_in_classes: true }]);
 
     const floors = page.getByTestId("spaces-loc-1-floors-in-classes");
     await expect(floors).toBeVisible();
     await expect(page.getByTestId("floor-in-classes-plan-1")).toBeChecked();
-    await page.getByTestId("floor-in-classes-plan-2").uncheck();
+    await page.getByTestId("floor-in-classes-plan-2").click();
     await expect.poll(() => floorPatches).toEqual([{ shown_in_classes: false }]);
 
     // Room photos: start off the public page; the floating 🌐 turns one on.
@@ -237,7 +237,8 @@ test.describe("Settings › Spaces › floor plans in classes and room photos", 
     await page.getByTestId("cleaning-point-instruction").fill("Drains and the grate");
     await page.getByTestId("cleaning-point-save").click();
 
-    await expect.poll(() => added).toEqual({ media_id: ids[0], instruction: "Drains and the grate" });
+    await expect.poll(() => added?.instruction).toBe("Drains and the grate");
+    expect(added).toEqual({ media_id: ids[0], instruction: "Drains and the grate" });
   });
 });
 
