@@ -37,22 +37,27 @@ defmodule Palee.Scheduling.Domain.SeriesEditTest do
 
   test "targets are upcoming classes in the range by the gym's date, without the edited one" do
     now = ~U[2026-11-01 12:00:00Z]
+    edited = occurrence("edited", "2026-11-02T05:00:00Z")
 
     occurrences = [
       occurrence("past", "2026-11-01T05:00:00Z"),
-      occurrence("edited", "2026-11-02T05:00:00Z"),
+      # Upcoming, but before the edited class: "all" means from it on.
+      occurrence("before", "2026-11-01T18:00:00Z"),
+      edited,
       # 23:30 UTC on the 2nd is already the 3rd in Athens.
       occurrence("late", "2026-11-02T23:30:00Z"),
       occurrence("out", "2026-11-05T05:00:00Z")
     ]
 
     ids = fn scope ->
-      occurrences |> SeriesEdit.targets(scope, @athens, "edited", now) |> Enum.map(& &1.id)
+      occurrences |> SeriesEdit.targets(scope, @athens, edited, now) |> Enum.map(& &1.id)
     end
 
     assert ids.(:this) == []
     assert ids.(:all) == ["late", "out"]
     assert ids.({:range, ~D[2026-11-03], ~D[2026-11-04]}) == ["late"]
+    # A range is the dates staff chose, even before the edited class.
+    assert ids.({:range, ~D[2026-11-01], ~D[2026-11-02]}) == ["before"]
   end
 
   test "a new time of day lands on each class's own date across a DST change" do

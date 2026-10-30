@@ -4,9 +4,9 @@ import type { WorkoutFolder } from "@/api/workouts";
 
 import {
   compareFolders,
-  dayFolderBadge,
   folderDisplayName,
   folderIcon,
+  folderMark,
   folderKind,
   folderSubtreeIds,
   resolveWorkoutIcon,
@@ -54,9 +54,16 @@ describe("library folders", () => {
     expect([...folderSubtreeIds(folders, "r")].sort()).toEqual(["a", "b", "r"]);
   });
 
-  it("draws the real date on class-day folders", () => {
-    expect(dayFolderBadge(folder("e", "2026-10-12", "classes:2026-10-12"), "en")).toEqual({ month: "Oct", day: "12" });
-    expect(dayFolderBadge(folder("d", "10", "classes:2026-10"), "en")).toBeNull();
+  it("marks folders with their emoji, the member glyph, or the real date", () => {
+    expect(folderMark(folder("a", "Athletes", "athletes"))).toEqual({ kind: "emoji", emoji: "👥" });
+    expect(folderMark(folder("v", "Variations for member", "member_variations"))).toEqual({ kind: "transfer" });
+    expect(folderMark(folder("y", "2026", "classes:2026"), "en")).toEqual({ kind: "date", main: "2026" });
+    expect(folderMark(folder("d", "10", "classes:2026-10"), "en")).toEqual({ kind: "date", main: "Oct" });
+    expect(folderMark(folder("e", "2026-10-12", "classes:2026-10-12"), "en")).toEqual({ kind: "date", main: "12", caption: "Oct" });
+    expect(folderMark(folder("e", "2026-10-12", "classes:2026-10-12"), "el")).toEqual({ kind: "date", main: "12", caption: "Οκτ" });
+    expect(folderMark(folder("b", "Benchmarks"))).toEqual({ kind: "emoji", emoji: "🏆" });
+    // The folder shape already reads as a folder, so no 📁 inside it.
+    expect(folderMark(folder("c", "Misc"))).toEqual({ kind: "none" });
   });
 
   it("picks icons from keywords in English and Greek, ignoring accents and case", () => {

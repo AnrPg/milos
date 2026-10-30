@@ -8,7 +8,8 @@ import { ApiError } from "@/api/client";
 import { createDraftWorkout, fetchAdminWorkout, listScaleLevels, publishWorkoutDraft, type WorkoutRecord } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
-import { Select } from "@/components/ui/Select";
+import { WorkoutTypeSelect } from "@/components/workouts/WorkoutTypeSelect";
+import { isWorkoutType } from "@/lib/workout-types";
 import { WodGoalsEditorPanel } from "@/components/wod-goals/WodGoalsEditorPanel";
 import { PlanEditor, type PlanLevel } from "@/components/workouts/plan-editor";
 import { useDraftSaver } from "@/hooks/useDraftSaver";
@@ -31,8 +32,6 @@ import {
   planToText,
   type PlanDraftPayload,
 } from "./structured-plan-authoring";
-
-const WORKOUT_TYPES: WorkoutType[] = ["crossfit", "strength", "gymnastics", "aerobics", "flexibility", "recovery"];
 
 /** What the authoring modes host asks of the open plan editor before switching away from it. */
 export type PlanEditorHandle = {
@@ -116,7 +115,7 @@ export function StructuredPlanWorkoutEditor({ draftId, folderId = null, onDraftR
   /** Puts a stored draft into the plan editor and arms autosave at its revision. */
   const applyWorkout = useCallback(
     (workout: WorkoutRecord) => {
-      const nextType = WORKOUT_TYPES.includes(workout.type as WorkoutType) ? (workout.type as WorkoutType) : "";
+      const nextType = isWorkoutType(workout.type) ? workout.type : "";
       typeRef.current = nextType;
       setType(nextType);
       metadataRef.current = workout.workout_metadata ?? {};
@@ -270,22 +269,14 @@ export function StructuredPlanWorkoutEditor({ draftId, folderId = null, onDraftR
                 <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                   {i18n("workoutType34a530c")}
                 </span>
-                <Select
+                <WorkoutTypeSelect
                   className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none"
                   style={{ background: "var(--card)", borderColor: showProblems && !type ? "var(--danger)" : "var(--dim)", color: "var(--text)" }}
                   value={type}
-                  onValueChange={(value) => changeType(value as WorkoutType)}
-                  aria-invalid={showProblems && !type}
-                >
-                  <option value="" disabled>
-                    {assistantT("chooseType")}
-                  </option>
-                  {WORKOUT_TYPES.map((item) => (
-                    <option key={item} value={item}>
-                      {item.replaceAll("_", " ")}
-                    </option>
-                  ))}
-                </Select>
+                  onChange={changeType}
+                  placeholder={assistantT("chooseType")}
+                  invalid={showProblems && !type}
+                />
               </label>
             </div>
           ) : null}

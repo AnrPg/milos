@@ -1,4 +1,5 @@
 import { apiRequest } from "@/api/client";
+import type { WorkoutType } from "@/lib/workout-types";
 
 export type GamificationSettings = {
   id?: string | null;
@@ -81,6 +82,8 @@ export type WorkoutAuthoringSettings = {
   wod_goals_visible_by_default: boolean;
   /** ADR-180: whether coaches may use the WOD assistant (on by default). */
   wod_assistant_enabled: boolean;
+  /** ADR-275: the workout kinds the gym's editors offer; null offers every kind. */
+  workout_types?: WorkoutType[] | null;
 };
 
 export type GamificationUpdate = Partial<

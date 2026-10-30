@@ -64,14 +64,7 @@ defmodule PaleeWeb.AdminChallengeController do
               count: %Schema{type: :integer, minimum: 1},
               type_filter: %Schema{
                 type: :string,
-                enum: [
-                  "crossfit",
-                  "strength",
-                  "gymnastics",
-                  "aerobics",
-                  "flexibility",
-                  "recovery"
-                ]
+                enum: Enum.map(Palee.Workouts.supported_workout_types(), &to_string/1)
               }
             },
             required: [:count, :type_filter],

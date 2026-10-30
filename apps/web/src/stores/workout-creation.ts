@@ -1,5 +1,7 @@
 import { create } from "zustand";
 
+import { isWorkoutType } from "@/lib/workout-types";
+
 import type {
   AdvancedSettings,
   DraftExercise,
@@ -322,16 +324,7 @@ function dropLoneGroups(exercises: DraftExercise[]): DraftExercise[] {
 }
 
 function parseWorkoutType(value: unknown): WorkoutType | null {
-  if (
-    value === "crossfit" ||
-    value === "strength" ||
-    value === "gymnastics" ||
-    value === "aerobics" ||
-    value === "flexibility" ||
-    value === "recovery"
-  ) {
-    return value;
-  }
+  if (isWorkoutType(value)) return value;
 
   return null;
 }

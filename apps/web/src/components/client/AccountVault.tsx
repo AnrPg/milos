@@ -9,7 +9,6 @@ import {
   asTrainingHistoryPage,
   fetchAccountHistory,
   fetchAccountVault,
-  VAULT_DISCIPLINES,
   type VaultAttempt,
   type VaultGroup,
   type VaultQuery,
@@ -31,12 +30,13 @@ import { SourceLabel } from "@/components/providers/SourceLabel";
 import { useMyProviders, useSourceDirectory } from "@/components/providers/use-providers";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
-import { semanticLabel } from "@/i18n/presentation";
+import { useWorkoutTypeLabels } from "@/components/workouts/WorkoutTypeSelect";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
 import { DEFAULT_VAULT_FILTER, parseVaultFilter, vaultFilterCount } from "@/lib/account-filters";
 import { sourceOptions, sourceToken } from "@/lib/provider-sources";
 import { defaultHistoryKind } from "@/lib/training-history";
+import { familiesOfWorkoutTypes, WORKOUT_TYPE_FAMILIES, workoutTypesOfFamilies } from "@/lib/workout-types";
 import { DateInput } from "@/components/ui/DateInput";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
@@ -135,7 +135,6 @@ function VaultFilters({
   groups: VaultGroup[];
 }) {
   const t = useTranslations("Providers");
-  const i18n = useUiTranslations();
   const directory = useSourceDirectory();
   const [pageOpen, setPageOpen] = useState(false);
   const set = (patch: Partial<VaultQuery>) => onChange({ ...filter, ...patch });
@@ -144,7 +143,11 @@ function VaultFilters({
     device: t("source.device"),
     former: (name) => t("source.former", { name }),
   });
-  const disciplines = VAULT_DISCIPLINES.map((value) => ({ value, label: semanticLabel(value, i18n) || value }));
+  const typeLabels = useWorkoutTypeLabels();
+  // ADR-275: the filter offers workout families; choosing one filters by all its kinds.
+  const disciplines = WORKOUT_TYPE_FAMILIES.map(({ family }) => ({ value: family, label: typeLabels.family(family) }));
+  const selectedFamilies = familiesOfWorkoutTypes(filter.disciplines);
+  const setFamilies = (families: string[]) => set({ disciplines: workoutTypesOfFamilies(families) });
   const benchmarks = useMemo(() => {
     const seen = new Map<string, string>();
     for (const group of groups) if (group.benchmark) seen.set(group.benchmark, group.title ?? group.benchmark);
@@ -167,9 +170,9 @@ function VaultFilters({
       kind: "menu",
       label: t("filter.discipline"),
       options: disciplines,
-      selected: filter.disciplines,
+      selected: selectedFamilies,
       multiple: true,
-      onChange: (values) => set({ disciplines: values as VaultQuery["disciplines"] }),
+      onChange: setFamilies,
     },
     ...(benchmarks.length
       ? [
@@ -219,9 +222,9 @@ function VaultFilters({
             <ChoiceChips
               ariaLabel={t("filter.discipline")}
               options={disciplines}
-              selected={filter.disciplines}
+              selected={selectedFamilies}
               multiple
-              onChange={(values) => set({ disciplines: values })}
+              onChange={setFamilies}
             />
           </FilterSection>
           <FilterSection label={t("filter.dates")}>

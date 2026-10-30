@@ -1,5 +1,5 @@
 import type { WorkoutFolder, WorkoutRecord } from "@/api/workouts";
-import type { WorkoutType } from "@/types/workout";
+import { workoutTypeFamily, type WorkoutTypeFamily } from "@/lib/workout-types";
 
 /** Folders the app maintains are recognised by their `system_key`, never by name. */
 export type FolderKind =
@@ -26,17 +26,22 @@ export const FOLDER_KIND_ICONS: Record<FolderKind, string> = {
   custom: "📁",
 };
 
-const WORKOUT_TYPE_ICONS: Record<WorkoutType, string> = {
-  crossfit: "🔥",
+/** ADR-275: one icon per workout family, so every kind in it has one. */
+const WORKOUT_FAMILY_ICONS: Record<WorkoutTypeFamily, string> = {
+  functional: "🔥",
   strength: "🏋️",
   gymnastics: "🤸",
-  aerobics: "🫀",
-  flexibility: "🧘",
+  endurance: "🫀",
+  mind_body: "🧘",
+  combat: "🥊",
+  dance: "💃",
+  outdoor: "🧗",
   recovery: "💆",
 };
 
 export function workoutIcon(type: string | null | undefined) {
-  return WORKOUT_TYPE_ICONS[type as WorkoutType] ?? "🏋️";
+  const family = workoutTypeFamily(type);
+  return family ? WORKOUT_FAMILY_ICONS[family] : "🏋️";
 }
 
 /**
@@ -164,14 +169,44 @@ export function compareFolders(a: WorkoutFolder, b: WorkoutFolder) {
   return rank(a) - rank(b) || a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" });
 }
 
-/** Month and day to draw on a class-day folder's calendar icon. */
-export function dayFolderBadge(folder: WorkoutFolder, locale?: string) {
-  if (folderKind(folder) !== "day") return null;
-  const date = new Date(`${(folder.system_key ?? "").slice(8)}T12:00:00Z`);
-  return {
-    month: new Intl.DateTimeFormat(locale, { month: "short", timeZone: "UTC" }).format(date),
-    day: String(date.getUTCDate()),
-  };
+/**
+ * What a folder icon shows in its middle. A folder always looks like a folder;
+ * this is only the mark drawn on it: the folder's emoji, the "member to member"
+ * glyph for Variations for member, or the date for class-date folders.
+ */
+export type FolderMark =
+  | { kind: "emoji"; emoji: string }
+  | { kind: "transfer" }
+  | { kind: "date"; main: string; caption?: string }
+  | { kind: "none" };
+
+export function folderMark(folder: WorkoutFolder, locale?: string): FolderMark {
+  const key = folder.system_key ?? "";
+  switch (folderKind(folder)) {
+    case "memberVariations":
+      return { kind: "transfer" };
+    case "year":
+      return { kind: "date", main: key.slice(8, 12) };
+    case "month": {
+      const date = new Date(Date.UTC(Number(key.slice(8, 12)), Number(key.slice(13, 15)) - 1, 15));
+      return { kind: "date", main: capitalize(shortMonth(date, locale), locale) };
+    }
+    case "day": {
+      const date = new Date(`${key.slice(8)}T12:00:00Z`);
+      return { kind: "date", main: String(date.getUTCDate()), caption: shortMonth(date, locale) };
+    }
+    case "custom": {
+      // The folder shape already says "folder", so a coach folder with no fitting rule stays plain.
+      const emoji = ruleIcon(folder.name);
+      return emoji ? { kind: "emoji", emoji } : { kind: "none" };
+    }
+    default:
+      return { kind: "emoji", emoji: folderIcon(folder) };
+  }
+}
+
+function shortMonth(date: Date, locale?: string) {
+  return new Intl.DateTimeFormat(locale, { month: "short", timeZone: "UTC" }).format(date).replace(/\.$/, "");
 }
 
 /** Ids of `folderId` and every folder nested below it. */

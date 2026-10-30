@@ -13,7 +13,7 @@ defmodule Palee.Workouts.Domain.WorkoutDsl.Parser do
   @max_nesting 8
   @max_title_bytes 500
   @max_content_bytes WorkoutContent.max_body_bytes()
-  @workout_types ~w(crossfit strength gymnastics aerobics flexibility recovery)
+  @workout_types Palee.Workouts.Domain.WorkoutType.keys()
   @difficulties ~w(beginner intermediate advanced all-levels)
   @score_types ~w(
     time reps weight rounds rounds+reps kcal hr_drop load distance

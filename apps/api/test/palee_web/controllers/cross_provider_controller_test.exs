@@ -137,7 +137,7 @@ defmodule PaleeWeb.CrossProviderControllerTest do
     assert {coach_id, coach_workout} == {ctx.coach_org.id, coach_fran.id}
     assert {older["organization_id"], older["master_workout_id"]} == {ctx.box.id, box_fran.id}
 
-    assert authed(ctx) |> get("/api/me/vault?disciplines=yoga") |> json_response(422)
+    assert authed(ctx) |> get("/api/me/vault?disciplines=karaoke") |> json_response(422)
   end
 
   test "Ροή filters, «Οι coach μου» and entry audiences", ctx do

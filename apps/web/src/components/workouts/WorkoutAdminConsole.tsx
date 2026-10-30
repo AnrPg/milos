@@ -32,14 +32,14 @@ import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail
 import { PlanSummaryList } from "@/components/workouts/plan-view/PlanSummaryList";
 import { readPlanSummary } from "@/components/workouts/plan-view/read";
 import { LibraryIconDialog } from "@/components/workouts/library/LibraryIconDialog";
+import { FolderIcon, WorkoutFileIcon } from "@/components/workouts/library/LibraryIcons";
 import { LibraryItemMenu, type LibraryMenuAction } from "@/components/workouts/library/LibraryItemMenu";
 import { LibraryTransferDialog, type FolderOption } from "@/components/workouts/library/LibraryTransferDialog";
 import {
   compareFolders,
-  dayFolderBadge,
   folderDisplayName,
-  folderIcon,
   folderKind,
+  folderMark,
   folderSubtreeIds,
   resolveWorkoutIcon,
   ruleIcon,
@@ -414,7 +414,6 @@ export function WorkoutAdminConsole() {
     const menuKey = `folder:${folder.id}`;
     const count = subtreeWorkoutCount(folder.id);
     const hint = folderHint(folder);
-    const badge = dayFolderBadge(folder, locale);
     const tile = (
       <button
         type="button"
@@ -425,19 +424,7 @@ export function WorkoutAdminConsole() {
           setMenuOpen(menuKey, true);
         }}
       >
-        <span aria-hidden className="relative text-[2.6rem] leading-none drop-shadow-sm">
-          {badge ? (
-            <span className="flex h-[2.6rem] w-[2.4rem] flex-col overflow-hidden rounded-md text-center shadow-sm" style={{ background: "var(--text)", border: "1px solid var(--border)" }}>
-              <span className="text-[9px] font-bold uppercase leading-[0.9rem]" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>{badge.month}</span>
-              <span className="flex-1 text-lg font-bold leading-[1.6rem]" style={{ color: "var(--bg)" }}>{badge.day}</span>
-            </span>
-          ) : folderIcon(folder)}
-          {count > 0 ? (
-            <span className="absolute -bottom-1 -end-2 min-w-5 rounded-full px-1 text-[10px] font-bold leading-4" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
-              {count}
-            </span>
-          ) : null}
-        </span>
+        <FolderIcon mark={folderMark(folder, locale)} count={count} />
         <span className="line-clamp-2 w-full break-words text-xs font-medium leading-4" style={{ color: "var(--text)" }}>{displayName(folder)}</span>
       </button>
     );
@@ -471,12 +458,7 @@ export function WorkoutAdminConsole() {
             setMenuOpen(menuKey, true);
           }}
         >
-          <span aria-hidden className="relative grid h-[2.6rem] w-[2.2rem] place-items-center rounded-md text-2xl leading-none shadow-sm" style={{ background: "color-mix(in srgb, var(--primary) 14%, var(--panel-muted))", border: "1px solid color-mix(in srgb, var(--primary) 30%, var(--border))" }}>
-            {resolveWorkoutIcon(workout)}
-            {workout.status === "draft" ? (
-              <span className="absolute -end-1 -top-1 h-2.5 w-2.5 rounded-full" style={{ background: "var(--warning)", boxShadow: "0 0 0 2px var(--panel)" }} />
-            ) : null}
-          </span>
+          <WorkoutFileIcon emoji={resolveWorkoutIcon(workout)} draft={workout.status === "draft"} />
           <span className="line-clamp-2 w-full break-words text-xs font-medium leading-4" style={{ color: "var(--text)" }}>{title}</span>
           <span className="w-full truncate text-[10px] leading-3" style={{ color: workout.status === "draft" ? "var(--warning)" : "var(--dim)" }}>
             {workout.status === "draft" ? i18n("draft23d33e2") : <SemanticLabel value={workout.type} />}
@@ -521,7 +503,7 @@ export function WorkoutAdminConsole() {
             }}
           >
             <span aria-hidden className="inline-block w-3 text-[10px] transition-transform" style={{ color: "var(--dim)", transform: expanded ? "rotate(90deg)" : undefined }}>▶</span>
-            <span aria-hidden>{folderIcon(folder)}</span>
+            <FolderIcon mark={folderMark(folder, locale)} size="inline" />
             <span className="truncate font-medium">{displayName(folder)}</span>
             <span className="text-xs tabular-nums" style={{ color: "var(--dim)" }}>{subtreeWorkoutCount(folder.id)}</span>
           </button>
@@ -554,7 +536,7 @@ export function WorkoutAdminConsole() {
             setMenuOpen(menuKey, true);
           }}
         >
-          <span aria-hidden>{resolveWorkoutIcon(workout)}</span>
+          <WorkoutFileIcon emoji={resolveWorkoutIcon(workout)} size="inline" />
           <span className="truncate">{title}</span>
           <span className="shrink-0 text-xs" style={{ color: "var(--dim)" }}><SemanticLabel value={workout.type} /></span>
           {workout.status === "draft" ? <span className="shrink-0 text-xs" style={{ color: "var(--warning)" }}>· {i18n("draft23d33e2")}</span> : null}
@@ -677,7 +659,7 @@ export function WorkoutAdminConsole() {
           onClick={() => toggleFolderGroup(folder.id)}
         >
           <span aria-hidden className="inline-block w-3 text-xs transition-transform" style={{ color: "var(--dim)", transform: collapsed ? "rotate(-90deg)" : undefined }}>▾</span>
-          <span aria-hidden>{folderIcon(folder)}</span>
+          <FolderIcon mark={folderMark(folder, locale)} size="inline" />
           <span className="min-w-0 flex-1 truncate text-sm font-semibold" style={{ color: "var(--text)" }}>{displayName(folder)}</span>
           <span className="text-xs tabular-nums" style={{ color: "var(--muted)" }}>{subtreeWorkoutCount(folder.id)}</span>
         </button>

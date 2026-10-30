@@ -157,7 +157,7 @@ defmodule PaleeWeb.AdminWorkoutFreeTextController do
   )
 
   operation(:authoring_settings,
-    summary: "What the workout editor may offer in this gym (ADR-180)",
+    summary: "What the workout editor may offer in this gym (ADR-180, ADR-275)",
     responses: [
       ok:
         {"Authoring settings", "application/json",
@@ -169,16 +169,25 @@ defmodule PaleeWeb.AdminWorkoutFreeTextController do
                type: :boolean,
                description:
                  "Off: no assistant; workouts are written in text sections with a timer each"
+             },
+             workout_types: %Schema{
+               type: :array,
+               items: %Schema{type: :string},
+               description:
+                 "ADR-275: the workout kinds this gym's editors offer, in catalogue order"
              }
            },
-           required: [:wod_assistant_enabled]
+           required: [:wod_assistant_enabled, :workout_types]
          }}
     ]
   )
 
   def authoring_settings(conn, _params) do
+    context = conn.assigns.tenant_context
+
     json(conn, %{
-      wod_assistant_enabled: Organizations.wod_assistant_enabled?(conn.assigns.tenant_context)
+      wod_assistant_enabled: Organizations.wod_assistant_enabled?(context),
+      workout_types: Organizations.workout_types(context)
     })
   end
 

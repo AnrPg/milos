@@ -3,6 +3,7 @@ import type { PRTimelineEntry, ProgressStats, ScoreHistorySeries } from "@/api/c
 import type { components } from "@/api/generated/schema";
 import type { EntrySource } from "@/api/providers";
 import type { TrainingHistoryPage } from "@/api/training-history";
+import { WORKOUT_TYPES, type WorkoutType } from "@/lib/workout-types";
 
 /**
  * The account read model (ADR-150, ADR-162): history, Πρόοδος and the Vault
@@ -27,8 +28,9 @@ export type AccountHistoryPage = components["schemas"]["AccountHistoryPage"];
 export const PROGRESS_RANGES = ["4w", "12w", "6m", "1y", "all"] as const;
 export type ProgressRange = (typeof PROGRESS_RANGES)[number];
 
-export const VAULT_DISCIPLINES = ["crossfit", "strength", "gymnastics", "aerobics", "flexibility", "recovery"] as const;
-export type VaultDiscipline = (typeof VAULT_DISCIPLINES)[number];
+/** ADR-275: the Vault filters by workout kind (the filter offers families, see AccountVault). */
+export const VAULT_DISCIPLINES = WORKOUT_TYPES;
+export type VaultDiscipline = WorkoutType;
 
 /**
  * A source token as the filters take it: a provider's organization id,

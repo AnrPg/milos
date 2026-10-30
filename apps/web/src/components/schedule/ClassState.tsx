@@ -33,8 +33,21 @@ export function ClassStateBadge({ slot }: { slot: ScheduleSlot }) {
   );
 }
 
-/** The class's state in its detail view, with the reason a cancel gave. */
-export function ClassStateNotice({ slot, className = "" }: { slot: ScheduleSlot; className?: string }) {
+/**
+ * The class's state in its detail view, with the reason a cancel gave. Staff
+ * get the way back inside it (restore a cancelled class, resume bookings), so
+ * the state and its fix read together.
+ */
+export function ClassStateNotice({
+  slot,
+  className = "",
+  onAction,
+}: {
+  slot: ScheduleSlot;
+  className?: string;
+  /** Staff: shows «Restore class» or «Resume bookings» in the notice. */
+  onAction?: (action: ClassAction) => void;
+}) {
   const t = useTranslations("Schedule");
   const state = classStateBadge(slot);
   if (!state) return null;
@@ -45,20 +58,32 @@ export function ClassStateNotice({ slot, className = "" }: { slot: ScheduleSlot;
       : slot.cancel_reason
         ? t("classStateCancelledReason", { reason: slot.cancel_reason })
         : t("classStateCancelledNotice");
+  const action: ClassAction = state === "paused" ? "resume" : "restore";
 
   return (
-    <p
+    <div
       role="status"
-      data-testid="class-state-notice"
-      className={`rounded-2xl px-4 py-3 text-sm font-semibold ${className}`}
+      data-testid="class-state"
+      className={`flex flex-wrap items-center justify-between gap-3 rounded-2xl px-4 py-3 ${className}`}
       style={{
         background: `color-mix(in srgb, ${TONE[state]} 12%, transparent)`,
         border: `1px solid color-mix(in srgb, ${TONE[state]} 30%, transparent)`,
-        color: TONE[state],
       }}
     >
-      {text}
-    </p>
+      <p data-testid="class-state-notice" className="min-w-0 flex-[1_1_12rem] text-sm font-semibold" style={{ color: TONE[state] }}>
+        {text}
+      </p>
+      {onAction ? (
+        <button
+          type="button"
+          className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold"
+          style={{ background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border-strong)" }}
+          onClick={() => onAction(action)}
+        >
+          {t(`classAction_${action}`)}
+        </button>
+      ) : null}
+    </div>
   );
 }
 
@@ -74,7 +99,7 @@ export function useClassActionSummary() {
 
   return (result: ClassStateResult) =>
     [
-      result.changed_count > 1 || result.skipped_count > 0 ? t("classActionDone", { count: result.changed_count }) : null,
+      result.changed_count !== 1 || result.skipped_count > 0 ? t("classActionDone", { count: result.changed_count }) : null,
       result.released_count > 0 ? t("classActionReleased", { count: result.released_count }) : null,
       result.skipped_with_bookings > 0 ? t("classActionSkippedBookings", { count: result.skipped_with_bookings }) : null,
       result.skipped_count > result.skipped_with_bookings
@@ -94,6 +119,7 @@ export function ClassActionDialog({
   token,
   slot,
   action,
+  initialScope,
   classDate,
   onClose,
   onDone,
@@ -101,6 +127,8 @@ export function ClassActionDialog({
   token: string;
   slot: ScheduleSlot;
   action: ClassAction;
+  /** The reach already chosen elsewhere (the class form's «Apply changes to»). */
+  initialScope?: SeriesEditScope;
   /** The class's date on the gym's clock (YYYY-MM-DD). */
   classDate: string;
   onClose: () => void;
@@ -109,7 +137,7 @@ export function ClassActionDialog({
   const t = useTranslations("Schedule");
   const common = useTranslations("Common");
   const i18n = useUiTranslations();
-  const [scope, setScope] = useState<SeriesEditScope>({ scope: "this" });
+  const [scope, setScope] = useState<SeriesEditScope>(initialScope ?? { scope: "this" });
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);

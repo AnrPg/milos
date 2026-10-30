@@ -81,7 +81,7 @@ async function openClass(page: Page) {
 }
 
 test.describe("Schedule › duplicate and series edits", () => {
-  test("an edit can go to every upcoming class of the series", async ({ page }) => {
+  test("an edit can go to this class and the following ones of the series", async ({ page }) => {
     await asOwner(page);
     let sent: Record<string, unknown> | null = null;
     await page.route("**/api/org/box1/admin/schedule/slots/slot-1", (route) => {
@@ -95,7 +95,7 @@ test.describe("Schedule › duplicate and series edits", () => {
     const scope = dialog.getByRole("radiogroup", { name: "Apply changes to" });
     await expect(scope.getByRole("radio", { name: "Only this class" })).toHaveAttribute("aria-checked", "true");
 
-    await scope.getByRole("radio", { name: "All upcoming classes" }).click();
+    await scope.getByRole("radio", { name: "This and following classes" }).click();
     await expect(dialog).toContainText("Each keeps its own date and WOD.");
     await dialog.getByRole("button", { name: "Save changes" }).click();
 

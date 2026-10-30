@@ -1,6 +1,6 @@
 import { ApiError } from "@/api/client";
 import type { EffectiveEntitlement } from "@/api/my-finance";
-import type { ScheduleLocation, ScheduleSlot } from "@/api/schedule";
+import type { ScheduleCoach, ScheduleLocation, ScheduleSlot } from "@/api/schedule";
 import { localizeError, type UiTranslator } from "@/i18n/presentation";
 import { clockFormat } from "@/lib/clock";
 
@@ -63,6 +63,12 @@ export function isEventSlot(slot: ScheduleSlot) {
 export function slotLocationName(slot: ScheduleSlot, locations: ScheduleLocation[] | undefined) {
   if (!slot.location_id) return null;
   return locations?.find((location) => location.id === slot.location_id)?.name ?? null;
+}
+
+/** The class's coach by name, from the schedule window's coaches (ADR-100). */
+export function slotCoachName(slot: ScheduleSlot, coaches: ScheduleCoach[] | undefined) {
+  if (!slot.coach_user_id) return null;
+  return coaches?.find((coach) => coach.id === slot.coach_user_id)?.nickname ?? null;
 }
 
 /** "Bring a guest" needs a free spot, a future class and no guest booked yet. */

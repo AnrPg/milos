@@ -49,6 +49,7 @@ import { GymTimeZoneSetting } from "@/components/admin/GymTimeZoneSetting";
 import { ProviderKindSetting } from "@/components/providers/ProviderKindSetting";
 import { WodGoalsDefaultSetting } from "@/components/wod-goals/WodGoalsDefaultSetting";
 import { WodAssistantSetting } from "@/components/workouts/creation/WodAssistantSetting";
+import { WorkoutTypesSetting } from "@/components/workouts/WorkoutTypesSetting";
 import { AiScalingSettings } from "@/components/scaling/AiScalingSettings";
 import { PlanCard, PlanNotice } from "@/components/solo-coach/PlanCard";
 import { Dialog } from "@/components/ui/Dialog";
@@ -1148,6 +1149,15 @@ function ProviderKindSection({ token }: { token: string }) {
   );
 }
 
+// ADR-275: the workout kinds the gym's WOD editors offer.
+function WorkoutTypesSection({ token }: { token: string }) {
+  const t = useTranslations("WorkoutTypes");
+  return (
+    <CollapsibleSection id="workout-types" title={t("setting.title")} description={t("setting.description")} defaultOpen={false}>
+      <WorkoutTypesSetting token={token} />
+    </CollapsibleSection>
+  );
+}
 
 // ADR-170: the organization's Palee plan (owners and admins).
 function PlanSection({ token }: { token: string }) {
@@ -1270,6 +1280,8 @@ export function AdminSettingsHub() {
             >
               <ClassTypeSettings token={token} />
             </CollapsibleSection>
+
+            <WorkoutTypesSection token={token} />
 
             <CollapsibleSection id="public-page" title={i18n("admPublicPageTitle")} description={i18n("admPublicPageDescription")}>
               <PublicPageLink />

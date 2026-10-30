@@ -16,6 +16,9 @@ const api = vi.hoisted(() => ({
   listScaleLevels: vi.fn(),
   publishWorkoutDraft: vi.fn(),
   updateDraftWorkout: vi.fn(),
+  // ADR-275: the type picker reads the gym's workout kinds.
+  WOD_ASSISTANT_AVAILABILITY_KEY: ["authoring-settings"],
+  fetchWorkoutAuthoringSettings: vi.fn(async () => ({ wod_assistant_enabled: true, workout_types: ["strength", "crossfit"] })),
 }));
 
 vi.mock("@/api/workouts", () => api);

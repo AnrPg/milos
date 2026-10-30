@@ -2,6 +2,8 @@
 
 import { useEffect, useEffectEvent, useRef } from "react";
 
+import { lockPageScroll } from "@/lib/scroll-lock";
+
 const FOCUSABLE = [
   "a[href]",
   "button:not([disabled])",
@@ -26,8 +28,7 @@ export function useModalFocusTrap<T extends HTMLElement>(onClose: () => void) {
     const id = Symbol("dialog");
     openDialogs.push(id);
     const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const releaseScroll = lockPageScroll();
 
     const focusable = () => Array.from(dialog?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? []);
     // A field marked data-autofocus (a picker's search box) wins; otherwise
@@ -75,7 +76,7 @@ export function useModalFocusTrap<T extends HTMLElement>(onClose: () => void) {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
       openDialogs.splice(openDialogs.indexOf(id), 1);
-      document.body.style.overflow = previousOverflow;
+      releaseScroll();
       previouslyFocused?.focus();
     };
   }, []);

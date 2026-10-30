@@ -8,6 +8,8 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError, semanticLabel } from "@/i18n/presentation";
+import { useWorkoutTypeLabels, workoutTypeOptionGroups } from "@/components/workouts/WorkoutTypeSelect";
+import { offeredWorkoutTypeGroups } from "@/lib/workout-types";
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -80,7 +82,6 @@ type ChallengeFormState = {
   endsAt: string;
 };
 
-const TRAINING_TYPES = ["crossfit", "strength", "gymnastics", "aerobics", "flexibility", "recovery"] as const;
 
 function slugify(value: string) {
   return value
@@ -202,6 +203,7 @@ function RuleRowEditor({
   onRemove: () => void;
 }) {
   const i18n = useUiTranslations();
+  const typeLabels = useWorkoutTypeLabels();
   const CONDITION_LABELS: Record<RuleCondition, string> = {
     workout_type: i18n("workoutType34a530c"),
     scale_level: i18n("scaleLeveld3d3921"),
@@ -242,11 +244,7 @@ function RuleRowEditor({
             value={row.type}
             onValueChange={(value) => onChange({ ...row, type: value })}
           >
-            {TRAINING_TYPES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
+            {workoutTypeOptionGroups(offeredWorkoutTypeGroups(null), typeLabels)}
           </Select>
         )}
 
@@ -382,6 +380,7 @@ export function AdminChallenges() {
   }
 
   const i18n = useUiTranslations();
+  const typeLabels = useWorkoutTypeLabels();
   const uiLocale = useUiLocale();
   const { tokens } = useSession();
   const [selectedChallengeId, setSelectedChallengeId] = useState<string | null>(null);
@@ -554,11 +553,7 @@ export function AdminChallenges() {
                     value={form.typeFilter}
                     onValueChange={(value) => updateForm("typeFilter", value)}
                   >
-                    {TRAINING_TYPES.map((value) => (
-                      <option key={value} value={value}>
-                        {value}
-                      </option>
-                    ))}
+                    {workoutTypeOptionGroups(offeredWorkoutTypeGroups(null), typeLabels)}
                   </Select>
                 </label>
               ) : null}
