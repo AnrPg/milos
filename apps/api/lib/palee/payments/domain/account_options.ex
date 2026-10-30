@@ -30,8 +30,7 @@ defmodule Palee.Payments.Domain.AccountOptions do
     stored_purposes = if is_map(given["purposes"]), do: given["purposes"], else: %{}
 
     %{
-      "purposes" =>
-        Map.new(@purposes, fn key -> {key, boolean(stored_purposes[key], true)} end),
+      "purposes" => Map.new(@purposes, fn key -> {key, boolean(stored_purposes[key], true)} end),
       "notify_member" => boolean(given["notify_member"], true),
       "notify_staff" => boolean(given["notify_staff"], true)
     }

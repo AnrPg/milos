@@ -28,7 +28,10 @@ defmodule Palee.Repo.Migrations.V3PaymentOptions do
   end
 
   def down do
-    execute("DELETE FROM notifications WHERE type IN ('payment_failed', 'payment_needs_attention')")
+    execute(
+      "DELETE FROM notifications WHERE type IN ('payment_failed', 'payment_needs_attention')"
+    )
+
     rewrite_notification_types(&(&1 -- @types))
 
     drop constraint(:payment_intents, :payment_intents_attention_resolution_check)
