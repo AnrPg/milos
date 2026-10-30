@@ -396,6 +396,7 @@ export function SetupRecipes() {
             : t("next.soldOnlineLater"),
       },
       { href: "/admin/users/import", title: t("next.import"), hint: t("next.importHint") },
+      { href: "/admin/settings/box-screens", title: t("next.screens"), hint: t("next.screensHint") },
     ];
     body = (
       <>

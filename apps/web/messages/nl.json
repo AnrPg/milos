@@ -3623,6 +3623,8 @@
     "admPublicPageDescription": "Tekst, foto's en wat de gym biedt, zoals mensen het zien voor ze lid worden",
     "admLocationsTitle": "Locaties",
     "admLocationsDescription": "Alleen voor sportscholen met meer dan één locatie",
+    "admOnSiteTitle": "In de box",
+    "admOnSiteDescription": "Tv's aan de muur en inchecken bij de deur",
     "admLocationsEmpty": "Locaties zijn optioneel. Heeft je sportschool één locatie, dan heb je er geen nodig. Voeg ze alleen toe als je lessen of vrij trainen op meer dan één plek aanbiedt.",
     "admLocationName": "Naam van de locatie",
     "admLocationAddressOptional": "Adres (optioneel)",
@@ -13082,6 +13084,8 @@
       "paymentsHint": "Eén knop, met Viva",
       "import": "Haal je leden binnen",
       "importHint": "Importeren uit Wodify, PushPress, Excel…",
+      "screens": "Boxschermen",
+      "screensHint": "De tv in de box toont de lessen vanzelf",
       "soldOnline": "Wat online verkocht wordt",
       "soldOnlineHint": "Verkooppagina · {count} van {total} abonnementspakketten",
       "soldOnlineLater": "Na het koppelen van online betalingen gaan betaalde abonnementspakketten vanzelf online in de verkoop"
@@ -13172,7 +13176,8 @@
       "payments": "Betalingen en documenten",
       "motivation": "Motivatie",
       "training": "Training",
-      "community": "Community"
+      "community": "Community",
+      "onSite": "In de box"
     },
     "keywords": {
       "bookings": "boeking boekingen goedkeuring wachtlijst annulering plaatsen check-in toegang",
@@ -13180,7 +13185,8 @@
       "motivation": "schild schilden reeks leaderboard niveaus moeilijkheid",
       "training": "WOD doelen assistent AI schaling",
       "community": "community discussie berichten",
-      "access": "rollen toegang rechten"
+      "access": "rollen toegang rechten",
+      "onSite": "tv televisie scherm schermen muur inchecken deur ingang TV"
     }
   },
   "Documents": {
