@@ -504,7 +504,7 @@ svg .m.heat.sel { stroke: var(--text); }
             <button type="button" data-tour="clubPublic">Η σελίδα ενός box όπως τη βλέπει μη-μέλος</button>
             <button type="button" data-tour="near">Γύρω μου</button>
             <button type="button" data-tour="filters">Φίλτρα: τοποθεσία και πολλά ακόμα</button>
-            <button type="button" data-tour="partners">Partners</button>
+            <button type="button" data-tour="partners">Συναθλητές κοντά σου (από το Γύρω μου)</button>
           </div>
           <div class="tourGroup"><span>Box</span>
             <button type="button" data-tour="box">Προπόνηση με «Καταγραφή» και «Έναρξη»</button>
@@ -554,7 +554,7 @@ svg .m.heat.sel { stroke: var(--text); }
       <div class="t2"><span class="k">Μερικώς · υπάρχουν δεδομένα ή backend, λείπει το UI</span><ul>
         <li>Referral: υπάρχει για τον admin, λείπει για το μέλος</li><li>Check-in με QR: υπάρχει check-in desk, λείπει το QR</li><li>Στόχοι WOD, μυϊκή κάλυψη: ο κατάλογος έχει ήδη <code>muscle_groups</code> και <code>movement_pattern</code></li><li>Φορτίο προπόνησης: υπάρχουν RPE και διάρκεια</li><li>Διάθεση και στρες: επέκταση του readiness</li><li>Φίλτρα προγράμματος: υπάρχουν τοποθεσίες και είδη μαθήματος</li><li>Ενιαίο ημερολόγιο για όλους τους οργανισμούς</li><li>Πρόοδος δύναμης και benchmarks: υπάρχει ιστορικό PRs</li></ul></div>
       <div class="t3"><span class="k">Νέο · χρειάζεται χτίσιμο</span><ul>
-        <li>Feed, clubs, κανάλια, ομάδες μελών, events, Γύρω μου, Partners</li><li>Φίλτρα τοποθεσίας, αποθηκευμένα φίλτρα</li><li>Μετρήσεις σώματος, φωτογραφίες, σύγκριση</li><li>Νερό, ύπνος, γεύματα, λιγούρες, buddy</li><li>Ανατομικός άτλαντας, radar ποιοτήτων, insights συσχετίσεων</li><li>Κάρτα Wallet, σεζόν</li><li>Garmin (web), Apple Health (native)</li></ul></div>
+        <li>Feed, clubs, κανάλια, ομάδες μελών, events, Γύρω μου, Συναθλητές</li><li>Φίλτρα τοποθεσίας, αποθηκευμένα φίλτρα</li><li>Μετρήσεις σώματος, φωτογραφίες, σύγκριση</li><li>Νερό, ύπνος, γεύματα, λιγούρες, buddy</li><li>Ανατομικός άτλαντας, radar ποιοτήτων, insights συσχετίσεων</li><li>Κάρτα Wallet, σεζόν</li><li>Garmin (web), Apple Health (native)</li></ul></div>
     </div>
   </section>
 
@@ -605,7 +605,7 @@ svg .m.heat.sel { stroke: var(--text); }
     <span class="eyebrow">Η σελίδα του box στο feed</span>
     <h2>Τι βλέπει ένα μέλος και τι ένας περαστικός</h2>
     <div class="duo">
-      <div><span class="k">Μέλος · Ροή · Κανάλια · Events · Μέλη</span><h3>Ο χώρος της κοινότητας</h3><ul><li><b>Ροή</b>: όλα τα κανάλια μαζί. Στην κορυφή η καρφιτσωμένη ανακοίνωση, μετά η κάρτα WOD με leaderboard, challenges, PR celebrations (opt-in), events και αναρτήσεις μελών.</li><li><b>Κανάλια</b>: λίστα με νέα και ειδοποιήσεις ανά κανάλι.</li><li><b>Events</b>: εσωτερικά και ανοιχτά, με «Θα έρθω».</li><li><b>Μέλη</b>: coaches, μέλη, και Partners (swipe).</li></ul></div>
+      <div><span class="k">Μέλος · Ροή · Κανάλια · Events · Μέλη</span><h3>Ο χώρος της κοινότητας</h3><ul><li><b>Ροή</b>: όλα τα κανάλια μαζί. Στην κορυφή η καρφιτσωμένη ανακοίνωση, μετά η κάρτα WOD με leaderboard, challenges, PR celebrations (opt-in), events και αναρτήσεις μελών.</li><li><b>Κανάλια</b>: λίστα με νέα και ειδοποιήσεις ανά κανάλι.</li><li><b>Events</b>: εσωτερικά και ανοιχτά, με «Θα έρθω».</li><li><b>Μέλη</b>: coaches και μέλη. Οι Συναθλητές είναι πια στο Γύρω μου (ADR-280).</li></ul></div>
       <div><span class="k">Μη-μέλος · Σχετικά · Πρόγραμμα · Events · Δημόσια</span><h3>Η βιτρίνα του box</h3><ul><li><b>Σχετικά</b>: φωτογραφίες, είδη προπόνησης, coaches, τοποθεσίες, ωράριο.</li><li><b>Πρόγραμμα</b>: τα μαθήματα της εβδομάδας, μόνο για ανάγνωση, με «Κλείσε με δοκιμαστικό» όπου ο ιδιοκτήτης έχει διαθέσει θέσεις.</li><li><b>Events</b>: τα ανοιχτά events (Open WOD, run club).</li><li><b>Δημόσια</b>: μόνο αναρτήσεις που ο συντάκτης τους έκανε «Δημόσιο».</li><li>Κουμπιά: <b>Ζήτα δοκιμαστικό</b> · <b>Ακολούθησε</b>, ώστε τα δημόσια posts του box να εμφανίζονται στο Γύρω μου.</li></ul></div>
     </div>
 
@@ -763,7 +763,7 @@ svg .m.heat.sel { stroke: var(--text); }
       <tbody>
         <tr><td>Γύρω μου</td><td><b>Απόσταση/ακτίνα, περιοχή ή χάρτης</b>, είδος προπόνησης, τι (events, clubs, box, αναρτήσεις), πότε (σήμερα, ΣΚ, πρωί, βράδυ), κόστος (δωρεάν, δοκιμαστικό, τιμή), επίπεδο, γλώσσα, κοινό (γυναίκες, 40+, αρχάριοι), προσβασιμότητα</td></tr>
         <tr><td>Πρόγραμμα (Box)</td><td>Τοποθεσία, είδος μαθήματος, coach, ώρα, μόνο με διαθέσιμες θέσεις, μόνο ό,τι καλύπτει το πακέτο μου</td></tr>
-        <tr><td>Partners</td><td>Επίπεδο, ώρα, στόχος, είδος, προτίμηση φύλου (προαιρετική, για ασφάλεια), απόσταση στα ανοιχτά clubs</td></tr>
+        <tr><td>Συναθλητές</td><td>Επίπεδο, ώρα, στόχος, είδος, προτίμηση φύλου (προαιρετική, για ασφάλεια), απόσταση 2/5/10/25 km από γειτονιά σε γειτονιά</td></tr>
         <tr><td>Ροή / club</td><td>Club, κανάλι, τύπος (ανακοινώσεις, PRs, events), μόνο coaches</td></tr>
         <tr><td>Ημερολόγιο</td><td>Τύπος καταχώρησης, ορατότητα, εύρος ημερομηνιών, πηγή (box, coach, ελεύθερη), αναζήτηση κειμένου</td></tr>
         <tr><td>Vault</td><td>Είδος workout, benchmark ή όχι, άσκηση, ημερομηνία</td></tr>
@@ -804,9 +804,9 @@ svg .m.heat.sel { stroke: var(--text); }
         <li>Πάνω: <b>⊕ Ανάρτηση</b> · Palee · ♡ Ειδοποιήσεις · Μηνύματα</li>
         <li><b>Club bar</b>: Όλα · τα clubs σου · + Βρες</li>
         <li><b>Scope</b>: Τα clubs μου | Γύρω μου</li>
-        <li>Σελίδα club (μέλος)<ul><li>Ροή · Κανάλια · Events · Μέλη (Partners)</li></ul></li>
+        <li>Σελίδα club (μέλος)<ul><li>Ροή · Κανάλια · Events · Μέλη</li></ul></li>
         <li>Σελίδα box (μη-μέλος)<ul><li>Σχετικά · Πρόγραμμα · Events · Δημόσια · Ζήτα δοκιμαστικό</li></ul></li>
-        <li>Γύρω μου<ul><li>Events · Ανοιχτά clubs · Box με δοκιμαστικό · Δημόσια posts</li><li>Φίλτρα (n): τοποθεσία, είδος, πότε, κόστος, κοινό · αποθηκευμένα</li></ul></li>
+        <li>Γύρω μου<ul><li>Events · Ανοιχτά clubs · Box με δοκιμαστικό · Δημόσια posts · «Συναθλητές κοντά σου»</li><li>Φίλτρα (n): τοποθεσία, είδος, πότε, κόστος, κοινό · αποθηκευμένα</li></ul></li>
       </ul></div>
       <div><h3>Box</h3><ul>
         <li>Τίτλος: box ή coach ▾</li>
@@ -857,7 +857,7 @@ svg .m.heat.sel { stroke: var(--text); }
     <div class="qa">
       <article><h3>⊕ = ανάρτηση, «Νέα καταχώρηση» = για σένα</h3><p>Το ⊕ υπάρχει μόνο πάνω αριστερά στην Αρχική, όπως στο Instagram. Στο Ημερολόγιο το κουμπί γράφει «Νέα καταχώρηση». Στο Box τα κουμπιά γράφουν «Καταγραφή» και «Έναρξη». Δεν υπάρχει κανένα ⊕ χωρίς λέξη δίπλα του, εκτός από το ένα της Αρχικής.</p></article>
       <article><h3>Χωρίς «Περισσότερα», χωρίς προσαρμοστικές οθόνες</h3><p>Τα δευτερεύοντα πάνε στο Εγώ. Κάθε tab έχει πάντα την ίδια σειρά καρτών. Αν μια κάρτα είναι κενή, γράφει «Καμία κράτηση · Κλείσε θέση», αλλά μένει στη θέση της.</p></article>
-      <article><h3>Swipe μόνο για ανθρώπους</h3><p>Partners μέσα σε ένα club, με αμοιβαία συμφωνία. Για clubs: «Μπες». Για events: «Θα έρθω». Για box: «Ζήτα δοκιμαστικό», που το αποδέχεται ο ιδιοκτήτης.</p></article>
+      <article><h3>Swipe μόνο για ανθρώπους</h3><p>Συναθλητές σε ένα δημόσιο σύνολο καρτών για όλο το Palee, μόνο ανάμεσα σε επαληθευμένους ενήλικες (με ενεργή συνδρομή, ή με δύο εγγυητές και έλεγχο από την ομάδα του Palee), με αμοιβαία συμφωνία. Το ανοίγει η κάρτα «Συναθλητές κοντά σου» στο Γύρω μου (ANR, 30/10/2026, ADR-280). Για clubs: «Μπες». Για events: «Θα έρθω». Για box: «Ζήτα δοκιμαστικό», που το αποδέχεται ο ιδιοκτήτης.</p></article>
       <article><h3>Club ≠ Box</h3><p>Το ίδιο γυμναστήριο έχει δύο ρόλους. Στην Αρχική είναι ο κοινωνικός χώρος: μιλάω, συμμετέχω. Στο Box είναι η υπηρεσία: κλείνω, προπονούμαι, πληρώνω, ρωτάω τον coach. Κάθε πράγμα δημιουργείται σε ένα tab και στα άλλα εμφανίζεται μόνο ως κάρτα που οδηγεί εκεί.</p></article>
     </div>
   </section>
@@ -868,7 +868,7 @@ svg .m.heat.sel { stroke: var(--text); }
     <ol class="steps">
       <li><strong>v1 · Αναδιάταξη και club του γυμναστηρίου.</strong> Τα 4 tabs. Box με την κάρτα προπόνησης (Καταγραφή/Έναρξη). Ημερολόγιο με «Νέα καταχώρηση» και σκάλα ορατότητας, φτιαγμένα από υπάρχοντα endpoints. Ένα κλειστό club ανά box με τα αυτόματα κανάλια. <i>Pitch: «Τα μέλη σου μένουν γιατί είναι κοινότητα.»</i></li>
       <li><strong>v2 · Ανοιχτά clubs, events, Γύρω μου, δημόσια σελίδα box.</strong> Ομάδες μελών με έγκριση. Check-in με QR και κάρτα Wallet. Referral για μέλη. Σώμα (μετρήσεις, φωτογραφίες) και Ευεξία (νερό, ύπνος, γεύματα, λιγούρες, buddy). Garmin. Ενιαίο ημερολόγιο για όλους τους οργανισμούς. <i>Pitch: «Φέρνεις νέους πελάτες με τους δικούς σου όρους.»</i></li>
-      <li><strong>v3 · Partners, σεζόν, στόχοι WOD και άτλαντας, προχωρημένα analytics, ανεξάρτητοι προπονητές ως δεύτερη αγορά.</strong> PT squads, πακέτα για solo coaches, native wrapper για Apple Health και widgets. <i>Pitch: «Πουλάς προγράμματα, όχι μόνο συνδρομές.»</i></li>
+      <li><strong>v3 · Συναθλητές, σεζόν, στόχοι WOD και άτλαντας, προχωρημένα analytics, ανεξάρτητοι προπονητές ως δεύτερη αγορά.</strong> PT squads, πακέτα για solo coaches, native wrapper για Apple Health και widgets. <i>Pitch: «Πουλάς προγράμματα, όχι μόνο συνδρομές.»</i></li>
     </ol>
   </section>
 </main>
@@ -950,7 +950,7 @@ svg .m.heat.sel { stroke: var(--text); }
     [['ΝΠ', 3, 'Νίκος · Coach', 'Ανέβασε βίντεο από το snatch σου να το δω', '12:40', true], ['BK', 4, 'Γραμματεία Box Κυψέλη', 'Η ανανέωση πέρασε, ευχαριστούμε!', 'Χθες', false], ['07', 1, 'Ομάδα 07:00', 'Ελένη: ποιος έρχεται αύριο;', 'Χθες', false], ['ΔΣ', 5, 'Δήμητρα Σ.', 'Πάμε Hyrox το Σάββατο;', 'Κυρ', false]]
       .map(c => '<div class="row" style="padding:7px 0;border-bottom:1px solid var(--app-border)">' + av(c[0], c[1]) + '<div class="grow"><b>' + c[2] + '</b><span class="sm">' + c[3] + '</span></div><span class="sm">' + c[4] + '</span>' + (c[5] ? '<span style="width:8px;height:8px;border-radius:50%;background:var(--app-primary)"></span>' : '') + '</div>').join('');
   const profileHead = (sub) => '<div class="row" style="gap:12px">' + '<span class="av" style="width:60px;height:60px;font-size:18px;background:' + AVC[0] + '">ΜΛ</span><div class="grow"><b style="font-size:16px">Μαρία Λ.</b><span class="sm">' + sub + '</span></div></div>';
-  const swipe = '<div class="swipe"><div class="ph"><span class="pill acc" style="justify-self:start">87% ταίριασμα</span><b>Δήμητρα, 29</b><span class="sm" style="color:var(--app-soft)">CrossFit · Intermediate · πρωινά 07:00</span><span class="sm">' + ic('pin').replace('<svg', '<svg style="width:12px;height:12px;vertical-align:-2px"') + ' 2,1 km · Box Κυψέλη</span></div><div class="meta"><span class="pill">Olympic lifting</span><span class="pill">Hyrox Νοέμβριο</span><span class="pill">Snatch 55 kg</span></div></div><div class="swbtn"><span class="no">✕</span><span class="yes">✓</span></div>';
+  const swipe = '<div class="swipe"><div class="ph"><span class="pill acc" style="justify-self:start">✓ Μέλος Box Κυψέλη</span><b>Δήμητρα</b><span class="sm" style="color:var(--app-soft)">CrossFit · Intermediate · πρωινά 07:00</span><span class="sm">' + ic('pin').replace('<svg', '<svg style="width:12px;height:12px;vertical-align:-2px"') + ' έως 2 km · Κοινά: πρωινά, Hyrox</span></div><div class="meta"><span class="pill">Olympic lifting</span><span class="pill">Hyrox Νοέμβριο</span><span class="pill">Snatch 55 kg</span></div></div><div class="swbtn"><span class="no">✕</span><span class="yes">✓</span></div>';
 
   // ---------- blocks for H–Z ----------
   const feedPosts = post('ΕΚ', 1, 'Ελένη Κ.', 'Box Κυψέλη', '2ω', 'Fran 4:12', 'Νέο PR · −0:31', 'Επιτέλους κάτω από 4:30!', 34, 6) + post('ΑΜ', 2, 'Άρης Μ.', 'Box Κυψέλη', '5ω', 'Back Squat 160 kg', '1RM · PR', 'Χρόνια το κυνηγούσα.', 58, 12);
@@ -971,8 +971,7 @@ svg .m.heat.sel { stroke: var(--text); }
     ? top('Clubs', ['search']) + rail(0, true) + '<div class="c"><div class="row"><div class="grow"><h6>Saturday Run Λυκαβηττός</h6><span class="sm">Ανοιχτό club · 88 μέλη · από Box Κυψέλη</span></div></div>' + chan('ανακοινώσεις', 'Σάββατο 09:00 από την είσοδο του box', '1') + chan('διαδρομές', '8 km · 6:00/km · όλα τα επίπεδα', '') + '</div>' +
       '<div class="c hl"><span class="ey">Από τον οργανωτή</span><h6>Δοκιμαστική εβδομάδα στο Box Κυψέλη</h6><span class="sm">Για μέλη του Saturday Run · 3 προπονήσεις δωρεάν</span><button class="btn full" type="button" tabindex="-1">Θέλω να δοκιμάσω</button></div>'
     : top('Clubs', ['search']) + rail(0) + '<div class="c"><div class="row"><div class="grow"><h6>Box Κυψέλη</h6><span class="sm">Το box σου · 142 μέλη</span></div><span class="pill ok">Μέλος</span></div>' +
-      chan('ανακοινώσεις', 'Νίκος: Τρίτη 28/10 κλειστά', '1') + chan('wod-σήμερα', 'Fran · 23 σκορ · εσύ 3η', '') + chan('ομάδα-18:00', 'Ελένη: ποιος φέρνει μαγνήσιο;', '4') + chan('hyrox-prep', 'Simulation Σάββατο 25/10', '') + '</div>' +
-      '<div class="c"><div class="row"><div class="grow"><span class="ey">Training partners</span><h6>3 μέλη πάνε 18:00 όπως εσύ</h6></div><span class="btn">Δες</span></div></div>';
+      chan('ανακοινώσεις', 'Νίκος: Τρίτη 28/10 κλειστά', '1') + chan('wod-σήμερα', 'Fran · 23 σκορ · εσύ 3η', '') + chan('ομάδα-18:00', 'Ελένη: ποιος φέρνει μαγνήσιο;', '4') + chan('hyrox-prep', 'Simulation Σάββατο 25/10', '') + '</div>';
   const ev = (dd, dn, title, host, tag) => '<div class="ev"><span class="d">' + dd + '<b>' + dn + '</b></span><div style="min-width:0"><b>' + title + '</b><div class="sm">' + host + '</div></div><span class="pill acc">' + tag + '</span></div>';
   const eventsScreen = top('Events', ['search']) + seg(['Τα clubs μου', 'Κοντά μου'], 1) + '<div class="c" style="padding-block:2px">' +
     ev('ΣΑΒ', 18, 'Open WOD για όλους', 'Box Κυψέλη · 18/30', 'Δωρεάν') + ev('ΚΥΡ', 19, 'Run 8 km Λυκαβηττός', 'Saturday Run · 41 πάνε', 'Δωρεάν') + ev('ΣΑΒ', 25, 'Hyrox simulation', 'Hyrox Crew Αθήνα', '€15') + ev('ΤΕΤ', 29, 'Workshop snatch', 'Athens Barbell', '€20') + '</div>' +
@@ -1032,7 +1031,7 @@ svg .m.heat.sel { stroke: var(--text); }
   const eventPost = '<div class="c">' + where('Hyrox Crew Αθήνα', 'events') + '<div class="row"><span class="evd">ΣΑΒ<b>25</b></span><div class="grow"><h6>Hyrox simulation</h6><span class="sm">10:00 · Box Κυψέλη · 12 πάνε · €15</span></div></div><span class="btn">Θα έρθω</span></div>';
   const prCelebration = '<div class="c cele"><div class="row"><span style="color:var(--app-warning)">' + sv('trophy', 22) + '</span><div class="grow"><b>Η Ελένη έκανε PR στο Fran</b><span class="sm">4:12 · −0:31 · αυτόματη κάρτα (opt-in)</span></div></div><div class="acts"><span>' + ic('heart') + ' Συγχαρητήρια · 27</span></div></div>';
   const cover = (name, sub, ini, c) => '<div class="cover"><span class="av" style="width:52px;height:52px;font-size:16px;background:' + AVC[c] + '">' + ini + '</span><div><b style="font-size:16px">' + name + '</b><div class="sm">' + sub + '</div></div></div>';
-  const clubSeg = (on) => '<div class="seg">' + [['Ροή', 'clubFeed'], ['Κανάλια', 'club'], ['Events', 'clubEvents'], ['Μέλη', 'partners']].map((x, i) => i === on ? '<span class="on">' + x[0] + '</span>' : go(x[1], '<span>' + x[0] + '</span>', ' data-replace="1"')).join('') + '</div>';
+  const clubSeg = (on) => '<div class="seg">' + [['Ροή', 'clubFeed'], ['Κανάλια', 'club'], ['Events', 'clubEvents'], ['Μέλη', 'clubMembers']].map((x, i) => i === on ? '<span class="on">' + x[0] + '</span>' : go(x[1], '<span>' + x[0] + '</span>', ' data-replace="1"')).join('') + '</div>';
   const vis = (kind) => ({ me: '<span class="vis">' + sv('lock', 12) + ' Μόνο εγώ</span>', coach: '<span class="vis">' + sv('eye', 12) + ' Ο coach βλέπει</span>', reply: '<span class="vis acc">' + sv('chat', 12) + ' Απάντησε ο Νίκος</span>', rated: '<span class="vis">' + sv('star', 12) + ' Αξιολόγηση 4/5</span>', post: '<span class="vis">' + sv('users', 12) + ' Ανάρτηση στο box</span>' })[kind];
   const jEntry = (dot, when, title, right, sub, v) => '<div class="tl"><span class="dot ' + dot + '"></span><div style="min-width:0"><span class="sm">' + when + '</span><div class="row"><b class="grow">' + title + '</b>' + (right || '') + '</div>' + (sub ? '<span class="sm">' + sub + '</span>' : '') + (v ? '<div>' + v + '</div>' : '') + '</div></div>';
   const workoutCard = (chips, title, src, txt, warn) => '<div class="c hl"><div class="row" style="flex-wrap:wrap;gap:5px">' + chips.map((c, i) => '<span class="pill ' + (i === 0 ? 'acc' : '') + '">' + c + '</span>').join('') + '</div><div class="row"><h6 class="grow">' + title + '</h6><span class="sm">' + src + '</span></div><div class="wodtxt">' + txt + '</div>' +
@@ -1089,7 +1088,8 @@ svg .m.heat.sel { stroke: var(--text); }
     near: { tab: 0, crumb: 'Αρχική · Γύρω μου', html: () => feedTop + bubbles(-1) + scope(true) + chipsRow([['≤ 3 km', 1], ['Σαββατοκύριακο', 1], ['Δωρεάν', 1], ['Hyrox', 0]], go('filters', '<span class="chip2 strong">' + sv('filt', 12) + ' Φίλτρα (3)</span>')) +
       '<div class="c" style="padding-block:2px"><span class="ey" style="padding-top:8px">Αυτή την εβδομάδα · έως 3 km</span>' + ev('ΣΑΒ', 18, 'Open WOD για όλους', 'Box Κυψέλη · 18/30', 'Δωρεάν') + ev('ΚΥΡ', 19, 'Run 8 km Λυκαβηττός', 'Saturday Run Club · 41 πάνε', 'Δωρεάν') + ev('ΣΑΒ', 18, 'Bootcamp στο Πεδίον', 'Team Νίκος · ανεξάρτητος coach', 'Δωρεάν') + '</div>' +
       '<div class="c hl"><span class="ey">Box κοντά σου</span>' + go('clubPublic', '<div class="row">' + av('ΑΘ', 1) + '<div class="grow"><b>Athens Barbell</b><span class="sm">Powerlifting · 2,8 km · 2 θέσεις δοκιμαστικού</span></div><span class="sm">›</span></div>') + '</div>' +
-      '<div class="c"><span class="ey">Ανοιχτά clubs</span><div class="row">' + av('SR', 2) + '<div class="grow"><b>Saturday Run Λυκαβηττός</b><span class="sm">88 μέλη · από Box Κυψέλη</span></div><span class="btn ghost">Μπες</span></div></div>' },
+      '<div class="c"><span class="ey">Ανοιχτά clubs</span><div class="row">' + av('SR', 2) + '<div class="grow"><b>Saturday Run Λυκαβηττός</b><span class="sm">88 μέλη · από Box Κυψέλη</span></div><span class="btn ghost">Μπες</span></div></div>' +
+      '<div class="c"><span class="ey">Συναθλητές κοντά σου</span>' + go('partners', '<div class="row"><div class="grow"><h6>3 επαληθευμένοι προπονούνται πρωί όπως εσύ</h6><span class="sm">Μόνο αν το θέλετε και οι δύο</span></div><span class="btn">Δες</span></div>') + '</div>' },
     clubFeed: { tab: 0, crumb: 'Αρχική › Box Κυψέλη › Ροή', html: () => head('Box Κυψέλη', ['bell'], 'Κλειστό club μελών · 142 μέλη') + clubSeg(0) +
       textPost('ΝΠ', 3, 'Νίκος · Coach', 'Box Κυψέλη', 'ανακοινώσεις', '1ω', 'Τρίτη 28/10 κλειστά λόγω αργίας.', 41, 9, true) + lbCard(false) + challenge + prCelebration +
       photoPost('ΕΚ', 1, 'Ελένη Κ.', 'Box Κυψέλη', 'ομάδα-07:00', '2ω', 'Fran 4:12', 'Νέο PR · −0:31', 'Fran · 4:12 · Rx', 'Επιτέλους κάτω από 4:30!', 34, 6) },
@@ -1098,7 +1098,10 @@ svg .m.heat.sel { stroke: var(--text); }
       '<div class="c" style="padding-block:4px"><span class="ey" style="padding-top:6px">Ομάδες μελών</span>' + chan('τρέξιμο-κυριακής', 'από Δήμητρα · 12 μέλη', '') + chan('mamas-who-lift', 'από Κατερίνα · 9 μέλη', '') + '<span class="btn ghost full" style="display:block;margin:6px 0">Πρότεινε ομάδα (με έγκριση)</span></div>' },
     clubEvents: { tab: 0, crumb: 'Αρχική › Box Κυψέλη › Events', html: () => head('Box Κυψέλη', ['bell'], 'Κλειστό club μελών · 142 μέλη') + clubSeg(2) +
       '<div class="c" style="padding-block:2px">' + ev('ΣΑΒ', 18, 'Open WOD για όλους', 'Ανοιχτό · 18/30', 'Δωρεάν') + ev('ΣΑΒ', 25, 'Hyrox simulation', 'Για μέλη · 12 πάνε', '€15') + ev('ΠΑΡ', 31, 'Halloween WOD', 'Για μέλη + 1 καλεσμένος', 'Guest pass') + '</div>' },
-    partners: { tab: 0, crumb: 'Αρχική › Box Κυψέλη › Μέλη › Partners', html: () => head('Box Κυψέλη', [], 'Κλειστό club μελών · 142 μέλη') + clubSeg(3) + '<span class="sm">Partners: μόνο μέλη του club. Ταίριασμα μόνο αν το θέλετε και οι δύο.</span>' + swipe },
+    clubMembers: { tab: 0, crumb: 'Αρχική › Box Κυψέλη › Μέλη', html: () => head('Box Κυψέλη', ['search'], 'Κλειστό club μελών · 142 μέλη') + clubSeg(3) +
+      '<div class="c" style="padding-block:4px"><span class="ey" style="padding-top:6px">Coaches</span>' + [['ΝΠ', 3, 'Νίκος Π.', 'Head coach'], ['ΚΣ', 1, 'Κώστας Σ.', 'Coach · Olympic lifting']].map(r => '<div class="row">' + av(r[0], r[1]) + '<div class="grow"><b>' + r[2] + '</b><span class="sm">' + r[3] + '</span></div></div>').join('') + '</div>' +
+      '<div class="c" style="padding-block:4px"><span class="ey" style="padding-top:6px">Μέλη · 142</span>' + [['ΕΚ', 1, 'Ελένη Κ.', 'Φιλαράκι'], ['ΑΜ', 2, 'Άρης Μ.', 'Ομάδα 18:00'], ['ΔΣ', 5, 'Δήμητρα Σ.', 'Ομάδα 07:00']].map(r => '<div class="row">' + av(r[0], r[1]) + '<div class="grow"><b>' + r[2] + '</b><span class="sm">' + r[3] + '</span></div><span class="btn ghost">Ακολούθησε</span></div>').join('') + '</div>' },
+    partners: { tab: 0, crumb: 'Αρχική › Γύρω μου › Συναθλητές', html: () => head('Συναθλητές κοντά σου', []) + '<span class="sm">Μόνο επαληθευμένοι ενήλικες. Ταίριασμα μόνο αν το θέλετε και οι δύο. Η απόσταση μετριέται από γειτονιά σε γειτονιά.</span>' + swipe },
     clubPublic: { tab: 0, crumb: 'Αρχική › Γύρω μου › Athens Barbell (μη-μέλος)', html: () => head('Athens Barbell', [], 'Powerlifting · Κολωνάκι · 2,8 km') + cover('Athens Barbell', 'Powerlifting & Olympic lifting · 96 μέλη', 'ΑΘ', 1) +
       '<div class="row"><span class="btn" style="flex:1">Ζήτα δοκιμαστικό</span><span class="btn ghost" style="flex:1">Ακολούθησε</span></div>' + seg(['Σχετικά', 'Πρόγραμμα', 'Events', 'Δημόσια'], 1) +
       '<div class="c" style="padding-block:2px">' + cls('07:30', 'Powerlifting', 'Στέλιος · 5/10', '<span class="pill acc">Δοκιμαστικό</span>') + cls('18:00', 'Olympic Lifting', 'Κώστας · 8/8', '<span class="pill bad">Πλήρες</span>') + cls('19:30', 'Strength 101', 'Στέλιος · 3/10', '<span class="pill acc">Δοκιμαστικό</span>') + '</div>' +
@@ -1240,7 +1243,7 @@ svg .m.heat.sel { stroke: var(--text); }
       '<div class="row"><span class="btn ghost" style="flex:1">Κωδικός πρόσκλησης</span><span class="btn ghost" style="flex:1">Σκάναρε join link</span></div>' },
     privacy: { tab: 3, crumb: 'Εγώ › Κοινοποίηση & ορατότητα', html: () => head('Κοινοποίηση & ορατότητα', []) +
       '<div class="c"><span class="ey">Ο coach μου βλέπει</span>' + toggleRow('PRs', 'Νίκος, όλοι οι coaches του box', true) + toggleRow('Ευεξία (εβδομαδιαία σύνοψη)', 'Ύπνος, διάθεση, λιγούρες', true) + toggleRow('Μετρήσεις', 'Χωρίς φωτογραφίες', false) + '<span class="sm">Οι τραυματισμοί φαίνονται πάντα, για την ασφάλειά σου.</span></div>' +
-      '<div class="c"><span class="ey">Κοινότητα</span>' + toggleRow('Leaderboards', 'Το σκορ μου στο #wod-σήμερα', true) + toggleRow('PR celebrations', 'Αυτόματη κάρτα στο club', true) + toggleRow('Challenges', 'Συμμετοχή και κατάταξη', true) + toggleRow('Partners', 'Να με προτείνει σε μέλη', false) + '</div>' +
+      '<div class="c"><span class="ey">Κοινότητα</span>' + toggleRow('Leaderboards', 'Το σκορ μου στο #wod-σήμερα', true) + toggleRow('PR celebrations', 'Αυτόματη κάρτα στο club', true) + toggleRow('Challenges', 'Συμμετοχή και κατάταξη', true) + toggleRow('Συναθλητές', 'Να εμφανίζομαι στις κάρτες', false) + '</div>' +
       '<div class="c"><span class="ey">PRs κοινοποιημένα σε λογαριασμούς</span><div class="row">' + av('ΕΚ', 1) + '<b class="grow">Ελένη Κ.</b><span class="sm">Διακοπή</span></div><span class="btn ghost full" style="display:block">Κοινοποίηση σε nickname</span></div>' +
       '<div class="c"><span class="ey">Προεπιλογή νέων καταχωρήσεων</span><div class="row"><b class="grow">Σημειώσεις</b><span class="chip2">Μόνο εγώ ▾</span></div><div class="row"><b class="grow">Προπονήσεις</b><span class="chip2">Ο coach βλέπει ▾</span></div></div>' },
     buddy: { tab: 3, crumb: 'Εγώ › Buddy για στήριξη', html: () => head('Buddy για στήριξη', []) +
@@ -1293,7 +1296,7 @@ svg .m.heat.sel { stroke: var(--text); }
     render();
   });
   phone.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.tap')) { e.preventDefault(); e.target.click(); } });
-  const PARENT = { vault: [], mePRs: [], meClubs: [], myClubs: ['me'], privacy: ['me'], buddy: ['me'], devices: ['me'], payments: ['me'], settings: ['me'], help: ['me'], filters: ['near'], checkin: ['box'], wodGoals: ['box'], atlas: ['box', 'wodGoals'], body: [], measure: ['body'], wellness: [], craving: ['wellness'], referral: ['me'], clubFeed: ['feed'], club: ['feed'], clubEvents: ['feed'], partners: ['feed'], clubPublic: ['near'], compose: ['feed'], inbox: ['feed'], start: ['box'], schedule: ['box'], coachPT: ['box'], indie: [], log: ['journal'], entry: ['journal'], note: ['journal', 'entry'], progress: [] };
+  const PARENT = { vault: [], mePRs: [], meClubs: [], myClubs: ['me'], privacy: ['me'], buddy: ['me'], devices: ['me'], payments: ['me'], settings: ['me'], help: ['me'], filters: ['near'], checkin: ['box'], wodGoals: ['box'], atlas: ['box', 'wodGoals'], body: [], measure: ['body'], wellness: [], craving: ['wellness'], referral: ['me'], clubFeed: ['feed'], club: ['feed'], clubEvents: ['feed'], clubMembers: ['feed'], partners: ['near'], clubPublic: ['near'], compose: ['feed'], inbox: ['feed'], start: ['box'], schedule: ['box'], coachPT: ['box'], indie: [], log: ['journal'], entry: ['journal'], note: ['journal', 'entry'], progress: [] };
   document.querySelectorAll('[data-tour]').forEach(b => b.addEventListener('click', () => {
     const id = b.dataset.tour;
     stack = (PARENT[id] || []).concat(id);
@@ -1313,7 +1316,8 @@ svg .m.heat.sel { stroke: var(--text); }
       ['Leaderboard WOD (opt-in)', 'Club › #wod-σήμερα', 'Κάρτα στη Ροή · «Καταχώρησε το σκορ σου»'],
       ['«Κοινοποίηση στο Palee»', 'Αρχική › ⊕', 'Νέα ανάρτηση με επισύναψη προπόνησης · ή μετά την καταγραφή'],
       ['PRs που μου κοινοποίησαν (shared with me)', 'Ημερολόγιο › PRs', 'Ενότητα «Κοινοποιημένα μαζί μου»'],
-      ['Κανάλια, ομάδες μελών, events, Γύρω μου, Partners', 'Αρχική › club', 'Club bar · scope' + NEW],
+      ['Κανάλια, ομάδες μελών, events, Γύρω μου', 'Αρχική › club', 'Club bar · scope' + NEW],
+      ['Συναθλητές (ένα δημόσιο σύνολο καρτών, με επαλήθευση)', 'Αρχική › Γύρω μου', 'Κάρτα «Συναθλητές κοντά σου» · συνομιλίες στα Μηνύματα › Partners' + NEW],
       ['Φίλτρα: τοποθεσία, είδος, πότε, κόστος, κοινό · αποθηκευμένα', 'Αρχική › Γύρω μου', 'Chip «Φίλτρα (n)» κάτω από το scope' + NEW],
     ]],
     ['Box', [

@@ -177,7 +177,6 @@ defmodule Palee.Setup.Domain.Recipes do
         "scheduling.default_booking_window_days" => 14,
         "gamification.leaderboard_enabled" => false,
         "finance.package_modules" => ["group_classes", "online_coaching", "personal_training"],
-        "community.partners_enabled" => false,
         "trials.enabled" => true,
         "trials.seats_per_class" => 1,
         "trials.approval" => "manual"
@@ -387,7 +386,6 @@ defmodule Palee.Setup.Domain.Recipes do
         "scheduling.default_cancellation_cutoff_minutes" => 720,
         "gamification.leaderboard_enabled" => false,
         "finance.package_modules" => ["online_coaching", "personal_training"],
-        "community.partners_enabled" => false,
         "trials.enabled" => false
       },
       class_types: [],

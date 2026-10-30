@@ -1,4 +1,5 @@
 import { buddyNotificationUrl } from "@/components/buddy/buddy-links";
+import { verifyNotificationUrl } from "@/components/partner-verify/verify-notifications";
 import { conversationNotificationUrl } from "@/components/conversations/conversation-links";
 import { seasonNotificationUrl } from "@/components/seasons/season-links";
 import { shopNotificationUrl } from "@/components/shop/shop-links";
@@ -150,6 +151,9 @@ export function notificationTargetUrl(
   // ADR-190: a shop order notice opens the order in Box › Κατάστημα.
   const shop = shopNotificationUrl(notification.type, notification.payload);
   if (shop) return shop;
+  // ADR-280: Partners verification notices open the verification or the vouch requests.
+  const verify = verifyNotificationUrl(notification.type, notification.payload);
+  if (verify) return verify;
   // ADR-193 §2: a new follower of a public account opens their profile.
   const social = socialNotificationUrl(notification.type, notification.payload);
   if (social) return social;

@@ -33,10 +33,10 @@ export const MEMBER_ROUTE_MOVES: ReadonlyArray<readonly [from: string, to: strin
 
 /**
  * Old paths with no page of their own that open a place on another page
- * (ADR-196). Exact matches only: `/partners/:id` is a real page.
+ * (ADR-196). Exact matches only. `/partners` is the public deck again
+ * (ADR-280), so it no longer moves to Μηνύματα › Partners.
  */
 export const MEMBER_EXACT_MOVES: ReadonlyArray<readonly [from: string, to: string]> = [
-  ["/partners", "/messages?filter=partners"],
   ["/me/settings/export", "/me/settings#journal-export"],
 ];
 

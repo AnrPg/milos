@@ -1,15 +1,15 @@
 defmodule Palee.Partners.DomainTest do
-  @moduledoc "ADR-169: Partners rules, pure."
+  @moduledoc "ADR-169, ADR-280: public Partners rules, pure."
 
   use ExUnit.Case, async: true
 
   alias Palee.Partners.Domain.{
-    ClubEligibility,
+    BadgePolicy,
     DeckPolicy,
     MatchPolicy,
     MessagePolicy,
     ProfilePolicy,
-    SessionPolicy,
+    ReportPolicy,
     SwipePolicy
   }
 
@@ -21,10 +21,12 @@ defmodule Palee.Partners.DomainTest do
         id: "p-#{user_id}",
         user_id: user_id,
         active: true,
-        suspended_at: nil,
+        paused_at: nil,
+        show_box: true,
         level: "intermediate",
         times: ["early"],
         goals: ["strength"],
+        disciplines: [],
         about: nil,
         gender: nil,
         gender_preference: "any"
@@ -33,7 +35,7 @@ defmodule Palee.Partners.DomainTest do
     )
   end
 
-  describe "ProfilePolicy.normalize/2" do
+  describe "ProfilePolicy.normalize/3" do
     test "keeps lists in canonical order, deduplicated, and trims about" do
       assert {:ok, attrs} =
                ProfilePolicy.normalize(%{
@@ -48,6 +50,7 @@ defmodule Palee.Partners.DomainTest do
       assert attrs.about == "Hyrox in November"
       assert attrs.gender_preference == "any"
       assert attrs.active
+      assert attrs.show_box
     end
 
     test "rejects missing or unknown values and more than three goals" do
@@ -75,53 +78,59 @@ defmodule Palee.Partners.DomainTest do
                  "about" => String.duplicate("a", 141)
                })
 
-      assert {:error, :invalid_partner_gender_preference} =
+      assert {:error, :invalid_partner_show_box} =
                ProfilePolicy.normalize(%{
                  "level" => "beginner",
                  "times" => ["early"],
                  "goals" => ["strength"],
-                 "gender_preference" => "dates"
+                 "show_box" => "yes"
                })
     end
 
-    test "a partial update keeps the current values" do
-      current = profile("a", %{level: "advanced", times: ["evening"], goals: ["skills"]})
-      assert {:ok, attrs} = ProfilePolicy.normalize(%{"active" => false}, current)
-      assert %{level: "advanced", times: ["evening"], goals: ["skills"], active: false} = attrs
-    end
+    test "a partial update keeps the current values, show_box included" do
+      current =
+        profile("a", %{level: "advanced", times: ["evening"], goals: ["skills"], show_box: false})
 
-    test "a suspended profile can't be switched on" do
-      suspended = profile("a", %{suspended_at: @now})
+      assert {:ok, attrs} = ProfilePolicy.normalize(%{active: false}, current)
 
-      assert {:error, :partner_profile_suspended} =
-               ProfilePolicy.check_activation(suspended, true)
-
-      assert :ok = ProfilePolicy.check_activation(suspended, false)
-      refute ProfilePolicy.live?(suspended)
-      refute ProfilePolicy.live?(profile("b", %{active: false}))
-      assert ProfilePolicy.live?(profile("c"))
+      assert %{
+               level: "advanced",
+               times: ["evening"],
+               goals: ["skills"],
+               active: false,
+               show_box: false
+             } = attrs
     end
   end
 
-  describe "ClubEligibility" do
-    test "only clubs whose members the gym verified offer Partners" do
-      assert ClubEligibility.verified?(%{kind: "gym"})
-      assert ClubEligibility.verified?(%{kind: "pt_squad"})
-      assert ClubEligibility.verified?(%{kind: "season"})
-      assert ClubEligibility.verified?(%{kind: "open", join_policy: "approval"})
-      assert ClubEligibility.verified?(%{kind: "open", join_policy: "invite"})
-      refute ClubEligibility.verified?(%{kind: "open", join_policy: "open"})
-      refute ClubEligibility.verified?(%{kind: "gym", archived_at: @now})
-      refute ClubEligibility.verified?(%{kind: "member_group"})
+  describe "ProfilePolicy: 18+, live, pause" do
+    test "the first save needs the 18+ confirmation; a saved profile keeps it" do
+      assert {:error, :partner_adult_required} = ProfilePolicy.adult_confirmation(nil, %{}, @now)
+
+      assert {:error, :partner_adult_required} =
+               ProfilePolicy.adult_confirmation(nil, %{"adult_confirmed" => "true"}, @now)
+
+      assert {:ok, @now} =
+               ProfilePolicy.adult_confirmation(nil, %{adult_confirmed: true}, @now)
+
+      earlier = ~U[2026-10-01 08:00:00.000000Z]
+
+      assert {:ok, ^earlier} =
+               ProfilePolicy.adult_confirmation(%{adult_confirmed_at: earlier}, %{}, @now)
     end
 
-    test "the gym's switch wins" do
-      assert {:error, :partners_disabled} = ClubEligibility.check(%{kind: "gym"}, false)
+    test "live means on and not paused; the Ρυθμίσεις switch pauses and resumes" do
+      assert ProfilePolicy.live?(profile("a"))
+      refute ProfilePolicy.live?(profile("b", %{active: false}))
+      refute ProfilePolicy.live?(profile("c", %{paused_at: @now}))
 
-      assert {:error, :partners_not_offered} =
-               ClubEligibility.check(%{kind: "open", join_policy: "open"}, true)
+      assert %{paused_at: @now} = ProfilePolicy.pause_changes(profile("a"), false, @now)
+      earlier = ~U[2026-10-01 08:00:00.000000Z]
 
-      assert :ok = ClubEligibility.check(%{kind: "gym"}, true)
+      assert %{paused_at: ^earlier} =
+               ProfilePolicy.pause_changes(profile("a", %{paused_at: earlier}), false, @now)
+
+      assert %{paused_at: nil} = ProfilePolicy.pause_changes(profile("a"), true, @now)
     end
   end
 
@@ -145,13 +154,14 @@ defmodule Palee.Partners.DomainTest do
       best = profile("b", %{times: ["early", "evening"], goals: ["strength"]})
       level_only = profile("a", %{times: ["midday"], goals: ["conditioning"]})
       adjacent = profile("c", %{level: "advanced", times: ["midday"], goals: ["conditioning"]})
-      paused = profile("d", %{active: false, times: ["early"]})
+      off = profile("d", %{active: false, times: ["early"]})
+      paused = profile("f", %{paused_at: @now, times: ["early"]})
       blocked = profile("e", %{times: ["early", "evening"], goals: ["strength", "skills"]})
 
       deck =
         DeckPolicy.deck(
           viewer,
-          [level_only, adjacent, best, paused, blocked, viewer],
+          [level_only, adjacent, best, off, paused, blocked, viewer],
           MapSet.new(["e"]),
           DeckPolicy.filters(%{})
         )
@@ -184,7 +194,7 @@ defmodule Palee.Partners.DomainTest do
       assert DeckPolicy.filters(%{"level" => "pro"}).level == nil
     end
 
-    test "disciplines narrow and weigh like goals; distances are fixed steps (ADR-197)" do
+    test "disciplines narrow and weigh like goals" do
       viewer = profile("v", %{disciplines: ["running"]})
       runner = profile("a", %{disciplines: ["running", "yoga"]})
       lifter = profile("b", %{disciplines: ["powerlifting"]})
@@ -199,9 +209,16 @@ defmodule Palee.Partners.DomainTest do
                  MapSet.new(),
                  DeckPolicy.filters(%{"discipline" => "powerlifting"})
                )
+    end
 
+    test "distance is one of 2, 5, 10, 25 km, 10 by default (ADR-280)" do
+      assert DeckPolicy.distances_km() == [2, 5, 10, 25]
+      assert DeckPolicy.filters(%{}).within_km == 10
+      assert DeckPolicy.filters(nil).within_km == 10
       assert DeckPolicy.filters(%{"within_km" => "5"}).within_km == 5
-      assert DeckPolicy.filters(%{"within_km" => 3}).within_km == nil
+      assert DeckPolicy.filters(%{"within_km" => 25}).within_km == 25
+      assert DeckPolicy.filters(%{"within_km" => 3}).within_km == 10
+      assert DeckPolicy.filters(%{"within_km" => "far"}).within_km == 10
     end
 
     test "likes stay out for good, passes for 30 days" do
@@ -224,6 +241,38 @@ defmodule Palee.Partners.DomainTest do
       ]
 
       assert DeckPolicy.swiped_ids(swipes, @now) == MapSet.new(["liked", "recent_pass"])
+    end
+
+    test "one person: swipeable only when live, compatible and not excluded" do
+      viewer = profile("v", %{gender: "woman", gender_preference: "women"})
+      assert DeckPolicy.swipeable?(viewer, profile("a", %{gender: "woman"}), MapSet.new())
+      refute DeckPolicy.swipeable?(viewer, profile("b", %{gender: "man"}), MapSet.new())
+      refute DeckPolicy.swipeable?(viewer, profile("c", %{gender: "woman"}), MapSet.new(["c"]))
+      refute DeckPolicy.swipeable?(viewer, viewer, MapSet.new())
+    end
+  end
+
+  describe "BadgePolicy" do
+    test "box while a membership is active and show_box is on, else member" do
+      assert %{kind: "box", box_name: "CrossFit Kifisia"} =
+               BadgePolicy.badge(%{method: "membership", box_name: "CrossFit Kifisia"}, true)
+
+      assert %{kind: "member", box_name: nil} =
+               BadgePolicy.badge(%{method: "membership", box_name: "CrossFit Kifisia"}, false)
+
+      # A sponsors-verified person who joined a box shows the membership.
+      assert %{kind: "box"} = BadgePolicy.badge(%{method: "sponsors", box_name: "Box"}, nil)
+    end
+
+    test "verified for an ex-member, sponsors for path 2, nothing when not verified" do
+      assert %{kind: "verified", box_name: nil} =
+               BadgePolicy.badge(%{method: "membership", box_name: nil}, true)
+
+      assert %{kind: "sponsors", box_name: nil} =
+               BadgePolicy.badge(%{method: "sponsors", box_name: nil}, true)
+
+      assert BadgePolicy.badge(nil, true) == nil
+      assert BadgePolicy.kinds() == ~w(box member verified sponsors)
     end
   end
 
@@ -253,18 +302,21 @@ defmodule Palee.Partners.DomainTest do
       refute MatchPolicy.party?(match, "c")
     end
 
-    test "ending once; the conversation is read-only once ended or someone left" do
+    test "ending once, for a known reason; ended conversations are read-only" do
       match = %{status: "active"}
+      assert MatchPolicy.end_reasons() == ~w(unmatched blocked reported suspended)
 
-      assert {:ok, %{status: "ended", end_reason: "blocked"}} =
-               MatchPolicy.end_changes(match, "blocked", "a", @now)
+      assert {:ok, %{status: "ended", end_reason: "suspended", ended_by_id: nil}} =
+               MatchPolicy.end_changes(match, "suspended", nil, @now)
+
+      assert {:error, :invalid_end_reason} = MatchPolicy.end_changes(match, "left", "a", @now)
 
       assert {:error, :partner_match_ended} =
                MatchPolicy.end_changes(%{status: "ended"}, "unmatched", "a", @now)
 
-      assert :ok = MatchPolicy.can_message?(match, true)
-      assert {:error, :partner_match_read_only} = MatchPolicy.can_message?(match, false)
-      assert MatchPolicy.read_only?(%{status: "ended"}, true)
+      assert :ok = MatchPolicy.can_message?(match)
+      assert {:error, :partner_match_read_only} = MatchPolicy.can_message?(%{status: "ended"})
+      assert MatchPolicy.read_only?(%{status: "ended"})
     end
   end
 
@@ -278,52 +330,97 @@ defmodule Palee.Partners.DomainTest do
       assert {:error, :invalid_cursor} = MessagePolicy.decode_cursor("nope")
     end
 
-    test "a plan keeps the class's name and start" do
-      slot = %{
-        id: "c1",
-        name: nil,
-        class_type: %{name: "CrossFit"},
-        scheduled_at: @now,
-        duration_minutes: 60
-      }
+    test "a plan keeps a snapshot of a class, event or trial" do
+      id = Ecto.UUID.generate()
 
-      assert MessagePolicy.plan_snapshot(slot) == %{
-               "class_id" => "c1",
-               "name" => "CrossFit",
-               "scheduled_at" => "2026-11-16T10:00:00.000000Z",
-               "duration_minutes" => 60
+      assert {:ok, snapshot} =
+               MessagePolicy.plan_snapshot(%{
+                 kind: "event",
+                 id: id,
+                 title: "Hyrox Athens",
+                 starts_at: @now,
+                 place: "Γήπεδο"
+               })
+
+      assert snapshot == %{
+               "kind" => "event",
+               "id" => id,
+               "title" => "Hyrox Athens",
+               "starts_at" => "2026-11-16T10:00:00.000000Z",
+               "place" => "Γήπεδο"
              }
+
+      assert {:ok, %{"place" => nil}} =
+               MessagePolicy.plan_snapshot(%{
+                 "kind" => "class",
+                 "id" => id,
+                 "title" => "WOD",
+                 "starts_at" => "2026-11-16T10:00:00Z",
+                 "place" => nil
+               })
+    end
+
+    test "an unknown kind, a bad id or a missing start is not a plan" do
+      id = Ecto.UUID.generate()
+      base = %{kind: "trial", id: id, title: "Trial", starts_at: @now, place: nil}
+      assert {:ok, _snapshot} = MessagePolicy.plan_snapshot(base)
+
+      for broken <- [
+            %{base | kind: "party"},
+            %{base | id: "nope"},
+            %{base | title: ""},
+            %{base | starts_at: "tomorrow"},
+            nil
+          ] do
+        assert {:error, :invalid_partner_plan} = MessagePolicy.plan_snapshot(broken)
+      end
     end
   end
 
-  describe "SessionPolicy" do
-    test "periods in the gym's zone; weekends are weekend" do
-      # 05:30 UTC is 07:30 in Athens on a Monday.
-      assert SessionPolicy.period(~U[2026-11-16 05:30:00Z], "Europe/Athens") == "early"
-      assert SessionPolicy.period(~U[2026-11-16 16:30:00Z], "Europe/Athens") == "evening"
-      assert SessionPolicy.period(~U[2026-11-21 08:00:00Z], "Europe/Athens") == "weekend"
+  describe "ReportPolicy" do
+    test "a report names someone else, a known reason and a short note" do
+      me = Ecto.UUID.generate()
+      other = Ecto.UUID.generate()
+
+      assert {:ok, %{reporter_id: ^me, target_id: ^other, reason: "minor", note: "looks 15"}} =
+               ReportPolicy.normalize(me, %{target_id: other, reason: "minor", note: " looks 15 "})
+
+      assert {:error, :cannot_report_self} =
+               ReportPolicy.normalize(me, %{target_id: me, reason: "fake"})
+
+      assert {:error, :invalid_partner_report_reason} =
+               ReportPolicy.normalize(me, %{"target_id" => other, "reason" => "spam"})
+
+      assert {:error, :partner_report_note_too_long} =
+               ReportPolicy.normalize(me, %{
+                 target_id: other,
+                 reason: "other",
+                 note: String.duplicate("a", 501)
+               })
+
+      assert {:error, :not_found} = ReportPolicy.normalize(me, %{target_id: "x", reason: "other"})
     end
 
-    test "booked by either first, then shared times, then the soonest; full classes only if booked" do
-      slot = fn id, at, spots, bookings ->
-        %{id: id, scheduled_at: at, spots_remaining: spots, bookings: bookings}
-      end
+    test "decisions: suspend actions, dismiss dismisses, once" do
+      assert {:ok, %{decision: "suspend", note: nil}} =
+               ReportPolicy.normalize_decision(%{"decision" => "suspend"})
 
-      slots = [
-        slot.("past", ~U[2026-11-16 09:00:00Z], 5, []),
-        slot.("soon", ~U[2026-11-16 12:00:00Z], 5, []),
-        slot.("early_shared", ~U[2026-11-17 05:30:00Z], 5, []),
-        slot.("full", ~U[2026-11-17 12:00:00Z], 0, []),
-        slot.("booked", ~U[2026-11-18 12:00:00Z], 0, [
-          %{user_id: "b", status: :approved},
-          %{user_id: "x", status: :approved}
-        ])
-      ]
+      assert {:error, :invalid_partner_decision} =
+               ReportPolicy.normalize_decision(%{decision: "hide"})
 
-      ranked = SessionPolicy.suggestions(slots, ["a", "b"], ["early"], "Europe/Athens", @now)
+      assert {:ok, %{status: "actioned", decided_by_id: "v", decided_at: @now}} =
+               ReportPolicy.decision_changes(%{status: "open"}, "suspend", "v", nil, @now)
 
-      assert Enum.map(ranked, & &1.slot.id) == ["booked", "early_shared", "soon"]
-      assert hd(ranked).booked == ["b"]
+      assert {:ok, %{status: "dismissed"}} =
+               ReportPolicy.decision_changes(%{status: "open"}, "dismiss", "v", "ok", @now)
+
+      assert {:error, :partner_report_decided} =
+               ReportPolicy.decision_changes(%{status: "dismissed"}, "suspend", "v", nil, @now)
+
+      assert ReportPolicy.suspends?("suspend")
+      refute ReportPolicy.suspends?("dismiss")
+      assert ReportPolicy.suspension_profile_changes() == %{active: false}
+      assert ReportPolicy.suspension_end_reason() in MatchPolicy.end_reasons()
     end
   end
 end

@@ -13,7 +13,6 @@ defmodule Palee.Setup.SetupRecipesTest do
   import Palee.AnalyticsHelpers, only: [organization_fixture: 0, member_context: 2]
 
   alias Palee.{
-    Community,
     Facility,
     Finance,
     Gamification,
@@ -135,7 +134,6 @@ defmodule Palee.Setup.SetupRecipesTest do
   test "independent coach turns the business into a coach", %{context: context} do
     assert {:ok, _result} = SetupRecipes.apply_recipe(context, "independent_coach", @now)
     assert Organizations.get_provider_kind(context) == "coach"
-    refute Community.community_settings(context).partners_enabled
   end
 
   test "only the owner applies; staff with manage_settings may preview", %{

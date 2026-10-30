@@ -27,7 +27,14 @@ defmodule Palee.Application.AccountDeletion do
 
   require Logger
 
-  alias Palee.Application.{LoginUser, PasswordVerifier, PublicURL, SecurityNotices}
+  alias Palee.Application.{
+    LoginUser,
+    PartnerVerificationRetention,
+    PasswordVerifier,
+    PublicURL,
+    SecurityNotices
+  }
+
   alias Palee.{Email, Identity}
   alias Palee.Email.LinkTokens
   alias Palee.Identity.AccountDeletionStore
@@ -320,6 +327,10 @@ defmodule Palee.Application.AccountDeletion do
   end
 
   defp remove_profile(profile) do
+    # ADR-280: the Partners check's selfies and rows (anonymising keeps the
+    # profile row, so they are removed here rather than by the cascade).
+    :ok = PartnerVerificationRetention.purge_person(profile.id)
+
     if AccountDeletionStore.has_retained_records?(profile.id) do
       :ok = AccountDeletionStore.anonymize_profile(profile.id)
     else

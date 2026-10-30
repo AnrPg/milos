@@ -1,12 +1,14 @@
 defmodule Palee.Partners.Domain.MessagePolicy do
   @moduledoc """
-  The pair's conversation (ADR-169 §7). Pure: body length, cursor paging
-  (newest first) and a plan's snapshot of a class.
+  The pair's conversation (ADR-169 §7, ADR-280). Pure: body length, cursor
+  paging (newest first) and a plan's snapshot (a class, event or trial).
   """
 
   @body_max 2000
   @page_default 30
   @page_max 100
+  @plan_kinds ~w(class event trial)
+  @plan_text_max 200
 
   def body_max, do: @body_max
 
@@ -70,17 +72,45 @@ defmodule Palee.Partners.Domain.MessagePolicy do
     {page, if(rest != [] and page != [], do: encode_cursor(List.last(page)))}
   end
 
-  @doc "What a plan message keeps of a class, so it renders without Scheduling."
-  def plan_snapshot(slot) do
-    %{
-      "class_id" => slot.id,
-      "name" => slot_name(slot),
-      "scheduled_at" => DateTime.to_iso8601(slot.scheduled_at),
-      "duration_minutes" => slot.duration_minutes
-    }
+  @doc """
+  What a plan message keeps (ADR-280 §1): a snapshot of a class, an event
+  or a trial class, so it renders without the context it came from.
+  `plan` is `%{kind: "class" | "event" | "trial", id:, title:, starts_at:,
+  place:}`; `place` may be nil.
+  """
+  def plan_snapshot(plan) when is_map(plan) do
+    with kind when kind in @plan_kinds <- field(plan, :kind),
+         {:ok, id} <- Ecto.UUID.cast(field(plan, :id) || ""),
+         title when is_binary(title) and title != "" <- field(plan, :title),
+         {:ok, starts_at} <- starts_at(field(plan, :starts_at)),
+         place when is_nil(place) or is_binary(place) <- field(plan, :place) do
+      {:ok,
+       %{
+         "kind" => kind,
+         "id" => id,
+         "title" => String.slice(title, 0, @plan_text_max),
+         "starts_at" => DateTime.to_iso8601(starts_at),
+         "place" => place && String.slice(place, 0, @plan_text_max)
+       }}
+    else
+      _invalid -> {:error, :invalid_partner_plan}
+    end
   end
 
-  defp slot_name(%{name: name}) when is_binary(name) and name != "", do: name
-  defp slot_name(%{class_type: %{name: name}}) when is_binary(name), do: name
-  defp slot_name(_slot), do: nil
+  def plan_snapshot(_plan), do: {:error, :invalid_partner_plan}
+
+  def plan_kinds, do: @plan_kinds
+
+  defp field(map, key), do: Map.get(map, key, Map.get(map, Atom.to_string(key)))
+
+  defp starts_at(%DateTime{} = at), do: {:ok, at}
+
+  defp starts_at(value) when is_binary(value) do
+    case DateTime.from_iso8601(value) do
+      {:ok, at, _offset} -> {:ok, at}
+      _error -> :error
+    end
+  end
+
+  defp starts_at(_value), do: :error
 end

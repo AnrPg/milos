@@ -1,13 +1,15 @@
 defmodule Palee.Partners.Domain.ProfilePolicy do
   @moduledoc """
-  A Partners profile (ADR-169 §1, plan D6). Pure.
+  A Partners profile (ADR-169 §1, plan D6; one per account since ADR-280).
+  Pure.
 
-  What a member says about training: a level, the times they train, up to
+  What a person says about training: a level, the times they train, up to
   three goals, up to five disciplines (keys of the box vocabulary, ADR-197)
   and an optional line of at most 140 characters. Gender and a
   gender preference are optional, used only to honour preferences and
   never shown to anyone. Lists keep a canonical order so two profiles
-  compare cleanly.
+  compare cleanly. `show_box` (default on) lets the card name the box of an
+  active membership. The first save needs the 18+ confirmation (ADR-280).
   """
 
   @levels ~w(beginner intermediate advanced)
@@ -52,7 +54,9 @@ defmodule Palee.Partners.Domain.ProfilePolicy do
            preference(
              fetch(params, :gender_preference, Map.get(current, :gender_preference, "any"))
            ),
-         {:ok, active} <- active(fetch(params, :active, Map.get(current, :active, true))) do
+         {:ok, active} <- active(fetch(params, :active, Map.get(current, :active, true))),
+         {:ok, show_box} <-
+           show_box(fetch(params, :show_box, Map.get(current, :show_box, true))) do
       {:ok,
        %{
          level: level,
@@ -62,20 +66,31 @@ defmodule Palee.Partners.Domain.ProfilePolicy do
          about: about,
          gender: gender,
          gender_preference: preference,
-         active: active
+         active: active,
+         show_box: show_box
        }}
     end
   end
 
-  @doc "A suspended profile stays off whatever its owner asks."
-  def check_activation(%{suspended_at: %DateTime{}}, true),
-    do: {:error, :partner_profile_suspended}
+  @doc """
+  The 18+ confirmation (ADR-280): the first save needs `adult_confirmed:
+  true` and records when; a saved profile keeps its confirmation.
+  """
+  def adult_confirmation(%{adult_confirmed_at: %DateTime{} = at}, _params, _now), do: {:ok, at}
 
-  def check_activation(_profile, _active), do: :ok
+  def adult_confirmation(_current, params, now) do
+    if fetch(params, :adult_confirmed, false) == true,
+      do: {:ok, now},
+      else: {:error, :partner_adult_required}
+  end
 
-  @doc "Whether the profile takes part in its club's deck."
-  def live?(%{active: true, suspended_at: nil}), do: true
+  @doc "Whether the profile takes part in the deck: on, and not paused in Ρυθμίσεις."
+  def live?(%{active: true, paused_at: nil}), do: true
   def live?(_profile), do: false
+
+  @doc "The Ρυθμίσεις switch: `paused_at` for `visible`."
+  def pause_changes(%{paused_at: paused_at}, false, now), do: %{paused_at: paused_at || now}
+  def pause_changes(_profile, true, _now), do: %{paused_at: nil}
 
   defp fetch(params, key, default) do
     case Map.fetch(params, key) do
@@ -135,4 +150,7 @@ defmodule Palee.Partners.Domain.ProfilePolicy do
 
   defp active(value) when is_boolean(value), do: {:ok, value}
   defp active(_value), do: {:error, :invalid_partner_active}
+
+  defp show_box(value) when is_boolean(value), do: {:ok, value}
+  defp show_box(_value), do: {:error, :invalid_partner_show_box}
 end

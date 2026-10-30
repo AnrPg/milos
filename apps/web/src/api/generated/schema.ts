@@ -1986,91 +1986,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/me/clubs/{club_id}/partners": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Partners in a club as it applies to you: offered?, your profile, the options */
-        get: operations["PaleeWeb.PartnersController.club"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/me/clubs/{club_id}/partners/deck": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** The next people of the club who opted in, best fit first */
-        get: operations["PaleeWeb.PartnersController.deck"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/me/clubs/{club_id}/partners/profile": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Opt in or change your Partners profile in a club (a member of the club only) */
-        put: operations["PaleeWeb.PartnersController.put_profile"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/me/clubs/{club_id}/partners/swipes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Like or pass; a like answered by a like makes a match */
-        post: operations["PaleeWeb.PartnersController.swipe"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/me/clubs/{club_id}/partners/swipes/{target_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Take back a swipe that made no match */
-        delete: operations["PaleeWeb.PartnersController.undo"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/me/clubs/{id}/members": {
         parameters: {
             query?: never;
@@ -3478,6 +3393,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/partners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Partners as it applies to you: verification, your profile, the options */
+        get: operations["PaleeWeb.PartnersController.overview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/deck": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The next verified people near you who opted in, best fit first */
+        get: operations["PaleeWeb.PartnersController.deck"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/partners/matches": {
         parameters: {
             query?: never;
@@ -3556,25 +3505,79 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Suggest a class in the conversation («Κλείστε μαζί») */
-        post: operations["PaleeWeb.PartnersController.plan"];
+        /** Propose a suggestion as a plan in the conversation */
+        post: operations["PaleeWeb.PartnerSuggestionsController.propose"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/me/partners/matches/{id}/sessions": {
+    "/api/me/partners/matches/{id}/suggestions": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** «Κλείστε μαζί»: the gym's next classes that suit you both */
-        get: operations["PaleeWeb.PartnersController.sessions"];
+        /**
+         * «Κλείστε μαζί»: up to three activities that suit you both
+         * @description Classes of a box you both belong to, and events and trial classes near both of you, in the next 7 days with free places. Says only whether you or your partner booked each one.
+         */
+        get: operations["PaleeWeb.PartnerSuggestionsController.index"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/matches/{id}/suggestions/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** «Δεν ταιριάζει»: why a suggestion does not suit you */
+        post: operations["PaleeWeb.PartnerSuggestionsController.feedback"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Opt in or change your Partners profile (verified people; 18+ on the first save) */
+        put: operations["PaleeWeb.PartnersController.put_profile"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Report a person to the Palee team; it also blocks them */
+        post: operations["PaleeWeb.PartnersController.report"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3588,10 +3591,303 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Ρυθμίσεις › Partners: whether others in your clubs see you */
+        /** Ρυθμίσεις › Partners: whether you show in the deck */
         get: operations["PaleeWeb.PartnersController.settings"];
-        /** Pause or resume every Partners profile at once */
+        /** Pause or resume your Partners profile */
         put: operations["PaleeWeb.PartnersController.put_settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/swipes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Like or pass; a like answered by a like makes a match */
+        post: operations["PaleeWeb.PartnersController.swipe"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/swipes/{target_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Take back a swipe that made no match */
+        delete: operations["PaleeWeb.PartnersController.undo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Your Partners verification: state, next step, your request
+         * @description A person with an active membership of a live box or coach is verified here on first use.
+         */
+        get: operations["PaleeWeb.PartnerVerificationController.show"];
+        put?: never;
+        post?: never;
+        /** Withdraw your request: phone, selfie, open sponsor requests and links are deleted */
+        delete: operations["PaleeWeb.PartnerVerificationController.withdraw"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/verification/consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Agree to the Palee check and open your request (sponsor path) */
+        post: operations["PaleeWeb.PartnerVerificationController.consent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/verification/link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A single-use, 10-minute link (and QR) for a sponsor outside your Buddies */
+        post: operations["PaleeWeb.PartnerVerificationController.create_link"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/verification/phone": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send a 6-digit code to your mobile number */
+        post: operations["PaleeWeb.PartnerVerificationController.send_phone_code"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/verification/phone/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirm your number with the code it received */
+        post: operations["PaleeWeb.PartnerVerificationController.confirm_phone"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/verification/selfie/upload-url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A presigned upload for the selfie holding your code */
+        post: operations["PaleeWeb.PartnerVerificationController.selfie_upload_url"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/verification/sponsor-candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your Buddies as possible sponsors, each marked whether they may vouch */
+        get: operations["PaleeWeb.PartnerVerificationController.sponsor_candidates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/verification/sponsors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ask a Buddy to vouch for you */
+        post: operations["PaleeWeb.PartnerVerificationController.request_sponsor"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/verification/sponsors/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Withdraw an unanswered request to a sponsor (the sponsor's person id) */
+        delete: operations["PaleeWeb.PartnerVerificationController.cancel_sponsor"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/verification/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send your request with the uploaded selfie to the Palee team */
+        post: operations["PaleeWeb.PartnerVerificationController.submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/vouch-links/inspect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Who a sponsor link is for, and whether you may vouch */
+        post: operations["PaleeWeb.PartnerVerificationController.inspect_link"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/vouch-links/vouch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Vouch through a sponsor link (single use) */
+        post: operations["PaleeWeb.PartnerVerificationController.vouch_by_link"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/vouch-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** People who asked you to vouch for them, and your quota */
+        get: operations["PaleeWeb.PartnerVerificationController.vouch_requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/vouch-requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Vouch for or decline someone who asked you */
+        post: operations["PaleeWeb.PartnerVerificationController.decide_vouch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/vouching": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your own standing as a sponsor: quota left, any pause */
+        get: operations["PaleeWeb.PartnerVerificationController.vouching"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -15461,6 +15757,111 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/platform/partner-reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Partners reports by status, newest first (vendors) */
+        get: operations["PaleeWeb.PlatformPartnerReportController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/partner-reports/{id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Suspend the reported person or dismiss, for every open report on them (vendors) */
+        post: operations["PaleeWeb.PlatformPartnerReportController.decide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/partner-suggestion-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daily «Κλείστε μαζί» counters of the last 30 days (vendors) */
+        get: operations["PaleeWeb.PartnerSuggestionsController.stats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/partner-verifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Partners verification requests in a status, default in_review (vendors) */
+        get: operations["PaleeWeb.PlatformPartnerVerificationController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/partner-verifications/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One request: the selfie (5-minute link), its code, the avatar, sponsors (vendors) */
+        get: operations["PaleeWeb.PlatformPartnerVerificationController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/partner-verifications/{id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Approve or reject a request in review; a reason is required to reject (vendors)
+         * @description The selfie is deleted and only the outcome is kept.
+         */
+        post: operations["PaleeWeb.PlatformPartnerVerificationController.decide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/platform/password-reset-log": {
         parameters: {
             query?: never;
@@ -27015,7 +27416,6 @@ export interface components {
             /** @enum {string} */
             member_groups: "none" | "approval" | "free";
             needs_approval: boolean;
-            partners_enabled: boolean;
         };
         /** CommunityGroupUpdateRequest */
         CommunityGroupUpdateRequest: {
@@ -27136,7 +27536,6 @@ export interface components {
                 /** @enum {string} */
                 member_groups: "none" | "approval" | "free";
                 needs_approval: boolean;
-                partners_enabled: boolean;
             };
         };
         /** CommunityMember */
@@ -28133,7 +28532,7 @@ export interface components {
             /** Format: uuid */
             target_id: string;
             /** @enum {string} */
-            target_type: "post" | "comment" | "channel" | "partner";
+            target_type: "post" | "comment" | "channel";
         };
         /** CommunityReportActionResponse */
         CommunityReportActionResponse: {
@@ -28151,7 +28550,7 @@ export interface components {
             /** Format: uuid */
             target_id: string;
             /** @enum {string} */
-            target_type: "post" | "comment" | "channel" | "partner";
+            target_type: "post" | "comment" | "channel";
         };
         /** CommunityReportResponse */
         CommunityReportResponse: {
@@ -28210,7 +28609,7 @@ export interface components {
             /** Format: uuid */
             target_id: string;
             /** @enum {string} */
-            target_type: "post" | "comment" | "channel" | "partner";
+            target_type: "post" | "comment" | "channel";
         };
         /** CommunityReportsResponse */
         CommunityReportsResponse: {
@@ -28263,15 +28662,13 @@ export interface components {
                 /** Format: uuid */
                 target_id: string;
                 /** @enum {string} */
-                target_type: "post" | "comment" | "channel" | "partner";
+                target_type: "post" | "comment" | "channel";
             }[];
         };
         /** CommunitySettingsRequest */
         CommunitySettingsRequest: {
             /** @enum {string} */
             member_groups?: "none" | "approval" | "free";
-            /** @description Whether the gym's verified clubs offer Partners (ADR-169) */
-            partners_enabled?: boolean;
         };
         /** CommunitySettingsResponse */
         CommunitySettingsResponse: {
@@ -28282,7 +28679,6 @@ export interface components {
             };
             /** @enum {string} */
             member_groups: "none" | "approval" | "free";
-            partners_enabled: boolean;
         };
         /** CommunityStaffGroup */
         CommunityStaffGroup: {
@@ -28427,7 +28823,6 @@ export interface components {
                 /** @enum {string} */
                 member_groups: "none" | "approval" | "free";
                 needs_approval: boolean;
-                partners_enabled: boolean;
             };
         };
         /** ConnectedDevices */
@@ -32961,9 +33356,22 @@ export interface components {
             score: number;
             unit: string;
         };
+        /** PartnerBadge */
+        PartnerBadge: {
+            /** @description Set for `box` only: the box of an active membership */
+            box_name: string | null;
+            /** @enum {string} */
+            kind: "box" | "member" | "verified" | "sponsors";
+        };
         /** PartnerCard */
         PartnerCard: {
             about: string | null;
+            badge: {
+                /** @description Set for `box` only: the box of an active membership */
+                box_name: string | null;
+                /** @enum {string} */
+                kind: "box" | "member" | "verified" | "sponsors";
+            } | null;
             disciplines: string[];
             goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
             /** @enum {string} */
@@ -32986,10 +33394,20 @@ export interface components {
             };
             times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
         };
+        /** PartnerCodeRequest */
+        PartnerCodeRequest: {
+            code: string;
+        };
         /** PartnerDeck */
         PartnerDeck: {
             cards: {
                 about: string | null;
+                badge: {
+                    /** @description Set for `box` only: the box of an active membership */
+                    box_name: string | null;
+                    /** @enum {string} */
+                    kind: "box" | "member" | "verified" | "sponsors";
+                } | null;
                 disciplines: string[];
                 goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
                 /** @enum {string} */
@@ -33012,17 +33430,23 @@ export interface components {
                 };
                 times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
             }[];
-            /** Format: uuid */
-            club_id: string;
             swipes_remaining: number;
+            /** @enum {integer} */
+            within_km: 2 | 5 | 10 | 25;
+        };
+        /** PartnerEligibility */
+        PartnerEligibility: {
+            /** @enum {string|null} */
+            method: "membership" | "sponsors" | null;
+            /** @enum {string|null} */
+            next_step: "consent" | "sponsors" | "phone" | "selfie" | null;
+            /** @enum {string} */
+            status: "verified" | "needs_verification" | "in_review" | "rejected" | "suspended";
         };
         /** PartnerMatch */
         PartnerMatch: {
-            /** Format: uuid */
-            club_id: string;
-            club_name: string | null;
             /** @enum {string|null} */
-            end_reason: "unmatched" | "blocked" | "reported" | "left" | "hidden" | null;
+            end_reason: "unmatched" | "blocked" | "reported" | "suspended" | null;
             ended_by_me: boolean;
             /** Format: uuid */
             id: string;
@@ -33032,9 +33456,9 @@ export interface components {
             matched_at: string;
             /**
              * Format: uuid
-             * @description The other person's profile in the club, what a report names
+             * @description The other person, what a report names (`target_id`)
              */
-            partner_profile_id: string | null;
+            partner_id: string;
             /** PartnerPerson */
             person: {
                 avatar_url: string | null;
@@ -33042,8 +33466,6 @@ export interface components {
                 id: string;
                 nickname: string | null;
             };
-            /** @description «Κλείστε μαζί» offers the gym's classes */
-            plannable: boolean;
             read_only: boolean;
             /** @enum {string} */
             status: "active" | "ended";
@@ -33059,11 +33481,8 @@ export interface components {
         /** PartnerMatches */
         PartnerMatches: {
             matches: {
-                /** Format: uuid */
-                club_id: string;
-                club_name: string | null;
                 /** @enum {string|null} */
-                end_reason: "unmatched" | "blocked" | "reported" | "left" | "hidden" | null;
+                end_reason: "unmatched" | "blocked" | "reported" | "suspended" | null;
                 ended_by_me: boolean;
                 /** Format: uuid */
                 id: string;
@@ -33073,9 +33492,9 @@ export interface components {
                 matched_at: string;
                 /**
                  * Format: uuid
-                 * @description The other person's profile in the club, what a report names
+                 * @description The other person, what a report names (`target_id`)
                  */
-                partner_profile_id: string | null;
+                partner_id: string;
                 /** PartnerPerson */
                 person: {
                     avatar_url: string | null;
@@ -33083,8 +33502,6 @@ export interface components {
                     id: string;
                     nickname: string | null;
                 };
-                /** @description «Κλείστε μαζί» offers the gym's classes */
-                plannable: boolean;
                 read_only: boolean;
                 /** @enum {string} */
                 status: "active" | "ended";
@@ -33112,11 +33529,13 @@ export interface components {
             mine: boolean;
             plan: {
                 /** Format: uuid */
-                class_id: string;
-                duration_minutes: number | null;
-                name: string | null;
+                id: string;
+                /** @enum {string} */
+                kind: "class" | "event" | "trial";
+                place: string | null;
                 /** Format: date-time */
-                scheduled_at: string;
+                starts_at: string;
+                title: string;
             } | null;
         };
         /** PartnerMessagePage */
@@ -33141,11 +33560,13 @@ export interface components {
                 mine: boolean;
                 plan: {
                     /** Format: uuid */
-                    class_id: string;
-                    duration_minutes: number | null;
-                    name: string | null;
+                    id: string;
+                    /** @enum {string} */
+                    kind: "class" | "event" | "trial";
+                    place: string | null;
                     /** Format: date-time */
-                    scheduled_at: string;
+                    starts_at: string;
+                    title: string;
                 } | null;
             }[];
             next_cursor: string | null;
@@ -33179,11 +33600,13 @@ export interface components {
                 mine: boolean;
                 plan: {
                     /** Format: uuid */
-                    class_id: string;
-                    duration_minutes: number | null;
-                    name: string | null;
+                    id: string;
+                    /** @enum {string} */
+                    kind: "class" | "event" | "trial";
+                    place: string | null;
                     /** Format: date-time */
-                    scheduled_at: string;
+                    starts_at: string;
+                    title: string;
                 } | null;
             };
         };
@@ -33195,9 +33618,10 @@ export interface components {
         PartnerOptions: {
             about_max: number;
             daily_swipes: number;
+            default_within_km: number;
             /** @description Box vocabulary keys a profile may name (ADR-197) */
             disciplines: string[];
-            /** @description The «Απόσταση» choices of an open club's deck (ADR-197) */
+            /** @description The «Απόσταση» choices of the deck (ADR-197, ADR-280) */
             distances_km: number[];
             gender_preferences: ("any" | "women" | "men")[];
             genders: ("woman" | "man" | "other")[];
@@ -33205,6 +33629,7 @@ export interface components {
             levels: ("beginner" | "intermediate" | "advanced")[];
             max_disciplines: number;
             max_goals: number;
+            report_reasons: ("unsafe" | "fake" | "minor" | "harassment" | "other")[];
             times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
         };
         /** PartnerPerson */
@@ -33214,27 +33639,42 @@ export interface components {
             id: string;
             nickname: string | null;
         };
+        /** PartnerPhoneRequest */
+        PartnerPhoneRequest: {
+            /** @description Mobile, E.164 or Greek 69… */
+            phone: string;
+        };
+        /** PartnerPhoneSent */
+        PartnerPhoneSent: {
+            code_minutes: number;
+            /** Format: date-time */
+            expires_at: string;
+            phone: string;
+        };
         /** PartnerPlan */
         PartnerPlan: {
             /** Format: uuid */
-            class_id: string;
-            duration_minutes: number | null;
-            name: string | null;
+            id: string;
+            /** @enum {string} */
+            kind: "class" | "event" | "trial";
+            place: string | null;
             /** Format: date-time */
-            scheduled_at: string;
+            starts_at: string;
+            title: string;
         };
         /** PartnerPlanRequest */
         PartnerPlanRequest: {
-            body?: string | null;
             /** Format: uuid */
-            class_id: string;
+            id: string;
+            /** @enum {string} */
+            kind: "class" | "event" | "trial";
         };
         /** PartnerProfile */
         PartnerProfile: {
             about: string | null;
             active: boolean;
-            /** Format: uuid */
-            club_id: string;
+            /** Format: date-time */
+            adult_confirmed_at: string;
             disciplines: string[];
             /**
              * @description Only used to honour preferences; never shown to anyone
@@ -33248,8 +33688,10 @@ export interface components {
             id: string;
             /** @enum {string} */
             level: "beginner" | "intermediate" | "advanced";
-            /** @description Staff hid it after a report */
-            suspended: boolean;
+            /** @description Switched off in Ρυθμίσεις */
+            paused: boolean;
+            /** @description «Δείξε το box μου»: the card names the box of an active membership */
+            show_box: boolean;
             times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
             /** Format: date-time */
             updated_at?: string;
@@ -33258,6 +33700,8 @@ export interface components {
         PartnerProfileRequest: {
             about?: string | null;
             active?: boolean;
+            /** @description «Είμαι 18 ετών ή μεγαλύτερος/η»: required true on the first save */
+            adult_confirmed?: boolean;
             disciplines?: string[];
             /** @enum {string|null} */
             gender?: "woman" | "man" | "other" | null;
@@ -33266,6 +33710,7 @@ export interface components {
             goals?: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
             /** @enum {string} */
             level?: "beginner" | "intermediate" | "advanced";
+            show_box?: boolean;
             times?: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
         };
         /** PartnerProfileResponse */
@@ -33274,8 +33719,8 @@ export interface components {
             profile: {
                 about: string | null;
                 active: boolean;
-                /** Format: uuid */
-                club_id: string;
+                /** Format: date-time */
+                adult_confirmed_at: string;
                 disciplines: string[];
                 /**
                  * @description Only used to honour preferences; never shown to anyone
@@ -33289,51 +33734,52 @@ export interface components {
                 id: string;
                 /** @enum {string} */
                 level: "beginner" | "intermediate" | "advanced";
-                /** @description Staff hid it after a report */
-                suspended: boolean;
+                /** @description Switched off in Ρυθμίσεις */
+                paused: boolean;
+                /** @description «Δείξε το box μου»: the card names the box of an active membership */
+                show_box: boolean;
                 times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
                 /** Format: date-time */
                 updated_at?: string;
             };
         };
-        /** PartnerSession */
-        PartnerSession: {
-            booked_by_me: boolean;
-            booked_by_partner: boolean;
+        /** PartnerReportRequest */
+        PartnerReportRequest: {
+            note?: string | null;
+            /** @enum {string} */
+            reason: "unsafe" | "fake" | "minor" | "harassment" | "other";
             /** Format: uuid */
-            class_id: string;
-            duration_minutes: number | null;
-            name: string | null;
-            /** Format: date-time */
-            scheduled_at: string;
-            /** @description In a time both of you chose */
-            shared_time: boolean;
-            spots_remaining: number;
+            target_id: string;
         };
-        /** PartnerSessions */
-        PartnerSessions: {
-            available: boolean;
-            sessions: {
-                booked_by_me: boolean;
-                booked_by_partner: boolean;
-                /** Format: uuid */
-                class_id: string;
-                duration_minutes: number | null;
-                name: string | null;
-                /** Format: date-time */
-                scheduled_at: string;
-                /** @description In a time both of you chose */
-                shared_time: boolean;
-                spots_remaining: number;
-            }[];
-            timezone: string | null;
+        /** PartnerReportResponse */
+        PartnerReportResponse: {
+            blocked: boolean;
+            reported: boolean;
+            /** Format: uuid */
+            target_id: string;
+        };
+        /** PartnerSelfieUpload */
+        PartnerSelfieUpload: {
+            content_type: string;
+            file_key: string;
+            max_bytes: number;
+            /** @enum {string} */
+            method: "PUT";
+            required_headers: {
+                [key: string]: string;
+            };
+            selfie_code: string;
+            upload_url: string;
+        };
+        /** PartnerSelfieUploadRequest */
+        PartnerSelfieUploadRequest: {
+            /** @enum {string} */
+            content_type: "image/heic" | "image/jpeg" | "image/png" | "image/webp";
         };
         /** PartnerSettings */
         PartnerSettings: {
-            club_ids: string[];
-            /** @description Clubs where you have a profile */
-            clubs: number;
-            /** @description Whether any of your profiles is on */
+            has_profile: boolean;
+            /** @description Whether you show in the deck */
             visible: boolean;
         };
         /** PartnerSettingsRequest */
@@ -33346,6 +33792,211 @@ export interface components {
             goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
             same_level: boolean;
             times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+        };
+        /** PartnerSponsorCandidate */
+        PartnerSponsorCandidate: {
+            eligible: boolean;
+            /** PartnerVerificationPerson */
+            person: {
+                avatar_url: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            };
+            /** @enum {string|null} */
+            reason: "not_verified" | "blocked" | "quota" | "penalty" | "self" | null;
+            sponsorship: {
+                /** @enum {string} */
+                channel?: "buddy" | "link";
+                /** Format: uuid */
+                id?: string;
+                /** @enum {string} */
+                status?: "requested" | "vouched" | "declined" | "cancelled";
+            } | null;
+        };
+        /** PartnerSponsorCandidates */
+        PartnerSponsorCandidates: {
+            candidates: {
+                eligible: boolean;
+                /** PartnerVerificationPerson */
+                person: {
+                    avatar_url: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                };
+                /** @enum {string|null} */
+                reason: "not_verified" | "blocked" | "quota" | "penalty" | "self" | null;
+                sponsorship: {
+                    /** @enum {string} */
+                    channel?: "buddy" | "link";
+                    /** Format: uuid */
+                    id?: string;
+                    /** @enum {string} */
+                    status?: "requested" | "vouched" | "declined" | "cancelled";
+                } | null;
+            }[];
+            required: number;
+            vouches: number;
+        };
+        /** PartnerSponsorLink */
+        PartnerSponsorLink: {
+            /** Format: date-time */
+            expires_at: string;
+            path: string;
+            /** @description Shown once */
+            token: string;
+            url: string;
+        };
+        /** PartnerSponsorRequest */
+        PartnerSponsorRequest: {
+            /** Format: uuid */
+            sponsor_id: string;
+        };
+        /** PartnerSponsorship */
+        PartnerSponsorship: {
+            /** @enum {string} */
+            channel: "buddy" | "link";
+            /** Format: date-time */
+            decided_at: string | null;
+            /** Format: uuid */
+            id: string;
+            /** PartnerVerificationPerson */
+            person: {
+                avatar_url: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            };
+            /** Format: date-time */
+            requested_at: string;
+            /** @enum {string} */
+            status: "requested" | "vouched" | "declined" | "cancelled";
+        };
+        /** PartnerSponsorshipResponse */
+        PartnerSponsorshipResponse: {
+            /** PartnerSponsorship */
+            sponsorship: {
+                /** @enum {string} */
+                channel: "buddy" | "link";
+                /** Format: date-time */
+                decided_at: string | null;
+                /** Format: uuid */
+                id: string;
+                /** PartnerVerificationPerson */
+                person: {
+                    avatar_url: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                };
+                /** Format: date-time */
+                requested_at: string;
+                /** @enum {string} */
+                status: "requested" | "vouched" | "declined" | "cancelled";
+            };
+        };
+        /** PartnerSuggestion */
+        PartnerSuggestion: {
+            booked_by_me: boolean;
+            booked_by_partner: boolean;
+            /** @description From your neighbourhood and your partner's, to 0.1 km; null when unknown (a class of a box you both belong to) */
+            distances_km: (number | null)[];
+            /** Format: date-time */
+            ends_at?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** @description `kind:id`, what feedback names */
+            key: string;
+            /** @enum {string} */
+            kind: "class" | "event" | "trial";
+            place: string | null;
+            /** @description Why it is suggested: both_booked, one_booked, shared_time:<early|midday|afternoon|evening|weekend>, level_fit, near_both */
+            reasons: string[];
+            /** @description Free places; null when there is no limit */
+            spots_left?: number | null;
+            /** Format: date-time */
+            starts_at: string;
+            /** @description The activity's own IANA zone; times show in it */
+            time_zone?: string | null;
+            title: string | null;
+        };
+        /** PartnerSuggestionFeedback */
+        PartnerSuggestionFeedback: {
+            key: string;
+            /** @enum {string} */
+            reason: "not_near" | "bad_time" | "wrong_level" | "other";
+        };
+        /** PartnerSuggestionFeedbackReasons */
+        PartnerSuggestionFeedbackReasons: {
+            bad_time: number;
+            not_near: number;
+            other: number;
+            wrong_level: number;
+        };
+        /** PartnerSuggestionFeedbackRequest */
+        PartnerSuggestionFeedbackRequest: {
+            key: string;
+            /** @enum {string} */
+            reason: "not_near" | "bad_time" | "wrong_level" | "other";
+        };
+        /** PartnerSuggestionStats */
+        PartnerSuggestionStats: {
+            /** @description Oldest first, one per day */
+            days: {
+                booked_together: number;
+                /** Format: date */
+                day: string;
+                feedback: number;
+                proposed: number;
+                shown: number;
+            }[];
+            /** PartnerSuggestionFeedbackReasons */
+            feedback_reasons: {
+                bad_time: number;
+                not_near: number;
+                other: number;
+                wrong_level: number;
+            };
+            /** Format: date */
+            since: string;
+        };
+        /** PartnerSuggestionStatsDay */
+        PartnerSuggestionStatsDay: {
+            booked_together: number;
+            /** Format: date */
+            day: string;
+            feedback: number;
+            proposed: number;
+            shown: number;
+        };
+        /** PartnerSuggestions */
+        PartnerSuggestions: {
+            /** @description At most three, best first; empty hides the card («Πάμε μαζί;» stays) */
+            suggestions: {
+                booked_by_me: boolean;
+                booked_by_partner: boolean;
+                /** @description From your neighbourhood and your partner's, to 0.1 km; null when unknown (a class of a box you both belong to) */
+                distances_km: (number | null)[];
+                /** Format: date-time */
+                ends_at?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @description `kind:id`, what feedback names */
+                key: string;
+                /** @enum {string} */
+                kind: "class" | "event" | "trial";
+                place: string | null;
+                /** @description Why it is suggested: both_booked, one_booked, shared_time:<early|midday|afternoon|evening|weekend>, level_fit, near_both */
+                reasons: string[];
+                /** @description Free places; null when there is no limit */
+                spots_left?: number | null;
+                /** Format: date-time */
+                starts_at: string;
+                /** @description The activity's own IANA zone; times show in it */
+                time_zone?: string | null;
+                title: string | null;
+            }[];
         };
         /** PartnerSwipeRequest */
         PartnerSwipeRequest: {
@@ -33360,11 +34011,8 @@ export interface components {
             direction: "like" | "pass";
             /** @description Set when the like was mutual */
             match: {
-                /** Format: uuid */
-                club_id: string;
-                club_name: string | null;
                 /** @enum {string|null} */
-                end_reason: "unmatched" | "blocked" | "reported" | "left" | "hidden" | null;
+                end_reason: "unmatched" | "blocked" | "reported" | "suspended" | null;
                 ended_by_me: boolean;
                 /** Format: uuid */
                 id: string;
@@ -33374,9 +34022,9 @@ export interface components {
                 matched_at: string;
                 /**
                  * Format: uuid
-                 * @description The other person's profile in the club, what a report names
+                 * @description The other person, what a report names (`target_id`)
                  */
-                partner_profile_id: string | null;
+                partner_id: string;
                 /** PartnerPerson */
                 person: {
                     avatar_url: string | null;
@@ -33384,8 +34032,6 @@ export interface components {
                     id: string;
                     nickname: string | null;
                 };
-                /** @description «Κλείστε μαζί» offers the gym's classes */
-                plannable: boolean;
                 read_only: boolean;
                 /** @enum {string} */
                 status: "active" | "ended";
@@ -33401,25 +34047,256 @@ export interface components {
             target_id: string;
             undone: boolean;
         };
-        /** PartnersClubOverview */
-        PartnersClubOverview: {
+        /** PartnerVerificationLimits */
+        PartnerVerificationLimits: {
+            code_attempts: number;
+            code_minutes: number;
+            link_minutes: number;
+            selfie_content_types: string[];
+            selfie_max_bytes: number;
+            selfie_retention_days: number;
+            sponsors_required: number;
+        };
+        /** PartnerVerificationOverview */
+        PartnerVerificationOverview: {
+            /** PartnerEligibility */
+            eligibility: {
+                /** @enum {string|null} */
+                method: "membership" | "sponsors" | null;
+                /** @enum {string|null} */
+                next_step: "consent" | "sponsors" | "phone" | "selfie" | null;
+                /** @enum {string} */
+                status: "verified" | "needs_verification" | "in_review" | "rejected" | "suspended";
+            };
+            /** PartnerVerificationLimits */
+            limits: {
+                code_attempts: number;
+                code_minutes: number;
+                link_minutes: number;
+                selfie_content_types: string[];
+                selfie_max_bytes: number;
+                selfie_retention_days: number;
+                sponsors_required: number;
+            };
+            /** PartnerVerificationRequest */
+            request: {
+                /** Format: date-time */
+                consent_at: string | null;
+                /** Format: date-time */
+                decided_at: string | null;
+                decision_reason: string | null;
+                /** Format: uuid */
+                id: string;
+                missing: ("consent" | "sponsors" | "phone")[];
+                /** @description Masked */
+                phone: string | null;
+                phone_verified: boolean;
+                /** @description Written on paper and held up in the selfie */
+                selfie_code: string;
+                /** Format: date-time */
+                selfie_expires_at: string | null;
+                /** Format: date-time */
+                selfie_uploaded_at: string | null;
+                sponsors: {
+                    /** @enum {string} */
+                    channel: "buddy" | "link";
+                    /** Format: date-time */
+                    decided_at: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** PartnerVerificationPerson */
+                    person: {
+                        avatar_url: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname: string | null;
+                    };
+                    /** Format: date-time */
+                    requested_at: string;
+                    /** @enum {string} */
+                    status: "requested" | "vouched" | "declined" | "cancelled";
+                }[];
+                sponsors_required: number;
+                /** @enum {string} */
+                status: "collecting" | "in_review" | "approved" | "rejected" | "expired" | "withdrawn";
+                /** Format: date-time */
+                submitted_at: string | null;
+                vouches: number;
+            } | null;
+        };
+        /** PartnerVerificationPerson */
+        PartnerVerificationPerson: {
+            avatar_url: string | null;
             /** Format: uuid */
-            club_id: string;
-            /**
-             * @description Open clubs only (ADR-197): «Απόσταση» works once the viewer has «Η περιοχή μου» and shows in Γύρω μου
-             * @enum {string|null}
-             */
-            distance: "available" | "needs_area" | null;
-            /** @description Whether the viewer is a member of the club now */
-            member: boolean;
-            offered: boolean;
+            id: string;
+            nickname: string | null;
+        };
+        /** PartnerVerificationRequest */
+        PartnerVerificationRequest: {
+            /** Format: date-time */
+            consent_at: string | null;
+            /** Format: date-time */
+            decided_at: string | null;
+            decision_reason: string | null;
+            /** Format: uuid */
+            id: string;
+            missing: ("consent" | "sponsors" | "phone")[];
+            /** @description Masked */
+            phone: string | null;
+            phone_verified: boolean;
+            /** @description Written on paper and held up in the selfie */
+            selfie_code: string;
+            /** Format: date-time */
+            selfie_expires_at: string | null;
+            /** Format: date-time */
+            selfie_uploaded_at: string | null;
+            sponsors: {
+                /** @enum {string} */
+                channel: "buddy" | "link";
+                /** Format: date-time */
+                decided_at: string | null;
+                /** Format: uuid */
+                id: string;
+                /** PartnerVerificationPerson */
+                person: {
+                    avatar_url: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                };
+                /** Format: date-time */
+                requested_at: string;
+                /** @enum {string} */
+                status: "requested" | "vouched" | "declined" | "cancelled";
+            }[];
+            sponsors_required: number;
+            /** @enum {string} */
+            status: "collecting" | "in_review" | "approved" | "rejected" | "expired" | "withdrawn";
+            /** Format: date-time */
+            submitted_at: string | null;
+            vouches: number;
+        } | null;
+        /** PartnerVerificationSubmit */
+        PartnerVerificationSubmit: {
+            file_key: string;
+        };
+        /** PartnerVouchDecision */
+        PartnerVouchDecision: {
+            /** @enum {string} */
+            decision: "vouch" | "decline";
+        };
+        /** PartnerVouchLinkInspection */
+        PartnerVouchLinkInspection: {
+            can_vouch: boolean;
+            /** Format: date-time */
+            expires_at: string;
+            /** PartnerVerificationPerson */
+            person: {
+                avatar_url: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            };
+            /** @enum {string|null} */
+            reason: "partner_sponsor_not_eligible" | "partner_sponsor_quota" | "partner_sponsor_penalty" | null;
+        };
+        /** PartnerVouchLinkToken */
+        PartnerVouchLinkToken: {
+            token: string;
+        };
+        /** PartnerVouchRequest */
+        PartnerVouchRequest: {
+            /** Format: uuid */
+            id: string;
+            /** PartnerVerificationPerson */
+            person: {
+                avatar_url: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            };
+            /** Format: date-time */
+            requested_at: string;
+        };
+        /** PartnerVouchRequests */
+        PartnerVouchRequests: {
+            requests: {
+                /** Format: uuid */
+                id: string;
+                /** PartnerVerificationPerson */
+                person: {
+                    avatar_url: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                };
+                /** Format: date-time */
+                requested_at: string;
+            }[];
+            /** PartnerVouching */
+            vouching: {
+                can_vouch: boolean;
+                left: number;
+                /** Format: date-time */
+                penalty_until: string | null;
+                quota: number;
+                /** @enum {string|null} */
+                reason: "not_verified" | "quota" | "penalty" | null;
+                used: number;
+                window_days: number;
+            };
+        };
+        /** PartnerVouchResult */
+        PartnerVouchResult: {
+            /** Format: date-time */
+            decided_at: string | null;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            status: "requested" | "vouched" | "declined" | "cancelled";
+        };
+        /** PartnerVouching */
+        PartnerVouching: {
+            can_vouch: boolean;
+            left: number;
+            /** Format: date-time */
+            penalty_until: string | null;
+            quota: number;
+            /** @enum {string|null} */
+            reason: "not_verified" | "quota" | "penalty" | null;
+            used: number;
+            window_days: number;
+        };
+        /** PartnersEligibility */
+        PartnersEligibility: {
+            /** @enum {string|null} */
+            method: "membership" | "sponsors" | null;
+            /** @description What the verification flow asks for next (the verification side's word) */
+            next_step: string | null;
+            /** @enum {string} */
+            status: "verified" | "needs_verification" | "in_review" | "rejected" | "suspended";
+        };
+        /** PartnersOverview */
+        PartnersOverview: {
+            /** @enum {string} */
+            distance: "available" | "needs_area";
+            /** PartnersEligibility */
+            eligibility: {
+                /** @enum {string|null} */
+                method: "membership" | "sponsors" | null;
+                /** @description What the verification flow asks for next (the verification side's word) */
+                next_step: string | null;
+                /** @enum {string} */
+                status: "verified" | "needs_verification" | "in_review" | "rejected" | "suspended";
+            };
             /** PartnerOptions */
             options: {
                 about_max: number;
                 daily_swipes: number;
+                default_within_km: number;
                 /** @description Box vocabulary keys a profile may name (ADR-197) */
                 disciplines: string[];
-                /** @description The «Απόσταση» choices of an open club's deck (ADR-197) */
+                /** @description The «Απόσταση» choices of the deck (ADR-197, ADR-280) */
                 distances_km: number[];
                 gender_preferences: ("any" | "women" | "men")[];
                 genders: ("woman" | "man" | "other")[];
@@ -33427,13 +34304,14 @@ export interface components {
                 levels: ("beginner" | "intermediate" | "advanced")[];
                 max_disciplines: number;
                 max_goals: number;
+                report_reasons: ("unsafe" | "fake" | "minor" | "harassment" | "other")[];
                 times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
             };
             profile: {
                 about: string | null;
                 active: boolean;
-                /** Format: uuid */
-                club_id: string;
+                /** Format: date-time */
+                adult_confirmed_at: string;
                 disciplines: string[];
                 /**
                  * @description Only used to honour preferences; never shown to anyone
@@ -33447,15 +34325,15 @@ export interface components {
                 id: string;
                 /** @enum {string} */
                 level: "beginner" | "intermediate" | "advanced";
-                /** @description Staff hid it after a report */
-                suspended: boolean;
+                /** @description Switched off in Ρυθμίσεις */
+                paused: boolean;
+                /** @description «Δείξε το box μου»: the card names the box of an active membership */
+                show_box: boolean;
                 times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
                 /** Format: date-time */
                 updated_at?: string;
             } | null;
             swipes_remaining: number;
-            /** @enum {string|null} */
-            unavailable_reason: "disabled" | "not_offered" | null;
         };
         /** PeopleSearchPerson */
         PeopleSearchPerson: {
@@ -35957,6 +36835,203 @@ export interface components {
                         } | null;
                     }[];
                 } | null;
+            }[];
+        };
+        /** PlatformPartnerReport */
+        PlatformPartnerReport: {
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            decided_at: string | null;
+            decision_note: string | null;
+            /** Format: uuid */
+            id: string;
+            note: string | null;
+            /** @enum {string} */
+            reason: "unsafe" | "fake" | "minor" | "harassment" | "other";
+            /** PartnerPerson */
+            reporter: {
+                avatar_url: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            };
+            /** @description Reports of this status on the same person */
+            reports_on_target: number;
+            /** @enum {string} */
+            status: "open" | "actioned" | "dismissed";
+            /** PartnerPerson */
+            target: {
+                avatar_url: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            };
+        };
+        /** PlatformPartnerReportDecision */
+        PlatformPartnerReportDecision: {
+            /** @enum {string} */
+            decision: "suspend" | "dismiss";
+            /** Format: uuid */
+            id: string;
+            penalized_sponsors: number;
+            /** @description Open reports on the person it closed */
+            resolved: number;
+            /** Format: uuid */
+            target_id: string;
+        };
+        /** PlatformPartnerReportDecisionRequest */
+        PlatformPartnerReportDecisionRequest: {
+            /** @enum {string} */
+            decision: "suspend" | "dismiss";
+            note?: string | null;
+        };
+        /** PlatformPartnerReports */
+        PlatformPartnerReports: {
+            reports: {
+                /** Format: date-time */
+                created_at: string;
+                /** Format: date-time */
+                decided_at: string | null;
+                decision_note: string | null;
+                /** Format: uuid */
+                id: string;
+                note: string | null;
+                /** @enum {string} */
+                reason: "unsafe" | "fake" | "minor" | "harassment" | "other";
+                /** PartnerPerson */
+                reporter: {
+                    avatar_url: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                };
+                /** @description Reports of this status on the same person */
+                reports_on_target: number;
+                /** @enum {string} */
+                status: "open" | "actioned" | "dismissed";
+                /** PartnerPerson */
+                target: {
+                    avatar_url: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                };
+            }[];
+        };
+        /** PlatformPartnerVerification */
+        PlatformPartnerVerification: {
+            /** Format: date-time */
+            consent_at: string | null;
+            /** Format: date-time */
+            decided_at: string | null;
+            decision_reason: string | null;
+            /** Format: uuid */
+            id: string;
+            /** PartnerVerificationPerson */
+            person: {
+                avatar_url: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            };
+            /** @description Masked */
+            phone: string | null;
+            phone_verified: boolean;
+            selfie_code: string;
+            /** Format: date-time */
+            selfie_expires_at: string | null;
+            /** Format: date-time */
+            selfie_uploaded_at: string | null;
+            /** @description Valid 5 minutes */
+            selfie_url: string | null;
+            selfie_url_expires_in: number;
+            sponsors: {
+                /** @enum {string} */
+                channel: "buddy" | "link";
+                /** PartnerVerificationPerson */
+                person: {
+                    avatar_url: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                };
+                /** Format: date-time */
+                vouched_at: string | null;
+            }[];
+            /** @enum {string} */
+            status: "collecting" | "in_review" | "approved" | "rejected" | "expired" | "withdrawn";
+            /** Format: date-time */
+            submitted_at: string | null;
+        };
+        /** PlatformPartnerVerificationDecided */
+        PlatformPartnerVerificationDecided: {
+            /** Format: date-time */
+            decided_at: string | null;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            status: "collecting" | "in_review" | "approved" | "rejected" | "expired" | "withdrawn";
+        };
+        /** PlatformPartnerVerificationDecision */
+        PlatformPartnerVerificationDecision: {
+            /** @enum {string} */
+            decision: "approve" | "reject";
+            /** @description Required to reject */
+            reason?: string | null;
+        };
+        /** PlatformPartnerVerificationItem */
+        PlatformPartnerVerificationItem: {
+            /** Format: uuid */
+            id: string;
+            overdue: boolean;
+            /** PartnerVerificationPerson */
+            person: {
+                avatar_url: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            };
+            /** Format: date-time */
+            selfie_expires_at: string | null;
+            /** @enum {string} */
+            status: "collecting" | "in_review" | "approved" | "rejected" | "expired" | "withdrawn";
+            /** Format: date-time */
+            submitted_at: string | null;
+        };
+        /** PlatformPartnerVerificationSponsor */
+        PlatformPartnerVerificationSponsor: {
+            /** @enum {string} */
+            channel: "buddy" | "link";
+            /** PartnerVerificationPerson */
+            person: {
+                avatar_url: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            };
+            /** Format: date-time */
+            vouched_at: string | null;
+        };
+        /** PlatformPartnerVerifications */
+        PlatformPartnerVerifications: {
+            requests: {
+                /** Format: uuid */
+                id: string;
+                overdue: boolean;
+                /** PartnerVerificationPerson */
+                person: {
+                    avatar_url: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                };
+                /** Format: date-time */
+                selfie_expires_at: string | null;
+                /** @enum {string} */
+                status: "collecting" | "in_review" | "approved" | "rejected" | "expired" | "withdrawn";
+                /** Format: date-time */
+                submitted_at: string | null;
             }[];
         };
         /** PlatformPlan */
@@ -54335,301 +55410,6 @@ export interface operations {
             };
         };
     };
-    "PaleeWeb.PartnersController.club": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                club_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Overview */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** Format: uuid */
-                        club_id: string;
-                        /**
-                         * @description Open clubs only (ADR-197): «Απόσταση» works once the viewer has «Η περιοχή μου» and shows in Γύρω μου
-                         * @enum {string|null}
-                         */
-                        distance: "available" | "needs_area" | null;
-                        /** @description Whether the viewer is a member of the club now */
-                        member: boolean;
-                        offered: boolean;
-                        /** PartnerOptions */
-                        options: {
-                            about_max: number;
-                            daily_swipes: number;
-                            /** @description Box vocabulary keys a profile may name (ADR-197) */
-                            disciplines: string[];
-                            /** @description The «Απόσταση» choices of an open club's deck (ADR-197) */
-                            distances_km: number[];
-                            gender_preferences: ("any" | "women" | "men")[];
-                            genders: ("woman" | "man" | "other")[];
-                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
-                            levels: ("beginner" | "intermediate" | "advanced")[];
-                            max_disciplines: number;
-                            max_goals: number;
-                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
-                        };
-                        profile: {
-                            about: string | null;
-                            active: boolean;
-                            /** Format: uuid */
-                            club_id: string;
-                            disciplines: string[];
-                            /**
-                             * @description Only used to honour preferences; never shown to anyone
-                             * @enum {string|null}
-                             */
-                            gender: "woman" | "man" | "other" | null;
-                            /** @enum {string} */
-                            gender_preference: "any" | "women" | "men";
-                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
-                            /** Format: uuid */
-                            id: string;
-                            /** @enum {string} */
-                            level: "beginner" | "intermediate" | "advanced";
-                            /** @description Staff hid it after a report */
-                            suspended: boolean;
-                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
-                            /** Format: date-time */
-                            updated_at?: string;
-                        } | null;
-                        swipes_remaining: number;
-                        /** @enum {string|null} */
-                        unavailable_reason: "disabled" | "not_offered" | null;
-                    };
-                };
-            };
-        };
-    };
-    "PaleeWeb.PartnersController.deck": {
-        parameters: {
-            query?: {
-                time?: "early" | "midday" | "afternoon" | "evening" | "weekend";
-                level?: "beginner" | "intermediate" | "advanced";
-                goal?: "strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency";
-                /** @description People who named this discipline, a box vocabulary key (ADR-197) */
-                discipline?: string;
-                /** @description Open clubs only (ADR-197): people who show in Γύρω μου with a main neighbourhood this close to yours */
-                within_km?: 2 | 5 | 10 | 25;
-            };
-            header?: never;
-            path: {
-                club_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Deck */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        cards: {
-                            about: string | null;
-                            disciplines: string[];
-                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
-                            /** @enum {string} */
-                            level: "beginner" | "intermediate" | "advanced";
-                            /** PartnerPerson */
-                            person: {
-                                avatar_url: string | null;
-                                /** Format: uuid */
-                                id: string;
-                                nickname: string | null;
-                            };
-                            /** Format: uuid */
-                            profile_id: string;
-                            /** PartnerShared */
-                            shared: {
-                                disciplines: string[];
-                                goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
-                                same_level: boolean;
-                                times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
-                            };
-                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
-                        }[];
-                        /** Format: uuid */
-                        club_id: string;
-                        swipes_remaining: number;
-                    };
-                };
-            };
-        };
-    };
-    "PaleeWeb.PartnersController.put_profile": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                club_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    about?: string | null;
-                    active?: boolean;
-                    disciplines?: string[];
-                    /** @enum {string|null} */
-                    gender?: "woman" | "man" | "other" | null;
-                    /** @enum {string} */
-                    gender_preference?: "any" | "women" | "men";
-                    goals?: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
-                    /** @enum {string} */
-                    level?: "beginner" | "intermediate" | "advanced";
-                    times?: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
-                };
-            };
-        };
-        responses: {
-            /** @description Profile */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** PartnerProfile */
-                        profile: {
-                            about: string | null;
-                            active: boolean;
-                            /** Format: uuid */
-                            club_id: string;
-                            disciplines: string[];
-                            /**
-                             * @description Only used to honour preferences; never shown to anyone
-                             * @enum {string|null}
-                             */
-                            gender: "woman" | "man" | "other" | null;
-                            /** @enum {string} */
-                            gender_preference: "any" | "women" | "men";
-                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
-                            /** Format: uuid */
-                            id: string;
-                            /** @enum {string} */
-                            level: "beginner" | "intermediate" | "advanced";
-                            /** @description Staff hid it after a report */
-                            suspended: boolean;
-                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
-                            /** Format: date-time */
-                            updated_at?: string;
-                        };
-                    };
-                };
-            };
-        };
-    };
-    "PaleeWeb.PartnersController.swipe": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                club_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @enum {string} */
-                    direction: "like" | "pass";
-                    /** Format: uuid */
-                    target_id: string;
-                };
-            };
-        };
-        responses: {
-            /** @description Swipe */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @enum {string} */
-                        direction: "like" | "pass";
-                        /** @description Set when the like was mutual */
-                        match: {
-                            /** Format: uuid */
-                            club_id: string;
-                            club_name: string | null;
-                            /** @enum {string|null} */
-                            end_reason: "unmatched" | "blocked" | "reported" | "left" | "hidden" | null;
-                            ended_by_me: boolean;
-                            /** Format: uuid */
-                            id: string;
-                            /** Format: date-time */
-                            last_message_at: string | null;
-                            /** Format: date-time */
-                            matched_at: string;
-                            /**
-                             * Format: uuid
-                             * @description The other person's profile in the club, what a report names
-                             */
-                            partner_profile_id: string | null;
-                            /** PartnerPerson */
-                            person: {
-                                avatar_url: string | null;
-                                /** Format: uuid */
-                                id: string;
-                                nickname: string | null;
-                            };
-                            /** @description «Κλείστε μαζί» offers the gym's classes */
-                            plannable: boolean;
-                            read_only: boolean;
-                            /** @enum {string} */
-                            status: "active" | "ended";
-                            unread: number;
-                        } | null;
-                        swipes_remaining: number;
-                        /** Format: uuid */
-                        target_id: string;
-                    };
-                };
-            };
-        };
-    };
-    "PaleeWeb.PartnersController.undo": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                club_id: string;
-                target_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Undone */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** Format: uuid */
-                        target_id: string;
-                        undone: boolean;
-                    };
-                };
-            };
-        };
-    };
     "PaleeWeb.OpenClubController.members": {
         parameters: {
             query?: {
@@ -56860,7 +57640,7 @@ export interface operations {
                     /** Format: uuid */
                     target_id: string;
                     /** @enum {string} */
-                    target_type: "post" | "comment" | "channel" | "partner";
+                    target_type: "post" | "comment" | "channel";
                 };
             };
         };
@@ -63188,6 +63968,145 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.PartnersController.overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Overview */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        distance: "available" | "needs_area";
+                        /** PartnersEligibility */
+                        eligibility: {
+                            /** @enum {string|null} */
+                            method: "membership" | "sponsors" | null;
+                            /** @description What the verification flow asks for next (the verification side's word) */
+                            next_step: string | null;
+                            /** @enum {string} */
+                            status: "verified" | "needs_verification" | "in_review" | "rejected" | "suspended";
+                        };
+                        /** PartnerOptions */
+                        options: {
+                            about_max: number;
+                            daily_swipes: number;
+                            default_within_km: number;
+                            /** @description Box vocabulary keys a profile may name (ADR-197) */
+                            disciplines: string[];
+                            /** @description The «Απόσταση» choices of the deck (ADR-197, ADR-280) */
+                            distances_km: number[];
+                            gender_preferences: ("any" | "women" | "men")[];
+                            genders: ("woman" | "man" | "other")[];
+                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                            levels: ("beginner" | "intermediate" | "advanced")[];
+                            max_disciplines: number;
+                            max_goals: number;
+                            report_reasons: ("unsafe" | "fake" | "minor" | "harassment" | "other")[];
+                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                        };
+                        profile: {
+                            about: string | null;
+                            active: boolean;
+                            /** Format: date-time */
+                            adult_confirmed_at: string;
+                            disciplines: string[];
+                            /**
+                             * @description Only used to honour preferences; never shown to anyone
+                             * @enum {string|null}
+                             */
+                            gender: "woman" | "man" | "other" | null;
+                            /** @enum {string} */
+                            gender_preference: "any" | "women" | "men";
+                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            level: "beginner" | "intermediate" | "advanced";
+                            /** @description Switched off in Ρυθμίσεις */
+                            paused: boolean;
+                            /** @description «Δείξε το box μου»: the card names the box of an active membership */
+                            show_box: boolean;
+                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                            /** Format: date-time */
+                            updated_at?: string;
+                        } | null;
+                        swipes_remaining: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnersController.deck": {
+        parameters: {
+            query?: {
+                time?: "early" | "midday" | "afternoon" | "evening" | "weekend";
+                level?: "beginner" | "intermediate" | "advanced";
+                goal?: "strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency";
+                /** @description People who named this discipline, a box vocabulary key (ADR-197) */
+                discipline?: string;
+                /** @description People whose main neighbourhood is this close to yours (default 10); needs «Η περιοχή μου» */
+                within_km?: 2 | 5 | 10 | 25;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deck */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        cards: {
+                            about: string | null;
+                            badge: {
+                                /** @description Set for `box` only: the box of an active membership */
+                                box_name: string | null;
+                                /** @enum {string} */
+                                kind: "box" | "member" | "verified" | "sponsors";
+                            } | null;
+                            disciplines: string[];
+                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                            /** @enum {string} */
+                            level: "beginner" | "intermediate" | "advanced";
+                            /** PartnerPerson */
+                            person: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            /** Format: uuid */
+                            profile_id: string;
+                            /** PartnerShared */
+                            shared: {
+                                disciplines: string[];
+                                goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                                same_level: boolean;
+                                times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                            };
+                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                        }[];
+                        swipes_remaining: number;
+                        /** @enum {integer} */
+                        within_km: 2 | 5 | 10 | 25;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.PartnersController.matches": {
         parameters: {
             query?: never;
@@ -63205,11 +64124,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         matches: {
-                            /** Format: uuid */
-                            club_id: string;
-                            club_name: string | null;
                             /** @enum {string|null} */
-                            end_reason: "unmatched" | "blocked" | "reported" | "left" | "hidden" | null;
+                            end_reason: "unmatched" | "blocked" | "reported" | "suspended" | null;
                             ended_by_me: boolean;
                             /** Format: uuid */
                             id: string;
@@ -63219,9 +64135,9 @@ export interface operations {
                             matched_at: string;
                             /**
                              * Format: uuid
-                             * @description The other person's profile in the club, what a report names
+                             * @description The other person, what a report names (`target_id`)
                              */
-                            partner_profile_id: string | null;
+                            partner_id: string;
                             /** PartnerPerson */
                             person: {
                                 avatar_url: string | null;
@@ -63229,8 +64145,6 @@ export interface operations {
                                 id: string;
                                 nickname: string | null;
                             };
-                            /** @description «Κλείστε μαζί» offers the gym's classes */
-                            plannable: boolean;
                             read_only: boolean;
                             /** @enum {string} */
                             status: "active" | "ended";
@@ -63309,11 +64223,13 @@ export interface operations {
                             mine: boolean;
                             plan: {
                                 /** Format: uuid */
-                                class_id: string;
-                                duration_minutes: number | null;
-                                name: string | null;
+                                id: string;
+                                /** @enum {string} */
+                                kind: "class" | "event" | "trial";
+                                place: string | null;
                                 /** Format: date-time */
-                                scheduled_at: string;
+                                starts_at: string;
+                                title: string;
                             } | null;
                         }[];
                         next_cursor: string | null;
@@ -63369,11 +64285,13 @@ export interface operations {
                             mine: boolean;
                             plan: {
                                 /** Format: uuid */
-                                class_id: string;
-                                duration_minutes: number | null;
-                                name: string | null;
+                                id: string;
+                                /** @enum {string} */
+                                kind: "class" | "event" | "trial";
+                                place: string | null;
                                 /** Format: date-time */
-                                scheduled_at: string;
+                                starts_at: string;
+                                title: string;
                             } | null;
                         };
                     };
@@ -63405,7 +64323,7 @@ export interface operations {
             };
         };
     };
-    "PaleeWeb.PartnersController.plan": {
+    "PaleeWeb.PartnerSuggestionsController.propose": {
         parameters: {
             query?: never;
             header?: never;
@@ -63417,9 +64335,10 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    body?: string | null;
                     /** Format: uuid */
-                    class_id: string;
+                    id: string;
+                    /** @enum {string} */
+                    kind: "class" | "event" | "trial";
                 };
             };
         };
@@ -63452,11 +64371,13 @@ export interface operations {
                             mine: boolean;
                             plan: {
                                 /** Format: uuid */
-                                class_id: string;
-                                duration_minutes: number | null;
-                                name: string | null;
+                                id: string;
+                                /** @enum {string} */
+                                kind: "class" | "event" | "trial";
+                                place: string | null;
                                 /** Format: date-time */
-                                scheduled_at: string;
+                                starts_at: string;
+                                title: string;
                             } | null;
                         };
                     };
@@ -63464,7 +64385,7 @@ export interface operations {
             };
         };
     };
-    "PaleeWeb.PartnersController.sessions": {
+    "PaleeWeb.PartnerSuggestionsController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -63475,28 +64396,174 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Sessions */
+            /** @description Suggestions */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        available: boolean;
-                        sessions: {
+                        /** @description At most three, best first; empty hides the card («Πάμε μαζί;» stays) */
+                        suggestions: {
                             booked_by_me: boolean;
                             booked_by_partner: boolean;
-                            /** Format: uuid */
-                            class_id: string;
-                            duration_minutes: number | null;
-                            name: string | null;
+                            /** @description From your neighbourhood and your partner's, to 0.1 km; null when unknown (a class of a box you both belong to) */
+                            distances_km: (number | null)[];
                             /** Format: date-time */
-                            scheduled_at: string;
-                            /** @description In a time both of you chose */
-                            shared_time: boolean;
-                            spots_remaining: number;
+                            ends_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description `kind:id`, what feedback names */
+                            key: string;
+                            /** @enum {string} */
+                            kind: "class" | "event" | "trial";
+                            place: string | null;
+                            /** @description Why it is suggested: both_booked, one_booked, shared_time:<early|midday|afternoon|evening|weekend>, level_fit, near_both */
+                            reasons: string[];
+                            /** @description Free places; null when there is no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** @description The activity's own IANA zone; times show in it */
+                            time_zone?: string | null;
+                            title: string | null;
                         }[];
-                        timezone: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerSuggestionsController.feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    key: string;
+                    /** @enum {string} */
+                    reason: "not_near" | "bad_time" | "wrong_level" | "other";
+                };
+            };
+        };
+        responses: {
+            /** @description Feedback */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        key: string;
+                        /** @enum {string} */
+                        reason: "not_near" | "bad_time" | "wrong_level" | "other";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnersController.put_profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    about?: string | null;
+                    active?: boolean;
+                    /** @description «Είμαι 18 ετών ή μεγαλύτερος/η»: required true on the first save */
+                    adult_confirmed?: boolean;
+                    disciplines?: string[];
+                    /** @enum {string|null} */
+                    gender?: "woman" | "man" | "other" | null;
+                    /** @enum {string} */
+                    gender_preference?: "any" | "women" | "men";
+                    goals?: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                    /** @enum {string} */
+                    level?: "beginner" | "intermediate" | "advanced";
+                    show_box?: boolean;
+                    times?: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                };
+            };
+        };
+        responses: {
+            /** @description Profile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PartnerProfile */
+                        profile: {
+                            about: string | null;
+                            active: boolean;
+                            /** Format: date-time */
+                            adult_confirmed_at: string;
+                            disciplines: string[];
+                            /**
+                             * @description Only used to honour preferences; never shown to anyone
+                             * @enum {string|null}
+                             */
+                            gender: "woman" | "man" | "other" | null;
+                            /** @enum {string} */
+                            gender_preference: "any" | "women" | "men";
+                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            level: "beginner" | "intermediate" | "advanced";
+                            /** @description Switched off in Ρυθμίσεις */
+                            paused: boolean;
+                            /** @description «Δείξε το box μου»: the card names the box of an active membership */
+                            show_box: boolean;
+                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnersController.report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    note?: string | null;
+                    /** @enum {string} */
+                    reason: "unsafe" | "fake" | "minor" | "harassment" | "other";
+                    /** Format: uuid */
+                    target_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Reported */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        blocked: boolean;
+                        reported: boolean;
+                        /** Format: uuid */
+                        target_id: string;
                     };
                 };
             };
@@ -63518,10 +64585,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        club_ids: string[];
-                        /** @description Clubs where you have a profile */
-                        clubs: number;
-                        /** @description Whether any of your profiles is on */
+                        has_profile: boolean;
+                        /** @description Whether you show in the deck */
                         visible: boolean;
                     };
                 };
@@ -63550,11 +64615,950 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        club_ids: string[];
-                        /** @description Clubs where you have a profile */
-                        clubs: number;
-                        /** @description Whether any of your profiles is on */
+                        has_profile: boolean;
+                        /** @description Whether you show in the deck */
                         visible: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnersController.swipe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    direction: "like" | "pass";
+                    /** Format: uuid */
+                    target_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Swipe */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        direction: "like" | "pass";
+                        /** @description Set when the like was mutual */
+                        match: {
+                            /** @enum {string|null} */
+                            end_reason: "unmatched" | "blocked" | "reported" | "suspended" | null;
+                            ended_by_me: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            last_message_at: string | null;
+                            /** Format: date-time */
+                            matched_at: string;
+                            /**
+                             * Format: uuid
+                             * @description The other person, what a report names (`target_id`)
+                             */
+                            partner_id: string;
+                            /** PartnerPerson */
+                            person: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            read_only: boolean;
+                            /** @enum {string} */
+                            status: "active" | "ended";
+                            unread: number;
+                        } | null;
+                        swipes_remaining: number;
+                        /** Format: uuid */
+                        target_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnersController.undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Undone */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        target_id: string;
+                        undone: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerVerificationController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Verification */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PartnerEligibility */
+                        eligibility: {
+                            /** @enum {string|null} */
+                            method: "membership" | "sponsors" | null;
+                            /** @enum {string|null} */
+                            next_step: "consent" | "sponsors" | "phone" | "selfie" | null;
+                            /** @enum {string} */
+                            status: "verified" | "needs_verification" | "in_review" | "rejected" | "suspended";
+                        };
+                        /** PartnerVerificationLimits */
+                        limits: {
+                            code_attempts: number;
+                            code_minutes: number;
+                            link_minutes: number;
+                            selfie_content_types: string[];
+                            selfie_max_bytes: number;
+                            selfie_retention_days: number;
+                            sponsors_required: number;
+                        };
+                        /** PartnerVerificationRequest */
+                        request: {
+                            /** Format: date-time */
+                            consent_at: string | null;
+                            /** Format: date-time */
+                            decided_at: string | null;
+                            decision_reason: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            missing: ("consent" | "sponsors" | "phone")[];
+                            /** @description Masked */
+                            phone: string | null;
+                            phone_verified: boolean;
+                            /** @description Written on paper and held up in the selfie */
+                            selfie_code: string;
+                            /** Format: date-time */
+                            selfie_expires_at: string | null;
+                            /** Format: date-time */
+                            selfie_uploaded_at: string | null;
+                            sponsors: {
+                                /** @enum {string} */
+                                channel: "buddy" | "link";
+                                /** Format: date-time */
+                                decided_at: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** PartnerVerificationPerson */
+                                person: {
+                                    avatar_url: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname: string | null;
+                                };
+                                /** Format: date-time */
+                                requested_at: string;
+                                /** @enum {string} */
+                                status: "requested" | "vouched" | "declined" | "cancelled";
+                            }[];
+                            sponsors_required: number;
+                            /** @enum {string} */
+                            status: "collecting" | "in_review" | "approved" | "rejected" | "expired" | "withdrawn";
+                            /** Format: date-time */
+                            submitted_at: string | null;
+                            vouches: number;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerVerificationController.withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Verification */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PartnerEligibility */
+                        eligibility: {
+                            /** @enum {string|null} */
+                            method: "membership" | "sponsors" | null;
+                            /** @enum {string|null} */
+                            next_step: "consent" | "sponsors" | "phone" | "selfie" | null;
+                            /** @enum {string} */
+                            status: "verified" | "needs_verification" | "in_review" | "rejected" | "suspended";
+                        };
+                        /** PartnerVerificationLimits */
+                        limits: {
+                            code_attempts: number;
+                            code_minutes: number;
+                            link_minutes: number;
+                            selfie_content_types: string[];
+                            selfie_max_bytes: number;
+                            selfie_retention_days: number;
+                            sponsors_required: number;
+                        };
+                        /** PartnerVerificationRequest */
+                        request: {
+                            /** Format: date-time */
+                            consent_at: string | null;
+                            /** Format: date-time */
+                            decided_at: string | null;
+                            decision_reason: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            missing: ("consent" | "sponsors" | "phone")[];
+                            /** @description Masked */
+                            phone: string | null;
+                            phone_verified: boolean;
+                            /** @description Written on paper and held up in the selfie */
+                            selfie_code: string;
+                            /** Format: date-time */
+                            selfie_expires_at: string | null;
+                            /** Format: date-time */
+                            selfie_uploaded_at: string | null;
+                            sponsors: {
+                                /** @enum {string} */
+                                channel: "buddy" | "link";
+                                /** Format: date-time */
+                                decided_at: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** PartnerVerificationPerson */
+                                person: {
+                                    avatar_url: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname: string | null;
+                                };
+                                /** Format: date-time */
+                                requested_at: string;
+                                /** @enum {string} */
+                                status: "requested" | "vouched" | "declined" | "cancelled";
+                            }[];
+                            sponsors_required: number;
+                            /** @enum {string} */
+                            status: "collecting" | "in_review" | "approved" | "rejected" | "expired" | "withdrawn";
+                            /** Format: date-time */
+                            submitted_at: string | null;
+                            vouches: number;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerVerificationController.consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Verification */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PartnerEligibility */
+                        eligibility: {
+                            /** @enum {string|null} */
+                            method: "membership" | "sponsors" | null;
+                            /** @enum {string|null} */
+                            next_step: "consent" | "sponsors" | "phone" | "selfie" | null;
+                            /** @enum {string} */
+                            status: "verified" | "needs_verification" | "in_review" | "rejected" | "suspended";
+                        };
+                        /** PartnerVerificationLimits */
+                        limits: {
+                            code_attempts: number;
+                            code_minutes: number;
+                            link_minutes: number;
+                            selfie_content_types: string[];
+                            selfie_max_bytes: number;
+                            selfie_retention_days: number;
+                            sponsors_required: number;
+                        };
+                        /** PartnerVerificationRequest */
+                        request: {
+                            /** Format: date-time */
+                            consent_at: string | null;
+                            /** Format: date-time */
+                            decided_at: string | null;
+                            decision_reason: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            missing: ("consent" | "sponsors" | "phone")[];
+                            /** @description Masked */
+                            phone: string | null;
+                            phone_verified: boolean;
+                            /** @description Written on paper and held up in the selfie */
+                            selfie_code: string;
+                            /** Format: date-time */
+                            selfie_expires_at: string | null;
+                            /** Format: date-time */
+                            selfie_uploaded_at: string | null;
+                            sponsors: {
+                                /** @enum {string} */
+                                channel: "buddy" | "link";
+                                /** Format: date-time */
+                                decided_at: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** PartnerVerificationPerson */
+                                person: {
+                                    avatar_url: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname: string | null;
+                                };
+                                /** Format: date-time */
+                                requested_at: string;
+                                /** @enum {string} */
+                                status: "requested" | "vouched" | "declined" | "cancelled";
+                            }[];
+                            sponsors_required: number;
+                            /** @enum {string} */
+                            status: "collecting" | "in_review" | "approved" | "rejected" | "expired" | "withdrawn";
+                            /** Format: date-time */
+                            submitted_at: string | null;
+                            vouches: number;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerVerificationController.create_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Link */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        expires_at: string;
+                        path: string;
+                        /** @description Shown once */
+                        token: string;
+                        url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerVerificationController.send_phone_code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Mobile, E.164 or Greek 69… */
+                    phone: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Sent */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code_minutes: number;
+                        /** Format: date-time */
+                        expires_at: string;
+                        phone: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerVerificationController.confirm_phone": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    code: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Verification */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PartnerEligibility */
+                        eligibility: {
+                            /** @enum {string|null} */
+                            method: "membership" | "sponsors" | null;
+                            /** @enum {string|null} */
+                            next_step: "consent" | "sponsors" | "phone" | "selfie" | null;
+                            /** @enum {string} */
+                            status: "verified" | "needs_verification" | "in_review" | "rejected" | "suspended";
+                        };
+                        /** PartnerVerificationLimits */
+                        limits: {
+                            code_attempts: number;
+                            code_minutes: number;
+                            link_minutes: number;
+                            selfie_content_types: string[];
+                            selfie_max_bytes: number;
+                            selfie_retention_days: number;
+                            sponsors_required: number;
+                        };
+                        /** PartnerVerificationRequest */
+                        request: {
+                            /** Format: date-time */
+                            consent_at: string | null;
+                            /** Format: date-time */
+                            decided_at: string | null;
+                            decision_reason: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            missing: ("consent" | "sponsors" | "phone")[];
+                            /** @description Masked */
+                            phone: string | null;
+                            phone_verified: boolean;
+                            /** @description Written on paper and held up in the selfie */
+                            selfie_code: string;
+                            /** Format: date-time */
+                            selfie_expires_at: string | null;
+                            /** Format: date-time */
+                            selfie_uploaded_at: string | null;
+                            sponsors: {
+                                /** @enum {string} */
+                                channel: "buddy" | "link";
+                                /** Format: date-time */
+                                decided_at: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** PartnerVerificationPerson */
+                                person: {
+                                    avatar_url: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname: string | null;
+                                };
+                                /** Format: date-time */
+                                requested_at: string;
+                                /** @enum {string} */
+                                status: "requested" | "vouched" | "declined" | "cancelled";
+                            }[];
+                            sponsors_required: number;
+                            /** @enum {string} */
+                            status: "collecting" | "in_review" | "approved" | "rejected" | "expired" | "withdrawn";
+                            /** Format: date-time */
+                            submitted_at: string | null;
+                            vouches: number;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerVerificationController.selfie_upload_url": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    content_type: "image/heic" | "image/jpeg" | "image/png" | "image/webp";
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        content_type: string;
+                        file_key: string;
+                        max_bytes: number;
+                        /** @enum {string} */
+                        method: "PUT";
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        selfie_code: string;
+                        upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerVerificationController.sponsor_candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Candidates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        candidates: {
+                            eligible: boolean;
+                            /** PartnerVerificationPerson */
+                            person: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            /** @enum {string|null} */
+                            reason: "not_verified" | "blocked" | "quota" | "penalty" | "self" | null;
+                            sponsorship: {
+                                /** @enum {string} */
+                                channel?: "buddy" | "link";
+                                /** Format: uuid */
+                                id?: string;
+                                /** @enum {string} */
+                                status?: "requested" | "vouched" | "declined" | "cancelled";
+                            } | null;
+                        }[];
+                        required: number;
+                        vouches: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerVerificationController.request_sponsor": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    sponsor_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Sponsorship */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PartnerSponsorship */
+                        sponsorship: {
+                            /** @enum {string} */
+                            channel: "buddy" | "link";
+                            /** Format: date-time */
+                            decided_at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** PartnerVerificationPerson */
+                            person: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** @enum {string} */
+                            status: "requested" | "vouched" | "declined" | "cancelled";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerVerificationController.cancel_sponsor": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sponsorship */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PartnerSponsorship */
+                        sponsorship: {
+                            /** @enum {string} */
+                            channel: "buddy" | "link";
+                            /** Format: date-time */
+                            decided_at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** PartnerVerificationPerson */
+                            person: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** @enum {string} */
+                            status: "requested" | "vouched" | "declined" | "cancelled";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerVerificationController.submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    file_key: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Verification */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PartnerEligibility */
+                        eligibility: {
+                            /** @enum {string|null} */
+                            method: "membership" | "sponsors" | null;
+                            /** @enum {string|null} */
+                            next_step: "consent" | "sponsors" | "phone" | "selfie" | null;
+                            /** @enum {string} */
+                            status: "verified" | "needs_verification" | "in_review" | "rejected" | "suspended";
+                        };
+                        /** PartnerVerificationLimits */
+                        limits: {
+                            code_attempts: number;
+                            code_minutes: number;
+                            link_minutes: number;
+                            selfie_content_types: string[];
+                            selfie_max_bytes: number;
+                            selfie_retention_days: number;
+                            sponsors_required: number;
+                        };
+                        /** PartnerVerificationRequest */
+                        request: {
+                            /** Format: date-time */
+                            consent_at: string | null;
+                            /** Format: date-time */
+                            decided_at: string | null;
+                            decision_reason: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            missing: ("consent" | "sponsors" | "phone")[];
+                            /** @description Masked */
+                            phone: string | null;
+                            phone_verified: boolean;
+                            /** @description Written on paper and held up in the selfie */
+                            selfie_code: string;
+                            /** Format: date-time */
+                            selfie_expires_at: string | null;
+                            /** Format: date-time */
+                            selfie_uploaded_at: string | null;
+                            sponsors: {
+                                /** @enum {string} */
+                                channel: "buddy" | "link";
+                                /** Format: date-time */
+                                decided_at: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** PartnerVerificationPerson */
+                                person: {
+                                    avatar_url: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname: string | null;
+                                };
+                                /** Format: date-time */
+                                requested_at: string;
+                                /** @enum {string} */
+                                status: "requested" | "vouched" | "declined" | "cancelled";
+                            }[];
+                            sponsors_required: number;
+                            /** @enum {string} */
+                            status: "collecting" | "in_review" | "approved" | "rejected" | "expired" | "withdrawn";
+                            /** Format: date-time */
+                            submitted_at: string | null;
+                            vouches: number;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerVerificationController.inspect_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        can_vouch: boolean;
+                        /** Format: date-time */
+                        expires_at: string;
+                        /** PartnerVerificationPerson */
+                        person: {
+                            avatar_url: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname: string | null;
+                        };
+                        /** @enum {string|null} */
+                        reason: "partner_sponsor_not_eligible" | "partner_sponsor_quota" | "partner_sponsor_penalty" | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerVerificationController.vouch_by_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Vouched */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        decided_at: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        status: "requested" | "vouched" | "declined" | "cancelled";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerVerificationController.vouch_requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Requests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        requests: {
+                            /** Format: uuid */
+                            id: string;
+                            /** PartnerVerificationPerson */
+                            person: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            /** Format: date-time */
+                            requested_at: string;
+                        }[];
+                        /** PartnerVouching */
+                        vouching: {
+                            can_vouch: boolean;
+                            left: number;
+                            /** Format: date-time */
+                            penalty_until: string | null;
+                            quota: number;
+                            /** @enum {string|null} */
+                            reason: "not_verified" | "quota" | "penalty" | null;
+                            used: number;
+                            window_days: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerVerificationController.decide_vouch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    decision: "vouch" | "decline";
+                };
+            };
+        };
+        responses: {
+            /** @description Answer */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        decided_at: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        status: "requested" | "vouched" | "declined" | "cancelled";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerVerificationController.vouching": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Vouching */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        can_vouch: boolean;
+                        left: number;
+                        /** Format: date-time */
+                        penalty_until: string | null;
+                        quota: number;
+                        /** @enum {string|null} */
+                        reason: "not_verified" | "quota" | "penalty" | null;
+                        used: number;
+                        window_days: number;
                     };
                 };
             };
@@ -75064,7 +77068,6 @@ export interface operations {
                             /** @enum {string} */
                             member_groups: "none" | "approval" | "free";
                             needs_approval: boolean;
-                            partners_enabled: boolean;
                         };
                     };
                 };
@@ -75241,7 +77244,7 @@ export interface operations {
                             /** Format: uuid */
                             target_id: string;
                             /** @enum {string} */
-                            target_type: "post" | "comment" | "channel" | "partner";
+                            target_type: "post" | "comment" | "channel";
                         }[];
                     };
                 };
@@ -75263,7 +77266,7 @@ export interface operations {
                     /** Format: uuid */
                     target_id: string;
                     /** @enum {string} */
-                    target_type: "post" | "comment" | "channel" | "partner";
+                    target_type: "post" | "comment" | "channel";
                 };
             };
         };
@@ -75297,8 +77300,6 @@ export interface operations {
                 "application/json": {
                     /** @enum {string} */
                     member_groups?: "none" | "approval" | "free";
-                    /** @description Whether the gym's verified clubs offer Partners (ADR-169) */
-                    partners_enabled?: boolean;
                 };
             };
         };
@@ -75317,7 +77318,6 @@ export interface operations {
                         };
                         /** @enum {string} */
                         member_groups: "none" | "approval" | "free";
-                        partners_enabled: boolean;
                     };
                 };
             };
@@ -102730,7 +104730,6 @@ export interface operations {
                             /** @enum {string} */
                             member_groups: "none" | "approval" | "free";
                             needs_approval: boolean;
-                            partners_enabled: boolean;
                         };
                     };
                 };
@@ -127749,6 +129748,283 @@ export interface operations {
                             slug: string;
                         }[];
                         purge_open: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformPartnerReportController.index": {
+        parameters: {
+            query?: {
+                /** @description Default open */
+                status?: "open" | "actioned" | "dismissed";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reports */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        reports: {
+                            /** Format: date-time */
+                            created_at: string;
+                            /** Format: date-time */
+                            decided_at: string | null;
+                            decision_note: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            note: string | null;
+                            /** @enum {string} */
+                            reason: "unsafe" | "fake" | "minor" | "harassment" | "other";
+                            /** PartnerPerson */
+                            reporter: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            /** @description Reports of this status on the same person */
+                            reports_on_target: number;
+                            /** @enum {string} */
+                            status: "open" | "actioned" | "dismissed";
+                            /** PartnerPerson */
+                            target: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformPartnerReportController.decide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    decision: "suspend" | "dismiss";
+                    note?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Decision */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        decision: "suspend" | "dismiss";
+                        /** Format: uuid */
+                        id: string;
+                        penalized_sponsors: number;
+                        /** @description Open reports on the person it closed */
+                        resolved: number;
+                        /** Format: uuid */
+                        target_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerSuggestionsController.stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Stats */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Oldest first, one per day */
+                        days: {
+                            booked_together: number;
+                            /** Format: date */
+                            day: string;
+                            feedback: number;
+                            proposed: number;
+                            shown: number;
+                        }[];
+                        /** PartnerSuggestionFeedbackReasons */
+                        feedback_reasons: {
+                            bad_time: number;
+                            not_near: number;
+                            other: number;
+                            wrong_level: number;
+                        };
+                        /** Format: date */
+                        since: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformPartnerVerificationController.index": {
+        parameters: {
+            query?: {
+                status?: "collecting" | "in_review" | "approved" | "rejected" | "expired" | "withdrawn";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Requests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        requests: {
+                            /** Format: uuid */
+                            id: string;
+                            overdue: boolean;
+                            /** PartnerVerificationPerson */
+                            person: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            /** Format: date-time */
+                            selfie_expires_at: string | null;
+                            /** @enum {string} */
+                            status: "collecting" | "in_review" | "approved" | "rejected" | "expired" | "withdrawn";
+                            /** Format: date-time */
+                            submitted_at: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformPartnerVerificationController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        consent_at: string | null;
+                        /** Format: date-time */
+                        decided_at: string | null;
+                        decision_reason: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** PartnerVerificationPerson */
+                        person: {
+                            avatar_url: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname: string | null;
+                        };
+                        /** @description Masked */
+                        phone: string | null;
+                        phone_verified: boolean;
+                        selfie_code: string;
+                        /** Format: date-time */
+                        selfie_expires_at: string | null;
+                        /** Format: date-time */
+                        selfie_uploaded_at: string | null;
+                        /** @description Valid 5 minutes */
+                        selfie_url: string | null;
+                        selfie_url_expires_in: number;
+                        sponsors: {
+                            /** @enum {string} */
+                            channel: "buddy" | "link";
+                            /** PartnerVerificationPerson */
+                            person: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            /** Format: date-time */
+                            vouched_at: string | null;
+                        }[];
+                        /** @enum {string} */
+                        status: "collecting" | "in_review" | "approved" | "rejected" | "expired" | "withdrawn";
+                        /** Format: date-time */
+                        submitted_at: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformPartnerVerificationController.decide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    decision: "approve" | "reject";
+                    /** @description Required to reject */
+                    reason?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Decision */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        decided_at: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        status: "collecting" | "in_review" | "approved" | "rejected" | "expired" | "withdrawn";
                     };
                 };
             };

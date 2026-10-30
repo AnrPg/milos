@@ -45,44 +45,6 @@ export function MemberGroupsSetting({ current }: { current: Setting }) {
   );
 }
 
-/**
- * Partners (ADR-169): whether members of the gym's own clubs can look for a
- * training partner. On by default; off hides it everywhere and pauses nothing
- * people wrote. Saves on change.
- */
-export function PartnersSetting({ current }: { current: boolean }) {
-  const t = useTranslations("CommunityAdmin");
-  const tUi = useUiTranslations();
-  const { tokens } = useSession();
-  const queryClient = useQueryClient();
-  const save = useMutation({
-    mutationFn: (enabled: boolean) => updateCommunitySettings(tokens!.access_token, { partners_enabled: enabled }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: STAFF_GROUPS_KEY }),
-  });
-  const value = save.isPending && save.variables !== undefined ? save.variables : current;
-
-  return (
-    <section className="flex flex-col gap-2 rounded-3xl p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-      <label className="flex min-h-11 items-center justify-between gap-3">
-        <span className="flex min-w-0 flex-col">
-          <span className="text-sm font-bold" style={{ color: "var(--text)" }}>{t("partnersTitle")}</span>
-          <span className="text-sm" style={{ color: "var(--text-soft)" }}>{t("partnersHint")}</span>
-        </span>
-        <input
-          type="checkbox"
-          role="switch"
-          checked={value}
-          disabled={save.isPending}
-          onChange={(event) => save.mutate(event.target.checked)}
-          className="h-5 w-5 shrink-0"
-          style={{ accentColor: "var(--primary)" }}
-        />
-      </label>
-      <ErrorLine message={save.error ? clientErrorMessage(save.error, tUi) : null} />
-    </section>
-  );
-}
-
 /** The settings entry for «Κοινότητα»: the member-groups setting, and a link to the staff page. */
 export function CommunitySettingsLink() {
   const t = useTranslations("CommunityAdmin");
@@ -95,7 +57,6 @@ export function CommunitySettingsLink() {
     <div className="flex flex-col gap-3">
       {/* An answer without settings shows only the link instead of crashing the hub. */}
       {groups.data?.settings ? <MemberGroupsSetting current={groups.data.settings.member_groups} /> : null}
-      {groups.data?.settings ? <PartnersSetting current={groups.data.settings.partners_enabled} /> : null}
       <Link
         href={adminHref("/admin/community", slug)}
         className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3"

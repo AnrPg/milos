@@ -80,6 +80,8 @@ defmodule Palee.Notifications.Domain.NotificationCategories do
       types: ~w(
         partner_match partner_message buddy_invite buddy_accepted buddy_message
         buddy_weekly_summary support_request support_reply support_no_reply_nudge
+        partner_vouch_request partner_vouched partner_verification_decided
+        partner_sponsor_penalty
       )
     },
     %{

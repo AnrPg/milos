@@ -6,6 +6,7 @@
 export type SubProcessorPurpose =
   | "purposeHosting"
   | "purposeEmail"
+  | "purposeSms"
   | "purposeAi"
   | "purposePush"
   | "purposeNetwork"
@@ -31,6 +32,8 @@ export const HOSTING_PLACEHOLDER = "[…]";
 export const SUB_PROCESSORS: readonly SubProcessor[] = [
   { id: "hosting", name: HOSTING_PLACEHOLDER, host: HOSTING_PLACEHOLDER, purpose: "purposeHosting" },
   { id: "brevo", name: "Brevo (Sendinblue SAS)", host: "brevo.com", purpose: "purposeEmail" },
+  // ADR-280: SMS codes for the Partners phone check (`BrevoSmsSender`).
+  { id: "brevo-sms", name: "Brevo (Sendinblue SAS)", host: "brevo.com", purpose: "purposeSms" },
   { id: "gemini", name: "Google Gemini API (Google)", host: "generativelanguage.googleapis.com", purpose: "purposeAi" },
   { id: "anthropic", name: "Anthropic API (Anthropic PBC)", host: "api.anthropic.com", purpose: "purposeAi" },
   { id: "apns", name: "Apple Push Notification service (Apple)", host: "api.push.apple.com", purpose: "purposePush" },
