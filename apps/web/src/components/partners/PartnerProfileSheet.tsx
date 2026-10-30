@@ -8,6 +8,7 @@ import { PARTNERS_KEY, putPartnerProfile, type PartnersOverview } from "@/api/pa
 import { SwitchRow } from "@/components/buddy/BuddyBits";
 import { ChoicePill, ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
 import { useMyInterests } from "@/components/interests/InterestsEditor";
+import { FieldError } from "@/components/ui/ErrorNotice";
 import { useUiTranslations } from "@/i18n/ui";
 
 import { PartnerChip } from "./PartnerBits";
@@ -100,7 +101,7 @@ export function PartnerProfileSheet({ overview, onClose }: { overview: PartnersO
               />
               {t("adultLabel")}
             </label>
-            <FieldError id="partner-adult-error" show={errors.adult}>{t("adultRequired")}</FieldError>
+            <FieldError id="partner-adult-error">{errors.adult ? t("adultRequired") : null}</FieldError>
           </div>
         ) : null}
 
@@ -195,7 +196,7 @@ export function PartnerProfileSheet({ overview, onClose }: { overview: PartnersO
           <span className="text-xs" style={{ color: "var(--dim)" }}>
             {t("aboutCount", { count: draft.about.length, max: options.about_max })}
           </span>
-          <FieldError id="partner-about-error" show={errors.about}>{t("aboutTooLong", { max: options.about_max })}</FieldError>
+          <FieldError id="partner-about-error">{errors.about ? t("aboutTooLong", { max: options.about_max }) : null}</FieldError>
         </div>
 
         {more ? (
@@ -238,16 +239,8 @@ function Field({ label, error, errorId, children }: { label: string; error?: str
     <div className="flex flex-col gap-2">
       <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{label}</p>
       {children}
-      <FieldError id={errorId} show={Boolean(error)}>{error ?? ""}</FieldError>
+      {errorId ? <FieldError id={errorId}>{error}</FieldError> : null}
     </div>
   );
 }
 
-function FieldError({ id, show, children }: { id?: string; show?: boolean; children: string }) {
-  if (!show) return null;
-  return (
-    <p id={id} role="alert" className="text-xs font-semibold" style={{ color: "var(--danger)" }}>
-      {children}
-    </p>
-  );
-}

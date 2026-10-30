@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 
 import { reportPartner, type PartnerReportReason } from "@/api/partners";
 import { ChoicePill, ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
+import { FieldError } from "@/components/ui/ErrorNotice";
 import { useUiTranslations } from "@/i18n/ui";
 
 import { partnerErrorMessage } from "./errors";
@@ -90,9 +91,7 @@ export function PartnerReportSheet({
                 </ChoicePill>
               ))}
             </div>
-            {tried && !reason ? (
-              <p role="alert" className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{t("reportReasonRequired")}</p>
-            ) : null}
+            <FieldError id="partner-report-reason-error">{tried && !reason ? t("reportReasonRequired") : null}</FieldError>
           </div>
           <label className="flex flex-col gap-1 text-sm font-semibold" style={{ color: "var(--text)" }}>
             {t("reportNote")}
