@@ -34,7 +34,7 @@ defmodule PaleeWeb.FallbackController do
     locked_category:
       {:unprocessable_entity, "Account and payment notifications cannot be switched off"},
     invalid_change: {:unprocessable_entity, "Send true or false for a channel of this category"},
-    # ADR-275: the platform's Web Push keys and contact.
+    # ADR-277: the platform's Web Push keys and contact.
     invalid_push_contact:
       {:unprocessable_entity, "Enter an email address or a web address that starts with https://"},
     push_managed_by_server:

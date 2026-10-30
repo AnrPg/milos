@@ -1,6 +1,6 @@
 defmodule Palee.Repo.Migrations.PlatformManagedWebPushKeys do
   @moduledoc """
-  ADR-275: the server makes the Web Push key pair itself and keeps the private
+  ADR-277: the server makes the Web Push key pair itself and keeps the private
   key encrypted (`DataCipher`), so nobody pastes or sees keys again.
 
   * `notification_push_settings` becomes a real singleton (unique `singleton`

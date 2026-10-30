@@ -2,7 +2,7 @@ defmodule Palee.Notifications.Domain.PushContact do
   @moduledoc """
   The contact push services (Google, Apple, Mozilla) use to reach the Palee
   team about our alerts: the VAPID `sub` claim, a `mailto:` or `https:` URL
-  (RFC 8292 §2.1). A plain email gets `mailto:` in front of it (ADR-275).
+  (RFC 8292 §2.1). A plain email gets `mailto:` in front of it (ADR-277).
   """
 
   @email ~r/^[^\s@]+@[^\s@]+\.[^\s@]+$/

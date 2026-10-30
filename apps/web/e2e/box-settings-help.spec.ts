@@ -3,7 +3,7 @@ import { expect, test, type Page, type Route } from "./support/test";
 // The box settings explain themselves (2026-10-28): difficulty levels ask
 // only for a name and say what the fixed code is for, the installation's push
 // keys are gone from the box (ADR-218), and the platform console shows only
-// status and the contact, because the server makes the keys itself (ADR-275).
+// status and the contact, because the server makes the keys itself (ADR-277).
 // The API is stubbed.
 
 const json = (route: Route, body: unknown, status = 200) =>

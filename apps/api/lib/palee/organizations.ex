@@ -515,6 +515,10 @@ defmodule Palee.Organizations do
   def wod_assistant_enabled?(context),
     do: context |> get_workout_settings() |> WorkoutSettingsPolicy.wod_assistant_enabled?()
 
+  @doc "ADR-275: the workout kinds the gym's editors offer (every kind unless the gym chose some)."
+  def workout_types(context),
+    do: context |> get_workout_settings() |> WorkoutSettingsPolicy.workout_types()
+
   def update_workout_settings(context, params),
     do: Palee.Organizations.Commands.UpdateWorkoutSettings.call(context, params)
 

@@ -177,7 +177,7 @@ function useWebPushNotifications(accessToken: string | null | undefined, active:
     setStep("browser-subscription");
     let existing = await registration.pushManager.getSubscription();
 
-    // ADR-275: after the platform replaces its keys, a subscription made with
+    // ADR-277: after the platform replaces its keys, a subscription made with
     // the old public key is never delivered again. Drop it; where alerts are
     // already allowed the code below subscribes again with no prompt.
     if (existing && !subscriptionUsesKey(existing, config.vapid_public_key)) {

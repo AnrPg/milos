@@ -153,11 +153,13 @@ test.describe("personal weekly goal (ADR-229)", () => {
     await expect(panel).toContainText("Not set yet. The default of 2 workouts a week applies.");
     await expect(panel).toContainText("Eleni is notified and can change it.");
 
-    const save = panel.getByRole("button", { name: "Save goal" });
-    await expect(save).toBeDisabled();
+    // ADR-276: the goal is a draft saved with the profile's save bar.
+    await expect(page.getByTestId("profile-save-bar")).toHaveCount(0);
     await panel.getByRole("button", { name: "One workout more" }).click();
     await panel.getByRole("button", { name: "One workout more" }).click();
-    await save.click();
+    await expect(page.getByTestId("profile-save-bar-count")).toHaveText("1 unsaved change");
+    expect(puts).toEqual([]);
+    await page.getByTestId("profile-save-bar-save").click();
     await expect.poll(() => puts).toEqual([{ weekly_workout_target: 4 }]);
     await expect(panel).toContainText("Saved. Eleni has been notified.");
     await expect(panel).toContainText("Last set by Kostas.");

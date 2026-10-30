@@ -48,6 +48,9 @@ const TEXT_PAIRS: [keyof ThemeTokens, keyof ThemeTokens][] = [
 const GRAPHIC_PAIRS: [keyof ThemeTokens, keyof ThemeTokens][] = [
   ["dim", "bg"],
   ["primary", "bg"],
+  ["workoutCombat", "bg"],
+  ["workoutDance", "bg"],
+  ["workoutOutdoor", "bg"],
   ["danger", "bg"],
   ["success", "bg"],
   ["warning", "bg"],
@@ -92,5 +95,9 @@ describe("theme palettes", () => {
   it("colours workout types with theme variables", () => {
     expect(workoutTypeColor("CrossFit")).toBe("var(--workout-crossfit)");
     expect(workoutTypeColor("unknown")).toBe("var(--primary)");
+    // ADR-275: kinds take their family's colour.
+    expect(workoutTypeColor("hyrox")).toBe("var(--workout-crossfit)");
+    expect(workoutTypeColor("muay_thai")).toBe("var(--workout-combat)");
+    expect(workoutTypeColor("dance_fitness")).toBe("var(--workout-dance)");
   });
 });

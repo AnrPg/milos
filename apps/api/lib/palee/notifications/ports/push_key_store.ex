@@ -1,6 +1,6 @@
 defmodule Palee.Notifications.Ports.PushKeyStore do
   @moduledoc """
-  Where the installation's Web Push key pair and contact live (ADR-275). One
+  Where the installation's Web Push key pair and contact live (ADR-277). One
   row for the whole platform; the private key is encrypted at rest.
   """
 

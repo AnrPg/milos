@@ -1,4 +1,4 @@
-# ADR-275: The server makes and keeps the Web Push keys; the console shows status only
+# ADR-277: The server makes and keeps the Web Push keys; the console shows status only
 Date: 2026-10-29
 Status: Accepted (supersedes the key editor of ADR-218 and ADR-049)
 

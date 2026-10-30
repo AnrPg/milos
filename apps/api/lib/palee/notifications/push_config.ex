@@ -1,6 +1,6 @@
 defmodule Palee.Notifications.PushConfig do
   @moduledoc """
-  The Web Push key pair and contact in use (ADR-275).
+  The Web Push key pair and contact in use (ADR-277).
 
   Keys given to the server (`WEB_PUSH_PUBLIC_KEY` / `WEB_PUSH_PRIVATE_KEY`,
   `config :palee, :web_push_server_keys`) win. Otherwise Palee uses the pair it

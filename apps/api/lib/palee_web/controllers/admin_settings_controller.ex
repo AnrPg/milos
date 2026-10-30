@@ -4,6 +4,7 @@ defmodule PaleeWeb.AdminSettingsController do
 
   alias Palee.Application.{GetAdminSettings, UpdateAdminSettings}
   alias Palee.Finance
+  alias Palee.Workouts
   alias OpenApiSpex.{MediaType, RequestBody, Schema}
 
   action_fallback PaleeWeb.FallbackController
@@ -142,14 +143,28 @@ defmodule PaleeWeb.AdminSettingsController do
       "ADR-180: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each"
   }
 
+  @workout_types_schema %Schema{
+    type: :array,
+    nullable: true,
+    minItems: 1,
+    uniqueItems: true,
+    items: %Schema{
+      type: :string,
+      enum: Enum.map(Workouts.supported_workout_types(), &to_string/1)
+    },
+    description:
+      "ADR-275: the workout kinds the gym's editors offer, in catalogue order; null offers every kind"
+  }
+
   @workout_settings_schema %Schema{
     type: :object,
     description: "ADR-163: workout-authoring defaults",
     properties: %{
       wod_goals_visible_by_default: @wod_goals_visible_by_default_schema,
-      wod_assistant_enabled: @wod_assistant_enabled_schema
+      wod_assistant_enabled: @wod_assistant_enabled_schema,
+      workout_types: @workout_types_schema
     },
-    required: [:wod_goals_visible_by_default, :wod_assistant_enabled]
+    required: [:wod_assistant_enabled, :wod_goals_visible_by_default, :workout_types]
   }
 
   @time_zone_schema %Schema{
@@ -226,7 +241,8 @@ defmodule PaleeWeb.AdminSettingsController do
         type: :object,
         properties: %{
           wod_goals_visible_by_default: @wod_goals_visible_by_default_schema,
-          wod_assistant_enabled: @wod_assistant_enabled_schema
+          wod_assistant_enabled: @wod_assistant_enabled_schema,
+          workout_types: @workout_types_schema
         },
         required: []
       },

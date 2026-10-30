@@ -12,6 +12,8 @@
  * literal elsewhere.
  */
 
+import { workoutTypeFamily, type WorkoutTypeFamily } from "@/lib/workout-types";
+
 export const THEME_SLUGS = ["frost", "graphite"] as const;
 
 export type ThemeSlug = (typeof THEME_SLUGS)[number];
@@ -101,6 +103,9 @@ export type ThemeTokens = {
   workoutAerobics: string;
   workoutFlexibility: string;
   workoutRecovery: string;
+  workoutCombat: string;
+  workoutDance: string;
+  workoutOutdoor: string;
   // Chart and data series (sources, wellness, analytics)
   series1: string;
   series2: string;
@@ -238,6 +243,9 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
       workoutAerobics: "#7A5AF8",
       workoutFlexibility: "#1F8A4C",
       workoutRecovery: "#0B7FA8",
+      workoutCombat: "#9C4A1A",
+      workoutDance: "#B0186A",
+      workoutOutdoor: "#4F7A12",
       series1: DOJO,
       series2: "#E0203F",
       series3: "#1F8A4C",
@@ -342,6 +350,9 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
       workoutAerobics: "#A894FF",
       workoutFlexibility: "#4CC27E",
       workoutRecovery: "#6FB8FF",
+      workoutCombat: "#F2925A",
+      workoutDance: "#FF7AC0",
+      workoutOutdoor: "#A6D35C",
       series1: DOJO_GLOW,
       series2: HEAT_GLOW,
       series3: "#4CC27E",
@@ -453,18 +464,22 @@ export function readToken(name: keyof ThemeTokens): string {
   return value || themeBySlug(document.documentElement.dataset.theme).tokens[name];
 }
 
-const WORKOUT_TYPE_TOKENS: Record<string, keyof ThemeTokens> = {
-  crossfit: "workoutCrossfit",
+/** ADR-275: one colour per workout family; the first six keep the original kinds' colours. */
+const WORKOUT_FAMILY_TOKENS: Record<WorkoutTypeFamily, keyof ThemeTokens> = {
+  functional: "workoutCrossfit",
   strength: "workoutStrength",
   gymnastics: "workoutGymnastics",
-  aerobics: "workoutAerobics",
-  flexibility: "workoutFlexibility",
+  endurance: "workoutAerobics",
+  mind_body: "workoutFlexibility",
   recovery: "workoutRecovery",
+  combat: "workoutCombat",
+  dance: "workoutDance",
+  outdoor: "workoutOutdoor",
 };
 
 export function workoutTypeColor(type: string): string {
-  const token = WORKOUT_TYPE_TOKENS[type.toLowerCase().replace(/[^a-z0-9]+/g, "-")];
-  return token ? tokenVar(token) : tokenVar("primary");
+  const family = workoutTypeFamily(type.toLowerCase().replace(/[^a-z0-9]+/g, "_"));
+  return family ? tokenVar(WORKOUT_FAMILY_TOKENS[family]) : tokenVar("primary");
 }
 
 export const SERIES_TOKENS: readonly (keyof ThemeTokens)[] = [

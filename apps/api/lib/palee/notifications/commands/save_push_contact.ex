@@ -1,6 +1,6 @@
 defmodule Palee.Notifications.Commands.SavePushContact do
   @moduledoc """
-  Saves the contact push services use to reach the Palee team (ADR-275). A
+  Saves the contact push services use to reach the Palee team (ADR-277). A
   `WEB_PUSH_SUBJECT` given to the server wins, so saving one here is refused.
   """
 

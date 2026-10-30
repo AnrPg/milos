@@ -96,7 +96,7 @@ config :palee, :wallet_pass_updaters, %{
 
 config :palee, :wallet_image_source, Palee.FakeWalletImageSource
 
-# ADR-275: tests start with no Web Push keys; a test that needs them turns
+# ADR-277: tests start with no Web Push keys; a test that needs them turns
 # auto keys on or gives server keys.
 config :palee, :web_push_auto_keys, false
 

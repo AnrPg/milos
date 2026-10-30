@@ -195,7 +195,7 @@ defmodule Palee.Notifications do
 
   def notification_categories, do: NotificationCategories.category_ids()
 
-  # ADR-275: the platform console's view of browser alerts. Callers are the
+  # ADR-277: the platform console's view of browser alerts. Callers are the
   # vendor pipeline; the device figures answer only to an active vendor.
   def platform_push_status(vendor_user_id),
     do: GetPlatformPushStatus.call(vendor_user_id)

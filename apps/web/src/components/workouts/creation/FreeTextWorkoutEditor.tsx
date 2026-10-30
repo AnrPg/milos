@@ -72,6 +72,8 @@ import { FreeTextTimerFields } from "./FreeTextTimerFields";
 import { FreeTextAnalysisPanel, IssueCard, type AnalysisStatus } from "./FreeTextAnalysisPanel";
 import { readToken } from "@/lib/theme";
 import { Select } from "@/components/ui/Select";
+import { WorkoutTypeSelect } from "@/components/workouts/WorkoutTypeSelect";
+import { isWorkoutType } from "@/lib/workout-types";
 
 type Props = {
   draftId: string | null;
@@ -87,15 +89,6 @@ type Props = {
 
 type AsideTab = "assistant" | "preview";
 type EditorTabKey = "details" | "timer" | "goals" | "tools";
-
-const WORKOUT_TYPES: WorkoutType[] = [
-  "crossfit",
-  "strength",
-  "gymnastics",
-  "aerobics",
-  "flexibility",
-  "recovery",
-];
 
 export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, onPublished, onUseSections, saveHandleRef }: Props) {
   const i18n = useUiTranslations();
@@ -192,7 +185,7 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
     (workout: WorkoutRecord) => {
       if (!editor) return;
       setTitle(workout.title ?? "");
-      setType(WORKOUT_TYPES.includes(workout.type as WorkoutType) ? (workout.type as WorkoutType) : "");
+      setType(isWorkoutType(workout.type) ? workout.type : "");
       const storedReview = (workout.draft_data as { free_text_review?: ReviewState } | null)?.free_text_review;
       const hasReview = Boolean(storedReview?.analysis && storedReview.workout);
       setReview(hasReview ? storedReview! : null);
@@ -316,7 +309,7 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
       const proposed = next.workout;
       // The coach's own title and type win; the assistant only fills blanks.
       if (!title.trim() && proposed.title) setTitle(proposed.title);
-      if (!type && proposed.type && WORKOUT_TYPES.includes(proposed.type as WorkoutType)) setType(proposed.type as WorkoutType);
+      if (!type && proposed.type && isWorkoutType(proposed.type)) setType(proposed.type);
       setReview(next);
       setAnalysisStatus("ready");
       return next;
@@ -329,7 +322,7 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
 
   function syncWorkoutField(path: string, value: unknown) {
     if (path === "title") setTitle(typeof value === "string" ? value : "");
-    if (path === "type") setType(typeof value === "string" && WORKOUT_TYPES.includes(value as WorkoutType) ? (value as WorkoutType) : "");
+    if (path === "type") setType(isWorkoutType(value) ? value : "");
   }
 
   function applyTextEdit(state: ReviewState, find: string, replace: string): ReviewState {
@@ -407,7 +400,7 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
 
     const effectiveTitle = title.trim() || current?.workout.title || "";
     const proposedType = current?.workout.type ?? "";
-    const effectiveType = type || (WORKOUT_TYPES.includes(proposedType as WorkoutType) ? (proposedType as WorkoutType) : "");
+    const effectiveType = type || (isWorkoutType(proposedType) ? proposedType : "");
     const problems = blockingProblems(effectiveTitle, effectiveType, current);
 
     if (problems.length > 0) {
@@ -504,22 +497,14 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
                 <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                   {i18n("workoutType34a530c")}
                 </span>
-                <Select
+                <WorkoutTypeSelect
                   className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none"
                   style={{ background: "var(--card)", borderColor: "var(--dim)", color: "var(--text)" }}
                   value={type}
-                  onValueChange={(value) => setType(value as WorkoutType)}
-                  aria-invalid={showBlocking && !type}
-                >
-                  <option value="" disabled>
-                    {assistantT("chooseType")}
-                  </option>
-                  {WORKOUT_TYPES.map((item) => (
-                    <option key={item} value={item}>
-                      {item.replaceAll("_", " ")}
-                    </option>
-                  ))}
-                </Select>
+                  onChange={setType}
+                  placeholder={assistantT("chooseType")}
+                  invalid={showBlocking && !type}
+                />
               </label>
             </div>
           ) : null}

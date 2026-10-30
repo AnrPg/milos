@@ -1367,7 +1367,7 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/tag-suggestions", PlatformTagSuggestionController, :index)
-    # ADR-218 / ADR-275: browser alerts for the installation (keys made by the server).
+    # ADR-218 / ADR-277: browser alerts for the installation (keys made by the server).
     get("/push-settings", PlatformPushSettingsController, :show)
     patch("/push-settings", PlatformPushSettingsController, :update)
     post("/push-settings/rotate", PlatformPushSettingsController, :rotate)

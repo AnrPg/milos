@@ -9,7 +9,7 @@ const madeWith = (publicKey: string | null) => ({
   options: { applicationServerKey: publicKey ? base64UrlToBytes(publicKey).buffer as ArrayBuffer : null },
 });
 
-describe("subscriptionUsesKey (ADR-275)", () => {
+describe("subscriptionUsesKey (ADR-277)", () => {
   it("matches a subscription made with the current key", () => {
     expect(subscriptionUsesKey(madeWith(key), key)).toBe(true);
   });

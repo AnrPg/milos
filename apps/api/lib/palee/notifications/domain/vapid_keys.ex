@@ -1,7 +1,7 @@
 defmodule Palee.Notifications.Domain.VapidKeys do
   @moduledoc """
   The Web Push (VAPID, RFC 8292) key pair the server signs every push with
-  (ADR-275): a P-256 key, the public half as the 65-byte uncompressed point
+  (ADR-277): a P-256 key, the public half as the 65-byte uncompressed point
   and the private half as the 32-byte scalar, both base64url without padding,
   the form browsers (`applicationServerKey`) and `web_push_elixir` expect.
   """

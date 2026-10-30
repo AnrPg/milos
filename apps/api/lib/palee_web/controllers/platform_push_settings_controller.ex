@@ -1,6 +1,6 @@
 defmodule PaleeWeb.PlatformPushSettingsController do
   @moduledoc """
-  ADR-218 / ADR-275: browser alerts for the whole Palee installation, for the
+  ADR-218 / ADR-277: browser alerts for the whole Palee installation, for the
   platform team only. The server makes and keeps the key pair itself, so this
   shows status and the contact, and can replace the keys; it never returns or
   accepts a key.

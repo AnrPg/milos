@@ -1,6 +1,6 @@
 defmodule Palee.Notifications.PushSetting do
   @moduledoc """
-  The installation's one Web Push row (ADR-275): the key pair the server made
+  The installation's one Web Push row (ADR-277): the key pair the server made
   and the contact for push services. The private key is encrypted at rest.
   """
 

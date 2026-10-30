@@ -310,7 +310,8 @@ export async function listScaleLevels(token: string) {
 export type FreeTextWorkoutAnalysis = components["schemas"]["FreeTextWorkoutAnalysis"];
 
 /** ADR-180: what the workout editor may offer in this gym. */
-export type WodAssistantAvailability = { wod_assistant_enabled: boolean };
+/** ADR-180 / ADR-275: what the editor may offer in this gym. */
+export type WodAssistantAvailability = { wod_assistant_enabled: boolean; workout_types?: string[] };
 
 export const WOD_ASSISTANT_AVAILABILITY_KEY = ["admin", "workouts", "authoring-settings"] as const;
 

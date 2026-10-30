@@ -47,7 +47,7 @@ function renderPage() {
   );
 }
 
-describe("PlatformPushSettingsPage (ADR-275)", () => {
+describe("PlatformPushSettingsPage (ADR-277)", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("shows status, devices and the contact, and never a key", async () => {

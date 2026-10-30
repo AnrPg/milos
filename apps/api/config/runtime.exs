@@ -80,7 +80,7 @@ config :palee, :anthropic,
   # ADR-175: voice logging turns the transcript into a draft entry.
   voice_model: System.get_env("ANTHROPIC_VOICE_MODEL", "claude-sonnet-5-5")
 
-# ADR-275: Web Push keys given to the server win over the pair Palee makes and
+# ADR-277: Web Push keys given to the server win over the pair Palee makes and
 # stores itself; the platform console then shows «Από τον server».
 config :palee, :web_push_server_keys,
   public_key: System.get_env("WEB_PUSH_PUBLIC_KEY"),

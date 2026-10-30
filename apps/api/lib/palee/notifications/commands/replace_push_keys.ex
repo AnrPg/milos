@@ -1,6 +1,6 @@
 defmodule Palee.Notifications.Commands.ReplacePushKeys do
   @moduledoc """
-  Makes a new Web Push key pair (ADR-275), for when the private key may have
+  Makes a new Web Push key pair (ADR-277), for when the private key may have
   leaked. Every browser subscription was made with the old public key and can
   never be delivered again, so all are removed; each device subscribes again
   by itself the next time its owner opens Palee. Refused while the server's

@@ -1,6 +1,6 @@
 defmodule Palee.Notifications.Queries.GetPlatformPushStatus do
   @moduledoc """
-  What the platform console shows about browser alerts (ADR-275): whether they
+  What the platform console shows about browser alerts (ADR-277): whether they
   work, whose keys sign them (the server's env or Palee's own pair), the
   contact and where it comes from, how many devices allow alerts and when one
   was last delivered. Never a key.

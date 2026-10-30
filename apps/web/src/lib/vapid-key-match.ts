@@ -1,4 +1,4 @@
-// ADR-275: the platform can replace its Web Push key pair. A browser
+// ADR-277: the platform can replace its Web Push key pair. A browser
 // subscription made with the old public key can never be delivered again, so
 // the app compares the key a subscription was made with to the current one.
 

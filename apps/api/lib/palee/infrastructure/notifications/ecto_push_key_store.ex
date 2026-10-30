@@ -1,6 +1,6 @@
 defmodule Palee.Infrastructure.Notifications.EctoPushKeyStore do
   @moduledoc """
-  Postgres adapter for the installation's Web Push row (ADR-275). The row is a
+  Postgres adapter for the installation's Web Push row (ADR-277). The row is a
   singleton (unique `singleton` column); the device figures come from two
   SECURITY DEFINER functions that answer only to an active vendor, because
   browser subscriptions are personal rows under RLS.

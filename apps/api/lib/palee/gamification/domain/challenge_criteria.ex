@@ -1,6 +1,6 @@
 defmodule Palee.Gamification.Domain.ChallengeCriteria do
   @valid_types ~w(workout_count workout_type_count pr_count custom)
-  @training_types ~w(crossfit strength gymnastics aerobics flexibility recovery)
+  @training_types Palee.Workouts.Domain.WorkoutType.keys()
   @rule_conditions ~w(workout_type scale_level pr_beaten weekly_consistency rare_workout_type team_workout_streak)
 
   def normalize(criteria_type, criteria_value) do

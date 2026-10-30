@@ -60,7 +60,7 @@ defmodule PaleeWeb.PlatformPushSettingsControllerTest do
     end
   end
 
-  describe "with keys made by the server (ADR-275)" do
+  describe "with keys made by the server (ADR-277)" do
     setup :auto_keys
 
     test "the first use makes a pair, members' browsers get the public key and no key is shown",

@@ -17,7 +17,7 @@ import { BackLink } from "@/components/ui/BackLink";
 import { formatInZone } from "@/lib/zoned-time";
 
 /**
- * ADR-218 / ADR-275: browser alerts for the whole Palee installation. The
+ * ADR-218 / ADR-277: browser alerts for the whole Palee installation. The
  * server makes and keeps the key pair itself, so this page shows only whether
  * alerts work, how many devices allow them and the contact for push services.
  * Replacing the keys is the one rare action, behind «Advanced».
