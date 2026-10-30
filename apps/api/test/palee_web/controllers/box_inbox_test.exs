@@ -103,7 +103,8 @@ defmodule PaleeWeb.BoxInboxTest do
       ctx.as.(user)
       |> send_json(:post, "/api/org/#{slug}/me/threads/#{thread_id}/messages", %{body: body})
 
-  defp drain, do: Oban.drain_queue(queue: :notifications, with_safety: false, with_recursion: true)
+  defp drain,
+    do: Oban.drain_queue(queue: :notifications, with_safety: false, with_recursion: true)
 
   defp inbox_notices(user),
     do:
@@ -209,7 +210,10 @@ defmodule PaleeWeb.BoxInboxTest do
       })
 
     thread_id = open!(ctx, member, slug)
-    write(ctx, member, slug, "Πονάει ο ώμος στα snatch", %{topic: "training"}) |> json_response(201)
+
+    write(ctx, member, slug, "Πονάει ο ώμος στα snatch", %{topic: "training"})
+    |> json_response(201)
+
     drain()
 
     assert [%{"id" => ^thread_id}] = inbox(ctx, coach, slug)
@@ -229,7 +233,9 @@ defmodule PaleeWeb.BoxInboxTest do
     stranger = user_fixture()
 
     thread_id = open!(ctx, stranger, slug)
-    write(ctx, stranger, slug, "Κάνετε προετοιμασία Hyrox;", %{topic: "training"}) |> json_response(201)
+
+    write(ctx, stranger, slug, "Κάνετε προετοιμασία Hyrox;", %{topic: "training"})
+    |> json_response(201)
 
     assert [%{"id" => ^thread_id}] = inbox(ctx, head_coach, slug)
     assert [] = inbox(ctx, coach, slug)
@@ -291,7 +297,9 @@ defmodule PaleeWeb.BoxInboxTest do
              |> put("/api/org/#{slug}/me/threads/#{stranger_thread}/block")
              |> json_response(200)
 
-    assert %{"code" => "blocked_by_box"} = write(ctx, stranger, slug, "ξανά") |> json_response(403)
+    assert %{"code" => "blocked_by_box"} =
+             write(ctx, stranger, slug, "ξανά") |> json_response(403)
+
     assert %{"code" => "blocked_by_box"} =
              ctx.as.(stranger) |> post("/api/boxes/#{slug}/conversation") |> json_response(403)
 

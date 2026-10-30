@@ -60,7 +60,10 @@ defmodule Palee.Messaging do
 
   def box_blocked?(user_id), do: ThreadStore.box_blocked?(user_id)
   def list_box_blocked_user_ids(user_ids), do: ThreadStore.list_box_blocked_user_ids(user_ids)
-  def block_box_sender(user_id, blocked_by_id), do: ThreadStore.block_box_sender(user_id, blocked_by_id)
+
+  def block_box_sender(user_id, blocked_by_id),
+    do: ThreadStore.block_box_sender(user_id, blocked_by_id)
+
   def unblock_box_sender(user_id), do: ThreadStore.unblock_box_sender(user_id)
 
   def message_topics, do: Palee.Messaging.Message.topics()

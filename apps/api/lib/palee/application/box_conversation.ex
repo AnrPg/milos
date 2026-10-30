@@ -156,7 +156,8 @@ defmodule Palee.Application.BoxConversation do
   end
 
   defp boxes(organization_ids, user_id) do
-    public = organization_ids |> Organizations.public_boxes() |> Map.new(&{&1.organization_id, &1})
+    public =
+      organization_ids |> Organizations.public_boxes() |> Map.new(&{&1.organization_id, &1})
 
     organization_ids
     |> Enum.reject(&Map.has_key?(public, &1))

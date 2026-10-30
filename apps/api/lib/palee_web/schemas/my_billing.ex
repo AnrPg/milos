@@ -245,7 +245,8 @@ defmodule PaleeWeb.Schemas.MyBilling do
             box_chat_slug: %Schema{
               type: :string,
               nullable: true,
-              description: "The box whose chat reaches it (`/b/{slug}/chat`, ADR-282: published or not)."
+              description:
+                "The box whose chat reaches it (`/b/{slug}/chat`, ADR-282: published or not)."
             }
           }),
         actions:

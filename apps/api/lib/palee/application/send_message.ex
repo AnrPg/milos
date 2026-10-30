@@ -115,7 +115,12 @@ defmodule Palee.Application.SendMessage do
   defp answering_reply_request?(_thread, _sender_id), do: false
 
   defp writes_for_box?(sender, thread),
-    do: BoxInboxPolicy.writes_for_box?(thread, sender.id, BoxInbox.lens(sender, thread.organization_id))
+    do:
+      BoxInboxPolicy.writes_for_box?(
+        thread,
+        sender.id,
+        BoxInbox.lens(sender, thread.organization_id)
+      )
 
   # ADR-179: the allowance day is the gym's.
   defp gym_today(%{organization_id: organization_id}) when is_binary(organization_id),

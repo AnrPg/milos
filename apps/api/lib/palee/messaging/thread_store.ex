@@ -48,7 +48,9 @@ defmodule Palee.Messaging.ThreadStore do
   @impl true
   def list_box_blocked_user_ids(user_ids), do: impl().list_box_blocked_user_ids(user_ids)
   @impl true
-  def block_box_sender(user_id, blocked_by_id), do: impl().block_box_sender(user_id, blocked_by_id)
+  def block_box_sender(user_id, blocked_by_id),
+    do: impl().block_box_sender(user_id, blocked_by_id)
+
   @impl true
   def unblock_box_sender(user_id), do: impl().unblock_box_sender(user_id)
 

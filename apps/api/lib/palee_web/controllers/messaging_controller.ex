@@ -370,7 +370,8 @@ defmodule PaleeWeb.MessagingController do
     user = Guardian.Plug.current_resource(conn)
     context_type = parse_context_type(params["context_type"])
 
-    threads = ListMessagingThreads.call(conn.assigns[:tenant_context] || %{}, user.id, context_type)
+    threads =
+      ListMessagingThreads.call(conn.assigns[:tenant_context] || %{}, user.id, context_type)
 
     json(conn, %{threads: Enum.map(threads, &serialize_thread/1)})
   end
@@ -564,8 +565,7 @@ defmodule PaleeWeb.MessagingController do
   end
 
   defp last_message(%{messages: [%{} = message | _rest]}),
-    do:
-      Map.take(message, [:id, :sender_id, :body, :message_type, :topic, :inserted_at])
+    do: Map.take(message, [:id, :sender_id, :body, :message_type, :topic, :inserted_at])
 
   defp last_message(_thread), do: nil
 

@@ -150,7 +150,7 @@ defmodule Palee.Application.BoxInbox do
   @doc "«Φέρε τον coach»: someone in the inbox brings a coach of the box into the thread."
   def bring_coach(context, user_id, thread_id, coach_id) do
     with {:ok, thread} <- inbox_thread(context, user_id, thread_id),
-         true <- (coach_id in coach_user_ids(thread.organization_id)) || {:error, :not_a_coach},
+         true <- coach_id in coach_user_ids(thread.organization_id) || {:error, :not_a_coach},
          true <- coach_id != thread.context_id || {:error, :not_a_coach},
          {:ok, _participant} <- Messaging.add_participant(thread.id, coach_id, :coach),
          {:ok, thread} <- Messaging.get_thread(thread.id, user_id) do
@@ -213,7 +213,8 @@ defmodule Palee.Application.BoxInbox do
 
   # Head coach = a coach whose scope is the whole box (ADR-217).
   defp head_coach_ids(organization_id) do
-    for {id, %{roles: roles, coach_scope: :all}} <- Organizations.member_roles_by_user(organization_id),
+    for {id, %{roles: roles, coach_scope: :all}} <-
+          Organizations.member_roles_by_user(organization_id),
         :coach in roles,
         do: id
   end
