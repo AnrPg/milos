@@ -62,9 +62,10 @@ export default async function PrivacyPage() {
 
       <LegalSection id="sub-processors" title={p("recipientsTitle")}>
         <p>{p("recipientsIntro")}</p>
-        {/* Focusable so keyboard users can scroll the table on narrow screens (axe scrollable-region-focusable). */}
+        {/* Focusable so keyboard users can scroll the table on narrow screens (axe scrollable-region-focusable).
+            A group, not a region: the section is already the landmark with this name (axe landmark-unique). */}
         <div
-          role="region"
+          role="group"
           aria-label={p("recipientsTitle")}
           tabIndex={0}
           className="overflow-x-auto rounded-2xl border"
