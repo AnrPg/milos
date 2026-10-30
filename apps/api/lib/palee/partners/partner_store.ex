@@ -1,7 +1,8 @@
 defmodule Palee.Partners.PartnerStore do
   @moduledoc """
-  Facade over the configured Partners adapter (ADR-169). Every call runs
-  inside a `RepoContext` session: the club's gym and the acting person.
+  Facade over the configured Partners adapter (ADR-169, ADR-280). Every call
+  runs inside a personal `RepoContext` session: the acting person
+  (`app.user_id`) and no gym, whatever else the caller's context holds.
   """
 
   @behaviour Palee.Partners.Ports.PartnerStore
@@ -10,27 +11,25 @@ defmodule Palee.Partners.PartnerStore do
 
   defp adapter, do: Application.fetch_env!(:palee, :partner_store)
 
-  defp scoped(context, function, args),
-    do: RepoContext.run(context, fn -> apply(adapter(), function, [context | args]) end)
+  defp scoped(context, function, args) do
+    personal = personal(context)
+    RepoContext.run(personal, fn -> apply(adapter(), function, [personal | args]) end)
+  end
 
-  def with_context(context, fun) when is_function(fun, 0), do: RepoContext.run(context, fun)
-
-  @impl true
-  def get_profile(context, club_id, user_id),
-    do: scoped(context, :get_profile, [club_id, user_id])
-
-  @impl true
-  def get_profile_by_id(context, id), do: scoped(context, :get_profile_by_id, [id])
+  @doc "The personal session of a context: its acting person only."
+  def personal(%{user_id: user_id}) when is_binary(user_id), do: %{user_id: user_id}
+  def personal(_context), do: %{}
 
   @impl true
-  def list_profiles_of(context, user_id), do: scoped(context, :list_profiles_of, [user_id])
+  def get_profile(context, user_id), do: scoped(context, :get_profile, [user_id])
 
   @impl true
-  def profile_ids_for(context, pairs), do: scoped(context, :profile_ids_for, [pairs])
+  def get_profiles(_context, []), do: []
+  def get_profiles(context, user_ids), do: scoped(context, :get_profiles, [user_ids])
 
   @impl true
-  def list_live_profiles(context, club_id, user_ids),
-    do: scoped(context, :list_live_profiles, [club_id, user_ids])
+  def list_live_profiles(context, excluded_ids),
+    do: scoped(context, :list_live_profiles, [excluded_ids])
 
   @impl true
   def create_profile(context, attrs), do: scoped(context, :create_profile, [attrs])
@@ -40,12 +39,7 @@ defmodule Palee.Partners.PartnerStore do
     do: scoped(context, :update_profile, [profile, changes])
 
   @impl true
-  def set_active_for_user(context, user_id, active),
-    do: scoped(context, :set_active_for_user, [user_id, active])
-
-  @impl true
-  def list_swipes_by(context, club_id, swiper_id),
-    do: scoped(context, :list_swipes_by, [club_id, swiper_id])
+  def list_swipes_by(context, swiper_id), do: scoped(context, :list_swipes_by, [swiper_id])
 
   @impl true
   def count_swipes_since(context, swiper_id, since),
@@ -56,8 +50,8 @@ defmodule Palee.Partners.PartnerStore do
     do: scoped(context, :record_swipe, [attrs, mutual?, now])
 
   @impl true
-  def delete_swipe(context, club_id, swiper_id, target_id),
-    do: scoped(context, :delete_swipe, [club_id, swiper_id, target_id])
+  def delete_swipe(context, swiper_id, target_id),
+    do: scoped(context, :delete_swipe, [swiper_id, target_id])
 
   @impl true
   def get_match(context, id), do: scoped(context, :get_match, [id])
@@ -87,4 +81,17 @@ defmodule Palee.Partners.PartnerStore do
   @impl true
   def unread_counts(context, user_id, matches),
     do: scoped(context, :unread_counts, [user_id, matches])
+
+  @impl true
+  def insert_report(context, attrs), do: scoped(context, :insert_report, [attrs])
+
+  @impl true
+  def get_report(context, id), do: scoped(context, :get_report, [id])
+
+  @impl true
+  def list_reports(context, status), do: scoped(context, :list_reports, [status])
+
+  @impl true
+  def decide_reports(context, target_id, changes),
+    do: scoped(context, :decide_reports, [target_id, changes])
 end

@@ -1,7 +1,7 @@
 defmodule Palee.Application.PartnerRealtime do
   @moduledoc """
-  Live updates for Partners (ADR-169 §7). A match's two people may belong to
-  different gyms, so each change goes to both on their own user topic
+  Live updates for Partners (ADR-169 §7, ADR-280). Each change goes to both
+  people of a match on their own user topic
   (`user:<user_id>`, as Buddy's, ADR-160) as one `partners:changed` event,
   through the `RealtimePublisher` port. The payload carries the kind and the
   match id only, never a message; clients refetch what they show.
@@ -20,7 +20,7 @@ defmodule Palee.Application.PartnerRealtime do
   def messages_read(match), do: publish(match, "partner_messages_read")
 
   defp publish(match, kind) do
-    payload = %{kind: kind, match_id: match.id, club_id: match.club_id}
+    payload = %{kind: kind, match_id: match.id}
 
     [match.user_a_id, match.user_b_id]
     |> Enum.filter(&is_binary/1)

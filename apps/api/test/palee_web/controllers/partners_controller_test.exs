@@ -1,9 +1,14 @@
 defmodule PaleeWeb.PartnersControllerTest do
   @moduledoc """
-  ADR-169 (P3-M7, Partners) end to end: opting in per club, the deck, a
-  mutual like making one match with its conversation, undo, preferences
-  and filters, which clubs offer Partners, ending, blocking and reporting,
-  «Κλείστε μαζί» and the Ρυθμίσεις switch.
+  ADR-280 (public Partners, deck side) end to end: verification gates the
+  profile, the deck and swipes; the first save needs 18+; one public deck
+  with badges and distance; a mutual like makes one match with its
+  conversation; undo; preferences and filters; ending, blocking and
+  reporting (which blocks); the Ρυθμίσεις switch; the Palee team's reports
+  queue and suspension.
+
+  Verification is the other side's (`PartnerEligibility`); these tests
+  record it straight in `partner_verifications` (ADR-280 §1 columns).
   """
 
   use PaleeWeb.ConnCase, async: false
@@ -12,31 +17,34 @@ defmodule PaleeWeb.PartnersControllerTest do
   import Palee.TestFixtures
 
   alias Palee.Notifications.Notification
-  alias Palee.Organizations.OrganizationMembership, as: Membership
-  alias Palee.{Organizations, Repo, Scheduling}
+  alias Palee.{Organizations, Repo}
 
   setup %{conn: conn} do
-    {:ok, organization} = Organizations.ensure_legacy_organization_for_migration()
-    Repo.query!("SELECT set_config($1, $2, false)", ["app.organization_id", organization.id])
-
-    person = fn role ->
-      user = user_fixture()
-      {:ok, _} = Organizations.ensure_legacy_membership_for_migration(user, role)
-      user
-    end
-
-    slug = Organizations.legacy_organization_slug()
+    vendor = user_fixture()
+    bypass_rls(fn -> {:ok, _vendor} = Organizations.grant_vendor(vendor.id) end)
 
     %{
-      organization: organization,
-      admin: person.(:admin),
-      member: person.(:member),
-      other: person.(:member),
-      third: person.(:member),
-      outsider: user_fixture(),
-      as: fn user -> put_bearer_token(conn, user) end,
-      staff: "/api/org/#{slug}/admin/community"
+      member: user_fixture(),
+      other: user_fixture(),
+      third: user_fixture(),
+      unverified: user_fixture(),
+      vendor: vendor,
+      as: fn user -> put_bearer_token(conn, user) end
     }
+  end
+
+  defp verify!(user, method \\ "membership") do
+    bypass_rls(fn ->
+      Repo.query!(
+        """
+        INSERT INTO partner_verifications (id, user_id, method, status, verified_at, inserted_at, updated_at)
+        VALUES (gen_random_uuid(), $1, $2, 'verified', now(), now(), now())
+        """,
+        [Ecto.UUID.dump!(user.id), method]
+      )
+    end)
+
+    user
   end
 
   defp send_json(conn, method, path, body) do
@@ -45,74 +53,124 @@ defmodule PaleeWeb.PartnersControllerTest do
     |> dispatch(@endpoint, method, path, Jason.encode!(body))
   end
 
-  defp gym_club_id(as, user) do
-    as.(user)
-    |> get("/api/me/clubs")
-    |> json_response(200)
-    |> Map.fetch!("clubs")
-    |> Enum.find(&(&1["kind"] == "gym"))
-    |> Map.fetch!("id")
-  end
+  @profile %{
+    level: "intermediate",
+    times: ["early", "evening"],
+    goals: ["strength"],
+    adult_confirmed: true
+  }
 
-  @profile %{level: "intermediate", times: ["early", "evening"], goals: ["strength"]}
-
-  defp opt_in!(as, user, club_id, attrs \\ %{}) do
+  defp opt_in!(as, user, attrs \\ %{}) do
     as.(user)
-    |> send_json(:put, "/api/me/clubs/#{club_id}/partners/profile", Map.merge(@profile, attrs))
+    |> send_json(:put, "/api/me/partners/profile", Map.merge(@profile, attrs))
     |> json_response(200)
     |> Map.fetch!("profile")
   end
 
-  defp deck_ids(as, user, club_id, query \\ "") do
-    as.(user)
-    |> get("/api/me/clubs/#{club_id}/partners/deck#{query}")
-    |> json_response(200)
-    |> Map.fetch!("cards")
-    |> Enum.map(& &1["person"]["id"])
+  defp deck(as, user, query \\ "") do
+    as.(user) |> get("/api/me/partners/deck#{query}") |> json_response(200)
   end
 
-  defp swipe(as, user, club_id, target, direction) do
+  defp deck_ids(as, user, query \\ ""),
+    do: as |> deck(user, query) |> Map.fetch!("cards") |> Enum.map(& &1["person"]["id"])
+
+  defp swipe(as, user, target, direction) do
     as.(user)
-    |> send_json(:post, "/api/me/clubs/#{club_id}/partners/swipes", %{
-      target_id: target.id,
-      direction: direction
-    })
+    |> send_json(:post, "/api/me/partners/swipes", %{target_id: target.id, direction: direction})
   end
 
-  defp match!(as, a, b, club_id) do
-    swipe(as, a, club_id, b, "like") |> json_response(200)
-    swipe(as, b, club_id, a, "like") |> json_response(200) |> Map.fetch!("match")
+  defp match!(as, a, b) do
+    swipe(as, a, b, "like") |> json_response(200)
+    swipe(as, b, a, "like") |> json_response(200) |> Map.fetch!("match")
   end
 
   defp notifications(user, type),
     do: Repo.all(from(n in Notification, where: n.user_id == ^user.id and n.type == ^type))
 
-  describe "opting in and matching" do
-    test "a mutual like makes one match, tells both once, and opens their conversation", ctx do
-      %{as: as, member: member, other: other} = ctx
-      club_id = gym_club_id(as, member)
+  describe "who takes part" do
+    test "the overview says what is missing; only verified people opt in, 18+ once", ctx do
+      %{as: as, unverified: unverified, member: member} = ctx
 
       assert %{
-               "offered" => true,
-               "member" => true,
+               "eligibility" => %{"status" => status},
                "profile" => nil,
-               "options" => %{"times" => times}
-             } =
-               as.(member) |> get("/api/me/clubs/#{club_id}/partners") |> json_response(200)
+               "distance" => "needs_area",
+               "options" => %{"distances_km" => [2, 5, 10, 25], "default_within_km" => 10}
+             } = as.(unverified) |> get("/api/me/partners") |> json_response(200)
 
-      assert "early" in times
+      assert status != "verified"
 
-      # No deck before opting in.
+      assert %{"code" => "partner_verification_required"} =
+               as.(unverified)
+               |> send_json(:put, "/api/me/partners/profile", @profile)
+               |> json_response(403)
+
+      assert %{"code" => "partner_verification_required"} =
+               as.(unverified) |> get("/api/me/partners/deck") |> json_response(403)
+
+      verify!(member)
+
+      assert %{"eligibility" => %{"status" => "verified"}} =
+               as.(member) |> get("/api/me/partners") |> json_response(200)
+
+      assert %{"code" => "partner_adult_required"} =
+               as.(member)
+               |> send_json(
+                 :put,
+                 "/api/me/partners/profile",
+                 Map.delete(@profile, :adult_confirmed)
+               )
+               |> json_response(422)
+
+      assert %{"adult_confirmed_at" => confirmed, "show_box" => true} = opt_in!(as, member)
+      assert is_binary(confirmed)
+
+      # Later saves keep the confirmation without asking again.
+      assert %{"about" => "Hyrox", "adult_confirmed_at" => ^confirmed} =
+               as.(member)
+               |> send_json(:put, "/api/me/partners/profile", %{about: "Hyrox"})
+               |> json_response(200)
+               |> Map.fetch!("profile")
+    end
+
+    test "no deck before opting in; unverified people never show in a deck", ctx do
+      %{as: as, member: member, other: other, unverified: unverified} = ctx
+      verify!(member)
+      verify!(other)
+
       assert %{"code" => "partner_profile_required"} =
-               as.(member) |> get("/api/me/clubs/#{club_id}/partners/deck") |> json_response(409)
+               as.(member) |> get("/api/me/partners/deck") |> json_response(409)
 
-      opt_in!(as, member, club_id, %{about: "Hyrox in November"})
-      opt_in!(as, other, club_id, %{times: ["early"], goals: ["strength", "skills"]})
+      opt_in!(as, member)
+      opt_in!(as, other)
 
-      assert %{"cards" => [card]} =
-               as.(member) |> get("/api/me/clubs/#{club_id}/partners/deck") |> json_response(200)
+      # A profile written before losing verification (seeded straight) never shows.
+      bypass_rls(fn ->
+        Repo.insert!(%Palee.Partners.Profile{
+          user_id: unverified.id,
+          adult_confirmed_at: DateTime.utc_now(),
+          level: "intermediate",
+          times: ["early"],
+          goals: ["strength"]
+        })
+      end)
 
+      assert deck_ids(as, member) == [other.id]
+      assert swipe(as, member, unverified, "like") |> json_response(404)
+    end
+  end
+
+  describe "the deck and matching" do
+    test "a mutual like makes one match, tells both once, and opens their conversation", ctx do
+      %{as: as, member: member, other: other, third: third} = ctx
+      Enum.each([member, other, third], &verify!/1)
+
+      opt_in!(as, member, %{about: "Hyrox in November"})
+      opt_in!(as, other, %{times: ["early"], goals: ["strength", "skills"]})
+
+      assert %{"cards" => [card], "within_km" => 10} = deck(as, member)
       assert card["person"]["id"] == other.id
+      assert card["badge"] == %{"kind" => "verified", "box_name" => nil}
 
       assert card["shared"] == %{
                "times" => ["early"],
@@ -123,43 +181,31 @@ defmodule PaleeWeb.PartnersControllerTest do
 
       refute Map.has_key?(card, "gender")
 
-      assert %{"match" => nil} = swipe(as, member, club_id, other, "like") |> json_response(200)
+      assert %{"match" => nil} = swipe(as, member, other, "like") |> json_response(200)
       assert [] == notifications(other, :partner_match)
 
       # Nobody learns who liked them: the other side's card looks the same.
-      assert deck_ids(as, other, club_id) == [member.id]
+      assert deck_ids(as, other) == [member.id]
 
       assert %{
                "match" => %{
                  "id" => match_id,
                  "status" => "active",
-                 "person" => %{"id" => member_id}
+                 "person" => %{"id" => member_id},
+                 "partner_id" => member_id
                }
-             } =
-               swipe(as, other, club_id, member, "like") |> json_response(200)
+             } = swipe(as, other, member, "like") |> json_response(200)
 
       assert member_id == member.id
-      assert [_] = notifications(member, :partner_match)
+      assert [notice] = notifications(member, :partner_match)
+      refute Map.has_key?(notice.payload, "club_name")
       assert [_] = notifications(other, :partner_match)
 
       # Matched people leave each other's decks.
-      assert deck_ids(as, member, club_id) == []
+      assert deck_ids(as, member) == []
 
-      assert %{
-               "matches" => [
-                 %{
-                   "id" => ^match_id,
-                   "read_only" => false,
-                   "unread" => 0,
-                   "plannable" => true,
-                   "partner_profile_id" => partner_profile_id
-                 }
-               ]
-             } =
+      assert %{"matches" => [%{"id" => ^match_id, "read_only" => false, "unread" => 0}]} =
                as.(member) |> get("/api/me/partners/matches") |> json_response(200)
-
-      # What a report from the conversation names.
-      assert partner_profile_id == card["profile_id"]
 
       assert %{"message" => %{"body" => "07:00 Thursday?", "mine" => true}} =
                as.(member)
@@ -168,8 +214,8 @@ defmodule PaleeWeb.PartnersControllerTest do
                })
                |> json_response(201)
 
-      assert [notice] = notifications(other, :partner_message)
-      refute inspect(notice.payload) =~ "Thursday"
+      assert [message_notice] = notifications(other, :partner_message)
+      refute inspect(message_notice.payload) =~ "Thursday"
 
       assert %{"matches" => [%{"unread" => 1}]} =
                as.(other) |> get("/api/me/partners/matches") |> json_response(200)
@@ -187,145 +233,72 @@ defmodule PaleeWeb.PartnersControllerTest do
                |> post("/api/me/partners/matches/#{match_id}/messages/read")
                |> json_response(200)
 
-      assert %{"matches" => [%{"unread" => 0}]} =
-               as.(other) |> get("/api/me/partners/matches") |> json_response(200)
-
       # Strangers can't read it.
-      assert as.(ctx.third)
+      assert as.(third)
              |> get("/api/me/partners/matches/#{match_id}/messages")
              |> json_response(404)
     end
 
     test "passes leave the deck, undo brings them back, a match can't be undone", ctx do
       %{as: as, member: member, other: other} = ctx
-      club_id = gym_club_id(as, member)
-      opt_in!(as, member, club_id)
-      opt_in!(as, other, club_id)
+      Enum.each([member, other], &verify!/1)
+      opt_in!(as, member)
+      opt_in!(as, other)
 
-      swipe(as, member, club_id, other, "pass") |> json_response(200)
-      assert deck_ids(as, member, club_id) == []
+      swipe(as, member, other, "pass") |> json_response(200)
+      assert deck_ids(as, member) == []
 
       assert %{"undone" => true} =
                as.(member)
-               |> delete("/api/me/clubs/#{club_id}/partners/swipes/#{other.id}")
+               |> delete("/api/me/partners/swipes/#{other.id}")
                |> json_response(200)
 
-      assert deck_ids(as, member, club_id) == [other.id]
-
-      match!(as, member, other, club_id)
+      assert deck_ids(as, member) == [other.id]
+      match!(as, member, other)
 
       assert %{"code" => "partner_already_matched"} =
                as.(member)
-               |> delete("/api/me/clubs/#{club_id}/partners/swipes/#{other.id}")
+               |> delete("/api/me/partners/swipes/#{other.id}")
                |> json_response(409)
     end
 
     test "gender preferences hold both ways and filters narrow the deck", ctx do
       %{as: as, member: member, other: other, third: third} = ctx
-      club_id = gym_club_id(as, member)
-      opt_in!(as, member, club_id, %{gender: "woman", gender_preference: "women"})
-      opt_in!(as, other, club_id, %{gender: "man"})
-      opt_in!(as, third, club_id, %{gender: "woman", times: ["midday"]})
+      Enum.each([member, other, third], &verify!/1)
+      opt_in!(as, member, %{gender: "woman", gender_preference: "women"})
+      opt_in!(as, other, %{gender: "man"})
+      opt_in!(as, third, %{gender: "woman", times: ["midday"], disciplines: ["running"]})
 
-      assert deck_ids(as, member, club_id) == [third.id]
-      # The preference holds from the other side too.
-      assert deck_ids(as, other, club_id) == [third.id]
-      assert deck_ids(as, other, club_id, "?time=evening") == []
-
-      # Swiping someone outside the preference is refused like a missing person.
-      assert swipe(as, member, club_id, other, "like") |> json_response(404)
+      assert deck_ids(as, member) == [third.id]
+      assert deck_ids(as, other) == [third.id]
+      assert deck_ids(as, other, "?time=evening") == []
+      assert deck_ids(as, other, "?discipline=running") == [third.id]
+      assert swipe(as, member, other, "like") |> json_response(404)
+      assert as.(member) |> get("/api/me/partners/deck?within_km=3") |> json_response(422)
     end
-  end
 
-  describe "disciplines and distance (ADR-197)" do
-    test "a profile names disciplines and the deck narrows by one", ctx do
+    test "with an area, the deck narrows to people whose neighbourhood is near", ctx do
       %{as: as, member: member, other: other, third: third} = ctx
-      club_id = gym_club_id(as, member)
-      opt_in!(as, member, club_id, %{disciplines: ["running", "crossfit"]})
+      Enum.each([member, other, third], &verify!/1)
+      Enum.each([member, other, third], &opt_in!(as, &1))
 
-      assert %{"disciplines" => ["running"]} =
-               opt_in!(as, other, club_id, %{disciplines: ["running"]})
-
-      opt_in!(as, third, club_id)
-
-      assert %{
-               "cards" => [
-                 %{"disciplines" => ["running"], "shared" => %{"disciplines" => ["running"]}}
-               ]
-             } =
-               as.(member)
-               |> get("/api/me/clubs/#{club_id}/partners/deck?discipline=running")
-               |> json_response(200)
-
-      assert as.(member)
-             |> send_json(:put, "/api/me/clubs/#{club_id}/partners/profile", %{
-               disciplines: ["knitting"]
-             })
-             |> json_response(422)
-
-      # A gym's club is one place: no distance there.
-      assert %{"distance" => nil, "options" => %{"distances_km" => [2, 5, 10, 25]}} =
-               as.(member) |> get("/api/me/clubs/#{club_id}/partners") |> json_response(200)
-    end
-
-    test "an open club narrows by distance between people who show in Γύρω μου", ctx do
-      %{as: as, admin: admin, member: member, other: other, third: third, staff: staff} = ctx
-
-      %{"club" => %{"id" => open_id}} =
-        as.(admin)
-        |> send_json(:post, "#{staff}/clubs", %{name: "Hill runs", join_policy: "approval"})
-        |> json_response(201)
-
-      for person <- [member, other, third] do
-        as.(person) |> post("/api/me/open-clubs/#{open_id}/membership") |> json_response(200)
-
-        as.(admin)
-        |> send_json(:put, "#{staff}/clubs/#{open_id}/requests/#{person.id}", %{approve: true})
-        |> json_response(200)
-
-        opt_in!(as, person, open_id)
-      end
-
-      assert %{"distance" => "needs_area"} =
-               as.(member) |> get("/api/me/clubs/#{open_id}/partners") |> json_response(200)
-
-      # Without the viewer showing in Γύρω μου the filter does nothing.
-      assert Enum.sort(deck_ids(as, member, open_id, "?within_km=5")) ==
-               Enum.sort([other.id, third.id])
-
-      for {person, slug, visible} <- [
-            {member, "athens-kypseli", true},
-            {other, "athens-patisia", true},
-            {third, "athens-patisia", false}
+      for {person, slug} <- [
+            {member, "athens-kypseli"},
+            {other, "athens-patisia"},
+            {third, "athens-glyfada"}
           ] do
         as.(person)
         |> send_json(:put, "/api/me/around/area", %{neighbourhood_ids: [neighbourhood_id(slug)]})
         |> json_response(200)
-
-        as.(person)
-        |> send_json(:put, "/api/me/social/around-visibility", %{visible: visible})
-        |> json_response(200)
       end
 
       assert %{"distance" => "available"} =
-               as.(member) |> get("/api/me/clubs/#{open_id}/partners") |> json_response(200)
+               as.(member) |> get("/api/me/partners") |> json_response(200)
 
-      # Patisia is about 2 km from Kypseli; someone not shown in Γύρω μου never counts as near.
-      assert deck_ids(as, member, open_id, "?within_km=5") == [other.id]
-      assert deck_ids(as, member, open_id, "?within_km=2") == [other.id]
-
-      as.(other)
-      |> send_json(:put, "/api/me/around/area", %{
-        neighbourhood_ids: [neighbourhood_id("athens-glyfada")]
-      })
-      |> json_response(200)
-
-      assert deck_ids(as, member, open_id, "?within_km=10") == []
-      assert deck_ids(as, member, open_id, "?within_km=25") == [other.id]
-
-      assert as.(member)
-             |> get("/api/me/clubs/#{open_id}/partners/deck?within_km=3")
-             |> json_response(422)
+      # Patisia is about 2 km from Kypseli, Glyfada about 15.
+      assert deck_ids(as, member) == [other.id]
+      assert deck_ids(as, member, "?within_km=2") == [other.id]
+      assert Enum.sort(deck_ids(as, member, "?within_km=25")) == Enum.sort([other.id, third.id])
     end
   end
 
@@ -335,81 +308,38 @@ defmodule PaleeWeb.PartnersControllerTest do
         from(n in "places_neighbourhoods", where: n.slug == ^slug, select: type(n.id, :binary_id))
       )
 
-  describe "who takes part" do
-    test "only members of a verified club, and only while the gym has Partners on", ctx do
-      %{as: as, member: member, admin: admin, outsider: outsider, staff: staff} = ctx
-      club_id = gym_club_id(as, member)
+  describe "settings, ending, blocking and reporting" do
+    test "the Ρυθμίσεις switch takes someone out of every deck and back", ctx do
+      %{as: as, member: member, other: other} = ctx
+      Enum.each([member, other], &verify!/1)
 
-      assert as.(outsider)
-             |> send_json(:put, "/api/me/clubs/#{club_id}/partners/profile", @profile)
-             |> json_response(404)
+      assert %{"visible" => false, "has_profile" => false} =
+               as.(member) |> get("/api/me/partners/settings") |> json_response(200)
 
-      %{"club" => %{"id" => open_id}} =
-        as.(admin)
-        |> send_json(:post, "#{staff}/clubs", %{name: "Sunday walk", join_policy: "open"})
-        |> json_response(201)
+      opt_in!(as, member)
+      opt_in!(as, other)
 
-      as.(member) |> post("/api/me/open-clubs/#{open_id}/membership") |> json_response(200)
-
-      assert %{"offered" => false, "unavailable_reason" => "not_offered"} =
-               as.(member) |> get("/api/me/clubs/#{open_id}/partners") |> json_response(200)
-
-      assert %{"code" => "partners_not_offered"} =
-               as.(member)
-               |> send_json(:put, "/api/me/clubs/#{open_id}/partners/profile", @profile)
-               |> json_response(403)
-
-      assert %{"partners_enabled" => false} =
-               as.(admin)
-               |> send_json(:put, "#{staff}/settings", %{partners_enabled: false})
+      assert %{"visible" => false, "has_profile" => true} =
+               as.(other)
+               |> send_json(:put, "/api/me/partners/settings", %{visible: false})
                |> json_response(200)
 
-      assert %{"offered" => false, "unavailable_reason" => "disabled"} =
-               as.(member) |> get("/api/me/clubs/#{club_id}/partners") |> json_response(200)
+      assert deck_ids(as, member) == []
 
-      # The group rule the gym chose earlier stays as it was.
-      assert %{"member_groups" => "approval", "partners_enabled" => true} =
-               as.(admin)
-               |> send_json(:put, "#{staff}/settings", %{partners_enabled: true})
+      assert %{"visible" => true} =
+               as.(other)
+               |> send_json(:put, "/api/me/partners/settings", %{visible: true})
                |> json_response(200)
+
+      assert deck_ids(as, member) == [other.id]
     end
 
-    test "leaving the gym takes someone out of decks and makes the conversation read-only", ctx do
-      %{as: as, member: member, other: other, third: third, organization: organization} = ctx
-      club_id = gym_club_id(as, member)
-      opt_in!(as, member, club_id)
-      opt_in!(as, other, club_id)
-      opt_in!(as, third, club_id)
-      %{"id" => match_id} = match!(as, member, other, club_id)
-
-      Repo.update_all(
-        from(m in Membership,
-          where: m.user_id == ^other.id and m.organization_id == ^organization.id
-        ),
-        set: [status: :suspended]
-      )
-
-      assert deck_ids(as, third, club_id) == [member.id]
-
-      assert %{"read_only" => true} =
-               as.(member)
-               |> get("/api/me/partners/matches/#{match_id}/messages")
-               |> json_response(200)
-
-      assert %{"code" => "partner_match_read_only"} =
-               as.(member)
-               |> send_json(:post, "/api/me/partners/matches/#{match_id}/messages", %{body: "hi"})
-               |> json_response(409)
-    end
-  end
-
-  describe "ending, blocking and reporting" do
     test "ending a match keeps the conversation readable but closed", ctx do
       %{as: as, member: member, other: other} = ctx
-      club_id = gym_club_id(as, member)
-      opt_in!(as, member, club_id)
-      opt_in!(as, other, club_id)
-      %{"id" => match_id} = match!(as, member, other, club_id)
+      Enum.each([member, other], &verify!/1)
+      opt_in!(as, member)
+      opt_in!(as, other)
+      %{"id" => match_id} = match!(as, member, other)
 
       assert %{"status" => "ended"} =
                as.(other) |> delete("/api/me/partners/matches/#{match_id}") |> json_response(200)
@@ -417,178 +347,96 @@ defmodule PaleeWeb.PartnersControllerTest do
       assert %{"matches" => [%{"status" => "ended", "read_only" => true, "ended_by_me" => false}]} =
                as.(member) |> get("/api/me/partners/matches") |> json_response(200)
 
-      assert as.(member)
-             |> send_json(:post, "/api/me/partners/matches/#{match_id}/messages", %{body: "?"})
-             |> json_response(409)
+      assert %{"code" => "partner_match_read_only"} =
+               as.(member)
+               |> send_json(:post, "/api/me/partners/matches/#{match_id}/messages", %{body: "?"})
+               |> json_response(409)
 
-      # They liked each other already: they don't meet in the deck again.
-      assert deck_ids(as, member, club_id) == []
+      assert deck_ids(as, member) == []
     end
 
     test "blocking ends the match and keeps both apart until unblocked", ctx do
-      %{as: as, member: member, other: other, third: third} = ctx
-      club_id = gym_club_id(as, member)
-      opt_in!(as, member, club_id)
-      opt_in!(as, other, club_id)
-      opt_in!(as, third, club_id)
-      match!(as, member, other, club_id)
-
-      assert %{"blocked" => true} =
-               as.(member)
-               |> send_json(:post, "/api/me/blocks", %{user_id: third.id})
-               |> json_response(200)
-
-      assert %{"blocked" => true} =
-               as.(member)
-               |> send_json(:post, "/api/me/blocks", %{user_id: other.id})
-               |> json_response(200)
-
-      assert %{"matches" => [%{"status" => "ended", "end_reason" => "blocked"}]} =
-               as.(other) |> get("/api/me/partners/matches") |> json_response(200)
-
-      refute member.id in deck_ids(as, third, club_id)
-      assert deck_ids(as, member, club_id) == []
-
-      assert %{"blocks" => blocks} = as.(member) |> get("/api/me/blocks") |> json_response(200)
-      assert Enum.sort(Enum.map(blocks, & &1["person"]["id"])) == Enum.sort([other.id, third.id])
-      assert %{"blocks" => []} = as.(third) |> get("/api/me/blocks") |> json_response(200)
-
-      assert as.(member) |> delete("/api/me/blocks/#{third.id}") |> json_response(200)
-      assert member.id in deck_ids(as, third, club_id)
-
-      assert %{"code" => "cannot_block_self"} =
-               as.(member)
-               |> send_json(:post, "/api/me/blocks", %{user_id: member.id})
-               |> json_response(422)
-    end
-
-    test "a report blocks the person for the reporter; staff hide the profile", ctx do
-      %{as: as, member: member, other: other, third: third, admin: admin, staff: staff} = ctx
-      club_id = gym_club_id(as, member)
-      opt_in!(as, member, club_id)
-      %{"id" => profile_id} = opt_in!(as, other, club_id, %{about: "rude words"})
-      opt_in!(as, third, club_id)
-      %{"id" => match_id} = match!(as, third, other, club_id)
+      %{as: as, member: member, other: other} = ctx
+      Enum.each([member, other], &verify!/1)
+      opt_in!(as, member)
+      opt_in!(as, other)
+      %{"id" => match_id} = match!(as, member, other)
 
       as.(member)
-      |> send_json(:post, "/api/me/community/reports", %{
-        target_type: "partner",
-        target_id: profile_id,
-        reason: "harassment"
-      })
-      |> json_response(201)
-
-      assert deck_ids(as, member, club_id) == [third.id]
-      assert [_ | _] = notifications(admin, :community_report_created)
-
-      assert %{
-               "reports" => [
-                 %{"target_type" => "partner", "preview" => %{"body" => "rude words"}}
-               ]
-             } =
-               as.(admin) |> get("#{staff}/reports") |> json_response(200)
-
-      as.(admin)
-      |> send_json(:post, "#{staff}/reports/actions", %{
-        target_type: "partner",
-        target_id: profile_id,
-        action: "hide"
-      })
+      |> send_json(:post, "/api/me/blocks", %{user_id: other.id})
       |> json_response(200)
 
-      assert %{"matches" => [%{"id" => ^match_id, "status" => "ended", "end_reason" => "hidden"}]} =
-               as.(third) |> get("/api/me/partners/matches") |> json_response(200)
+      assert %{"matches" => [%{"id" => ^match_id, "end_reason" => "blocked"}]} =
+               as.(other) |> get("/api/me/partners/matches") |> json_response(200)
 
-      assert %{"profile" => %{"suspended" => true, "active" => false}} =
-               as.(other) |> get("/api/me/clubs/#{club_id}/partners") |> json_response(200)
-
-      assert %{"code" => "partner_profile_suspended"} =
-               as.(other)
-               |> send_json(:put, "/api/me/clubs/#{club_id}/partners/profile", %{active: true})
-               |> json_response(403)
+      assert deck_ids(as, other) == []
     end
-  end
 
-  describe "«Κλείστε μαζί»" do
-    test "the gym's next classes, the ones a partner booked first; a plan posts the class", ctx do
-      %{as: as, member: member, other: other, admin: admin, organization: organization} = ctx
-      club_id = gym_club_id(as, member)
-      opt_in!(as, member, club_id)
-      opt_in!(as, other, club_id)
-      %{"id" => match_id} = match!(as, member, other, club_id)
+    test "reporting someone blocks them and reaches the Palee team, never the gym", ctx do
+      %{as: as, member: member, other: other, third: third, vendor: vendor} = ctx
+      Enum.each([member, other, third], &verify!/1)
+      Enum.each([member, other, third], &opt_in!(as, &1))
+      %{"id" => match_id} = match!(as, member, other)
 
-      workout = workout_fixture(admin)
-
-      soon =
-        slot_fixture(workout, %{
-          scheduled_at:
-            DateTime.add(DateTime.utc_now(), 2 * 3600, :second) |> DateTime.truncate(:second)
-        })
-
-      later =
-        slot_fixture(workout, %{
-          scheduled_at:
-            DateTime.add(DateTime.utc_now(), 2 * 86_400, :second) |> DateTime.truncate(:second)
-        })
-
-      tenant = %{organization_id: organization.id, user_id: other.id}
-      {:ok, _booking} = Scheduling.submit_auto_approved_booking(tenant, other.id, later.id)
-
-      assert %{"available" => true, "sessions" => [first, second | _]} =
+      assert %{"code" => "cannot_report_self"} =
                as.(member)
-               |> get("/api/me/partners/matches/#{match_id}/sessions")
-               |> json_response(200)
+               |> send_json(:post, "/api/me/partners/reports", %{
+                 target_id: member.id,
+                 reason: "fake"
+               })
+               |> json_response(422)
 
-      assert %{"class_id" => later_id, "booked_by_partner" => true, "booked_by_me" => false} =
-               first
-
-      assert later_id == later.id
-      assert second["class_id"] == soon.id
-
-      assert %{
-               "message" => %{
-                 "kind" => "plan",
-                 "plan" => %{"class_id" => ^later_id},
-                 "body" => "Join me?"
-               }
-             } =
+      assert %{"reported" => true, "blocked" => true} =
                as.(member)
-               |> send_json(:post, "/api/me/partners/matches/#{match_id}/plans", %{
-                 class_id: later.id,
-                 body: "Join me?"
+               |> send_json(:post, "/api/me/partners/reports", %{
+                 target_id: other.id,
+                 reason: "harassment",
+                 note: "rude messages"
                })
                |> json_response(201)
 
-      assert %{"messages" => [%{"kind" => "plan", "mine" => false}]} =
-               as.(other)
-               |> get("/api/me/partners/matches/#{match_id}/messages")
-               |> json_response(200)
-    end
-  end
+      assert %{"matches" => [%{"id" => ^match_id, "end_reason" => "reported"}]} =
+               as.(member) |> get("/api/me/partners/matches") |> json_response(200)
 
-  describe "Ρυθμίσεις" do
-    test "the switch pauses and resumes every profile", ctx do
-      %{as: as, member: member, other: other} = ctx
-      club_id = gym_club_id(as, member)
-      opt_in!(as, member, club_id)
-      opt_in!(as, other, club_id)
+      as.(third)
+      |> send_json(:post, "/api/me/partners/reports", %{target_id: other.id, reason: "fake"})
+      |> json_response(201)
 
-      assert %{"visible" => true, "clubs" => 1} =
-               as.(member) |> get("/api/me/partners/settings") |> json_response(200)
+      # Only the Palee team sees the queue.
+      assert %{"code" => "vendor_required"} =
+               as.(member) |> get("/api/platform/partner-reports") |> json_response(403)
 
-      assert %{"visible" => false} =
-               as.(member)
-               |> send_json(:put, "/api/me/partners/settings", %{visible: false})
-               |> json_response(200)
+      assert %{"reports" => [first, _second]} =
+               as.(vendor) |> get("/api/platform/partner-reports") |> json_response(200)
 
-      assert deck_ids(as, other, club_id) == []
+      assert first["target"]["id"] == other.id
+      assert first["reports_on_target"] == 2
 
-      assert %{"visible" => true} =
-               as.(member)
-               |> send_json(:put, "/api/me/partners/settings", %{visible: true})
+      assert %{"decision" => "suspend", "resolved" => 2} =
+               as.(vendor)
+               |> send_json(:post, "/api/platform/partner-reports/#{first["id"]}/decision", %{
+                 decision: "suspend",
+                 note: "two reports"
+               })
                |> json_response(200)
 
-      assert deck_ids(as, other, club_id) == [member.id]
+      assert %{"code" => "partner_report_decided"} =
+               as.(vendor)
+               |> send_json(:post, "/api/platform/partner-reports/#{first["id"]}/decision", %{
+                 decision: "dismiss"
+               })
+               |> json_response(409)
+
+      assert %{"reports" => []} =
+               as.(vendor) |> get("/api/platform/partner-reports") |> json_response(200)
+
+      assert %{"reports" => [_, _]} =
+               as.(vendor)
+               |> get("/api/platform/partner-reports?status=actioned")
+               |> json_response(200)
+
+      # The suspended person's profile is off: nobody meets them in the deck.
+      assert deck_ids(as, third) == []
     end
   end
 end

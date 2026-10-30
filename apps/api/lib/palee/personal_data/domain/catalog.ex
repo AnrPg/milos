@@ -139,7 +139,8 @@ defmodule Palee.PersonalData.Domain.Catalog do
       tenant("messages", "communication_messages", {:eq, "sender_id"},
         drop: ~w(recipient_id recipient_role_snapshot)
       ),
-      tenant("messages", "partner_messages", {:eq, "author_id"}),
+      # ADR-280: Partners rows are the person's own (account-level).
+      account("messages", "partner_messages", {:eq, "author_id"}),
 
       # -- community -------------------------------------------------------------
       account("community", "community_profile_posts", @me),
@@ -147,10 +148,18 @@ defmodule Palee.PersonalData.Domain.Catalog do
       account("community", "community_profile_post_reactions", @me),
       account("community", "community_follows", @me),
       account("community", "community_user_blocks", @me, drop: ~w(blocked_user_id)),
+      account("community", "partner_profiles", @me),
+      account("community", "partner_swipes", {:eq, "swiper_id"}, drop: ~w(target_id)),
+      account(
+        "community",
+        "partner_matches",
+        {:any, [{:eq, "user_a_id"}, {:eq, "user_b_id"}]},
+        drop: ~w(user_a_id user_b_id)
+      ),
+      account("community", "partner_reports", {:eq, "reporter_id"}, drop: ~w(target_id)),
       tenant("community", "community_posts", {:eq, "author_id"}),
       tenant("community", "community_post_comments", {:eq, "author_id"}),
       tenant("community", "community_post_reactions", @me),
-      tenant("community", "partner_profiles", @me),
 
       # -- payments, packages and invoices ---------------------------------------
       tenant("payments", "memberships", @me, drop: ~w(referred_by_user_id)),

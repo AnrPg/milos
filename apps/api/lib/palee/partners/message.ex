@@ -1,7 +1,7 @@
 defmodule Palee.Partners.Message do
   @moduledoc """
-  A message in a match's conversation (ADR-169 §7): words, or a «Κλείστε
-  μαζί» plan carrying a class and a snapshot of it.
+  A message in a match's conversation (ADR-169 §7, ADR-280): words, or a
+  «Κλείστε μαζί» plan carrying a snapshot of a class, event or trial.
   """
 
   use Ecto.Schema
@@ -15,12 +15,10 @@ defmodule Palee.Partners.Message do
   @type t :: %__MODULE__{}
 
   schema "partner_messages" do
-    field :organization_id, :binary_id, read_after_writes: true
     field :match_id, :binary_id
     field :author_id, :binary_id
     field :kind, :string, default: "text"
     field :body, :string
-    field :scheduled_class_id, :binary_id
     field :plan, :map
 
     timestamps(type: :utc_datetime_usec, updated_at: false)
@@ -30,15 +28,7 @@ defmodule Palee.Partners.Message do
 
   def changeset(attrs) do
     %__MODULE__{}
-    |> cast(attrs, [
-      :organization_id,
-      :match_id,
-      :author_id,
-      :kind,
-      :body,
-      :scheduled_class_id,
-      :plan
-    ])
+    |> cast(attrs, [:match_id, :author_id, :kind, :body, :plan])
     |> validate_required([:match_id, :author_id, :kind])
     |> validate_inclusion(:kind, @kinds)
     |> validate_length(:body, min: 1, max: 2000)

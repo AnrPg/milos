@@ -38,7 +38,6 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     community_post_comments community_reports community_settings
     community_events community_event_attendees community_event_cohosts
     community_event_view_days community_event_view_marks
-    partner_profiles partner_swipes partner_matches partner_messages
     media_tenant_objects organization_public_profiles profile_tag_suggestions
     spaces space_floor_plans space_unavailabilities
     housekeeping_entries housekeeping_schedules

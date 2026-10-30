@@ -2091,20 +2091,7 @@ defmodule PaleeWeb.Router do
     delete("/me/body/consents/:scope", MyBodyController, :withdraw_consent)
     get("/me/body/access-log", MyBodyController, :access_log)
     post("/me/body/share", MyBodyController, :share)
-    # ADR-169: Partners.
-    get("/me/clubs/:club_id/partners", PartnersController, :club)
-    put("/me/clubs/:club_id/partners/profile", PartnersController, :put_profile)
-    get("/me/clubs/:club_id/partners/deck", PartnersController, :deck)
-    post("/me/clubs/:club_id/partners/swipes", PartnersController, :swipe)
-    delete("/me/clubs/:club_id/partners/swipes/:target_id", PartnersController, :undo)
-    get("/me/partners/matches", PartnersController, :matches)
-    delete("/me/partners/matches/:id", PartnersController, :end_match)
-    get("/me/partners/matches/:id/messages", PartnersController, :messages)
-    post("/me/partners/matches/:id/messages", PartnersController, :post_message)
-    post("/me/partners/matches/:id/messages/read", PartnersController, :mark_read)
-    get("/me/partners/matches/:id/sessions", PartnersController, :sessions)
-    get("/me/partners/settings", PartnersController, :settings)
-    put("/me/partners/settings", PartnersController, :put_settings)
+    # ADR-169: blocking a person (Partners routes: the ADR-280 deck scope).
     get("/me/blocks", PartnersController, :blocks)
     post("/me/blocks", PartnersController, :block)
     delete("/me/blocks/:user_id", PartnersController, :unblock)
@@ -2139,6 +2126,46 @@ defmodule PaleeWeb.Router do
     )
 
     put("/me/wellness-summary-sharing", WellnessSummarySharingController, :update)
+  end
+
+  # ADR-280 deck: public Partners, one account-level profile and deck.
+  scope "/api/me/partners", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :notification_write_rate_limited,
+      :tenant_write_rate_limited
+    ])
+
+    get("/", PartnersController, :overview)
+    put("/profile", PartnersController, :put_profile)
+    get("/deck", PartnersController, :deck)
+    post("/swipes", PartnersController, :swipe)
+    delete("/swipes/:target_id", PartnersController, :undo)
+    get("/matches", PartnersController, :matches)
+    delete("/matches/:id", PartnersController, :end_match)
+    get("/matches/:id/messages", PartnersController, :messages)
+    post("/matches/:id/messages", PartnersController, :post_message)
+    post("/matches/:id/messages/read", PartnersController, :mark_read)
+    get("/settings", PartnersController, :settings)
+    put("/settings", PartnersController, :put_settings)
+    post("/reports", PartnersController, :report)
+  end
+
+  # ADR-280 deck: the Palee team's Partners reports queue.
+  scope "/api/platform", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :vendor,
+      :platform_write_rate_limited
+    ])
+
+    get("/partner-reports", PlatformPartnerReportController, :index)
+    post("/partner-reports/:id/decision", PlatformPartnerReportController, :decide)
   end
 
   # ADR-185: creating an event as yourself or a business has its own budget

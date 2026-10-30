@@ -2844,15 +2844,12 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: Atom.to_string(reason), error: message})
   end
 
-  # ADR-169 Partners.
+  # ADR-280 deck: public Partners (ADR-169 codes still used, plus the deck's).
   @partner_errors %{
-    partners_disabled: {:forbidden, "This gym has switched Partners off"},
-    partners_not_offered:
-      {:forbidden, "Partners is only in clubs whose members the gym verified"},
-    not_club_member: {:forbidden, "Only members of this club take part"},
-    partner_profile_required: {:conflict, "Turn on your Partners profile in this club first"},
-    partner_profile_suspended:
-      {:forbidden, "Staff have hidden your Partners profile in this club"},
+    partner_verification_required: {:forbidden, "Get verified to take part in Partners first"},
+    partner_suspended: {:forbidden, "Your Partners access has been suspended"},
+    partner_adult_required: {:unprocessable_entity, "Partners is for people 18 or older"},
+    partner_profile_required: {:conflict, "Turn on your Partners profile first"},
     invalid_partner_level: {:unprocessable_entity, "Choose your level"},
     invalid_partner_times: {:unprocessable_entity, "Choose when you train"},
     invalid_partner_goals: {:unprocessable_entity, "Choose one to three goals"},
@@ -2860,6 +2857,7 @@ defmodule PaleeWeb.FallbackController do
     invalid_partner_gender: {:unprocessable_entity, "Unknown gender"},
     invalid_partner_gender_preference: {:unprocessable_entity, "Unknown preference"},
     invalid_partner_active: {:unprocessable_entity, "active must be true or false"},
+    invalid_partner_show_box: {:unprocessable_entity, "show_box must be true or false"},
     partner_about_too_long: {:unprocessable_entity, "At most 140 characters"},
     invalid_direction: {:unprocessable_entity, "Like or pass"},
     invalid_swipe: {:unprocessable_entity, "That swipe isn't possible"},
@@ -2869,10 +2867,15 @@ defmodule PaleeWeb.FallbackController do
     partner_match_ended: {:conflict, "This match has ended"},
     invalid_end_reason: {:unprocessable_entity, "Unknown reason"},
     partner_match_read_only: {:conflict, "This conversation is read-only"},
-    partner_plans_unavailable: {:unprocessable_entity, "Class plans are for a gym's own clubs"},
     invalid_partner_message: {:unprocessable_entity, "Check the message"},
+    invalid_partner_plan: {:unprocessable_entity, "That plan can't be shared"},
     invalid_partners_visible: {:unprocessable_entity, "visible must be true or false"},
-    invalid_partners_enabled: {:unprocessable_entity, "partners_enabled must be true or false"},
+    invalid_partner_report_reason: {:unprocessable_entity, "Choose a reason"},
+    partner_report_note_too_long: {:unprocessable_entity, "A note is at most 500 characters"},
+    cannot_report_self: {:unprocessable_entity, "You can't report yourself"},
+    invalid_partner_decision: {:unprocessable_entity, "Suspend or dismiss"},
+    partner_report_decided: {:conflict, "This report has already been decided"},
+    invalid_partner_report_status: {:unprocessable_entity, "Unknown status"},
     cannot_block_self: {:unprocessable_entity, "You can't block yourself"},
     invalid_user: {:unprocessable_entity, "Unknown person"}
   }

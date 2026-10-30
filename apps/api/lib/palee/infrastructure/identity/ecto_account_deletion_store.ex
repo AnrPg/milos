@@ -126,6 +126,27 @@ defmodule Palee.Infrastructure.Identity.EctoAccountDeletionStore do
     :ok
   end
 
+  # ADR-280: Partners rows are the person's own and leave with the account
+  # even when the profile itself is kept anonymised (a deleted user row
+  # takes them by cascade).
+  @partner_rows [
+    {"partner_reports", ~w(reporter_id target_id)},
+    {"partner_matches", ~w(user_a_id user_b_id)},
+    {"partner_swipes", ~w(swiper_id target_id)},
+    {"partner_profiles", ~w(user_id)}
+  ]
+
+  defp delete_partner_rows(user_id) do
+    id = Ecto.UUID.dump!(user_id)
+
+    for {table, columns} <- @partner_rows do
+      condition = Enum.map_join(columns, " OR ", &"#{&1} = $1")
+      Repo.query!("DELETE FROM #{table} WHERE #{condition}", [id])
+    end
+
+    :ok
+  end
+
   defp anonymize(%User{} = user) do
     # A login of its own: the person's login (and email) can go, and nobody
     # knows this one's address or password.
@@ -143,6 +164,8 @@ defmodule Palee.Infrastructure.Identity.EctoAccountDeletionStore do
     "handle_reservations"
     |> where([r], r.user_id == ^Ecto.UUID.dump!(user.id))
     |> Repo.delete_all()
+
+    delete_partner_rows(user.id)
 
     user
     |> Ecto.Changeset.change(

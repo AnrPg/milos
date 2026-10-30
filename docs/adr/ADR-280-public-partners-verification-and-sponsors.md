@@ -267,3 +267,9 @@ plus the ADR-169 ones still used.
   suggestions side calls.
 - Migrations: verification `20270325000000`, deck `20270325100000`,
   suggestions `20270325200000`.
+- Deck side, as built: `palee_partner_people_within` keeps its ADR-197
+  signature `(uuid[], double precision)` (the Places adapter calls it) and
+  now counts people with a live Partners profile instead of Γύρω μου
+  visibility; `palee_partner_box_badges` is not created, badges come from
+  `PartnerEligibility.verification_badges/1` plus the profile's `show_box`.
+  The platform queue lives in `PaleeWeb.PlatformPartnerReportController`.
