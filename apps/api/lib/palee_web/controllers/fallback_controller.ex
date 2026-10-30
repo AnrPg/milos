@@ -2846,8 +2846,7 @@ defmodule PaleeWeb.FallbackController do
 
   # ADR-280 verification
   @partner_verification_errors %{
-    partner_verification_required:
-      {:forbidden, "Verify your account to use Training partners"},
+    partner_verification_required: {:forbidden, "Verify your account to use Training partners"},
     partner_suspended: {:forbidden, "Your Training partners access is suspended"},
     partner_already_verified: {:conflict, "Your account is already verified"},
     partner_verification_in_review: {:conflict, "Your request is with the Palee team"},

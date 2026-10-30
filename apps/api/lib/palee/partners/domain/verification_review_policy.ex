@@ -143,7 +143,9 @@ defmodule Palee.Partners.Domain.VerificationReviewPolicy do
 
   @doc "When a selfie uploaded at `uploaded_at` is deleted unreviewed."
   def selfie_expires_at(nil), do: nil
-  def selfie_expires_at(%DateTime{} = uploaded_at), do: DateTime.add(uploaded_at, @retention_days * 86_400)
+
+  def selfie_expires_at(%DateTime{} = uploaded_at),
+    do: DateTime.add(uploaded_at, @retention_days * 86_400)
 
   @doc "Selfies uploaded before this are past retention."
   def retention_cutoff(%DateTime{} = now), do: DateTime.add(now, -@retention_days * 86_400)

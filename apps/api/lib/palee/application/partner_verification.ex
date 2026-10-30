@@ -38,7 +38,10 @@ defmodule Palee.Application.PartnerVerification do
     verification = PartnerEligibility.verification(scope)
     request = Verifications.latest_request(scope, user_id)
     request = tidy(scope, verification, request, now)
-    sponsorships = if request, do: Verifications.sponsorships_of_candidate(scope, user_id), else: []
+
+    sponsorships =
+      if request, do: Verifications.sponsorships_of_candidate(scope, user_id), else: []
+
     vouches = Verifications.vouch_count(sponsorships)
     eligibility = Verifications.status(verification, request, vouches)
 
@@ -149,7 +152,8 @@ defmodule Palee.Application.PartnerVerification do
 
     with {:ok, sponsor_id} <- cast_id(param(params, :sponsor_id)),
          {:ok, _request} <- editable_request(scope, user_id),
-         true <- sponsor_id in buddy_ids(context, user_id) || {:error, :partner_sponsor_not_eligible},
+         true <-
+           sponsor_id in buddy_ids(context, user_id) || {:error, :partner_sponsor_not_eligible},
          standing = Verifications.sponsor_standing(scope, [sponsor_id], window(now)),
          :ok <-
            Verifications.check_sponsor(
@@ -161,7 +165,9 @@ defmodule Palee.Application.PartnerVerification do
            ),
          {:ok, sponsorship, new?} <- ask(scope, user_id, sponsor_id, now) do
       if new?, do: PartnerVerificationNotices.vouch_request(sponsorship)
-      {:ok, %{sponsorship: present_sponsorship(sponsorship, CommunityPeople.by_ids([sponsor_id]))}}
+
+      {:ok,
+       %{sponsorship: present_sponsorship(sponsorship, CommunityPeople.by_ids([sponsor_id]))}}
     end
   end
 
@@ -204,7 +210,8 @@ defmodule Palee.Application.PartnerVerification do
            Verifications.sponsorship_between(scope, user_id, sponsor_id) || {:error, :not_found},
          {:ok, changes} <- Verifications.cancel_sponsorship(sponsorship),
          {:ok, sponsorship} <- Verifications.update_sponsorship(scope, sponsorship, changes) do
-      {:ok, %{sponsorship: present_sponsorship(sponsorship, CommunityPeople.by_ids([sponsor_id]))}}
+      {:ok,
+       %{sponsorship: present_sponsorship(sponsorship, CommunityPeople.by_ids([sponsor_id]))}}
     end
   end
 
@@ -225,7 +232,9 @@ defmodule Palee.Application.PartnerVerification do
              expires_at: Verifications.link_expires_at(now)
            }) do
       path = "/partners/vouch#token=" <> token
-      {:ok, %{token: token, path: path, url: PublicURL.base_url() <> path, expires_at: link.expires_at}}
+
+      {:ok,
+       %{token: token, path: path, url: PublicURL.base_url() <> path, expires_at: link.expires_at}}
     end
   end
 
@@ -269,7 +278,11 @@ defmodule Palee.Application.PartnerVerification do
   end
 
   defp deliver(scope, row, phone, code) do
-    case Sms.deliver(%{to: phone, body: Verifications.sms_body(code), tag: "partner-verification"}) do
+    case Sms.deliver(%{
+           to: phone,
+           body: Verifications.sms_body(code),
+           tag: "partner-verification"
+         }) do
       :ok ->
         :ok
 
@@ -345,9 +358,12 @@ defmodule Palee.Application.PartnerVerification do
            Verifications.selfie_content_type(key, user_id, request.id) ||
              {:error, :document_key_forbidden},
          vouches =
-           scope |> Verifications.sponsorships_of_candidate(user_id) |> Verifications.vouch_count(),
+           scope
+           |> Verifications.sponsorships_of_candidate(user_id)
+           |> Verifications.vouch_count(),
          :ok <- discard_on_error(user_id, key, Verifications.check_submittable(request, vouches)),
-         {:ok, probe} <- PartnerSelfieStorage.probe(user_id, key, Verifications.selfie_probe_bytes()),
+         {:ok, probe} <-
+           PartnerSelfieStorage.probe(user_id, key, Verifications.selfie_probe_bytes()),
          :ok <-
            discard_on_error(
              user_id,
@@ -424,7 +440,11 @@ defmodule Palee.Application.PartnerVerification do
 
   @doc false
   def present_eligibility(%{status: status, method: method, next_step: next_step}),
-    do: %{status: Atom.to_string(status), method: method, next_step: next_step && Atom.to_string(next_step)}
+    do: %{
+      status: Atom.to_string(status),
+      method: method,
+      next_step: next_step && Atom.to_string(next_step)
+    }
 
   defp present_request(request, sponsorships, vouches) do
     people = CommunityPeople.by_ids(Enum.map(sponsorships, & &1.sponsor_id))

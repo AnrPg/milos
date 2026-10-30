@@ -45,6 +45,7 @@ defmodule Palee.Partners.Verifications do
   defdelegate extend_penalty(current, until), to: SponsorPolicy
   defdelegate quota_left(vouches), to: SponsorPolicy
   defdelegate vouch_count(sponsorships), to: SponsorPolicy
+
   defdelegate check_sponsor(standing, sponsor_id, candidate_id, blocked?, now),
     to: SponsorPolicy,
     as: :check
@@ -89,7 +90,11 @@ defmodule Palee.Partners.Verifications do
   defdelegate check_editable(request), to: VerificationReviewPolicy
   defdelegate selfie_code_from(random), to: VerificationReviewPolicy
   defdelegate new_request(user_id, selfie_code, now), to: VerificationReviewPolicy
-  defdelegate validate_selfie_upload(content_type), to: VerificationReviewPolicy, as: :validate_upload
+
+  defdelegate validate_selfie_upload(content_type),
+    to: VerificationReviewPolicy,
+    as: :validate_upload
+
   defdelegate selfie_key(user_id, request_id, extension), to: VerificationReviewPolicy
 
   defdelegate selfie_content_type(key, user_id, request_id), to: VerificationReviewPolicy
@@ -106,7 +111,11 @@ defmodule Palee.Partners.Verifications do
   defdelegate selfie_expired?(request, now), to: VerificationReviewPolicy
   defdelegate expire_changes(), to: VerificationReviewPolicy
   defdelegate withdraw_changes(), to: VerificationReviewPolicy
-  defdelegate normalize_review_decision(params), to: VerificationReviewPolicy, as: :normalize_decision
+
+  defdelegate normalize_review_decision(params),
+    to: VerificationReviewPolicy,
+    as: :normalize_decision
+
   defdelegate check_decidable(request), to: VerificationReviewPolicy
   defdelegate decision_changes(decision, reason, actor_id, now), to: VerificationReviewPolicy
 

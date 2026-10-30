@@ -43,7 +43,10 @@ defmodule Palee.Partners.VerificationStore do
   def get_request(scope, id), do: call(scope, :get_request, [id])
   def latest_request(scope, user_id), do: call(scope, :latest_request, [user_id])
   def create_request(scope, attrs), do: call(scope, :create_request, [attrs])
-  def update_request(scope, request, changes), do: call(scope, :update_request, [request, changes])
+
+  def update_request(scope, request, changes),
+    do: call(scope, :update_request, [request, changes])
+
   def list_requests(scope, status, limit), do: call(scope, :list_requests, [status, limit])
 
   def requests_with_selfies_before(scope, cutoff),

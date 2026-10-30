@@ -34,6 +34,7 @@ defmodule Palee.Application.AccountDeletion do
     PublicURL,
     SecurityNotices
   }
+
   alias Palee.{Email, Identity}
   alias Palee.Email.LinkTokens
   alias Palee.Identity.AccountDeletionStore

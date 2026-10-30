@@ -222,7 +222,10 @@ defmodule Palee.Infrastructure.Partners.EctoVerificationStore do
   @impl true
   def count_vouches_since(sponsor_id, since) do
     Sponsorship
-    |> where([s], s.sponsor_id == ^sponsor_id and s.status == "vouched" and s.decided_at >= ^since)
+    |> where(
+      [s],
+      s.sponsor_id == ^sponsor_id and s.status == "vouched" and s.decided_at >= ^since
+    )
     |> Repo.aggregate(:count)
   end
 

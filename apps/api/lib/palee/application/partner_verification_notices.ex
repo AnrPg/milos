@@ -53,7 +53,11 @@ defmodule Palee.Application.PartnerVerificationNotices do
   end
 
   defp nickname(user_id),
-    do: [user_id] |> CommunityPeople.by_ids() |> CommunityPeople.person(user_id) |> Map.get(:nickname)
+    do:
+      [user_id]
+      |> CommunityPeople.by_ids()
+      |> CommunityPeople.person(user_id)
+      |> Map.get(:nickname)
 
   defp stamp(nil), do: "0"
   defp stamp(%DateTime{} = at), do: DateTime.to_unix(at)

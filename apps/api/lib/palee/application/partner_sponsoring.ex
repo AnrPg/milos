@@ -148,7 +148,11 @@ defmodule Palee.Application.PartnerSponsoring do
        quota: Verifications.sponsor_quota(),
        window_days: Verifications.sponsor_quota_days(),
        used: used,
-       left: if(Verifications.membership_verified?(standing), do: Verifications.quota_left(used), else: 0),
+       left:
+         if(Verifications.membership_verified?(standing),
+           do: Verifications.quota_left(used),
+           else: 0
+         ),
        penalty_until: standing && standing.penalty_until
      }}
   end

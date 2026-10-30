@@ -16,7 +16,9 @@ defmodule Palee.Infrastructure.Sms.LogSmsSender do
   end
 
   defp mask(to) when is_binary(to) and byte_size(to) > 5,
-    do: String.slice(to, 0, 3) <> String.duplicate("•", byte_size(to) - 6) <> String.slice(to, -3, 3)
+    do:
+      String.slice(to, 0, 3) <>
+        String.duplicate("•", byte_size(to) - 6) <> String.slice(to, -3, 3)
 
   defp mask(_to), do: "•••"
 end

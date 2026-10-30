@@ -21,7 +21,9 @@ defmodule Palee.Application.PlatformPartnerVerifications do
     scope = scope(platform_context)
     status = param(params, :status) || "in_review"
 
-    with true <- status in Verifications.request_statuses() || {:error, :invalid_partner_verification_status} do
+    with true <-
+           status in Verifications.request_statuses() ||
+             {:error, :invalid_partner_verification_status} do
       requests = Verifications.list_requests(scope, status, @limit)
       people = CommunityPeople.by_ids(Enum.map(requests, & &1.user_id))
 
@@ -87,7 +89,12 @@ defmodule Palee.Application.PlatformPartnerVerifications do
   defp selfie_url(request), do: PartnerSelfieStorage.view_url(request.user_id, request.selfie_key)
 
   @doc "Approves or rejects a request in review (`decision`, `reason` required to reject)."
-  def decide(%{user_id: actor_id} = platform_context, request_id, params, now \\ DateTime.utc_now()) do
+  def decide(
+        %{user_id: actor_id} = platform_context,
+        request_id,
+        params,
+        now \\ DateTime.utc_now()
+      ) do
     scope = scope(platform_context)
 
     with {:ok, %{decision: decision, reason: reason}} <-

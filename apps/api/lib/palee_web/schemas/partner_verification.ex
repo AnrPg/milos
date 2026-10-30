@@ -197,14 +197,20 @@ defmodule PaleeWeb.Schemas.PartnerVerification do
     do:
       object(
         "PartnerPhoneRequest",
-        %{phone: %Schema{type: :string, maxLength: 32, description: "Mobile, E.164 or Greek 69…"}},
+        %{
+          phone: %Schema{type: :string, maxLength: 32, description: "Mobile, E.164 or Greek 69…"}
+        },
         [:phone]
       )
 
   def phone_sent do
     object(
       "PartnerPhoneSent",
-      %{phone: %Schema{type: :string}, expires_at: @datetime, code_minutes: %Schema{type: :integer}},
+      %{
+        phone: %Schema{type: :string},
+        expires_at: @datetime,
+        code_minutes: %Schema{type: :integer}
+      },
       [:phone, :expires_at, :code_minutes]
     )
   end
@@ -296,13 +302,18 @@ defmodule PaleeWeb.Schemas.PartnerVerification do
   def vouch_result do
     object(
       "PartnerVouchResult",
-      %{id: @uuid, status: enum(Verifications.sponsorship_statuses()), decided_at: @nullable_datetime},
+      %{
+        id: @uuid,
+        status: enum(Verifications.sponsorship_statuses()),
+        decided_at: @nullable_datetime
+      },
       [:id, :status, :decided_at]
     )
   end
 
   def token_request,
-    do: object("PartnerVouchLinkToken", %{token: %Schema{type: :string, maxLength: 128}}, [:token])
+    do:
+      object("PartnerVouchLinkToken", %{token: %Schema{type: :string, maxLength: 128}}, [:token])
 
   def link_inspection do
     object(
@@ -311,7 +322,10 @@ defmodule PaleeWeb.Schemas.PartnerVerification do
         person: person(),
         expires_at: @datetime,
         can_vouch: %Schema{type: :boolean},
-        reason: nullable_enum(~w(partner_sponsor_not_eligible partner_sponsor_quota partner_sponsor_penalty))
+        reason:
+          nullable_enum(
+            ~w(partner_sponsor_not_eligible partner_sponsor_quota partner_sponsor_penalty)
+          )
       },
       [:person, :expires_at, :can_vouch, :reason]
     )
@@ -341,7 +355,11 @@ defmodule PaleeWeb.Schemas.PartnerVerification do
     sponsor =
       object(
         "PlatformPartnerVerificationSponsor",
-        %{person: person(), channel: enum(Verifications.sponsorship_channels()), vouched_at: @nullable_datetime},
+        %{
+          person: person(),
+          channel: enum(Verifications.sponsorship_channels()),
+          vouched_at: @nullable_datetime
+        },
         [:person, :channel, :vouched_at]
       )
 
@@ -389,7 +407,12 @@ defmodule PaleeWeb.Schemas.PartnerVerification do
       "PlatformPartnerVerificationDecision",
       %{
         decision: enum(Verifications.review_decisions()),
-        reason: %Schema{type: :string, maxLength: 500, nullable: true, description: "Required to reject"}
+        reason: %Schema{
+          type: :string,
+          maxLength: 500,
+          nullable: true,
+          description: "Required to reject"
+        }
       },
       [:decision]
     )
@@ -398,7 +421,11 @@ defmodule PaleeWeb.Schemas.PartnerVerification do
   def platform_decision do
     object(
       "PlatformPartnerVerificationDecided",
-      %{id: @uuid, status: enum(Verifications.request_statuses()), decided_at: @nullable_datetime},
+      %{
+        id: @uuid,
+        status: enum(Verifications.request_statuses()),
+        decided_at: @nullable_datetime
+      },
       [:id, :status, :decided_at]
     )
   end

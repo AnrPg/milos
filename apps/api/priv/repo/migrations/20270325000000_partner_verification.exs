@@ -279,8 +279,7 @@ defmodule Palee.Repo.Migrations.PartnerVerification do
     create table(:partner_sponsorships, primary_key: false) do
       add :id, :binary_id, primary_key: true
 
-      add :candidate_id, references(:users, type: :binary_id, on_delete: :delete_all),
-        null: false
+      add :candidate_id, references(:users, type: :binary_id, on_delete: :delete_all), null: false
 
       add :sponsor_id, references(:users, type: :binary_id, on_delete: :delete_all), null: false
       add :channel, :text, null: false
@@ -375,8 +374,7 @@ defmodule Palee.Repo.Migrations.PartnerVerification do
     create table(:partner_sponsor_links, primary_key: false) do
       add :id, :binary_id, primary_key: true
 
-      add :candidate_id, references(:users, type: :binary_id, on_delete: :delete_all),
-        null: false
+      add :candidate_id, references(:users, type: :binary_id, on_delete: :delete_all), null: false
 
       add :token_hash, :binary, null: false
       add :expires_at, :utc_datetime_usec, null: false
@@ -435,9 +433,7 @@ defmodule Palee.Repo.Migrations.PartnerVerification do
     $$
     """)
 
-    execute(
-      "REVOKE EXECUTE ON FUNCTION palee_partner_membership_organization(uuid) FROM PUBLIC"
-    )
+    execute("REVOKE EXECUTE ON FUNCTION palee_partner_membership_organization(uuid) FROM PUBLIC")
 
     # ADR-280 §1: the membership that verifies a person. Answers only for
     # the session's own person, the Palee team and system sessions.

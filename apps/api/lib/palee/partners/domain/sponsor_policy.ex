@@ -115,6 +115,7 @@ defmodule Palee.Partners.Domain.SponsorPolicy do
   """
   def ask(nil, _now), do: :insert
   def ask(%{status: "cancelled"}, now), do: {:update, %{status: "requested", requested_at: now}}
+
   def ask(%{status: status} = sponsorship, _now) when status in ["requested", "vouched"],
     do: {:keep, sponsorship}
 

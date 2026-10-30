@@ -23,7 +23,9 @@ defmodule Palee.Partners.Ports.VerificationStore do
   @callback get_verification(user_id :: id) :: Verification.t() | nil
   @doc "Verifies the session's person by a membership when they hold one (idempotent)."
   @callback verify_by_membership() :: Verification.t() | nil
-  @callback verification_badges([id]) :: %{id => %{method: String.t(), box_name: String.t() | nil}}
+  @callback verification_badges([id]) :: %{
+              id => %{method: String.t(), box_name: String.t() | nil}
+            }
   @callback sponsor_standing([id], since :: DateTime.t()) :: %{id => standing()}
   @callback insert_verification(attrs :: map()) :: {:ok, Verification.t()} | {:error, term()}
   @callback update_verification(Verification.t(), changes :: map()) ::
@@ -36,7 +38,9 @@ defmodule Palee.Partners.Ports.VerificationStore do
   @callback create_request(attrs :: map()) :: {:ok, VerificationRequest.t()} | {:error, term()}
   @callback update_request(VerificationRequest.t(), changes :: map()) ::
               {:ok, VerificationRequest.t()} | {:error, term()}
-  @callback list_requests(status :: String.t(), limit :: pos_integer()) :: [VerificationRequest.t()]
+  @callback list_requests(status :: String.t(), limit :: pos_integer()) :: [
+              VerificationRequest.t()
+            ]
   @callback requests_with_selfies_before(DateTime.t()) :: [VerificationRequest.t()]
   @callback requests_of(user_id :: id) :: [VerificationRequest.t()]
 
@@ -44,7 +48,8 @@ defmodule Palee.Partners.Ports.VerificationStore do
   @callback count_codes_since(user_id :: id, since :: DateTime.t()) :: non_neg_integer()
   @callback insert_code(attrs :: map()) :: {:ok, PhoneCode.t()} | {:error, term()}
   @callback latest_code(request_id :: id) :: PhoneCode.t() | nil
-  @callback update_code(PhoneCode.t(), changes :: map()) :: {:ok, PhoneCode.t()} | {:error, term()}
+  @callback update_code(PhoneCode.t(), changes :: map()) ::
+              {:ok, PhoneCode.t()} | {:error, term()}
   @callback delete_code(PhoneCode.t()) :: :ok
   @callback delete_codes_before(DateTime.t()) :: non_neg_integer()
 
@@ -52,7 +57,9 @@ defmodule Palee.Partners.Ports.VerificationStore do
   @callback get_sponsorship(id) :: Sponsorship.t() | nil
   @callback sponsorship_between(candidate_id :: id, sponsor_id :: id) :: Sponsorship.t() | nil
   @callback sponsorships_of_candidate(candidate_id :: id) :: [Sponsorship.t()]
-  @callback sponsorships_of_sponsor(sponsor_id :: id, statuses :: [String.t()]) :: [Sponsorship.t()]
+  @callback sponsorships_of_sponsor(sponsor_id :: id, statuses :: [String.t()]) :: [
+              Sponsorship.t()
+            ]
   @callback count_vouches_since(sponsor_id :: id, since :: DateTime.t()) :: non_neg_integer()
   @callback insert_sponsorship(attrs :: map()) :: {:ok, Sponsorship.t()} | {:error, term()}
   @callback update_sponsorship(Sponsorship.t(), changes :: map()) ::
