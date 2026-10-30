@@ -2,7 +2,18 @@ import { describe, expect, it } from "vitest";
 
 import type { ChatThread } from "@/api/messaging";
 
-import { inboxHref, parseInboxSegment, showsIn, threadSegment, threadsIn, visibleSegments, type ThreadSegmentContext } from "./inbox-model";
+import {
+  awaitsBoxReply,
+  boxInboxThreads,
+  inboxHref,
+  isBoxInboxThread,
+  parseInboxSegment,
+  showsIn,
+  threadSegment,
+  threadsIn,
+  visibleSegments,
+  type ThreadSegmentContext,
+} from "./inbox-model";
 
 function thread(id: string, context_type: ChatThread["context_type"], others: string[] = [], context_id: string | null = null): ChatThread {
   return {
@@ -60,5 +71,35 @@ describe("inbox model", () => {
     expect(visibleSegments({ hasPartners: false })).toEqual(["all", "people", "coach", "clubs"]);
     expect(visibleSegments({ hasPartners: true })).toEqual(["all", "people", "coach", "clubs", "partners"]);
     expect(parseInboxSegment("people")).toBe("people");
+  });
+
+  describe("the box's inbox (ADR-282)", () => {
+    const boxThread = (id: string, person: string, lastSender: string | null, at: string): ChatThread => ({
+      ...thread(id, "box", [person], person),
+      last_message: lastSender
+        ? { id: `${id}-m`, sender_id: lastSender, body: "…", message_type: "chat", topic: null, inserted_at: at }
+        : null,
+    });
+
+    const waiting = boxThread("b1", "giorgos", "giorgos", "2026-10-30T10:00:00Z");
+    const answered = boxThread("b2", "eleni", "me", "2026-10-30T11:00:00Z");
+    const newer = boxThread("b3", "nikos", "nikos", "2026-10-30T12:00:00Z");
+
+    it("is the box's thread with someone else, never the person's own", () => {
+      expect(isBoxInboxThread(waiting, "me")).toBe(true);
+      expect(isBoxInboxThread(waiting, "giorgos")).toBe(false);
+      expect(isBoxInboxThread(thread("d", "direct", ["x"]), "me")).toBe(false);
+    });
+
+    it("waits for an answer when the person wrote last", () => {
+      expect(awaitsBoxReply(waiting)).toBe(true);
+      expect(awaitsBoxReply(answered)).toBe(false);
+      expect(awaitsBoxReply(boxThread("b4", "x", null, "2026-10-30T09:00:00Z"))).toBe(false);
+    });
+
+    it("«Αναπάντητα» keeps the waiting threads, newest first; «Όλα» keeps every one", () => {
+      expect(boxInboxThreads([waiting, answered, newer], "unanswered").map((t) => t.id)).toEqual(["b3", "b1"]);
+      expect(boxInboxThreads([waiting, answered, newer], "all").map((t) => t.id)).toEqual(["b3", "b2", "b1"]);
+    });
   });
 });

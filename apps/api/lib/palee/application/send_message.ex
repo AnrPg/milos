@@ -12,8 +12,9 @@ defmodule Palee.Application.SendMessage do
   * **Chat**: everything else.
   """
 
-  alias Palee.Application.TrackMessagingAnalytics
+  alias Palee.Application.{BoxInbox, TrackMessagingAnalytics}
   alias Palee.{Coaching, Finance, Messaging, Organizations}
+  alias Palee.Messaging.Domain.BoxInboxPolicy
 
   def call(sender, params) do
     with {:ok, thread} <- Messaging.get_thread(params.thread_id, sender.id),
@@ -39,6 +40,17 @@ defmodule Palee.Application.SendMessage do
     |> TrackMessagingAnalytics.call()
   end
 
+  # ADR-282: the person writing to the box may say what it is about.
+  defp deliver(:chat, %{context_type: :box} = thread, sender, params) do
+    params
+    |> Map.put(:message_type, :chat)
+    |> then(fn params ->
+      if thread.context_id == sender.id, do: params, else: Map.delete(params, :topic)
+    end)
+    |> Messaging.send_message(%{reservations: []})
+    |> TrackMessagingAnalytics.call()
+  end
+
   defp deliver(:chat, _thread, _sender, params) do
     params
     |> Map.put(:message_type, :chat)
@@ -47,11 +59,12 @@ defmodule Palee.Application.SendMessage do
     |> TrackMessagingAnalytics.call()
   end
 
-  # The gym's thread with a member: staff write for the box, the member chats.
+  # The gym's thread with a person: the box's inbox and the coaches brought
+  # in write for the box (ADR-282), the person chats.
   defp kind(sender, %{context_type: :box} = thread, _params) do
     cond do
       thread.context_id == sender.id -> {:ok, :chat}
-      may_message_from_box?(sender, thread) -> {:ok, :box_message}
+      writes_for_box?(sender, thread) -> {:ok, :box_message}
       true -> {:error, :forbidden}
     end
   end
@@ -101,12 +114,8 @@ defmodule Palee.Application.SendMessage do
 
   defp answering_reply_request?(_thread, _sender_id), do: false
 
-  defp may_message_from_box?(sender, thread) do
-    case Organizations.resolve_tenant_context_by_id(sender, thread.organization_id) do
-      {:ok, context} -> Organizations.can?(context, :message_from_box)
-      _error -> false
-    end
-  end
+  defp writes_for_box?(sender, thread),
+    do: BoxInboxPolicy.writes_for_box?(thread, sender.id, BoxInbox.lens(sender, thread.organization_id))
 
   # ADR-179: the allowance day is the gym's.
   defp gym_today(%{organization_id: organization_id}) when is_binary(organization_id),

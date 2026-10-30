@@ -752,3 +752,12 @@ msgstr "Een fiscale koppeling vraagt aandacht"
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr "%{connection} werkt niet meer. Open Factuurgegevens › Koppelingen om het op te lossen."
+
+msgid "%{by} brought you into a conversation"
+msgstr "%{by} heeft je bij een gesprek gehaald"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "%{nickname} schreef naar %{box}"
+
+msgid "%{nickname} sent the box a message."
+msgstr "%{nickname} stuurde de box een bericht."

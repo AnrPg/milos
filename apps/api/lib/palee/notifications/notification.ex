@@ -57,6 +57,8 @@ defmodule Palee.Notifications.Notification do
     :new_follower,
     :person_message,
     :message_request,
+    # ADR-282: someone wrote to the box (its shared inbox).
+    :box_inbox_message,
     :trial_requested,
     :trial_booked,
     :trial_cancelled,

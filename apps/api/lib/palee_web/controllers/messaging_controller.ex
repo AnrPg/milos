@@ -3,6 +3,7 @@ defmodule PaleeWeb.MessagingController do
   use OpenApiSpex.ControllerSpecs
 
   alias Palee.Application.{
+    BoxInbox,
     CountUnreadMessagingThreads,
     GetMessagingThread,
     GetOrCreateMessagingThread,
@@ -15,7 +16,7 @@ defmodule PaleeWeb.MessagingController do
   alias PaleeWeb.ParamExtractor
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
-  @topics ~w(booking payment membership facility)
+  @topics ~w(booking payment membership facility training)
 
   action_fallback PaleeWeb.FallbackController
 
@@ -36,7 +37,7 @@ defmodule PaleeWeb.MessagingController do
 
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true]
-       when action in [:create_thread, :send_message, :mark_read]
+       when action in [:create_thread, :send_message, :mark_read, :bring_coach]
 
   @thread_schema %Schema{
     type: :object,
@@ -54,13 +55,57 @@ defmodule PaleeWeb.MessagingController do
             id: %Schema{type: :string, format: :uuid},
             user_id: %Schema{type: :string, format: :uuid},
             nickname: %Schema{type: :string, nullable: true},
-            last_read_message_id: %Schema{type: :string, format: :uuid, nullable: true}
+            last_read_message_id: %Schema{type: :string, format: :uuid, nullable: true},
+            joined_as: %Schema{
+              type: :string,
+              enum: ["member", "staff", "coach"],
+              nullable: true,
+              description: "ADR-282: why someone is in a box thread"
+            }
           },
           required: [:id, :user_id, :nickname, :last_read_message_id]
         }
+      },
+      last_message: %Schema{
+        type: :object,
+        nullable: true,
+        properties: %{
+          id: %Schema{type: :string, format: :uuid},
+          sender_id: %Schema{type: :string, format: :uuid},
+          body: %Schema{type: :string},
+          message_type: %Schema{type: :string},
+          topic: %Schema{type: :string, nullable: true},
+          inserted_at: %Schema{type: :string, format: :"date-time"}
+        },
+        required: [:id, :sender_id, :body, :message_type, :topic, :inserted_at]
+      },
+      box_person: %Schema{
+        type: :object,
+        nullable: true,
+        description: "ADR-282: in a box thread, whether the person is a newcomer and blocked",
+        properties: %{newcomer: %Schema{type: :boolean}, blocked: %Schema{type: :boolean}},
+        required: [:blocked, :newcomer]
       }
     },
     required: [:id, :context_type, :context_id, :created_by_id, :inserted_at, :participants]
+  }
+
+  @block_schema %Schema{
+    type: :object,
+    properties: %{blocked: %Schema{type: :boolean}},
+    required: [:blocked]
+  }
+
+  @coach_candidate_schema %Schema{
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      nickname: %Schema{type: :string, nullable: true},
+      avatar_url: %Schema{type: :string, nullable: true},
+      coaches_person: %Schema{type: :boolean},
+      in_thread: %Schema{type: :boolean}
+    },
+    required: [:avatar_url, :coaches_person, :id, :in_thread, :nickname]
   }
 
   @organization_slug_parameter %Parameter{
@@ -325,7 +370,7 @@ defmodule PaleeWeb.MessagingController do
     user = Guardian.Plug.current_resource(conn)
     context_type = parse_context_type(params["context_type"])
 
-    threads = ListMessagingThreads.call(user.id, context_type)
+    threads = ListMessagingThreads.call(conn.assigns[:tenant_context] || %{}, user.id, context_type)
 
     json(conn, %{threads: Enum.map(threads, &serialize_thread/1)})
   end
@@ -334,6 +379,7 @@ defmodule PaleeWeb.MessagingController do
     user = Guardian.Plug.current_resource(conn)
 
     with {:ok, thread_id} <- ParamExtractor.fetch(params, "id"),
+         :ok <- authorize_box(conn, user, thread_id),
          {:ok, thread} <- GetMessagingThread.call(thread_id, user.id) do
       json(conn, %{thread: serialize_thread(thread)})
     end
@@ -342,7 +388,8 @@ defmodule PaleeWeb.MessagingController do
   def list_messages(conn, params) do
     user = Guardian.Plug.current_resource(conn)
 
-    with {:ok, thread_id} <- ParamExtractor.fetch(params, "id") do
+    with {:ok, thread_id} <- ParamExtractor.fetch(params, "id"),
+         :ok <- authorize_box(conn, user, thread_id) do
       list_params =
         %{actor_id: user.id}
         |> maybe_put(:limit, ParamExtractor.get(params, "limit"))
@@ -359,6 +406,7 @@ defmodule PaleeWeb.MessagingController do
     message_type = parse_message_type(bp(conn, "message_type") || "chat")
 
     with {:ok, thread_id} <- ParamExtractor.fetch(params, "id"),
+         :ok <- authorize_box(conn, user, thread_id),
          {:ok, message} <-
            SendMessageUseCase.call(user, %{
              thread_id: thread_id,
@@ -379,8 +427,126 @@ defmodule PaleeWeb.MessagingController do
     message_id = bp(conn, "message_id")
 
     with {:ok, thread_id} <- ParamExtractor.fetch(params, "id"),
+         :ok <- authorize_box(conn, user, thread_id),
          {:ok, result} <- MarkMessagingThreadRead.call(thread_id, user.id, message_id) do
       json(conn, result)
+    end
+  end
+
+  operation(:coach_candidates,
+    summary: "The coaches the box's inbox may bring into a box thread (ADR-282)",
+    parameters: [
+      @organization_slug_parameter,
+      %Parameter{name: :id, in: :path, required: true, schema: %Schema{type: :string}}
+    ],
+    responses: [
+      ok:
+        {"Coaches", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{coaches: %Schema{type: :array, items: @coach_candidate_schema}},
+           required: [:coaches]
+         }},
+      forbidden: {"Not in the box's inbox", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def coach_candidates(conn, params) do
+    user = Guardian.Plug.current_resource(conn)
+
+    with {:ok, thread_id} <- ParamExtractor.fetch(params, "id"),
+         {:ok, coaches} <- BoxInbox.coach_candidates(tenant_context(conn), user.id, thread_id) do
+      json(conn, %{coaches: coaches})
+    end
+  end
+
+  operation(:bring_coach,
+    summary: "«Φέρε τον coach»: bring a coach of the box into a box thread (ADR-282)",
+    parameters: [
+      @organization_slug_parameter,
+      %Parameter{name: :id, in: :path, required: true, schema: %Schema{type: :string}}
+    ],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{user_id: %Schema{type: :string, format: :uuid}},
+            required: [:user_id]
+          }
+        }
+      }
+    },
+    responses: [
+      ok:
+        {"Thread", "application/json",
+         %Schema{type: :object, properties: %{thread: @thread_schema}, required: [:thread]}},
+      forbidden: {"Not in the box's inbox", "application/json", %Schema{type: :object}},
+      unprocessable_entity: {"Not a coach of the box", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def bring_coach(conn, params) do
+    user = Guardian.Plug.current_resource(conn)
+
+    with {:ok, thread_id} <- ParamExtractor.fetch(params, "id"),
+         {:ok, thread} <-
+           BoxInbox.bring_coach(tenant_context(conn), user.id, thread_id, bp(conn, "user_id")) do
+      json(conn, %{thread: serialize_thread(thread)})
+    end
+  end
+
+  operation(:block_sender,
+    summary: "The box stops hearing from a newcomer who wrote to it (ADR-282)",
+    parameters: [
+      @organization_slug_parameter,
+      %Parameter{name: :id, in: :path, required: true, schema: %Schema{type: :string}}
+    ],
+    responses: [
+      ok: {"Blocked", "application/json", @block_schema},
+      forbidden: {"Not in the box's inbox", "application/json", %Schema{type: :object}},
+      unprocessable_entity: {"A client of the box", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def block_sender(conn, params) do
+    user = Guardian.Plug.current_resource(conn)
+
+    with {:ok, thread_id} <- ParamExtractor.fetch(params, "id"),
+         {:ok, _thread} <- BoxInbox.block(tenant_context(conn), user.id, thread_id) do
+      json(conn, %{blocked: true})
+    end
+  end
+
+  operation(:unblock_sender,
+    summary: "The box hears from the person again (ADR-282)",
+    parameters: [
+      @organization_slug_parameter,
+      %Parameter{name: :id, in: :path, required: true, schema: %Schema{type: :string}}
+    ],
+    responses: [
+      ok: {"Unblocked", "application/json", @block_schema},
+      forbidden: {"Not in the box's inbox", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def unblock_sender(conn, params) do
+    user = Guardian.Plug.current_resource(conn)
+
+    with {:ok, thread_id} <- ParamExtractor.fetch(params, "id"),
+         {:ok, _thread} <- BoxInbox.unblock(tenant_context(conn), user.id, thread_id) do
+      json(conn, %{blocked: false})
+    end
+  end
+
+  defp tenant_context(conn), do: conn.assigns[:tenant_context] || %{}
+
+  # ADR-282: box threads are read by role, so the inbox check runs first.
+  defp authorize_box(conn, user, thread_id) do
+    case conn.assigns[:tenant_context] do
+      nil -> :ok
+      context -> BoxInbox.authorize(context, user.id, thread_id)
     end
   end
 
@@ -391,16 +557,25 @@ defmodule PaleeWeb.MessagingController do
       context_id: thread.context_id,
       created_by_id: thread.created_by_id,
       inserted_at: thread.inserted_at,
-      participants: Enum.map(thread.participants || [], &serialize_participant/1)
+      participants: Enum.map(thread.participants || [], &serialize_participant/1),
+      last_message: last_message(thread),
+      box_person: Map.get(thread, :box_person)
     }
   end
+
+  defp last_message(%{messages: [%{} = message | _rest]}),
+    do:
+      Map.take(message, [:id, :sender_id, :body, :message_type, :topic, :inserted_at])
+
+  defp last_message(_thread), do: nil
 
   defp serialize_participant(p) do
     %{
       id: p.id,
       user_id: p.user_id,
       nickname: Map.get(p, :nickname),
-      last_read_message_id: p.last_read_message_id
+      last_read_message_id: p.last_read_message_id,
+      joined_as: Map.get(p, :joined_as)
     }
   end
 

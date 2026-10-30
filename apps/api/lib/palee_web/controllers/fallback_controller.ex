@@ -544,6 +544,37 @@ defmodule PaleeWeb.FallbackController do
     })
   end
 
+  # ADR-282: the box's shared inbox.
+  def call(conn, {:error, :blocked_by_box}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{code: "blocked_by_box", error: "This box no longer receives your messages"})
+  end
+
+  def call(conn, {:error, :awaiting_box_reply}) do
+    conn
+    |> put_status(:too_many_requests)
+    |> json(%{
+      code: "awaiting_box_reply",
+      error: "Wait for the box to answer before you send more messages"
+    })
+  end
+
+  def call(conn, {:error, :not_a_coach}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "not_a_coach", error: "Only a coach of the box can be brought in"})
+  end
+
+  def call(conn, {:error, :client_not_blockable}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "client_not_blockable",
+      error: "Only someone who is not a client of the box can be blocked"
+    })
+  end
+
   # ADR-138: club and channel governance.
   def call(conn, {:error, :channel_not_optional}) do
     conn

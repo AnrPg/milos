@@ -37,6 +37,21 @@ defmodule Palee.Messaging.ThreadStore do
   def list_box_conversation_organization_ids,
     do: impl().list_box_conversation_organization_ids()
 
+  @impl true
+  def add_participant(thread_id, user_id, joined_as),
+    do: impl().add_participant(thread_id, user_id, joined_as)
+
+  @impl true
+  def join_box_threads(user_id), do: impl().join_box_threads(user_id)
+  @impl true
+  def box_blocked?(user_id), do: impl().box_blocked?(user_id)
+  @impl true
+  def list_box_blocked_user_ids(user_ids), do: impl().list_box_blocked_user_ids(user_ids)
+  @impl true
+  def block_box_sender(user_id, blocked_by_id), do: impl().block_box_sender(user_id, blocked_by_id)
+  @impl true
+  def unblock_box_sender(user_id), do: impl().unblock_box_sender(user_id)
+
   defp impl do
     Application.fetch_env!(:palee, :messaging_thread_store)
   end

@@ -4792,7 +4792,31 @@
     "semanticWorkoutDanceFitness": "Танцевальный фитнес (Zumba)",
     "semanticWorkoutPoleAerial": "Пилон и воздушная акробатика",
     "semanticWorkoutOutdoorTraining": "Тренировки на улице",
-    "semanticWorkoutClimbingBouldering": "Скалолазание и боулдеринг"
+    "semanticWorkoutClimbingBouldering": "Скалолазание и боулдеринг",
+    "msgTopicTraining": "Тренировки",
+    "inboxBringCoach": "Позвать тренера",
+    "inboxBringCoachHint": "Тренер присоединится к разговору и сможет отвечать от имени бокса.",
+    "inboxLoadingCoaches": "Загрузка тренеров…",
+    "inboxNoCoaches": "В боксе пока нет тренеров.",
+    "inboxCoachInThread": "В разговоре",
+    "inboxCoachTheirs": "Его/её тренер",
+    "inboxMoreActions": "Другие действия",
+    "inboxBlock": "Заблокировать",
+    "inboxUnblock": "Разблокировать",
+    "inboxBlockTitle": "Заблокировать {name}?",
+    "inboxBlockHint": "Этот человек больше не сможет писать в бокс. Разблокировать можно здесь же.",
+    "inboxCancel": "Отмена",
+    "inboxActionFailed": "Не получилось. Попробуй ещё раз.",
+    "inboxBlockedNote": "Бокс больше не получает сообщения от этого человека.",
+    "inboxBoxFilter": "Сообщения в бокс",
+    "inboxUnanswered": "Без ответа · {count}",
+    "inboxAllBox": "Все",
+    "inboxNewcomer": "Новый",
+    "inboxNewcomerHint": "Не клиент бокса",
+    "inboxAwaitsReply": "Ждёт ответа",
+    "ntfBoxInboxTitle": "{name} написал(а) в {box}",
+    "ntfBoxInboxBroughtIn": "{by} добавил(а) тебя в разговор",
+    "ntfBoxInboxBody": "{name} написал(а) в бокс."
   },
   "PrSharing": {
     "gymLabel": "Где ты установил этот PR?",
@@ -5845,7 +5869,8 @@
       },
       "saveError": "Не сохранилось. Попробуй ещё раз."
     },
-    "boxFindByName": "Или найдите по названию"
+    "boxFindByName": "Или найдите по названию",
+    "membershipContactBox": "Связаться с боксом"
   },
   "Community": {
     "all": "Все",
@@ -6486,7 +6511,8 @@
     "openClubMembers": "{count, plural, one {# участник клуба} few {# участника клуба} many {# участников клуба} other {# участника клуба}}",
     "guestTitle": "Ты гость бокса {box}",
     "guestBody": "Ты платишь на ресепшене при каждом визите. Стань участником бокса, чтобы записываться на занятия и видеть тренировки.",
-    "guestAction": "Стать участником бокса"
+    "guestAction": "Стать участником бокса",
+    "messageBox": "Написать в бокс"
   },
   "Trials": {
     "ask": "Запросить пробное занятие",
@@ -6655,7 +6681,14 @@
     "error_trial_already_open": "У тебя здесь уже есть запись на пробное занятие.",
     "error_invalid_trial_transition": "Это пробное занятие уже изменилось. Обнови страницу.",
     "error_class_not_found": "Это занятие больше недоступно.",
-    "error_package_not_found": "Выбери активный абонементный пакет."
+    "error_package_not_found": "Выбери активный абонементный пакет.",
+    "chatTeamAnswers": "Отвечает команда бокса",
+    "chatEmptyBox": "Напиши в бокс. Ответит тот, кто из команды свободен.",
+    "chatFrom": "{name} · {box}",
+    "chatTopicLabel": "О чём это?",
+    "chatBlocked": "Этот бокс больше не получает твои сообщения.",
+    "chatAwaitingReply": "Дождись ответа бокса, прежде чем писать ещё.",
+    "writeToBox": "Написать в {box}"
   },
   "Clubs": {
     "loading": "Загрузка…",

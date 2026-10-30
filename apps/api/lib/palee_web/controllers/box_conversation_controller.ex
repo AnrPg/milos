@@ -32,9 +32,7 @@ defmodule PaleeWeb.BoxConversationController do
     responses:
       [
         ok: {"Conversation", "application/json", S.conversation_response()},
-        forbidden:
-          {"Only members and people who tried a class", "application/json",
-           %Schema{type: :object}}
+        forbidden: {"The box blocked you", "application/json", %Schema{type: :object}}
       ] ++ @missing
   )
 
@@ -73,7 +71,13 @@ defmodule PaleeWeb.BoxConversationController do
     summary: "Write to the box",
     parameters: [@slug],
     request_body: S.body(S.message_request()),
-    responses: [created: {"Message", "application/json", S.message_response()}] ++ @missing
+    responses:
+      [
+        created: {"Message", "application/json", S.message_response()},
+        forbidden: {"The box blocked you", "application/json", %Schema{type: :object}},
+        too_many_requests:
+          {"Wait for the box to answer first", "application/json", %Schema{type: :object}}
+      ] ++ @missing
   )
 
   def send_message(conn, %{slug: slug}) do
@@ -96,7 +100,7 @@ defmodule PaleeWeb.BoxConversationController do
   end
 
   operation(:index,
-    summary: "The boxes you talk to without being a member, latest first",
+    summary: "The boxes you talk to, latest first",
     responses: [ok: {"Conversations", "application/json", S.conversations_response()}]
   )
 

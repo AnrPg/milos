@@ -4792,7 +4792,31 @@
     "semanticWorkoutDanceFitness": "Dansfitness (Zumba)",
     "semanticWorkoutPoleAerial": "Paaldansen & aerial",
     "semanticWorkoutOutdoorTraining": "Buitentraining",
-    "semanticWorkoutClimbingBouldering": "Klimmen & boulderen"
+    "semanticWorkoutClimbingBouldering": "Klimmen & boulderen",
+    "msgTopicTraining": "Training",
+    "inboxBringCoach": "Coach erbij halen",
+    "inboxBringCoachHint": "De coach komt in het gesprek en kan namens de box antwoorden.",
+    "inboxLoadingCoaches": "Coaches laden…",
+    "inboxNoCoaches": "De box heeft nog geen coaches.",
+    "inboxCoachInThread": "In het gesprek",
+    "inboxCoachTheirs": "Hun coach",
+    "inboxMoreActions": "Meer acties",
+    "inboxBlock": "Blokkeren",
+    "inboxUnblock": "Deblokkeren",
+    "inboxBlockTitle": "{name} blokkeren?",
+    "inboxBlockHint": "Deze persoon kan de box niet meer schrijven. Je kunt de blokkering hier later opheffen.",
+    "inboxCancel": "Annuleren",
+    "inboxActionFailed": "Dat lukte niet. Probeer het opnieuw.",
+    "inboxBlockedNote": "De box ontvangt geen berichten meer van deze persoon.",
+    "inboxBoxFilter": "Berichten aan de box",
+    "inboxUnanswered": "Onbeantwoord · {count}",
+    "inboxAllBox": "Alle",
+    "inboxNewcomer": "Nieuw",
+    "inboxNewcomerHint": "Geen klant van de box",
+    "inboxAwaitsReply": "Wacht op antwoord",
+    "ntfBoxInboxTitle": "{name} schreef naar {box}",
+    "ntfBoxInboxBroughtIn": "{by} heeft je bij een gesprek gehaald",
+    "ntfBoxInboxBody": "{name} stuurde de box een bericht."
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -5845,7 +5869,8 @@
       },
       "saveError": "Dat is niet opgeslagen. Probeer het opnieuw."
     },
-    "boxFindByName": "Of zoek op naam"
+    "boxFindByName": "Of zoek op naam",
+    "membershipContactBox": "Contact met de box"
   },
   "Community": {
     "all": "Alles",
@@ -6486,7 +6511,8 @@
     "openClubMembers": "{count, plural, one {# lid} other {# leden}}",
     "guestTitle": "Je bent gast van {box}",
     "guestBody": "Je betaalt bij de receptie wanneer je komt. Word boxlid om lessen te boeken en de workouts te zien.",
-    "guestAction": "Word boxlid"
+    "guestAction": "Word boxlid",
+    "messageBox": "De box een bericht sturen"
   },
   "Trials": {
     "ask": "Vraag een proefles aan",
@@ -6655,7 +6681,14 @@
     "error_trial_already_open": "Je hebt hier al een proefles geboekt.",
     "error_invalid_trial_transition": "Deze proefles is al gewijzigd. Vernieuw de pagina.",
     "error_class_not_found": "Deze les is niet meer beschikbaar.",
-    "error_package_not_found": "Kies een actief abonnementspakket."
+    "error_package_not_found": "Kies een actief abonnementspakket.",
+    "chatTeamAnswers": "Het team van de box antwoordt",
+    "chatEmptyBox": "Schrijf de box. Wie van het team tijd heeft, antwoordt.",
+    "chatFrom": "{name} · {box}",
+    "chatTopicLabel": "Waar gaat het over?",
+    "chatBlocked": "Deze box ontvangt je berichten niet meer.",
+    "chatAwaitingReply": "Wacht op het antwoord van de box voordat je meer stuurt.",
+    "writeToBox": "Schrijf naar {box}"
   },
   "Clubs": {
     "loading": "Laden…",

@@ -4,7 +4,7 @@ defmodule Palee.Infrastructure.Messaging.EctoThreadStore do
   import Ecto.Query
 
   alias Palee.Infrastructure.Tenancy.RepoContext
-  alias Palee.Messaging.{Message, Participant, Thread}
+  alias Palee.Messaging.{BoxBlock, Message, Participant, Thread}
   alias Palee.Repo
 
   @impl true
@@ -114,14 +114,83 @@ defmodule Palee.Infrastructure.Messaging.EctoThreadStore do
   end
 
   @impl true
-  def add_participant(thread_id, user_id) do
+  def add_participant(thread_id, user_id), do: add_participant(thread_id, user_id, nil)
+
+  @impl true
+  def add_participant(thread_id, user_id, joined_as) do
     attrs =
-      %{thread_id: thread_id, user_id: user_id}
+      %{thread_id: thread_id, user_id: user_id, joined_as: joined_as}
       |> put_current_organization_id()
+
+    # The latest reason wins (a coach brought into a thread they read as
+    # staff); a call without a reason never overwrites one.
+    conflict =
+      if joined_as,
+        do: [set: [joined_as: joined_as]],
+        else: :nothing
 
     %Participant{}
     |> Participant.changeset(attrs)
-    |> Repo.insert(on_conflict: :nothing, conflict_target: [:thread_id, :user_id])
+    |> Repo.insert(on_conflict: conflict, conflict_target: [:thread_id, :user_id])
+  end
+
+  @impl true
+  def join_box_threads(user_id) do
+    case current_organization_id() do
+      organization_id when is_binary(organization_id) ->
+        %{num_rows: count} =
+          Repo.query!(
+            """
+            INSERT INTO messaging_participants
+              (id, organization_id, thread_id, user_id, joined_as, inserted_at)
+            SELECT gen_random_uuid(), t.organization_id, t.id, $1, 'staff', now()
+            FROM messaging_threads t
+            WHERE t.organization_id = $2 AND t.context_type = 'box' AND t.context_id <> $1
+            ON CONFLICT (thread_id, user_id) DO NOTHING
+            """,
+            [Ecto.UUID.dump!(user_id), Ecto.UUID.dump!(organization_id)]
+          )
+
+        count
+
+      _missing_scope ->
+        0
+    end
+  end
+
+  @impl true
+  def box_blocked?(user_id) do
+    BoxBlock |> scoped_to_tenant() |> where([b], b.user_id == ^user_id) |> Repo.exists?()
+  end
+
+  @impl true
+  def list_box_blocked_user_ids([]), do: []
+
+  def list_box_blocked_user_ids(user_ids) do
+    BoxBlock
+    |> scoped_to_tenant()
+    |> where([b], b.user_id in ^user_ids)
+    |> select([b], b.user_id)
+    |> Repo.all()
+  end
+
+  @impl true
+  def block_box_sender(user_id, blocked_by_id) do
+    %BoxBlock{}
+    |> BoxBlock.changeset(
+      put_current_organization_id(%{user_id: user_id, blocked_by_id: blocked_by_id})
+    )
+    |> Repo.insert(
+      on_conflict: {:replace, [:blocked_by_id]},
+      conflict_target: [:organization_id, :user_id],
+      returning: true
+    )
+  end
+
+  @impl true
+  def unblock_box_sender(user_id) do
+    BoxBlock |> scoped_to_tenant() |> where([b], b.user_id == ^user_id) |> Repo.delete_all()
+    :ok
   end
 
   @impl true

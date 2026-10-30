@@ -11905,7 +11905,7 @@
       "BillingContact": {
         "properties": {
           "box_chat_slug": {
-            "description": "The published box page whose chat reaches the box (`/b/{slug}/chat`).",
+            "description": "The box whose chat reaches it (`/b/{slug}/chat`, ADR-282: published or not).",
             "nullable": true,
             "type": "string"
           }
@@ -12236,7 +12236,7 @@
           "contact": {
             "properties": {
               "box_chat_slug": {
-                "description": "The published box page whose chat reaches the box (`/b/{slug}/chat`).",
+                "description": "The box whose chat reaches it (`/b/{slug}/chat`, ADR-282: published or not).",
                 "nullable": true,
                 "type": "string"
               }
@@ -15424,6 +15424,10 @@
       },
       "BoxConversation": {
         "properties": {
+          "blocked": {
+            "description": "ADR-282: the box no longer receives your messages",
+            "type": "boolean"
+          },
           "box": {
             "properties": {
               "logo_url": {
@@ -15525,6 +15529,17 @@
                 "thread_id": {
                   "format": "uuid",
                   "type": "string"
+                },
+                "topic": {
+                  "enum": [
+                    "booking",
+                    "payment",
+                    "membership",
+                    "facility",
+                    "training"
+                  ],
+                  "nullable": true,
+                  "type": "string"
                 }
               },
               "required": [
@@ -15603,6 +15618,17 @@
           "thread_id": {
             "format": "uuid",
             "type": "string"
+          },
+          "topic": {
+            "enum": [
+              "booking",
+              "payment",
+              "membership",
+              "facility",
+              "training"
+            ],
+            "nullable": true,
+            "type": "string"
           }
         },
         "required": [
@@ -15644,6 +15670,17 @@
               "thread_id": {
                 "format": "uuid",
                 "type": "string"
+              },
+              "topic": {
+                "enum": [
+                  "booking",
+                  "payment",
+                  "membership",
+                  "facility",
+                  "training"
+                ],
+                "nullable": true,
+                "type": "string"
               }
             },
             "required": [
@@ -15679,6 +15716,10 @@
         "properties": {
           "conversation": {
             "properties": {
+              "blocked": {
+                "description": "ADR-282: the box no longer receives your messages",
+                "type": "boolean"
+              },
               "box": {
                 "properties": {
                   "logo_url": {
@@ -15780,6 +15821,17 @@
                     "thread_id": {
                       "format": "uuid",
                       "type": "string"
+                    },
+                    "topic": {
+                      "enum": [
+                        "booking",
+                        "payment",
+                        "membership",
+                        "facility",
+                        "training"
+                      ],
+                      "nullable": true,
+                      "type": "string"
                     }
                   },
                   "required": [
@@ -15846,6 +15898,18 @@
           },
           "client_operation_id": {
             "format": "uuid",
+            "type": "string"
+          },
+          "topic": {
+            "description": "ADR-282: what it is about; training also reaches your coach",
+            "enum": [
+              "booking",
+              "payment",
+              "membership",
+              "facility",
+              "training"
+            ],
+            "nullable": true,
             "type": "string"
           }
         },
@@ -15919,6 +15983,17 @@
                         },
                         "thread_id": {
                           "format": "uuid",
+                          "type": "string"
+                        },
+                        "topic": {
+                          "enum": [
+                            "booking",
+                            "payment",
+                            "membership",
+                            "facility",
+                            "training"
+                          ],
+                          "nullable": true,
                           "type": "string"
                         }
                       },
@@ -49883,7 +49958,7 @@
                 "contact": {
                   "properties": {
                     "box_chat_slug": {
-                      "description": "The published box page whose chat reaches the box (`/b/{slug}/chat`).",
+                      "description": "The box whose chat reaches it (`/b/{slug}/chat`, ADR-282: published or not).",
                       "nullable": true,
                       "type": "string"
                     }
@@ -86246,6 +86321,10 @@
             "allOf": [
               {
                 "properties": {
+                  "blocked": {
+                    "description": "ADR-282: the box no longer receives your messages",
+                    "type": "boolean"
+                  },
                   "box": {
                     "properties": {
                       "logo_url": {
@@ -86346,6 +86425,17 @@
                         },
                         "thread_id": {
                           "format": "uuid",
+                          "type": "string"
+                        },
+                        "topic": {
+                          "enum": [
+                            "booking",
+                            "payment",
+                            "membership",
+                            "facility",
+                            "training"
+                          ],
+                          "nullable": true,
                           "type": "string"
                         }
                       },
@@ -101915,6 +102005,10 @@
                   "properties": {
                     "conversation": {
                       "properties": {
+                        "blocked": {
+                          "description": "ADR-282: the box no longer receives your messages",
+                          "type": "boolean"
+                        },
                         "box": {
                           "properties": {
                             "logo_url": {
@@ -102015,6 +102109,17 @@
                               },
                               "thread_id": {
                                 "format": "uuid",
+                                "type": "string"
+                              },
+                              "topic": {
+                                "enum": [
+                                  "booking",
+                                  "payment",
+                                  "membership",
+                                  "facility",
+                                  "training"
+                                ],
+                                "nullable": true,
                                 "type": "string"
                               }
                             },
@@ -102121,6 +102226,10 @@
                   "properties": {
                     "conversation": {
                       "properties": {
+                        "blocked": {
+                          "description": "ADR-282: the box no longer receives your messages",
+                          "type": "boolean"
+                        },
                         "box": {
                           "properties": {
                             "logo_url": {
@@ -102222,6 +102331,17 @@
                               "thread_id": {
                                 "format": "uuid",
                                 "type": "string"
+                              },
+                              "topic": {
+                                "enum": [
+                                  "booking",
+                                  "payment",
+                                  "membership",
+                                  "facility",
+                                  "training"
+                                ],
+                                "nullable": true,
+                                "type": "string"
                               }
                             },
                             "required": [
@@ -102291,7 +102411,7 @@
                 }
               }
             },
-            "description": "Only members and people who tried a class"
+            "description": "The box blocked you"
           },
           "404": {
             "content": {
@@ -102344,6 +102464,18 @@
                   "client_operation_id": {
                     "format": "uuid",
                     "type": "string"
+                  },
+                  "topic": {
+                    "description": "ADR-282: what it is about; training also reaches your coach",
+                    "enum": [
+                      "booking",
+                      "payment",
+                      "membership",
+                      "facility",
+                      "training"
+                    ],
+                    "nullable": true,
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -102390,6 +102522,17 @@
                         "thread_id": {
                           "format": "uuid",
                           "type": "string"
+                        },
+                        "topic": {
+                          "enum": [
+                            "booking",
+                            "payment",
+                            "membership",
+                            "facility",
+                            "training"
+                          ],
+                          "nullable": true,
+                          "type": "string"
                         }
                       },
                       "required": [
@@ -102412,6 +102555,16 @@
             },
             "description": "Message"
           },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The box blocked you"
+          },
           "404": {
             "content": {
               "application/json": {
@@ -102421,6 +102574,16 @@
               }
             },
             "description": "No such box or conversation"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Wait for the box to answer first"
           }
         },
         "security": [
@@ -109063,7 +109226,7 @@
                           "contact": {
                             "properties": {
                               "box_chat_slug": {
-                                "description": "The published box page whose chat reaches the box (`/b/{slug}/chat`).",
+                                "description": "The box whose chat reaches it (`/b/{slug}/chat`, ADR-282: published or not).",
                                 "nullable": true,
                                 "type": "string"
                               }
@@ -114266,6 +114429,17 @@
                                   "thread_id": {
                                     "format": "uuid",
                                     "type": "string"
+                                  },
+                                  "topic": {
+                                    "enum": [
+                                      "booking",
+                                      "payment",
+                                      "membership",
+                                      "facility",
+                                      "training"
+                                    ],
+                                    "nullable": true,
+                                    "type": "string"
                                   }
                                 },
                                 "required": [
@@ -114314,7 +114488,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "The boxes you talk to without being a member, latest first",
+        "summary": "The boxes you talk to, latest first",
         "tags": [
           "Box conversations"
         ]
@@ -146738,6 +146912,10 @@
                       "allOf": [
                         {
                           "properties": {
+                            "blocked": {
+                              "description": "ADR-282: the box no longer receives your messages",
+                              "type": "boolean"
+                            },
                             "box": {
                               "properties": {
                                 "logo_url": {
@@ -146838,6 +147016,17 @@
                                   },
                                   "thread_id": {
                                     "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "topic": {
+                                    "enum": [
+                                      "booking",
+                                      "payment",
+                                      "membership",
+                                      "facility",
+                                      "training"
+                                    ],
+                                    "nullable": true,
                                     "type": "string"
                                   }
                                 },
@@ -272407,6 +272596,23 @@
                     "threads": {
                       "items": {
                         "properties": {
+                          "box_person": {
+                            "description": "ADR-282: in a box thread, whether the person is a newcomer and blocked",
+                            "nullable": true,
+                            "properties": {
+                              "blocked": {
+                                "type": "boolean"
+                              },
+                              "newcomer": {
+                                "type": "boolean"
+                              }
+                            },
+                            "required": [
+                              "blocked",
+                              "newcomer"
+                            ],
+                            "type": "object"
+                          },
                           "context_id": {
                             "format": "uuid",
                             "nullable": true,
@@ -272433,11 +272639,57 @@
                             "format": "date-time",
                             "type": "string"
                           },
+                          "last_message": {
+                            "nullable": true,
+                            "properties": {
+                              "body": {
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "inserted_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "message_type": {
+                                "type": "string"
+                              },
+                              "sender_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "topic": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "sender_id",
+                              "body",
+                              "message_type",
+                              "topic",
+                              "inserted_at"
+                            ],
+                            "type": "object"
+                          },
                           "participants": {
                             "items": {
                               "properties": {
                                 "id": {
                                   "format": "uuid",
+                                  "type": "string"
+                                },
+                                "joined_as": {
+                                  "description": "ADR-282: why someone is in a box thread",
+                                  "enum": [
+                                    "member",
+                                    "staff",
+                                    "coach"
+                                  ],
+                                  "nullable": true,
                                   "type": "string"
                                 },
                                 "last_read_message_id": {
@@ -272549,6 +272801,23 @@
                   "properties": {
                     "thread": {
                       "properties": {
+                        "box_person": {
+                          "description": "ADR-282: in a box thread, whether the person is a newcomer and blocked",
+                          "nullable": true,
+                          "properties": {
+                            "blocked": {
+                              "type": "boolean"
+                            },
+                            "newcomer": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "blocked",
+                            "newcomer"
+                          ],
+                          "type": "object"
+                        },
                         "context_id": {
                           "format": "uuid",
                           "nullable": true,
@@ -272575,11 +272844,57 @@
                           "format": "date-time",
                           "type": "string"
                         },
+                        "last_message": {
+                          "nullable": true,
+                          "properties": {
+                            "body": {
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "inserted_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "message_type": {
+                              "type": "string"
+                            },
+                            "sender_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "topic": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "sender_id",
+                            "body",
+                            "message_type",
+                            "topic",
+                            "inserted_at"
+                          ],
+                          "type": "object"
+                        },
                         "participants": {
                           "items": {
                             "properties": {
                               "id": {
                                 "format": "uuid",
+                                "type": "string"
+                              },
+                              "joined_as": {
+                                "description": "ADR-282: why someone is in a box thread",
+                                "enum": [
+                                  "member",
+                                  "staff",
+                                  "coach"
+                                ],
+                                "nullable": true,
                                 "type": "string"
                               },
                               "last_read_message_id": {
@@ -272698,6 +273013,23 @@
                   "properties": {
                     "thread": {
                       "properties": {
+                        "box_person": {
+                          "description": "ADR-282: in a box thread, whether the person is a newcomer and blocked",
+                          "nullable": true,
+                          "properties": {
+                            "blocked": {
+                              "type": "boolean"
+                            },
+                            "newcomer": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "blocked",
+                            "newcomer"
+                          ],
+                          "type": "object"
+                        },
                         "context_id": {
                           "format": "uuid",
                           "nullable": true,
@@ -272724,11 +273056,57 @@
                           "format": "date-time",
                           "type": "string"
                         },
+                        "last_message": {
+                          "nullable": true,
+                          "properties": {
+                            "body": {
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "inserted_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "message_type": {
+                              "type": "string"
+                            },
+                            "sender_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "topic": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "sender_id",
+                            "body",
+                            "message_type",
+                            "topic",
+                            "inserted_at"
+                          ],
+                          "type": "object"
+                        },
                         "participants": {
                           "items": {
                             "properties": {
                               "id": {
                                 "format": "uuid",
+                                "type": "string"
+                              },
+                              "joined_as": {
+                                "description": "ADR-282: why someone is in a box thread",
+                                "enum": [
+                                  "member",
+                                  "staff",
+                                  "coach"
+                                ],
+                                "nullable": true,
                                 "type": "string"
                               },
                               "last_read_message_id": {
@@ -272803,6 +273181,453 @@
           }
         ],
         "summary": "Get a single thread",
+        "tags": [
+          "Messaging"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/threads/{id}/block": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MessagingController.unblock_sender",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organization_slug",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "blocked": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "blocked"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unblocked"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not in the box's inbox"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The box hears from the person again (ADR-282)",
+        "tags": [
+          "Messaging"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MessagingController.block_sender",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organization_slug",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "blocked": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "blocked"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Blocked"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not in the box's inbox"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "A client of the box"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The box stops hearing from a newcomer who wrote to it (ADR-282)",
+        "tags": [
+          "Messaging"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/threads/{id}/coaches": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MessagingController.coach_candidates",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organization_slug",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "coaches": {
+                      "items": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "coaches_person": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "in_thread": {
+                            "type": "boolean"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "avatar_url",
+                          "coaches_person",
+                          "id",
+                          "in_thread",
+                          "nickname"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "coaches"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Coaches"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not in the box's inbox"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The coaches the box's inbox may bring into a box thread (ADR-282)",
+        "tags": [
+          "Messaging"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MessagingController.bring_coach",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organization_slug",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "user_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "user_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "thread": {
+                      "properties": {
+                        "box_person": {
+                          "description": "ADR-282: in a box thread, whether the person is a newcomer and blocked",
+                          "nullable": true,
+                          "properties": {
+                            "blocked": {
+                              "type": "boolean"
+                            },
+                            "newcomer": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "blocked",
+                            "newcomer"
+                          ],
+                          "type": "object"
+                        },
+                        "context_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "context_type": {
+                          "enum": [
+                            "direct",
+                            "assignment",
+                            "class_slot",
+                            "box"
+                          ],
+                          "type": "string"
+                        },
+                        "created_by_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "last_message": {
+                          "nullable": true,
+                          "properties": {
+                            "body": {
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "inserted_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "message_type": {
+                              "type": "string"
+                            },
+                            "sender_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "topic": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "sender_id",
+                            "body",
+                            "message_type",
+                            "topic",
+                            "inserted_at"
+                          ],
+                          "type": "object"
+                        },
+                        "participants": {
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "joined_as": {
+                                "description": "ADR-282: why someone is in a box thread",
+                                "enum": [
+                                  "member",
+                                  "staff",
+                                  "coach"
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "last_read_message_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "user_id",
+                              "nickname",
+                              "last_read_message_id"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "context_type",
+                        "context_id",
+                        "created_by_id",
+                        "inserted_at",
+                        "participants"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "thread"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Thread"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not in the box's inbox"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not a coach of the box"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "«Φέρε τον coach»: bring a coach of the box into a box thread (ADR-282)",
         "tags": [
           "Messaging"
         ]
@@ -272890,7 +273715,8 @@
                               "booking",
                               "payment",
                               "membership",
-                              "facility"
+                              "facility",
+                              "training"
                             ],
                             "nullable": true,
                             "type": "string"
@@ -272992,7 +273818,8 @@
                       "booking",
                       "payment",
                       "membership",
-                      "facility"
+                      "facility",
+                      "training"
                     ],
                     "type": "string"
                   }
@@ -273052,7 +273879,8 @@
                             "booking",
                             "payment",
                             "membership",
-                            "facility"
+                            "facility",
+                            "training"
                           ],
                           "nullable": true,
                           "type": "string"

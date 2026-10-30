@@ -4792,7 +4792,31 @@
     "semanticWorkoutDanceFitness": "Tanz-Fitness (Zumba)",
     "semanticWorkoutPoleAerial": "Pole & Aerial",
     "semanticWorkoutOutdoorTraining": "Outdoor-Training",
-    "semanticWorkoutClimbingBouldering": "Klettern & Bouldern"
+    "semanticWorkoutClimbingBouldering": "Klettern & Bouldern",
+    "msgTopicTraining": "Training",
+    "inboxBringCoach": "Coach dazuholen",
+    "inboxBringCoachHint": "Der Coach kommt ins Gespräch und kann für die Box antworten.",
+    "inboxLoadingCoaches": "Coaches werden geladen…",
+    "inboxNoCoaches": "Die Box hat noch keine Coaches.",
+    "inboxCoachInThread": "Im Gespräch",
+    "inboxCoachTheirs": "Ihr Coach",
+    "inboxMoreActions": "Weitere Aktionen",
+    "inboxBlock": "Blockieren",
+    "inboxUnblock": "Blockierung aufheben",
+    "inboxBlockTitle": "{name} blockieren?",
+    "inboxBlockHint": "Die Person kann der Box nicht mehr schreiben. Du kannst die Blockierung später hier aufheben.",
+    "inboxCancel": "Abbrechen",
+    "inboxActionFailed": "Das hat nicht geklappt. Versuch es noch einmal.",
+    "inboxBlockedNote": "Die Box erhält keine Nachrichten mehr von dieser Person.",
+    "inboxBoxFilter": "Nachrichten an die Box",
+    "inboxUnanswered": "Unbeantwortet · {count}",
+    "inboxAllBox": "Alle",
+    "inboxNewcomer": "Neu",
+    "inboxNewcomerHint": "Kein Kunde der Box",
+    "inboxAwaitsReply": "Wartet auf Antwort",
+    "ntfBoxInboxTitle": "{name} hat {box} geschrieben",
+    "ntfBoxInboxBroughtIn": "{by} hat dich zu einem Gespräch geholt",
+    "ntfBoxInboxBody": "{name} hat der Box geschrieben."
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",
@@ -5845,7 +5869,8 @@
       },
       "saveError": "Das wurde nicht gespeichert. Versuch es noch einmal."
     },
-    "boxFindByName": "Oder nach Namen suchen"
+    "boxFindByName": "Oder nach Namen suchen",
+    "membershipContactBox": "Box kontaktieren"
   },
   "Community": {
     "all": "Alle",
@@ -6486,7 +6511,8 @@
     "openClubMembers": "{count, plural, one {# Mitglied} other {# Mitglieder}}",
     "guestTitle": "Du bist Gast bei {box}",
     "guestBody": "Du zahlst am Empfang, wann immer du kommst. Werde Mitglied, um Kurse zu buchen und die Workouts zu sehen.",
-    "guestAction": "Mitglied werden"
+    "guestAction": "Mitglied werden",
+    "messageBox": "Der Box schreiben"
   },
   "Trials": {
     "ask": "Probetraining anfragen",
@@ -6655,7 +6681,14 @@
     "error_trial_already_open": "Du hast hier bereits ein Probetraining gebucht.",
     "error_invalid_trial_transition": "Dieses Probetraining hat sich bereits geändert. Lade die Seite neu.",
     "error_class_not_found": "Dieser Kurs ist nicht mehr verfügbar.",
-    "error_package_not_found": "Wähle ein aktives Abo-Paket."
+    "error_package_not_found": "Wähle ein aktives Abo-Paket.",
+    "chatTeamAnswers": "Das Team der Box antwortet",
+    "chatEmptyBox": "Schreib der Box. Wer im Team gerade Zeit hat, antwortet.",
+    "chatFrom": "{name} · {box}",
+    "chatTopicLabel": "Worum geht es?",
+    "chatBlocked": "Diese Box erhält deine Nachrichten nicht mehr.",
+    "chatAwaitingReply": "Warte auf die Antwort der Box, bevor du mehr schickst.",
+    "writeToBox": "{box} schreiben"
   },
   "Clubs": {
     "loading": "Wird geladen …",

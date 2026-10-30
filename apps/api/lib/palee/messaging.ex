@@ -48,6 +48,21 @@ defmodule Palee.Messaging do
   @doc "Adds a member of staff to a thread (a message from the box is the gym's thread)."
   def add_participant(thread_id, user_id), do: ThreadStore.add_participant(thread_id, user_id)
 
+  @doc "ADR-282: adds someone to a box thread as `:member`, `:staff` or `:coach`."
+  def add_participant(thread_id, user_id, joined_as),
+    do: ThreadStore.add_participant(thread_id, user_id, joined_as)
+
+  @doc "A thread and its participants, without the reader check (callers authorize)."
+  def peek_thread(thread_id), do: ThreadStore.get_thread_with_participants(thread_id)
+
+  @doc "ADR-282: a row in every box thread of the tenant for someone in the box's inbox."
+  def join_box_threads(user_id), do: ThreadStore.join_box_threads(user_id)
+
+  def box_blocked?(user_id), do: ThreadStore.box_blocked?(user_id)
+  def list_box_blocked_user_ids(user_ids), do: ThreadStore.list_box_blocked_user_ids(user_ids)
+  def block_box_sender(user_id, blocked_by_id), do: ThreadStore.block_box_sender(user_id, blocked_by_id)
+  def unblock_box_sender(user_id), do: ThreadStore.unblock_box_sender(user_id)
+
   def message_topics, do: Palee.Messaging.Message.topics()
 
   @doc "Boxes where the person in `context` (a user scope) has their own conversation."

@@ -379,9 +379,6 @@ defmodule Palee.Web.TrialsControllerTest do
       slot = ctx.slot.(1, %{})
       policy!(ctx, %{})
 
-      # No conversation without a trial or a membership.
-      assert ctx.as.(ctx.other) |> post("/api/boxes/#{ctx.slug}/conversation") |> response(403)
-
       %{"trial" => %{"id" => id}} = ask(ctx, ctx.visitor, slot) |> json_response(201)
 
       ctx.as.(ctx.owner)
