@@ -14547,5 +14547,295 @@
     "leaveStay": "Hierbleiben",
     "leaveDiscard": "Verwerfen",
     "changed": "Geändert"
+  },
+  "PartnerVerify": {
+    "back": "Trainingspartner",
+    "title": "Verifizierung",
+    "loading": "Wird geladen…",
+    "someone": "Jemand",
+    "intro": "Trainingspartner gibt es nur für verifizierte Personen. Ohne Mitgliedschaft in einer Box oder bei einem Coach verifizieren dich {count} Bürgen und eine Prüfung durch das Palee-Team. Das machst du nur einmal.",
+    "stepsLabel": "Schritte der Verifizierung",
+    "stepOf": "Schritt {step} von {total}",
+    "state": {
+      "done": "Erledigt",
+      "open": "Offen",
+      "locked": "Noch nicht"
+    },
+    "selfieExpired": "Dein Foto wurde nach {days} Tagen ungeprüft gelöscht. Mach ein neues Selfie, um abzuschließen.",
+    "verified": {
+      "title": "Du bist verifiziert",
+      "byMembership": "Verifiziert über deine Mitgliedschaft in einer Box oder bei einem Coach. Das bleibt, auch wenn dein Abo endet.",
+      "bySponsors": "Verifiziert durch deine Bürgen und das Palee-Team. Das gilt dauerhaft.",
+      "open": "Zu den Trainingspartnern"
+    },
+    "suspended": {
+      "title": "Dein Zugang zu Trainingspartnern ist gesperrt",
+      "body": "Das Palee-Team hat ihn nach Meldungen gesperrt. Deine übrigen Funktionen in Palee sind nicht betroffen."
+    },
+    "review": {
+      "title": "In Prüfung durch das Palee-Team",
+      "body": "Eine Person aus dem Palee-Team vergleicht dein Selfie mit deinem Avatar. Wir sagen dir Bescheid. Das Foto wird gelöscht, sobald entschieden ist, spätestens nach {days} Tagen."
+    },
+    "rejected": {
+      "title": "Deine Verifizierung wurde nicht genehmigt",
+      "reason": "Grund:",
+      "again": "Wenn du denkst, dass das ein Fehler ist, bitte um eine zweite Prüfung. Eine neue Anfrage wird geöffnet und du machst die fehlenden Schritte erneut.",
+      "ask": "Zweite Prüfung anfragen"
+    },
+    "steps": {
+      "consent": {
+        "title": "Einwilligung",
+        "locked": "Gib zuerst deine Einwilligung.",
+        "doneShort": "Du hast der Prüfung durch das Palee-Team zugestimmt."
+      },
+      "sponsors": {
+        "title": "Bürgen",
+        "locked": "Öffnet sich nach deiner Einwilligung.",
+        "doneShort": "Deine Bürgen haben für dich gebürgt.",
+        "done": "Gebürgt: {names}"
+      },
+      "phone": {
+        "title": "Handynummer",
+        "locked": "Öffnet sich nach deiner Einwilligung.",
+        "doneShort": "Deine Nummer ist bestätigt.",
+        "done": "Bestätigt: {phone}"
+      },
+      "selfie": {
+        "title": "Selfie mit Code",
+        "locked": "Öffnet sich, wenn deine Bürgen gebürgt haben und deine Nummer bestätigt ist.",
+        "doneShort": "Gesendet."
+      }
+    },
+    "consent": {
+      "what": "Wir brauchen {count} Bürgen aus deinen Kumpels, eine Handynummer und ein Selfie.",
+      "phone": "Deine Nummer wird verschlüsselt gespeichert und nur genutzt, damit niemand ein zweites Konto anlegt. Niemand sonst sieht sie.",
+      "selfie": "Nur eine Person aus dem Palee-Team sieht dein Selfie neben deinem Avatar. Wir löschen es, sobald entschieden ist, spätestens nach {days} Tagen. Keine Gesichtserkennung.",
+      "human": "Es entscheidet immer ein Mensch, nie eine Maschine. Wirst du nicht genehmigt, erfährst du warum und kannst eine zweite Prüfung anfragen.",
+      "keep": "Wir speichern nur, dass du verifiziert wurdest, wann, wie und wer geprüft hat.",
+      "withdraw": "Du kannst jederzeit abbrechen; dann werden deine Angaben gelöscht.",
+      "privacy": "Wie wir deine Daten nutzen",
+      "agree": "Ich stimme zu, weiter"
+    },
+    "withdraw": {
+      "button": "Abbrechen und Angaben löschen",
+      "confirmTitle": "Verifizierung abbrechen?",
+      "confirmBody": "Wir löschen deine Handynummer, dein Selfie, deine unbeantworteten Anfragen an Bürgen und deine Links. Du kannst später neu beginnen.",
+      "confirm": "Ja, abbrechen und löschen",
+      "keep": "Nein, zurück"
+    },
+    "sponsors": {
+      "lead": "Bitte {count} Kumpels, die dich kennen, für dich zu bürgen.",
+      "count": "{vouches}/{required} gebürgt",
+      "meaning": "Ein Bürge bestätigt, dass er dich persönlich kennt. Bürgen kann nur, wer über eine Box oder einen Coach verifiziert ist.",
+      "noBuddies": "Du hast noch keine Kumpels. Kumpels sind Menschen, denen du folgst und die dir zurückfolgen.",
+      "listLabel": "Deine Kumpels",
+      "viaLink": "Per QR-Code gebürgt",
+      "othersTitle": "Wer dich kennt, ist nicht hier?",
+      "othersBody": "Wenn die Person dich persönlich kennt, etwa aus dem Park, kann sie einen QR-Code auf deinem Handy scannen.",
+      "showQr": "QR-Code oder Link zeigen",
+      "state": {
+        "vouched": "Hat für dich gebürgt",
+        "requested": "Wartet auf Antwort",
+        "declined": "Hat nicht gebürgt",
+        "eligible": "Verifiziert, kann bürgen"
+      },
+      "reason": {
+        "not_verified": "Nicht über eine Box oder einen Coach verifiziert",
+        "blocked": "Kann nicht für dich bürgen",
+        "quota": "Hat zuletzt für viele gebürgt",
+        "penalty": "Kann gerade nicht bürgen",
+        "self": "Das bist du"
+      },
+      "ask": "Fragen",
+      "askLabel": "{name} bitten, für dich zu bürgen",
+      "cancel": "Zurückziehen",
+      "cancelLabel": "Anfrage an {name} zurückziehen"
+    },
+    "link": {
+      "title": "Persönlich bürgen",
+      "body": "Zeig diesen QR-Code jemandem, der dich kennt. Die Person muss verifiziertes Mitglied einer Box oder bei einem Coach sein.",
+      "vouched": "Gerade hat jemand für dich gebürgt.",
+      "qrLabel": "QR-Code für deinen Bürgen",
+      "expiresIn": "Läuft ab in {time}",
+      "singleUse": "Gilt nur für einen Bürgen.",
+      "copy": "Link kopieren",
+      "copied": "Link kopiert",
+      "expired": "Der Link ist abgelaufen.",
+      "renew": "Neuer Link"
+    },
+    "phone": {
+      "lead": "Wir schicken dir einen 6-stelligen Code per SMS. Eine Nummer pro Konto.",
+      "label": "Handynummer",
+      "placeholder": "+49… oder 01…",
+      "private": "Verschlüsselt gespeichert; niemand sonst sieht sie.",
+      "send": "Code senden",
+      "back": "Zurück zum Code",
+      "sentTo": "Wir haben einen Code an {phone} geschickt. Er gilt {minutes} Minuten.",
+      "codeLabel": "6-stelliger Code",
+      "attempts": "Du hast {count} Versuche pro Code.",
+      "confirm": "Bestätigen",
+      "resendIn": "Erneut senden in {seconds} s",
+      "resend": "Erneut senden",
+      "change": "Nummer ändern"
+    },
+    "selfie": {
+      "write": "Schreib diesen Code auf ein Blatt Papier:",
+      "codeLabel": "Dein Code: {code}",
+      "hold": "Halte es neben dein Gesicht und mach ein Selfie. Gesicht und Code müssen gut zu sehen sein.",
+      "previewAlt": "Dein Selfie",
+      "take": "Selfie machen",
+      "retake": "Neu aufnehmen",
+      "choose": "Foto auswählen",
+      "tooBig": "Das Foto ist größer als {mb} MB.",
+      "wrongType": "Wähle ein Foto im Format JPEG, PNG, WebP oder HEIC.",
+      "privacy": "Nur eine Person aus dem Palee-Team sieht es, und wir löschen es, sobald entschieden ist (spätestens nach {days} Tagen). Wir nutzen es nicht zur Gesichtserkennung.",
+      "uploading": "Wird hochgeladen… {percent} %",
+      "sending": "Wird gesendet…",
+      "submit": "Zur Prüfung senden"
+    },
+    "vouch": {
+      "title": "Bürgschaftsanfragen",
+      "didVouch": "Du hast für {name} gebürgt.",
+      "didDecline": "Du hast uns gesagt, dass du {name} nicht kennst.",
+      "none": "Gerade bittet dich niemand um eine Bürgschaft.",
+      "paused": "Du kannst ab {date} wieder bürgen.",
+      "notVerified": "Bürgen kann nur, wer über eine Mitgliedschaft in einer Box oder bei einem Coach verifiziert ist.",
+      "quotaUsed": "Du hast in den letzten {days} Tagen {quota}-mal gebürgt. Später kannst du wieder bürgen.",
+      "quotaLeft": "Du kannst noch für {left} von {quota} Personen in {days} Tagen bürgen.",
+      "asks": "{name} bittet dich, Bürge zu sein",
+      "forPartners": "für Trainingspartner",
+      "meaning": "Du bestätigst, dass du die Person persönlich kennst und sie vertrauenswürdig ist. Sperren wir sie nach Meldungen, sagen wir dir Bescheid, und du kannst 60 Tage lang für niemanden bürgen.",
+      "meaningLink": "Du bestätigst, dass du die Person persönlich kennst und sie vertrauenswürdig ist. Sperren wir sie nach Meldungen, sagen wir dir Bescheid, und du kannst 60 Tage lang für niemanden bürgen.",
+      "vouch": "Ich bürge",
+      "decline": "Kenne ich nicht"
+    },
+    "vouchLink": {
+      "title": "Bürgen",
+      "missing": "Dieser Link ist unvollständig. Bitte um einen neuen QR-Code."
+    },
+    "error": {
+      "partner_verification_required": "Verifiziere dein Konto, um Trainingspartner zu nutzen.",
+      "partner_suspended": "Dein Zugang zu Trainingspartnern ist gesperrt.",
+      "partner_already_verified": "Dein Konto ist bereits verifiziert.",
+      "partner_verification_in_review": "Deine Anfrage wird vom Palee-Team geprüft.",
+      "partner_verification_request_open": "Du hast bereits eine offene Anfrage.",
+      "partner_consent_required": "Gib zuerst deine Einwilligung.",
+      "partner_sponsor_not_eligible": "Diese Person kann nicht für dich bürgen.",
+      "partner_sponsor_quota": "Diese Person hat zuletzt für viele gebürgt. Frag jemand anderen.",
+      "partner_sponsor_penalty": "Bürgschaften sind gerade pausiert.",
+      "partner_sponsor_declined": "Diese Person hat nicht für dich gebürgt.",
+      "partner_sponsor_already_asked": "Du hast diese Person bereits gefragt.",
+      "partner_vouch_request_closed": "Diese Anfrage wurde bereits beantwortet.",
+      "partner_link_expired": "Dieser Link ist abgelaufen oder wurde schon benutzt. Bitte um einen neuen QR-Code.",
+      "partner_phone_invalid": "Gib eine Handynummer ein.",
+      "partner_phone_taken": "Diese Nummer verifiziert bereits ein anderes Konto.",
+      "partner_phone_rate_limited": "Zu viele Codes. Versuch es später noch einmal.",
+      "partner_code_invalid": "Der Code stimmt nicht.",
+      "partner_code_expired": "Der Code ist abgelaufen. Fordere einen neuen an.",
+      "partner_selfie_missing": "Mach zuerst das Selfie.",
+      "partner_selfie_invalid": "Das Selfie muss ein Foto mit höchstens 8 MB sein.",
+      "partner_verification_incomplete": "Es fehlen noch Schritte.",
+      "partner_verification_closed": "Diese Anfrage wartet nicht mehr auf eine Entscheidung.",
+      "partner_decision_reason_required": "Gib einen Grund für die Ablehnung an.",
+      "partner_decision_reason_too_long": "Höchstens 500 Zeichen.",
+      "sms_unavailable": "SMS sind gerade nicht verfügbar. Versuch es später noch einmal."
+    },
+    "notif": {
+      "vouchRequest_title": "{name} bittet dich, Bürge zu sein",
+      "vouchRequest_body": "Für Trainingspartner. Sieh dir an, was Bürgen bedeutet, bevor du antwortest.",
+      "vouched_title": "{name} hat für dich gebürgt",
+      "vouched_body": "Ein Schritt näher an den Trainingspartnern.",
+      "decided_approved_title": "Du bist verifiziert",
+      "decided_approved_body": "Du kannst jetzt Trainingspartner nutzen.",
+      "decided_rejected_title": "Deine Verifizierung wurde nicht genehmigt",
+      "decided_rejected_body": "Sieh dir den Grund an und bitte um eine zweite Prüfung.",
+      "decided_rejected_reason": "Grund: {reason}",
+      "decided_expired_title": "Dein Foto ist abgelaufen",
+      "decided_expired_body": "Mach ein neues Selfie, um deine Verifizierung abzuschließen.",
+      "penalty_title": "Deine Bürgschaften sind pausiert",
+      "penalty_body": "Jemand, für den du gebürgt hast, wurde nach Meldungen gesperrt. Du kannst ab {date} wieder bürgen.",
+      "penalty_bodyNoDate": "Jemand, für den du gebürgt hast, wurde nach Meldungen gesperrt. Du kannst später wieder bürgen."
+    }
+  },
+  "PlatformPartners": {
+    "back": "Plattform-Konsole",
+    "forbidden": "Nur das Palee-Team kann diese Seite sehen.",
+    "loading": "Wird geladen…",
+    "someone": "Jemand",
+    "cancel": "Abbrechen",
+    "verifications": {
+      "title": "Verifizierungen für Trainingspartner",
+      "subtitle": "Personen, die mit Bürgen kamen. Vergleiche das Selfie und seinen Code mit dem Avatar, dann genehmige oder lehne ab.",
+      "queue": "Wartend",
+      "queueCount": "{count, plural, one {# wartet} other {# warten}}",
+      "empty": "Keine Anfragen warten.",
+      "pick": "Wähle eine Anfrage zur Prüfung.",
+      "submitted": "Gesendet {date}",
+      "overdue": "Das Foto wird bald ungeprüft gelöscht",
+      "approved": "{name} ist verifiziert.",
+      "rejected": "{name} wurde abgelehnt.",
+      "codeToFind": "Code, der auf dem Papier stehen muss",
+      "selfie": "Selfie",
+      "selfieAlt": "Selfie von {name}",
+      "linkExpired": "Der Foto-Link ist abgelaufen. Aktualisiere ihn.",
+      "noSelfie": "Kein Foto.",
+      "linkLeft": "Link gültig für {seconds} s",
+      "refreshLink": "Link aktualisieren",
+      "avatar": "Avatar",
+      "avatarAlt": "Avatar von {name}",
+      "noAvatar": "Kein Avatar.",
+      "sponsors": "Bürgen",
+      "channel": {
+        "buddy": "Kumpel",
+        "link": "QR-Code"
+      },
+      "phone": "Handy",
+      "phoneVerified": "bestätigt",
+      "deletedNote": "Das Foto wird gelöscht, sobald du entscheidest. Nur das Ergebnis bleibt.",
+      "reason": "Grund (die Person sieht ihn)",
+      "reasonHint": "Einfache Worte: was fehlte und was für eine zweite Prüfung zu tun ist. Höchstens 500 Zeichen.",
+      "reasonRequired": "Schreib einen Grund für die Ablehnung.",
+      "confirmReject": "Ablehnen",
+      "approve": "Genehmigen",
+      "reject": "Ablehnen…"
+    },
+    "reports": {
+      "title": "Meldungen zu Trainingspartnern",
+      "subtitle": "Offene Meldungen, nach Person. Eine Sperre beendet den Zugang zu Trainingspartnern und pausiert die Bürgen der Person für 60 Tage.",
+      "empty": "Keine offenen Meldungen.",
+      "suspended": "{name} wurde gesperrt. {sponsors, plural, one {# Bürge pausiert} other {# Bürgen pausiert}}.",
+      "dismissed": "Meldungen zu {name} wurden verworfen ({count}).",
+      "count": "{count, plural, one {# offene Meldung} other {# offene Meldungen}}",
+      "by": "Von {name} · {date}",
+      "note": "Notiz (intern, optional)",
+      "suspend": "Sperren",
+      "suspendConfirm": "{name} sperren? Das Profil wird ausgeblendet, Matches enden und die Bürgen können 60 Tage lang nicht bürgen.",
+      "suspendYes": "Ja, sperren",
+      "dismiss": "Verwerfen",
+      "alreadyDecided": "Über diese Meldungen wurde bereits entschieden."
+    },
+    "reason": {
+      "unsafe": "Ich habe mich unsicher gefühlt",
+      "fake": "Gefälschtes Konto",
+      "minor": "Minderjährig",
+      "harassment": "Belästigung",
+      "other": "Sonstiges"
+    },
+    "stats": {
+      "title": "Qualität der Vorschläge",
+      "since": "Letzte 30 Tage, seit {date}",
+      "shown": "Angezeigt",
+      "proposed": "Vorgeschlagen",
+      "proposedShare": "Vorgeschlagen von angezeigt",
+      "feedback": "„Passt nicht“",
+      "reasons": "Warum es nicht passte",
+      "reason": {
+        "not_near": "Nicht in der Nähe",
+        "bad_time": "Ungünstige Zeit",
+        "wrong_level": "Falsches Niveau",
+        "other": "Sonstiges"
+      },
+      "note": "Nur anonyme Zähler; keine Person wird erfasst."
+    }
   }
 }

@@ -14547,5 +14547,295 @@
     "leaveStay": "Stay here",
     "leaveDiscard": "Discard",
     "changed": "Changed"
+  },
+  "PartnerVerify": {
+    "back": "Training partners",
+    "title": "Verification",
+    "loading": "Loading…",
+    "someone": "Someone",
+    "intro": "Training partners is for verified people only. Without a box or coach membership, you get verified by {count} sponsors and a check by the Palee team. You do it once.",
+    "stepsLabel": "Verification steps",
+    "stepOf": "Step {step} of {total}",
+    "state": {
+      "done": "Done",
+      "open": "To do",
+      "locked": "Not yet"
+    },
+    "selfieExpired": "Your photo was deleted unchecked after {days} days. Take a new selfie to finish.",
+    "verified": {
+      "title": "You are verified",
+      "byMembership": "Verified through your box or coach membership. It stays even if your subscription ends.",
+      "bySponsors": "Verified by your sponsors and the Palee team. It stays for good.",
+      "open": "Go to Training partners"
+    },
+    "suspended": {
+      "title": "Your Training partners access is suspended",
+      "body": "The Palee team suspended it after reports. Your other features on Palee are not affected."
+    },
+    "review": {
+      "title": "In review by the Palee team",
+      "body": "A person of the Palee team compares your selfie with your avatar. We will let you know. The photo is deleted as soon as they decide, at the latest after {days} days."
+    },
+    "rejected": {
+      "title": "Your verification was not approved",
+      "reason": "Reason:",
+      "again": "If you think this is a mistake, ask for a second review. A new request opens and you go through the missing steps again.",
+      "ask": "Ask for a second review"
+    },
+    "steps": {
+      "consent": {
+        "title": "Consent",
+        "locked": "First give your consent.",
+        "doneShort": "You agreed to the Palee check."
+      },
+      "sponsors": {
+        "title": "Sponsors",
+        "locked": "Opens after your consent.",
+        "doneShort": "Your sponsors vouched for you.",
+        "done": "Vouched: {names}"
+      },
+      "phone": {
+        "title": "Mobile number",
+        "locked": "Opens after your consent.",
+        "doneShort": "Your number is confirmed.",
+        "done": "Confirmed: {phone}"
+      },
+      "selfie": {
+        "title": "Selfie with a code",
+        "locked": "Opens when your sponsors vouched and your number is confirmed.",
+        "doneShort": "Sent."
+      }
+    },
+    "consent": {
+      "what": "We ask for {count} sponsors from your Buddies, a mobile number and a selfie.",
+      "phone": "Your number is stored encrypted and only used so that nobody makes a second account. Nobody else sees it.",
+      "selfie": "Only one person of the Palee team sees your selfie, next to your avatar. We delete it as soon as they decide, at the latest after {days} days. No face recognition.",
+      "human": "A person always decides, never a machine. If you are not approved, you learn why and can ask for a second review.",
+      "keep": "We keep only that you were verified, when, how and who checked.",
+      "withdraw": "You can withdraw at any time; then your details are deleted.",
+      "privacy": "How we use your data",
+      "agree": "I agree, continue"
+    },
+    "withdraw": {
+      "button": "Cancel and delete my details",
+      "confirmTitle": "Cancel your verification?",
+      "confirmBody": "We delete your mobile number, your selfie, your unanswered requests to sponsors and your links. You can start again later.",
+      "confirm": "Yes, cancel and delete",
+      "keep": "No, go back"
+    },
+    "sponsors": {
+      "lead": "Ask {count} Buddies who know you to vouch for you.",
+      "count": "{vouches}/{required} vouched",
+      "meaning": "A sponsor confirms they know you in person. Only people verified through a box or coach can vouch.",
+      "noBuddies": "You have no Buddies yet. Buddies are people you follow and who follow you back.",
+      "listLabel": "Your Buddies",
+      "viaLink": "Vouched with the QR code",
+      "othersTitle": "The person who knows you is not here?",
+      "othersBody": "If they know you in person, say from the park, they can scan a QR code on your phone.",
+      "showQr": "Show QR code or link",
+      "state": {
+        "vouched": "Vouched for you",
+        "requested": "Waiting for an answer",
+        "declined": "Did not vouch",
+        "eligible": "Verified, can vouch"
+      },
+      "reason": {
+        "not_verified": "Not verified through a box or coach",
+        "blocked": "Cannot vouch for you",
+        "quota": "Vouched for many people lately",
+        "penalty": "Cannot vouch for now",
+        "self": "That is you"
+      },
+      "ask": "Ask",
+      "askLabel": "Ask {name} to vouch for you",
+      "cancel": "Cancel",
+      "cancelLabel": "Cancel your request to {name}"
+    },
+    "link": {
+      "title": "Vouching in person",
+      "body": "Show this QR code to someone who knows you. They must be a verified member of a box or coach.",
+      "vouched": "Someone just vouched for you.",
+      "qrLabel": "QR code for your sponsor",
+      "expiresIn": "Expires in {time}",
+      "singleUse": "Works for one sponsor only.",
+      "copy": "Copy link",
+      "copied": "Link copied",
+      "expired": "The link has expired.",
+      "renew": "New link"
+    },
+    "phone": {
+      "lead": "We send a 6-digit code by SMS. One number per account.",
+      "label": "Mobile number",
+      "placeholder": "69xxxxxxxx or +30…",
+      "private": "Stored encrypted; nobody else sees it.",
+      "send": "Send code",
+      "back": "Back to the code",
+      "sentTo": "We sent a code to {phone}. It is valid for {minutes} minutes.",
+      "codeLabel": "6-digit code",
+      "attempts": "You have {count} tries per code.",
+      "confirm": "Confirm",
+      "resendIn": "Send again in {seconds}s",
+      "resend": "Send again",
+      "change": "Change number"
+    },
+    "selfie": {
+      "write": "Write this code on a piece of paper:",
+      "codeLabel": "Your code: {code}",
+      "hold": "Hold it next to your face and take a selfie. Your face and the code must be clear.",
+      "previewAlt": "Your selfie",
+      "take": "Take selfie",
+      "retake": "Take again",
+      "choose": "Choose photo",
+      "tooBig": "The photo is larger than {mb} MB.",
+      "wrongType": "Choose a JPEG, PNG, WebP or HEIC photo.",
+      "privacy": "Only one person of the Palee team sees it, and we delete it as soon as they decide (at the latest after {days} days). We do not use it for face recognition.",
+      "uploading": "Uploading… {percent}%",
+      "sending": "Sending…",
+      "submit": "Send for review"
+    },
+    "vouch": {
+      "title": "Vouch requests",
+      "didVouch": "You vouched for {name}.",
+      "didDecline": "You told us you don't know {name}.",
+      "none": "Nobody is asking you to vouch right now.",
+      "paused": "You can vouch again from {date}.",
+      "notVerified": "Only people verified through a box or coach membership can vouch.",
+      "quotaUsed": "You vouched {quota} times in the last {days} days. You can vouch again later.",
+      "quotaLeft": "You can vouch for {left} more of {quota} people in {days} days.",
+      "asks": "{name} asks you to be their sponsor",
+      "forPartners": "for Training partners",
+      "meaning": "You confirm that you know them in person and that they can be trusted. If we suspend them after reports, we will tell you, and you will not be able to vouch for anyone for 60 days.",
+      "meaningLink": "You confirm that you know them in person and that they can be trusted. If we suspend them after reports, we will tell you, and you will not be able to vouch for anyone for 60 days.",
+      "vouch": "I vouch",
+      "decline": "I don't know them"
+    },
+    "vouchLink": {
+      "title": "Vouch",
+      "missing": "This link is incomplete. Ask for a new QR code."
+    },
+    "error": {
+      "partner_verification_required": "Verify your account to use Training partners.",
+      "partner_suspended": "Your Training partners access is suspended.",
+      "partner_already_verified": "Your account is already verified.",
+      "partner_verification_in_review": "Your request is in review by the Palee team.",
+      "partner_verification_request_open": "You already have an open request.",
+      "partner_consent_required": "Give your consent first.",
+      "partner_sponsor_not_eligible": "This person cannot vouch for you.",
+      "partner_sponsor_quota": "This person has vouched for many people lately. Ask someone else.",
+      "partner_sponsor_penalty": "Vouching is paused for now.",
+      "partner_sponsor_declined": "This person did not vouch for you.",
+      "partner_sponsor_already_asked": "You have already asked this person.",
+      "partner_vouch_request_closed": "This request has already been answered.",
+      "partner_link_expired": "This link has expired or was already used. Ask for a new QR code.",
+      "partner_phone_invalid": "Enter a mobile number.",
+      "partner_phone_taken": "This number already verifies another account.",
+      "partner_phone_rate_limited": "Too many codes. Try again later.",
+      "partner_code_invalid": "That code is not right.",
+      "partner_code_expired": "The code expired. Ask for a new one.",
+      "partner_selfie_missing": "Take the selfie first.",
+      "partner_selfie_invalid": "The selfie must be a photo of at most 8 MB.",
+      "partner_verification_incomplete": "Some steps are still missing.",
+      "partner_verification_closed": "This request is no longer waiting for a decision.",
+      "partner_decision_reason_required": "Give a reason to reject.",
+      "partner_decision_reason_too_long": "At most 500 characters.",
+      "sms_unavailable": "Text messages are not available right now. Try again later."
+    },
+    "notif": {
+      "vouchRequest_title": "{name} asks you to be their sponsor",
+      "vouchRequest_body": "For Training partners. See what vouching means before you answer.",
+      "vouched_title": "{name} vouched for you",
+      "vouched_body": "One step closer to Training partners.",
+      "decided_approved_title": "You are verified",
+      "decided_approved_body": "You can now use Training partners.",
+      "decided_rejected_title": "Your verification was not approved",
+      "decided_rejected_body": "See the reason and ask for a second review.",
+      "decided_rejected_reason": "Reason: {reason}",
+      "decided_expired_title": "Your photo expired",
+      "decided_expired_body": "Take a new selfie to finish your verification.",
+      "penalty_title": "Your vouching is paused",
+      "penalty_body": "Someone you vouched for was suspended after reports. You can vouch again from {date}.",
+      "penalty_bodyNoDate": "Someone you vouched for was suspended after reports. You can vouch again later."
+    }
+  },
+  "PlatformPartners": {
+    "back": "Platform console",
+    "forbidden": "Only the Palee team can see this page.",
+    "loading": "Loading…",
+    "someone": "Someone",
+    "cancel": "Cancel",
+    "verifications": {
+      "title": "Training partner verifications",
+      "subtitle": "People who came with sponsors. Compare the selfie and its code with the avatar, then approve or reject.",
+      "queue": "Waiting",
+      "queueCount": "{count, plural, one {# waiting} other {# waiting}}",
+      "empty": "No requests are waiting.",
+      "pick": "Choose a request to review.",
+      "submitted": "Sent {date}",
+      "overdue": "The photo will soon be deleted unchecked",
+      "approved": "{name} is verified.",
+      "rejected": "{name} was rejected.",
+      "codeToFind": "Code to look for on the paper",
+      "selfie": "Selfie",
+      "selfieAlt": "Selfie of {name}",
+      "linkExpired": "The photo link expired. Refresh it.",
+      "noSelfie": "No photo.",
+      "linkLeft": "Link valid for {seconds}s",
+      "refreshLink": "Refresh link",
+      "avatar": "Avatar",
+      "avatarAlt": "Avatar of {name}",
+      "noAvatar": "No avatar.",
+      "sponsors": "Sponsors",
+      "channel": {
+        "buddy": "Buddy",
+        "link": "QR code"
+      },
+      "phone": "Mobile",
+      "phoneVerified": "confirmed",
+      "deletedNote": "The photo is deleted as soon as you decide. Only the outcome is kept.",
+      "reason": "Reason (the person sees it)",
+      "reasonHint": "Plain words: what was missing and what to do for a second review. At most 500 characters.",
+      "reasonRequired": "Write a reason to reject.",
+      "confirmReject": "Reject",
+      "approve": "Approve",
+      "reject": "Reject…"
+    },
+    "reports": {
+      "title": "Training partner reports",
+      "subtitle": "Open reports, per person. Suspending ends their Training partners access and pauses their sponsors for 60 days.",
+      "empty": "No open reports.",
+      "suspended": "{name} was suspended. {sponsors, plural, one {# sponsor was paused} other {# sponsors were paused}}.",
+      "dismissed": "Reports on {name} were dismissed ({count}).",
+      "count": "{count, plural, one {# open report} other {# open reports}}",
+      "by": "By {name} · {date}",
+      "note": "Note (internal, optional)",
+      "suspend": "Suspend",
+      "suspendConfirm": "Suspend {name}? Their profile is hidden, their matches end and their sponsors cannot vouch for 60 days.",
+      "suspendYes": "Yes, suspend",
+      "dismiss": "Dismiss",
+      "alreadyDecided": "These reports were already decided."
+    },
+    "reason": {
+      "unsafe": "Made me feel unsafe",
+      "fake": "Fake account",
+      "minor": "Minor",
+      "harassment": "Harassment",
+      "other": "Other"
+    },
+    "stats": {
+      "title": "Suggestion quality",
+      "since": "Last 30 days, since {date}",
+      "shown": "Shown",
+      "proposed": "Proposed",
+      "proposedShare": "Proposed of shown",
+      "feedback": "“Doesn't fit”",
+      "reasons": "Why it didn't fit",
+      "reason": {
+        "not_near": "Not near",
+        "bad_time": "Bad time",
+        "wrong_level": "Wrong level",
+        "other": "Other"
+      },
+      "note": "Anonymous counters only; no person is recorded."
+    }
   }
 }
