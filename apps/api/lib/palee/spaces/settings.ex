@@ -7,9 +7,11 @@ defmodule Palee.Spaces.Settings do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @primary_key {:organization_id, :binary_id, autogenerate: false}
+  @primary_key {:id, :binary_id, autogenerate: true}
 
+  # One row per gym (unique organization_id).
   schema "space_settings" do
+    field :organization_id, :binary_id
     field :floor_plans_in_classes, :boolean, default: false
 
     timestamps(type: :utc_datetime_usec)

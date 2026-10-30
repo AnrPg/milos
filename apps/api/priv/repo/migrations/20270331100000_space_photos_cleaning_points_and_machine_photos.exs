@@ -25,13 +25,16 @@ defmodule Palee.Repo.Migrations.SpacePhotosCleaningPointsAndMachinePhotos do
 
   def up do
     create table(:space_settings, primary_key: false) do
-      add :organization_id,
-          references(:organizations, type: :binary_id, on_delete: :delete_all),
-          primary_key: true
+      add :id, :binary_id, primary_key: true
+
+      add :organization_id, references(:organizations, type: :binary_id, on_delete: :delete_all),
+        null: false
 
       add :floor_plans_in_classes, :boolean, null: false, default: false
       timestamps(type: :utc_datetime_usec)
     end
+
+    create unique_index(:space_settings, [:organization_id])
 
     alter table(:space_floor_plans) do
       add :shown_in_classes, :boolean, null: false, default: true

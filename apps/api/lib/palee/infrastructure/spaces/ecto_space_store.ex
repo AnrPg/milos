@@ -187,7 +187,7 @@ defmodule Palee.Infrastructure.Spaces.EctoSpaceStore do
 
   @impl true
   def get_settings(%{organization_id: organization_id}) do
-    case Repo.get(Settings, organization_id) do
+    case Repo.get_by(Settings, organization_id: organization_id) do
       nil -> %{floor_plans_in_classes: false}
       settings -> normalize_settings(settings)
     end
@@ -195,7 +195,8 @@ defmodule Palee.Infrastructure.Spaces.EctoSpaceStore do
 
   @impl true
   def put_settings(%{organization_id: organization_id}, attrs) do
-    (Repo.get(Settings, organization_id) || %Settings{organization_id: organization_id})
+    (Repo.get_by(Settings, organization_id: organization_id) ||
+       %Settings{organization_id: organization_id})
     |> Settings.changeset(attrs)
     |> Repo.insert_or_update()
     |> result(&normalize_settings/1)
