@@ -104,6 +104,10 @@ test.describe("admin profile save bar", () => {
     const count = page.getByTestId("profile-save-bar-count");
     await expect(starts).toHaveAttribute("data-value", isoDay(-2));
     await expect(bar).toHaveCount(0);
+    // The start date comes before the end date: left of it on one row, above it in one column.
+    const [startBox, endBox] = await Promise.all([starts.boundingBox(), expires.boundingBox()]);
+    const sameRow = Math.abs(startBox!.y - endBox!.y) < 1;
+    expect(sameRow ? startBox!.x < endBox!.x : startBox!.y < endBox!.y).toBe(true);
 
     await chooseDate(page, starts, isoDay(-1));
     await expect(count).toHaveText("1 unsaved change");
