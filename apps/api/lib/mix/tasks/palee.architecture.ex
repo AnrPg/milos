@@ -85,6 +85,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     body/body_store
     buddies/buddy_store
     partners/partner_store
+    partners/verification_store
     wellness/wellness_store
     insights/insight_store
     devices/device_store

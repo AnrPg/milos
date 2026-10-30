@@ -752,3 +752,41 @@ msgstr "Een fiscale koppeling vraagt aandacht"
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr "%{connection} werkt niet meer. Open Factuurgegevens › Koppelingen om het op te lossen."
+
+# ADR-280 verification: sponsors and the Palee check of Partners.
+
+msgid "Vouch for %{nickname}?"
+msgstr "Instaan voor %{nickname}?"
+
+msgid "%{nickname} asks you to vouch for them for Training partners."
+msgstr "%{nickname} vraagt je om voor hem of haar in te staan voor Trainingsmaatjes."
+
+msgid "%{nickname} vouched for you"
+msgstr "%{nickname} staat voor je in"
+
+msgid "One step closer to Training partners."
+msgstr "Een stap dichter bij Trainingsmaatjes."
+
+msgid "You are verified"
+msgstr "Je bent geverifieerd"
+
+msgid "You can now use Training partners."
+msgstr "Je kunt Trainingsmaatjes nu gebruiken."
+
+msgid "Take a new selfie"
+msgstr "Maak een nieuwe selfie"
+
+msgid "Your selfie was deleted after 7 days without a check. Take a new one to finish."
+msgstr "Je selfie is na 7 dagen zonder controle verwijderd. Maak een nieuwe om af te ronden."
+
+msgid "Verification not approved"
+msgstr "Verificatie niet goedgekeurd"
+
+msgid "The Palee team could not verify your account. You can try again."
+msgstr "Het Palee-team kon je account niet verifiëren. Je kunt het opnieuw proberen."
+
+msgid "Someone you vouched for was suspended"
+msgstr "Iemand voor wie je instond is geschorst"
+
+msgid "You can vouch again from %{date}. Your own access stays."
+msgstr "Je kunt vanaf %{date} weer instaan. Je eigen toegang blijft."

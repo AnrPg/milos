@@ -2844,10 +2844,49 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: Atom.to_string(reason), error: message})
   end
 
+  # ADR-280 verification
+  @partner_verification_errors %{
+    partner_verification_required: {:forbidden, "Verify your account to use Training partners"},
+    partner_suspended: {:forbidden, "Your Training partners access is suspended"},
+    partner_already_verified: {:conflict, "Your account is already verified"},
+    partner_verification_in_review: {:conflict, "Your request is with the Palee team"},
+    partner_verification_request_open: {:conflict, "You already have an open request"},
+    partner_consent_required: {:conflict, "Agree to the Palee check first"},
+    partner_sponsor_not_eligible: {:unprocessable_entity, "This person can't vouch for you"},
+    partner_sponsor_quota: {:too_many_requests, "This sponsor vouched 5 times in 30 days"},
+    partner_sponsor_penalty: {:forbidden, "Vouching is paused for now"},
+    partner_sponsor_declined: {:conflict, "This person declined"},
+    partner_sponsor_already_asked: {:conflict, "You already asked this person"},
+    partner_vouch_request_closed: {:conflict, "This request was already answered"},
+    invalid_partner_vouch_decision: {:unprocessable_entity, "Vouch or decline"},
+    partner_link_expired: {:gone, "This link has expired or was already used"},
+    partner_phone_invalid: {:unprocessable_entity, "Enter a mobile number"},
+    partner_phone_taken: {:conflict, "This number verifies another account"},
+    partner_phone_rate_limited: {:too_many_requests, "Too many codes; try again later"},
+    partner_code_invalid: {:unprocessable_entity, "That code is not right"},
+    partner_code_expired: {:gone, "The code expired; ask for a new one"},
+    partner_selfie_missing: {:unprocessable_entity, "Upload the selfie first"},
+    partner_selfie_invalid: {:unprocessable_entity, "The selfie must be a photo of at most 8 MB"},
+    partner_verification_incomplete:
+      {:conflict, "Two vouches and a confirmed phone are needed first"},
+    partner_verification_closed: {:conflict, "This request is not waiting for a decision"},
+    invalid_partner_verification_decision: {:unprocessable_entity, "Approve or reject"},
+    partner_decision_reason_required: {:unprocessable_entity, "Give a reason to reject"},
+    partner_decision_reason_too_long: {:unprocessable_entity, "At most 500 characters"},
+    invalid_partner_verification_status: {:unprocessable_entity, "Unknown status"},
+    sms_unavailable: {:service_unavailable, "Text messages are unavailable; try again later"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@partner_verification_errors, reason) do
+    {status, message} = Map.fetch!(@partner_verification_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: Atom.to_string(reason), error: message})
+  end
+
   # ADR-280 deck: public Partners (ADR-169 codes still used, plus the deck's).
   @partner_errors %{
-    partner_verification_required: {:forbidden, "Get verified to take part in Partners first"},
-    partner_suspended: {:forbidden, "Your Partners access has been suspended"},
     partner_adult_required: {:unprocessable_entity, "Partners is for people 18 or older"},
     partner_profile_required: {:conflict, "Turn on your Partners profile first"},
     invalid_partner_level: {:unprocessable_entity, "Choose your level"},

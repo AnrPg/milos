@@ -46,6 +46,10 @@ defmodule Palee.TestSupport.MemoryObjectStore do
     do: {:ok, "https://objects.test/#{bucket}/#{key}?signature=test"}
 
   @impl true
+  def presigned_object_url(bucket, key, expires_seconds),
+    do: {:ok, "https://objects.test/#{bucket}/#{key}?expires=#{expires_seconds}&signature=test"}
+
+  @impl true
   def presigned_upload(bucket, key, content_type),
     do:
       {:ok,

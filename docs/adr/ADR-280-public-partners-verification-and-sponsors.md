@@ -273,3 +273,42 @@ plus the ADR-169 ones still used.
   visibility; `palee_partner_box_badges` is not created, badges come from
   `PartnerEligibility.verification_badges/1` plus the profile's `show_box`.
   The platform queue lives in `PaleeWeb.PlatformPartnerReportController`.
+
+### Verification side (as built)
+- Migration file `20270325000000_partner_verification.exs`. Additions to §1:
+  `partner_verifications.sponsor_penalty_until` (the 60-day pause lives on
+  the sponsor's own verification row), `partner_phone_codes.user_id` (row
+  security and the send limits survive a withdrawal) and `consumed_at`.
+- "Active membership or package" = a finance `memberships` row (not a guest,
+  not past `leaving_on`) with status `active|expiring|comped` and no past
+  `expires_on`, or a running `active` package subscription; in an
+  organization with `status = active`, `activation = active`,
+  `provider_kind in (gym, coach)`. The SQL lives in the internal
+  `palee_partner_membership_organization(uuid)` (EXECUTE revoked from
+  PUBLIC); `palee_partner_membership_source(uuid)` answers only for the
+  session's own person, vendors and system sessions.
+- Extra definer functions: `palee_partner_verification_badges(uuid[])`
+  (behind `PartnerEligibility.verification_badges/1`),
+  `palee_partner_sponsor_standing(uuid[], timestamptz)` (only the session
+  person's Buddies), `palee_partner_sponsor_link(bytea)` and
+  `palee_partner_redeem_sponsor_link(bytea, timestamptz)` (a sponsor uses a
+  link only by its digest). Guard triggers: the person never decides their
+  own request; the candidate only cancels/re-asks, the sponsor only answers.
+  The phone trigger refuses a number another account verified (not
+  withdrawn), under an advisory lock.
+- A phone's ciphertext goes with the decision; its keyed hash stays.
+- `DELETE /verification/sponsors/:id` takes the sponsor's person id.
+- `Eligibility.status/3` takes the vouch count instead of the profile.
+- Extra error codes: `partner_already_verified`,
+  `partner_verification_in_review`, `partner_verification_request_open`,
+  `partner_consent_required`, `partner_sponsor_declined`,
+  `partner_sponsor_already_asked`, `partner_vouch_request_closed`,
+  `invalid_partner_vouch_decision`, `partner_selfie_invalid`,
+  `partner_verification_closed`, `invalid_partner_verification_decision`,
+  `invalid_partner_verification_status`, `partner_decision_reason_required`,
+  `partner_decision_reason_too_long`.
+- `TenantObjectStore` gained `presigned_object_url/3` (expiry in seconds)
+  for the 5-minute selfie link.
+- Account deletion (`AccountDeletion.remove_profile/1`) calls
+  `PartnerVerificationRetention.purge_person/1` before deleting or
+  anonymising the profile.

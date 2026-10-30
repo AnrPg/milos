@@ -752,3 +752,41 @@ msgstr "חיבור פיסקלי דורש תשומת לב"
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr "%{connection} הפסיק לעבוד. פתחו את פרטי החיוב › חיבורים כדי לתקן."
+
+# ADR-280 verification: sponsors and the Palee check of Partners.
+
+msgid "Vouch for %{nickname}?"
+msgstr "לערוב ל-%{nickname}?"
+
+msgid "%{nickname} asks you to vouch for them for Training partners."
+msgstr "%{nickname} מבקש/ת שתערוב/י לו/ה עבור שותפים לאימונים."
+
+msgid "%{nickname} vouched for you"
+msgstr "%{nickname} ערב/ה לך"
+
+msgid "One step closer to Training partners."
+msgstr "צעד אחד קרוב יותר לשותפים לאימונים."
+
+msgid "You are verified"
+msgstr "החשבון שלך אומת"
+
+msgid "You can now use Training partners."
+msgstr "עכשיו אפשר להשתמש בשותפים לאימונים."
+
+msgid "Take a new selfie"
+msgstr "צלם/י סלפי חדש"
+
+msgid "Your selfie was deleted after 7 days without a check. Take a new one to finish."
+msgstr "הסלפי שלך נמחק אחרי 7 ימים ללא בדיקה. צלם/י חדש כדי לסיים."
+
+msgid "Verification not approved"
+msgstr "האימות לא אושר"
+
+msgid "The Palee team could not verify your account. You can try again."
+msgstr "צוות Palee לא הצליח לאמת את החשבון שלך. אפשר לנסות שוב."
+
+msgid "Someone you vouched for was suspended"
+msgstr "מישהו שערבת לו הושעה"
+
+msgid "You can vouch again from %{date}. Your own access stays."
+msgstr "אפשר לערוב שוב החל מ-%{date}. הגישה שלך נשארת."

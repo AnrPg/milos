@@ -58,11 +58,16 @@ defmodule Palee.Infrastructure.Storage.MinioStorage do
   end
 
   @impl Palee.Application.Ports.TenantObjectStore
-  def presigned_object_url(bucket, key) when is_binary(key) do
+  def presigned_object_url(bucket, key) when is_binary(key),
+    do: presigned_object_url(bucket, key, @expires_seconds)
+
+  @impl Palee.Application.Ports.TenantObjectStore
+  def presigned_object_url(bucket, key, expires_seconds)
+      when is_binary(key) and is_integer(expires_seconds) and expires_seconds > 0 do
     {_config, url_config, bucket_name} = bucket_config(bucket)
 
     ExAws.S3.presigned_url(url_config, :get, bucket_name, key,
-      expires_in: @expires_seconds,
+      expires_in: expires_seconds,
       virtual_host: false
     )
   end
