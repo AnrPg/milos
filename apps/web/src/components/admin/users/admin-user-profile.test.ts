@@ -4,6 +4,7 @@ import {
   dossierMode,
   filterDossierMembers,
   grantableAllowances,
+  membershipDateCards,
   packageSubscriptionLabel,
   prSectionContentCount,
   visibleAdminProfileSections,
@@ -110,5 +111,12 @@ describe("grantableAllowances", () => {
   it("falls back to class visits for an empty plan", () => {
     expect(grantableAllowances({})).toEqual(["class_visits"]);
     expect(grantableAllowances(null)).toEqual(["class_visits"]);
+  });
+});
+
+describe("membershipDateCards", () => {
+  it("puts the start before the end, with or without a current subscription", () => {
+    expect(membershipDateCards(true)).toEqual(["starts_on", "subscription_end"]);
+    expect(membershipDateCards(false)).toEqual(["starts_on", "expires_on"]);
   });
 });

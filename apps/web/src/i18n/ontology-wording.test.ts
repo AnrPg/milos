@@ -126,4 +126,36 @@ describe("canonical wording", () => {
       }
     }
   });
+  it("names an interval's work phase with the gym word of each locale, the same everywhere", () => {
+    // ontology §4.8: the timer's work phase (Work / Rest), never a job or an on/off switch.
+    const work: Record<string, string> = {
+      en: "Work",
+      el: "Άσκηση",
+      de: "Belastung",
+      fr: "Effort",
+      es: "Trabajo",
+      it: "Lavoro",
+      ru: "Работа",
+      ar: "تمرين",
+      he: "עבודה",
+      bg: "Работа",
+      nl: "Inspanning",
+      "pt-PT": "Trabalho",
+    };
+    const switchWords = /[δΔ]ουλει|ein\/aus|\b(an|aus|aan|uit|ligado|desligado)\b|تشغيل|إيقاف|מופעל|כבוי|הנחה|включени|изключени|الموارد البشرية|משאבי אנוש|RH|HR-verdieping|етаж/u;
+    for (const locale of locales) {
+      const messages = catalog(locale);
+      const ui = messages.Ui as Record<string, string>;
+      const plan = messages.PlanCore as { param: Record<string, string> };
+      const editor = messages.PlanEditor as Record<string, string>;
+      expect(ui.workPhaseLabel, locale).toBe(work[locale]);
+      expect(ui.work00040ba, locale).toBe(work[locale]);
+      expect(plan.param.work, locale).toBe(work[locale]);
+      expect(editor.timelineWork, locale).toBe(work[locale]);
+      expect(ui.timerLabelWork, locale).toBe(`${work[locale]} {round}/{total}`);
+      for (const key of ["instructionTabata", "instructionCustomHiit", "instructionHrr", "hrCeilingStopWork3e9d698", "hrFloorResumeWork82d77a0", "workSecondsLabel"]) {
+        expect(words(ui[key]), `${locale}.${key}`).not.toMatch(switchWords);
+      }
+    }
+  });
 });

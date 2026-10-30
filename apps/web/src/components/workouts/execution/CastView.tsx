@@ -3,6 +3,9 @@
 import { useUiTranslations } from "@/i18n/ui";
 import React, { useEffect, useRef } from "react";
 
+import { TimerNowPanel } from "@/components/class-timer/TimerNowPanel";
+import type { TimerNow } from "@/lib/timer-now";
+
 import { formatClock, PHASE_COLORS, type TimerPhase } from "./TimerDisplay";
 import { useHideBottomNav } from "@/components/nav/bottom-nav-visibility";
 
@@ -16,6 +19,8 @@ type Props = {
   nextText: string | null;
   finalSeconds: boolean;
   paused: boolean;
+  /** What is done now (this window's exercises, the section's text), shown under the clock. */
+  now?: TimerNow | null;
   onExit: () => void;
 };
 
@@ -24,7 +29,7 @@ type Props = {
  * room (a phone propped against a wall, or a laptop cast to a TV). It asks for
  * fullscreen and landscape where the browser allows, and any tap exits.
  */
-export function CastView({ seconds, phase, label, sectionName, roundText, nextText, finalSeconds, paused, onExit }: Props) {
+export function CastView({ seconds, phase, label, sectionName, roundText, nextText, finalSeconds, paused, now = null, onExit }: Props) {
   // A full-screen surface: the member app's bottom bar steps aside.
   useHideBottomNav();
   const i18n = useUiTranslations();
@@ -95,6 +100,7 @@ export function CastView({ seconds, phase, label, sectionName, roundText, nextTe
       <div className="max-w-[90vw] truncate text-center font-semibold" style={{ fontSize: "clamp(1rem, 4vmin, 3rem)", color: "var(--text-soft)" }}>
         {label}
       </div>
+      {now ? <TimerNowPanel now={now} size="wall" style={{ maxWidth: "90vw", maxHeight: "28vh", fontSize: "clamp(0.9rem, 3.2vmin, 2.25rem)" }} /> : null}
       {nextText ? (
         <div className="absolute bottom-[3vmin] max-w-[90vw] truncate" style={{ fontSize: "clamp(0.9rem, 3vmin, 2rem)", color: "var(--muted)" }}>
           {nextText}

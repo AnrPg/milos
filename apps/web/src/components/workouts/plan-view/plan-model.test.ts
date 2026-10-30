@@ -123,8 +123,8 @@ describe("buildPlanView", () => {
   });
 
   it("intervals, with a fixed rest or until heart rate falls", () => {
-    expect(buildPlanView(tabata(), greek).params).toBe("8 × 20″ δουλειά / 10″ ξεκούραση");
-    expect(buildPlanView(hrIntervals(), greek).params).toBe("3 × 3′ δουλειά, ξεκούραση μέχρι οι παλμοί να πέσουν στους 120");
+    expect(buildPlanView(tabata(), greek).params).toBe("8 × 20″ άσκηση / 10″ ξεκούραση");
+    expect(buildPlanView(hrIntervals(), greek).params).toBe("3 × 3′ άσκηση, ξεκούραση μέχρι οι παλμοί να πέσουν στους 120");
     expect(buildPlanView(tabata(), english).params).toBe("8 × 20″ work / 10″ rest");
   });
 

@@ -1700,7 +1700,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** The boxes you talk to without being a member, latest first */
+        /** The boxes you talk to, latest first */
         get: operations["PaleeWeb.BoxConversationController.index"];
         put?: never;
         post?: never;
@@ -12623,6 +12623,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/threads/{id}/block": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** The box stops hearing from a newcomer who wrote to it (ADR-282) */
+        put: operations["PaleeWeb.MessagingController.block_sender"];
+        post?: never;
+        /** The box hears from the person again (ADR-282) */
+        delete: operations["PaleeWeb.MessagingController.unblock_sender"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/threads/{id}/coaches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The coaches the box's inbox may bring into a box thread (ADR-282) */
+        get: operations["PaleeWeb.MessagingController.coach_candidates"];
+        put?: never;
+        /** «Φέρε τον coach»: bring a coach of the box into a box thread (ADR-282) */
+        post: operations["PaleeWeb.MessagingController.bring_coach"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/threads/{id}/messages": {
         parameters: {
             query?: never;
@@ -19762,7 +19798,7 @@ export interface components {
         };
         /** BillingContact */
         BillingContact: {
-            /** @description The published box page whose chat reaches the box (`/b/{slug}/chat`). */
+            /** @description The box whose chat reaches it (`/b/{slug}/chat`, ADR-282: published or not). */
             box_chat_slug: string | null;
         };
         /** BillingCounterparty */
@@ -19876,7 +19912,7 @@ export interface components {
             }[];
             /** BillingContact */
             contact: {
-                /** @description The published box page whose chat reaches the box (`/b/{slug}/chat`). */
+                /** @description The box whose chat reaches it (`/b/{slug}/chat`, ADR-282: published or not). */
                 box_chat_slug: string | null;
             };
             credit_balance_cents: number;
@@ -20862,6 +20898,8 @@ export interface components {
         };
         /** BoxConversation */
         BoxConversation: {
+            /** @description ADR-282: the box no longer receives your messages */
+            blocked?: boolean;
             /** PublicBox */
             box: {
                 logo_url?: string | null;
@@ -20898,6 +20936,8 @@ export interface components {
                 sender_id: string;
                 /** Format: uuid */
                 thread_id?: string;
+                /** @enum {string|null} */
+                topic?: "booking" | "payment" | "membership" | "facility" | "training" | null;
             }[];
             staff: {
                 avatar_url?: string | null;
@@ -20922,6 +20962,8 @@ export interface components {
             sender_id: string;
             /** Format: uuid */
             thread_id?: string;
+            /** @enum {string|null} */
+            topic?: "booking" | "payment" | "membership" | "facility" | "training" | null;
         };
         /** BoxConversationMessageResponse */
         BoxConversationMessageResponse: {
@@ -20939,6 +20981,8 @@ export interface components {
                 sender_id: string;
                 /** Format: uuid */
                 thread_id?: string;
+                /** @enum {string|null} */
+                topic?: "booking" | "payment" | "membership" | "facility" | "training" | null;
             };
         };
         /** BoxConversationRead */
@@ -20950,6 +20994,8 @@ export interface components {
         BoxConversationResponse: {
             /** BoxConversation */
             conversation: {
+                /** @description ADR-282: the box no longer receives your messages */
+                blocked?: boolean;
                 /** PublicBox */
                 box: {
                     logo_url?: string | null;
@@ -20986,6 +21032,8 @@ export interface components {
                     sender_id: string;
                     /** Format: uuid */
                     thread_id?: string;
+                    /** @enum {string|null} */
+                    topic?: "booking" | "payment" | "membership" | "facility" | "training" | null;
                 }[];
                 staff: {
                     avatar_url?: string | null;
@@ -21002,6 +21050,11 @@ export interface components {
             body: string;
             /** Format: uuid */
             client_operation_id?: string;
+            /**
+             * @description ADR-282: what it is about; training also reaches your coach
+             * @enum {string|null}
+             */
+            topic?: "booking" | "payment" | "membership" | "facility" | "training" | null;
         };
         /** BoxConversationsResponse */
         BoxConversationsResponse: {
@@ -21029,6 +21082,8 @@ export interface components {
                     sender_id: string;
                     /** Format: uuid */
                     thread_id?: string;
+                    /** @enum {string|null} */
+                    topic?: "booking" | "payment" | "membership" | "facility" | "training" | null;
                 } | null;
                 /** Format: uuid */
                 thread_id: string;
@@ -31480,7 +31535,7 @@ export interface components {
                 }[];
                 /** BillingContact */
                 contact: {
-                    /** @description The published box page whose chat reaches the box (`/b/{slug}/chat`). */
+                    /** @description The box whose chat reaches it (`/b/{slug}/chat`, ADR-282: published or not). */
                     box_chat_slug: string | null;
                 };
                 credit_balance_cents: number;
@@ -42508,6 +42563,8 @@ export interface components {
         /** TrialFollowUpResponse */
         TrialFollowUpResponse: {
             conversation?: {
+                /** @description ADR-282: the box no longer receives your messages */
+                blocked?: boolean;
                 /** PublicBox */
                 box: {
                     logo_url?: string | null;
@@ -42544,6 +42601,8 @@ export interface components {
                     sender_id: string;
                     /** Format: uuid */
                     thread_id?: string;
+                    /** @enum {string|null} */
+                    topic?: "booking" | "payment" | "membership" | "facility" | "training" | null;
                 }[];
                 staff: {
                     avatar_url?: string | null;
@@ -48040,6 +48099,8 @@ export interface operations {
                     "application/json": {
                         /** BoxConversation */
                         conversation: {
+                            /** @description ADR-282: the box no longer receives your messages */
+                            blocked?: boolean;
                             /** PublicBox */
                             box: {
                                 logo_url?: string | null;
@@ -48076,6 +48137,8 @@ export interface operations {
                                 sender_id: string;
                                 /** Format: uuid */
                                 thread_id?: string;
+                                /** @enum {string|null} */
+                                topic?: "booking" | "payment" | "membership" | "facility" | "training" | null;
                             }[];
                             staff: {
                                 avatar_url?: string | null;
@@ -48121,6 +48184,8 @@ export interface operations {
                     "application/json": {
                         /** BoxConversation */
                         conversation: {
+                            /** @description ADR-282: the box no longer receives your messages */
+                            blocked?: boolean;
                             /** PublicBox */
                             box: {
                                 logo_url?: string | null;
@@ -48157,6 +48222,8 @@ export interface operations {
                                 sender_id: string;
                                 /** Format: uuid */
                                 thread_id?: string;
+                                /** @enum {string|null} */
+                                topic?: "booking" | "payment" | "membership" | "facility" | "training" | null;
                             }[];
                             staff: {
                                 avatar_url?: string | null;
@@ -48170,7 +48237,7 @@ export interface operations {
                     };
                 };
             };
-            /** @description Only members and people who tried a class */
+            /** @description The box blocked you */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -48206,6 +48273,11 @@ export interface operations {
                     body: string;
                     /** Format: uuid */
                     client_operation_id?: string;
+                    /**
+                     * @description ADR-282: what it is about; training also reaches your coach
+                     * @enum {string|null}
+                     */
+                    topic?: "booking" | "payment" | "membership" | "facility" | "training" | null;
                 };
             };
         };
@@ -48231,12 +48303,32 @@ export interface operations {
                             sender_id: string;
                             /** Format: uuid */
                             thread_id?: string;
+                            /** @enum {string|null} */
+                            topic?: "booking" | "payment" | "membership" | "facility" | "training" | null;
                         };
                     };
                 };
             };
+            /** @description The box blocked you */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
             /** @description No such box or conversation */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Wait for the box to answer first */
+            429: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -50921,7 +51013,7 @@ export interface operations {
                             }[];
                             /** BillingContact */
                             contact: {
-                                /** @description The published box page whose chat reaches the box (`/b/{slug}/chat`). */
+                                /** @description The box whose chat reaches it (`/b/{slug}/chat`, ADR-282: published or not). */
                                 box_chat_slug: string | null;
                             };
                             credit_balance_cents: number;
@@ -52737,6 +52829,8 @@ export interface operations {
                                 sender_id: string;
                                 /** Format: uuid */
                                 thread_id?: string;
+                                /** @enum {string|null} */
+                                topic?: "booking" | "payment" | "membership" | "facility" | "training" | null;
                             } | null;
                             /** Format: uuid */
                             thread_id: string;
@@ -64933,6 +65027,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         conversation?: {
+                            /** @description ADR-282: the box no longer receives your messages */
+                            blocked?: boolean;
                             /** PublicBox */
                             box: {
                                 logo_url?: string | null;
@@ -64969,6 +65065,8 @@ export interface operations {
                                 sender_id: string;
                                 /** Format: uuid */
                                 thread_id?: string;
+                                /** @enum {string|null} */
+                                topic?: "booking" | "payment" | "membership" | "facility" | "training" | null;
                             }[];
                             staff: {
                                 avatar_url?: string | null;
@@ -109777,6 +109875,11 @@ export interface operations {
                 content: {
                     "application/json": {
                         threads: {
+                            /** @description ADR-282: in a box thread, whether the person is a newcomer and blocked */
+                            box_person?: {
+                                blocked: boolean;
+                                newcomer: boolean;
+                            } | null;
                             /** Format: uuid */
                             context_id: string | null;
                             /** @enum {string} */
@@ -109787,9 +109890,25 @@ export interface operations {
                             id: string;
                             /** Format: date-time */
                             inserted_at: string;
+                            last_message?: {
+                                body: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                message_type: string;
+                                /** Format: uuid */
+                                sender_id: string;
+                                topic: string | null;
+                            } | null;
                             participants: {
                                 /** Format: uuid */
                                 id: string;
+                                /**
+                                 * @description ADR-282: why someone is in a box thread
+                                 * @enum {string|null}
+                                 */
+                                joined_as?: "member" | "staff" | "coach" | null;
                                 /** Format: uuid */
                                 last_read_message_id: string | null;
                                 nickname: string | null;
@@ -109835,6 +109954,11 @@ export interface operations {
                 content: {
                     "application/json": {
                         thread: {
+                            /** @description ADR-282: in a box thread, whether the person is a newcomer and blocked */
+                            box_person?: {
+                                blocked: boolean;
+                                newcomer: boolean;
+                            } | null;
                             /** Format: uuid */
                             context_id: string | null;
                             /** @enum {string} */
@@ -109845,9 +109969,25 @@ export interface operations {
                             id: string;
                             /** Format: date-time */
                             inserted_at: string;
+                            last_message?: {
+                                body: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                message_type: string;
+                                /** Format: uuid */
+                                sender_id: string;
+                                topic: string | null;
+                            } | null;
                             participants: {
                                 /** Format: uuid */
                                 id: string;
+                                /**
+                                 * @description ADR-282: why someone is in a box thread
+                                 * @enum {string|null}
+                                 */
+                                joined_as?: "member" | "staff" | "coach" | null;
                                 /** Format: uuid */
                                 last_read_message_id: string | null;
                                 nickname: string | null;
@@ -109901,6 +110041,11 @@ export interface operations {
                 content: {
                     "application/json": {
                         thread: {
+                            /** @description ADR-282: in a box thread, whether the person is a newcomer and blocked */
+                            box_person?: {
+                                blocked: boolean;
+                                newcomer: boolean;
+                            } | null;
                             /** Format: uuid */
                             context_id: string | null;
                             /** @enum {string} */
@@ -109911,9 +110056,25 @@ export interface operations {
                             id: string;
                             /** Format: date-time */
                             inserted_at: string;
+                            last_message?: {
+                                body: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                message_type: string;
+                                /** Format: uuid */
+                                sender_id: string;
+                                topic: string | null;
+                            } | null;
                             participants: {
                                 /** Format: uuid */
                                 id: string;
+                                /**
+                                 * @description ADR-282: why someone is in a box thread
+                                 * @enum {string|null}
+                                 */
+                                joined_as?: "member" | "staff" | "coach" | null;
                                 /** Format: uuid */
                                 last_read_message_id: string | null;
                                 nickname: string | null;
@@ -109935,6 +110096,215 @@ export interface operations {
             };
             /** @description Not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.MessagingController.block_sender": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organization_slug: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Blocked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        blocked: boolean;
+                    };
+                };
+            };
+            /** @description Not in the box's inbox */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description A client of the box */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.MessagingController.unblock_sender": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organization_slug: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unblocked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        blocked: boolean;
+                    };
+                };
+            };
+            /** @description Not in the box's inbox */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.MessagingController.coach_candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organization_slug: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Coaches */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        coaches: {
+                            avatar_url: string | null;
+                            coaches_person: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            in_thread: boolean;
+                            nickname: string | null;
+                        }[];
+                    };
+                };
+            };
+            /** @description Not in the box's inbox */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.MessagingController.bring_coach": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organization_slug: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    user_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Thread */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        thread: {
+                            /** @description ADR-282: in a box thread, whether the person is a newcomer and blocked */
+                            box_person?: {
+                                blocked: boolean;
+                                newcomer: boolean;
+                            } | null;
+                            /** Format: uuid */
+                            context_id: string | null;
+                            /** @enum {string} */
+                            context_type: "direct" | "assignment" | "class_slot" | "box";
+                            /** Format: uuid */
+                            created_by_id: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            last_message?: {
+                                body: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                message_type: string;
+                                /** Format: uuid */
+                                sender_id: string;
+                                topic: string | null;
+                            } | null;
+                            participants: {
+                                /** Format: uuid */
+                                id: string;
+                                /**
+                                 * @description ADR-282: why someone is in a box thread
+                                 * @enum {string|null}
+                                 */
+                                joined_as?: "member" | "staff" | "coach" | null;
+                                /** Format: uuid */
+                                last_read_message_id: string | null;
+                                nickname: string | null;
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+            /** @description Not in the box's inbox */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Not a coach of the box */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -109980,7 +110350,7 @@ export interface operations {
                             /** Format: uuid */
                             thread_id: string;
                             /** @enum {string|null} */
-                            topic?: "booking" | "payment" | "membership" | "facility" | null;
+                            topic?: "booking" | "payment" | "membership" | "facility" | "training" | null;
                         }[];
                     };
                 };
@@ -110022,7 +110392,7 @@ export interface operations {
                      * @description What a message from the box is about.
                      * @enum {string}
                      */
-                    topic?: "booking" | "payment" | "membership" | "facility";
+                    topic?: "booking" | "payment" | "membership" | "facility" | "training";
                 };
             };
         };
@@ -110049,7 +110419,7 @@ export interface operations {
                             /** Format: uuid */
                             thread_id: string;
                             /** @enum {string|null} */
-                            topic?: "booking" | "payment" | "membership" | "facility" | null;
+                            topic?: "booking" | "payment" | "membership" | "facility" | "training" | null;
                         };
                     };
                 };

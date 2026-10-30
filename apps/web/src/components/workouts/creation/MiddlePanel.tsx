@@ -97,7 +97,7 @@ export function MiddlePanel({ scaleLevels }: Props) {
         const durLabel = dur >= 60
           ? i18n("minutesSecondsDuration", {minutes: Math.floor(dur / 60), seconds: dur % 60})
           : i18n("secondsShort", {value: dur});
-        groups.push({ label: i18n("roundec7b598") + (min) + " · " + (durLabel), color: "var(--accent)", exercises: exs });
+        groups.push({ label: i18n("roundNumber", { number: min }) + " · " + durLabel, color: "var(--accent)", exercises: exs });
       }
 
       if (unassigned.length > 0) {

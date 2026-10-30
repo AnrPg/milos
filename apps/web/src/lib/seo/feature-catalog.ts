@@ -26,6 +26,7 @@ export const FEATURE_SECTIONS: FeatureSection[] = [
       "One search for clubs, people, boxes and independent coaches by name, forgiving accents, Latin spelling and typos",
       "Around me: nearby events, open clubs, gyms offering trials and public posts, as a list or a map, with radius, discipline, time, cost, level, language and audience filters and saved filter combinations",
       "Direct messages and threads, notifications and web push",
+      "Message any box from its page; the box answers from one shared team inbox, with coaches brought in for training questions",
       "Moderation: report queue, block, auto-archive of inactive member groups",
     ],
   },

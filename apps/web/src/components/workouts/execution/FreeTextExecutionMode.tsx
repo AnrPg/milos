@@ -51,6 +51,7 @@ import {
   type TextSectionResult,
 } from "@/lib/text-sections";
 import { type CueMode, type CueSnapshot, nextCue, playCue, primeCueAudio, readCueMode } from "@/lib/timer-cues";
+import { textNow } from "@/lib/timer-now";
 import { getFormatLabels, type SectionFormat } from "@/types/workout";
 import { FreeTextTimerFields } from "../creation/FreeTextTimerFields";
 import { CastView } from "./CastView";
@@ -550,6 +551,7 @@ export function FreeTextExecutionMode() {
           nextText={null}
           finalSeconds={status === "running" && remainingSeconds !== null && remainingSeconds > 0 && remainingSeconds <= 3}
           paused={status === "paused"}
+          now={currentSection ? textNow("section", null, currentSection.body) : textNow("workout", null, workout.body)}
           onExit={exitCastMode}
         />
       ) : null}

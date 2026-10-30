@@ -290,7 +290,7 @@ export function PantheonCard({
       }}
       role={onEdit ? "button" : undefined}
       tabIndex={onEdit ? 0 : undefined}
-      aria-label={onEdit ? i18n("updatefb91e24") + (pr.name) + i18n("personalRecord3b9dbf2") : undefined}
+      aria-label={onEdit ? i18n("updatePersonalRecordNamed", { name: pr.name }) : undefined}
     >
       <Particles prId={pr.id} />
 
