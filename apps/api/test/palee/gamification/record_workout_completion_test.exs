@@ -62,6 +62,10 @@ defmodule Palee.Gamification.RecordWorkoutCompletionTest do
     assert stats.total_prs >= 1
     assert progress.progress == 2
     assert not is_nil(progress.completed_at)
+    # ADR-285: the challenge it finished and the week on the default goal of 2
+    # are counted for «Επίπεδο».
+    assert stats.challenges_completed == 1
+    assert stats.weeks_on_goal == 1
     assert Enum.any?(badges, &(&1.badge_key == "workouts_1"))
     assert Enum.any?(badges, &(&1.badge_key == "prs_1"))
     assert Enum.any?(badges, &(&1.badge_key == "challenge_june_builder"))

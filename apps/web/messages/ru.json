@@ -828,7 +828,6 @@
     "loadingYourTrainingOverview39806c7": "Загрузка обзора тренировок...",
     "yourTrainingOverviewIsUnavailable0a82b18": "Обзор твоих тренировок недоступен.",
     "refreshSessionf2ed411": "Обновить сеанс",
-    "last10WeeksVsTarget153cf63": "Последние 10 недель относительно цели",
     "last7TrainingDays5c44037": "Последние 7 тренировочных дней",
     "trainingVolume11e038b": "Объём тренировок",
     "seasonalMomentum8724e0a": "Сезонный прогресс",
@@ -857,11 +856,6 @@
     "monthlyRanking5999a91": "Рейтинг месяца:",
     "countsPersonalRecordsPrsLoggedInTheCurrentf701a4e": "Считает личные рекорды (PR), записанные в текущем месяце.",
     "theLeaderboardIsOptInOnlyYourData3e23cde": "Рейтинг — только по желанию. Твои данные никто не увидит, пока ты сам не присоединишься.",
-    "consistencyScore4c4624c": "Показатель регулярности",
-    "thePercentageOfWeeksInTheLast12b38b745": "Доля недель за последние 12 недель, в которые ты выполнил как минимум",
-    "showUpConsistentlyCompleteAtLeast7695825": "Приходи регулярно — выполняй как минимум",
-    "perWeekToCountThatWeekTowardYourc1cfc10": "в неделю, чтобы неделя засчиталась в твой показатель.",
-    "consistencyOverTimePredictsLongTermAthleticProgress04e2415": "Регулярность со временем лучше любого отдельного показателя предсказывает долгосрочный спортивный прогресс.",
     "whatTheyAree294e57": "Что это:",
     "timeLimitedGoalsSetByYourCoachOreba26f4": "Цели с ограниченным сроком от твоего тренера или платформы, чтобы тренировки были целенаправленными и заряжали энергией.",
     "howToParticipate3af38ca": "Как участвовать:",
@@ -1261,7 +1255,6 @@
     "dismiss70afe9e": "Скрыть",
     "advancements7f59df0": "продвижения",
     "retry9f5cd8a": "Повторить попытку",
-    "motivationd6a0619": "Мотивация",
     "perseverance3b53f48": "Упорство",
     "create6e157c5": "Создать",
     "leaderboard0381247": "Рейтинг",
@@ -1599,7 +1592,6 @@
     "yourTrainingIsInMotioncfd94f0": "Твои тренировки идут полным ходом.",
     "executionNotAvailablea9817d4": "Выполнение недоступно.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "Не удалось загрузить стартовую страницу.",
-    "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "Частота тренировок относительно цели на неделю — последние 10 недель",
     "howCloselyYouFollowedPrescribedExercises760e833": "Насколько точно ты выполнял заданные упражнения",
     "whatAreChallengesfdf13a8": "Что такое челленджи?",
     "howDoesTheLeaderboardWork74f2b8a": "Как работает рейтинг?",
@@ -4829,7 +4821,31 @@
     "apiErrorCleaningPointNoteRequired": "Напишите, почему точка не убрана.",
     "apiErrorInvalidMachinePosition": "Метка вне плана или меток больше, чем предметов в помещении.",
     "apiErrorSpaceNotOnPlan": "Помещение не нарисовано на плане, метки поставить нельзя.",
-    "apiErrorTooManyMachinePhotos": "К записи можно добавить не более 10 фото."
+    "apiErrorTooManyMachinePhotos": "К записи можно добавить не более 10 фото.",
+    "perseveranceHelpWhat": "Насколько точно ты следовал программе в последние 7 тренировочных дней (дни отдыха не считаются). Каждое пропущенное упражнение или выполненное с другим весом или числом повторений, чем в WOD, снижает показатель в зависимости от отклонения.",
+    "perseveranceHelpHow": "Выполняй упражнения так, как они записаны. Если ты не записывал изменений, показатель равен 100%.",
+    "perseveranceHelpWhy": "Программа твоего тренера построена так, чтобы прогрессировать шаг за шагом. Чем ближе ты к ней держишься, тем лучше она работает.",
+    "scoreLevel": "Уровень XP",
+    "scoreLevelTooltip": "Очки за всё, что ты делаешь, и уровень, которого они достигают",
+    "scoreLevelCaption": "{xp, number} / {next, number} XP до уровня {level}",
+    "scoreLevelHelpWhat": "Очки опыта (XP), которые ты получаешь: тренировка +{workouts}, рекорд +{prs}, неделя с выполненной недельной целью +{weeks}, завершённый челлендж +{challenges}.",
+    "scoreLevelHelpHow": "Тренируйся, ставь рекорды, выполняй недельную цель и завершай челленджи. Каждый уровень требует чуть больше XP, чем предыдущий.",
+    "scoreLevelHelpWhy": "Каждая тренировка приближает тебя к видимой цели, даже когда следующий рекорд ещё далеко.",
+    "scoreStrength": "Рост силы",
+    "scoreStrengthTooltip": "Насколько вырос твой расчётный 1ПМ за последние 8 недель",
+    "scoreStrengthCaption": "Расчётный 1ПМ, последние {weeks} недель по сравнению с прежним",
+    "scoreStrengthLifts": "Упражнения с ростом",
+    "scoreStrengthHelpWhat": "Насколько в среднем вырос расчётный разовый максимум твоих рекордов с весом за последние 8 недель по сравнению с лучшим результатом до них. Каждое упражнение весит одинаково, лёгкое или тяжёлое.",
+    "scoreStrengthHelpHow": "Записывай рекорды с весом и повторениями. Каждый новый рекорд поднимает оценку, даже больше повторений с тем же весом.",
+    "scoreStrengthHelpWhy": "Ты видишь отдачу от работы между рекордами на один повтор, а не только в день, когда бьёшь один из них.",
+    "scoreNextMilestone": "Следующий рубеж",
+    "scoreNextMilestoneTooltip": "Насколько ты близок к ближайшему значку, которого у тебя ещё нет",
+    "scoreNextMilestoneWorkouts": "{remaining, plural, one {тренировка} few {тренировки} many {тренировок} other {тренировки}} до значка «{target} тренировок»",
+    "scoreNextMilestonePrs": "{remaining, plural, one {рекорд} few {рекорда} many {рекордов} other {рекорда}} до значка «{target} рекордов»",
+    "scoreNextMilestoneStreak": "{remaining, plural, one {день} few {дня} many {дней} other {дня}} серии до значка «{target} дней серии»",
+    "scoreNextMilestoneHelpWhat": "Насколько ты близок к ближайшему значку, который ещё не получил: тренировки, рекорды или дни тренировок подряд.",
+    "scoreNextMilestoneHelpHow": "Делай то, что написано на карточке. Когда получишь значок, карточка покажет следующий.",
+    "scoreNextMilestoneHelpWhy": "Близкую конкретную цель достичь легче, чем далёкую."
   },
   "PrSharing": {
     "gymLabel": "Где ты установил этот PR?",
@@ -8793,7 +8809,8 @@
       "exercise": "Упражнение",
       "exercisePlaceholder": "напр. back squat",
       "empty": "Ничего не подходит под эти фильтры.",
-      "clear": "Сбросить фильтры"
+      "clear": "Сбросить фильтры",
+      "period": "Период"
     },
     "range": {
       "4w": "4 недели",
@@ -8801,6 +8818,13 @@
       "6m": "6 месяцев",
       "1y": "1 год",
       "all": "Всё время"
+    },
+    "rangeShort": {
+      "4w": "4 н",
+      "12w": "3 м",
+      "6m": "6 м",
+      "1y": "1 г",
+      "all": "Всё"
     },
     "progress": {
       "bySource": "Тренировки по источникам"

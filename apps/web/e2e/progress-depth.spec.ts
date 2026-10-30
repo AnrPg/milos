@@ -146,10 +146,14 @@ test.describe("Πρόοδος depth (ADR-165)", () => {
       await page.screenshot({ path: `${SHOTS}/${test.info().project.name}-member.png`, fullPage: true });
     }
 
-    // The page's range chip narrows the sections too.
-    await page.getByRole("toolbar").getByRole("button", { name: /3 months/ }).click();
-    await page.getByRole("menuitemradio", { name: "4 weeks" }).click();
+    // The page's period bar narrows the sections too (ADR-285: one tap).
+    const period = page.getByRole("group", { name: "Period" });
+    await expect(period.getByRole("button", { name: "3 months" })).toHaveAttribute("aria-pressed", "true");
+    await period.getByRole("button", { name: "4 weeks" }).click();
     await expect.poll(() => requests).toContain("4w");
+    // One source only: no «Source» chip and no «Filters» page.
+    await expect(page.getByRole("button", { name: "Source" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: /^Filters/ })).toHaveCount(0);
 
     await coverage.getByRole("link", { name: /Hamstrings/ }).click();
     await expect(page).toHaveURL(/\/journal\/atlas\?node=hamstrings$/, { timeout: 60_000 });

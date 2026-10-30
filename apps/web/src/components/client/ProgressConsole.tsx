@@ -26,8 +26,7 @@ import {
   weeksOnTarget,
   type HeatLevel,
 } from "@/components/client/consistency";
-import { FilterChipRow, type FilterChip } from "@/components/filters/FilterChipRow";
-import { ChoiceChips, FilterPage, FilterSection } from "@/components/filters/FilterPage";
+import { FilterMenuChip, type FilterChip } from "@/components/filters/FilterChipRow";
 import { useRememberedFilter } from "@/components/filters/use-remembered-filter";
 import { InsightsCard } from "@/components/member-app/progress/InsightsCard";
 import { ProgressDepthSections } from "@/components/member-app/progress/ProgressDepthSections";
@@ -63,7 +62,10 @@ import { useTranslations } from "next-intl";
 export function ProgressConsole() {
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
-  const { filter, setFilter } = useRememberedFilter("progress", parseProgressFilter, DEFAULT_PROGRESS_FILTER);
+  const { filter: remembered, setFilter } = useRememberedFilter("progress", parseProgressFilter, DEFAULT_PROGRESS_FILTER);
+  // ADR-285: the page no longer narrows by exercise (Personal Records searches
+  // its own list), so an exercise remembered from before never hides data.
+  const filter = useMemo(() => (remembered ? { ...remembered, exercise: null } : null), [remembered]);
   const query = useQuery({
     queryKey: [...ACCOUNT_PROGRESS_KEY, filter],
     enabled: Boolean(token) && filter !== null,
@@ -79,7 +81,11 @@ export function ProgressConsole() {
           <LoadingLine />
         ) : (
           <>
-            <ProgressFilters filter={filter} onChange={setFilter} />
+            <ProgressFilters
+              filter={filter}
+              availableSources={progress?.available_sources ?? filter.sources}
+              onChange={setFilter}
+            />
             {query.isPending ? (
               <LoadingLine />
             ) : query.isError ? (
@@ -112,76 +118,71 @@ export function ProgressConsole() {
   );
 }
 
-/** Time range, then «Όλοι ▾» (every provider) to narrow by source. */
-function ProgressFilters({ filter, onChange }: { filter: ProgressQuery; onChange: (filter: ProgressQuery) => void }) {
+/**
+ * ADR-285 (ANR picked mockup Φ3, 2026-10-30): the period is a bar that is
+ * always in view, one tap to change. «Πηγή ▾» shows only when the person
+ * trained with two or more sources (their box, on their own, a device), or
+ * while one is picked so it can be cleared. The exercise search lives in
+ * Personal Records, the one section it narrows.
+ */
+function ProgressFilters({
+  filter,
+  availableSources,
+  onChange,
+}: {
+  filter: ProgressQuery;
+  availableSources: string[];
+  onChange: (filter: ProgressQuery) => void;
+}) {
   const t = useTranslations("Providers");
   const directory = useSourceDirectory();
-  const [pageOpen, setPageOpen] = useState(false);
+  const offered = new Set([...availableSources, ...filter.sources]);
   const sources = sourceOptions(directory, {
     freeform: t("source.freeform"),
     device: t("source.device"),
     former: (name) => t("source.former", { name }),
-  });
-  const chips: FilterChip[] = [
-    {
-      key: "range",
-      kind: "menu",
-      label: t(`range.${filter.range}`),
-      options: PROGRESS_RANGES.map((range) => ({ value: range, label: t(`range.${range}`) })),
-      selected: [filter.range],
-      multiple: false,
-      onChange: (values) => onChange({ ...filter, range: (values[0] as ProgressQuery["range"]) ?? DEFAULT_PROGRESS_FILTER.range }),
-    },
-    {
-      key: "sources",
-      kind: "menu",
-      label: t("filter.allSources"),
-      options: sources,
-      selected: filter.sources,
-      multiple: true,
-      onChange: (values) => onChange({ ...filter, sources: values }),
-    },
-  ];
-  const count = (filter.sources.length > 0 ? 1 : 0) + (filter.exercise ? 1 : 0);
-  const clear = () => onChange({ ...DEFAULT_PROGRESS_FILTER, range: filter.range });
+  }).filter((option) => offered.has(option.value));
+  const sourceChip: FilterChip = {
+    key: "sources",
+    kind: "menu",
+    label: t("filter.source"),
+    options: sources,
+    selected: filter.sources,
+    multiple: true,
+    onChange: (values) => onChange({ ...filter, sources: values }),
+  };
   return (
-    <>
-      <FilterChipRow
-        ariaLabel={t("filter.title")}
-        activeCount={count}
-        onOpenFilters={() => setPageOpen(true)}
-        onClear={clear}
-        chips={chips}
-      />
-      {pageOpen ? (
-        <FilterPage title={t("filter.title")} onClose={() => setPageOpen(false)} onClear={clear}>
-          <FilterSection label={t("filter.exercise")}>
-            <input
-              type="search"
-              aria-label={t("filter.exercise")}
-              placeholder={t("filter.exercisePlaceholder")}
-              defaultValue={filter.exercise ?? ""}
-              maxLength={100}
-              onBlur={(event) => onChange({ ...filter, exercise: event.target.value.trim() || null })}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") onChange({ ...filter, exercise: event.currentTarget.value.trim() || null });
-              }}
-              className="min-h-11 w-full rounded-2xl px-4 text-sm outline-none"
-              style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-            />
-          </FilterSection>
-          <FilterSection label={t("filter.source")}>
-            <ChoiceChips
-              ariaLabel={t("filter.source")}
-              options={sources}
-              selected={filter.sources}
-              multiple
-              onChange={(values) => onChange({ ...filter, sources: values })}
-            />
-          </FilterSection>
-        </FilterPage>
-      ) : null}
-    </>
+    <div className="flex items-center gap-2">
+      <div
+        role="group"
+        aria-label={t("filter.period")}
+        className="flex min-w-0 flex-1 gap-0.5 rounded-full p-1"
+        style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
+      >
+        {PROGRESS_RANGES.map((range) => {
+          const on = filter.range === range;
+          return (
+            <button
+              key={range}
+              type="button"
+              aria-pressed={on}
+              aria-label={t(`range.${range}`)}
+              title={t(`range.${range}`)}
+              onClick={() => onChange({ ...filter, range })}
+              className="min-h-9 min-w-0 flex-1 whitespace-nowrap rounded-full px-2 text-sm font-semibold"
+              style={
+                on
+                  ? { background: "var(--panel)", color: "var(--text)", boxShadow: "0 1px 3px color-mix(in srgb, var(--text) 18%, transparent)" }
+                  : { background: "transparent", color: "var(--muted)" }
+              }
+            >
+              {t(`rangeShort.${range}`)}
+            </button>
+          );
+        })}
+      </div>
+      {sources.length > 1 || filter.sources.length > 0 ? <FilterMenuChip chip={sourceChip} /> : null}
+    </div>
   );
 }
 

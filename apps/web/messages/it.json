@@ -828,7 +828,6 @@
     "loadingYourTrainingOverview39806c7": "Caricamento della panoramica dei tuoi allenamenti...",
     "yourTrainingOverviewIsUnavailable0a82b18": "La panoramica dei tuoi allenamenti non è disponibile.",
     "refreshSessionf2ed411": "Aggiorna sessione",
-    "last10WeeksVsTarget153cf63": "Ultime 10 settimane rispetto all'obiettivo",
     "last7TrainingDays5c44037": "Ultimi 7 giorni di allenamento",
     "trainingVolume11e038b": "Volume di allenamento",
     "seasonalMomentum8724e0a": "Slancio stagionale",
@@ -857,11 +856,6 @@
     "monthlyRanking5999a91": "Classifica mensile:",
     "countsPersonalRecordsPrsLoggedInTheCurrentf701a4e": "Conta i record personali (PR) registrati nel mese corrente.",
     "theLeaderboardIsOptInOnlyYourData3e23cde": "La classifica è solo su adesione. I tuoi dati non sono mai visibili agli altri, a meno che tu non ti unisca esplicitamente.",
-    "consistencyScore4c4624c": "Punteggio di costanza",
-    "thePercentageOfWeeksInTheLast12b38b745": "La percentuale di settimane nelle ultime 12 settimane in cui hai completato almeno",
-    "showUpConsistentlyCompleteAtLeast7695825": "Allenati con costanza: completa almeno",
-    "perWeekToCountThatWeekTowardYourc1cfc10": "a settimana perché quella settimana conti per il tuo punteggio.",
-    "consistencyOverTimePredictsLongTermAthleticProgress04e2415": "La costanza nel tempo predice i progressi atletici a lungo termine meglio di qualsiasi singola metrica.",
     "whatTheyAree294e57": "Cosa sono:",
     "timeLimitedGoalsSetByYourCoachOreba26f4": "Obiettivi a tempo fissati dal tuo coach o dalla piattaforma per dare al tuo allenamento uno scopo e più energia.",
     "howToParticipate3af38ca": "Come partecipare:",
@@ -1261,7 +1255,6 @@
     "dismiss70afe9e": "Ignora",
     "advancements7f59df0": "progressi",
     "retry9f5cd8a": "Riprova",
-    "motivationd6a0619": "Motivazione",
     "perseverance3b53f48": "Perseveranza",
     "create6e157c5": "Crea",
     "leaderboard0381247": "Classifica",
@@ -1599,7 +1592,6 @@
     "yourTrainingIsInMotioncfd94f0": "Il tuo allenamento è in corso.",
     "executionNotAvailablea9817d4": "Esecuzione non disponibile.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "Impossibile caricare la pagina di destinazione.",
-    "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "Frequenza di allenamento rispetto all'obiettivo settimanale: ultime 10 settimane",
     "howCloselyYouFollowedPrescribedExercises760e833": "Quanto attentamente hai seguito gli esercizi prescritti",
     "whatAreChallengesfdf13a8": "Cosa sono le challenge?",
     "howDoesTheLeaderboardWork74f2b8a": "Come funziona la classifica?",
@@ -4829,7 +4821,31 @@
     "apiErrorCleaningPointNoteRequired": "Scrivi perché un punto non è stato pulito.",
     "apiErrorInvalidMachinePosition": "Un segnaposto è fuori dalla planimetria o ce ne sono più degli elementi in quella sala.",
     "apiErrorSpaceNotOnPlan": "Questa sala non è disegnata su una planimetria, quindi non può avere segnaposto.",
-    "apiErrorTooManyMachinePhotos": "Una voce accetta al massimo 10 foto."
+    "apiErrorTooManyMachinePhotos": "Una voce accetta al massimo 10 foto.",
+    "perseveranceHelpWhat": "Quanto fedelmente hai seguito il programma negli ultimi 7 giorni di allenamento (i giorni di riposo non contano). Ogni esercizio saltato, o fatto con un carico o ripetizioni diversi da quelli del WOD, lo abbassa in base a quanto ti sei discostato.",
+    "perseveranceHelpHow": "Esegui gli esercizi come sono scritti. Se non hai registrato modifiche, il punteggio è 100%.",
+    "perseveranceHelpWhy": "Il programma del tuo coach è pensato per progredire passo dopo passo. Più gli resti vicino, meglio funziona.",
+    "scoreLevel": "Livello XP",
+    "scoreLevelTooltip": "Punti per tutto ciò che fai e il livello che raggiungono",
+    "scoreLevelCaption": "{xp, number} / {next, number} XP per il livello {level}",
+    "scoreLevelHelpWhat": "I punti esperienza (XP) che guadagni: un allenamento +{workouts}, un PR +{prs}, una settimana con l'obiettivo settimanale raggiunto +{weeks}, una sfida completata +{challenges}.",
+    "scoreLevelHelpHow": "Allenati, stabilisci PR, raggiungi l'obiettivo settimanale e completa sfide. Ogni livello richiede un po' più XP del precedente.",
+    "scoreLevelHelpWhy": "Ogni allenamento conta per qualcosa che vedi, anche quando il prossimo PR tarda.",
+    "scoreStrength": "Aumento di forza",
+    "scoreStrengthTooltip": "Quanto è salito il tuo 1RM stimato nelle ultime 8 settimane",
+    "scoreStrengthCaption": "1RM stimato, ultime {weeks} settimane rispetto a prima",
+    "scoreStrengthLifts": "Esercizi saliti",
+    "scoreStrengthHelpWhat": "Quanto è salito in media l'1RM stimato dei tuoi PR con carico nelle ultime 8 settimane, rispetto al tuo migliore di prima. Ogni esercizio pesa uguale, leggero o pesante.",
+    "scoreStrengthHelpHow": "Registra i PR con carico e ripetizioni. Ogni nuovo PR alza la stima, anche più ripetizioni con lo stesso carico.",
+    "scoreStrengthHelpWhy": "Vedi il lavoro dare frutti tra un massimale e l'altro, non solo il giorno in cui lo batti.",
+    "scoreNextMilestone": "Prossimo traguardo",
+    "scoreNextMilestoneTooltip": "Quanto ti manca al badge più vicino che non hai ancora",
+    "scoreNextMilestoneWorkouts": "{remaining, plural, one {allenamento} other {allenamenti}} al badge {target} allenamenti",
+    "scoreNextMilestonePrs": "{remaining, plural, one {PR} other {PR}} al badge {target} PR",
+    "scoreNextMilestoneStreak": "{remaining, plural, one {giorno} other {giorni}} di serie al badge {target} giorni di serie",
+    "scoreNextMilestoneHelpWhat": "Quanto ti manca al badge più vicino che non hai ancora ottenuto: allenamenti, PR o giorni di allenamento di fila.",
+    "scoreNextMilestoneHelpHow": "Fai quello che dice la scheda. Ottenuto il badge, la scheda mostra il successivo.",
+    "scoreNextMilestoneHelpWhy": "Un obiettivo vicino e concreto si raggiunge più facilmente di uno lontano."
   },
   "PrSharing": {
     "gymLabel": "Dove hai stabilito questo PR?",
@@ -8793,7 +8809,8 @@
       "exercise": "Esercizio",
       "exercisePlaceholder": "es. back squat",
       "empty": "Nessun risultato con questi filtri.",
-      "clear": "Cancella filtri"
+      "clear": "Cancella filtri",
+      "period": "Periodo"
     },
     "range": {
       "4w": "4 settimane",
@@ -8801,6 +8818,13 @@
       "6m": "6 mesi",
       "1y": "1 anno",
       "all": "Sempre"
+    },
+    "rangeShort": {
+      "4w": "4 s",
+      "12w": "3 m",
+      "6m": "6 m",
+      "1y": "1 a",
+      "all": "Tutto"
     },
     "progress": {
       "bySource": "Sessioni per fonte"

@@ -16755,6 +16755,8 @@ export interface components {
         /** AccountProgress */
         AccountProgress: {
             active_filter_count: number;
+            /** @description Source tokens (organization id, `freeform`, `device`) the person has any completed workout from, whatever the filter or range: the «Πηγή» chip shows only with two or more (ADR-285). */
+            available_sources: string[];
             by_source: {
                 sessions: number;
                 /**
@@ -16841,6 +16843,8 @@ export interface components {
             /** AccountProgress */
             progress: {
                 active_filter_count: number;
+                /** @description Source tokens (organization id, `freeform`, `device`) the person has any completed workout from, whatever the filter or range: the «Πηγή» chip shows only with two or more (ADR-285). */
+                available_sources: string[];
                 by_source: {
                     sessions: number;
                     /**
@@ -65953,6 +65957,8 @@ export interface operations {
                         /** AccountProgress */
                         progress: {
                             active_filter_count: number;
+                            /** @description Source tokens (organization id, `freeform`, `device`) the person has any completed workout from, whatever the filter or range: the «Πηγή» chip shows only with two or more (ADR-285). */
+                            available_sources: string[];
                             by_source: {
                                 sessions: number;
                                 /**

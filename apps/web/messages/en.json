@@ -828,7 +828,6 @@
     "loadingYourTrainingOverview39806c7": "Loading your training overview...",
     "yourTrainingOverviewIsUnavailable0a82b18": "Your training overview is unavailable.",
     "refreshSessionf2ed411": "Refresh session",
-    "last10WeeksVsTarget153cf63": "Last 10 weeks vs target",
     "last7TrainingDays5c44037": "Last 7 training days",
     "trainingVolume11e038b": "Training Volume",
     "seasonalMomentum8724e0a": "Seasonal momentum",
@@ -857,11 +856,6 @@
     "monthlyRanking5999a91": "Monthly ranking:",
     "countsPersonalRecordsPrsLoggedInTheCurrentf701a4e": "Counts personal records (PRs) logged in the current month.",
     "theLeaderboardIsOptInOnlyYourData3e23cde": "The leaderboard is opt-in only. Your data is never visible to others unless you explicitly join.",
-    "consistencyScore4c4624c": "Consistency Score",
-    "thePercentageOfWeeksInTheLast12b38b745": "The percentage of weeks in the last 12 weeks in which you completed at least",
-    "showUpConsistentlyCompleteAtLeast7695825": "Show up consistently — complete at least",
-    "perWeekToCountThatWeekTowardYourc1cfc10": "per week to count that week toward your score.",
-    "consistencyOverTimePredictsLongTermAthleticProgress04e2415": "Consistency over time predicts long-term athletic progress better than any single metric.",
     "whatTheyAree294e57": "What they are:",
     "timeLimitedGoalsSetByYourCoachOreba26f4": "Time-limited goals set by your coach or the platform to keep your training purposeful and energised.",
     "howToParticipate3af38ca": "How to participate:",
@@ -1261,7 +1255,6 @@
     "dismiss70afe9e": "Dismiss",
     "advancements7f59df0": "advancements",
     "retry9f5cd8a": "Retry",
-    "motivationd6a0619": "Motivation",
     "perseverance3b53f48": "Perseverance",
     "create6e157c5": "Create",
     "leaderboard0381247": "Leaderboard",
@@ -1599,7 +1592,6 @@
     "yourTrainingIsInMotioncfd94f0": "Your training is in motion.",
     "executionNotAvailablea9817d4": "Execution not available.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "The landing page could not be loaded.",
-    "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "Workout frequency vs weekly target — last 10 weeks",
     "howCloselyYouFollowedPrescribedExercises760e833": "How closely you followed prescribed exercises",
     "whatAreChallengesfdf13a8": "What are challenges?",
     "howDoesTheLeaderboardWork74f2b8a": "How does the leaderboard work?",
@@ -4829,7 +4821,31 @@
     "apiErrorCleaningPointNoteRequired": "Say why a point was not cleaned.",
     "apiErrorInvalidMachinePosition": "A pin is off the plan, or there are more pins than items in that space.",
     "apiErrorSpaceNotOnPlan": "That space is not drawn on a floor plan, so it cannot take pins.",
-    "apiErrorTooManyMachinePhotos": "A log entry takes at most 10 photos."
+    "apiErrorTooManyMachinePhotos": "A log entry takes at most 10 photos.",
+    "perseveranceHelpWhat": "How closely you followed the programme on your last 7 training days (rest days do not count). Every exercise you skipped, or did with different weight or reps from what the WOD said, lowers it, by as much as you strayed.",
+    "perseveranceHelpHow": "Do the exercises as they are written. If you have logged no changes, the score is 100%.",
+    "perseveranceHelpWhy": "Your coach's programme is built to progress step by step. The closer you stay to it, the better it works.",
+    "scoreLevel": "XP level",
+    "scoreLevelTooltip": "Points from everything you do, and the level they reach",
+    "scoreLevelCaption": "{xp, number} / {next, number} XP to level {level}",
+    "scoreLevelHelpWhat": "The experience points (XP) you earn from what you do: a workout +{workouts}, a PR +{prs}, a week on your weekly goal +{weeks}, a challenge you complete +{challenges}.",
+    "scoreLevelHelpHow": "Train, set PRs, reach your weekly goal and finish challenges. Each level takes a little more XP than the one before.",
+    "scoreLevelHelpWhy": "Every workout counts towards something you can see, even while the next PR is still a while away.",
+    "scoreStrength": "Strength gain",
+    "scoreStrengthTooltip": "How much your estimated 1RM went up in the last 8 weeks",
+    "scoreStrengthCaption": "Estimated 1RM, last {weeks} weeks against before",
+    "scoreStrengthLifts": "Lifts that went up",
+    "scoreStrengthHelpWhat": "How much the estimated one-rep max of your weight PRs went up on average in the last 8 weeks, compared with your best before them. Each lift weighs the same, light or heavy.",
+    "scoreStrengthHelpHow": "Log your PRs with weight and reps. Every new PR raises the estimate, even more reps at the same weight.",
+    "scoreStrengthHelpWhy": "You see the work paying off between one-rep records, not only on the day you beat one.",
+    "scoreNextMilestone": "Next milestone",
+    "scoreNextMilestoneTooltip": "How far you are from the closest badge you do not have yet",
+    "scoreNextMilestoneWorkouts": "{remaining, plural, one {workout} other {workouts}} to the {target} workouts badge",
+    "scoreNextMilestonePrs": "{remaining, plural, one {PR} other {PRs}} to the {target} PRs badge",
+    "scoreNextMilestoneStreak": "{remaining, plural, one {day} other {days}} of streak to the {target}-day streak badge",
+    "scoreNextMilestoneHelpWhat": "How far you are from the closest badge you have not earned yet: workouts, PRs or days in a row of training.",
+    "scoreNextMilestoneHelpHow": "Do what the card says. Once you earn the badge, the card shows the next one.",
+    "scoreNextMilestoneHelpWhy": "A close, concrete goal is easier to reach than a distant one."
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",
@@ -8793,7 +8809,8 @@
       "exercise": "Exercise",
       "exercisePlaceholder": "e.g. back squat",
       "empty": "Nothing matches these filters.",
-      "clear": "Clear filters"
+      "clear": "Clear filters",
+      "period": "Period"
     },
     "range": {
       "4w": "4 weeks",
@@ -8801,6 +8818,13 @@
       "6m": "6 months",
       "1y": "1 year",
       "all": "All time"
+    },
+    "rangeShort": {
+      "4w": "4w",
+      "12w": "3m",
+      "6m": "6m",
+      "1y": "1y",
+      "all": "All"
     },
     "progress": {
       "bySource": "Sessions by source"

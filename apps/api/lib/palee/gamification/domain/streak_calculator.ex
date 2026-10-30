@@ -22,7 +22,8 @@ defmodule Palee.Gamification.Domain.StreakCalculator do
       current_streak: computed.current_streak,
       longest_streak: max(stats[:longest_streak] || 0, computed.longest_streak),
       current_streak_shields: computed.current_streak_shields,
-      consistency_score: computed.consistency_score
+      consistency_score: computed.consistency_score,
+      weeks_on_goal: computed.weeks_on_goal
     }
   end
 
@@ -35,7 +36,8 @@ defmodule Palee.Gamification.Domain.StreakCalculator do
       current_streak: 0,
       longest_streak: 0,
       current_streak_shields: Keyword.get(opts, :shields, @default_shields),
-      consistency_score: 0.0
+      consistency_score: 0.0,
+      weeks_on_goal: 0
     }
   end
 
@@ -97,7 +99,9 @@ defmodule Palee.Gamification.Domain.StreakCalculator do
       current_streak: current_streak,
       longest_streak: longest_streak,
       current_streak_shields: shields_left,
-      consistency_score: consistency_score(weekly_map, week_starts)
+      consistency_score: consistency_score(weekly_map, week_starts),
+      # ADR-285: every week, since the anchor, that reached the goal («Επίπεδο»).
+      weeks_on_goal: Enum.count(week_starts, &(Map.get(weekly_map, &1, 0) >= target))
     }
   end
 

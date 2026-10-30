@@ -17,6 +17,32 @@ defmodule Palee.Gamification.Domain.StreakCalculatorTest do
     assert result.longest_streak == 2
   end
 
+  test "weeks on goal count every week that reached the target, streak or not (ADR-285)" do
+    # Weeks from 2026-06-01: two on goal, one with a single workout, one on goal.
+    completed_dates = [
+      ~D[2026-06-01],
+      ~D[2026-06-02],
+      ~D[2026-06-08],
+      ~D[2026-06-09],
+      ~D[2026-06-16],
+      ~D[2026-06-22],
+      ~D[2026-06-23]
+    ]
+
+    result =
+      StreakCalculator.update(%{},
+        completed_dates: completed_dates,
+        current_date: ~D[2026-06-24],
+        target: 2,
+        shields: 0
+      )
+
+    assert result.weeks_on_goal == 3
+    assert result.current_streak == 1
+
+    assert StreakCalculator.calculate([], current_date: ~D[2026-06-24]).weeks_on_goal == 0
+  end
+
   test "shield preserves the streak for one missed week" do
     completed_dates = [~D[2026-05-26], ~D[2026-05-28], ~D[2026-06-09], ~D[2026-06-10]]
 

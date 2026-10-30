@@ -84,6 +84,22 @@ defmodule PaleeWeb.LandingControllerTest do
         earned_at: DateTime.utc_now()
       })
 
+    # ADR-285 «Δύναμη»: a squat PR from before the 8-week window, beaten today.
+    {:ok, squat} =
+      Palee.Pantheon.create_pr(athlete.id, %{
+        "name" => "Back squat",
+        "current_score" => 100,
+        "unit" => "kg",
+        "beaten_on" => Date.add(Date.utc_today(), -90),
+        "supporting_metrics" => %{"reps" => 1}
+      })
+
+    {:ok, _beaten} =
+      Palee.Pantheon.update_pr(squat.id, athlete.id, %{
+        "current_score" => 110,
+        "beaten_on" => Date.utc_today()
+      })
+
     {:ok, package} =
       Finance.create_package(%{
         code: "landing_package",
@@ -138,6 +154,23 @@ defmodule PaleeWeb.LandingControllerTest do
     assert get_in(landing, ["membership", "entitlement_status"]) == "active"
     assert get_in(landing, ["membership", "amount"]) == 12_000
     assert length(get_in(landing, ["gamification", "badges"])) == 1
+
+    # ADR-285: the scores that replaced «Κίνητρο». Two workouts (2 × 50 XP)
+    # and two hand-logged PR advancements (2 × 100 XP) reach level 2.
+    refute Map.has_key?(get_in(landing, ["gamification", "stats"]), "motivation_score")
+
+    assert %{"level" => 2, "xp" => 300, "level_start_xp" => 200, "next_level_xp" => 500} =
+             get_in(landing, ["gamification", "level"])
+
+    assert %{"badge_key" => "workouts_10", "current" => 2, "remaining" => 8} =
+             get_in(landing, ["gamification", "next_milestone"])
+
+    assert %{
+             "percent" => 10.0,
+             "window_days" => 56,
+             "lifts" => [%{"name" => "Back squat", "from_kg" => 100.0, "to_kg" => 110.0}]
+           } = get_in(landing, ["gamification", "strength"])
+
     assert get_in(landing, ["recent_executions", Access.at(0), "workout_title"]) == workout.title
 
     assert get_in(landing, [

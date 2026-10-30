@@ -3,7 +3,6 @@ defmodule Palee.Gamification.Commands.RecordWorkoutCompletion do
     AchievementRules,
     ChallengeProgress,
     DayStreakCalculator,
-    MotivationCalculator,
     PerseveranceCalculator,
     PRDetector,
     StreakCalculator,
@@ -56,9 +55,6 @@ defmodule Palee.Gamification.Commands.RecordWorkoutCompletion do
       |> GamificationStore.get_training_goal(WeeklyGoal.kind())
       |> WeeklyGoal.effective_target()
 
-    motivation_score =
-      MotivationCalculator.calculate(completed_dates, weekly_target, today)
-
     perseverance_score =
       PerseveranceCalculator.calculate(
         Map.get(params, :recent_changes, []),
@@ -97,16 +93,28 @@ defmodule Palee.Gamification.Commands.RecordWorkoutCompletion do
         end
       }
 
-      extra_scores = %{
-        motivation_score: motivation_score,
-        perseverance_score: perseverance_score,
-        advancement_count: existing_stats[:advancement_count] || 0,
-        day_streaks: day_streaks
-      }
-
+      # ADR-285: challenges are counted when they complete (a completion
+      # happens once per person, under the challenge lock), so the stats
+      # are written after the challenge progress of this completion.
       with {:ok, _pr_events} <-
              persist_pr_events(user_id, organization_id, execution_id, pr_scores, completed_at),
            total_prs <- GamificationStore.count_achievements_by_prefix(user_id, "pr_event:"),
+           {:ok, challenge_result} <-
+             persist_challenge_progress(
+               user_id,
+               organization_id,
+               current_execution,
+               completion_facts,
+               completed_at
+             ),
+           extra_scores <- %{
+             perseverance_score: perseverance_score,
+             advancement_count: existing_stats[:advancement_count] || 0,
+             challenges_completed:
+               (existing_stats[:challenges_completed] || 0) +
+                 length(challenge_result.completions),
+             day_streaks: day_streaks
+           },
            stats <-
              build_stats(
                user_id,
@@ -122,14 +130,6 @@ defmodule Palee.Gamification.Commands.RecordWorkoutCompletion do
                AchievementRules.milestone_badges(stats, type_counts),
                user_id,
                organization_id,
-               completed_at
-             ),
-           {:ok, challenge_result} <-
-             persist_challenge_progress(
-               user_id,
-               organization_id,
-               current_execution,
-               completion_facts,
                completed_at
              ) do
         {:ok,
@@ -151,9 +151,10 @@ defmodule Palee.Gamification.Commands.RecordWorkoutCompletion do
       current_streak_shields: streaks.current_streak_shields,
       last_workout_at: List.last(completed_executions, current_execution).completed_at_utc,
       consistency_score: streaks.consistency_score,
-      motivation_score: extra.motivation_score,
       perseverance_score: extra.perseverance_score,
       advancement_count: extra.advancement_count,
+      weeks_on_goal: streaks.weeks_on_goal,
+      challenges_completed: extra.challenges_completed,
       updated_at: DateTime.utc_now()
     }
   end

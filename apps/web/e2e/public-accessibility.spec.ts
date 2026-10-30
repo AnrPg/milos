@@ -144,7 +144,6 @@ async function stubApi(page: Page, user?: { id: string; nickname: string; role: 
             total_prs: 0,
             current_streak_shields: 0,
             consistency_score: 0,
-            motivation_score: 0,
             perseverance_score: 0,
             advancement_count: 0,
             last_workout_at: null,

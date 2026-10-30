@@ -828,7 +828,6 @@
     "loadingYourTrainingOverview39806c7": "טוען את סקירת האימונים שלך...",
     "yourTrainingOverviewIsUnavailable0a82b18": "סקירת ההדרכה שלך אינה זמינה.",
     "refreshSessionf2ed411": "סשן רענון",
-    "last10WeeksVsTarget153cf63": "10 השבועות האחרונים לעומת היעד",
     "last7TrainingDays5c44037": "7 ימי אימון אחרונים",
     "trainingVolume11e038b": "נפח אימון",
     "seasonalMomentum8724e0a": "מומנטום עונתי",
@@ -857,11 +856,6 @@
     "monthlyRanking5999a91": "דירוג חודשי:",
     "countsPersonalRecordsPrsLoggedInTheCurrentf701a4e": "סופר רשומות אישיות (PRs) שנרשמו בחודש הנוכחי.",
     "theLeaderboardIsOptInOnlyYourData3e23cde": "ה-Leaderboard הוא הצטרפות בלבד. הנתונים שלך לעולם אינם גלויים לאחרים אלא אם כן אתה מצטרף במפורש.",
-    "consistencyScore4c4624c": "ציון עקביות",
-    "thePercentageOfWeeksInTheLast12b38b745": "אחוז השבועות ב-12 השבועות האחרונים שבהם השלמת לפחות",
-    "showUpConsistentlyCompleteAtLeast7695825": "הצג באופן עקבי - השלם לפחות",
-    "perWeekToCountThatWeekTowardYourc1cfc10": "לשבוע כדי לספור את השבוע הזה לקראת הציון שלך.",
-    "consistencyOverTimePredictsLongTermAthleticProgress04e2415": "עקביות לאורך זמן מנבאת התקדמות אתלטית ארוכת טווח טוב יותר מכל מדד בודד.",
     "whatTheyAree294e57": "מה הם:",
     "timeLimitedGoalsSetByYourCoachOreba26f4": "יעדים מוגבלים בזמן שהוגדרו על ידי המאמן שלך או הפלטפורמה כדי לשמור על האימון שלך תכליתי ומלא אנרגיה.",
     "howToParticipate3af38ca": "איך להשתתף:",
@@ -1261,7 +1255,6 @@
     "dismiss70afe9e": "לבטל",
     "advancements7f59df0": "התקדמות",
     "retry9f5cd8a": "נסה שוב",
-    "motivationd6a0619": "מוטיבציה",
     "perseverance3b53f48": "התמדה",
     "create6e157c5": "צור",
     "leaderboard0381247": "Leaderboard",
@@ -1599,7 +1592,6 @@
     "yourTrainingIsInMotioncfd94f0": "האימון שלך בתנועה.",
     "executionNotAvailablea9817d4": "ביצוע לא זמין.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "לא ניתן היה לטעון את דף הנחיתה.",
-    "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "תדירות אימון מול יעד שבועי - 10 השבועות האחרונים",
     "howCloselyYouFollowedPrescribedExercises760e833": "עד כמה עקבת אחר התרגילים שנקבעו",
     "whatAreChallengesfdf13a8": "מהם אתגרים?",
     "howDoesTheLeaderboardWork74f2b8a": "איך עובד לוח התוצאות?",
@@ -4829,7 +4821,31 @@
     "apiErrorCleaningPointNoteRequired": "כתוב למה נקודה לא נוקתה.",
     "apiErrorInvalidMachinePosition": "נעץ מחוץ לתוכנית, או שיש יותר נעצים מפריטים בחלל.",
     "apiErrorSpaceNotOnPlan": "החלל לא מסומן בתוכנית, ולכן אי אפשר להוסיף נעצים.",
-    "apiErrorTooManyMachinePhotos": "רשומה מקבלת עד 10 תמונות."
+    "apiErrorTooManyMachinePhotos": "רשומה מקבלת עד 10 תמונות.",
+    "perseveranceHelpWhat": "עד כמה עקבת אחר התוכנית ב-7 ימי האימון האחרונים (ימי מנוחה לא נספרים). כל תרגיל שדילגת עליו, או שביצעת במשקל או בחזרות שונים ממה שנכתב ב-WOD, מוריד אותו לפי מידת הסטייה.",
+    "perseveranceHelpHow": "בצע את התרגילים כפי שהם כתובים. אם לא רשמת שינויים, הציון הוא 100%.",
+    "perseveranceHelpWhy": "התוכנית של המאמן שלך בנויה להתקדם צעד אחר צעד. ככל שתישאר קרוב אליה, היא תעבוד טוב יותר.",
+    "scoreLevel": "רמת XP",
+    "scoreLevelTooltip": "נקודות על כל מה שאתה עושה, והרמה שאליה הן מגיעות",
+    "scoreLevelCaption": "{xp, number} / {next, number} XP לרמה {level}",
+    "scoreLevelHelpWhat": "נקודות הניסיון (XP) שאתה צובר: אימון +{workouts}, שיא +{prs}, שבוע שבו עמדת ביעד השבועי +{weeks}, אתגר שהשלמת +{challenges}.",
+    "scoreLevelHelpHow": "התאמן, שבור שיאים, עמוד ביעד השבועי והשלם אתגרים. כל רמה דורשת קצת יותר XP מהקודמת.",
+    "scoreLevelHelpWhy": "כל אימון נספר למשהו שאתה רואה, גם כשהשיא הבא מתעכב.",
+    "scoreStrength": "עלייה בכוח",
+    "scoreStrengthTooltip": "בכמה עלה ה-1RM המשוער שלך ב-8 השבועות האחרונים",
+    "scoreStrengthCaption": "1RM משוער, {weeks} השבועות האחרונים לעומת לפניהם",
+    "scoreStrengthLifts": "תרגילים שעלו",
+    "scoreStrengthHelpWhat": "בכמה עלה בממוצע המקסימום המשוער לחזרה אחת בשיאי המשקל שלך ב-8 השבועות האחרונים, לעומת הטוב ביותר שלך לפניהם. כל תרגיל שוקל אותו דבר, קל או כבד.",
+    "scoreStrengthHelpHow": "רשום את השיאים שלך עם משקל וחזרות. כל שיא חדש מעלה את ההערכה, גם יותר חזרות באותו משקל.",
+    "scoreStrengthHelpWhy": "אתה רואה שהעבודה משתלמת בין שיא לחזרה אחת לשיא הבא, לא רק ביום ששברת אחד.",
+    "scoreNextMilestone": "אבן הדרך הבאה",
+    "scoreNextMilestoneTooltip": "כמה אתה רחוק מהתג הקרוב ביותר שעוד אין לך",
+    "scoreNextMilestoneWorkouts": "{remaining, plural, one {אימון} other {אימונים}} לתג {target} אימונים",
+    "scoreNextMilestonePrs": "{remaining, plural, one {שיא} other {שיאים}} לתג {target} שיאים",
+    "scoreNextMilestoneStreak": "{remaining, plural, one {יום} other {ימים}} רצף לתג {target} ימי רצף",
+    "scoreNextMilestoneHelpWhat": "כמה אתה רחוק מהתג הקרוב ביותר שעוד לא השגת: אימונים, שיאים או ימי אימון ברצף.",
+    "scoreNextMilestoneHelpHow": "עשה מה שכתוב בכרטיס. כשתשיג את התג, הכרטיס יציג את הבא.",
+    "scoreNextMilestoneHelpWhy": "יעד קרוב ומוחשי קל יותר להשגה מיעד רחוק."
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",
@@ -8793,7 +8809,8 @@
       "exercise": "תרגיל",
       "exercisePlaceholder": "למשל: סקוואט אחורי",
       "empty": "אין תוצאות למסננים האלה.",
-      "clear": "ניקוי מסננים"
+      "clear": "ניקוי מסננים",
+      "period": "תקופה"
     },
     "range": {
       "4w": "4 שבועות",
@@ -8801,6 +8818,13 @@
       "6m": "6 חודשים",
       "1y": "שנה",
       "all": "כל הזמן"
+    },
+    "rangeShort": {
+      "4w": "4 ש׳",
+      "12w": "3 ח׳",
+      "6m": "6 ח׳",
+      "1y": "שנה",
+      "all": "הכול"
     },
     "progress": {
       "bySource": "אימונים לפי מקור"

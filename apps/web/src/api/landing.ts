@@ -82,11 +82,19 @@ export type LandingPayload = {
       total_prs: number;
       current_streak_shields: number;
       consistency_score: number;
-      motivation_score: number;
       perseverance_score: number;
       advancement_count: number;
+      /** ADR-285: weeks that reached the weekly goal, and challenges finished (XP inputs). */
+      weeks_on_goal?: number;
+      challenges_completed?: number;
       last_workout_at: string | null;
     };
+    /** ADR-285 «Επίπεδο»: XP worked out from the stats (null on staff landings). */
+    level?: LevelSummary | null;
+    /** ADR-285 «Επόμενο ορόσημο»: the closest milestone badge not earned yet. */
+    next_milestone?: NextMilestone | null;
+    /** ADR-285 «Δύναμη»: strength gained over the last 8 weeks, null with nothing to compare. */
+    strength?: StrengthTrend | null;
     preferences: {
       off_days: number[];
     } | null;
@@ -111,6 +119,30 @@ export type LandingPayload = {
     entitlement_source?: string | null;
   };
   recent_executions: WorkoutExecution[];
+};
+
+export type LevelSummary = {
+  level: number;
+  xp: number;
+  level_start_xp: number;
+  next_level_xp: number;
+  points: { workouts: number; prs: number; weeks_on_goal: number; challenges: number };
+};
+
+export type NextMilestone = {
+  badge_key: string;
+  kind: "workouts" | "prs" | "streak";
+  current: number;
+  target: number;
+  remaining: number;
+};
+
+export type StrengthTrend = {
+  percent: number;
+  window_days: number;
+  lifts: { name: string; from_kg: number; to_kg: number; gain_kg: number }[];
+  compared_lifts: number;
+  new_lifts: number;
 };
 
 export async function fetchLandingPayload(token: string) {

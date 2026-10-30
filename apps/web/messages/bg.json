@@ -828,7 +828,6 @@
     "loadingYourTrainingOverview39806c7": "Зарежда се преглед на вашето обучение...",
     "yourTrainingOverviewIsUnavailable0a82b18": "Вашият преглед на обучението не е наличен.",
     "refreshSessionf2ed411": "Опресняване на сесията",
-    "last10WeeksVsTarget153cf63": "Последните 10 седмици спрямо целта",
     "last7TrainingDays5c44037": "Последни 7 тренировъчни дни",
     "trainingVolume11e038b": "Обем на обучение",
     "seasonalMomentum8724e0a": "Сезонна инерция",
@@ -857,11 +856,6 @@
     "monthlyRanking5999a91": "Месечна класация:",
     "countsPersonalRecordsPrsLoggedInTheCurrentf701a4e": "Брои лични записи (PR), регистрирани през текущия месец.",
     "theLeaderboardIsOptInOnlyYourData3e23cde": "Класацията е само за включване. Вашите данни никога не са видими за другите, освен ако изрично не се присъедините.",
-    "consistencyScore4c4624c": "Оценка за последователност",
-    "thePercentageOfWeeksInTheLast12b38b745": "Процентът седмици през последните 12 седмици, в които сте завършили поне",
-    "showUpConsistentlyCompleteAtLeast7695825": "Показвайте се последователно — завършете поне",
-    "perWeekToCountThatWeekTowardYourc1cfc10": "на седмица, за да се отчете тази седмица към вашия резултат.",
-    "consistencyOverTimePredictsLongTermAthleticProgress04e2415": "Последователността във времето прогнозира дългосрочен спортен напредък по-добре от който и да е отделен показател.",
     "whatTheyAree294e57": "Какво представляват:",
     "timeLimitedGoalsSetByYourCoachOreba26f4": "Ограничени във времето цели, определени от вашия треньор или платформата, за да поддържате обучението си целенасочено и заредено с енергия.",
     "howToParticipate3af38ca": "Как да участвате:",
@@ -1261,7 +1255,6 @@
     "dismiss70afe9e": "Отхвърляне",
     "advancements7f59df0": "напредъци",
     "retry9f5cd8a": "Опитайте отново",
-    "motivationd6a0619": "Мотивация",
     "perseverance3b53f48": "Упоритост",
     "create6e157c5": "Създавайте",
     "leaderboard0381247": "класация",
@@ -1599,7 +1592,6 @@
     "yourTrainingIsInMotioncfd94f0": "Вашето обучение е в движение.",
     "executionNotAvailablea9817d4": "Не е налично изпълнение.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "Целевата страница не можа да се зареди.",
-    "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "Честота на тренировка срещу седмична цел — последните 10 седмици",
     "howCloselyYouFollowedPrescribedExercises760e833": "Колко точно сте следвали предписаните упражнения",
     "whatAreChallengesfdf13a8": "Какво представляват предизвикателствата?",
     "howDoesTheLeaderboardWork74f2b8a": "Как работи класацията?",
@@ -4829,7 +4821,31 @@
     "apiErrorCleaningPointNoteRequired": "Напиши защо точка не е почистена.",
     "apiErrorInvalidMachinePosition": "Маркер е извън плана или има повече маркери от уреди в залата.",
     "apiErrorSpaceNotOnPlan": "Залата не е начертана на план и не може да има маркери.",
-    "apiErrorTooManyMachinePhotos": "Записът приема до 10 снимки."
+    "apiErrorTooManyMachinePhotos": "Записът приема до 10 снимки.",
+    "perseveranceHelpWhat": "Колко точно си следвал програмата през последните си 7 тренировъчни дни (дните за почивка не се броят). Всяко пропуснато упражнение или направено с друга тежест или повторения от написаното в WOD го намалява според отклонението.",
+    "perseveranceHelpHow": "Прави упражненията така, както са написани. Ако не си записал промени, резултатът е 100%.",
+    "perseveranceHelpWhy": "Програмата на треньора ти е създадена да напредва стъпка по стъпка. Колкото по-близо оставаш до нея, толкова по-добре работи.",
+    "scoreLevel": "Ниво XP",
+    "scoreLevelTooltip": "Точки за всичко, което правиш, и нивото, до което стигат",
+    "scoreLevelCaption": "{xp, number} / {next, number} XP до ниво {level}",
+    "scoreLevelHelpWhat": "Точките опит (XP), които трупаш: тренировка +{workouts}, рекорд +{prs}, седмица с постигната седмична цел +{weeks}, завършено предизвикателство +{challenges}.",
+    "scoreLevelHelpHow": "Тренирай, поставяй рекорди, постигай седмичната цел и завършвай предизвикателства. Всяко ниво иска малко повече XP от предишното.",
+    "scoreLevelHelpWhy": "Всяка тренировка води към нещо видимо, дори когато следващият рекорд се бави.",
+    "scoreStrength": "Ръст на силата",
+    "scoreStrengthTooltip": "Колко се е повишил прогнозният ти 1ПМ през последните 8 седмици",
+    "scoreStrengthCaption": "Прогнозен 1ПМ, последните {weeks} седмици спрямо преди",
+    "scoreStrengthLifts": "Упражнения с ръст",
+    "scoreStrengthHelpWhat": "Колко средно се е повишил прогнозният максимум за едно повторение на рекордите ти с тежест през последните 8 седмици спрямо най-добрия ти резултат преди тях. Всяко упражнение тежи еднакво, леко или тежко.",
+    "scoreStrengthHelpHow": "Записвай рекордите си с тежест и повторения. Всеки нов рекорд вдига оценката, дори повече повторения със същата тежест.",
+    "scoreStrengthHelpWhy": "Виждаш, че работата дава резултат между рекордите за едно повторение, а не само в деня, когато подобриш някой.",
+    "scoreNextMilestone": "Следващ етап",
+    "scoreNextMilestoneTooltip": "Колко ти остава до най-близката значка, която още нямаш",
+    "scoreNextMilestoneWorkouts": "{remaining, plural, one {тренировка} other {тренировки}} до значката „{target} тренировки“",
+    "scoreNextMilestonePrs": "{remaining, plural, one {рекорд} other {рекорда}} до значката „{target} рекорда“",
+    "scoreNextMilestoneStreak": "{remaining, plural, one {ден} other {дни}} серия до значката „{target} дни серия“",
+    "scoreNextMilestoneHelpWhat": "Колко ти остава до най-близката значка, която още не си спечелил: тренировки, рекорди или поредни тренировъчни дни.",
+    "scoreNextMilestoneHelpHow": "Направи това, което пише на картата. Щом спечелиш значката, картата показва следващата.",
+    "scoreNextMilestoneHelpWhy": "Близката, конкретна цел се постига по-лесно от далечната."
   },
   "PrSharing": {
     "gymLabel": "Къде постигна този рекорд?",
@@ -8793,7 +8809,8 @@
       "exercise": "Упражнение",
       "exercisePlaceholder": "напр. back squat",
       "empty": "Нищо не отговаря на тези филтри.",
-      "clear": "Изчисти филтрите"
+      "clear": "Изчисти филтрите",
+      "period": "Период"
     },
     "range": {
       "4w": "4 седмици",
@@ -8801,6 +8818,13 @@
       "6m": "6 месеца",
       "1y": "1 година",
       "all": "Всичко"
+    },
+    "rangeShort": {
+      "4w": "4 с",
+      "12w": "3 м",
+      "6m": "6 м",
+      "1y": "1 г",
+      "all": "Всички"
     },
     "progress": {
       "bySource": "Тренировки по източник"
