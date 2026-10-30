@@ -148,7 +148,7 @@ export function FloorPlanCanvas({
           aria-label={pin.label}
           title={pin.label}
           className="absolute flex h-7 w-7 -translate-x-1/2 -translate-y-full items-center justify-center text-xl leading-none disabled:cursor-default"
-          style={{ left: `${pin.at[0] * 100}%`, top: `${pin.at[1] * 100}%`, filter: "drop-shadow(0 1px 1px rgb(0 0 0 / 0.35))", pointerEvents: onPinClick ? "auto" : "none" }}
+          style={{ left: `${pin.at[0] * 100}%`, top: `${pin.at[1] * 100}%`, pointerEvents: onPinClick ? "auto" : "none" }}
           onClick={() => onPinClick?.(pin.id)}
         >
           <span aria-hidden="true">📍</span>
