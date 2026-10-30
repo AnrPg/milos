@@ -62,7 +62,7 @@ Researched Oct 2026. Many figures come from interested parties (vendors, Strava,
 | **AI layered on human coaches** | Vasa, NYSC and Hotworx launched AI personal training in 2026, always refining trainer-built programs. Analysts note manual loggers (e.g. Hevy) risk losing users to AI-automated logging. | Manual logging is becoming a commodity. Differentiation moves to **community + the gym relationship**. AI belongs as the coach's assistant, not as a tab. |
 | **Software + client pool is proven** | Playlist (Mindbody + ClassPass) merged with EGYM ($7.5B, closed Mar 2026). ClassPass says 94% of its users are new to the venues they visit. Studios complain about discount-driven devaluation. | "We bring you clients" works, but there is a gap: **bring clients without a discount marketplace**, with the owner controlling the offer. |
 | **Europe headroom** | 75.5M members (+5.8%), €39.1B revenue (2025). Penetration 9.3% vs 24.9% in the US. No Greece-specific data found. | Independent gyms in markets that big players underserve (language, local payments and invoicing) are a real wedge. Get Greek numbers from the Panhellenic Gyms Association. |
-| **Gym-buddy apps** | Many small swipe apps (GymBuddy, DUFIT, SpotYourMatch, SwipeFlex). Users ask for verification and safety. None at scale. | Our unfair advantage: **the gym has already verified its members.** Matching inside a club is safer than any stranger app. |
+| **Gym-buddy apps** | Many small swipe apps (GymBuddy, DUFIT, SpotYourMatch, SwipeFlex). Users ask for verification and safety. None at scale. | Our unfair advantage: **the gym has already verified its members.** A paying member is verified at once; someone without a gym needs two verified sponsors and a human check by the Palee team (ANR 2026-10-30, ADR-280: one public deck instead of one per club). That is safer than any stranger app. |
 | **Wearables #1** | ACSM 2026: wearables #1, mobile exercise apps #4, exercise for mental health up to #6. | Auto-fill the journal from devices. Our wellbeing features tie into mental health. |
 
 ### The gap we fill
@@ -86,7 +86,7 @@ Researched Oct 2026. Many figures come from interested parties (vendors, Strava,
 4. **Comparison with others lives in clubs and is opt-in. Comparison with yourself lives in the Journal.**
 5. **Private by default.** Notes, body data, photos and cravings are private unless the user explicitly widens visibility (§8.2). Injuries are the one exception: coaches always see them, for safety.
 6. **Club ≠ Box.** The same gym plays two roles: a *social space* (Feed: talk, see, participate) and a *service relationship* (Box: book, train, pay, ask). Never mix them.
-7. **Swipe only for people, and only with mutual consent.**
+7. **Swipe only for people, and only with mutual consent.** Only verified adults take part: verified by an active membership at a box or coach, or by two sponsors and a check by the Palee team (ANR 2026-10-30, ADR-280).
 8. **No "More" drawer.** Secondary things live in `Εγώ`. Gym things live in `Box`'s action row.
 9. **The journal belongs to the athlete, not to the gym.** It follows them across gyms and coaches.
 10. **Do no harm with body and food data** (§8.6).
@@ -145,9 +145,9 @@ Messages live top-right in the Feed. `Box › Coach` opens the same inbox filter
 Αρχική
 ├─ ⊕ Νέα ανάρτηση (audience: club›channel | followers | public; attach workout from journal)
 ├─ top bar: Ειδοποιήσεις (bell) · bottom bar: Μηνύματα (Όλα | Coach | Clubs | Partners)
-├─ Club bar → Club page (member):  Ροή · Κανάλια · Events · Μέλη(Partners)
+├─ Club bar → Club page (member):  Ροή · Κανάλια · Events · Μέλη
 ├─ Box page (non-member):          Σχετικά · Πρόγραμμα(read-only, trial slots) · Events · Δημόσια · [Ζήτα δοκιμαστικό] [Ακολούθησε]
-└─ Γύρω μου: events · open clubs · boxes with trials · public posts · Φίλτρα(n) · saved filters
+└─ Γύρω μου: events · open clubs · boxes with trials · public posts · «Συναθλητές κοντά σου» (→ Partners deck, ADR-280) · Φίλτρα(n) · saved filters
 
 Box   (title ▾ switches provider: gym or independent coach)
 ├─ Workout of the day → Καταγραφή | Έναρξη ▶ (existing execution screen) | Στόχοι → Άτλαντας
@@ -179,7 +179,7 @@ Box   (title ▾ switches provider: gym or independent coach)
 | Post | Αρχική | Club page, Εγώ grid |
 | Club, channel | Αρχική › club bar | Εγώ › Τα clubs μου |
 | Event | Club › Events | Feed card, Γύρω μου |
-| Partner match | Club › Μέλη › Partners | Messages |
+| Partner match | Αρχική › Γύρω μου › «Συναθλητές κοντά σου» (one public deck, ADR-280; was Club › Μέλη until 2026-10-30) | Messages |
 | Messages | bottom bar › Μηνύματα (`/messages`: Όλα · Άτομα · Coach · Clubs · Partners; person conversations and requests under Άτομα; Partners only once the person has a training partner or check-in buddy; ADR-196 amended 2026-10-25) | Box › Coach (`?filter=coach`) |
 | Class, booking, check-in | Box | Journal (after training) |
 | WOD of the day | Box | Feed (#wod-σήμερα + leaderboard) |
@@ -202,7 +202,7 @@ Legend: **[EXISTS]** reuse as-is, only needs a new home · **[PARTIAL]** data/ba
 - **Scope toggle** (Twitter-like): `Οι δικοί μου` / "My people" (default; clubs + people you follow, Φιλαράκια included, + boxes you follow; renamed from «Τα clubs μου», ANR 2026-10-24) | `Γύρω μου` (**local**, not global). Newest first, never ranked. Remember the last choice.
 - **Post format** (Instagram-like): optional media, text, **optional workout attachment from the journal**. Text-only posts allowed (announcements, questions).
 - **Audience picker** on compose: club › channel | followers | public.
-- **Club page (member):** `Ροή` (pinned announcement → WOD card with leaderboard → challenges → PR celebrations (opt-in) → events → member posts), `Κανάλια`, `Events`, `Μέλη` (coaches, members, Partners).
+- **Club page (member):** `Ροή` (pinned announcement → WOD card with leaderboard → challenges → PR celebrations (opt-in) → events → member posts), `Κανάλια`, `Events`, `Μέλη` (coaches, members; Partners moved to Γύρω μου, ADR-280).
 - **Box page (non-member):** `Σχετικά` (photos, disciplines, coaches, locations, hours), `Πρόγραμμα` (read-only, "Κλείσε με δοκιμαστικό" where the owner allotted trial slots), `Events` (open), `Δημόσια`. CTAs: **Ζήτα δοκιμαστικό**, **Ακολούθησε**.
 
 **Channel governance**
@@ -233,7 +233,7 @@ One pattern everywhere: a **chip row under the title, with `Φίλτρα (n)` fi
 |---|---|
 | Γύρω μου | **radius, neighbourhood or map**, discipline, what (events/clubs/boxes/posts), when (a **From / To date picker** above the shortcut chips today, tomorrow, weekend, this week; plus morning, midday, evening), cost (a **price range slider** above the shortcut chips free, up to €15, trial), level, language, audience (women, 40+, beginners), accessibility |
 | Box › Πρόγραμμα [PARTIAL] | location, class type, coach, time, only with spots, only covered by my package |
-| Partners | level, time, goal, discipline, optional gender preference (safety), distance in open clubs |
+| Partners | level, time, goal, discipline, optional gender preference (safety), distance (2/5/10/25 km between neighbourhoods) |
 | Feed/club | club, channel, type (announcements, PRs, events), coaches only |
 | Journal | entry type, visibility, date range, source (box/coach/freeform), text search |
 | Vault | discipline, benchmark, exercise, date |
@@ -241,13 +241,21 @@ One pattern everywhere: a **chip row under the title, with `Φίλτρα (n)` fi
 
 In the Γύρω μου sheet, «Πότε» and «Κόστος» each open with a picker and keep their chips underneath as shortcuts (ANR, 2026-10-24). The pickers and the chips edit one value: a chip replaces what the picker chose and the other way round (picking dates clears today/weekend; «Δωρεάν» or «Έως €15» replaces a hand-picked price range; «Δοκιμαστικό» is independent). A date range is at most 62 days; the price slider's ends mean «no limit». The chip row itself stays «Φίλτρα (n) · Τα αθλήματά μου · Πότε · Δωρεάν».
 
-Every other list uses the same `ListFilters` row + sheet, remembered per surface (ADR-197, 2026-10-24): Find (kind, box), events (club, free, going), videos (tags), appointments (kind, format, coach), my workouts (status, kind, season), reviews (subject, feeling), my posts (club, type). A filter shows only the choices the list actually has, so none is ever empty. «Επίπεδο» in Γύρω μου means the box runs classes at that level, and posts drop out. Partner distance exists only in open clubs, between people shown in Γύρω μου, measured from neighbourhood to neighbourhood.
+Every other list uses the same `ListFilters` row + sheet, remembered per surface (ADR-197, 2026-10-24): Find (kind, box), events (club, free, going), videos (tags), appointments (kind, format, coach), my workouts (status, kind, season), reviews (subject, feeling), my posts (club, type). A filter shows only the choices the list actually has, so none is ever empty. «Επίπεδο» in Γύρω μου means the box runs classes at that level, and posts drop out. Partner distance is measured from neighbourhood to neighbourhood (never a live location), in fixed steps of 2/5/10/25 km (ADR-280 replaced the open-club limit of ADR-197 on 2026-10-30).
 
 ### 7.3 Partners (gym buddies) [NEW]
 Why swipe works for people and not for clubs: swipe makes sense when **both sides must agree**, options are many, and the decision is quick. Clubs fail all three. An open club needs no approval, a neighbourhood has 10–20 of them, and joining a gym is not a snap decision. Therefore:
-- Swipe **only among members of the same club** (verified by the gym), with **mutual** match → message → "Κλείστε μαζί 07:00".
+- Swipe **only among verified people**, with **mutual** match → message → "Κλείστε μαζί 07:00".
 - Clubs: `Μπες`. Events: `Θα έρθω`. Boxes: `Ζήτα δοκιμαστικό` (owner accepts within allotted capacity).
-- Frame as **training partner**, never "match/date". Filters: time, level, goal.
+- Frame as **training partner**, never "match/date". Filters: time, level, goal, discipline, distance.
+
+**Public Partners («Συναθλητές»)** (ANR 2026-10-30, ADR-280; replaces the per-club decks of ADR-169):
+- **Where:** one deck for all of Palee. A «Συναθλητές κοντά σου» card in Feed › Γύρω μου opens it (hidden when there is nothing to show). Conversations stay in Μηνύματα › Partners. The card in Club › Μέλη and the box's Partners switch are gone.
+- **Who:** adults only (a required «Είμαι 18 ετών ή μεγαλύτερος/η» checkbox). Verification happens once per account and does not lapse when a subscription ends: (1) an active member of a live box or an active client of an independent coach, or (2) two sponsors plus a check by the Palee team: an SMS code to a mobile number (one number per account) and a selfie holding a 4-digit code, which a person compares with the avatar. No face recognition and no automatic decision; the selfie is deleted on the decision, at the latest 7 days after upload.
+- **Sponsors:** only people verified through a membership; at most 5 vouches in 30 days; if someone they vouched for is suspended, they cannot vouch for 60 days. Asked from one's verified Φιλαράκια, or by a single-use QR/link valid for 10 minutes.
+- **Card:** full screen, drag to swipe. Avatar, nickname, a badge («✓ Μέλος <box>», «✓ Μέλος box», «✓ Επαληθευμένος», «✓ Με εγγυητές»), level, times, goals, disciplines, the person's own line, what the two share and a distance step.
+- **Reports** go to the Palee team (platform console), not to box staff. Reporting also blocks. «Ανήλικος» is a report reason.
+- **«Κλείστε μαζί»:** up to 3 suggestions from a deterministic rule engine: classes of a box both share, otherwise events and trial classes near both, plus «Πάμε μαζί;». Each says why; none says who else attends.
 
 ### 7.4 Box: the workout card [EXISTS + PARTIAL]
 - **First card, always:** today's workout preview. If there are several (class WOD + coach program), show source **chips** (`WOD 18:00 · Strength A · από Νίκο`).
@@ -435,7 +443,7 @@ Food and body tracking can harm people with disordered eating:
 - **No leaderboards or public comparison** for weight, body or diet.
 - Body/diet/cravings sections can each be switched off entirely.
 - Insights are labelled as indicators, never medical advice.
-- Safety for Partners: club-verified members only, mutual consent, report/block, optional gender preference.
+- Safety for Partners: verified adults only (membership, or two sponsors plus a human check by the Palee team; ADR-280), mutual consent, report/block with a Palee-level review, optional gender preference, distance only between neighbourhoods. The selfie check uses no face recognition and is deleted within 7 days. A DPIA is written before launch.
 
 ---
 
@@ -445,7 +453,7 @@ Food and body tracking can harm people with disordered eating:
 |---|---|---|
 | **v1: Re-architecture + the gym as a club** | 4 tabs. Box with workout card (Καταγραφή/Έναρξη) and existing features re-homed. Journal with `Νέα καταχώρηση`, visibility ladder, Vault. One **closed club per gym** with auto channels (#ανακοινώσεις, #wod-σήμερα + leaderboard, #challenges, class-slot groups). Feed landing. | "Τα μέλη σου μένουν γιατί είναι κοινότητα." |
 | **v2: Open up, under the owner's control** | Open clubs, events, `Γύρω μου` + filters, public box page, trial-slot policy, member groups (approval). QR check-in + Wallet. Member referral. Body (snapshots, photos) and Wellness (water, sleep, meals, cravings, buddy). Garmin. Cross-org unified journal. | "Φέρνεις νέους πελάτες με τους δικούς σου όρους." |
-| **v3: Depth & second market** | Partners (swipe within clubs), seasons, WOD goals + anatomy atlas, advanced analytics (coverage, qualities, load, insights), PT squads, solo-coach tier, native wrapper (Apple Health, widgets, geofence), AI coach assistant as a layer (scaling suggestions from injuries, voice logging, coach approves). | "Πουλάς προγράμματα, όχι μόνο συνδρομές." |
+| **v3: Depth & second market** | Partners (one public deck of verified people, ADR-280), seasons, WOD goals + anatomy atlas, advanced analytics (coverage, qualities, load, insights), PT squads, solo-coach tier, native wrapper (Apple Health, widgets, geofence), AI coach assistant as a layer (scaling suggestions from injuries, voice logging, coach approves). | "Πουλάς προγράμματα, όχι μόνο συνδρομές." |
 
 **Validate the hypothesis continuously:** if members open `Αρχική` far less than `Box`, reconsider the landing. If clubs explode (≥3 per member), consider a 5th `Clubs` tab.
 

@@ -27,10 +27,21 @@ const DATA_KEYS = [
   "dataPayments",
   "dataDocuments",
   "dataLocation",
+  "dataPartners",
   "dataTechnical",
 ] as const;
 const PURPOSE_KEYS = ["purposeContract", "purposeLegal", "purposeConsent", "purposeSecurity"] as const;
-const RETENTION_KEYS = ["retentionAccount", "retentionBox", "retentionFiscal", "retentionExport", "retentionBackups"] as const;
+const RETENTION_KEYS = [
+  "retentionAccount",
+  "retentionBox",
+  "retentionFiscal",
+  "retentionExport",
+  "retentionPartners",
+  "retentionBackups",
+] as const;
+/** ADR-280: what public Partners («Συναθλητές») processes; the selfie item names the contact for a second review. */
+const PARTNERS_KEYS = ["partnersProfile", "partnersDistance", "partnersVerification", "partnersPhone"] as const;
+const PARTNERS_TAIL_KEYS = ["partnersConsent", "partnersReports"] as const;
 const RIGHT_KEYS = ["rightAccess", "rightRectification", "rightErasure", "rightConsent"] as const;
 
 /** ADR-267: Palee's privacy policy (GDPR articles 13 and 14), a draft for the law consultant. */
@@ -58,6 +69,17 @@ export default async function PrivacyPage() {
 
       <LegalSection id="health" title={p("healthTitle")}>
         <p>{p("healthBody")}</p>
+      </LegalSection>
+
+      <LegalSection id="partners" title={p("partnersTitle")}>
+        <p>{p("partnersIntro")}</p>
+        <LegalList
+          items={[
+            ...PARTNERS_KEYS.map((key) => p(key)),
+            p("partnersSelfie", values),
+            ...PARTNERS_TAIL_KEYS.map((key) => p(key)),
+          ]}
+        />
       </LegalSection>
 
       <LegalSection id="sub-processors" title={p("recipientsTitle")}>
