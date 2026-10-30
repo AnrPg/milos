@@ -44,11 +44,18 @@ defmodule Palee.Application.PartnersRLSTest do
             times: ["early"],
             goals: ["strength"]
           },
-          attrs
+          Map.delete(attrs, :paused_at)
         )
       )
 
-    profile
+    case attrs do
+      %{paused_at: paused_at} ->
+        {:ok, paused} = Partners.update_profile(as(user), profile, %{paused_at: paused_at})
+        paused
+
+      _attrs ->
+        profile
+    end
   end
 
   defp match!(ctx) do

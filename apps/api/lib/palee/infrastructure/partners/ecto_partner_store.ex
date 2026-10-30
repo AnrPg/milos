@@ -158,12 +158,15 @@ defmodule Palee.Infrastructure.Partners.EctoPartnerStore do
     |> where([m], m.status == "active" and (m.user_a_id == ^user_id or m.user_b_id == ^user_id))
     |> select(
       [m],
-      fragment(
-        "CASE WHEN ? = ? THEN ? ELSE ? END",
-        m.user_a_id,
-        type(^user_id, :binary_id),
-        m.user_b_id,
-        m.user_a_id
+      type(
+        fragment(
+          "CASE WHEN ? = ? THEN ? ELSE ? END",
+          m.user_a_id,
+          type(^user_id, :binary_id),
+          m.user_b_id,
+          m.user_a_id
+        ),
+        :binary_id
       )
     )
     |> Repo.all()

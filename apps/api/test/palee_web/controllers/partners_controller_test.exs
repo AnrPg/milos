@@ -435,8 +435,8 @@ defmodule PaleeWeb.PartnersControllerTest do
                |> get("/api/platform/partner-reports?status=actioned")
                |> json_response(200)
 
-      # The suspended person's profile is off: nobody meets them in the deck.
-      assert deck_ids(as, third) == []
+      # The suspended person's profile is off: only the member is left in the deck.
+      assert deck_ids(as, third) == [member.id]
     end
   end
 end
