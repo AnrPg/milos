@@ -190,4 +190,52 @@ test.describe("admin profile save bar", () => {
     await expect.poll(() => puts).toEqual([{ roles: ["coach", "member"] }]);
     await expect(page.getByTestId("profile-save-bar")).toContainText("Changes saved.");
   });
+  test("with a running subscription the start date still comes before the subscription end", async ({ page }) => {
+    await asOwner(page);
+    await page.route("**/api/org/box1/admin/users/u-3", (route) =>
+      route.fulfill(
+        json({
+          user: {
+            identity: { id: "u-3", nickname: "Rena", avatar_url: null, role: "member", joined_at: "2026-01-10T00:00:00Z" },
+            account_status: "active",
+            membership: { roles: ["member"], coach_scope: "own" },
+            available_sections: ["overview", "finance"],
+            attention: [],
+            operational_links: {},
+          },
+        }),
+      ),
+    );
+    await page.route("**/api/org/box1/admin/users/u-3/finance", (route) =>
+      route.fulfill(
+        json({
+          user_id: "u-3",
+          available: true,
+          summary: { credit_balance: 0, current_status: { state: "active" }, package_relationship: {}, outstanding_items: [], effective_entitlement: null },
+          details: {
+            membership: { id: "m-3", status: "active", starts_on: isoDay(-10), expires_on: null, leaving_on: null },
+            package_subscriptions: [
+              { id: "s-3", status: "active", package_name: "Unlimited", price_cents_snapshot: 6000, current_period: { ends_on: isoDay(20), renews: true } },
+            ],
+            referral_claims: [],
+            referred_members: [],
+            referral_rewards: [],
+          },
+          drill_down: null,
+          operational_links: {},
+        }),
+      ),
+    );
+
+    await page.goto("/admin/users/u-3?tab=finance");
+    const starts = page.getByTestId("membership-starts_on");
+    const ends = page.locator(`[data-subscription-ends="${isoDay(20)}"]`);
+    await expect(starts).toHaveAttribute("data-value", isoDay(-10));
+    await expect(ends).toBeVisible();
+    await expect(page.getByTestId("membership-expires_on")).toHaveCount(0);
+    // Left of it on one row (desktop), above it in one column (phone).
+    const [startBox, endBox] = await Promise.all([starts.boundingBox(), ends.boundingBox()]);
+    const sameRow = Math.abs(startBox!.y - endBox!.y) < 40;
+    expect(sameRow ? startBox!.x < endBox!.x : startBox!.y < endBox!.y).toBe(true);
+  });
 });
