@@ -464,6 +464,11 @@ config :palee, :body_store, Palee.Infrastructure.Body.EctoBodyStore
 config :palee, :buddy_store, Palee.Infrastructure.Buddies.EctoBuddyStore
 config :palee, :partner_store, Palee.Infrastructure.Partners.EctoPartnerStore
 
+# ADR-280 §4: «Κλείστε μαζί» suggestions (feedback and anonymous counters).
+config :palee,
+       :partner_suggestion_store,
+       Palee.Infrastructure.Partners.EctoSuggestionStore
+
 config :palee,
        :support_scheduler,
        Palee.Infrastructure.Buddies.ObanSupportScheduler

@@ -2888,6 +2888,22 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: Atom.to_string(reason), error: message})
   end
 
+  # ADR-280 suggestions
+  @partner_suggestion_errors %{
+    partner_suggestion_unavailable:
+      {:conflict, "That is no longer a suggestion for you two; refresh the suggestions"},
+    invalid_partner_suggestion_key: {:unprocessable_entity, "Unknown suggestion"},
+    invalid_partner_suggestion_feedback: {:unprocessable_entity, "Choose why it doesn't suit you"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@partner_suggestion_errors, reason) do
+    {status, message} = Map.fetch!(@partner_suggestion_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: Atom.to_string(reason), error: message})
+  end
+
   # ADR-159 Ευεξία and Λιγούρα.
   def call(conn, {:error, {:invalid_wellness_value, errors}}) when is_map(errors) do
     conn

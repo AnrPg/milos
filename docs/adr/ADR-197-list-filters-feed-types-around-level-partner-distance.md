@@ -1,6 +1,6 @@
 # ADR-197: One filter pattern on every list; feed types, Around level, partner disciplines and distance
 Date: 2026-10-24
-Status: Accepted
+Status: Accepted; the partner distance «only in open clubs» is superseded by ADR-280 (2026-10-30): distance now applies to the one public deck, still from neighbourhood centroids in fixed steps.
 
 ## Context
 Vision §7.2 and §8.5 ask for the chip row + «Φίλτρα (n)» sheet on every list, with the filter remembered (ADR-151). Some lists had none (Feed, club Ροή, Find, events, appointments, workouts, reviews). Some had their own controls: tag buttons on videos, an «all channels» header button on the club, a toggled panel on the Partners deck. Three filters in the vision table had no data behind them: the feed's type and coaches-only filters, the Γύρω μου level filter, and the Partners discipline and distance filters.

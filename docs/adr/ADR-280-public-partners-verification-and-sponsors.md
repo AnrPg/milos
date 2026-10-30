@@ -157,6 +157,30 @@ deterministic). Quality is measured with anonymous daily counters
 (`partner_suggestion_events`) and per-suggestion «Δεν ταιριάζει» feedback;
 weights live in `SuggestionPolicy.weights/0` so they change in one place.
 
+Implementation notes (suggestions):
+- A start falls in one hour slot (`early` <9, `midday` <15, `afternoon` <18,
+  `evening`) of the activity's own zone, plus `weekend` on Saturday/Sunday;
+  the rank counts slots both chose. A full activity stays only when both are
+  already in it. An unknown distance (a box location without a point) passes
+  only for a shared box's class. Class levels admit Partners levels:
+  `beginner` → beginner/intermediate, `advanced` → intermediate/advanced,
+  `all_levels` → any; a person without a level fits any.
+- The organiser checked against blocks is a class's coach or a person
+  organiser's account (ADR-185); a business has none.
+- Migration `20270325200000` adds, besides the two tables and
+  `palee_partner_suggestion_count(text)`, the definer reads
+  `palee_partner_suggestion_pair(match)` (both people's level, times and main
+  neighbourhood centroid) and `palee_partner_suggestion_blocked(match, ids)`,
+  and creates `palee_partner_shared_organizations(a, b)` (`CREATE OR
+  REPLACE`). All answer only for an active match of the session user.
+- Trial classes: the 5 nearest boxes with trials that neither person belongs
+  to, classes where `Trials.offer/4` gives both a seat. Events: the 30
+  soonest Γύρω μου events within the larger of the two distances.
+- `shown` counts a response with at least one suggestion; `booked_together`
+  is not written yet (no booking hook ties a booking to a proposed plan).
+- `GET /api/platform/partner-suggestion-stats` (vendors): the last 30 days'
+  counters and the feedback reasons counted.
+
 ### 5. HTTP API (contract-first, `PaleeWeb.Schemas.Partners*`)
 Member (`/api/me/partners`, authenticated):
 - `GET /` overview: `eligibility {status, method, next_step}`, `profile`,
@@ -243,3 +267,9 @@ plus the ADR-169 ones still used.
   suggestions side calls.
 - Migrations: verification `20270325000000`, deck `20270325100000`,
   suggestions `20270325200000`.
+- Deck side, as built: `palee_partner_people_within` keeps its ADR-197
+  signature `(uuid[], double precision)` (the Places adapter calls it) and
+  now counts people with a live Partners profile instead of Γύρω μου
+  visibility; `palee_partner_box_badges` is not created, badges come from
+  `PartnerEligibility.verification_badges/1` plus the profile's `show_box`.
+  The platform queue lives in `PaleeWeb.PlatformPartnerReportController`.

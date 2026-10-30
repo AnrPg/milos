@@ -1823,6 +1823,35 @@ defmodule PaleeWeb.Router do
     delete("/activation-links/:id", PlatformBusinessAccountController, :revoke_link)
   end
 
+  # ADR-280 suggestions: «Κλείστε μαζί» for a Partners match.
+  scope "/api/me/partners/matches/:id", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :notification_write_rate_limited,
+      :tenant_write_rate_limited
+    ])
+
+    get("/suggestions", PartnerSuggestionsController, :index)
+    post("/plans", PartnerSuggestionsController, :propose)
+    post("/suggestions/feedback", PartnerSuggestionsController, :feedback)
+  end
+
+  # ADR-280 suggestions: the vendors' daily counters, to measure quality.
+  scope "/api/platform", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :vendor,
+      :platform_write_rate_limited
+    ])
+
+    get("/partner-suggestion-stats", PartnerSuggestionsController, :stats)
+  end
+
   scope "/api/me", PaleeWeb do
     pipe_through([
       :api,
