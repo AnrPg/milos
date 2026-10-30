@@ -53640,6 +53640,19 @@
         "title": "PartnerCard",
         "type": "object"
       },
+      "PartnerCodeRequest": {
+        "properties": {
+          "code": {
+            "maxLength": 12,
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "PartnerCodeRequest",
+        "type": "object"
+      },
       "PartnerDeck": {
         "properties": {
           "cards": {
@@ -53830,6 +53843,47 @@
           "within_km"
         ],
         "title": "PartnerDeck",
+        "type": "object"
+      },
+      "PartnerEligibility": {
+        "properties": {
+          "method": {
+            "enum": [
+              "membership",
+              "sponsors",
+              null
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "next_step": {
+            "enum": [
+              "consent",
+              "sponsors",
+              "phone",
+              "selfie",
+              null
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "verified",
+              "needs_verification",
+              "in_review",
+              "rejected",
+              "suspended"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "method",
+          "next_step"
+        ],
+        "title": "PartnerEligibility",
         "type": "object"
       },
       "PartnerMatch": {
@@ -54562,6 +54616,41 @@
         "title": "PartnerPerson",
         "type": "object"
       },
+      "PartnerPhoneRequest": {
+        "properties": {
+          "phone": {
+            "description": "Mobile, E.164 or Greek 69…",
+            "maxLength": 32,
+            "type": "string"
+          }
+        },
+        "required": [
+          "phone"
+        ],
+        "title": "PartnerPhoneRequest",
+        "type": "object"
+      },
+      "PartnerPhoneSent": {
+        "properties": {
+          "code_minutes": {
+            "type": "integer"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "phone",
+          "expires_at",
+          "code_minutes"
+        ],
+        "title": "PartnerPhoneSent",
+        "type": "object"
+      },
       "PartnerPlan": {
         "properties": {
           "id": {
@@ -54971,6 +55060,66 @@
         "title": "PartnerReportResponse",
         "type": "object"
       },
+      "PartnerSelfieUpload": {
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "file_key": {
+            "type": "string"
+          },
+          "max_bytes": {
+            "type": "integer"
+          },
+          "method": {
+            "enum": [
+              "PUT"
+            ],
+            "type": "string"
+          },
+          "required_headers": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "selfie_code": {
+            "type": "string"
+          },
+          "upload_url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "upload_url",
+          "method",
+          "required_headers",
+          "file_key",
+          "content_type",
+          "max_bytes",
+          "selfie_code"
+        ],
+        "title": "PartnerSelfieUpload",
+        "type": "object"
+      },
+      "PartnerSelfieUploadRequest": {
+        "properties": {
+          "content_type": {
+            "enum": [
+              "image/heic",
+              "image/jpeg",
+              "image/png",
+              "image/webp"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "content_type"
+        ],
+        "title": "PartnerSelfieUploadRequest",
+        "type": "object"
+      },
       "PartnerSettings": {
         "properties": {
           "has_profile": {
@@ -55046,6 +55195,358 @@
           "same_level"
         ],
         "title": "PartnerShared",
+        "type": "object"
+      },
+      "PartnerSponsorCandidate": {
+        "properties": {
+          "eligible": {
+            "type": "boolean"
+          },
+          "person": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nickname",
+              "avatar_url"
+            ],
+            "title": "PartnerVerificationPerson",
+            "type": "object"
+          },
+          "reason": {
+            "enum": [
+              "not_verified",
+              "blocked",
+              "quota",
+              "penalty",
+              "self",
+              null
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "sponsorship": {
+            "nullable": true,
+            "properties": {
+              "channel": {
+                "enum": [
+                  "buddy",
+                  "link"
+                ],
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "requested",
+                  "vouched",
+                  "declined",
+                  "cancelled"
+                ],
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "person",
+          "eligible",
+          "reason",
+          "sponsorship"
+        ],
+        "title": "PartnerSponsorCandidate",
+        "type": "object"
+      },
+      "PartnerSponsorCandidates": {
+        "properties": {
+          "candidates": {
+            "items": {
+              "properties": {
+                "eligible": {
+                  "type": "boolean"
+                },
+                "person": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname",
+                    "avatar_url"
+                  ],
+                  "title": "PartnerVerificationPerson",
+                  "type": "object"
+                },
+                "reason": {
+                  "enum": [
+                    "not_verified",
+                    "blocked",
+                    "quota",
+                    "penalty",
+                    "self",
+                    null
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
+                "sponsorship": {
+                  "nullable": true,
+                  "properties": {
+                    "channel": {
+                      "enum": [
+                        "buddy",
+                        "link"
+                      ],
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "requested",
+                        "vouched",
+                        "declined",
+                        "cancelled"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "required": [
+                "person",
+                "eligible",
+                "reason",
+                "sponsorship"
+              ],
+              "title": "PartnerSponsorCandidate",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "required": {
+            "type": "integer"
+          },
+          "vouches": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "candidates",
+          "required",
+          "vouches"
+        ],
+        "title": "PartnerSponsorCandidates",
+        "type": "object"
+      },
+      "PartnerSponsorLink": {
+        "properties": {
+          "expires_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "token": {
+            "description": "Shown once",
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "path",
+          "url",
+          "expires_at"
+        ],
+        "title": "PartnerSponsorLink",
+        "type": "object"
+      },
+      "PartnerSponsorRequest": {
+        "properties": {
+          "sponsor_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "sponsor_id"
+        ],
+        "title": "PartnerSponsorRequest",
+        "type": "object"
+      },
+      "PartnerSponsorship": {
+        "properties": {
+          "channel": {
+            "enum": [
+              "buddy",
+              "link"
+            ],
+            "type": "string"
+          },
+          "decided_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "person": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nickname",
+              "avatar_url"
+            ],
+            "title": "PartnerVerificationPerson",
+            "type": "object"
+          },
+          "requested_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "requested",
+              "vouched",
+              "declined",
+              "cancelled"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "person",
+          "channel",
+          "status",
+          "requested_at",
+          "decided_at"
+        ],
+        "title": "PartnerSponsorship",
+        "type": "object"
+      },
+      "PartnerSponsorshipResponse": {
+        "properties": {
+          "sponsorship": {
+            "properties": {
+              "channel": {
+                "enum": [
+                  "buddy",
+                  "link"
+                ],
+                "type": "string"
+              },
+              "decided_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "person": {
+                "properties": {
+                  "avatar_url": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "nickname": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "nickname",
+                  "avatar_url"
+                ],
+                "title": "PartnerVerificationPerson",
+                "type": "object"
+              },
+              "requested_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "requested",
+                  "vouched",
+                  "declined",
+                  "cancelled"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "person",
+              "channel",
+              "status",
+              "requested_at",
+              "decided_at"
+            ],
+            "title": "PartnerSponsorship",
+            "type": "object"
+          }
+        },
+        "required": [
+          "sponsorship"
+        ],
+        "title": "PartnerSponsorshipResponse",
         "type": "object"
       },
       "PartnerSuggestion": {
@@ -55572,6 +56073,803 @@
           "undone"
         ],
         "title": "PartnerUndoResponse",
+        "type": "object"
+      },
+      "PartnerVerificationLimits": {
+        "properties": {
+          "code_attempts": {
+            "type": "integer"
+          },
+          "code_minutes": {
+            "type": "integer"
+          },
+          "link_minutes": {
+            "type": "integer"
+          },
+          "selfie_content_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "selfie_max_bytes": {
+            "type": "integer"
+          },
+          "selfie_retention_days": {
+            "type": "integer"
+          },
+          "sponsors_required": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "sponsors_required",
+          "link_minutes",
+          "code_minutes",
+          "code_attempts",
+          "selfie_content_types",
+          "selfie_max_bytes",
+          "selfie_retention_days"
+        ],
+        "title": "PartnerVerificationLimits",
+        "type": "object"
+      },
+      "PartnerVerificationOverview": {
+        "properties": {
+          "eligibility": {
+            "properties": {
+              "method": {
+                "enum": [
+                  "membership",
+                  "sponsors",
+                  null
+                ],
+                "nullable": true,
+                "type": "string"
+              },
+              "next_step": {
+                "enum": [
+                  "consent",
+                  "sponsors",
+                  "phone",
+                  "selfie",
+                  null
+                ],
+                "nullable": true,
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "verified",
+                  "needs_verification",
+                  "in_review",
+                  "rejected",
+                  "suspended"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "status",
+              "method",
+              "next_step"
+            ],
+            "title": "PartnerEligibility",
+            "type": "object"
+          },
+          "limits": {
+            "properties": {
+              "code_attempts": {
+                "type": "integer"
+              },
+              "code_minutes": {
+                "type": "integer"
+              },
+              "link_minutes": {
+                "type": "integer"
+              },
+              "selfie_content_types": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "selfie_max_bytes": {
+                "type": "integer"
+              },
+              "selfie_retention_days": {
+                "type": "integer"
+              },
+              "sponsors_required": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "sponsors_required",
+              "link_minutes",
+              "code_minutes",
+              "code_attempts",
+              "selfie_content_types",
+              "selfie_max_bytes",
+              "selfie_retention_days"
+            ],
+            "title": "PartnerVerificationLimits",
+            "type": "object"
+          },
+          "request": {
+            "nullable": true,
+            "properties": {
+              "consent_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "decided_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "decision_reason": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "missing": {
+                "items": {
+                  "enum": [
+                    "consent",
+                    "sponsors",
+                    "phone"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "phone": {
+                "description": "Masked",
+                "nullable": true,
+                "type": "string"
+              },
+              "phone_verified": {
+                "type": "boolean"
+              },
+              "selfie_code": {
+                "description": "Written on paper and held up in the selfie",
+                "pattern": "^[0-9]{4}$",
+                "type": "string"
+              },
+              "selfie_expires_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "selfie_uploaded_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "sponsors": {
+                "items": {
+                  "properties": {
+                    "channel": {
+                      "enum": [
+                        "buddy",
+                        "link"
+                      ],
+                      "type": "string"
+                    },
+                    "decided_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "person": {
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "nickname",
+                        "avatar_url"
+                      ],
+                      "title": "PartnerVerificationPerson",
+                      "type": "object"
+                    },
+                    "requested_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "requested",
+                        "vouched",
+                        "declined",
+                        "cancelled"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "person",
+                    "channel",
+                    "status",
+                    "requested_at",
+                    "decided_at"
+                  ],
+                  "title": "PartnerSponsorship",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "sponsors_required": {
+                "type": "integer"
+              },
+              "status": {
+                "enum": [
+                  "collecting",
+                  "in_review",
+                  "approved",
+                  "rejected",
+                  "expired",
+                  "withdrawn"
+                ],
+                "type": "string"
+              },
+              "submitted_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "vouches": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "consent_at",
+              "vouches",
+              "sponsors_required",
+              "sponsors",
+              "phone",
+              "phone_verified",
+              "selfie_code",
+              "selfie_uploaded_at",
+              "selfie_expires_at",
+              "submitted_at",
+              "decided_at",
+              "decision_reason",
+              "missing"
+            ],
+            "title": "PartnerVerificationRequest",
+            "type": "object"
+          }
+        },
+        "required": [
+          "eligibility",
+          "request",
+          "limits"
+        ],
+        "title": "PartnerVerificationOverview",
+        "type": "object"
+      },
+      "PartnerVerificationPerson": {
+        "properties": {
+          "avatar_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nickname",
+          "avatar_url"
+        ],
+        "title": "PartnerVerificationPerson",
+        "type": "object"
+      },
+      "PartnerVerificationRequest": {
+        "nullable": true,
+        "properties": {
+          "consent_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "decided_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "decision_reason": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "missing": {
+            "items": {
+              "enum": [
+                "consent",
+                "sponsors",
+                "phone"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "phone": {
+            "description": "Masked",
+            "nullable": true,
+            "type": "string"
+          },
+          "phone_verified": {
+            "type": "boolean"
+          },
+          "selfie_code": {
+            "description": "Written on paper and held up in the selfie",
+            "pattern": "^[0-9]{4}$",
+            "type": "string"
+          },
+          "selfie_expires_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "selfie_uploaded_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "sponsors": {
+            "items": {
+              "properties": {
+                "channel": {
+                  "enum": [
+                    "buddy",
+                    "link"
+                  ],
+                  "type": "string"
+                },
+                "decided_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "person": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname",
+                    "avatar_url"
+                  ],
+                  "title": "PartnerVerificationPerson",
+                  "type": "object"
+                },
+                "requested_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "requested",
+                    "vouched",
+                    "declined",
+                    "cancelled"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "person",
+                "channel",
+                "status",
+                "requested_at",
+                "decided_at"
+              ],
+              "title": "PartnerSponsorship",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "sponsors_required": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "collecting",
+              "in_review",
+              "approved",
+              "rejected",
+              "expired",
+              "withdrawn"
+            ],
+            "type": "string"
+          },
+          "submitted_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "vouches": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "consent_at",
+          "vouches",
+          "sponsors_required",
+          "sponsors",
+          "phone",
+          "phone_verified",
+          "selfie_code",
+          "selfie_uploaded_at",
+          "selfie_expires_at",
+          "submitted_at",
+          "decided_at",
+          "decision_reason",
+          "missing"
+        ],
+        "title": "PartnerVerificationRequest",
+        "type": "object"
+      },
+      "PartnerVerificationSubmit": {
+        "properties": {
+          "file_key": {
+            "maxLength": 300,
+            "type": "string"
+          }
+        },
+        "required": [
+          "file_key"
+        ],
+        "title": "PartnerVerificationSubmit",
+        "type": "object"
+      },
+      "PartnerVouchDecision": {
+        "properties": {
+          "decision": {
+            "enum": [
+              "vouch",
+              "decline"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "decision"
+        ],
+        "title": "PartnerVouchDecision",
+        "type": "object"
+      },
+      "PartnerVouchLinkInspection": {
+        "properties": {
+          "can_vouch": {
+            "type": "boolean"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "person": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nickname",
+              "avatar_url"
+            ],
+            "title": "PartnerVerificationPerson",
+            "type": "object"
+          },
+          "reason": {
+            "enum": [
+              "partner_sponsor_not_eligible",
+              "partner_sponsor_quota",
+              "partner_sponsor_penalty",
+              null
+            ],
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "person",
+          "expires_at",
+          "can_vouch",
+          "reason"
+        ],
+        "title": "PartnerVouchLinkInspection",
+        "type": "object"
+      },
+      "PartnerVouchLinkToken": {
+        "properties": {
+          "token": {
+            "maxLength": 128,
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "title": "PartnerVouchLinkToken",
+        "type": "object"
+      },
+      "PartnerVouchRequest": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "person": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nickname",
+              "avatar_url"
+            ],
+            "title": "PartnerVerificationPerson",
+            "type": "object"
+          },
+          "requested_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "person",
+          "requested_at"
+        ],
+        "title": "PartnerVouchRequest",
+        "type": "object"
+      },
+      "PartnerVouchRequests": {
+        "properties": {
+          "requests": {
+            "items": {
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "person": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname",
+                    "avatar_url"
+                  ],
+                  "title": "PartnerVerificationPerson",
+                  "type": "object"
+                },
+                "requested_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "person",
+                "requested_at"
+              ],
+              "title": "PartnerVouchRequest",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "vouching": {
+            "properties": {
+              "can_vouch": {
+                "type": "boolean"
+              },
+              "left": {
+                "type": "integer"
+              },
+              "penalty_until": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "quota": {
+                "type": "integer"
+              },
+              "reason": {
+                "enum": [
+                  "not_verified",
+                  "quota",
+                  "penalty",
+                  null
+                ],
+                "nullable": true,
+                "type": "string"
+              },
+              "used": {
+                "type": "integer"
+              },
+              "window_days": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "can_vouch",
+              "reason",
+              "quota",
+              "window_days",
+              "used",
+              "left",
+              "penalty_until"
+            ],
+            "title": "PartnerVouching",
+            "type": "object"
+          }
+        },
+        "required": [
+          "requests",
+          "vouching"
+        ],
+        "title": "PartnerVouchRequests",
+        "type": "object"
+      },
+      "PartnerVouchResult": {
+        "properties": {
+          "decided_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "requested",
+              "vouched",
+              "declined",
+              "cancelled"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "decided_at"
+        ],
+        "title": "PartnerVouchResult",
+        "type": "object"
+      },
+      "PartnerVouching": {
+        "properties": {
+          "can_vouch": {
+            "type": "boolean"
+          },
+          "left": {
+            "type": "integer"
+          },
+          "penalty_until": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "quota": {
+            "type": "integer"
+          },
+          "reason": {
+            "enum": [
+              "not_verified",
+              "quota",
+              "penalty",
+              null
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "used": {
+            "type": "integer"
+          },
+          "window_days": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "can_vouch",
+          "reason",
+          "quota",
+          "window_days",
+          "used",
+          "left",
+          "penalty_until"
+        ],
+        "title": "PartnerVouching",
         "type": "object"
       },
       "PartnersEligibility": {
@@ -64971,6 +66269,405 @@
           "reports"
         ],
         "title": "PlatformPartnerReports",
+        "type": "object"
+      },
+      "PlatformPartnerVerification": {
+        "properties": {
+          "consent_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "decided_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "decision_reason": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "person": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nickname",
+              "avatar_url"
+            ],
+            "title": "PartnerVerificationPerson",
+            "type": "object"
+          },
+          "phone": {
+            "description": "Masked",
+            "nullable": true,
+            "type": "string"
+          },
+          "phone_verified": {
+            "type": "boolean"
+          },
+          "selfie_code": {
+            "type": "string"
+          },
+          "selfie_expires_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "selfie_uploaded_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "selfie_url": {
+            "description": "Valid 5 minutes",
+            "nullable": true,
+            "type": "string"
+          },
+          "selfie_url_expires_in": {
+            "type": "integer"
+          },
+          "sponsors": {
+            "items": {
+              "properties": {
+                "channel": {
+                  "enum": [
+                    "buddy",
+                    "link"
+                  ],
+                  "type": "string"
+                },
+                "person": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname",
+                    "avatar_url"
+                  ],
+                  "title": "PartnerVerificationPerson",
+                  "type": "object"
+                },
+                "vouched_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "person",
+                "channel",
+                "vouched_at"
+              ],
+              "title": "PlatformPartnerVerificationSponsor",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "collecting",
+              "in_review",
+              "approved",
+              "rejected",
+              "expired",
+              "withdrawn"
+            ],
+            "type": "string"
+          },
+          "submitted_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "person",
+          "selfie_code",
+          "selfie_url",
+          "selfie_url_expires_in",
+          "selfie_uploaded_at",
+          "selfie_expires_at",
+          "phone",
+          "phone_verified",
+          "consent_at",
+          "submitted_at",
+          "decided_at",
+          "decision_reason",
+          "sponsors"
+        ],
+        "title": "PlatformPartnerVerification",
+        "type": "object"
+      },
+      "PlatformPartnerVerificationDecided": {
+        "properties": {
+          "decided_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "collecting",
+              "in_review",
+              "approved",
+              "rejected",
+              "expired",
+              "withdrawn"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "decided_at"
+        ],
+        "title": "PlatformPartnerVerificationDecided",
+        "type": "object"
+      },
+      "PlatformPartnerVerificationDecision": {
+        "properties": {
+          "decision": {
+            "enum": [
+              "approve",
+              "reject"
+            ],
+            "type": "string"
+          },
+          "reason": {
+            "description": "Required to reject",
+            "maxLength": 500,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "decision"
+        ],
+        "title": "PlatformPartnerVerificationDecision",
+        "type": "object"
+      },
+      "PlatformPartnerVerificationItem": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "overdue": {
+            "type": "boolean"
+          },
+          "person": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nickname",
+              "avatar_url"
+            ],
+            "title": "PartnerVerificationPerson",
+            "type": "object"
+          },
+          "selfie_expires_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "collecting",
+              "in_review",
+              "approved",
+              "rejected",
+              "expired",
+              "withdrawn"
+            ],
+            "type": "string"
+          },
+          "submitted_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "person",
+          "submitted_at",
+          "selfie_expires_at",
+          "overdue"
+        ],
+        "title": "PlatformPartnerVerificationItem",
+        "type": "object"
+      },
+      "PlatformPartnerVerificationSponsor": {
+        "properties": {
+          "channel": {
+            "enum": [
+              "buddy",
+              "link"
+            ],
+            "type": "string"
+          },
+          "person": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nickname",
+              "avatar_url"
+            ],
+            "title": "PartnerVerificationPerson",
+            "type": "object"
+          },
+          "vouched_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "person",
+          "channel",
+          "vouched_at"
+        ],
+        "title": "PlatformPartnerVerificationSponsor",
+        "type": "object"
+      },
+      "PlatformPartnerVerifications": {
+        "properties": {
+          "requests": {
+            "items": {
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "overdue": {
+                  "type": "boolean"
+                },
+                "person": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname",
+                    "avatar_url"
+                  ],
+                  "title": "PartnerVerificationPerson",
+                  "type": "object"
+                },
+                "selfie_expires_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "collecting",
+                    "in_review",
+                    "approved",
+                    "rejected",
+                    "expired",
+                    "withdrawn"
+                  ],
+                  "type": "string"
+                },
+                "submitted_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "status",
+                "person",
+                "submitted_at",
+                "selfie_expires_at",
+                "overdue"
+              ],
+              "title": "PlatformPartnerVerificationItem",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "requests"
+        ],
+        "title": "PlatformPartnerVerifications",
         "type": "object"
       },
       "PlatformPlan": {
@@ -142824,6 +144521,2474 @@
         "summary": "Take back a swipe that made no match",
         "tags": [
           "Partners"
+        ]
+      }
+    },
+    "/api/me/partners/verification": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PartnerVerificationController.withdraw",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "eligibility": {
+                      "properties": {
+                        "method": {
+                          "enum": [
+                            "membership",
+                            "sponsors",
+                            null
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "next_step": {
+                          "enum": [
+                            "consent",
+                            "sponsors",
+                            "phone",
+                            "selfie",
+                            null
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "verified",
+                            "needs_verification",
+                            "in_review",
+                            "rejected",
+                            "suspended"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "method",
+                        "next_step"
+                      ],
+                      "title": "PartnerEligibility",
+                      "type": "object"
+                    },
+                    "limits": {
+                      "properties": {
+                        "code_attempts": {
+                          "type": "integer"
+                        },
+                        "code_minutes": {
+                          "type": "integer"
+                        },
+                        "link_minutes": {
+                          "type": "integer"
+                        },
+                        "selfie_content_types": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "selfie_max_bytes": {
+                          "type": "integer"
+                        },
+                        "selfie_retention_days": {
+                          "type": "integer"
+                        },
+                        "sponsors_required": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "sponsors_required",
+                        "link_minutes",
+                        "code_minutes",
+                        "code_attempts",
+                        "selfie_content_types",
+                        "selfie_max_bytes",
+                        "selfie_retention_days"
+                      ],
+                      "title": "PartnerVerificationLimits",
+                      "type": "object"
+                    },
+                    "request": {
+                      "nullable": true,
+                      "properties": {
+                        "consent_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "decided_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "decision_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "missing": {
+                          "items": {
+                            "enum": [
+                              "consent",
+                              "sponsors",
+                              "phone"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "phone": {
+                          "description": "Masked",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "phone_verified": {
+                          "type": "boolean"
+                        },
+                        "selfie_code": {
+                          "description": "Written on paper and held up in the selfie",
+                          "pattern": "^[0-9]{4}$",
+                          "type": "string"
+                        },
+                        "selfie_expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "selfie_uploaded_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "sponsors": {
+                          "items": {
+                            "properties": {
+                              "channel": {
+                                "enum": [
+                                  "buddy",
+                                  "link"
+                                ],
+                                "type": "string"
+                              },
+                              "decided_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "person": {
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "nickname",
+                                  "avatar_url"
+                                ],
+                                "title": "PartnerVerificationPerson",
+                                "type": "object"
+                              },
+                              "requested_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "requested",
+                                  "vouched",
+                                  "declined",
+                                  "cancelled"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "person",
+                              "channel",
+                              "status",
+                              "requested_at",
+                              "decided_at"
+                            ],
+                            "title": "PartnerSponsorship",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "sponsors_required": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "collecting",
+                            "in_review",
+                            "approved",
+                            "rejected",
+                            "expired",
+                            "withdrawn"
+                          ],
+                          "type": "string"
+                        },
+                        "submitted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "vouches": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "status",
+                        "consent_at",
+                        "vouches",
+                        "sponsors_required",
+                        "sponsors",
+                        "phone",
+                        "phone_verified",
+                        "selfie_code",
+                        "selfie_uploaded_at",
+                        "selfie_expires_at",
+                        "submitted_at",
+                        "decided_at",
+                        "decision_reason",
+                        "missing"
+                      ],
+                      "title": "PartnerVerificationRequest",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "eligibility",
+                    "request",
+                    "limits"
+                  ],
+                  "title": "PartnerVerificationOverview",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Verification"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Withdraw your request: phone, selfie, open sponsor requests and links are deleted",
+        "tags": [
+          "Partners verification"
+        ]
+      },
+      "get": {
+        "callbacks": {},
+        "description": "A person with an active membership of a live box or coach is verified here on first use.",
+        "operationId": "PaleeWeb.PartnerVerificationController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "eligibility": {
+                      "properties": {
+                        "method": {
+                          "enum": [
+                            "membership",
+                            "sponsors",
+                            null
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "next_step": {
+                          "enum": [
+                            "consent",
+                            "sponsors",
+                            "phone",
+                            "selfie",
+                            null
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "verified",
+                            "needs_verification",
+                            "in_review",
+                            "rejected",
+                            "suspended"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "method",
+                        "next_step"
+                      ],
+                      "title": "PartnerEligibility",
+                      "type": "object"
+                    },
+                    "limits": {
+                      "properties": {
+                        "code_attempts": {
+                          "type": "integer"
+                        },
+                        "code_minutes": {
+                          "type": "integer"
+                        },
+                        "link_minutes": {
+                          "type": "integer"
+                        },
+                        "selfie_content_types": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "selfie_max_bytes": {
+                          "type": "integer"
+                        },
+                        "selfie_retention_days": {
+                          "type": "integer"
+                        },
+                        "sponsors_required": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "sponsors_required",
+                        "link_minutes",
+                        "code_minutes",
+                        "code_attempts",
+                        "selfie_content_types",
+                        "selfie_max_bytes",
+                        "selfie_retention_days"
+                      ],
+                      "title": "PartnerVerificationLimits",
+                      "type": "object"
+                    },
+                    "request": {
+                      "nullable": true,
+                      "properties": {
+                        "consent_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "decided_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "decision_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "missing": {
+                          "items": {
+                            "enum": [
+                              "consent",
+                              "sponsors",
+                              "phone"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "phone": {
+                          "description": "Masked",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "phone_verified": {
+                          "type": "boolean"
+                        },
+                        "selfie_code": {
+                          "description": "Written on paper and held up in the selfie",
+                          "pattern": "^[0-9]{4}$",
+                          "type": "string"
+                        },
+                        "selfie_expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "selfie_uploaded_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "sponsors": {
+                          "items": {
+                            "properties": {
+                              "channel": {
+                                "enum": [
+                                  "buddy",
+                                  "link"
+                                ],
+                                "type": "string"
+                              },
+                              "decided_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "person": {
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "nickname",
+                                  "avatar_url"
+                                ],
+                                "title": "PartnerVerificationPerson",
+                                "type": "object"
+                              },
+                              "requested_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "requested",
+                                  "vouched",
+                                  "declined",
+                                  "cancelled"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "person",
+                              "channel",
+                              "status",
+                              "requested_at",
+                              "decided_at"
+                            ],
+                            "title": "PartnerSponsorship",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "sponsors_required": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "collecting",
+                            "in_review",
+                            "approved",
+                            "rejected",
+                            "expired",
+                            "withdrawn"
+                          ],
+                          "type": "string"
+                        },
+                        "submitted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "vouches": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "status",
+                        "consent_at",
+                        "vouches",
+                        "sponsors_required",
+                        "sponsors",
+                        "phone",
+                        "phone_verified",
+                        "selfie_code",
+                        "selfie_uploaded_at",
+                        "selfie_expires_at",
+                        "submitted_at",
+                        "decided_at",
+                        "decision_reason",
+                        "missing"
+                      ],
+                      "title": "PartnerVerificationRequest",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "eligibility",
+                    "request",
+                    "limits"
+                  ],
+                  "title": "PartnerVerificationOverview",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Verification"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your Partners verification: state, next step, your request",
+        "tags": [
+          "Partners verification"
+        ]
+      }
+    },
+    "/api/me/partners/verification/consent": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PartnerVerificationController.consent",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "eligibility": {
+                      "properties": {
+                        "method": {
+                          "enum": [
+                            "membership",
+                            "sponsors",
+                            null
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "next_step": {
+                          "enum": [
+                            "consent",
+                            "sponsors",
+                            "phone",
+                            "selfie",
+                            null
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "verified",
+                            "needs_verification",
+                            "in_review",
+                            "rejected",
+                            "suspended"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "method",
+                        "next_step"
+                      ],
+                      "title": "PartnerEligibility",
+                      "type": "object"
+                    },
+                    "limits": {
+                      "properties": {
+                        "code_attempts": {
+                          "type": "integer"
+                        },
+                        "code_minutes": {
+                          "type": "integer"
+                        },
+                        "link_minutes": {
+                          "type": "integer"
+                        },
+                        "selfie_content_types": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "selfie_max_bytes": {
+                          "type": "integer"
+                        },
+                        "selfie_retention_days": {
+                          "type": "integer"
+                        },
+                        "sponsors_required": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "sponsors_required",
+                        "link_minutes",
+                        "code_minutes",
+                        "code_attempts",
+                        "selfie_content_types",
+                        "selfie_max_bytes",
+                        "selfie_retention_days"
+                      ],
+                      "title": "PartnerVerificationLimits",
+                      "type": "object"
+                    },
+                    "request": {
+                      "nullable": true,
+                      "properties": {
+                        "consent_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "decided_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "decision_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "missing": {
+                          "items": {
+                            "enum": [
+                              "consent",
+                              "sponsors",
+                              "phone"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "phone": {
+                          "description": "Masked",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "phone_verified": {
+                          "type": "boolean"
+                        },
+                        "selfie_code": {
+                          "description": "Written on paper and held up in the selfie",
+                          "pattern": "^[0-9]{4}$",
+                          "type": "string"
+                        },
+                        "selfie_expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "selfie_uploaded_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "sponsors": {
+                          "items": {
+                            "properties": {
+                              "channel": {
+                                "enum": [
+                                  "buddy",
+                                  "link"
+                                ],
+                                "type": "string"
+                              },
+                              "decided_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "person": {
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "nickname",
+                                  "avatar_url"
+                                ],
+                                "title": "PartnerVerificationPerson",
+                                "type": "object"
+                              },
+                              "requested_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "requested",
+                                  "vouched",
+                                  "declined",
+                                  "cancelled"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "person",
+                              "channel",
+                              "status",
+                              "requested_at",
+                              "decided_at"
+                            ],
+                            "title": "PartnerSponsorship",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "sponsors_required": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "collecting",
+                            "in_review",
+                            "approved",
+                            "rejected",
+                            "expired",
+                            "withdrawn"
+                          ],
+                          "type": "string"
+                        },
+                        "submitted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "vouches": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "status",
+                        "consent_at",
+                        "vouches",
+                        "sponsors_required",
+                        "sponsors",
+                        "phone",
+                        "phone_verified",
+                        "selfie_code",
+                        "selfie_uploaded_at",
+                        "selfie_expires_at",
+                        "submitted_at",
+                        "decided_at",
+                        "decision_reason",
+                        "missing"
+                      ],
+                      "title": "PartnerVerificationRequest",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "eligibility",
+                    "request",
+                    "limits"
+                  ],
+                  "title": "PartnerVerificationOverview",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Verification"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Agree to the Palee check and open your request (sponsor path)",
+        "tags": [
+          "Partners verification"
+        ]
+      }
+    },
+    "/api/me/partners/verification/link": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PartnerVerificationController.create_link",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "token": {
+                      "description": "Shown once",
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "token",
+                    "path",
+                    "url",
+                    "expires_at"
+                  ],
+                  "title": "PartnerSponsorLink",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Link"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A single-use, 10-minute link (and QR) for a sponsor outside your Buddies",
+        "tags": [
+          "Partners verification"
+        ]
+      }
+    },
+    "/api/me/partners/verification/phone": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PartnerVerificationController.send_phone_code",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "phone": {
+                    "description": "Mobile, E.164 or Greek 69…",
+                    "maxLength": 32,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "phone"
+                ],
+                "title": "PartnerPhoneRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code_minutes": {
+                      "type": "integer"
+                    },
+                    "expires_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "phone": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "phone",
+                    "expires_at",
+                    "code_minutes"
+                  ],
+                  "title": "PartnerPhoneSent",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Sent"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Send a 6-digit code to your mobile number",
+        "tags": [
+          "Partners verification"
+        ]
+      }
+    },
+    "/api/me/partners/verification/phone/confirm": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PartnerVerificationController.confirm_phone",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "code": {
+                    "maxLength": 12,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code"
+                ],
+                "title": "PartnerCodeRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "eligibility": {
+                      "properties": {
+                        "method": {
+                          "enum": [
+                            "membership",
+                            "sponsors",
+                            null
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "next_step": {
+                          "enum": [
+                            "consent",
+                            "sponsors",
+                            "phone",
+                            "selfie",
+                            null
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "verified",
+                            "needs_verification",
+                            "in_review",
+                            "rejected",
+                            "suspended"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "method",
+                        "next_step"
+                      ],
+                      "title": "PartnerEligibility",
+                      "type": "object"
+                    },
+                    "limits": {
+                      "properties": {
+                        "code_attempts": {
+                          "type": "integer"
+                        },
+                        "code_minutes": {
+                          "type": "integer"
+                        },
+                        "link_minutes": {
+                          "type": "integer"
+                        },
+                        "selfie_content_types": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "selfie_max_bytes": {
+                          "type": "integer"
+                        },
+                        "selfie_retention_days": {
+                          "type": "integer"
+                        },
+                        "sponsors_required": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "sponsors_required",
+                        "link_minutes",
+                        "code_minutes",
+                        "code_attempts",
+                        "selfie_content_types",
+                        "selfie_max_bytes",
+                        "selfie_retention_days"
+                      ],
+                      "title": "PartnerVerificationLimits",
+                      "type": "object"
+                    },
+                    "request": {
+                      "nullable": true,
+                      "properties": {
+                        "consent_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "decided_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "decision_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "missing": {
+                          "items": {
+                            "enum": [
+                              "consent",
+                              "sponsors",
+                              "phone"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "phone": {
+                          "description": "Masked",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "phone_verified": {
+                          "type": "boolean"
+                        },
+                        "selfie_code": {
+                          "description": "Written on paper and held up in the selfie",
+                          "pattern": "^[0-9]{4}$",
+                          "type": "string"
+                        },
+                        "selfie_expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "selfie_uploaded_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "sponsors": {
+                          "items": {
+                            "properties": {
+                              "channel": {
+                                "enum": [
+                                  "buddy",
+                                  "link"
+                                ],
+                                "type": "string"
+                              },
+                              "decided_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "person": {
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "nickname",
+                                  "avatar_url"
+                                ],
+                                "title": "PartnerVerificationPerson",
+                                "type": "object"
+                              },
+                              "requested_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "requested",
+                                  "vouched",
+                                  "declined",
+                                  "cancelled"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "person",
+                              "channel",
+                              "status",
+                              "requested_at",
+                              "decided_at"
+                            ],
+                            "title": "PartnerSponsorship",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "sponsors_required": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "collecting",
+                            "in_review",
+                            "approved",
+                            "rejected",
+                            "expired",
+                            "withdrawn"
+                          ],
+                          "type": "string"
+                        },
+                        "submitted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "vouches": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "status",
+                        "consent_at",
+                        "vouches",
+                        "sponsors_required",
+                        "sponsors",
+                        "phone",
+                        "phone_verified",
+                        "selfie_code",
+                        "selfie_uploaded_at",
+                        "selfie_expires_at",
+                        "submitted_at",
+                        "decided_at",
+                        "decision_reason",
+                        "missing"
+                      ],
+                      "title": "PartnerVerificationRequest",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "eligibility",
+                    "request",
+                    "limits"
+                  ],
+                  "title": "PartnerVerificationOverview",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Verification"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Confirm your number with the code it received",
+        "tags": [
+          "Partners verification"
+        ]
+      }
+    },
+    "/api/me/partners/verification/selfie/upload-url": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PartnerVerificationController.selfie_upload_url",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "content_type": {
+                    "enum": [
+                      "image/heic",
+                      "image/jpeg",
+                      "image/png",
+                      "image/webp"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content_type"
+                ],
+                "title": "PartnerSelfieUploadRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "content_type": {
+                      "type": "string"
+                    },
+                    "file_key": {
+                      "type": "string"
+                    },
+                    "max_bytes": {
+                      "type": "integer"
+                    },
+                    "method": {
+                      "enum": [
+                        "PUT"
+                      ],
+                      "type": "string"
+                    },
+                    "required_headers": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "selfie_code": {
+                      "type": "string"
+                    },
+                    "upload_url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "upload_url",
+                    "method",
+                    "required_headers",
+                    "file_key",
+                    "content_type",
+                    "max_bytes",
+                    "selfie_code"
+                  ],
+                  "title": "PartnerSelfieUpload",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Upload"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A presigned upload for the selfie holding your code",
+        "tags": [
+          "Partners verification"
+        ]
+      }
+    },
+    "/api/me/partners/verification/sponsor-candidates": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PartnerVerificationController.sponsor_candidates",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "candidates": {
+                      "items": {
+                        "properties": {
+                          "eligible": {
+                            "type": "boolean"
+                          },
+                          "person": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname",
+                              "avatar_url"
+                            ],
+                            "title": "PartnerVerificationPerson",
+                            "type": "object"
+                          },
+                          "reason": {
+                            "enum": [
+                              "not_verified",
+                              "blocked",
+                              "quota",
+                              "penalty",
+                              "self",
+                              null
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "sponsorship": {
+                            "nullable": true,
+                            "properties": {
+                              "channel": {
+                                "enum": [
+                                  "buddy",
+                                  "link"
+                                ],
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "requested",
+                                  "vouched",
+                                  "declined",
+                                  "cancelled"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "person",
+                          "eligible",
+                          "reason",
+                          "sponsorship"
+                        ],
+                        "title": "PartnerSponsorCandidate",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "required": {
+                      "type": "integer"
+                    },
+                    "vouches": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "candidates",
+                    "required",
+                    "vouches"
+                  ],
+                  "title": "PartnerSponsorCandidates",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Candidates"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your Buddies as possible sponsors, each marked whether they may vouch",
+        "tags": [
+          "Partners verification"
+        ]
+      }
+    },
+    "/api/me/partners/verification/sponsors": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PartnerVerificationController.request_sponsor",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "sponsor_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "sponsor_id"
+                ],
+                "title": "PartnerSponsorRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "sponsorship": {
+                      "properties": {
+                        "channel": {
+                          "enum": [
+                            "buddy",
+                            "link"
+                          ],
+                          "type": "string"
+                        },
+                        "decided_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "person": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nickname",
+                            "avatar_url"
+                          ],
+                          "title": "PartnerVerificationPerson",
+                          "type": "object"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "requested",
+                            "vouched",
+                            "declined",
+                            "cancelled"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "person",
+                        "channel",
+                        "status",
+                        "requested_at",
+                        "decided_at"
+                      ],
+                      "title": "PartnerSponsorship",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "sponsorship"
+                  ],
+                  "title": "PartnerSponsorshipResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Sponsorship"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Ask a Buddy to vouch for you",
+        "tags": [
+          "Partners verification"
+        ]
+      }
+    },
+    "/api/me/partners/verification/sponsors/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PartnerVerificationController.cancel_sponsor",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "sponsorship": {
+                      "properties": {
+                        "channel": {
+                          "enum": [
+                            "buddy",
+                            "link"
+                          ],
+                          "type": "string"
+                        },
+                        "decided_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "person": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nickname",
+                            "avatar_url"
+                          ],
+                          "title": "PartnerVerificationPerson",
+                          "type": "object"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "requested",
+                            "vouched",
+                            "declined",
+                            "cancelled"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "person",
+                        "channel",
+                        "status",
+                        "requested_at",
+                        "decided_at"
+                      ],
+                      "title": "PartnerSponsorship",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "sponsorship"
+                  ],
+                  "title": "PartnerSponsorshipResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Sponsorship"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Withdraw an unanswered request to a sponsor (the sponsor's person id)",
+        "tags": [
+          "Partners verification"
+        ]
+      }
+    },
+    "/api/me/partners/verification/submit": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PartnerVerificationController.submit",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "file_key": {
+                    "maxLength": 300,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "file_key"
+                ],
+                "title": "PartnerVerificationSubmit",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "eligibility": {
+                      "properties": {
+                        "method": {
+                          "enum": [
+                            "membership",
+                            "sponsors",
+                            null
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "next_step": {
+                          "enum": [
+                            "consent",
+                            "sponsors",
+                            "phone",
+                            "selfie",
+                            null
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "verified",
+                            "needs_verification",
+                            "in_review",
+                            "rejected",
+                            "suspended"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "method",
+                        "next_step"
+                      ],
+                      "title": "PartnerEligibility",
+                      "type": "object"
+                    },
+                    "limits": {
+                      "properties": {
+                        "code_attempts": {
+                          "type": "integer"
+                        },
+                        "code_minutes": {
+                          "type": "integer"
+                        },
+                        "link_minutes": {
+                          "type": "integer"
+                        },
+                        "selfie_content_types": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "selfie_max_bytes": {
+                          "type": "integer"
+                        },
+                        "selfie_retention_days": {
+                          "type": "integer"
+                        },
+                        "sponsors_required": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "sponsors_required",
+                        "link_minutes",
+                        "code_minutes",
+                        "code_attempts",
+                        "selfie_content_types",
+                        "selfie_max_bytes",
+                        "selfie_retention_days"
+                      ],
+                      "title": "PartnerVerificationLimits",
+                      "type": "object"
+                    },
+                    "request": {
+                      "nullable": true,
+                      "properties": {
+                        "consent_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "decided_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "decision_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "missing": {
+                          "items": {
+                            "enum": [
+                              "consent",
+                              "sponsors",
+                              "phone"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "phone": {
+                          "description": "Masked",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "phone_verified": {
+                          "type": "boolean"
+                        },
+                        "selfie_code": {
+                          "description": "Written on paper and held up in the selfie",
+                          "pattern": "^[0-9]{4}$",
+                          "type": "string"
+                        },
+                        "selfie_expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "selfie_uploaded_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "sponsors": {
+                          "items": {
+                            "properties": {
+                              "channel": {
+                                "enum": [
+                                  "buddy",
+                                  "link"
+                                ],
+                                "type": "string"
+                              },
+                              "decided_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "person": {
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "nickname",
+                                  "avatar_url"
+                                ],
+                                "title": "PartnerVerificationPerson",
+                                "type": "object"
+                              },
+                              "requested_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "requested",
+                                  "vouched",
+                                  "declined",
+                                  "cancelled"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "person",
+                              "channel",
+                              "status",
+                              "requested_at",
+                              "decided_at"
+                            ],
+                            "title": "PartnerSponsorship",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "sponsors_required": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "collecting",
+                            "in_review",
+                            "approved",
+                            "rejected",
+                            "expired",
+                            "withdrawn"
+                          ],
+                          "type": "string"
+                        },
+                        "submitted_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "vouches": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "status",
+                        "consent_at",
+                        "vouches",
+                        "sponsors_required",
+                        "sponsors",
+                        "phone",
+                        "phone_verified",
+                        "selfie_code",
+                        "selfie_uploaded_at",
+                        "selfie_expires_at",
+                        "submitted_at",
+                        "decided_at",
+                        "decision_reason",
+                        "missing"
+                      ],
+                      "title": "PartnerVerificationRequest",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "eligibility",
+                    "request",
+                    "limits"
+                  ],
+                  "title": "PartnerVerificationOverview",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Verification"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Send your request with the uploaded selfie to the Palee team",
+        "tags": [
+          "Partners verification"
+        ]
+      }
+    },
+    "/api/me/partners/vouch-links/inspect": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PartnerVerificationController.inspect_link",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "maxLength": 128,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ],
+                "title": "PartnerVouchLinkToken",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "can_vouch": {
+                      "type": "boolean"
+                    },
+                    "expires_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "person": {
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "nickname",
+                        "avatar_url"
+                      ],
+                      "title": "PartnerVerificationPerson",
+                      "type": "object"
+                    },
+                    "reason": {
+                      "enum": [
+                        "partner_sponsor_not_eligible",
+                        "partner_sponsor_quota",
+                        "partner_sponsor_penalty",
+                        null
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "person",
+                    "expires_at",
+                    "can_vouch",
+                    "reason"
+                  ],
+                  "title": "PartnerVouchLinkInspection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Link"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Who a sponsor link is for, and whether you may vouch",
+        "tags": [
+          "Partners verification"
+        ]
+      }
+    },
+    "/api/me/partners/vouch-links/vouch": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PartnerVerificationController.vouch_by_link",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "maxLength": 128,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ],
+                "title": "PartnerVouchLinkToken",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "decided_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "requested",
+                        "vouched",
+                        "declined",
+                        "cancelled"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "status",
+                    "decided_at"
+                  ],
+                  "title": "PartnerVouchResult",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Vouched"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Vouch through a sponsor link (single use)",
+        "tags": [
+          "Partners verification"
+        ]
+      }
+    },
+    "/api/me/partners/vouch-requests": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PartnerVerificationController.vouch_requests",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "requests": {
+                      "items": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "person": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname",
+                              "avatar_url"
+                            ],
+                            "title": "PartnerVerificationPerson",
+                            "type": "object"
+                          },
+                          "requested_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "person",
+                          "requested_at"
+                        ],
+                        "title": "PartnerVouchRequest",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "vouching": {
+                      "properties": {
+                        "can_vouch": {
+                          "type": "boolean"
+                        },
+                        "left": {
+                          "type": "integer"
+                        },
+                        "penalty_until": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "quota": {
+                          "type": "integer"
+                        },
+                        "reason": {
+                          "enum": [
+                            "not_verified",
+                            "quota",
+                            "penalty",
+                            null
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "used": {
+                          "type": "integer"
+                        },
+                        "window_days": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "can_vouch",
+                        "reason",
+                        "quota",
+                        "window_days",
+                        "used",
+                        "left",
+                        "penalty_until"
+                      ],
+                      "title": "PartnerVouching",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "requests",
+                    "vouching"
+                  ],
+                  "title": "PartnerVouchRequests",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Requests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "People who asked you to vouch for them, and your quota",
+        "tags": [
+          "Partners verification"
+        ]
+      }
+    },
+    "/api/me/partners/vouch-requests/{id}": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PartnerVerificationController.decide_vouch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "decision": {
+                    "enum": [
+                      "vouch",
+                      "decline"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "decision"
+                ],
+                "title": "PartnerVouchDecision",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "decided_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "requested",
+                        "vouched",
+                        "declined",
+                        "cancelled"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "status",
+                    "decided_at"
+                  ],
+                  "title": "PartnerVouchResult",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Answer"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Vouch for or decline someone who asked you",
+        "tags": [
+          "Partners verification"
+        ]
+      }
+    },
+    "/api/me/partners/vouching": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PartnerVerificationController.vouching",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "can_vouch": {
+                      "type": "boolean"
+                    },
+                    "left": {
+                      "type": "integer"
+                    },
+                    "penalty_until": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "quota": {
+                      "type": "integer"
+                    },
+                    "reason": {
+                      "enum": [
+                        "not_verified",
+                        "quota",
+                        "penalty",
+                        null
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "used": {
+                      "type": "integer"
+                    },
+                    "window_days": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "can_vouch",
+                    "reason",
+                    "quota",
+                    "window_days",
+                    "used",
+                    "left",
+                    "penalty_until"
+                  ],
+                  "title": "PartnerVouching",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Vouching"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your own standing as a sponsor: quota left, any pause",
+        "tags": [
+          "Partners verification"
         ]
       }
     },
@@ -323133,6 +327298,414 @@
         "summary": "Daily «Κλείστε μαζί» counters of the last 30 days (vendors)",
         "tags": [
           "Partners"
+        ]
+      }
+    },
+    "/api/platform/partner-verifications": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PlatformPartnerVerificationController.index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "enum": [
+                "collecting",
+                "in_review",
+                "approved",
+                "rejected",
+                "expired",
+                "withdrawn"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "requests": {
+                      "items": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "overdue": {
+                            "type": "boolean"
+                          },
+                          "person": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname",
+                              "avatar_url"
+                            ],
+                            "title": "PartnerVerificationPerson",
+                            "type": "object"
+                          },
+                          "selfie_expires_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "collecting",
+                              "in_review",
+                              "approved",
+                              "rejected",
+                              "expired",
+                              "withdrawn"
+                            ],
+                            "type": "string"
+                          },
+                          "submitted_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "status",
+                          "person",
+                          "submitted_at",
+                          "selfie_expires_at",
+                          "overdue"
+                        ],
+                        "title": "PlatformPartnerVerificationItem",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "requests"
+                  ],
+                  "title": "PlatformPartnerVerifications",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Requests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Partners verification requests in a status, default in_review (vendors)",
+        "tags": [
+          "Platform Partners verification"
+        ]
+      }
+    },
+    "/api/platform/partner-verifications/{id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.PlatformPartnerVerificationController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "consent_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "decided_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "decision_reason": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "person": {
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "nickname",
+                        "avatar_url"
+                      ],
+                      "title": "PartnerVerificationPerson",
+                      "type": "object"
+                    },
+                    "phone": {
+                      "description": "Masked",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "phone_verified": {
+                      "type": "boolean"
+                    },
+                    "selfie_code": {
+                      "type": "string"
+                    },
+                    "selfie_expires_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "selfie_uploaded_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "selfie_url": {
+                      "description": "Valid 5 minutes",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "selfie_url_expires_in": {
+                      "type": "integer"
+                    },
+                    "sponsors": {
+                      "items": {
+                        "properties": {
+                          "channel": {
+                            "enum": [
+                              "buddy",
+                              "link"
+                            ],
+                            "type": "string"
+                          },
+                          "person": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname",
+                              "avatar_url"
+                            ],
+                            "title": "PartnerVerificationPerson",
+                            "type": "object"
+                          },
+                          "vouched_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "person",
+                          "channel",
+                          "vouched_at"
+                        ],
+                        "title": "PlatformPartnerVerificationSponsor",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "status": {
+                      "enum": [
+                        "collecting",
+                        "in_review",
+                        "approved",
+                        "rejected",
+                        "expired",
+                        "withdrawn"
+                      ],
+                      "type": "string"
+                    },
+                    "submitted_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "status",
+                    "person",
+                    "selfie_code",
+                    "selfie_url",
+                    "selfie_url_expires_in",
+                    "selfie_uploaded_at",
+                    "selfie_expires_at",
+                    "phone",
+                    "phone_verified",
+                    "consent_at",
+                    "submitted_at",
+                    "decided_at",
+                    "decision_reason",
+                    "sponsors"
+                  ],
+                  "title": "PlatformPartnerVerification",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Request"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "One request: the selfie (5-minute link), its code, the avatar, sponsors (vendors)",
+        "tags": [
+          "Platform Partners verification"
+        ]
+      }
+    },
+    "/api/platform/partner-verifications/{id}/decision": {
+      "post": {
+        "callbacks": {},
+        "description": "The selfie is deleted and only the outcome is kept.",
+        "operationId": "PaleeWeb.PlatformPartnerVerificationController.decide",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "decision": {
+                    "enum": [
+                      "approve",
+                      "reject"
+                    ],
+                    "type": "string"
+                  },
+                  "reason": {
+                    "description": "Required to reject",
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "decision"
+                ],
+                "title": "PlatformPartnerVerificationDecision",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "decided_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "collecting",
+                        "in_review",
+                        "approved",
+                        "rejected",
+                        "expired",
+                        "withdrawn"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "status",
+                    "decided_at"
+                  ],
+                  "title": "PlatformPartnerVerificationDecided",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Decision"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Approve or reject a request in review; a reason is required to reject (vendors)",
+        "tags": [
+          "Platform Partners verification"
         ]
       }
     },
