@@ -3623,6 +3623,8 @@
     "admPublicPageDescription": "Texto, fotos y lo que ofrece el box, tal como se ve antes de apuntarse",
     "admLocationsTitle": "Sedes",
     "admLocationsDescription": "Solo para boxes con más de una sede",
+    "admOnSiteTitle": "En el box",
+    "admOnSiteDescription": "Televisores en la pared y check-in en la puerta",
     "admLocationsEmpty": "Las sedes son opcionales. Si tu box tiene un solo local, no necesitas ninguna. Añádelas solo si das clases u open gym en más de un sitio.",
     "admLocationName": "Nombre de la sede",
     "admLocationAddressOptional": "Dirección (opcional)",
@@ -13115,6 +13117,8 @@
       "paymentsHint": "Un botón, con Viva",
       "import": "Trae a tus miembros",
       "importHint": "Importar desde Wodify, PushPress, Excel…",
+      "screens": "Pantallas del box",
+      "screensHint": "La tele del box muestra las clases sola",
       "soldOnline": "Qué se vende online",
       "soldOnlineHint": "Página de venta · {count} de {total} paquetes de suscripción",
       "soldOnlineLater": "Tras conectar los pagos online, los paquetes de suscripción de pago se ponen a la venta online solos"
@@ -13205,7 +13209,8 @@
       "payments": "Pagos y documentos",
       "motivation": "Motivación",
       "training": "Entrenamiento",
-      "community": "Comunidad"
+      "community": "Comunidad",
+      "onSite": "En el box"
     },
     "keywords": {
       "bookings": "reserva reservas aprobación espera cancelación plazas check-in entrada",
@@ -13213,7 +13218,8 @@
       "motivation": "escudo escudos racha leaderboard niveles dificultad",
       "training": "WOD objetivos asistente IA AI escalado",
       "community": "comunidad debate mensajes",
-      "access": "roles acceso permisos"
+      "access": "roles acceso permisos",
+      "onSite": "televisor televisores pantalla pantallas pared check-in puerta entrada TV"
     }
   },
   "Documents": {

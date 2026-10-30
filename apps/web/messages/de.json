@@ -3623,6 +3623,8 @@
     "admPublicPageDescription": "Text, Fotos und Angebot der Box – so, wie Interessierte sie vor dem Beitritt sehen",
     "admLocationsTitle": "Standorte",
     "admLocationsDescription": "Nur für Boxen mit mehr als einem Standort",
+    "admOnSiteTitle": "In der Box",
+    "admOnSiteDescription": "Fernseher an der Wand und Check-in an der Tür",
     "admLocationsEmpty": "Standorte sind optional. Wenn deine Box nur einen Standort hat, brauchst du keine. Füge sie nur hinzu, wenn Kurse oder Open Gym an mehreren Orten stattfinden.",
     "admLocationName": "Name des Standorts",
     "admLocationAddressOptional": "Adresse (optional)",
@@ -13115,6 +13117,8 @@
       "paymentsHint": "Ein Knopf, mit Viva",
       "import": "Hol deine Mitglieder",
       "importHint": "Import aus Wodify, PushPress, Excel…",
+      "screens": "Box-Bildschirme",
+      "screensHint": "Der Box-Fernseher zeigt die Kurse von selbst",
       "soldOnline": "Was online verkauft wird",
       "soldOnlineHint": "Verkaufsseite · {count} von {total} Abo-Paketen",
       "soldOnlineLater": "Nach dem Verbinden der Online-Zahlungen gehen kostenpflichtige Abo-Pakete von selbst online in den Verkauf"
@@ -13205,7 +13209,8 @@
       "payments": "Zahlungen und Belege",
       "motivation": "Motivation",
       "training": "Training",
-      "community": "Community"
+      "community": "Community",
+      "onSite": "In der Box"
     },
     "keywords": {
       "bookings": "Buchung Buchungen Freigabe Warteliste Stornierung Plätze Check-in Zutritt",
@@ -13213,7 +13218,8 @@
       "motivation": "Schild Schilde Serie Leaderboard Stufen Schwierigkeit",
       "training": "WOD Ziele Assistent KI AI Skalierung",
       "community": "Community Diskussion Nachrichten",
-      "access": "Rollen Zugriff Rechte"
+      "access": "Rollen Zugriff Rechte",
+      "onSite": "Fernseher Bildschirm Bildschirme Anzeige Wand Check-in Tür Eingang TV"
     }
   },
   "Documents": {

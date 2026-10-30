@@ -3623,6 +3623,8 @@
     "admPublicPageDescription": "Κείμενο, φωτογραφίες και τι προσφέρει το box, όπως τα βλέπει ο κόσμος πριν γραφτεί",
     "admLocationsTitle": "Παραρτήματα",
     "admLocationsDescription": "Μόνο για box με περισσότερα από ένα παραρτήματα",
+    "admOnSiteTitle": "Στο box",
+    "admOnSiteDescription": "Τηλεοράσεις στον τοίχο και check-in στην πόρτα",
     "admLocationsEmpty": "Τα παραρτήματα είναι προαιρετικά. Αν το box σου είναι σε ένα σημείο, δεν χρειάζεσαι κανένα. Πρόσθεσέ τα μόνο αν έχεις τμήματα ή open gym σε περισσότερα από ένα σημεία.",
     "admLocationName": "Όνομα παραρτήματος",
     "admLocationAddressOptional": "Διεύθυνση (προαιρετικά)",
@@ -13115,6 +13117,8 @@
       "paymentsHint": "Ένα κουμπί, με Viva",
       "import": "Φέρε τα μέλη σου",
       "importHint": "Εισαγωγή από Wodify, PushPress, Excel…",
+      "screens": "Οθόνες box",
+      "screensHint": "Η TV του box δείχνει τα τμήματα μόνη της",
       "soldOnline": "Τι πωλείται online",
       "soldOnlineHint": "Σελίδα πακέτων · {count} από {total} πακέτα συνδρομής",
       "soldOnlineLater": "Μετά τις online πληρωμές, τα πακέτα συνδρομής με τιμή πωλούνται online μόνα τους"
@@ -13205,7 +13209,8 @@
       "payments": "Πληρωμές και παραστατικά",
       "motivation": "Κίνητρα",
       "training": "Προπόνηση",
-      "community": "Κοινότητα"
+      "community": "Κοινότητα",
+      "onSite": "Στο box"
     },
     "keywords": {
       "bookings": "κράτηση κρατήσεις έγκριση αναμονή ακύρωση θέσεις check-in είσοδος",
@@ -13213,7 +13218,8 @@
       "motivation": "ασπίδα ασπίδες σερί leaderboard επίπεδα δυσκολίας",
       "training": "WOD στόχοι βοηθός AI κλιμάκωση",
       "community": "κοινότητα συζήτηση μηνύματα",
-      "access": "ρόλοι πρόσβαση δικαιώματα"
+      "access": "ρόλοι πρόσβαση δικαιώματα",
+      "onSite": "τηλεόραση τηλεοράσεις οθόνη οθόνες TV τοίχος check-in πόρτα είσοδος"
     }
   },
   "Documents": {

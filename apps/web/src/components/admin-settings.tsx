@@ -1283,6 +1283,14 @@ export function AdminSettingsHub() {
 
             <WorkoutTypesSection token={token} />
 
+            {/* Every box, one branch or many: Οθόνες box used to live only under Παραρτήματα, which a single-branch owner never opens. */}
+            <CollapsibleSection id="on-site" title={i18n("admOnSiteTitle")} description={i18n("admOnSiteDescription")}>
+              <BoxScreensSettingsLink />
+              <div className="mt-3">
+                <CheckInSettingsLink />
+              </div>
+            </CollapsibleSection>
+
             <CollapsibleSection id="public-page" title={i18n("admPublicPageTitle")} description={i18n("admPublicPageDescription")}>
               <PublicPageLink />
               <div className="mt-3">
@@ -1379,6 +1387,12 @@ export function AdminSettingsHub() {
                   title: adv("groups.community"),
                   keywords: [adv("keywords.community")],
                   content: <CommunitySettingsLink />,
+                },
+                {
+                  id: "on-site",
+                  title: adv("groups.onSite"),
+                  keywords: [adv("keywords.onSite"), i18n("admOnSiteDescription")],
+                  content: <BoxScreensSettingsLink />,
                 },
                 ...(can(membership, "grant_staff_roles")
                   ? [
