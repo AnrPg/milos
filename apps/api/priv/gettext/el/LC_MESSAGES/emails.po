@@ -207,3 +207,21 @@ msgstr "Ο σύνδεσμος ισχύει για 24 ώρες."
 
 msgid "You're receiving this email because someone asked to use this address for a %{product} account."
 msgstr "Λαμβάνεις αυτό το email επειδή ζητήθηκε να χρησιμοποιηθεί αυτή η διεύθυνση για έναν λογαριασμό στο %{product}."
+
+msgid "%{title} %{number} from %{business}"
+msgstr "%{title} %{number} από %{business}"
+
+msgid "%{business} sent you this document. You'll find it attached as a PDF."
+msgstr "Η επιχείρηση %{business} σού έστειλε αυτό το παραστατικό. Θα το βρεις συνημμένο σε PDF."
+
+msgid "Document"
+msgstr "Παραστατικό"
+
+msgid "Date of issue"
+msgstr "Ημερομηνία έκδοσης"
+
+msgid "Total"
+msgstr "Σύνολο"
+
+msgid "Keep it for your records. For questions about it, contact the business."
+msgstr "Κράτησέ το στο αρχείο σου. Για απορίες σχετικά με αυτό, επικοινώνησε με την επιχείρηση."

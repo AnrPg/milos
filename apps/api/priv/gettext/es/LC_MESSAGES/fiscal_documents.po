@@ -1,0 +1,209 @@
+msgid ""
+msgstr ""
+"Language: es\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Receipt"
+msgstr "Recibo"
+
+msgid "Invoice"
+msgstr "Factura"
+
+msgid "Credit note"
+msgstr "Factura rectificativa"
+
+msgid "Retail sales receipt"
+msgstr "Recibo de venta al por menor"
+
+msgid "Service receipt"
+msgstr "Recibo de prestación de servicios"
+
+msgid "Retail credit note"
+msgstr "Abono de venta al por menor"
+
+msgid "Sales invoice"
+msgstr "Factura de venta"
+
+msgid "Service invoice"
+msgstr "Factura de prestación de servicios"
+
+msgid "Credit invoice"
+msgstr "Factura rectificativa"
+
+msgid "Number"
+msgstr "Número"
+
+msgid "Date of issue"
+msgstr "Fecha de expedición"
+
+msgid "Seller"
+msgstr "Emisor"
+
+msgid "Customer"
+msgstr "Cliente"
+
+msgid "Payment method"
+msgstr "Forma de pago"
+
+msgid "Cash"
+msgstr "Efectivo"
+
+msgid "Card"
+msgstr "Tarjeta"
+
+msgid "Bank transfer"
+msgstr "Transferencia bancaria"
+
+msgid "Online payment"
+msgstr "Pago en línea"
+
+msgid "Other"
+msgstr "Otro"
+
+msgid "Corrects document"
+msgstr "Rectifica el documento"
+
+msgid "Description"
+msgstr "Descripción"
+
+msgid "Qty"
+msgstr "Cant."
+
+msgid "Unit price"
+msgstr "Precio unitario"
+
+msgid "Discount"
+msgstr "Descuento"
+
+msgid "VAT"
+msgstr "IVA"
+
+msgid "Amount"
+msgstr "Importe"
+
+msgid "VAT breakdown"
+msgstr "Desglose del IVA"
+
+msgid "Rate"
+msgstr "Tipo"
+
+msgid "Net"
+msgstr "Base imponible"
+
+msgid "Gross"
+msgstr "Total"
+
+msgid "Total excluding VAT"
+msgstr "Total base imponible"
+
+msgid "Total VAT"
+msgstr "Total IVA"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Sales tax"
+msgstr "Impuesto sobre las ventas"
+
+msgid "Total sales tax"
+msgstr "Total impuesto sobre las ventas"
+
+msgid "Subtotal"
+msgstr "Subtotal"
+
+msgid "Prices include VAT."
+msgstr "Precios con IVA incluido."
+
+msgid "Exempt"
+msgstr "Exento"
+
+msgid "Zero-rated"
+msgstr "Tipo cero"
+
+msgid "Tax ID (AFM)"
+msgstr "NIF (AFM)"
+
+msgid "Tax office (DOY)"
+msgstr "Oficina tributaria (DOY)"
+
+msgid "Tax number"
+msgstr "Número de identificación fiscal"
+
+msgid "VAT number"
+msgstr "NIF-IVA"
+
+msgid "SIREN/SIRET"
+msgstr "SIREN/SIRET"
+
+msgid "Trade register number"
+msgstr "Número de registro mercantil"
+
+msgid "EIN"
+msgstr "EIN"
+
+msgid "Enterprise number"
+msgstr "Número de empresa"
+
+msgid "UID (myDATA)"
+msgstr "UID (myDATA)"
+
+msgid "UID"
+msgstr "UID"
+
+msgid "Email"
+msgstr "Correo electrónico"
+
+msgid "Phone"
+msgstr "Teléfono"
+
+msgid "myDATA (AADE)"
+msgstr "myDATA (AADE)"
+
+msgid "MARK"
+msgstr "MARK"
+
+msgid "Authentication code"
+msgstr "Código de autenticación"
+
+msgid "Reporting to myDATA (AADE) is pending."
+msgstr "La transmisión a myDATA (AADE) está pendiente."
+
+msgid "Bank details"
+msgstr "Datos bancarios"
+
+msgid "IBAN"
+msgstr "IBAN"
+
+msgid "Category of operation: provision of services"
+msgstr "Categoría de la operación: prestación de servicios"
+
+msgid "Late payment: penalties at three times the legal interest rate and a fixed recovery fee of 40 euros (Commercial Code, art. L441-10 and D441-5). No discount for early payment."
+msgstr "En caso de retraso en el pago: penalización del triple del tipo de interés legal e indemnización a tanto alzado de 40 euros por gastos de cobro (Code de commerce, art. L441-10 y D441-5). Sin descuento por pronto pago."
+
+msgid "This document is recorded in the inalterable fiscal journal of the business."
+msgstr "Este documento está registrado en el diario fiscal inalterable de la empresa."
+
+msgid "Document fingerprint (SHA-256)"
+msgstr "Huella del documento (SHA-256)"
+
+msgid "Page"
+msgstr "Página"
+
+msgid "Reason for the credit note"
+msgstr "Motivo de la factura rectificativa"
+
+msgid "Product returned"
+msgstr "Devolución del producto"
+
+msgid "Billing error"
+msgstr "Error de facturación"
+
+msgid "Subscription cancelled"
+msgstr "Cancelación de la suscripción"
+
+msgid "Technical security system (TSE)"
+msgstr "Dispositivo técnico de seguridad (TSE)"
+
+msgid "Cash register security device (RKSV)"
+msgstr "Dispositivo de seguridad de la caja registradora (RKSV)"

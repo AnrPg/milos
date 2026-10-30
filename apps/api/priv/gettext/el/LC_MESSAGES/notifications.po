@@ -720,3 +720,35 @@ msgstr "Ένα μέλος του box αποχωρεί"
 
 msgid "%{nickname} is leaving the box. Last day: %{date}."
 msgstr "Ο/Η %{nickname} αποχωρεί από το box. Τελευταία ημέρα: %{date}."
+
+msgid "Card payment failed"
+msgstr "Η πληρωμή με κάρτα απέτυχε"
+
+msgid "%{amount} for %{what} was declined. We will try again automatically, or you can pay now with another card."
+msgstr "Η χρέωση %{amount} για %{what} απορρίφθηκε. Θα ξαναδοκιμάσουμε αυτόματα, ή μπορείς να πληρώσεις τώρα με άλλη κάρτα."
+
+msgid "%{amount} for %{what} was declined and will not be tried again. Pay with another card to keep it."
+msgstr "Η χρέωση %{amount} για %{what} απορρίφθηκε και δεν θα ξαναδοκιμαστεί. Πλήρωσε με άλλη κάρτα για να το κρατήσεις."
+
+msgid "A card payment needs attention"
+msgstr "Μια πληρωμή με κάρτα θέλει προσοχή"
+
+msgid "%{amount} for %{what} failed after every retry."
+msgstr "Η χρέωση %{amount} για %{what} απέτυχε μετά από όλες τις νέες προσπάθειες."
+msgid "A document to sign"
+msgstr "Έγγραφο για υπογραφή"
+
+msgid "%{business} asks you to read and sign «%{title}»."
+msgstr "%{business}: διάβασε και υπόγραψε το «%{title}»."
+
+msgid "Your health certificate expires soon"
+msgstr "Η βεβαίωση υγείας σου λήγει σύντομα"
+
+msgid "Upload a new health certificate before %{date}."
+msgstr "Ανέβασε νέα βεβαίωση υγείας πριν από τις %{date}."
+
+msgid "A fiscal connection needs attention"
+msgstr "Μια φορολογική σύνδεση θέλει προσοχή"
+
+msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
+msgstr "Το %{connection} σταμάτησε να λειτουργεί. Άνοιξε Στοιχεία τιμολόγησης › Συνδέσεις για να το διορθώσεις."

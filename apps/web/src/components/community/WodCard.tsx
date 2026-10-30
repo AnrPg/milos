@@ -12,6 +12,7 @@ import { HubCard } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
 import { TrainingLogDialog, type TrainingLogDialogState } from "@/components/training-log/TrainingLog";
 import { useUiLocale } from "@/i18n/use-ui-locale";
+import { formatClock } from "@/lib/clock";
 
 /**
  * The club's #wod-σήμερα card (ADR-138 D6, mockup «lbCard»): today's class
@@ -28,7 +29,7 @@ export function WodCard({ club, showOrigin = true }: { club: CommunityClub; show
   const card = useWodToday(club.organization_slug);
   const [logDialog, setLogDialog] = useState<TrainingLogDialogState>({ mode: "closed" });
   const wod = builtInChannel(club, "wod");
-  const time = (iso: string) => new Date(iso).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+  const time = (iso: string) => formatClock(new Date(iso), locale, { hour: "2-digit", minute: "2-digit" });
   const data = card.data;
   const mine = data?.leaderboard.find((row) => row.me) ?? null;
 

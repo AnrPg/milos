@@ -84,6 +84,38 @@ defmodule Palee.Application.TenantObjectStorage do
     end
   end
 
+  # --- ADR-252 health certificates (documents bucket, tenant prefix) ---------
+
+  @doc "Presigned PUT for a tenant-owned document key, constrained to `content_type`."
+  def document_upload(organization_id, key, content_type)
+      when is_binary(organization_id) and is_binary(key) do
+    if String.starts_with?(key, tenant_prefix(organization_id)),
+      do: impl().presigned_upload(:documents, key, content_type),
+      else: {:error, :document_key_forbidden}
+  end
+
+  @doc "Leading bytes and size of a tenant-owned document."
+  def probe_document_object(organization_id, key, bytes)
+      when is_binary(organization_id) and is_binary(key) do
+    if String.starts_with?(key, tenant_prefix(organization_id)),
+      do: impl().probe_object(:documents, key, bytes),
+      else: {:error, :document_key_forbidden}
+  end
+
+  @doc "Deletes tenant-owned documents; keys outside the tenant prefix are refused."
+  def delete_document_objects(organization_id, keys)
+      when is_binary(organization_id) and is_list(keys) do
+    prefix = tenant_prefix(organization_id)
+
+    if Enum.all?(keys, &(is_binary(&1) and String.starts_with?(&1, prefix))),
+      do: delete(:documents, Enum.map(keys, &%{key: &1})),
+      else: {:error, :document_key_forbidden}
+  end
+
+  @doc "The tenant prefix (`organizations/<id>/`) every tenant object key starts with."
+  def tenant_object_prefix(organization_id) when is_binary(organization_id),
+    do: tenant_prefix(organization_id)
+
   @doc "Short-lived signed download URL for an object owned by the tenant."
   def tenant_download_url(organization_id, key)
       when is_binary(organization_id) and is_binary(key) do

@@ -133,11 +133,12 @@ defmodule Palee.Application.ChangeClassState do
   end
 
   defp after_commit(context, outcome, action, now) do
-    Enum.each(outcome.released, fn {booking, _slot} ->
+    Enum.each(outcome.released, fn {booking, slot} ->
       WithdrawBooking.reconcile_now(context, booking, false, @release_reason)
 
       Palee.DomainEvents.publish(:booking_cancelled, %{
         organization_id: context.organization_id,
+        scheduled_class_id: slot.id,
         booking_id: booking.id,
         user_id: booking.user_id,
         kind: Map.get(booking, :kind) || "member",

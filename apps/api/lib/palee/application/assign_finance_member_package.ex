@@ -6,13 +6,23 @@ defmodule Palee.Application.AssignFinanceMemberPackage do
   @doc """
   `opts`: `:price_cents` sets the subscription's price instead of the
   package's (ADR-167: a season sells its package at the season's price).
-  The request body can never set it.
+  `:billing` says when Palee starts charging for it (ADR-274): `:now`
+  (default), `:next_period` (an imported member who already paid for the
+  current one) or `:none`. The request body can set neither.
   """
   def call(context, user_id, params, opts \\ []) do
     params =
       params
-      |> Map.drop(["price_cents_snapshot", :price_cents_snapshot])
+      |> Map.drop([
+        "price_cents_snapshot",
+        :price_cents_snapshot,
+        "charges_from",
+        :charges_from,
+        "charge_now",
+        :charge_now
+      ])
       |> put_price(opts[:price_cents])
+      |> put_billing(opts[:billing])
 
     with user when not is_nil(user) <- Identity.find_by_id(user_id),
          :ok <- ensure_client(context, user.id),
@@ -29,9 +39,10 @@ defmodule Palee.Application.AssignFinanceMemberPackage do
   end
 
   # ADR-217: packages are for clients only; staff never get one, not even a
-  # leftover profile from before they became staff.
+  # leftover profile from before they became staff. ADR-272: a guest of the
+  # box may be sold one at the desk.
   defp ensure_client(context, user_id) do
-    if Organizations.client_role(context, user_id), do: :ok, else: {:error, :not_a_client}
+    if Organizations.buyer_role(context, user_id), do: :ok, else: {:error, :not_a_client}
   end
 
   # A new profile starts active: the package, not a placeholder status,
@@ -53,6 +64,14 @@ defmodule Palee.Application.AssignFinanceMemberPackage do
     do: Map.put(params, "price_cents_snapshot", price)
 
   defp put_price(params, _price), do: params
+
+  defp put_billing(params, :next_period),
+    do: Map.merge(params, %{"charges_from" => "next_period", "charge_now" => false})
+
+  defp put_billing(params, :none),
+    do: Map.merge(params, %{"charges_from" => "none", "charge_now" => false})
+
+  defp put_billing(params, _now), do: params
 
   defp package_id(params),
     do: params["membership_package_id"] || params[:membership_package_id]

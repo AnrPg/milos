@@ -9,6 +9,11 @@ defmodule Palee.Identity.Ports.UserStore do
   @callback create_demo_person(Ecto.UUID.t(), map()) ::
               {:ok, Account.t()} | {:error, :email_taken | Ecto.Changeset.t()}
   @callback demo_user_ids(Ecto.UUID.t()) :: [Ecto.UUID.t()]
+  @doc "ADR-254: a profile an import of `organization_id` holds until it is claimed."
+  @callback create_held_person(Ecto.UUID.t(), map()) ::
+              {:ok, Account.t()} | {:error, :email_taken | Ecto.Changeset.t()}
+  @doc "ADR-254: the profiles of each login email, `%{email => [%{id, held_by_organization_id}]}`."
+  @callback profiles_by_emails([String.t()]) :: %{String.t() => [map()]}
   @callback visible_user_ids([Ecto.UUID.t()], Ecto.UUID.t() | nil) :: [Ecto.UUID.t()]
   @callback add_profile(Ecto.UUID.t(), map()) ::
               {:ok, Account.t()} | {:error, :not_found | :profile_limit | Ecto.Changeset.t()}
@@ -29,6 +34,8 @@ defmodule Palee.Identity.Ports.UserStore do
               {:ok, Account.t()} | {:error, :not_found | Ecto.Changeset.t()}
   @callback mark_email_verified(Ecto.UUID.t(), String.t(), DateTime.t()) ::
               :ok | {:error, :email_mismatch}
+  @doc "ADR-267: records when the login confirmed the minimum age (kept once set)."
+  @callback confirm_age(Ecto.UUID.t(), DateTime.t()) :: :ok
   @callback reset_login_password(Ecto.UUID.t(), String.t()) ::
               :ok | {:error, :not_found | Ecto.Changeset.t()}
   @callback delete_user(Account.t()) :: :ok | {:error, term()}

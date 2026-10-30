@@ -56,6 +56,8 @@ defmodule Palee.Application.PlaceMemberInClass do
     case SubmitBooking.write(context, user, slot_id,
            approved: true,
            booking_window: false,
+           # ADR-252: staff decide; the documents gate is for clients booking themselves.
+           documents_gate: false,
            now: now
          ) do
       {:ok, slot, booking} -> {:ok, slot, booking}

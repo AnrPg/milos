@@ -38,6 +38,7 @@ defmodule Palee.MixProject do
         :logger,
         :runtime_tools,
         :os_mon,
+        :xmerl,
         :opentelemetry_exporter,
         :opentelemetry
       ]
@@ -87,6 +88,8 @@ defmodule Palee.MixProject do
       {:ex_aws, "~> 2.5"},
       {:ex_aws_s3, "~> 2.5"},
       {:hackney, "~> 4.7.2"},
+      # ADR-245: Swiss QR-bill and myDATA QR codes (pure Elixir, no NIFs).
+      {:eqrcode, "~> 0.2.1"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
     ]

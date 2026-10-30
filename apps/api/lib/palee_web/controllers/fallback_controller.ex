@@ -201,6 +201,292 @@ defmodule PaleeWeb.FallbackController do
     })
   end
 
+  # ADR-240–242: the Fiscal context.
+  @fiscal_errors %{
+    fiscal_identity_missing: {:conflict, "Fill in the business's billing details first"},
+    fiscal_identity_incomplete: {:conflict, "The business's billing details are incomplete"},
+    unsupported_country: {:unprocessable_entity, "This country is not supported yet"},
+    idempotency_key_required: {:unprocessable_entity, "idempotency_key is required"},
+    idempotency_key_reused:
+      {:conflict, "This idempotency key was already used for a different request"},
+    already_credited: {:conflict, "This document has already been fully credited"},
+    invalid_credit_reason: {:unprocessable_entity, "Choose why the credit note is issued"},
+    refund_not_available:
+      {:conflict,
+       "This document was not paid online or by card terminal: give the money back another way"},
+    registry_not_connected:
+      {:conflict,
+       "Add the AADE registry credentials of the business to fill in details from the tax ID"},
+    registry_credentials_rejected:
+      {:conflict, "AADE refused the registry credentials of the business. Check them"},
+    registry_not_found: {:not_found, "AADE has no business with this tax ID"},
+    registry_limit_reached: {:too_many_requests, "Too many look-ups for now. Try again later"},
+    registry_unavailable:
+      {:service_unavailable, "The AADE registry is not answering. Try again later"},
+    invalid_tax_id: {:unprocessable_entity, "Check the tax ID: its check digit is wrong"},
+    no_recipient: {:unprocessable_entity, "Enter an email address"},
+    credit_exceeds_document: {:unprocessable_entity, "More than what is left on the document"},
+    not_creditable: {:unprocessable_entity, "A credit note cannot be credited"},
+    unknown_line: {:unprocessable_entity, "The document has no such line"},
+    invalid_credit_request: {:unprocessable_entity, "Choose the lines to credit"},
+    invalid_date_range:
+      {:unprocessable_entity, "Choose a start and an end date (up to 10 years)"},
+    journal_signing_unavailable:
+      {:service_unavailable, "Fiscal documents are paused: the journal signing key is missing"},
+    not_retryable:
+      {:conflict, "Only a refused or failed report can be sent again; this one is on its way"},
+    # ADR-244/245: taxes, document files and accounting exports.
+    unsupported_language:
+      {:unprocessable_entity, "Documents can be printed in el, en, de, fr, it, nl or es"},
+    sales_tax_not_applicable:
+      {:conflict, "Sales tax rates apply only to a business in the United States"},
+    sales_tax_rate_missing:
+      {:unprocessable_entity, "Add a sales tax rate for this state or ZIP code first"},
+    unknown_export_format: {:not_found, "No such accounting export format"},
+    # ADR-250/251: Peppol and the till's security device.
+    invalid_peppol_id:
+      {:unprocessable_entity, "This is not a valid Peppol address (scheme:identifier)"},
+    till_not_connected: {:conflict, "Connect the till's security device (RKSV) first"},
+    till_credentials_refused: {:conflict, "fiskaly refused the business's API key or secret"},
+    till_provisioning_failed:
+      {:bad_gateway, "The security device could not be set up; see the connection's error code"},
+    # ADR-273: fiscal connection checks and who manages the connections.
+    siren_missing:
+      {:unprocessable_entity, "Add the business's SIREN in the billing details, then save again"},
+    connection_not_found: {:not_found, "This connection has not been saved yet"},
+    unknown_connection: {:not_found, "No such fiscal connection"},
+    check_too_soon:
+      {:too_many_requests, "The connection was checked a moment ago; try again in a few minutes"},
+    fiscal_connections_managed_by_palee:
+      {:forbidden, "The Palee team manages this box's fiscal connections"}
+  }
+
+  # ADR-254: CSV imports.
+  @import_errors %{
+    import_file_missing: {:unprocessable_entity, "Attach a CSV file"},
+    file_too_large: {413, "The file is larger than 5 MB"},
+    empty_file: {:unprocessable_entity, "The file is empty"},
+    no_rows: {:unprocessable_entity, "The file has a header row but no people"},
+    too_many_rows: {:unprocessable_entity, "At most 20,000 rows per import; split the file"},
+    unbalanced_quotes:
+      {:unprocessable_entity, "A quote in the file is never closed; save it again as CSV"},
+    invalid_source: {:unprocessable_entity, "Choose one of the systems in the list"},
+    invalid_mapping:
+      {:unprocessable_entity,
+       "Map each field to one column at most, and at least a name, email or phone"},
+    invalid_date_order: {:unprocessable_entity, "Choose how dates are written: dmy, mdy or ymd"},
+    invalid_default_role: {:unprocessable_entity, "Choose member or athlete"},
+    import_not_editable: {:conflict, "This import was applied; its mapping can no longer change"},
+    import_not_applicable: {:conflict, "This import is being applied or was undone"},
+    import_already_applied: {:conflict, "Only an import that was never applied can be deleted"},
+    import_not_applied: {:conflict, "This import has not been applied"},
+    import_already_undone: {:conflict, "This import was already undone"},
+    undo_window_closed: {:conflict, "An import can be undone for 7 days after it finished"},
+    undo_incomplete:
+      {:conflict, "Some rows could not be undone; their changes were kept. Try again"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@import_errors, reason) do
+    {status, message} = Map.fetch!(@import_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
+  def call(conn, {:error, {:invalid_sale_line, index, reason}}) when is_integer(index) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_sale_line",
+      error: "A line of the sale cannot go on a fiscal document",
+      errors: %{"lines.#{index}" => [to_string(reason)]}
+    })
+  end
+
+  def call(conn, {:error, reason}) when is_map_key(@fiscal_errors, reason) do
+    {status, message} = Map.fetch!(@fiscal_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
+  # ADR-255: setup recipes.
+  @setup_errors %{
+    recipe_not_found: {:not_found, "There is no such setup recipe"},
+    recipe_owner_only: {:forbidden, "Only the owner applies a setup recipe"},
+    invalid_recipe_mode: {:unprocessable_entity, "The mode is all or defaults_only"},
+    invalid_recipe_prices:
+      {:unprocessable_entity,
+       "Each price must be a whole number of cents for a package of the recipe"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@setup_errors, reason) do
+    {status, message} = Map.fetch!(@setup_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
+  def call(conn, {:error, {:recipe_step_failed, step, _reason}}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "recipe_step_failed",
+      error: "A step of the setup recipe could not be applied; nothing was changed",
+      step: step
+    })
+  end
+
+  # ADR-246/247: online payments.
+  @payment_errors %{
+    online_payments_unavailable: {:conflict, "Online payments are not set up for this business"},
+    payment_provider_unavailable:
+      {:service_unavailable, "The payment provider did not answer; try again in a moment"},
+    payment_provider_rejected_credentials:
+      {:conflict, "The payment provider refused the business's credentials"},
+    payment_declined: {:payment_required, "The card was declined"},
+    invalid_payment_purpose: {:unprocessable_entity, "Nothing to pay for"},
+    unsupported_currency: {:unprocessable_entity, "This currency is not supported"},
+    duplicate_idempotency_key:
+      {:conflict, "This idempotency key was already used for a different request"},
+    consent_required: {:unprocessable_entity, "Agree to save the card first"},
+    invalid_consent_limit: {:unprocessable_entity, "The amount to allow is missing"},
+    payment_method_inactive: {:conflict, "This card can no longer be charged"},
+    consent_currency_mismatch: {:conflict, "The card was saved for another currency"},
+    consent_limit_exceeded: {:conflict, "More than the amount the payer allowed"},
+    payment_method_expired: {:conflict, "The card has expired"},
+    refund_exceeds_payment: {:unprocessable_entity, "More than what is left of the payment"},
+    refund_refused: {:conflict, "The payment provider refused the refund"},
+    invoice_not_payable: {:conflict, "This invoice has nothing left to pay"},
+    # ADR-248: online sales and withdrawal.
+    package_not_for_sale: {:conflict, "This package is not sold online"},
+    start_now_consent_required:
+      {:unprocessable_entity, "Ask for the package to start now to buy it online"},
+    withdrawal_period_over: {:conflict, "The 14 days to withdraw have passed"},
+    withdrawal_not_available: {:conflict, "This payment cannot be withdrawn from"},
+    already_withdrawn: {:conflict, "You have already withdrawn from this package"},
+    # ADR-260: failed charges in the queue.
+    payment_not_retryable: {:conflict, "This charge can no longer be tried again"},
+    # ADR-261: one-button connection.
+    connect_not_available:
+      {:conflict, "This provider cannot be connected with one button yet; use its API keys"},
+    connect_not_configured:
+      {:conflict, "This provider cannot be connected with one button yet; use its API keys"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@payment_errors, reason) do
+    {status, message} = Map.fetch!(@payment_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
+  # ADR-249: Tap to Pay at the desk.
+  @terminal_payment_errors %{
+    terminal_payments_unavailable:
+      {:conflict, "Tap to Pay is not set up for this business (connect a Viva account)"},
+    terminal_member_required: {:unprocessable_entity, "Choose the member who pays"},
+    terminal_request_used:
+      {:conflict, "This payment request was already used for another card payment"},
+    terminal_transaction_used:
+      {:conflict, "This card payment is already recorded for another request"},
+    payment_not_cancellable: {:conflict, "This payment can no longer be cancelled"},
+    package_inactive: {:conflict, "This package is no longer offered"},
+    # ADR-272: the receipt, guests of the box and the tips summary.
+    terminal_no_receipt: {:conflict, "This payment has no receipt yet"},
+    guest_name_required: {:unprocessable_entity, "Enter the person's name"},
+    guest_email_invalid: {:unprocessable_entity, "Enter a valid email address"},
+    guest_is_staff:
+      {:conflict, "This person works at the box; give them a client role in Users instead"},
+    tips_period_invalid: {:unprocessable_entity, "Choose a period of up to one year"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@terminal_payment_errors, reason) do
+    {status, message} = Map.fetch!(@terminal_payment_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
+  # ADR-252: documents, signatures and health certificates.
+  @documents_errors %{
+    document_archived: {:conflict, "This document is archived"},
+    document_not_published: {:conflict, "This document has no published version yet"},
+    document_version_outdated:
+      {:conflict, "The document changed while you were reading it; read it again and sign"},
+    document_request_closed: {:conflict, "This request is already signed or cancelled"},
+    health_certificate_file_invalid:
+      {:unprocessable_entity, "Upload a PDF or a photo (JPEG, PNG, WebP) of up to 10 MB"},
+    health_certificate_file_missing: {:unprocessable_entity, "Upload the file first"},
+    document_key_forbidden: {:forbidden, "This file does not belong to this upload"},
+    storage_unavailable: {:service_unavailable, "Storage is unavailable; try again."}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@documents_errors, reason) do
+    {status, message} = Map.fetch!(@documents_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
+  # ADR-253: box screens.
+  @box_screen_errors %{
+    invalid_pairing_code:
+      {:unprocessable_entity, "This code is wrong or has expired; ask staff for a new one"},
+    invalid_screen_name: {:unprocessable_entity, "Give the screen a name (up to 60 characters)"},
+    invalid_screen_branch: {:unprocessable_entity, "Choose one of your branches"},
+    invalid_screen_override:
+      {:unprocessable_entity, "Choose what to show, a class of today and an end within 24 hours"},
+    too_many_screens: {:conflict, "A box can have up to 20 screens"},
+    box_screen_not_found: {:not_found, "Box screen not found"},
+    invalid_screen_token: {:unauthorized, "Pair this screen again"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@box_screen_errors, reason) do
+    {status, message} = Map.fetch!(@box_screen_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: to_string(reason), error: message})
+  end
+
+  def call(conn, {:error, {reason, _detail}})
+      when reason in [:certificate_render_failed, :evidence_storage_failed] do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{
+      code: "signature_evidence_unavailable",
+      error: "The signature could not be recorded; nothing was signed. Try again."
+    })
+  end
+
+  # The booking gate: which documents block the booking.
+  def call(conn, {:error, :documents_required, details}) do
+    package_contract_error(
+      conn,
+      :conflict,
+      "documents_required",
+      "Sign the box's mandatory documents before you book",
+      details
+    )
+  end
+
+  # ADR-214: field errors stay in the form, one code per field.
+  def call(conn, {:error, {:invalid_fields, errors}}) when is_map(errors) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "validation_failed",
+      errors: Map.new(errors, fn {field, reason} -> {field, [to_string(reason)]} end)
+    })
+  end
+
   def call(conn, {:error, %Ecto.Changeset{} = changeset}) do
     conn
     |> put_status(:unprocessable_entity)
@@ -2470,6 +2756,20 @@ defmodule PaleeWeb.FallbackController do
     conn
     |> put_status(status)
     |> json(%{code: Atom.to_string(reason), error: message})
+  end
+
+  # ADR-267: one "Download my data" a day; says when the next one may start.
+  def call(conn, {:error, {:export_rate_limited, %DateTime{} = retry_at}}) do
+    seconds = max(DateTime.diff(retry_at, DateTime.utc_now()), 1)
+
+    conn
+    |> put_resp_header("retry-after", Integer.to_string(seconds))
+    |> put_status(:too_many_requests)
+    |> json(%{
+      code: "export_rate_limited",
+      error: "You can ask for your data once a day",
+      retry_at: DateTime.to_iso8601(retry_at)
+    })
   end
 
   def call(conn, {:error, :comment_conflict}) do

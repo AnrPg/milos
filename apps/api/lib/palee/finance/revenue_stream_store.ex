@@ -15,6 +15,8 @@ defmodule Palee.Finance.RevenueStreamStore do
   @impl true
   def record_payment(context, attrs), do: tenant_call(context, :record_payment, [attrs])
   @impl true
+  def record_sale(context, attrs), do: tenant_call(context, :record_sale, [attrs])
+  @impl true
   def reverse_payment(context, attrs), do: tenant_call(context, :reverse_payment, [attrs])
   @impl true
   def void_invoice(context, invoice_id, attrs),

@@ -77,6 +77,10 @@ Owner has every right of an admin.
 | People directory | ✔ | ✔ | own | ✔ contact + status | billing contacts | — | — |
 | Client profile: training, PRs, history | ✔ | ✔ | own | — | — | — | own |
 | Health and injuries | ✔ | ✔ | own (safety) | — | — | — | own |
+| Documents to sign: write them, mandatory or optional, booking gate (ADR-252) | ✔ | ✔ | — | — | — | — | sign own |
+| Ask clients to sign, see who has not — `request_signatures` (ADR-252) | ✔ | ✔ | — | ✔ | — | — | — |
+| Health certificates: dates and file — `view_health_certificates` (ADR-252) | ✔ | ✔ | valid / expired (own) | ✔ | — | — | own |
+| Health certificates: upload for a client, delete — `manage_health_certificates` | ✔ | ✔ | — | grantable | — | — | own |
 | Reviews and feedback from clients | ✔ | ✔ | about them | — | — | — | own |
 
 ### Money

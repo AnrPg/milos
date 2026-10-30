@@ -3,6 +3,7 @@ defmodule Palee.Finance.Ports.FinanceStore do
   @callback update_package(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback retire_package(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback list_packages() :: [map()]
+  @callback open_packages_online([Ecto.UUID.t()]) :: non_neg_integer()
   @callback get_package(Ecto.UUID.t()) :: map() | nil
   @callback upsert_membership(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback get_member_profile(Ecto.UUID.t()) :: map() | nil
@@ -18,7 +19,10 @@ defmodule Palee.Finance.Ports.FinanceStore do
               {:ok, map()} | {:error, term()}
   @callback reverse_credit_ledger_entry(Ecto.UUID.t(), Ecto.UUID.t(), map()) ::
               {:ok, map()} | {:error, term()}
+  @callback reverse_credit_grant(Ecto.UUID.t(), Ecto.UUID.t(), map()) ::
+              {:ok, map()} | {:error, term()}
   @callback get_invoice(Ecto.UUID.t()) :: {:ok, struct()} | {:error, :not_found}
+  @callback invoice_lines(Ecto.UUID.t()) :: [map()]
   @callback member_shop_terms(Ecto.UUID.t()) ::
               %{membership_id: Ecto.UUID.t(), member_discount_percent: integer() | nil} | nil
   @callback update_invoice_params(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
@@ -55,6 +59,8 @@ defmodule Palee.Finance.Ports.FinanceStore do
               map()
             ) :: {:ok, map()} | {:error, term()}
   @callback list_expiring_memberships(non_neg_integer()) :: [map()]
+  @doc "ADR-252: people whose subscription to `package_id` covers `date`."
+  @callback package_holder_user_ids(Ecto.UUID.t(), Date.t()) :: [Ecto.UUID.t()]
   @callback operational_queues(map()) :: map()
   @callback financial_summary(map()) :: map()
   @callback package_location_scopes() :: %{optional(String.t()) => :all | [String.t()]}
@@ -74,6 +80,8 @@ defmodule Palee.Finance.Ports.FinanceStore do
   @callback open_attributed_referral(map()) :: {:ok, map()} | {:error, term()}
   @callback count_referral_events_since(Ecto.UUID.t(), DateTime.t()) :: non_neg_integer()
   @callback referral_outcomes([Ecto.UUID.t()]) :: %{Ecto.UUID.t() => map()}
+  @callback cancel_subscription(Ecto.UUID.t(), Ecto.UUID.t()) ::
+              {:ok, map()} | {:error, term()}
   @callback extend_current_subscription(Ecto.UUID.t(), pos_integer()) ::
               {:ok, map()} | {:error, term()}
   @callback create_referral_event(map()) :: {:ok, map()} | {:error, term()}
@@ -97,6 +105,10 @@ defmodule Palee.Finance.Ports.FinanceStore do
               [map()]
   @callback mark_subscription_notice_sent(Ecto.UUID.t(), :expiry_reminder | :grace_notice) :: :ok
   @doc "ADR-220: the member's (or staff's) renewal choice for one subscription."
+  # ADR-248: withdrawal from a package bought online.
+  @callback withdrawal_facts(payment_id :: Ecto.UUID.t()) :: {:ok, map()} | {:error, term()}
+  @callback withdraw_subscription(subscription_id :: Ecto.UUID.t(), Date.t()) ::
+              {:ok, map()} | {:error, term()}
   @callback set_subscription_auto_renew(Ecto.UUID.t(), String.t(), boolean(), String.t()) ::
               {:ok, map()} | {:error, term()}
   @doc "ADR-220: the last day a member leaving today would keep, or nil without a membership."
@@ -106,6 +118,14 @@ defmodule Palee.Finance.Ports.FinanceStore do
   @callback undo_leave_membership(Ecto.UUID.t(), String.t()) :: {:ok, map()} | {:error, term()}
   @doc "Refreshes every snapshot; returns the memberships that lost access."
   @callback refresh_entitlement_snapshots() :: [map()]
+  # ADR-274: subscription charges and values staff set by hand.
+  @callback charge_due_subscriptions(Date.t()) :: [map()]
+  @callback charge_subscription_now(Ecto.UUID.t()) :: {:ok, [map()]} | {:error, term()}
+  @callback set_value_override(Ecto.UUID.t(), String.t(), map()) ::
+              {:ok, map()} | {:error, term()}
+  @callback reset_value_override(Ecto.UUID.t(), String.t(), map()) ::
+              {:ok, map()} | {:error, term()}
+  @callback list_value_overrides(Ecto.UUID.t()) :: [map()]
   @callback total_outstanding_balance_cents() :: non_neg_integer()
   @callback count_pending_referral_approvals() :: non_neg_integer()
 

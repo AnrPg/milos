@@ -720,3 +720,35 @@ msgstr "A box member is leaving"
 
 msgid "%{nickname} is leaving the box. Last day: %{date}."
 msgstr "%{nickname} is leaving the box. Last day: %{date}."
+
+msgid "Card payment failed"
+msgstr "Card payment failed"
+
+msgid "%{amount} for %{what} was declined. We will try again automatically, or you can pay now with another card."
+msgstr "%{amount} for %{what} was declined. We will try again automatically, or you can pay now with another card."
+
+msgid "%{amount} for %{what} was declined and will not be tried again. Pay with another card to keep it."
+msgstr "%{amount} for %{what} was declined and will not be tried again. Pay with another card to keep it."
+
+msgid "A card payment needs attention"
+msgstr "A card payment needs attention"
+
+msgid "%{amount} for %{what} failed after every retry."
+msgstr "%{amount} for %{what} failed after every retry."
+msgid "A document to sign"
+msgstr "A document to sign"
+
+msgid "%{business} asks you to read and sign «%{title}»."
+msgstr "%{business} asks you to read and sign «%{title}»."
+
+msgid "Your health certificate expires soon"
+msgstr "Your health certificate expires soon"
+
+msgid "Upload a new health certificate before %{date}."
+msgstr "Upload a new health certificate before %{date}."
+
+msgid "A fiscal connection needs attention"
+msgstr "A fiscal connection needs attention"
+
+msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
+msgstr "%{connection} stopped working. Open Billing details › Connections to fix it."

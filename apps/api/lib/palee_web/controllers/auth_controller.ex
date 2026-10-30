@@ -83,6 +83,14 @@ defmodule PaleeWeb.AuthController do
     description: "ADR-195: the new profile's UI language; defaults to en"
   }
 
+  # ADR-267: the person confirms the minimum age (16). Not marked required
+  # here so a missing one answers the field error the form shows under it.
+  @age_confirmed_param %Schema{
+    type: :boolean,
+    description:
+      "ADR-267: true when the person confirms they are at least 16; without it nothing is created (422, errors.age_confirmed)"
+  }
+
   @email_in_use_schema %Schema{
     type: :object,
     description:
@@ -138,7 +146,8 @@ defmodule PaleeWeb.AuthController do
               password: %Schema{type: :string, minLength: 4},
               role: %Schema{type: :string, enum: ["member", "athlete"]},
               email: %Schema{type: :string, format: :email},
-              preferred_locale: @preferred_locale_param
+              preferred_locale: @preferred_locale_param,
+              age_confirmed: @age_confirmed_param
             },
             required: [:password, :role, :email]
           }
@@ -275,7 +284,8 @@ defmodule PaleeWeb.AuthController do
               password: %Schema{type: :string, minLength: 4},
               invitation_token: %Schema{type: :string, minLength: 20, maxLength: 256},
               email: %Schema{type: :string, format: :email},
-              preferred_locale: @preferred_locale_param
+              preferred_locale: @preferred_locale_param,
+              age_confirmed: @age_confirmed_param
             },
             required: [:password, :invitation_token, :email]
           }
@@ -343,7 +353,8 @@ defmodule PaleeWeb.AuthController do
               password: %Schema{type: :string, minLength: 4},
               invitation_token: %Schema{type: :string, minLength: 20, maxLength: 256},
               email: %Schema{type: :string, format: :email},
-              preferred_locale: @preferred_locale_param
+              preferred_locale: @preferred_locale_param,
+              age_confirmed: @age_confirmed_param
             },
             required: [:password, :invitation_token, :email]
           }

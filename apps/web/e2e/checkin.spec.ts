@@ -413,7 +413,7 @@ test.describe("QR check-in", () => {
     expect(saved).toEqual([expect.objectContaining({ member_code_mode: "rotating" })]);
 
     // Saved as rotating: a later save doesn't ask again.
-    await page.getByRole("radiogroup", { name: "The door code changes every" }).getByText("15 seconds").click();
+    await page.getByRole("switch", { name: /Check in anyway/ }).click();
     await page.getByRole("button", { name: "Save" }).click();
     await expect(page.getByTestId("mode-confirm")).toBeHidden();
     await expect.poll(() => saved.length).toBe(2);

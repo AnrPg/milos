@@ -5,5 +5,5 @@
     <string name="package_name">app.palee.member</string>
     <string name="custom_url_scheme">app.palee.member</string>
     <!-- ADR-172: the page Health Connect links to from its permission screens. -->
-    <string name="palee_health_privacy_path" translatable="false">/me/devices</string>
+    <string name="palee_health_privacy_path" translatable="false">/privacy#health</string>
 </resources>

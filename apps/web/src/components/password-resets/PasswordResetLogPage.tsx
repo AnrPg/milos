@@ -9,6 +9,7 @@ import { PASSWORD_RESET_LOG_KEY, fetchPasswordResetLog } from "@/api/password-re
 import { useSession } from "@/components/session-provider";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { BackLink } from "@/components/ui/BackLink";
+import { formatClock } from "@/lib/clock";
 
 const EVENTS = new Set([
   "requested",
@@ -38,7 +39,7 @@ export function PasswordResetLogPage() {
   });
   const forbidden = log.error instanceof ApiError && log.error.status === 403;
   const entries = log.data?.entries ?? [];
-  const when = (iso: string) => new Date(iso).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" });
+  const when = (iso: string) => formatClock(new Date(iso), locale, { dateStyle: "medium", timeStyle: "short" });
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6">

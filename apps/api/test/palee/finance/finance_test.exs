@@ -233,8 +233,18 @@ defmodule Palee.FinanceTest do
 
     profile = Finance.get_member_profile(user.id)
     assert profile.membership.status == "active"
-    assert profile.membership.entitlement_status == "active"
+    # ADR-274: the first month is charged at once, due today: it is owed
+    # (access holds while the charge is open), so staff see «Απλήρωτο».
+    assert profile.membership.entitlement_status == "grace"
+    assert profile.membership.status_shown == "unpaid"
     assert [^subscription] = profile.package_subscriptions
+    assert [charge] = profile.invoices
+    assert charge.invoice_type == "subscription"
+    assert charge.status == "issued"
+    assert charge.total_cents == 9000
+    assert charge.due_date == gym_today()
+    assert charge.service_period_start == gym_today()
+    assert charge.service_period_end == Date.shift(gym_today(), month: 1)
     assert Finance.get_package(package.id).code == "unlimited_monthly"
   end
 
@@ -640,7 +650,10 @@ defmodule Palee.FinanceTest do
              })
 
     assert {:ok, subscription} =
-             Finance.assign_package(membership.id, package.id, %{starts_on: gym_today()})
+             Finance.assign_package(membership.id, package.id, %{
+               starts_on: gym_today(),
+               charge_now: false
+             })
 
     assert {:ok, invoice} =
              Finance.generate_renewal_invoice(membership.id, %{
@@ -724,7 +737,10 @@ defmodule Palee.FinanceTest do
              })
 
     assert {:ok, subscription} =
-             Finance.assign_package(membership.id, package.id, %{starts_on: gym_today()})
+             Finance.assign_package(membership.id, package.id, %{
+               starts_on: gym_today(),
+               charge_now: false
+             })
 
     assert {:ok, invoice} =
              Finance.create_invoice(membership.id, %{

@@ -1,0 +1,5 @@
+{
+  "$comment": "ADR-256: the store version of the apps. version is what people see in the stores (CFBundleShortVersionString, versionName) and follows the Palee release. build is the build number (CFBundleVersion, versionCode): raise it by one for every upload to App Store Connect or Google Play, or pass PALEE_BUILD_NUMBER when building. scripts/configure.mjs writes both into the native projects.",
+  "version": "3.0.0",
+  "build": 1
+}

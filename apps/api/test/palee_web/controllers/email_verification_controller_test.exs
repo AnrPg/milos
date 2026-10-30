@@ -24,7 +24,8 @@ defmodule PaleeWeb.EmailVerificationControllerTest do
           handle: "verify_web_#{unique}",
           password: "a b c d",
           role: "member",
-          email: email
+          email: email,
+          age_confirmed: true
         })
       )
       |> json_response(201)

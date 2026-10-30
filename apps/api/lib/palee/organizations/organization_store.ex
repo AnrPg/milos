@@ -30,6 +30,8 @@ defmodule Palee.Organizations.OrganizationStore do
   @impl true
   def get_organization_by_id(id), do: impl().get_organization_by_id(id)
   @impl true
+  def insert_provisioning_event(attrs), do: impl().insert_provisioning_event(attrs)
+  @impl true
   def get_organization_by_slug(slug), do: impl().get_organization_by_slug(slug)
   @impl true
   def get_organization_by_domain(host), do: impl().get_organization_by_domain(host)
@@ -45,6 +47,8 @@ defmodule Palee.Organizations.OrganizationStore do
 
   @impl true
   def slug_taken?(slug), do: impl().slug_taken?(slug)
+  @impl true
+  def add_guest(organization_id, user_id), do: impl().add_guest(organization_id, user_id)
 
   @impl true
   def count_seats(organization_id, now), do: impl().count_seats(organization_id, now)

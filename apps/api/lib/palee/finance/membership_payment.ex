@@ -53,7 +53,14 @@ defmodule Palee.Finance.MembershipPayment do
       :payment_status
     ])
     |> validate_number(:amount_cents, greater_than_or_equal_to: 0)
-    |> validate_inclusion(:payment_method, ["cash", "bank_transfer", "card_manual", "other"])
+    |> validate_inclusion(:payment_method, [
+      "cash",
+      "bank_transfer",
+      "card_manual",
+      "card_terminal",
+      "online",
+      "other"
+    ])
     |> validate_inclusion(:payment_status, ["paid", "pending", "refunded", "failed", "waived"])
     |> foreign_key_constraint(:membership_id)
     |> foreign_key_constraint(:membership_package_subscription_id)
@@ -90,11 +97,19 @@ defmodule Palee.Finance.MembershipPayment do
       :source_id
     ])
     |> validate_number(:amount_cents, greater_than_or_equal_to: 0)
-    |> validate_inclusion(:payment_method, ["cash", "bank_transfer", "card_manual", "other"])
+    |> validate_inclusion(:payment_method, [
+      "cash",
+      "bank_transfer",
+      "card_manual",
+      "card_terminal",
+      "online",
+      "other"
+    ])
     |> validate_inclusion(:payment_status, ["paid", "pending", "refunded", "failed", "waived"])
     |> validate_inclusion(:revenue_stream, Palee.Finance.Domain.RevenueStream.keys())
     |> check_constraint(:membership_id, name: :membership_payments_member_or_shop_check)
     |> unique_constraint(:source_id, name: :membership_payments_shop_order_index)
+    |> unique_constraint(:source_id, name: :membership_payments_terminal_source_index)
     |> foreign_key_constraint(:finance_invoice_id)
   end
 end

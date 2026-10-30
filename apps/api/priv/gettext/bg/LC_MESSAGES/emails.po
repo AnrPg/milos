@@ -207,3 +207,21 @@ msgstr "Връзката е валидна 24 часа."
 
 msgid "You're receiving this email because someone asked to use this address for a %{product} account."
 msgstr "Получавате този имейл, защото е поискано този адрес да се използва за профил в %{product}."
+
+msgid "%{title} %{number} from %{business}"
+msgstr "%{title} %{number} от %{business}"
+
+msgid "%{business} sent you this document. You'll find it attached as a PDF."
+msgstr "%{business} ви изпрати този документ. Ще го намерите прикачен като PDF."
+
+msgid "Document"
+msgstr "Документ"
+
+msgid "Date of issue"
+msgstr "Дата на издаване"
+
+msgid "Total"
+msgstr "Общо"
+
+msgid "Keep it for your records. For questions about it, contact the business."
+msgstr "Запазете го за архива си. За въпроси относно него се свържете с фирмата."

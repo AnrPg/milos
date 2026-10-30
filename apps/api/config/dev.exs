@@ -73,3 +73,15 @@ config :swoosh, :api_client, false
 # ADR-213: AUTO_VERIFY_EMAIL=true marks new logins' email verified instead of
 # emailing a link (the link also works: see /dev/mailbox). Dev only.
 config :palee, :auto_verify_email, System.get_env("AUTO_VERIFY_EMAIL") in ~w(true 1)
+
+# ADR-242: a fixed dev key for the fiscal journal; prod reads
+# FISCAL_JOURNAL_SIGNING_KEY (config/runtime.exs).
+config :palee, Palee.Infrastructure.Fiscal.Ed25519JournalSigner,
+  signing_key:
+    System.get_env(
+      "FISCAL_JOURNAL_SIGNING_KEY",
+      "dev-1:" <> Base.encode64(:binary.copy(<<1>>, 32))
+    )
+
+# ADR-246: the sandbox payment provider (never enabled in prod).
+config :palee, :payments_sandbox, true

@@ -14,6 +14,7 @@ const CAPABILITY_LABELS: Record<string, string> = {
   manage_packages: "roleAccessPackages",
   view_finance_reports: "roleAccessReports",
   manage_spaces: "roleAccessSpaces",
+  manage_health_certificates: "roleAccessHealthCertificates",
 };
 
 /** What this gym unlocks for front desk in Finance (navigation-by-role §3). */
@@ -35,8 +36,8 @@ export function RoleAccessSettings({ token }: { token: string }) {
 
   return (
     <div className="space-y-6">
-      {Object.entries(access.data.grantable).map(([role, grantable]) => {
-        const granted = access.data.grants[role] ?? [];
+      {Object.entries(access.data.grantable ?? {}).map(([role, grantable]) => {
+        const granted = access.data.grants?.[role] ?? [];
         return (
           <fieldset key={role} className="space-y-3">
             <legend className="text-sm font-semibold" style={{ color: "var(--text)" }}>

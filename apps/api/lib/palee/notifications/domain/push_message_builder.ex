@@ -914,6 +914,31 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-252: neutral wording; the document's title, never its text.
+  def build("document_signature_requested", payload, localize) do
+    %{
+      title: localize.("A document to sign", %{}),
+      body:
+        localize.("%{business} asks you to read and sign «%{title}».", %{
+          business: payload["business_name"] || "",
+          title: payload["title"] || ""
+        }),
+      url: payload["url"] || "/me/documents"
+    }
+  end
+
+  # ADR-252: only the date, never anything about the person's health.
+  def build("health_certificate_expiring", payload, localize) do
+    %{
+      title: localize.("Your health certificate expires soon", %{}),
+      body:
+        localize.("Upload a new health certificate before %{date}.", %{
+          date: payload["expires_on"] || ""
+        }),
+      url: payload["url"] || "/me/documents"
+    }
+  end
+
   def build("package_expiring", payload, localize) do
     %{
       title: localize.("Your package ends soon", %{}),
@@ -1211,6 +1236,52 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("payment_failed", payload, localize) do
+    bindings = payment_bindings(payload)
+
+    body =
+      if payload["final"] in [true, "true"],
+        do:
+          localize.(
+            "%{amount} for %{what} was declined and will not be tried again. Pay with another card to keep it.",
+            bindings
+          ),
+        else:
+          localize.(
+            "%{amount} for %{what} was declined. We will try again automatically, or you can pay now with another card.",
+            bindings
+          )
+
+    %{
+      title: localize.("Card payment failed", %{}),
+      body: body,
+      url: payload["url"] || "/me/payments"
+    }
+  end
+
+  def build("payment_needs_attention", payload, localize) do
+    %{
+      title: localize.("A card payment needs attention", %{}),
+      body:
+        localize.("%{amount} for %{what} failed after every retry.", payment_bindings(payload)),
+      url: payload["url"] || "/admin/finance"
+    }
+  end
+
+  # ADR-273: `connection` is a brand or service name (myDATA, fiskaly SIGN
+  # DE …) and stays as is in every language.
+  def build("fiscal_connection_failed", payload, localize) do
+    %{
+      title: localize.("A fiscal connection needs attention", %{}),
+      body:
+        localize.(
+          "%{connection} stopped working. Open Billing details › Connections to fix it.",
+          %{connection: payload["connection"] || ""}
+        ),
+      url: payload["url"] || "/admin/settings/billing"
+    }
+  end
+
   def build("shop_order_placed", payload, localize) do
     %{
       title: localize.("New shop order", %{}),
@@ -1369,6 +1440,29 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     do: "/workouts/#{execution_id}/execute"
 
   defp execution_url(_payload), do: "/"
+
+  @currency_symbols %{"EUR" => "€", "GBP" => "£", "USD" => "$", "CHF" => "CHF "}
+
+  defp payment_bindings(payload) do
+    cents =
+      case payload["amount_cents"] do
+        value when is_integer(value) ->
+          value
+
+        value when is_binary(value) ->
+          with({cents, ""} <- Integer.parse(value), do: cents, else: (_ -> 0))
+
+        _missing ->
+          0
+      end
+
+    symbol = Map.get(@currency_symbols, payload["currency"], (payload["currency"] || "") <> " ")
+
+    %{
+      amount: symbol <> :erlang.float_to_binary(cents / 100, decimals: 2),
+      what: payload["description"] || ""
+    }
+  end
 
   defp default_to("", fallback), do: fallback
   defp default_to(value, _fallback), do: value

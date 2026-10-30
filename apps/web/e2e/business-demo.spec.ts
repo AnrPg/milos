@@ -188,6 +188,7 @@ test.describe("business sign-up", () => {
     await page.getByLabel("Handle", { exact: true }).fill("maria_coach");
     await page.getByLabel("Email address", { exact: true }).fill("maria@example.com");
     await page.getByLabel("Password", { exact: true }).fill("secret-pass");
+    await page.getByLabel("I am 16 or older").check();
     await page.getByRole("button", { name: "Open my business" }).click();
 
     await expect(page.getByRole("heading", { name: "Your account is ready" })).toBeVisible();
@@ -195,7 +196,7 @@ test.describe("business sign-up", () => {
     await expect(page.getByRole("link", { name: "Get recovery codes" })).toHaveAttribute("href", "/me/settings#recovery-codes");
 
     expect(sent.registered).toEqual([
-      expect.objectContaining({ handle: "maria_coach", display_name: "Maria", email: "maria@example.com", password: "secret-pass", role: "member" }),
+      expect.objectContaining({ handle: "maria_coach", display_name: "Maria", email: "maria@example.com", password: "secret-pass", role: "member", age_confirmed: true }),
     ]);
     expect(sent.businesses).toEqual([
       {

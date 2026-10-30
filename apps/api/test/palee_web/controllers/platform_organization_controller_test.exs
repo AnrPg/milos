@@ -243,7 +243,8 @@ defmodule PaleeWeb.PlatformOrganizationControllerTest do
           nickname: "client_admin",
           password: "S3cur3P@ss!42",
           invitation_token: token,
-          email: "client@example.test"
+          email: "client@example.test",
+          age_confirmed: true
         })
       )
 
@@ -385,7 +386,8 @@ defmodule PaleeWeb.PlatformOrganizationControllerTest do
           nickname: "emailed_owner",
           password: "S3cur3P@ss!42",
           invitation_token: gym.token,
-          email: "owner@example.test"
+          email: "owner@example.test",
+          age_confirmed: true
         })
       )
 

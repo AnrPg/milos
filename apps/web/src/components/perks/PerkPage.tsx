@@ -15,6 +15,7 @@ import { PerkLogo, useBenefitConditions, useBenefitText } from "./PerkRows";
 import { useClaimPerk, useMemberPerks, useRefreshPerkLink } from "./use-perks";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { BackLink } from "@/components/ui/BackLink";
+import { formatClock } from "@/lib/clock";
 
 const REASONS = new Set([
   "perk_sold_out",
@@ -236,7 +237,7 @@ function ShowMembership({ perk, note }: { perk: MemberPerk; note: React.ReactNod
       <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{t("membershipCard")}</p>
       <p className="text-xl font-extrabold" style={{ color: "var(--text)" }}>{name}</p>
       <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{t("memberOf", { box: perk.provider.name ?? "" })}</p>
-      <p className="font-mono text-lg tabular-nums" style={{ color: "var(--text)" }}>{now.toLocaleString(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", second: "2-digit" })}</p>
+      <p className="font-mono text-lg tabular-nums" style={{ color: "var(--text)" }}>{formatClock(now, locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", second: "2-digit" })}</p>
       {note}
       <p className="text-xs" style={{ color: "var(--text-soft)" }}>{t("hint_show_membership")}</p>
     </section>

@@ -1,7 +1,8 @@
 defmodule Palee.Facility.CheckIn do
   @moduledoc """
   An open-gym visit: one per member and day (ADR-097), with how it happened
-  (ADR-155): `door_qr`, `door_poster`, `member_qr`, `wallet`, `desk_search`
+  (ADR-155): `door_qr`, `door_poster`, `member_qr`, `wallet`, `desk_search`,
+  `imported` (a visit brought in by a CSV import, ADR-254)
   or `self`, and `door_nfc` or `geofence` (ADR-173).
   """
 
@@ -25,7 +26,7 @@ defmodule Palee.Facility.CheckIn do
     timestamps(type: :utc_datetime_usec)
   end
 
-  @methods ~w(door_qr door_poster door_nfc geofence member_qr wallet desk_search self)
+  @methods ~w(door_qr door_poster door_nfc geofence member_qr wallet desk_search self imported)
 
   @doc "How a check-in happened (ADR-155)."
   def methods, do: @methods

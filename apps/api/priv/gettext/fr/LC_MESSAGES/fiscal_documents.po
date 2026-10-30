@@ -1,0 +1,209 @@
+msgid ""
+msgstr ""
+"Language: fr\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Receipt"
+msgstr "Reçu"
+
+msgid "Invoice"
+msgstr "Facture"
+
+msgid "Credit note"
+msgstr "Avoir"
+
+msgid "Retail sales receipt"
+msgstr "Ticket de vente au détail"
+
+msgid "Service receipt"
+msgstr "Reçu de prestation de services"
+
+msgid "Retail credit note"
+msgstr "Avoir de vente au détail"
+
+msgid "Sales invoice"
+msgstr "Facture de vente"
+
+msgid "Service invoice"
+msgstr "Facture de prestation de services"
+
+msgid "Credit invoice"
+msgstr "Facture d'avoir"
+
+msgid "Number"
+msgstr "Numéro"
+
+msgid "Date of issue"
+msgstr "Date d'émission"
+
+msgid "Seller"
+msgstr "Vendeur"
+
+msgid "Customer"
+msgstr "Client"
+
+msgid "Payment method"
+msgstr "Mode de paiement"
+
+msgid "Cash"
+msgstr "Espèces"
+
+msgid "Card"
+msgstr "Carte"
+
+msgid "Bank transfer"
+msgstr "Virement bancaire"
+
+msgid "Online payment"
+msgstr "Paiement en ligne"
+
+msgid "Other"
+msgstr "Autre"
+
+msgid "Corrects document"
+msgstr "Rectifie le document"
+
+msgid "Description"
+msgstr "Désignation"
+
+msgid "Qty"
+msgstr "Qté"
+
+msgid "Unit price"
+msgstr "Prix unitaire"
+
+msgid "Discount"
+msgstr "Remise"
+
+msgid "VAT"
+msgstr "TVA"
+
+msgid "Amount"
+msgstr "Montant"
+
+msgid "VAT breakdown"
+msgstr "Détail de la TVA"
+
+msgid "Rate"
+msgstr "Taux"
+
+msgid "Net"
+msgstr "HT"
+
+msgid "Gross"
+msgstr "TTC"
+
+msgid "Total excluding VAT"
+msgstr "Total HT"
+
+msgid "Total VAT"
+msgstr "Total TVA"
+
+msgid "Total"
+msgstr "Total TTC"
+
+msgid "Sales tax"
+msgstr "Taxe de vente"
+
+msgid "Total sales tax"
+msgstr "Total taxe de vente"
+
+msgid "Subtotal"
+msgstr "Sous-total"
+
+msgid "Prices include VAT."
+msgstr "Prix TTC."
+
+msgid "Exempt"
+msgstr "Exonéré"
+
+msgid "Zero-rated"
+msgstr "Taux zéro"
+
+msgid "Tax ID (AFM)"
+msgstr "N° fiscal (AFM)"
+
+msgid "Tax office (DOY)"
+msgstr "Centre des impôts (DOY)"
+
+msgid "Tax number"
+msgstr "Numéro fiscal"
+
+msgid "VAT number"
+msgstr "N° TVA intracommunautaire"
+
+msgid "SIREN/SIRET"
+msgstr "SIREN/SIRET"
+
+msgid "Trade register number"
+msgstr "N° RCS"
+
+msgid "EIN"
+msgstr "EIN"
+
+msgid "Enterprise number"
+msgstr "Numéro d'entreprise"
+
+msgid "UID (myDATA)"
+msgstr "UID (myDATA)"
+
+msgid "UID"
+msgstr "IDE"
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "Phone"
+msgstr "Téléphone"
+
+msgid "myDATA (AADE)"
+msgstr "myDATA (AADE)"
+
+msgid "MARK"
+msgstr "MARK"
+
+msgid "Authentication code"
+msgstr "Code d'authentification"
+
+msgid "Reporting to myDATA (AADE) is pending."
+msgstr "La transmission à myDATA (AADE) est en attente."
+
+msgid "Bank details"
+msgstr "Coordonnées bancaires"
+
+msgid "IBAN"
+msgstr "IBAN"
+
+msgid "Category of operation: provision of services"
+msgstr "Catégorie de l'opération : prestation de services"
+
+msgid "Late payment: penalties at three times the legal interest rate and a fixed recovery fee of 40 euros (Commercial Code, art. L441-10 and D441-5). No discount for early payment."
+msgstr "En cas de retard de paiement : pénalités au taux de trois fois le taux d'intérêt légal et indemnité forfaitaire pour frais de recouvrement de 40 euros (Code de commerce, art. L441-10 et D441-5). Pas d'escompte pour paiement anticipé."
+
+msgid "This document is recorded in the inalterable fiscal journal of the business."
+msgstr "Ce document est enregistré dans le journal fiscal inaltérable de l'entreprise."
+
+msgid "Document fingerprint (SHA-256)"
+msgstr "Empreinte du document (SHA-256)"
+
+msgid "Page"
+msgstr "Page"
+
+msgid "Reason for the credit note"
+msgstr "Motif de l'avoir"
+
+msgid "Product returned"
+msgstr "Retour de produit"
+
+msgid "Billing error"
+msgstr "Erreur de facturation"
+
+msgid "Subscription cancelled"
+msgstr "Résiliation de l'abonnement"
+
+msgid "Technical security system (TSE)"
+msgstr "Dispositif de sécurité technique (TSE)"
+
+msgid "Cash register security device (RKSV)"
+msgstr "Dispositif de sécurité de la caisse (RKSV)"

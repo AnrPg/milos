@@ -188,9 +188,16 @@ defmodule PaleeWeb.AdminSettingsController do
       finance: @finance_settings_schema,
       scheduling: @scheduling_settings_schema,
       workouts: @workout_settings_schema,
-      provider: @provider_settings_schema
+      provider: @provider_settings_schema,
+      advanced_settings: %Schema{
+        type: :array,
+        items: %Schema{type: :string},
+        description:
+          "ADR-255 (CP-H1): catalog keys (`<section>.<field>`, e.g. `finance.subscription_grace_days`) " <>
+            "of the settings the web keeps under «Προχωρημένα», closed by default"
+      }
     },
-    required: [:gamification, :finance, :scheduling, :workouts, :provider]
+    required: [:advanced_settings, :finance, :gamification, :provider, :scheduling, :workouts]
   }
 
   @admin_settings_update_schema %Schema{

@@ -23,7 +23,7 @@ import {
 } from "@/components/schedule/DayWorkoutFields";
 import { useOrganizationTimeZone } from "@/lib/organization-slug";
 import { dateKeyInZone } from "@/lib/zoned-time";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { fetchAdminWorkout, type WorkoutRecord } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { formatLocalDate } from "@/lib/local-date";
@@ -33,6 +33,7 @@ import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { clockFormat } from "@/lib/clock";
 
 type Props = {
   workoutId: string;
@@ -46,6 +47,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
   const [workout, setWorkout] = useState<WorkoutRecord | null>(null);
   const [athletes, setAthletes] = useState<AthleteOption[]>([]);
   const scheduleT = useTranslations("Schedule");
+  const locale = useLocale();
   // ADR-230: «Ημέρα» sets the WOD of a whole day (all classes or some types).
   const [mode, setMode] = useState<"athletes" | "class" | "day">("athletes");
   const gymZone = useOrganizationTimeZone();
@@ -412,7 +414,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
                 <option value="">{i18n("featureChooseClass")}</option>
                 {slots.map((slot) => (
                   <option key={slot.id} value={slot.id}>
-                    {new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(slot.scheduled_at))} · {slot.name}
+                    {clockFormat(locale, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(slot.scheduled_at))} · {slot.name}
                   </option>
                 ))}
               </Select>

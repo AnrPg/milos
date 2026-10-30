@@ -11,8 +11,12 @@ defmodule Palee.Email.Ports.Sender do
           required(:text) => String.t(),
           required(:html) => String.t(),
           required(:message_id) => String.t(),
-          optional(:headers) => %{String.t() => String.t()}
+          optional(:headers) => %{String.t() => String.t()},
+          optional(:attachments) => [attachment()]
         }
+
+  # ADR-265: a file sent with the email (a fiscal document's PDF).
+  @type attachment :: %{filename: String.t(), content_type: String.t(), data: binary()}
 
   @callback deliver(email()) :: {:ok, term()} | {:error, term()}
 end

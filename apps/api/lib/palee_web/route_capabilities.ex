@@ -13,6 +13,9 @@ defmodule PaleeWeb.RouteCapabilities do
 
   @controller_defaults %{
     W.AdminWorkoutController => [:manage_workouts],
+    # ADR-252: templates, versions, requirement, settings and audit.
+    W.AdminDocumentsController => [:manage_settings],
+    W.AdminHealthCertificatesController => [:manage_health_certificates],
     # The class form's WOD picker: whoever schedules classes picks WODs.
     W.AdminWorkoutChoiceController => [:manage_schedule, :manage_workouts],
     # ADR-230: the day's WOD, like linking a WOD to one class.
@@ -53,8 +56,14 @@ defmodule PaleeWeb.RouteCapabilities do
     W.AdminAiSettingsController => [:manage_settings],
     # ADR-184: demo data and the activation request (owners and admins).
     W.AdminBusinessController => [:manage_settings],
+    # ADR-255: settings catalog and setup recipes (applying is owner only, in the service).
+    W.AdminSetupController => [:manage_settings],
     # ADR-191: partner perks.
-    W.AdminPerkController => [:manage_perks]
+    W.AdminPerkController => [:manage_perks],
+    # ADR-253: box screens (TVs on the wall), their codes and overrides.
+    W.AdminBoxScreenController => [:manage_settings, :manage_locations],
+    # ADR-254: CSV imports (owners and admins hold manage_settings).
+    W.AdminImportController => [:manage_settings]
   }
 
   @actions %{
@@ -223,6 +232,143 @@ defmodule PaleeWeb.RouteCapabilities do
       :view_finance_reports
     ],
     {W.AdminFinanceController, :summary} => [:view_finance_reports],
+    {W.AdminFiscalController, :countries} => [:view_finance_reports],
+    {W.AdminFiscalController, :identity} => [:view_finance_reports],
+    {W.AdminFiscalController, :save_identity} => [:manage_billing],
+    {W.AdminFiscalController, :documents} => [:view_finance_reports],
+    {W.AdminFiscalController, :document} => [:view_finance_reports],
+    {W.AdminFiscalController, :credit} => [:manage_billing],
+    {W.AdminFiscalController, :verify_journal} => [:manage_billing],
+    {W.AdminFiscalController, :closings} => [:view_finance_reports],
+    {W.AdminFiscalController, :archive} => [:manage_billing],
+    {W.AdminFiscalTaxController, :tax_categories} => [:view_finance_reports],
+    {W.AdminFiscalTaxController, :sales_tax_rates} => [:view_finance_reports],
+    {W.AdminFiscalTaxController, :save_sales_tax_rates} => [:manage_billing],
+    {W.AdminFiscalTaxController, :document_pdf} => [:view_finance_reports],
+    {W.AdminFiscalTaxController, :document_html} => [:view_finance_reports],
+    {W.AdminFiscalTaxController, :email_document} => [:manage_billing],
+    {W.AdminFiscalRegistryController, :connection} => [:view_finance_reports],
+    {W.AdminFiscalRegistryController, :save_connection} => [:manage_billing],
+    {W.AdminFiscalRegistryController, :lookup} => [:manage_billing],
+    # ADR-273: the box's fiscal connections as one set and «Δοκιμή σύνδεσης».
+    {W.AdminFiscalConnectionsController, :index} => [:view_finance_reports],
+    {W.AdminFiscalConnectionsController, :check} => [:manage_billing],
+    {W.AdminFiscalTaxController, :export_formats} => [:view_finance_reports],
+    {W.AdminFiscalTaxController, :save_export_settings} => [:manage_billing],
+    {W.AdminFiscalTaxController, :export} => [:view_finance_reports],
+    {W.AdminFiscalReportingController, :connection} => [:view_finance_reports],
+    {W.AdminFiscalReportingController, :save_connection} => [:manage_billing],
+    {W.AdminFiscalReportingController, :transmissions} => [:view_finance_reports],
+    {W.AdminFiscalReportingController, :retry} => [:manage_billing],
+    {W.AdminFiscalEInvoicingController, :connection} => [:view_finance_reports],
+    {W.AdminFiscalEInvoicingController, :save_connection} => [:manage_billing],
+    {W.AdminFiscalEInvoicingController, :index} => [:view_finance_reports],
+    {W.AdminFiscalEInvoicingController, :show} => [:view_finance_reports],
+    {W.AdminFiscalEInvoicingController, :retry} => [:manage_billing],
+    {W.AdminFiscalTillSigningController, :connection} => [:view_finance_reports],
+    {W.AdminFiscalTillSigningController, :save_connection} => [:manage_billing],
+    {W.AdminFiscalTillSigningController, :index} => [:view_finance_reports],
+    {W.AdminFiscalTillSigningController, :show} => [:view_finance_reports],
+    {W.AdminFiscalTillSigningController, :retry} => [:manage_billing],
+    {W.AdminFiscalTillSigningController, :null_receipt} => [:manage_billing],
+    # ADR-246/247: online payments.
+    {W.AdminPaymentsController, :account} => [:view_finance_reports, :manage_billing],
+    {W.AdminPaymentsController, :save_account} => [:manage_billing],
+    {W.AdminPaymentsController, :index} => [:view_finance_reports, :manage_billing],
+    {W.AdminPaymentsController, :show} => [:view_finance_reports, :manage_billing],
+    {W.AdminPaymentsController, :refund} => [:manage_billing],
+    {W.AdminPaymentsController, :retry} => [:manage_billing],
+    {W.AdminPaymentsController, :save_options} => [:manage_billing],
+    # ADR-271: «Τα N πακέτα σου πωλούνται τώρα online» closed.
+    {W.AdminPaymentsController, :dismiss_packages_notice} => [:manage_billing],
+    {W.AdminPaymentsController, :connect} => [:manage_billing],
+    {W.AdminPaymentsController, :disconnect} => [:manage_billing],
+    {W.AdminPaymentsController, :attention} => [:manage_billing, :take_payments],
+    {W.AdminPaymentsController, :retry_charge} => [:manage_billing],
+    {W.AdminPaymentsController, :dismiss_charge} => [:manage_billing, :take_payments],
+    {W.AdminPaymentsController, :card_link} => [:manage_billing, :take_payments],
+    # ADR-249: Tap to Pay is taking money at the desk, like ADR-222.
+    {W.AdminTerminalPaymentsController, :availability} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :create} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :result} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :show} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :cancel} => [:take_payments],
+    {W.AdminTerminalPaymentsController, :sandbox_complete} => [:take_payments],
+    # ADR-272: the receipt by email, «Ποιος;» / «Τι;», guests of the box, tips.
+    {W.AdminTerminalPaymentsController, :receipt_email} => [:take_payments],
+    {W.AdminDeskBuyersController, :people} => [:take_payments],
+    {W.AdminDeskBuyersController, :options} => [:take_payments],
+    {W.AdminDeskBuyersController, :make_guest} => [:take_payments],
+    {W.AdminTipsController, :index} => [:view_finance_reports, :manage_billing],
+    # ADR-252: documents are box rules (manage_settings: which are
+    # mandatory, their text, the booking gate); asking clients to sign and
+    # reading who signed is membership work too, and front desk work
+    # (request_signatures; the evidence PDF stays with the first two).
+    {W.AdminDocumentsController, :index} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
+    {W.AdminDocumentsController, :show} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
+    {W.AdminDocumentsController, :version} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
+    {W.AdminDocumentsController, :request} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
+    {W.AdminDocumentsController, :requests} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
+    {W.AdminDocumentsController, :cancel_request} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
+    {W.AdminDocumentsController, :signatures} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
+    {W.AdminDocumentsController, :evidence} => [:manage_settings, :manage_memberships],
+    {W.AdminDocumentsController, :member} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
+    {W.AdminDocumentsController, :outstanding} => [
+      :manage_settings,
+      :manage_memberships,
+      :request_signatures
+    ],
+    # ADR-252: health certificates are health data (GDPR art. 9): dates and
+    # files need manage_health_certificates; view_health (coaches, own
+    # clients) sees only valid / expired / missing in the list.
+    {W.AdminHealthCertificatesController, :index} => [
+      :manage_health_certificates,
+      :view_health_certificates,
+      :view_health
+    ],
+    # Front desk sees certificates by default (product owner, 2026-10-29):
+    # a client's dates and the file; uploading and deleting stay with
+    # manage_health_certificates.
+    {W.AdminHealthCertificatesController, :client} => [
+      :manage_health_certificates,
+      :view_health_certificates
+    ],
+    {W.AdminHealthCertificatesController, :file} => [
+      :manage_health_certificates,
+      :view_health_certificates
+    ],
     # ADR-192: shop reports read like the business statistics; the
     # reconciliation is also a finance check; targets are a setting.
     {W.AdminShopReportController, :reconciliation} => [
@@ -252,6 +398,10 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminFinanceController, :members} => [:manage_billing, :take_payments],
     {W.AdminFinanceController, :member} => [:manage_billing, :take_payments],
     {W.AdminFinanceController, :update_member} => [:manage_billing],
+    # ADR-274: values set by hand; the history is read with the ledger.
+    {W.AdminFinanceController, :set_member_override} => [:manage_billing],
+    {W.AdminFinanceController, :reset_member_override} => [:manage_billing],
+    {W.AdminFinanceController, :member_overrides} => [:manage_billing, :take_payments],
     {W.AdminFinanceController, :set_member_auto_renew} => [:manage_billing],
     {W.AdminFinanceController, :mark_member_left} => [:manage_billing],
     {W.AdminFinanceController, :undo_member_left} => [:manage_billing],

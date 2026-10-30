@@ -207,3 +207,21 @@ msgstr "Ссылка действительна 24 часа."
 
 msgid "You're receiving this email because someone asked to use this address for a %{product} account."
 msgstr "Вы получили это письмо, потому что поступил запрос использовать этот адрес для учётной записи %{product}."
+
+msgid "%{title} %{number} from %{business}"
+msgstr "%{title} %{number} от %{business}"
+
+msgid "%{business} sent you this document. You'll find it attached as a PDF."
+msgstr "%{business} отправил(а) вам этот документ. Он приложен в формате PDF."
+
+msgid "Document"
+msgstr "Документ"
+
+msgid "Date of issue"
+msgstr "Дата выдачи"
+
+msgid "Total"
+msgstr "Итого"
+
+msgid "Keep it for your records. For questions about it, contact the business."
+msgstr "Сохраните его для своих записей. По вопросам о нём обращайтесь в компанию."

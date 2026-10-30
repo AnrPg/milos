@@ -69,7 +69,7 @@ defmodule Palee.Organizations.Domain.LocationScopePolicy do
   end
 
   @doc "Whether a role set holds any staff role (owner and admin included)."
-  def staff?(roles), do: Enum.any?(List.wrap(roles), &(&1 not in MembershipPolicy.client_roles()))
+  def staff?(roles), do: MembershipPolicy.staff?(roles)
 
   @doc "The scope a tenant context carries; contexts built without one work everywhere."
   def scope(%{location_scope: scope}) when is_list(scope), do: scope

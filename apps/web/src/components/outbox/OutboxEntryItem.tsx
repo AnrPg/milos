@@ -4,6 +4,7 @@ import { OutboxFailureControls } from "@/components/outbox/OutboxFailureControls
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import type { OutboxEntry } from "@/lib/outbox-snapshot";
+import { clockFormat } from "@/lib/clock";
 
 /** One queued or failed outbox operation, with Retry / Discard when it failed. */
 export function OutboxEntryItem({
@@ -17,7 +18,7 @@ export function OutboxEntryItem({
 }) {
   const i18n = useUiTranslations();
   const locale = useUiLocale();
-  const queuedAt = new Intl.DateTimeFormat(locale, { dateStyle: "short", timeStyle: "short" }).format(entry.createdAt);
+  const queuedAt = clockFormat(locale, { dateStyle: "short", timeStyle: "short" }).format(entry.createdAt);
 
   return (
     <li className="rounded-2xl p-3" style={{ background: "var(--card)", border: "1px solid var(--border-strong)" }}>

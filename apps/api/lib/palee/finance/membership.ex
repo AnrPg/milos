@@ -2,6 +2,8 @@ defmodule Palee.Finance.Membership do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Palee.Finance.Domain.MemberStatus
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
@@ -10,6 +12,8 @@ defmodule Palee.Finance.Membership do
     field :user_id, :binary_id
     field :user_type_snapshot, :string
     field :status, :string, default: "trial"
+    # ADR-274: the status staff see, worked out from subscriptions and charges.
+    field :status_shown, :string
     field :signup_source, :string, default: "admin_created"
     field :starts_on, :date
     field :expires_on, :date
@@ -49,7 +53,7 @@ defmodule Palee.Finance.Membership do
       :last_payment_reminder_sent_at
     ])
     |> validate_required([:user_id, :user_type_snapshot, :status, :signup_source])
-    |> validate_inclusion(:user_type_snapshot, ["member", "athlete"])
+    |> validate_inclusion(:user_type_snapshot, ["member", "athlete", "guest"])
     |> validate_inclusion(:status, [
       "active",
       "expiring",
@@ -83,5 +87,16 @@ defmodule Palee.Finance.Membership do
     |> validate_inclusion(:left_by, ["member", "staff"])
     |> validate_length(:leave_reason, max: 500)
     |> check_constraint(:leaving_on, name: :leaving_consistency_check)
+  end
+
+  @doc """
+  ADR-274: the worked-out status (or the one staff set by hand). Kept out of
+  `changeset/2` so a plain membership update cannot set what staff see.
+  """
+  def status_changeset(%__MODULE__{} = membership, params) do
+    membership
+    |> cast(params, [:status, :status_shown])
+    |> validate_inclusion(:status, MemberStatus.lifecycles())
+    |> validate_inclusion(:status_shown, MemberStatus.statuses())
   end
 end

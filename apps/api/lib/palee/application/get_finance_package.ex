@@ -1,12 +1,13 @@
 defmodule Palee.Application.GetFinancePackage do
   alias Palee.Application.PackageBranches
+  alias Palee.Application.Payments.OnlineSales
   alias Palee.Finance
 
   @doc "ADR-186 §8: a package valid only at other branches is not found."
   def call(context, id) do
     with %{} = package <- Finance.get_package(context, id),
          [_visible] <- PackageBranches.visible(context, [package]) do
-      {:ok, %{package: package}}
+      {:ok, %{package: OnlineSales.with_visibility(context, package)}}
     else
       _missing -> {:error, :not_found}
     end

@@ -8,8 +8,17 @@
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
         <string>Palee</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>el</string>
+	</array>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Palee uses the microphone only while you record a workout by voice. The recording is not kept.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Palee uses the camera when you scan your box's check-in QR code, take a body photo or add a photo to a post. A photo is saved only when you choose to.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Palee opens your photos only when you pick one for your profile, a post or a body photo.</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -27,7 +36,7 @@
 	<key>NSHealthShareUsageDescription</key>
 	<string>Palee reads the workouts, sleep, weight, resting heart rate and steps you choose, so they appear in your journal. Only you see them unless you share them.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Palee uses your location only on this phone, to remind you to check in when you arrive at your box with a booking.</string>
+	<string>Palee uses your location to show boxes near you (rounded and never saved) and, on this phone only, to remind you to check in when you arrive at your box with a booking. You can always pick an area instead.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>With "Always", Palee can remind you to check in when you arrive at your box with a booking, even while the app is closed. Your location stays on this phone.</string>
 	<key>NFCReaderUsageDescription</key>
@@ -76,6 +85,22 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<!-- ADR-249: Tap to Pay through the «Viva.com Terminal» app and its answer. -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>vivapayclient</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>app.palee.terminal-result</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>palee-terminal</string>
+			</array>
+		</dict>
+	</array>
     <!-- palee:app-links begin -->
     <key>WKAppBoundDomains</key>
     <array>

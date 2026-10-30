@@ -207,3 +207,21 @@ msgstr "الرابط صالح لمدة 24 ساعة."
 
 msgid "You're receiving this email because someone asked to use this address for a %{product} account."
 msgstr "تصلكم هذه الرسالة لأنه طُلب استخدام هذا العنوان لحساب على %{product}."
+
+msgid "%{title} %{number} from %{business}"
+msgstr "%{title} %{number} من %{business}"
+
+msgid "%{business} sent you this document. You'll find it attached as a PDF."
+msgstr "أرسل إليك %{business} هذا المستند. ستجده مرفقًا بصيغة PDF."
+
+msgid "Document"
+msgstr "المستند"
+
+msgid "Date of issue"
+msgstr "تاريخ الإصدار"
+
+msgid "Total"
+msgstr "الإجمالي"
+
+msgid "Keep it for your records. For questions about it, contact the business."
+msgstr "احتفظ به في سجلاتك. للاستفسار عنه، تواصل مع النشاط التجاري."

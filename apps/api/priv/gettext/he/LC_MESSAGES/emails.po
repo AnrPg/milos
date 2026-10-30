@@ -207,3 +207,21 @@ msgstr "הקישור בתוקף למשך 24 שעות."
 
 msgid "You're receiving this email because someone asked to use this address for a %{product} account."
 msgstr "קיבלתם את המייל הזה כי התבקש להשתמש בכתובת הזו עבור חשבון ב-%{product}."
+
+msgid "%{title} %{number} from %{business}"
+msgstr "%{title} %{number} מאת %{business}"
+
+msgid "%{business} sent you this document. You'll find it attached as a PDF."
+msgstr "%{business} שלח/ה לך את המסמך הזה. הוא מצורף כקובץ PDF."
+
+msgid "Document"
+msgstr "מסמך"
+
+msgid "Date of issue"
+msgstr "תאריך הנפקה"
+
+msgid "Total"
+msgstr "סה״כ"
+
+msgid "Keep it for your records. For questions about it, contact the business."
+msgstr "שמור/י אותו לרישומים שלך. לשאלות לגביו, פנה/י לעסק."

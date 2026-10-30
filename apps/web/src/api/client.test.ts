@@ -9,6 +9,22 @@ describe("apiRequest tenant headers", () => {
     window.history.replaceState(null, "", "/");
   });
 
+  it("sends a FormData body as multipart, without a JSON content type (ADR-254)", async () => {
+    window.history.replaceState(null, "", "/org/atlas-gym/admin");
+    const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), { status: 201 }),
+    );
+    const form = new FormData();
+    form.append("file", new Blob(["a,b\n1,2"], { type: "text/csv" }), "people.csv");
+
+    await apiRequest<{ ok: boolean }>("/admin/imports", { token: "token", method: "POST", body: form });
+
+    const init = fetchMock.mock.calls[0]![1] as RequestInit;
+    expect(init.body).toBe(form);
+    expect(init.headers).not.toHaveProperty("Content-Type");
+    expect(init.headers).toHaveProperty("Authorization", "Bearer token");
+  });
+
   it("uses the organization slug from /org paths", async () => {
     window.history.replaceState(null, "", "/org/atlas-gym/admin");
     window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, "stored-gym");
@@ -219,6 +235,7 @@ describe("apiRequest tenant headers", () => {
     ["/workouts/workout-1/scales", "/api/org/atlas-gym/workouts/workout-1/scales"],
     ["/me/finance", "/api/org/atlas-gym/me/finance"],
     ["/me/entitlement", "/api/org/atlas-gym/me/entitlement"],
+    ["/me/documents/t-1/sign", "/api/org/atlas-gym/me/documents/t-1/sign"],
     ["/challenges/c-1/leaderboard", "/api/org/atlas-gym/challenges/c-1/leaderboard"],
     ["/challenges/c-1/opt_in", "/api/org/atlas-gym/challenges/c-1/opt_in"],
     ["/landing/leaderboard-opt-in", "/api/org/atlas-gym/landing/leaderboard-opt-in"],

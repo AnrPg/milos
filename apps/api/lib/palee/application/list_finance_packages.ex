@@ -1,5 +1,6 @@
 defmodule Palee.Application.ListFinancePackages do
   alias Palee.Application.{BranchReport, PackageBranches}
+  alias Palee.Application.Payments.OnlineSales
   alias Palee.Finance
 
   def call, do: {:ok, %{packages: Finance.list_packages()}}
@@ -16,6 +17,7 @@ defmodule Palee.Application.ListFinancePackages do
       context
       |> PackageBranches.visible(Finance.list_packages(context))
       |> BranchReport.covering_only(report, &PackageBranches.target/1)
+      |> then(&OnlineSales.with_visibility(context, &1))
 
     {:ok, %{packages: packages, branch_filter: BranchReport.filter_payload(report)}}
   end

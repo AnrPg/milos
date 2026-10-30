@@ -249,6 +249,13 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
   def get_organization_by_id(id), do: Repo.get(Organization, id)
 
   @impl true
+  def insert_provisioning_event(attrs) do
+    %OrganizationProvisioningEvent{}
+    |> OrganizationProvisioningEvent.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @impl true
   def get_organization_by_slug(slug), do: Repo.get_by(Organization, slug: slug)
 
   @impl true
@@ -290,6 +297,26 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
         is_nil(invitation.revoked_at) and invitation.expires_at > ^now
     )
     |> Repo.aggregate(:count)
+  end
+
+  # ADR-272: memberships are written by owners and admins only (RLS); the
+  # SQL function lets front desk and coaches write a guest membership and
+  # nothing else, checking the acting person itself.
+  @impl true
+  def add_guest(organization_id, user_id) do
+    case Repo.query("SELECT palee_add_box_guest($1, $2)", [
+           Ecto.UUID.dump!(organization_id),
+           Ecto.UUID.dump!(user_id)
+         ]) do
+      {:ok, %{rows: [[id]]}} ->
+        {:ok, Ecto.UUID.cast!(id)}
+
+      {:error, %Postgrex.Error{postgres: %{code: :insufficient_privilege}}} ->
+        {:error, :forbidden}
+
+      {:error, error} ->
+        {:error, error}
+    end
   end
 
   @impl true

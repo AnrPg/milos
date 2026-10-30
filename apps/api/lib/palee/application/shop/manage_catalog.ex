@@ -22,6 +22,7 @@ defmodule Palee.Application.Shop.ManageCatalog do
   """
 
   alias Palee.Application.{CoveringBranches, GoLive}
+  alias Palee.Application.Fiscal.SoldItemTax
   alias Palee.Application.Shop.{Observability, ProductMedia}
   alias Palee.Shop
 
@@ -109,7 +110,8 @@ defmodule Palee.Application.Shop.ManageCatalog do
   def create(context, params, now \\ DateTime.utc_now()) do
     params = atomize(params)
 
-    with {:ok, target} <- CoveringBranches.for_new(context, CoveringBranches.requested(params)),
+    with :ok <- SoldItemTax.check(context, [params | List.wrap(params[:variants])]),
+         {:ok, target} <- CoveringBranches.for_new(context, CoveringBranches.requested(params)),
          :ok <- ProductMedia.check_ready(context, params[:media_ids]),
          {:ok, options} <- Shop.normalize_options(params[:options]),
          {:ok, status} <- optional_status(params[:status]),
@@ -225,7 +227,8 @@ defmodule Palee.Application.Shop.ManageCatalog do
   def update(context, id, params, now \\ DateTime.utc_now()) do
     params = atomize(params)
 
-    with {:ok, product} <- get(context, id),
+    with :ok <- SoldItemTax.check(context, [params | List.wrap(params[:variants])]),
+         {:ok, product} <- get(context, id),
          :ok <- CoveringBranches.authorize(context, CoveringBranches.of_row(product)),
          {:ok, attrs} <- covering_change(context, params),
          :ok <- ProductMedia.check_ready(context, params[:media_ids]),
@@ -469,7 +472,8 @@ defmodule Palee.Application.Shop.ManageCatalog do
   def save_variant(context, product_id, variant_id, params) do
     params = atomize(params)
 
-    with {:ok, product} <- get(context, product_id),
+    with :ok <- SoldItemTax.check(context, params),
+         {:ok, product} <- get(context, product_id),
          :ok <- CoveringBranches.authorize(context, CoveringBranches.of_row(product)),
          {:ok, before} <- existing_variant(product, variant_id),
          {:ok, saved} <- write_variant(context, product, before, params) do
@@ -588,7 +592,8 @@ defmodule Palee.Application.Shop.ManageCatalog do
   @known ~w(title description category media_ids options visibility sell_in_app sell_at_desk
             member_discount_applies per_person_limit all_locations location_ids position variants
             price_cents option_values sku barcode currency compare_at_price_cents cost_price_cents
-            tax_class low_stock_threshold track_inventory initial_quantity location_id
+            tax_class tax_category exemption_reason low_stock_threshold track_inventory
+            initial_quantity location_id
             status id q location_ids)a
 
   @doc false

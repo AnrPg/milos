@@ -15,7 +15,8 @@ export type TenantMembershipRole =
   | "accountant"
   | "janitor"
   | "member"
-  | "athlete";
+  | "athlete"
+  | "guest";
 export type SurfaceRole = "admin" | "member" | "athlete";
 
 export function selectedMembership(

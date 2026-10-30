@@ -2,6 +2,7 @@ defmodule Palee.Application.SubmitBooking do
   require Logger
 
   alias Palee.Application.{BookingTerms, GoLive, TrackAnalyticsEvent}
+  alias Palee.Application.Documents.BookingGate
   alias Palee.{Finance, Identity, Scheduling}
   alias Palee.Scheduling.Domain.{BookingOperationPolicy, BookingPolicy}
 
@@ -14,6 +15,11 @@ defmodule Palee.Application.SubmitBooking do
   that booking without reserving another class visit, notifying staff, or
   broadcasting again; reusing the id for another class is
   `{:error, :idempotency_key_conflict}`.
+
+  ADR-252: a client with an unsigned mandatory document (or a missing or
+  expired health certificate, when the box asks for it) is refused with
+  `{:error, :documents_required, details}`. Staff placing a client pass
+  `documents_gate: false`.
   """
   def call(context, %{id: _} = actor, slot_id) do
     case call(context, actor, slot_id, []) do
@@ -26,14 +32,18 @@ defmodule Palee.Application.SubmitBooking do
     with {:ok, operation_id} <-
            BookingOperationPolicy.normalize_operation_id(Keyword.get(opts, :client_operation_id)),
          :none <- find_replay(context, user_id, operation_id, slot_id) do
-      submit(context, actor, slot_id, operation_id)
+      submit(context, actor, slot_id, operation_id, Keyword.get(opts, :documents_gate, true))
     end
   end
 
-  defp submit(context, actor, slot_id, operation_id) do
+  defp submit(context, actor, slot_id, operation_id, documents_gate?) do
     now = DateTime.utc_now()
 
-    case write(context, actor, slot_id, client_operation_id: operation_id, now: now) do
+    case write(context, actor, slot_id,
+           client_operation_id: operation_id,
+           now: now,
+           documents_gate: documents_gate?
+         ) do
       {:ok, slot, booking} ->
         announce(context, slot, booking, now)
         {:ok, booking, :created}
@@ -50,8 +60,9 @@ defmodule Palee.Application.SubmitBooking do
   The checks and writes of a booking without its announcements, so a caller
   can run them inside its own transaction and announce after it commits
   (`announce/4`). `PlaceMemberInClass` books for staff with `approved: true`
-  (no approval step) and `booking_window: false` (staff may place a member
-  before the member's own booking window opens); capacity, timing and the
+  (no approval step), `booking_window: false` (staff may place a member
+  before the member's own booking window opens) and `documents_gate: false`
+  (ADR-252: staff decide); capacity, timing and the
   member's package still apply.
 
   Returns `{:ok, slot, booking}`, `{:replayed, booking}` for a replayed
@@ -65,6 +76,7 @@ defmodule Palee.Application.SubmitBooking do
          # ADR-184: a business in demo mode takes no bookings from real people.
          :ok <- GoLive.check_booking(context, user_id),
          :ok <- BookingPolicy.can_book?(slot, user_id: user_id, now: now),
+         :ok <- documents_gate(Keyword.get(opts, :documents_gate, true), context, user_id, now),
          :ok <- check_booking_window(context, user_id, slot, now, opts),
          request = BookingPolicy.entitlement_request(slot),
          {:ok, reservation} <- reserve_visit(context, actor, slot, request) do
@@ -101,6 +113,7 @@ defmodule Palee.Application.SubmitBooking do
 
     Palee.DomainEvents.publish(:booking_made, %{
       organization_id: slot.organization_id,
+      scheduled_class_id: slot.id,
       booking_id: booking.id,
       user_id: user_id,
       at: now
@@ -122,6 +135,9 @@ defmodule Palee.Application.SubmitBooking do
       :ok
     end
   end
+
+  defp documents_gate(false, _context, _user_id, _now), do: :ok
+  defp documents_gate(true, context, user_id, now), do: BookingGate.check(context, user_id, now)
 
   defp find_replay(_context, _user_id, nil, _slot_id), do: :none
   defp find_replay(nil, _user_id, _operation_id, _slot_id), do: :none

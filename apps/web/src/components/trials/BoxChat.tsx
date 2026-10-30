@@ -19,6 +19,7 @@ import { useSession } from "@/components/session-provider";
 
 import { newOperationId } from "./trial-ui";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { clockFormat } from "@/lib/clock";
 
 const POLL_MS = 5_000;
 const PERIODS = ["monthly", "quarterly", "semiannual", "annual"] as const;
@@ -86,7 +87,7 @@ export function BoxChat({ slug, draft }: { slug: string; draft: string | null })
   const staff = new Map(data.staff.map((person) => [person.id, person.nickname ?? data.box.name]));
   const pkg = data.conversion_package;
   const clock = (iso: string) =>
-    new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+    clockFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
   const price = pkg
     ? new Intl.NumberFormat(locale, { style: "currency", currency: pkg.currency }).format(pkg.base_price_cents / 100)
     : null;

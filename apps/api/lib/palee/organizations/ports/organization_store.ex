@@ -25,6 +25,8 @@ defmodule Palee.Organizations.Ports.OrganizationStore do
   @callback redeem_invitation(binary(), Ecto.UUID.t(), DateTime.t()) ::
               {:ok, map()} | {:error, :invalid_invitation | Ecto.Changeset.t()}
   @callback get_organization_by_id(Ecto.UUID.t()) :: Organization.t() | nil
+  @doc "ADR-273: one row of the vendors' audit log (`organization_provisioning_events`)."
+  @callback insert_provisioning_event(map()) :: {:ok, map()} | {:error, term()}
   @callback get_organization_by_slug(String.t()) :: Organization.t() | nil
   @callback get_organization_by_domain(String.t()) :: Organization.t() | nil
   # ADR-122 retired slug aliases.
@@ -33,6 +35,8 @@ defmodule Palee.Organizations.Ports.OrganizationStore do
   @callback list_slug_aliases(Ecto.UUID.t()) :: [OrganizationSlugAlias.t()]
   @callback count_pending_invitations(Ecto.UUID.t(), DateTime.t()) :: non_neg_integer()
   @callback slug_taken?(String.t()) :: boolean()
+  @doc "ADR-272: makes `user_id` a guest of the box as the acting staff member; the membership id."
+  @callback add_guest(binary(), binary()) :: {:ok, binary()} | {:error, term()}
   @callback count_seats(Ecto.UUID.t(), DateTime.t()) :: %{
               staff: non_neg_integer(),
               clients: non_neg_integer(),

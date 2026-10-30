@@ -116,6 +116,7 @@ describe("AuthConsole", () => {
 
     fireEvent.change(screen.getByLabelText("emailAddress"), { target: { value: "maria@example.test" } });
     fireEvent.change(screen.getByLabelText("password8be3c94"), { target: { value: "abcd" } });
+    fireEvent.click(screen.getByLabelText('ageConfirmation:{"age":16}'));
     fireEvent.click(screen.getByRole("button", { name: "createAccountaaf3744" }));
 
     await waitFor(() =>
@@ -124,6 +125,7 @@ describe("AuthConsole", () => {
         display_name: "Maria K",
         email: "maria@example.test",
         password: "abcd",
+        age_confirmed: true,
         role: "member",
       }),
     );
@@ -140,6 +142,41 @@ describe("AuthConsole", () => {
     expect(replace).toHaveBeenCalledWith("/");
   });
 
+  it("asks to confirm the minimum age under the box, before any request (ADR-267)", async () => {
+    render(<AuthConsole initialMode="register" />);
+
+    fireEvent.change(screen.getByLabelText("displayNameLabel"), { target: { value: "Maria" } });
+    fireEvent.change(screen.getByLabelText("handleLabel"), { target: { value: "maria" } });
+    fireEvent.change(screen.getByLabelText("emailAddress"), { target: { value: "maria@example.test" } });
+    fireEvent.change(screen.getByLabelText("password8be3c94"), { target: { value: "abcd" } });
+    fireEvent.click(screen.getByRole("button", { name: "createAccountaaf3744" }));
+
+    const box = screen.getByLabelText('ageConfirmation:{"age":16}');
+    expect(box).toHaveAttribute("aria-invalid", "true");
+    expect(await screen.findByText("minimumAgeRule")).toBeInTheDocument();
+    expect(signUp).not.toHaveBeenCalled();
+  });
+
+  it("shows the API's minimum-age refusal under the box (ADR-267)", async () => {
+    signUp.mockRejectedValue(
+      new ApiError(422, "Validation failed", {
+        code: "validation_failed",
+        error: "Validation failed",
+        errors: { age_confirmed: ["minimum_age"] },
+      }),
+    );
+    render(<AuthConsole initialMode="register" />);
+
+    fireEvent.change(screen.getByLabelText("displayNameLabel"), { target: { value: "Maria" } });
+    fireEvent.change(screen.getByLabelText("handleLabel"), { target: { value: "maria" } });
+    fireEvent.change(screen.getByLabelText("emailAddress"), { target: { value: "maria@example.test" } });
+    fireEvent.change(screen.getByLabelText("password8be3c94"), { target: { value: "abcd" } });
+    fireEvent.click(screen.getByLabelText('ageConfirmation:{"age":16}'));
+    fireEvent.click(screen.getByRole("button", { name: "createAccountaaf3744" }));
+
+    expect(await screen.findByText("minimumAgeRule")).toBeInTheDocument();
+  });
+
   it("answers a known email like a new one, then leads to sign-in (ADR-211)", async () => {
     signUp.mockResolvedValue({ email: "maria@example.test", user: null });
     render(<AuthConsole initialMode="register" />);
@@ -148,6 +185,7 @@ describe("AuthConsole", () => {
     fireEvent.change(screen.getByLabelText("handleLabel"), { target: { value: "maria" } });
     fireEvent.change(screen.getByLabelText("emailAddress"), { target: { value: "maria@example.test" } });
     fireEvent.change(screen.getByLabelText("password8be3c94"), { target: { value: "abcd" } });
+    fireEvent.click(screen.getByLabelText('ageConfirmation:{"age":16}'));
     fireEvent.click(screen.getByRole("button", { name: "createAccountaaf3744" }));
 
     expect(await screen.findByText('sentTo:{"email":"maria@example.test"}')).toBeInTheDocument();

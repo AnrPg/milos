@@ -24,7 +24,9 @@ defmodule Palee.Organizations.Domain.GoLivePolicy do
     * `:send_outside` - an email, push or message to anyone outside the
       business's own staff;
     * `:publish_perk` - publishing a partner perk to members (ADR-191);
-      drafts stay possible.
+      drafts stay possible;
+    * `:import_people` - applying a CSV import and inviting the people it
+      brought in (ADR-254); uploading and the dry run stay possible.
 
   Discovery (Γύρω μου, the public box page, referral invites) is gated in
   the SQL lookups themselves, which answer only for active organizations.
@@ -39,7 +41,8 @@ defmodule Palee.Organizations.Domain.GoLivePolicy do
     :take_booking,
     :take_payment,
     :send_outside,
-    :publish_perk
+    :publish_perk,
+    :import_people
   ]
 
   @type organization :: %{
@@ -56,6 +59,7 @@ defmodule Palee.Organizations.Domain.GoLivePolicy do
           | :take_payment
           | :send_outside
           | :publish_perk
+          | :import_people
 
   @doc "The gated actions, for the web and for tests."
   @spec actions() :: [action()]

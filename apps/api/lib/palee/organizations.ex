@@ -95,7 +95,17 @@ defmodule Palee.Organizations do
   or a club to them: lists of gyms, Box ▾ and the club bar use this.
   """
   def provider_memberships(memberships) when is_list(memberships),
-    do: Enum.reject(memberships, &hosting_only?/1)
+    do: Enum.reject(memberships, &(hosting_only?(&1) or guest_only?(&1)))
+
+  @doc """
+  ADR-272: whether a membership entry only makes the person a guest of the
+  box. Such a box is not one of their gyms (`provider_memberships/1` leaves
+  it out): no club, member app or member-only content.
+  """
+  def guest_only?(%{membership: %{roles: roles}}),
+    do: Palee.Organizations.Domain.MembershipPolicy.guest_only?(roles)
+
+  def guest_only?(_entry), do: false
 
   @doc "ADR-185: whether a membership entry is of an organiser organisation."
   def hosting_only?(%{organization: %{provider_kind: kind}}), do: kind == "organiser"
@@ -454,6 +464,24 @@ defmodule Palee.Organizations do
 
   def client_role(_context, _user_id), do: nil
 
+  @doc """
+  ADR-272: the role a person buys from the gym as (`:athlete`, `:member`,
+  then `:guest`), or nil for someone who may not buy (staff only, or not
+  in the gym).
+  """
+  def buyer_role(%{organization_id: organization_id}, user_id) when is_binary(organization_id),
+    do: buyer_role(organization_id, user_id)
+
+  def buyer_role(organization_id, user_id)
+      when is_binary(organization_id) and is_binary(user_id) do
+    case member(organization_id, user_id) do
+      %{roles: roles} -> Palee.Organizations.Domain.MembershipPolicy.buyer_role(roles)
+      nil -> nil
+    end
+  end
+
+  def buyer_role(_context, _user_id), do: nil
+
   defp member(organization_id, user_id) do
     organization_id
     |> ListMemberRoles.call(user_id: user_id)
@@ -571,6 +599,20 @@ defmodule Palee.Organizations do
 
   def resolve_platform_context(account, request_metadata \\ %{}),
     do: ResolvePlatformContext.call(account, request_metadata)
+
+  @doc "ADR-273: a vendor change to a box, in the vendors' audit log."
+  def record_platform_event(platform_context, organization_id, attrs),
+    do:
+      Palee.Organizations.Commands.RecordPlatformEvent.call(
+        platform_context,
+        organization_id,
+        attrs
+      )
+
+  @doc "ADR-273: whether the organization exists, read as the vendor."
+  def platform_organization_exists?(platform_context, organization_id),
+    do:
+      Palee.Organizations.Commands.RecordPlatformEvent.exists?(platform_context, organization_id)
 
   def grant_vendor(user_id), do: OrganizationStore.grant_vendor(user_id)
 
@@ -1157,6 +1199,54 @@ defmodule Palee.Organizations do
       when is_binary(organization_id) and is_binary(user_id) do
     RepoContext.run(%{organization_id: organization_id, user_id: user_id}, fn ->
       params |> Map.put(:organization_id, organization_id) |> AddMembership.call()
+    end)
+  end
+
+  @doc """
+  ADR-272: makes `user_id` a guest of the context's box, as the acting
+  staff member (owner, admin, coach or front desk). Someone with an active
+  membership keeps it as it is. `{:ok, membership_id}`.
+  """
+  def add_guest(%{organization_id: organization_id} = context, user_id)
+      when is_binary(organization_id) and is_binary(user_id) do
+    RepoContext.run(context, fn -> OrganizationStore.add_guest(organization_id, user_id) end)
+  end
+
+  @doc """
+  ADR-254: the membership of a person an import brought in. Like
+  `add_demo_membership/2` it announces nothing: `:membership_activated`
+  starts the welcome, referral, trial and event reactions, and an import
+  sends nothing to anyone until staff choose to invite. An existing
+  membership is left as it is (its roles and status are the business's
+  current truth); a revoked one is reactivated with `params`.
+  """
+  def add_imported_membership(%{organization_id: organization_id} = context, params)
+      when is_binary(organization_id) do
+    RepoContext.run(context, fn ->
+      case OrganizationStore.get_membership(organization_id, params.user_id) do
+        %{status: :active} = membership ->
+          {:ok, membership}
+
+        _missing_or_inactive ->
+          params |> Map.put(:organization_id, organization_id) |> AddMembership.call()
+      end
+    end)
+  end
+
+  @doc """
+  ADR-254: undoing an import revokes the membership it added (the person
+  keeps their profile; their history is kept or reversed by Finance).
+  """
+  def remove_imported_membership(%{organization_id: organization_id} = context, user_id)
+      when is_binary(organization_id) and is_binary(user_id) do
+    RepoContext.run(context, fn ->
+      case OrganizationStore.get_membership(organization_id, user_id) do
+        nil ->
+          {:ok, nil}
+
+        membership ->
+          OrganizationStore.update_membership_status(organization_id, membership.id, :revoked)
+      end
     end)
   end
 

@@ -656,6 +656,27 @@ defmodule Palee.Notifications do
         url: "/box/schedule"
       })
 
+  # ADR-252: staff asked the member to sign a document.
+  def process_event("document_signature_requested", payload),
+    do:
+      enqueue_simple(:document_signature_requested, payload, %{
+        template_id: field(payload, :template_id),
+        title: field(payload, :title),
+        business_name: field(payload, :business_name),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/documents"
+      })
+
+  # ADR-252: the member's health certificate expires soon (once per expiry).
+  def process_event("health_certificate_expiring", payload),
+    do:
+      enqueue_simple(:health_certificate_expiring, payload, %{
+        expires_on: field(payload, :expires_on),
+        business_name: field(payload, :business_name),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/documents"
+      })
+
   def process_event("package_expiring", payload),
     do:
       enqueue_simple(:package_expiring, payload, %{
@@ -857,6 +878,24 @@ defmodule Palee.Notifications do
         total_cents: field(payload, :total_cents),
         currency: field(payload, :currency),
         url: "/admin/shop?tab=orders"
+      })
+
+  # ADR-260: a declined saved-card charge; deduplicated per charge attempt.
+  def process_event("payment_failed", payload),
+    do: enqueue_payment_notice(:payment_failed, payload)
+
+  def process_event("payment_needs_attention", payload),
+    do: enqueue_payment_notice(:payment_needs_attention, payload)
+
+  # ADR-273: a fiscal connection stopped working; to the staff who manage
+  # billing, once a day at most per connection (the dedupe key has the date).
+  def process_event("fiscal_connection_failed", payload),
+    do:
+      enqueue_simple(:fiscal_connection_failed, payload, %{
+        connection: field(payload, :connection),
+        error_code: field(payload, :error_code),
+        dedupe_key: field(payload, :dedupe_key),
+        url: field(payload, :url)
       })
 
   def process_event("shop_order_ready", payload),
@@ -1708,4 +1747,16 @@ defmodule Palee.Notifications do
     do: "/partners/#{match_id}"
 
   defp partner_url(_match_id), do: "/messages?filter=partners"
+
+  defp enqueue_payment_notice(type, payload),
+    do:
+      enqueue_simple(type, payload, %{
+        payment_id: field(payload, :payment_id),
+        amount_cents: field(payload, :amount_cents),
+        currency: field(payload, :currency),
+        description: field(payload, :description),
+        final: field(payload, :final),
+        dedupe_key: field(payload, :dedupe_key),
+        url: field(payload, :url)
+      })
 end

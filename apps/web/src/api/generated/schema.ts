@@ -615,6 +615,77 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/box-screen/classes/{slot_id}/timer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A class's timer, for a class the screen shows */
+        get: operations["PaleeWeb.BoxScreenController.class_timer"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/box-screen/pair": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pair this TV with the code staff got (no sign-in)
+         * @description Case, spaces and dashes do not matter. A code pairs one device once. The display token lasts 90 days and is renewed with `POST /api/box-screen/token`.
+         */
+        post: operations["PaleeWeb.BoxScreenController.pair"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/box-screen/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What the screen shows today: classes, WODs, leaderboards and the focus */
+        get: operations["PaleeWeb.BoxScreenController.today"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/box-screen/token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Renew the display token */
+        post: operations["PaleeWeb.BoxScreenController.token"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/box-search": {
         parameters: {
             query?: never;
@@ -2372,6 +2443,27 @@ export interface paths {
         get: operations["PaleeWeb.DevicesController.daily_stats"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/data-exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your data exports, newest first, with short-lived download links */
+        get: operations["PaleeWeb.PersonalDataExportController.index"];
+        put?: never;
+        /**
+         * Ask for a copy of all your data (one ZIP of JSON files)
+         * @description One request at a time and one a day. The file is built in the background; an email says when it is ready.
+         */
+        post: operations["PaleeWeb.PersonalDataExportController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4276,6 +4368,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/memberships/guest-boxes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The boxes the account is only a guest of (ADR-272) */
+        get: operations["PaleeWeb.OrganizationAccessController.guest_boxes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/memberships/join/{slug}": {
         parameters: {
             query?: never;
@@ -4686,6 +4795,86 @@ export interface paths {
          * @description Booking resolution is never replayed blindly (ADR-120): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
          */
         patch: operations["PaleeWeb.AdminScheduleController.reject_booking"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/box-screens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's screens (those of the branches the staff member works at) */
+        get: operations["PaleeWeb.AdminBoxScreenController.index"];
+        put?: never;
+        /**
+         * Add a box screen and get its pairing code
+         * @description The code is shown once and works for 15 minutes; type it on the TV. A box has at most 20 screens. `location_id` null shows the whole box.
+         */
+        post: operations["PaleeWeb.AdminBoxScreenController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/box-screens/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a box screen: its TV stops at once */
+        delete: operations["PaleeWeb.AdminBoxScreenController.delete"];
+        options?: never;
+        head?: never;
+        /** Rename a box screen or move it to another branch */
+        patch: operations["PaleeWeb.AdminBoxScreenController.update"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/box-screens/{id}/override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Choose what a screen shows and pin it
+         * @description `wod`, `timer`, `leaderboard`, `bookings` or one `class` (with `slot_id`, one of today's classes on the screen), optionally until a time. The TV changes at once.
+         */
+        put: operations["PaleeWeb.AdminBoxScreenController.put_override"];
+        post?: never;
+        /** Return the screen to automatic («Επιστροφή στο αυτόματο») */
+        delete: operations["PaleeWeb.AdminBoxScreenController.delete_override"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/box-screens/{id}/pairing-code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * A new pairing code for a screen (to pair it with another TV)
+         * @description Replaces any pending code. The paired TV keeps working until another device pairs with the new code.
+         */
+        post: operations["PaleeWeb.AdminBoxScreenController.pairing_code"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/branding": {
@@ -5537,6 +5726,369 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/documents/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The documents audit log, newest first */
+        get: operations["PaleeWeb.AdminDocumentsController.audit"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/health-certificates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Clients with their health certificate status */
+        get: operations["PaleeWeb.AdminHealthCertificatesController.index"];
+        put?: never;
+        /** Record an uploaded health certificate with its dates */
+        post: operations["PaleeWeb.AdminHealthCertificatesController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/health-certificates/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A client's health certificates, newest first */
+        get: operations["PaleeWeb.AdminHealthCertificatesController.client"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/health-certificates/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload a client's health certificate: get a presigned upload */
+        post: operations["PaleeWeb.AdminHealthCertificatesController.request_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/health-certificates/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a health certificate and its file (audited) */
+        delete: operations["PaleeWeb.AdminHealthCertificatesController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/health-certificates/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A short-lived link to the certificate file (audited) */
+        get: operations["PaleeWeb.AdminHealthCertificatesController.file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A client's documents, signatures and health certificate status */
+        get: operations["PaleeWeb.AdminDocumentsController.member"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/outstanding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Per active document: how many clients signed and who has not */
+        get: operations["PaleeWeb.AdminDocumentsController.outstanding"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Signature requests, newest first */
+        get: operations["PaleeWeb.AdminDocumentsController.requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/requests/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel a pending request */
+        post: operations["PaleeWeb.AdminDocumentsController.cancel_request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's document rules (booking gate, health certificates) */
+        get: operations["PaleeWeb.AdminDocumentsController.settings"];
+        /** Change the box's document rules (audited) */
+        put: operations["PaleeWeb.AdminDocumentsController.save_settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/signatures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Signatures with their evidence, newest first */
+        get: operations["PaleeWeb.AdminDocumentsController.signatures"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/signatures/{id}/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A short-lived link to a signature's PDF certificate (audited) */
+        get: operations["PaleeWeb.AdminDocumentsController.evidence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/starters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ready-made drafts to start from (always marked for legal review) */
+        get: operations["PaleeWeb.AdminDocumentsController.starters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's documents, active first */
+        get: operations["PaleeWeb.AdminDocumentsController.index"];
+        put?: never;
+        /** Create a document with its first version */
+        post: operations["PaleeWeb.AdminDocumentsController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A document with its versions and the current text */
+        get: operations["PaleeWeb.AdminDocumentsController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive a document: no longer offered, required or requested */
+        post: operations["PaleeWeb.AdminDocumentsController.archive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask one client, every client, a role or a package's holders to sign
+         * @description Clients who already signed the required version or have a pending request are skipped. Each new request notifies its client.
+         */
+        post: operations["PaleeWeb.AdminDocumentsController.request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/requirement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Mark a document mandatory (blocks booking) or optional (only offered) */
+        put: operations["PaleeWeb.AdminDocumentsController.set_requirement"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish a new version (major: everyone signs again; minor: signatures still count) */
+        post: operations["PaleeWeb.AdminDocumentsController.publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/documents/templates/{id}/versions/{version_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One version's text */
+        get: operations["PaleeWeb.AdminDocumentsController.version"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/accounting-exports": {
         parameters: {
             query?: never;
@@ -6034,6 +6586,41 @@ export interface paths {
         post: operations["PaleeWeb.AdminFinanceController.mark_member_left"];
         /** Undo a member's leave (ADR-220) */
         delete: operations["PaleeWeb.AdminFinanceController.undo_member_left"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/finance/members/{id}/overrides": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every value set by hand for a member, newest first (ADR-274) */
+        get: operations["PaleeWeb.AdminFinanceController.member_overrides"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/finance/members/{id}/overrides/{field}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set a worked-out value by hand (ADR-274) */
+        put: operations["PaleeWeb.AdminFinanceController.set_member_override"];
+        post?: never;
+        /** Put a value set by hand back to automatic (ADR-274) */
+        delete: operations["PaleeWeb.AdminFinanceController.reset_member_override"];
         options?: never;
         head?: never;
         patch?: never;
@@ -6600,6 +7187,598 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/fiscal/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download the signed audit archive of a date range (ZIP) */
+        get: operations["PaleeWeb.AdminFiscalController.archive"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/authority-connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The myDATA connection (environment and user; never the key) */
+        get: operations["PaleeWeb.AdminFiscalReportingController.connection"];
+        /**
+         * Connect to myDATA: sandbox, AADE test or production with the business's credentials
+         * @description `test` and `production` need the business's myDATA user and subscription key; a saved key is kept when none is sent. The connection is then checked with AADE (ADR-273, `check`). Documents waiting for a connection are sent right after. Refused with `fiscal_connections_managed_by_palee` while the Palee team manages the connections.
+         */
+        put: operations["PaleeWeb.AdminFiscalReportingController.save_connection"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/closings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daily, monthly and yearly closings */
+        get: operations["PaleeWeb.AdminFiscalController.closings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/connections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's fiscal connections: only those its country asks for (never a credential) */
+        get: operations["PaleeWeb.AdminFiscalConnectionsController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/connections/{kind}/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * «Δοκιμή σύνδεσης»: ask the provider whether the saved connection works
+         * @description Nothing is sent or signed. myDATA: a harmless request with the business's user and key; AADE registry: a look-up of the business's own ΑΦΜ (one call of its quota, at most every 10 minutes); fiskaly: sign in and read the unit or System Palee uses. A refusal marks the connection invalid (`check.result = invalid`, with `error_code`); a provider that cannot be reached changes nothing (`unreachable`). Errors: `unknown_connection`, `connection_not_found`, `check_too_soon` (429).
+         */
+        post: operations["PaleeWeb.AdminFiscalConnectionsController.check"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/countries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Supported countries, what each asks of a business, and the VAT schemes */
+        get: operations["PaleeWeb.AdminFiscalController.countries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fiscal documents, newest first */
+        get: operations["PaleeWeb.AdminFiscalController.documents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A fiscal document with its lines and the credit notes against it */
+        get: operations["PaleeWeb.AdminFiscalController.document"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/credit-notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Issue a credit note for a document (all that is left, or chosen quantities)
+         * @description Documents are never changed: a credit note corrects them, with its reason (ADR-265). With `refund: true` the money goes back to the card the document was paid with and that refund issues the note (`document` is null when the refund could not issue it yet). Idempotent by `idempotency_key`.
+         */
+        post: operations["PaleeWeb.AdminFiscalController.credit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/einvoice/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a refused, failed or uncertain document over Peppol again
+         * @description An uncertain submission may already have reached the access point: check its portal first. It is sent with the same idempotency GUID, so a copy is refused, not delivered.
+         */
+        post: operations["PaleeWeb.AdminFiscalEInvoicingController.retry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Email a fiscal document's PDF to its buyer or to a typed address (ADR-265)
+         * @description Queued in the email outbox with the PDF attached, in the document's language (or `language`), and journaled. Without `to` the buyer's email printed on the document is used. Idempotent by `idempotency_key`; one address gets at most a few a day (`throttled`); a business in demo mode cannot send (`business_not_activated`).
+         */
+        post: operations["PaleeWeb.AdminFiscalTaxController.email_document"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/html": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A fiscal document as printable HTML */
+        get: operations["PaleeWeb.AdminFiscalTaxController.document_html"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A fiscal document as PDF, with its country's mentions (and the Swiss QR-bill) */
+        get: operations["PaleeWeb.AdminFiscalTaxController.document_pdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/documents/{id}/transmission/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send a refused or failed document to the tax authority again */
+        post: operations["PaleeWeb.AdminFiscalReportingController.retry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/einvoices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Peppol submissions, newest first, with counts per status */
+        get: operations["PaleeWeb.AdminFiscalEInvoicingController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/einvoices/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A Peppol submission with its attempts */
+        get: operations["PaleeWeb.AdminFiscalEInvoicingController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/exports/formats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Accounting export formats and the gym's options for each */
+        get: operations["PaleeWeb.AdminFiscalTaxController.export_formats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/exports/settings/{format}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Save the gym's options of an accounting export format (journaled)
+         * @description Unknown options are dropped and missing ones take their default; invalid ones come back as `validation_failed` with `options.<key>` fields.
+         */
+        put: operations["PaleeWeb.AdminFiscalTaxController.save_export_settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/exports/{format}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download the accounting export of a period (at most 366 days)
+         * @description Fiscal documents issued in the period (credit notes negative) and Finance payments, in the format's file layout, with the gym's saved options. The export is journaled. `x-palee-export-skipped` counts documents or payments the format cannot carry.
+         */
+        get: operations["PaleeWeb.AdminFiscalTaxController.export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/identity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The business's legal identity, its country profile and the fields still missing */
+        get: operations["PaleeWeb.AdminFiscalController.identity"];
+        /**
+         * Save the business's legal identity (partial updates allowed)
+         * @description Tax ids are checked against their country's format and check digits; field errors come back as `validation_failed` with one code per field. Every change is journaled.
+         */
+        put: operations["PaleeWeb.AdminFiscalController.save_identity"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/journal/verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Recompute the journal's hash chain and signatures */
+        get: operations["PaleeWeb.AdminFiscalController.verify_journal"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/peppol-connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Peppol connection (access point, environment, Peppol id; never the key) */
+        get: operations["PaleeWeb.AdminFiscalEInvoicingController.connection"];
+        /**
+         * Connect to Peppol: sandbox, or fiskaly E-INVOICE (test or production)
+         * @description `test` and `production` send through fiskaly E-INVOICE and need the business's fiskaly E-INVOICE System id (`legal_entity_id`) and an API key and secret; saved ones are kept when none are sent, and without any the business's fiskaly till connection's key and secret are used (one fiskaly account per business). The Peppol id defaults to the `0208` enterprise number of the business. The connection is then checked (ADR-273, `check`). Documents waiting for a connection are sent right after. Refused with `fiscal_connections_managed_by_palee` while the Palee team manages the connections.
+         */
+        put: operations["PaleeWeb.AdminFiscalEInvoicingController.save_connection"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/registry-connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The AADE registry connection (environment and user; never the password) */
+        get: operations["PaleeWeb.AdminFiscalRegistryController.connection"];
+        /**
+         * Connect AADE's registry service (RgWsPublic2) with the business's credentials
+         * @description `production` needs the special credentials AADE issued to the business for this service; a saved password is kept when none is sent. `sandbox` answers with made-up details and needs none. The connection is then checked by looking up the business's own ΑΦΜ (one call of its AADE quota; ADR-273, `check`). Refused with `fiscal_connections_managed_by_palee` while the Palee team manages the connections.
+         */
+        put: operations["PaleeWeb.AdminFiscalRegistryController.save_connection"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/registry/businesses/{tax_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A Greek business's registry details by ΑΦΜ (AADE)
+         * @description The ΑΦΜ's check digit is verified first (`invalid_tax_id`). Errors: `registry_not_connected`, `registry_credentials_rejected`, `registry_not_found`, `registry_limit_reached`, `registry_unavailable`.
+         */
+        get: operations["PaleeWeb.AdminFiscalRegistryController.lookup"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/sales-tax-rates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The gym's US sales tax rates by state and ZIP code */
+        get: operations["PaleeWeb.AdminFiscalTaxController.sales_tax_rates"];
+        /**
+         * Replace the gym's US sales tax rates (journaled)
+         * @description Only for a business whose legal identity is in the US (`sales_tax_not_applicable` otherwise). A ZIP code rate wins over its state's rate.
+         */
+        put: operations["PaleeWeb.AdminFiscalTaxController.save_sales_tax_rates"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/tax-categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tax categories the gym may give packages and products, and the default one */
+        get: operations["PaleeWeb.AdminFiscalTaxController.tax_categories"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/till-connections/{device}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The TSE, RKSV or SIGN FR connection (provider, environment, unit; never the credentials) */
+        get: operations["PaleeWeb.AdminFiscalTillSigningController.connection"];
+        /**
+         * Connect the till to a TSE (DE), RKSV unit (AT) or SIGN FR (FR): sandbox or fiskaly
+         * @description `test` and `production` use fiskaly SIGN DE / SIGN AT / SIGN FR and need the API key and secret; saved ones are kept when none are sent. A new connection (or `reprovision`) creates and initialises the TSS and client (DE), the signature unit and cash register (AT), or the taxpayer, location and System (FR; needs the business's SIREN, else `siren_missing`). The connection is then checked (ADR-273, `check`). Receipts waiting for a connection are signed right after. Refused with `fiscal_connections_managed_by_palee` while the Palee team manages the connections.
+         */
+        put: operations["PaleeWeb.AdminFiscalTillSigningController.save_connection"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/till-signatures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Receipt signatures, newest first, with counts per status */
+        get: operations["PaleeWeb.AdminFiscalTillSigningController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/till-signatures/null-receipts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sign an RKSV null receipt (Nullbeleg) */
+        post: operations["PaleeWeb.AdminFiscalTillSigningController.null_receipt"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/till-signatures/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A receipt signature with what it prints and its attempts */
+        get: operations["PaleeWeb.AdminFiscalTillSigningController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/till-signatures/{id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sign a refused, failed or uncertain receipt again
+         * @description An uncertain signature is read back from the device first. A German receipt recorded as a TSE failure stays so.
+         */
+        post: operations["PaleeWeb.AdminFiscalTillSigningController.retry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/fiscal/transmissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Reports to the tax authority, newest first, with counts per status */
+        get: operations["PaleeWeb.AdminFiscalReportingController.transmissions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/geocode": {
         parameters: {
             query?: never;
@@ -6645,6 +7824,153 @@ export interface paths {
         get: operations["PaleeWeb.AdminFacilityController.reverse_geocode"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The business's imports, newest first */
+        get: operations["PaleeWeb.AdminImportController.index"];
+        put?: never;
+        /**
+         * Upload a CSV file (≤ 5 MB, ≤ 20,000 rows) as a draft import
+         * @description The encoding (UTF-8/16, Windows-1252, ISO-8859-7, Windows-1253) and the delimiter (`,` `;` tab) are detected; the columns get a proposed mapping from the chosen system's preset, or the best matching one.
+         */
+        post: operations["PaleeWeb.AdminImportController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Fields, presets (best guesses), date orders, limits and codes of imports */
+        get: operations["PaleeWeb.AdminImportController.catalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One import with its dry run, counts per row status and outcome, and report */
+        get: operations["PaleeWeb.AdminImportController.show"];
+        put?: never;
+        post?: never;
+        /** Delete an import that was never applied */
+        delete: operations["PaleeWeb.AdminImportController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Apply the import in the background (each row once; again only finishes the rest) */
+        post: operations["PaleeWeb.AdminImportController.apply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Email invitations to the people the import brought in (at most 200 per call)
+         * @description Only people with an address who have not claimed their profile and were not invited yet; within the business's daily invitation limits.
+         */
+        post: operations["PaleeWeb.AdminImportController.invitations"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Save the mapping and options of a draft and run the dry run
+         * @description Nothing is written outside the import: every row gets its outcome and warnings.
+         */
+        post: operations["PaleeWeb.AdminImportController.preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}/rows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** An import's rows with their outcome, warnings and what applying them did */
+        get: operations["PaleeWeb.AdminImportController.rows"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/imports/{id}/undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Undo an applied import (within 7 days of its end) */
+        post: operations["PaleeWeb.AdminImportController.undo"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6749,6 +8075,435 @@ export interface paths {
         put?: never;
         /** Hand ownership to an active member; the former owner stays as admin */
         post: operations["PaleeWeb.OwnerOrganizationController.transfer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Online payments, newest first */
+        get: operations["PaleeWeb.AdminPaymentsController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The business's payment provider account (never its credentials) */
+        get: operations["PaleeWeb.AdminPaymentsController.account"];
+        /**
+         * Connect the business's own Viva or Stripe account
+         * @description The provider checks the credentials before they are saved. Secrets left out keep their saved values when the provider stays the same.
+         */
+        put: operations["PaleeWeb.AdminPaymentsController.save_account"];
+        post?: never;
+        /**
+         * Stop online payments: saved cards are no longer charged
+         * @description A one-button connection also loses Palee's access at the provider.
+         */
+        delete: operations["PaleeWeb.AdminPaymentsController.disconnect"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/account/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Choose what members pay online and who hears about failed charges
+         * @description Keys left out keep their value. Every purpose is on by default.
+         */
+        put: operations["PaleeWeb.AdminPaymentsController.save_options"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/account/packages-notice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Close the notice that connecting put the paid packages on sale online
+         * @description ADR-271: the notice shows once, after the first connection.
+         */
+        delete: operations["PaleeWeb.AdminPaymentsController.dismiss_packages_notice"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/attention": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Saved-card charges that need a person (Εκκρεμότητες)
+         * @description Declined and waiting for a retry, or failed for good, until staff close them or the purpose is paid. Each names the member (`member_name`).
+         */
+        get: operations["PaleeWeb.AdminPaymentsController.attention"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start connecting the business's Stripe or Viva account with one button
+         * @description Answers the provider page to send the owner to. There they sign in or open a merchant account and allow Palee; the provider sends them back to `/api/payments/connect/callback`, which opens the settings page with `connect=ok` or `connect=<error code>`.
+         */
+        post: operations["PaleeWeb.AdminPaymentsController.connect"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/desk/guests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Make a found person, or a walk-in who signs up, a guest of the box
+         * @description `user_id` for a person found by «Ποιος;», or `name` and `email` for a walk-in (a new held profile, ADR-254, or the account that already has that email). Someone who is already a box member, athlete or guest stays as they are (`added: false`).
+         */
+        post: operations["PaleeWeb.AdminDeskBuyersController.make_guest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/desk/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What a person (or a walk-in, without `user_id`) can pay at the desk */
+        get: operations["PaleeWeb.AdminDeskBuyersController.options"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/desk/people": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Who can pay at the desk
+         * @description Without `q`, the people who checked in today; with it, the box's members, athletes and guests whose name or email matches, or a Palee account outside the box when `q` is its exact email.
+         */
+        get: operations["PaleeWeb.AdminDeskBuyersController.people"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Open a Tap to Pay payment at the desk
+         * @description Answers the payment and the request the phone hands to the provider's terminal app. A retry with the same idempotency key answers the first payment.
+         */
+        post: operations["PaleeWeb.AdminTerminalPaymentsController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Whether the business can take Tap to Pay now */
+        get: operations["PaleeWeb.AdminTerminalPaymentsController.availability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal/result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * What the terminal app returned (confirmed with the provider)
+         * @description The phone posts the callback it received. Money is recorded only after the provider confirms the transaction; a duplicate callback answers the payment as it stands.
+         */
+        post: operations["PaleeWeb.AdminTerminalPaymentsController.result"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One Tap to Pay payment */
+        get: operations["PaleeWeb.AdminTerminalPaymentsController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Give up on a Tap to Pay payment that has no card transaction */
+        post: operations["PaleeWeb.AdminTerminalPaymentsController.cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal/{id}/receipt-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Email the receipt of a Tap to Pay payment (ADR-272)
+         * @description «Αποστολή με email» on the result screen, through the document email of ADR-265. A walk-in's needs `to`; a member's goes to their account email when `to` is left out.
+         */
+        post: operations["PaleeWeb.AdminTerminalPaymentsController.receipt_email"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/terminal/{id}/sandbox-complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dev/test only: the sandbox terminal app takes or refuses the card */
+        post: operations["PaleeWeb.AdminTerminalPaymentsController.sandbox_complete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/tips": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Card tips per staff member for a period (default: this month)
+         * @description Tips are the staff's, not revenue (ADR-264). Each is attributed to whoever started the payment on their phone, or to the front desk (ADR-272).
+         */
+        get: operations["PaleeWeb.AdminTipsController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One online payment with its refunds */
+        get: operations["PaleeWeb.AdminPaymentsController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/{id}/card-link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send the member the link to pay with another card again */
+        post: operations["PaleeWeb.AdminPaymentsController.card_link"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/{id}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Close a failed charge (e.g. paid at the desk); stops its retries */
+        post: operations["PaleeWeb.AdminPaymentsController.dismiss_charge"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/{id}/refunds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Give back part or all of a payment through the provider */
+        post: operations["PaleeWeb.AdminPaymentsController.refund"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/{id}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ask the provider about a payment now */
+        post: operations["PaleeWeb.AdminPaymentsController.retry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/payments/{id}/retry-charge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Charge the saved card once more now */
+        post: operations["PaleeWeb.AdminPaymentsController.retry_charge"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7632,6 +9387,80 @@ export interface paths {
          * @description ADR-176: `confirmed` sets the zone. `inferred` is a guess (the device's zone, else an IP-derived zone from the edge) and never replaces a confirmed zone.
          */
         put: operations["PaleeWeb.AdminSettingsController.update_time_zone"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/setup/recipes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Setup recipes per kind of box, and the recipes this business applied */
+        get: operations["PaleeWeb.AdminSetupController.recipes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/setup/recipes/{key}/apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Apply a recipe (owner only); applying it again changes nothing
+         * @description Creates the recipe's subscription packages and class types that are missing and sets its settings through the same services as the settings screens, in one transaction, then records which recipe was applied, when and by whom. Documents are listed in `manual`. `prices` (optional) are the owner's own prices for the recipe's packages, by code. `mode`: `all` changes every setting; `defaults_only` keeps the settings the owner already changed (the preview marks them `owner_changed`).
+         */
+        post: operations["PaleeWeb.AdminSetupController.apply_recipe"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/setup/recipes/{key}/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** What applying a recipe would change now (dry run; nothing is saved) */
+        post: operations["PaleeWeb.AdminSetupController.preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/setup/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Every business setting with its level (basic or under «Προχωρημένα»)
+         * @description CP-H1: the web shows the settings with `advanced: false` and keeps the rest under «Προχωρημένα», closed by default. `verdict` says why (derive: the app or a recipe sets it; remove: not shown to owners).
+         */
+        get: operations["PaleeWeb.AdminSetupController.settings"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -9034,6 +10863,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/class-timers/{slot_id}/screens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box screens this class can be shown on, for its coach */
+        get: operations["PaleeWeb.ClassScreenController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/class-timers/{slot_id}/screens/{screen_id}/override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Pin the class's timer, leaderboard or WOD on a box screen
+         * @description The class's own coach, today, on a screen of the class's branch or the whole box (or staff who manage screens). The TV changes at once.
+         */
+        put: operations["PaleeWeb.ClassScreenController.put_override"];
+        post?: never;
+        /**
+         * Return the screen to automatic from the class's remote
+         * @description A coach may only while the screen shows their class, or nothing pinned.
+         */
+        delete: operations["PaleeWeb.ClassScreenController.delete_override"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/community/channels/{id}/membership": {
         parameters: {
             query?: never;
@@ -9742,6 +11612,162 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My documents: what is outstanding, offered or signed, and my health certificate */
+        get: operations["PaleeWeb.MyDocumentsController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/health-certificate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record my uploaded health certificate with its dates */
+        post: operations["PaleeWeb.MyDocumentsController.create_health_certificate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/health-certificate/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload my health certificate: get a presigned upload */
+        post: operations["PaleeWeb.MyDocumentsController.request_health_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/health-certificate/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete my health certificate and its file */
+        delete: operations["PaleeWeb.MyDocumentsController.delete_health_certificate"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/health-certificate/{id}/file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A short-lived link to my health certificate file */
+        get: operations["PaleeWeb.MyDocumentsController.health_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/signatures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My signatures, newest first */
+        get: operations["PaleeWeb.MyDocumentsController.signatures"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/signatures/{id}/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A short-lived link to the PDF certificate of my signature */
+        get: operations["PaleeWeb.MyDocumentsController.evidence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The current text of a document, to read before signing */
+        get: operations["PaleeWeb.MyDocumentsController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/documents/{id}/sign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sign the current version (typed name and/or drawn signature)
+         * @description Simple electronic signature (eIDAS art. 25): the evidence keeps the SHA-256 of the exact text, the time, the IP address, the device and the account, and a PDF certificate is stored. `version_id` must be the version that was read.
+         */
+        post: operations["PaleeWeb.MyDocumentsController.sign"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/entitlement": {
         parameters: {
             query?: never;
@@ -9883,6 +11909,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/invoices/{id}/pay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Pay an open invoice on the payment provider's page
+         * @description Returns the payment with `redirect_url`: send the member there. Saving the card needs `consent_accepted`.
+         */
+        post: operations["PaleeWeb.MyPaymentsController.pay"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/invoices/{id}/payment-terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What paying this invoice online costs, and the text to agree to when saving the card */
+        get: operations["PaleeWeb.MyPaymentsController.terms"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/membership/leave": {
         parameters: {
             query?: never;
@@ -9929,6 +11992,165 @@ export interface paths {
         get: operations["PaleeWeb.CoachingExtrasController.my_nutrition_plan"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/packages/{id}/buy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Buy a package on the payment provider's page (and book a class once paid)
+         * @description Where the law gives 14 days to withdraw, `start_now` must be true: the member asks for the package to start at once. `book_slot_id` books that class once the package is paid.
+         */
+        post: operations["PaleeWeb.MyPaymentsController.buy_package"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/packages/{id}/purchase-terms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What buying a package online costs, and the texts to agree to */
+        get: operations["PaleeWeb.MyPaymentsController.package_terms"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/payment-methods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My saved cards */
+        get: operations["PaleeWeb.MyPaymentsController.methods"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/payment-methods/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Withdraw my permission: the card is never charged again */
+        delete: operations["PaleeWeb.MyPaymentsController.revoke_method"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/payment-methods/{id}/autopay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Pay due invoices automatically with this card (one card at a time) */
+        put: operations["PaleeWeb.MyPaymentsController.set_autopay"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/payments/return": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Back from the provider's page: ask the provider about the payment now */
+        post: operations["PaleeWeb.MyPaymentsController.returned"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/payments/sandbox/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dev and test only: finish a sandbox checkout as the provider's page would */
+        post: operations["PaleeWeb.MyPaymentsController.sandbox_complete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/payments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One of my online payments */
+        get: operations["PaleeWeb.MyPaymentsController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/payments/{id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Withdraw from a package bought online within 14 days
+         * @description Gives back the price less the part already used, and ends the package.
+         */
+        post: operations["PaleeWeb.MyPaymentsController.withdraw"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10223,6 +12445,23 @@ export interface paths {
         put?: never;
         /** Pay an unpaid order online (409 online_payment_unavailable until a provider exists) */
         post: operations["PaleeWeb.MyShopController.pay"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/orders/{id}/pay-online": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pay an unpaid shop order on the payment provider's page */
+        post: operations["PaleeWeb.MyPaymentsController.pay_shop_order"];
         delete?: never;
         options?: never;
         head?: never;
@@ -12629,6 +14868,77 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/platform/organizations/{id}/fiscal-connections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A box's fiscal connections and who manages them (never a credential) */
+        get: operations["PaleeWeb.PlatformFiscalConnectionsController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/organizations/{id}/fiscal-connections/managed-by": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Choose who manages a box's fiscal connections: its owner or the Palee team */
+        put: operations["PaleeWeb.PlatformFiscalConnectionsController.managed_by"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/organizations/{id}/fiscal-connections/{kind}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Fill or replace one of a box's fiscal connections (Palee team)
+         * @description Takes the same fields as the box's own save for that connection; saved secrets are kept when none are sent. The connection is then checked. Audited without any secret.
+         */
+        put: operations["PaleeWeb.PlatformFiscalConnectionsController.save"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/organizations/{id}/fiscal-connections/{kind}/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** «Δοκιμή σύνδεσης» of one of a box's fiscal connections (Palee team) */
+        post: operations["PaleeWeb.PlatformFiscalConnectionsController.check"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/platform/organizations/{id}/invitations": {
         parameters: {
             query?: never;
@@ -13338,6 +15648,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/public/boxes/{slug}/packages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The packages a published box sells online (ADR-248) */
+        get: operations["PaleeWeb.PublicBoxController.packages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/public/perk-verifications/{token}": {
         parameters: {
             query?: never;
@@ -13381,6 +15708,23 @@ export interface paths {
         };
         /** Active public platform plans (pricing, coach onboarding) */
         get: operations["PaleeWeb.PlatformPlanController.index_public"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/receipts/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A walk-in's receipt by its signed link */
+        get: operations["PaleeWeb.PublicReceiptsController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -18852,6 +21196,840 @@ export interface components {
             photo_ids?: string[];
             services?: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
         };
+        /** BoxScreen */
+        BoxScreen: {
+            /** @description Who last changed what the screen shows, and when */
+            focus_changed: {
+                /** Format: date-time */
+                at: string;
+                by: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string | null;
+                } | null;
+            } | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at: string;
+            /** Format: date-time */
+            last_seen_at: string | null;
+            /**
+             * Format: uuid
+             * @description The branch; null for the whole box
+             */
+            location_id: string | null;
+            name: string;
+            /**
+             * BoxScreenOverride
+             * @description What staff pinned on the screen; null when it follows the day automatically
+             */
+            override: {
+                /** Format: uuid */
+                slot_id: string | null;
+                /** Format: date-time */
+                until: string | null;
+                /** @enum {string} */
+                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+            } | null;
+            paired: boolean;
+            /** Format: date-time */
+            paired_at: string | null;
+            /**
+             * Format: date-time
+             * @description When the pending pairing code stops working; null without one
+             */
+            pairing_expires_at: string | null;
+        };
+        /** BoxScreenClass */
+        BoxScreenClass: {
+            /** @description First names of booked members who do not hide; hidden people, guests and trials only counted */
+            bookings: {
+                capacity: number;
+                count: number;
+                names: string[];
+                unnamed: number;
+                waitlist: number;
+            };
+            cancelled: boolean;
+            class_type: string | null;
+            coach_name: string | null;
+            duration_minutes: number;
+            /** Format: date-time */
+            ends_at: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            location_id: string | null;
+            name: string | null;
+            /** Format: date-time */
+            scheduled_at: string;
+            /** Format: uuid */
+            workout_id: string | null;
+        };
+        /**
+         * BoxScreenFocus
+         * @description What the screen puts first: automatically (preview, timer, results, idle) or as staff pinned it
+         */
+        BoxScreenFocus: {
+            /** Format: uuid */
+            slot_id: string | null;
+            /** @enum {string} */
+            source: "auto" | "staff";
+            /** Format: date-time */
+            until: string | null;
+            /** @enum {string} */
+            view: "preview" | "timer" | "results" | "idle" | "wod" | "timer" | "leaderboard" | "bookings" | "class";
+        };
+        /**
+         * BoxScreenLeaderboard
+         * @description Only people who opted in to leaderboards; never journal-private results
+         */
+        BoxScreenLeaderboard: {
+            entries: {
+                /** @description First word of the display name */
+                name: string;
+                rank: number;
+                scale_level_slug: string | null;
+                unit: string | null;
+                value: string | null;
+            }[];
+            score: {
+                name?: string | null;
+                score_type?: string | null;
+                unit?: string | null;
+            } | null;
+            /** Format: uuid */
+            workout_id: string;
+        };
+        /**
+         * BoxScreenOverride
+         * @description What staff pinned on the screen; null when it follows the day automatically
+         */
+        BoxScreenOverride: {
+            /** Format: uuid */
+            slot_id: string | null;
+            /** Format: date-time */
+            until: string | null;
+            /** @enum {string} */
+            view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+        } | null;
+        /**
+         * BoxScreenPairingCode
+         * @description Shown once: typed on the TV within 15 minutes
+         */
+        BoxScreenPairingCode: {
+            /** @example ACEF-3467 */
+            code: string;
+            /** Format: date-time */
+            expires_at: string;
+        };
+        /** BoxScreenToday */
+        BoxScreenToday: {
+            /** @description The box; `id` is the topic of `box_screen:<id>` on `/box_screen_socket` */
+            box: {
+                /** Format: uuid */
+                id: string;
+                name: string | null;
+            };
+            classes: {
+                /** @description First names of booked members who do not hide; hidden people, guests and trials only counted */
+                bookings: {
+                    capacity: number;
+                    count: number;
+                    names: string[];
+                    unnamed: number;
+                    waitlist: number;
+                };
+                cancelled: boolean;
+                class_type: string | null;
+                coach_name: string | null;
+                duration_minutes: number;
+                /** Format: date-time */
+                ends_at: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                location_id: string | null;
+                name: string | null;
+                /** Format: date-time */
+                scheduled_at: string;
+                /** Format: uuid */
+                workout_id: string | null;
+            }[];
+            /**
+             * Format: date
+             * @description Today on the box's clock
+             */
+            date: string;
+            /**
+             * BoxScreenFocus
+             * @description What the screen puts first: automatically (preview, timer, results, idle) or as staff pinned it
+             */
+            focus: {
+                /** Format: uuid */
+                slot_id: string | null;
+                /** @enum {string} */
+                source: "auto" | "staff";
+                /** Format: date-time */
+                until: string | null;
+                /** @enum {string} */
+                view: "preview" | "timer" | "results" | "idle" | "wod" | "timer" | "leaderboard" | "bookings" | "class";
+            };
+            leaderboards: {
+                entries: {
+                    /** @description First word of the display name */
+                    name: string;
+                    rank: number;
+                    scale_level_slug: string | null;
+                    unit: string | null;
+                    value: string | null;
+                }[];
+                score: {
+                    name?: string | null;
+                    score_type?: string | null;
+                    unit?: string | null;
+                } | null;
+                /** Format: uuid */
+                workout_id: string;
+            }[];
+            screen: {
+                branch: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                } | null;
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
+            /** Format: date-time */
+            server_now: string;
+            time_zone: string;
+            workouts: {
+                /** WorkoutBody */
+                body: {
+                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                    document: {
+                        [key: string]: unknown;
+                    } | null;
+                    /** @enum {string} */
+                    kind: "free_text";
+                    /** @description The assistant also derived exercises (see `sections`) */
+                    structured: boolean;
+                    text: string | null;
+                    timer: {
+                        [key: string]: unknown;
+                    } | null;
+                } | {
+                    /** @enum {string} */
+                    kind: "text_sections";
+                    sections: {
+                        /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                        document: {
+                            [key: string]: unknown;
+                        } | null;
+                        /** Format: uuid */
+                        id: string | null;
+                        /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                        scoring: {
+                            [key: string]: unknown;
+                        }[];
+                        text: string;
+                        /** SectionTimerPreset */
+                        timer: {
+                            duration_seconds?: number | null;
+                            /** @enum {string} */
+                            format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                            interval_seconds?: number | null;
+                            rest_seconds?: number | null;
+                            rounds?: number | null;
+                            work_seconds?: number | null;
+                        } | null;
+                        /** @description Null when untitled */
+                        title: string | null;
+                    }[];
+                } | {
+                    /** @enum {string} */
+                    kind: "structured";
+                    sections: {
+                        /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                        exercises: {
+                            [key: string]: unknown;
+                        }[];
+                        /** Format: uuid */
+                        id: string | null;
+                        name: string;
+                        scoreable: boolean;
+                        subtitle?: string | null;
+                        timer: {
+                            [key: string]: unknown;
+                        } | null;
+                    }[];
+                } | {
+                    /** @enum {string} */
+                    kind: "plan";
+                    sections: {
+                        /** Format: uuid */
+                        id: string | null;
+                        name: string;
+                        /**
+                         * PlanSection
+                         * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                         */
+                        plan: {
+                            blocks: {
+                                cells: ({
+                                    d?: string;
+                                    dist?: string;
+                                    height?: string;
+                                    hold?: string;
+                                    l?: string;
+                                    pace?: string;
+                                    rir?: string;
+                                    rpe?: string;
+                                    tempo?: string;
+                                    zone?: string;
+                                } | null)[];
+                                dose: string;
+                                exerciseRef?: string | null;
+                                extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                group?: string | null;
+                                id: string;
+                                /** @enum {string} */
+                                kind: "ex" | "rest";
+                                load: string;
+                                name: string;
+                                note?: string;
+                                perRound?: boolean;
+                                x?: {
+                                    dist?: string;
+                                    height?: string;
+                                    hold?: string;
+                                    pace?: string;
+                                    rir?: string;
+                                    rpe?: string;
+                                    tempo?: string;
+                                    zone?: string;
+                                };
+                            }[][];
+                            /** @enum {string} */
+                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                            interrupt?: {
+                                cells: ({
+                                    d?: string;
+                                    dist?: string;
+                                    height?: string;
+                                    hold?: string;
+                                    l?: string;
+                                    pace?: string;
+                                    rir?: string;
+                                    rpe?: string;
+                                    tempo?: string;
+                                    zone?: string;
+                                } | null)[];
+                                dose: string;
+                                exerciseRef?: string | null;
+                                extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                group?: string | null;
+                                id: string;
+                                /** @enum {string} */
+                                kind: "ex" | "rest";
+                                load: string;
+                                name: string;
+                                note?: string;
+                                perRound?: boolean;
+                                x?: {
+                                    dist?: string;
+                                    height?: string;
+                                    hold?: string;
+                                    pace?: string;
+                                    rir?: string;
+                                    rpe?: string;
+                                    tempo?: string;
+                                    zone?: string;
+                                };
+                            }[];
+                            levelNotes?: {
+                                [key: string]: string;
+                            };
+                            /** PlanMods */
+                            mods?: {
+                                hr?: boolean;
+                                interrupt?: boolean;
+                            };
+                            note?: string;
+                            /** PlanParams */
+                            params: {
+                                cap?: string;
+                                dur?: string;
+                                every?: string;
+                                hrTarget?: string;
+                                intEvery?: string;
+                                off?: string;
+                                rest?: string;
+                                rounds?: string;
+                                sets?: string;
+                                times?: string;
+                                work?: string;
+                            };
+                            preset?: string | null;
+                            /** @enum {string} */
+                            score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                            structs?: {
+                                [key: string]: {
+                                    clusters?: string;
+                                    dropby?: string;
+                                    drops?: string;
+                                    intra?: string;
+                                    /** @enum {string} */
+                                    kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                    minis?: string;
+                                };
+                            };
+                            /** @enum {integer} */
+                            v: 1;
+                        } | null;
+                        /**
+                         * PlanPrescription
+                         * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                         */
+                        prescription: {
+                            /**
+                             * PlanClock
+                             * @description How a plan section runs, unit-normalised (seconds, counts)
+                             */
+                            clock: {
+                                blocks: number;
+                                cap_secs: number | null;
+                                dur_secs: number | null;
+                                every_secs: number | null;
+                                /** @enum {string} */
+                                flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                hr_target_bpm: number | null;
+                                interrupt_every_secs: number | null;
+                                off_secs: number | null;
+                                /** @description AMRAP, or EMOM without times: no last round */
+                                open_ended: boolean;
+                                preset: string | null;
+                                rest_secs: {
+                                    max: number;
+                                    min: number;
+                                } | null;
+                                rounds: number | null;
+                                score: string | null;
+                                sets: {
+                                    max: number;
+                                    min: number;
+                                } | null;
+                                times: number | null;
+                                /** @description Null when open-ended */
+                                total_rounds: number | null;
+                                windows_secs: number[] | null;
+                                work_secs: number | null;
+                            };
+                            rows: {
+                                /** @description -1: an interruption row */
+                                block_index: number;
+                                exercise_ref: string | null;
+                                group_id: string | null;
+                                interrupt: boolean;
+                                /** @enum {string} */
+                                kind: "exercise" | "rest";
+                                name: string | null;
+                                note: string | null;
+                                per_side: boolean;
+                                row_id: string;
+                                sets: {
+                                    index: number;
+                                    /** PlanLoad */
+                                    load: {
+                                        /** @enum {string} */
+                                        kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                        text: string | null;
+                                        /** @description Decimal (22.5) */
+                                        value: number | null;
+                                        value_max: number | null;
+                                    } | null;
+                                    /** PlanMeasures */
+                                    measures: {
+                                        distance_m: number | null;
+                                        height_cm: number | null;
+                                        hold_secs: number | null;
+                                        hr_zone: number | null;
+                                        pace_secs_per_500m: number | null;
+                                        rir: number | null;
+                                        rpe: number | null;
+                                        tempo: {
+                                            bottom: number | "X";
+                                            down: number | "X";
+                                            top: number | "X";
+                                            up: number | "X";
+                                        } | null;
+                                    };
+                                    /** PlanReps */
+                                    reps: {
+                                        max: number | null;
+                                        max_effort: boolean;
+                                        min: number | null;
+                                        sets: {
+                                            max: number;
+                                            min: number;
+                                        } | null;
+                                        text: string | null;
+                                        /** @enum {string} */
+                                        unit: "reps" | "secs" | "meters" | "kcal";
+                                        within_secs: number | null;
+                                    } | null;
+                                    rest_secs: number | null;
+                                    /** @description 1-based rounds it applies to (empty: every interruption) */
+                                    rounds: number[];
+                                }[];
+                                /** PlanStructurePrescription */
+                                structure: {
+                                    clusters: number | null;
+                                    drop_by: string | null;
+                                    drops: number | null;
+                                    intra_secs: number | null;
+                                    /** @enum {string} */
+                                    kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                    minis: number | null;
+                                };
+                                /**
+                                 * PlanThenRule
+                                 * @description Open-ended flows: what follows the written rounds
+                                 */
+                                then: {
+                                    load_step: number | null;
+                                    reps_step: number | null;
+                                    /** @enum {string} */
+                                    rule: "repeat" | "step";
+                                } | null;
+                            }[];
+                        } | null;
+                    }[];
+                };
+                /** Format: uuid */
+                id: string;
+                title: string | null;
+                type: string | null;
+            }[];
+        };
+        /** BoxScreenToken */
+        BoxScreenToken: {
+            /** Format: date-time */
+            expires_at: string;
+            token: string;
+        };
+        /** BoxScreenWorkout */
+        BoxScreenWorkout: {
+            /** WorkoutBody */
+            body: {
+                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                document: {
+                    [key: string]: unknown;
+                } | null;
+                /** @enum {string} */
+                kind: "free_text";
+                /** @description The assistant also derived exercises (see `sections`) */
+                structured: boolean;
+                text: string | null;
+                timer: {
+                    [key: string]: unknown;
+                } | null;
+            } | {
+                /** @enum {string} */
+                kind: "text_sections";
+                sections: {
+                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                    document: {
+                        [key: string]: unknown;
+                    } | null;
+                    /** Format: uuid */
+                    id: string | null;
+                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                    scoring: {
+                        [key: string]: unknown;
+                    }[];
+                    text: string;
+                    /** SectionTimerPreset */
+                    timer: {
+                        duration_seconds?: number | null;
+                        /** @enum {string} */
+                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                        interval_seconds?: number | null;
+                        rest_seconds?: number | null;
+                        rounds?: number | null;
+                        work_seconds?: number | null;
+                    } | null;
+                    /** @description Null when untitled */
+                    title: string | null;
+                }[];
+            } | {
+                /** @enum {string} */
+                kind: "structured";
+                sections: {
+                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                    exercises: {
+                        [key: string]: unknown;
+                    }[];
+                    /** Format: uuid */
+                    id: string | null;
+                    name: string;
+                    scoreable: boolean;
+                    subtitle?: string | null;
+                    timer: {
+                        [key: string]: unknown;
+                    } | null;
+                }[];
+            } | {
+                /** @enum {string} */
+                kind: "plan";
+                sections: {
+                    /** Format: uuid */
+                    id: string | null;
+                    name: string;
+                    /**
+                     * PlanSection
+                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                     */
+                    plan: {
+                        blocks: {
+                            cells: ({
+                                d?: string;
+                                dist?: string;
+                                height?: string;
+                                hold?: string;
+                                l?: string;
+                                pace?: string;
+                                rir?: string;
+                                rpe?: string;
+                                tempo?: string;
+                                zone?: string;
+                            } | null)[];
+                            dose: string;
+                            exerciseRef?: string | null;
+                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                            group?: string | null;
+                            id: string;
+                            /** @enum {string} */
+                            kind: "ex" | "rest";
+                            load: string;
+                            name: string;
+                            note?: string;
+                            perRound?: boolean;
+                            x?: {
+                                dist?: string;
+                                height?: string;
+                                hold?: string;
+                                pace?: string;
+                                rir?: string;
+                                rpe?: string;
+                                tempo?: string;
+                                zone?: string;
+                            };
+                        }[][];
+                        /** @enum {string} */
+                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                        interrupt?: {
+                            cells: ({
+                                d?: string;
+                                dist?: string;
+                                height?: string;
+                                hold?: string;
+                                l?: string;
+                                pace?: string;
+                                rir?: string;
+                                rpe?: string;
+                                tempo?: string;
+                                zone?: string;
+                            } | null)[];
+                            dose: string;
+                            exerciseRef?: string | null;
+                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                            group?: string | null;
+                            id: string;
+                            /** @enum {string} */
+                            kind: "ex" | "rest";
+                            load: string;
+                            name: string;
+                            note?: string;
+                            perRound?: boolean;
+                            x?: {
+                                dist?: string;
+                                height?: string;
+                                hold?: string;
+                                pace?: string;
+                                rir?: string;
+                                rpe?: string;
+                                tempo?: string;
+                                zone?: string;
+                            };
+                        }[];
+                        levelNotes?: {
+                            [key: string]: string;
+                        };
+                        /** PlanMods */
+                        mods?: {
+                            hr?: boolean;
+                            interrupt?: boolean;
+                        };
+                        note?: string;
+                        /** PlanParams */
+                        params: {
+                            cap?: string;
+                            dur?: string;
+                            every?: string;
+                            hrTarget?: string;
+                            intEvery?: string;
+                            off?: string;
+                            rest?: string;
+                            rounds?: string;
+                            sets?: string;
+                            times?: string;
+                            work?: string;
+                        };
+                        preset?: string | null;
+                        /** @enum {string} */
+                        score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                        structs?: {
+                            [key: string]: {
+                                clusters?: string;
+                                dropby?: string;
+                                drops?: string;
+                                intra?: string;
+                                /** @enum {string} */
+                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                minis?: string;
+                            };
+                        };
+                        /** @enum {integer} */
+                        v: 1;
+                    } | null;
+                    /**
+                     * PlanPrescription
+                     * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                     */
+                    prescription: {
+                        /**
+                         * PlanClock
+                         * @description How a plan section runs, unit-normalised (seconds, counts)
+                         */
+                        clock: {
+                            blocks: number;
+                            cap_secs: number | null;
+                            dur_secs: number | null;
+                            every_secs: number | null;
+                            /** @enum {string} */
+                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                            hr_target_bpm: number | null;
+                            interrupt_every_secs: number | null;
+                            off_secs: number | null;
+                            /** @description AMRAP, or EMOM without times: no last round */
+                            open_ended: boolean;
+                            preset: string | null;
+                            rest_secs: {
+                                max: number;
+                                min: number;
+                            } | null;
+                            rounds: number | null;
+                            score: string | null;
+                            sets: {
+                                max: number;
+                                min: number;
+                            } | null;
+                            times: number | null;
+                            /** @description Null when open-ended */
+                            total_rounds: number | null;
+                            windows_secs: number[] | null;
+                            work_secs: number | null;
+                        };
+                        rows: {
+                            /** @description -1: an interruption row */
+                            block_index: number;
+                            exercise_ref: string | null;
+                            group_id: string | null;
+                            interrupt: boolean;
+                            /** @enum {string} */
+                            kind: "exercise" | "rest";
+                            name: string | null;
+                            note: string | null;
+                            per_side: boolean;
+                            row_id: string;
+                            sets: {
+                                index: number;
+                                /** PlanLoad */
+                                load: {
+                                    /** @enum {string} */
+                                    kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                    text: string | null;
+                                    /** @description Decimal (22.5) */
+                                    value: number | null;
+                                    value_max: number | null;
+                                } | null;
+                                /** PlanMeasures */
+                                measures: {
+                                    distance_m: number | null;
+                                    height_cm: number | null;
+                                    hold_secs: number | null;
+                                    hr_zone: number | null;
+                                    pace_secs_per_500m: number | null;
+                                    rir: number | null;
+                                    rpe: number | null;
+                                    tempo: {
+                                        bottom: number | "X";
+                                        down: number | "X";
+                                        top: number | "X";
+                                        up: number | "X";
+                                    } | null;
+                                };
+                                /** PlanReps */
+                                reps: {
+                                    max: number | null;
+                                    max_effort: boolean;
+                                    min: number | null;
+                                    sets: {
+                                        max: number;
+                                        min: number;
+                                    } | null;
+                                    text: string | null;
+                                    /** @enum {string} */
+                                    unit: "reps" | "secs" | "meters" | "kcal";
+                                    within_secs: number | null;
+                                } | null;
+                                rest_secs: number | null;
+                                /** @description 1-based rounds it applies to (empty: every interruption) */
+                                rounds: number[];
+                            }[];
+                            /** PlanStructurePrescription */
+                            structure: {
+                                clusters: number | null;
+                                drop_by: string | null;
+                                drops: number | null;
+                                intra_secs: number | null;
+                                /** @enum {string} */
+                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                minis: number | null;
+                            };
+                            /**
+                             * PlanThenRule
+                             * @description Open-ended flows: what follows the written rounds
+                             */
+                            then: {
+                                load_step: number | null;
+                                reps_step: number | null;
+                                /** @enum {string} */
+                                rule: "repeat" | "step";
+                            } | null;
+                        }[];
+                    } | null;
+                }[];
+            };
+            /** Format: uuid */
+            id: string;
+            title: string | null;
+            type: string | null;
+        };
         /** BoxSearchResponse */
         BoxSearchResponse: {
             boxes: {
@@ -19798,7 +22976,7 @@ export interface components {
                 /** @enum {string} */
                 kind: "class" | "open_gym";
                 /** @enum {string|null} */
-                method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
                 override?: boolean;
             } | null;
             /** @enum {string} */
@@ -20036,7 +23214,7 @@ export interface components {
             /** @enum {string} */
             kind: "class" | "open_gym";
             /** @enum {string|null} */
-            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
             override?: boolean;
         } | null;
         /** CheckInRules */
@@ -20128,7 +23306,7 @@ export interface components {
                 /** @enum {string} */
                 kind: "class" | "open_gym";
                 /** @enum {string|null} */
-                method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
                 override?: boolean;
             } | null;
             choices?: {
@@ -20316,6 +23494,58 @@ export interface components {
                 /** Format: uuid */
                 user_id: string;
             }[];
+        };
+        /**
+         * ClassScreenList
+         * @description The box screens the person may change for this class: its coach (today, screens of the class's branch or the whole box) or staff who manage screens
+         */
+        ClassScreenList: {
+            screens: {
+                /** @description Who last changed what the screen shows, and when */
+                focus_changed: {
+                    /** Format: date-time */
+                    at: string;
+                    by: {
+                        /** Format: uuid */
+                        id: string;
+                        name: string | null;
+                    } | null;
+                } | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                /** Format: date-time */
+                last_seen_at: string | null;
+                /**
+                 * Format: uuid
+                 * @description The branch; null for the whole box
+                 */
+                location_id: string | null;
+                name: string;
+                /**
+                 * BoxScreenOverride
+                 * @description What staff pinned on the screen; null when it follows the day automatically
+                 */
+                override: {
+                    /** Format: uuid */
+                    slot_id: string | null;
+                    /** Format: date-time */
+                    until: string | null;
+                    /** @enum {string} */
+                    view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                } | null;
+                paired: boolean;
+                /** Format: date-time */
+                paired_at: string | null;
+                /**
+                 * Format: date-time
+                 * @description When the pending pairing code stops working; null without one
+                 */
+                pairing_expires_at: string | null;
+            }[];
+            /** @description What the person may pin: a coach `timer`, `leaderboard` and `wod` */
+            views: ("wod" | "timer" | "leaderboard" | "bookings" | "class")[];
         };
         /** ClassSlotInjuryWarnings */
         ClassSlotInjuryWarnings: {
@@ -35221,6 +38451,8 @@ export interface components {
             archived_at?: string | null;
             category?: string | null;
             description?: string | null;
+            /** @description Required with exempt: the article of the VAT law printed on the document */
+            exemption_reason?: string | null;
             /** Format: uuid */
             id: string;
             location_ids?: string[];
@@ -35251,6 +38483,11 @@ export interface components {
             sell_in_app?: boolean;
             /** @enum {string} */
             status: "draft" | "published" | "archived";
+            /**
+             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+             * @enum {string|null}
+             */
+            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
             title: string;
             variants: {
                 /** Format: date-time */
@@ -35259,6 +38496,7 @@ export interface components {
                 compare_at_price_cents?: number | null;
                 cost_price_cents?: number | null;
                 currency: string;
+                exemption_reason?: string | null;
                 /** Format: uuid */
                 id: string;
                 low_stock_threshold?: number | null;
@@ -35285,6 +38523,15 @@ export interface components {
                 };
                 /** @enum {string} */
                 stock_status: "ok" | "low" | "critical" | "out";
+                /**
+                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                 * @enum {string|null}
+                 */
+                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                /**
+                 * @deprecated
+                 * @description Use tax_category (ADR-244)
+                 */
                 tax_class?: string | null;
                 title?: string | null;
                 track_inventory?: boolean;
@@ -35297,6 +38544,8 @@ export interface components {
             all_locations?: boolean;
             category?: string | null;
             description?: string | null;
+            /** @description Required with exempt: the article of the VAT law printed on the document */
+            exemption_reason?: string | null;
             location_ids?: string[];
             media_ids?: string[];
             member_discount_applies?: boolean;
@@ -35314,12 +38563,19 @@ export interface components {
              * @enum {string}
              */
             status?: "draft" | "published" | "archived";
+            /**
+             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+             * @enum {string|null}
+             */
+            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
             title: string;
             variants?: {
                 barcode?: string | null;
                 compare_at_price_cents?: number | null;
                 cost_price_cents?: number | null;
                 currency?: string;
+                /** @description Required with exempt: the article of the VAT law printed on the document */
+                exemption_reason?: string | null;
                 initial_quantity?: number;
                 /** Format: uuid */
                 location_id?: string | null;
@@ -35330,7 +38586,16 @@ export interface components {
                 position?: number;
                 price_cents: number;
                 sku?: string | null;
-                /** @enum {string|null} */
+                /**
+                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                 * @enum {string|null}
+                 */
+                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                /**
+                 * @deprecated
+                 * @description Deprecated alias of tax_category (ADR-244)
+                 * @enum {string|null}
+                 */
                 tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
                 title?: string | null;
                 track_inventory?: boolean;
@@ -35392,6 +38657,8 @@ export interface components {
                 archived_at?: string | null;
                 category?: string | null;
                 description?: string | null;
+                /** @description Required with exempt: the article of the VAT law printed on the document */
+                exemption_reason?: string | null;
                 /** Format: uuid */
                 id: string;
                 location_ids?: string[];
@@ -35422,6 +38689,11 @@ export interface components {
                 sell_in_app?: boolean;
                 /** @enum {string} */
                 status: "draft" | "published" | "archived";
+                /**
+                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                 * @enum {string|null}
+                 */
+                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                 title: string;
                 variants: {
                     /** Format: date-time */
@@ -35430,6 +38702,7 @@ export interface components {
                     compare_at_price_cents?: number | null;
                     cost_price_cents?: number | null;
                     currency: string;
+                    exemption_reason?: string | null;
                     /** Format: uuid */
                     id: string;
                     low_stock_threshold?: number | null;
@@ -35456,6 +38729,15 @@ export interface components {
                     };
                     /** @enum {string} */
                     stock_status: "ok" | "low" | "critical" | "out";
+                    /**
+                     * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                     * @enum {string|null}
+                     */
+                    tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                    /**
+                     * @deprecated
+                     * @description Use tax_category (ADR-244)
+                     */
                     tax_class?: string | null;
                     title?: string | null;
                     track_inventory?: boolean;
@@ -35485,6 +38767,8 @@ export interface components {
             all_locations?: boolean;
             category?: string | null;
             description?: string | null;
+            /** @description Required with exempt: the article of the VAT law printed on the document */
+            exemption_reason?: string | null;
             location_ids?: string[];
             media_ids?: string[];
             member_discount_applies?: boolean;
@@ -35498,6 +38782,11 @@ export interface components {
             sell_in_app?: boolean;
             /** @enum {string} */
             status?: "draft" | "published" | "archived";
+            /**
+             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+             * @enum {string|null}
+             */
+            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
             title?: string;
             /** @description The full list of live variants: with id edited, without one added (with optional opening stock), live ones left out archived. Written with the product in one transaction. */
             variants?: {
@@ -35505,6 +38794,8 @@ export interface components {
                 compare_at_price_cents?: number | null;
                 cost_price_cents?: number | null;
                 currency?: string;
+                /** @description Required with exempt: the article of the VAT law printed on the document */
+                exemption_reason?: string | null;
                 /** Format: uuid */
                 id?: string | null;
                 initial_quantity?: number;
@@ -35517,7 +38808,16 @@ export interface components {
                 position?: number;
                 price_cents?: number;
                 sku?: string | null;
-                /** @enum {string|null} */
+                /**
+                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                 * @enum {string|null}
+                 */
+                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                /**
+                 * @deprecated
+                 * @description Deprecated alias of tax_category (ADR-244)
+                 * @enum {string|null}
+                 */
                 tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
                 title?: string | null;
                 track_inventory?: boolean;
@@ -35975,6 +39275,7 @@ export interface components {
             compare_at_price_cents?: number | null;
             cost_price_cents?: number | null;
             currency: string;
+            exemption_reason?: string | null;
             /** Format: uuid */
             id: string;
             low_stock_threshold?: number | null;
@@ -36001,6 +39302,15 @@ export interface components {
             };
             /** @enum {string} */
             stock_status: "ok" | "low" | "critical" | "out";
+            /**
+             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+             * @enum {string|null}
+             */
+            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+            /**
+             * @deprecated
+             * @description Use tax_category (ADR-244)
+             */
             tax_class?: string | null;
             title?: string | null;
             track_inventory?: boolean;
@@ -36011,6 +39321,8 @@ export interface components {
             compare_at_price_cents?: number | null;
             cost_price_cents?: number | null;
             currency?: string;
+            /** @description Required with exempt: the article of the VAT law printed on the document */
+            exemption_reason?: string | null;
             low_stock_threshold?: number | null;
             option_values?: {
                 [key: string]: string;
@@ -36018,7 +39330,16 @@ export interface components {
             position?: number;
             price_cents?: number;
             sku?: string | null;
-            /** @enum {string|null} */
+            /**
+             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+             * @enum {string|null}
+             */
+            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+            /**
+             * @deprecated
+             * @description Deprecated alias of tax_category (ADR-244)
+             * @enum {string|null}
+             */
             tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
             title?: string | null;
             track_inventory?: boolean;
@@ -43471,6 +46792,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description ADR-267: true when the person confirms they are at least 16; without it nothing is created (422, errors.age_confirmed) */
+                    age_confirmed?: boolean;
                     /** @description Free display name; defaults to the handle */
                     display_name?: string;
                     /** Format: email */
@@ -43566,6 +46889,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description ADR-267: true when the person confirms they are at least 16; without it nothing is created (422, errors.age_confirmed) */
+                    age_confirmed?: boolean;
                     display_name?: string;
                     /** Format: email */
                     email: string;
@@ -43668,6 +46993,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description ADR-267: true when the person confirms they are at least 16; without it nothing is created (422, errors.age_confirmed) */
+                    age_confirmed?: boolean;
                     display_name?: string;
                     /** Format: email */
                     email: string;
@@ -43969,6 +47296,584 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "PaleeWeb.BoxScreenController.class_timer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Class timer */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        class: {
+                            duration_minutes?: number;
+                            /** Format: uuid */
+                            id?: string;
+                            name?: string;
+                            /** Format: date-time */
+                            scheduled_at?: string;
+                        };
+                        segments: {
+                            [key: string]: unknown;
+                        }[];
+                        /** Format: date-time */
+                        server_now: string;
+                        timer: {
+                            current_segment_index: number;
+                            duration_adjustments?: {
+                                [key: string]: unknown;
+                            };
+                            lock_version: number;
+                            paused_elapsed_ms: number;
+                            /** Format: date-time */
+                            segment_started_at_utc?: string | null;
+                            /** @enum {string} */
+                            status: "ready" | "running" | "paused" | "finished";
+                            timer_preset?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                        };
+                        workout?: {
+                            [key: string]: unknown;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Not on this screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.BoxScreenController.pair": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    code: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Display token */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The box; `id` is the topic of `box_screen:<id>` on `/box_screen_socket` */
+                        box: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        /** Format: date-time */
+                        expires_at: string;
+                        screen: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        token: string;
+                    };
+                };
+            };
+            /** @description Wrong or expired code */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.BoxScreenController.today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Today */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The box; `id` is the topic of `box_screen:<id>` on `/box_screen_socket` */
+                        box: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string | null;
+                        };
+                        classes: {
+                            /** @description First names of booked members who do not hide; hidden people, guests and trials only counted */
+                            bookings: {
+                                capacity: number;
+                                count: number;
+                                names: string[];
+                                unnamed: number;
+                                waitlist: number;
+                            };
+                            cancelled: boolean;
+                            class_type: string | null;
+                            coach_name: string | null;
+                            duration_minutes: number;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id: string | null;
+                            name: string | null;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                            /** Format: uuid */
+                            workout_id: string | null;
+                        }[];
+                        /**
+                         * Format: date
+                         * @description Today on the box's clock
+                         */
+                        date: string;
+                        /**
+                         * BoxScreenFocus
+                         * @description What the screen puts first: automatically (preview, timer, results, idle) or as staff pinned it
+                         */
+                        focus: {
+                            /** Format: uuid */
+                            slot_id: string | null;
+                            /** @enum {string} */
+                            source: "auto" | "staff";
+                            /** Format: date-time */
+                            until: string | null;
+                            /** @enum {string} */
+                            view: "preview" | "timer" | "results" | "idle" | "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                        };
+                        leaderboards: {
+                            entries: {
+                                /** @description First word of the display name */
+                                name: string;
+                                rank: number;
+                                scale_level_slug: string | null;
+                                unit: string | null;
+                                value: string | null;
+                            }[];
+                            score: {
+                                name?: string | null;
+                                score_type?: string | null;
+                                unit?: string | null;
+                            } | null;
+                            /** Format: uuid */
+                            workout_id: string;
+                        }[];
+                        screen: {
+                            branch: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        /** Format: date-time */
+                        server_now: string;
+                        time_zone: string;
+                        workouts: {
+                            /** WorkoutBody */
+                            body: {
+                                /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                document: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                kind: "free_text";
+                                /** @description The assistant also derived exercises (see `sections`) */
+                                structured: boolean;
+                                text: string | null;
+                                timer: {
+                                    [key: string]: unknown;
+                                } | null;
+                            } | {
+                                /** @enum {string} */
+                                kind: "text_sections";
+                                sections: {
+                                    /** @description The editor's rich text (TipTap/ProseMirror JSON): marks such as bold, italic, underline, strike, textStyle colour and highlight; nodes such as headings, lists and quotes */
+                                    document: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    /** @description What the section counts (SectionScoring metrics), empty when not scored */
+                                    scoring: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    text: string;
+                                    /** SectionTimerPreset */
+                                    timer: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
+                                    /** @description Null when untitled */
+                                    title: string | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "structured";
+                                sections: {
+                                    /** @description Every exercise with its full prescription (the WorkoutItem shape) */
+                                    exercises: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    scoreable: boolean;
+                                    subtitle?: string | null;
+                                    timer: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                            } | {
+                                /** @enum {string} */
+                                kind: "plan";
+                                sections: {
+                                    /** Format: uuid */
+                                    id: string | null;
+                                    name: string;
+                                    /**
+                                     * PlanSection
+                                     * @description ADR-270: a structured WOD plan section (camelCase keys, values as typed by the coach); validated by Palee.Workouts.Domain.StructuredPlan
+                                     */
+                                    plan: {
+                                        blocks: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[][];
+                                        /** @enum {string} */
+                                        flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                        interrupt?: {
+                                            cells: ({
+                                                d?: string;
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                l?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            } | null)[];
+                                            dose: string;
+                                            exerciseRef?: string | null;
+                                            extra?: ("pace" | "tempo" | "rpe" | "rir" | "zone" | "height" | "dist" | "hold" | "side")[];
+                                            group?: string | null;
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "ex" | "rest";
+                                            load: string;
+                                            name: string;
+                                            note?: string;
+                                            perRound?: boolean;
+                                            x?: {
+                                                dist?: string;
+                                                height?: string;
+                                                hold?: string;
+                                                pace?: string;
+                                                rir?: string;
+                                                rpe?: string;
+                                                tempo?: string;
+                                                zone?: string;
+                                            };
+                                        }[];
+                                        levelNotes?: {
+                                            [key: string]: string;
+                                        };
+                                        /** PlanMods */
+                                        mods?: {
+                                            hr?: boolean;
+                                            interrupt?: boolean;
+                                        };
+                                        note?: string;
+                                        /** PlanParams */
+                                        params: {
+                                            cap?: string;
+                                            dur?: string;
+                                            every?: string;
+                                            hrTarget?: string;
+                                            intEvery?: string;
+                                            off?: string;
+                                            rest?: string;
+                                            rounds?: string;
+                                            sets?: string;
+                                            times?: string;
+                                            work?: string;
+                                        };
+                                        preset?: string | null;
+                                        /** @enum {string} */
+                                        score: "none" | "best_load" | "reps" | "time" | "rounds_reps" | "done" | "total_reps" | "lowest_round" | "distance";
+                                        structs?: {
+                                            [key: string]: {
+                                                clusters?: string;
+                                                dropby?: string;
+                                                drops?: string;
+                                                intra?: string;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis?: string;
+                                            };
+                                        };
+                                        /** @enum {integer} */
+                                        v: 1;
+                                    } | null;
+                                    /**
+                                     * PlanPrescription
+                                     * @description ADR-270: the plan section's canonical read model (StructuredPlan.Prescription); null outside structured_plan workouts
+                                     */
+                                    prescription: {
+                                        /**
+                                         * PlanClock
+                                         * @description How a plan section runs, unit-normalised (seconds, counts)
+                                         */
+                                        clock: {
+                                            blocks: number;
+                                            cap_secs: number | null;
+                                            dur_secs: number | null;
+                                            every_secs: number | null;
+                                            /** @enum {string} */
+                                            flow: "sets" | "for_time" | "amrap" | "emom" | "intervals" | "rest";
+                                            hr_target_bpm: number | null;
+                                            interrupt_every_secs: number | null;
+                                            off_secs: number | null;
+                                            /** @description AMRAP, or EMOM without times: no last round */
+                                            open_ended: boolean;
+                                            preset: string | null;
+                                            rest_secs: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            rounds: number | null;
+                                            score: string | null;
+                                            sets: {
+                                                max: number;
+                                                min: number;
+                                            } | null;
+                                            times: number | null;
+                                            /** @description Null when open-ended */
+                                            total_rounds: number | null;
+                                            windows_secs: number[] | null;
+                                            work_secs: number | null;
+                                        };
+                                        rows: {
+                                            /** @description -1: an interruption row */
+                                            block_index: number;
+                                            exercise_ref: string | null;
+                                            group_id: string | null;
+                                            interrupt: boolean;
+                                            /** @enum {string} */
+                                            kind: "exercise" | "rest";
+                                            name: string | null;
+                                            note: string | null;
+                                            per_side: boolean;
+                                            row_id: string;
+                                            sets: {
+                                                index: number;
+                                                /** PlanLoad */
+                                                load: {
+                                                    /** @enum {string} */
+                                                    kind: "kg" | "pct_1rm" | "bodyweight" | "qualitative";
+                                                    text: string | null;
+                                                    /** @description Decimal (22.5) */
+                                                    value: number | null;
+                                                    value_max: number | null;
+                                                } | null;
+                                                /** PlanMeasures */
+                                                measures: {
+                                                    distance_m: number | null;
+                                                    height_cm: number | null;
+                                                    hold_secs: number | null;
+                                                    hr_zone: number | null;
+                                                    pace_secs_per_500m: number | null;
+                                                    rir: number | null;
+                                                    rpe: number | null;
+                                                    tempo: {
+                                                        bottom: number | "X";
+                                                        down: number | "X";
+                                                        top: number | "X";
+                                                        up: number | "X";
+                                                    } | null;
+                                                };
+                                                /** PlanReps */
+                                                reps: {
+                                                    max: number | null;
+                                                    max_effort: boolean;
+                                                    min: number | null;
+                                                    sets: {
+                                                        max: number;
+                                                        min: number;
+                                                    } | null;
+                                                    text: string | null;
+                                                    /** @enum {string} */
+                                                    unit: "reps" | "secs" | "meters" | "kcal";
+                                                    within_secs: number | null;
+                                                } | null;
+                                                rest_secs: number | null;
+                                                /** @description 1-based rounds it applies to (empty: every interruption) */
+                                                rounds: number[];
+                                            }[];
+                                            /** PlanStructurePrescription */
+                                            structure: {
+                                                clusters: number | null;
+                                                drop_by: string | null;
+                                                drops: number | null;
+                                                intra_secs: number | null;
+                                                /** @enum {string} */
+                                                kind: "single" | "cluster" | "drop" | "restpause" | "superset" | "complex";
+                                                minis: number | null;
+                                            };
+                                            /**
+                                             * PlanThenRule
+                                             * @description Open-ended flows: what follows the written rounds
+                                             */
+                                            then: {
+                                                load_step: number | null;
+                                                reps_step: number | null;
+                                                /** @enum {string} */
+                                                rule: "repeat" | "step";
+                                            } | null;
+                                        }[];
+                                    } | null;
+                                }[];
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            title: string | null;
+                            type: string | null;
+                        }[];
+                    };
+                };
+            };
+            /** @description Invalid display token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.BoxScreenController.token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Display token */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        expires_at: string;
+                        token: string;
+                    };
+                };
+            };
+            /** @description Invalid display token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
                 };
             };
         };
@@ -45422,7 +49327,7 @@ export interface operations {
                             /** @enum {string} */
                             kind: "class" | "open_gym";
                             /** @enum {string|null} */
-                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
                             override?: boolean;
                         } | null;
                         choices?: {
@@ -53010,6 +56915,118 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonalDataExportController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Exports */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        exports: {
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** @description The ZIP of JSON files, while it is kept (status ready) */
+                            file?: {
+                                bytes: number;
+                                /** @description Short-lived presigned link, made afresh on every request */
+                                download_url: string | null;
+                                name: string;
+                                sha256: string;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            record_count?: number | null;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** @enum {string} */
+                            status: "pending" | "ready" | "failed" | "expired";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PersonalDataExportController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Requested */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        export: {
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** @description The ZIP of JSON files, while it is kept (status ready) */
+                            file?: {
+                                bytes: number;
+                                /** @description Short-lived presigned link, made afresh on every request */
+                                download_url: string | null;
+                                name: string;
+                                sha256: string;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            record_count?: number | null;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** @enum {string} */
+                            status: "pending" | "ready" | "failed" | "expired";
+                        };
+                    };
+                };
+            };
+            /** @description An export is being prepared */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        /** Format: date-time */
+                        retry_at?: string;
+                    };
+                };
+            };
+            /** @description Asked less than a day ago */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        /** Format: date-time */
+                        retry_at?: string;
                     };
                 };
             };
@@ -62177,6 +66194,33 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.OrganizationAccessController.guest_boxes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Boxes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        boxes: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            slug: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.OrganizationAccessController.join": {
         parameters: {
             query?: never;
@@ -63573,6 +67617,592 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminBoxScreenController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Box screens */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        max_screens: number;
+                        override_views: ("wod" | "timer" | "leaderboard" | "bookings" | "class")[];
+                        screens: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Box screen and pairing code */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * BoxScreenPairingCode
+                         * @description Shown once: typed on the TV within 15 minutes
+                         */
+                        pairing_code: {
+                            /** @example ACEF-3467 */
+                            code: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                        };
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Too many screens */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Invalid name or branch */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No such screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Box screen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Invalid name or branch */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.put_override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: uuid
+                     * @description One of today's classes on the screen; required for `class`
+                     */
+                    slot_id?: string | null;
+                    /**
+                     * Format: date-time
+                     * @description When the screen goes back to automatic (within 24 hours); null to keep it
+                     */
+                    until?: string | null;
+                    /** @enum {string} */
+                    view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                };
+            };
+        };
+        responses: {
+            /** @description Box screen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Invalid choice */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.delete_override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Box screen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminBoxScreenController.pairing_code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Box screen and pairing code */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * BoxScreenPairingCode
+                         * @description Shown once: typed on the TV within 15 minutes
+                         */
+                        pairing_code: {
+                            /** @example ACEF-3467 */
+                            code: string;
+                            /** Format: date-time */
+                            expires_at: string;
+                        };
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminBrandingController.show": {
         parameters: {
             query?: never;
@@ -64660,7 +69290,7 @@ export interface operations {
                             /** @enum {string} */
                             kind: "class" | "open_gym";
                             /** @enum {string|null} */
-                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
                             override?: boolean;
                         } | null;
                         /** @enum {string} */
@@ -64818,7 +69448,7 @@ export interface operations {
                             /** @enum {string} */
                             kind: "class" | "open_gym";
                             /** @enum {string|null} */
-                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | "imported" | null;
                             override?: boolean;
                         } | null;
                         /** @enum {string} */
@@ -70107,6 +74737,1291 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminDocumentsController.audit": {
+        parameters: {
+            query?: {
+                subject_id?: string;
+                action?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Audit events */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        events: {
+                            action: string;
+                            /** Format: uuid */
+                            actor_id: string | null;
+                            details: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            occurred_at: string;
+                            /** Format: uuid */
+                            subject_id: string | null;
+                            subject_type: string;
+                            /** Format: uuid */
+                            subject_user_id: string | null;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.index": {
+        parameters: {
+            query?: {
+                status?: "missing" | "valid" | "expiring" | "expired";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Health certificates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        full_access: boolean;
+                        health_certificates: {
+                            /** @description Only for staff who manage health certificates */
+                            certificate: {
+                                byte_size: number;
+                                /** @enum {string} */
+                                content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                                /**
+                                 * Format: date
+                                 * @description The first day it is no longer valid
+                                 */
+                                expires_on: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                /** Format: date */
+                                issued_on: string;
+                                /** Format: uuid */
+                                uploaded_by_id: string | null;
+                                /** Format: uuid */
+                                user_id: string;
+                            } | null;
+                            display_name: string | null;
+                            handle: string | null;
+                            /** @enum {string} */
+                            status: "missing" | "valid" | "expiring" | "expired";
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        required: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                    /**
+                     * Format: date
+                     * @description Default: the issue date plus the box's validity (12 months)
+                     */
+                    expires_on?: string;
+                    file_key: string;
+                    /** Format: date */
+                    issued_on: string;
+                    /** Format: uuid */
+                    user_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Health certificate */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        health_certificate: {
+                            byte_size: number;
+                            /** @enum {string} */
+                            content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                            /**
+                             * Format: date
+                             * @description The first day it is no longer valid
+                             */
+                            expires_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date */
+                            issued_on: string;
+                            /** Format: uuid */
+                            uploaded_by_id: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.client": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Health certificates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        health_certificates: {
+                            byte_size: number;
+                            /** @enum {string} */
+                            content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                            /**
+                             * Format: date
+                             * @description The first day it is no longer valid
+                             */
+                            expires_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date */
+                            issued_on: string;
+                            /** Format: uuid */
+                            uploaded_by_id: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        /** Format: uuid */
+                        user_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.request_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                    /** Format: uuid */
+                    user_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                        file_key: string;
+                        max_bytes: number;
+                        /** @enum {string} */
+                        method: "PUT";
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Health certificate */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        health_certificate: {
+                            byte_size: number;
+                            /** @enum {string} */
+                            content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                            /**
+                             * Format: date
+                             * @description The first day it is no longer valid
+                             */
+                            expires_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date */
+                            issued_on: string;
+                            /** Format: uuid */
+                            uploaded_by_id: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminHealthCertificatesController.file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description File */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        content_type: string;
+                        /** @description Short-lived link; the look is audited */
+                        url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Client documents */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        documents: {
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description Mandatory and not signed */
+                            outstanding: boolean;
+                            /** @description Staff asked for it */
+                            requested: boolean;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            signature: {
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                signed_at: string;
+                                version_number: number;
+                            } | null;
+                            /** @enum {string} */
+                            status: "signed" | "unsigned" | "resign_required";
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        }[];
+                        /** @enum {string} */
+                        health_certificate_status: "missing" | "valid" | "expiring" | "expired";
+                        outstanding: number;
+                        signatures: {
+                            /** @description The signer's account at signing time */
+                            account: {
+                                [key: string]: unknown;
+                            };
+                            content_hash: string;
+                            evidence_byte_size: number;
+                            evidence_hash: string;
+                            evidence_sha256: string;
+                            has_drawn_signature: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            ip_address: string | null;
+                            /** @enum {string} */
+                            level: "simple" | "advanced" | "qualified";
+                            provider: string;
+                            /** Format: uuid */
+                            request_id: string | null;
+                            /** Format: date-time */
+                            signed_at: string;
+                            /** Format: uuid */
+                            template_id: string;
+                            typed_name: string | null;
+                            user_agent: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** Format: uuid */
+                            version_id: string;
+                            version_number: number;
+                        }[];
+                        /** Format: uuid */
+                        user_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.outstanding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Outstanding */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Clients of the box: everyone a new mandatory document or a major version would block from booking until they sign */
+                        clients: number;
+                        templates: {
+                            /** @description Clients who have not signed */
+                            clients: {
+                                display_name: string | null;
+                                handle: string | null;
+                                /** @enum {string} */
+                                status: "unsigned" | "resign_required";
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                            outstanding: number;
+                            /** @description Clients whose signature counts */
+                            signed: number;
+                            /** Format: uuid */
+                            template_id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.requests": {
+        parameters: {
+            query?: {
+                status?: "pending" | "signed" | "cancelled";
+                template_id?: string;
+                user_id?: string;
+                batch_id?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Requests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        requests: {
+                            /** @enum {string} */
+                            audience: "person" | "all_clients" | "role" | "package";
+                            /** Format: uuid */
+                            batch_id: string | null;
+                            /** Format: date-time */
+                            closed_at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** Format: uuid */
+                            requested_by_id: string | null;
+                            /** Format: uuid */
+                            signature_id: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "signed" | "cancelled";
+                            /** Format: uuid */
+                            template_id: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.cancel_request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        request: {
+                            /** @enum {string} */
+                            audience: "person" | "all_clients" | "role" | "package";
+                            /** Format: uuid */
+                            batch_id: string | null;
+                            /** Format: date-time */
+                            closed_at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** Format: uuid */
+                            requested_by_id: string | null;
+                            /** Format: uuid */
+                            signature_id: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "signed" | "cancelled";
+                            /** Format: uuid */
+                            template_id: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        settings: {
+                            block_booking_on_health_certificate: boolean;
+                            block_booking_on_unsigned: boolean;
+                            health_certificate_reminder_days: number;
+                            health_certificate_required: boolean;
+                            health_certificate_validity_months: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.save_settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    block_booking_on_health_certificate?: boolean;
+                    block_booking_on_unsigned?: boolean;
+                    health_certificate_reminder_days?: number;
+                    health_certificate_required?: boolean;
+                    health_certificate_validity_months?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        settings: {
+                            block_booking_on_health_certificate: boolean;
+                            block_booking_on_unsigned: boolean;
+                            health_certificate_reminder_days: number;
+                            health_certificate_required: boolean;
+                            health_certificate_validity_months: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.signatures": {
+        parameters: {
+            query?: {
+                template_id?: string;
+                user_id?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signatures */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        signatures: {
+                            /** @description The signer's account at signing time */
+                            account: {
+                                [key: string]: unknown;
+                            };
+                            content_hash: string;
+                            evidence_byte_size: number;
+                            evidence_hash: string;
+                            evidence_sha256: string;
+                            has_drawn_signature: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            ip_address: string | null;
+                            /** @enum {string} */
+                            level: "simple" | "advanced" | "qualified";
+                            provider: string;
+                            /** Format: uuid */
+                            request_id: string | null;
+                            /** Format: date-time */
+                            signed_at: string;
+                            /** Format: uuid */
+                            template_id: string;
+                            typed_name: string | null;
+                            user_agent: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** Format: uuid */
+                            version_id: string;
+                            version_number: number;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Certificate */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        byte_size: number;
+                        sha256: string;
+                        /** @description Short-lived link to the PDF certificate */
+                        url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.starters": {
+        parameters: {
+            query?: {
+                language?: "el" | "en";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Drafts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        starters: {
+                            body: string;
+                            draft: boolean;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            language: string;
+                            legal_review_required: boolean;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            title: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.index": {
+        parameters: {
+            query?: {
+                status?: "active" | "archived";
+                requirement?: "mandatory" | "optional";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Documents */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        templates: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                    /** @enum {string} */
+                    kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                    /** @enum {string} */
+                    language?: "el" | "en" | "de" | "fr" | "es" | "it" | "ru" | "pt-PT" | "nl" | "bg" | "ar" | "he";
+                    /** @enum {string} */
+                    requirement?: "mandatory" | "optional";
+                    title: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Document */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                        version: {
+                            /** @description Only when one version is read */
+                            body?: string;
+                            /** @enum {string} */
+                            change_kind: "major" | "minor";
+                            content_hash: string;
+                            /** Format: uuid */
+                            id: string;
+                            language: string;
+                            number: number;
+                            /** Format: date-time */
+                            published_at: string;
+                            /** Format: uuid */
+                            published_by_id: string | null;
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Document */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        current_version: {
+                            /** @description Only when one version is read */
+                            body?: string;
+                            /** @enum {string} */
+                            change_kind: "major" | "minor";
+                            content_hash: string;
+                            /** Format: uuid */
+                            id: string;
+                            language: string;
+                            number: number;
+                            /** Format: date-time */
+                            published_at: string;
+                            /** Format: uuid */
+                            published_by_id: string | null;
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        } | null;
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Document */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    audience: "person" | "all_clients" | "role" | "package";
+                    /** Format: uuid */
+                    package_id?: string;
+                    /** @enum {string} */
+                    role?: "member" | "athlete";
+                    /** Format: uuid */
+                    user_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Requests */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        audience: string;
+                        /** Format: uuid */
+                        batch_id: string;
+                        created: number;
+                        recipients: number;
+                        requests: {
+                            /** @enum {string} */
+                            audience: "person" | "all_clients" | "role" | "package";
+                            /** Format: uuid */
+                            batch_id: string | null;
+                            /** Format: date-time */
+                            closed_at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** Format: uuid */
+                            requested_by_id: string | null;
+                            /** Format: uuid */
+                            signature_id: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "signed" | "cancelled";
+                            /** Format: uuid */
+                            template_id: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        /** @description Already signed or already asked */
+                        skipped: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.set_requirement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    requirement: "mandatory" | "optional";
+                };
+            };
+        };
+        responses: {
+            /** @description Document */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                    /**
+                     * @description major (default): everyone signs again; minor: earlier signatures count
+                     * @enum {string}
+                     */
+                    change_kind?: "major" | "minor";
+                    /** @enum {string} */
+                    language?: "el" | "en" | "de" | "fr" | "es" | "it" | "ru" | "pt-PT" | "nl" | "bg" | "ar" | "he";
+                    title?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Version */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                        version: {
+                            /** @description Only when one version is read */
+                            body?: string;
+                            /** @enum {string} */
+                            change_kind: "major" | "minor";
+                            content_hash: string;
+                            /** Format: uuid */
+                            id: string;
+                            language: string;
+                            number: number;
+                            /** Format: date-time */
+                            published_at: string;
+                            /** Format: uuid */
+                            published_by_id: string | null;
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDocumentsController.version": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Version */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        version: {
+                            /** @description Only when one version is read */
+                            body?: string;
+                            /** @enum {string} */
+                            change_kind: "major" | "minor";
+                            content_hash: string;
+                            /** Format: uuid */
+                            id: string;
+                            language: string;
+                            number: number;
+                            /** Format: date-time */
+                            published_at: string;
+                            /** Format: uuid */
+                            published_by_id: string | null;
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminFinanceAccountingController.exports": {
         parameters: {
             query?: {
@@ -71965,6 +77880,150 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminFinanceController.member_overrides": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Override history */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        overrides: {
+                            computed_value?: string | null;
+                            end_reason?: string | null;
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            ended_by_name?: string | null;
+                            field: string;
+                            /** Format: uuid */
+                            id: string;
+                            reason?: string | null;
+                            /** Format: date-time */
+                            set_at: string;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_name?: string | null;
+                            /** Format: uuid */
+                            subject_id: string;
+                            subject_type?: string;
+                            value: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFinanceController.set_member_override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                field: "status" | "ends_on";
+            };
+            cookie?: never;
+        };
+        /** @description Override */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    commitment_override_reason?: string | null;
+                    reason?: string | null;
+                    /** Format: uuid */
+                    subscription_id?: string | null;
+                    value: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Override */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        override: {
+                            computed_value?: string | null;
+                            end_reason?: string | null;
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            ended_by_name?: string | null;
+                            field: string;
+                            /** Format: uuid */
+                            id: string;
+                            reason?: string | null;
+                            /** Format: date-time */
+                            set_at: string;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_name?: string | null;
+                            /** Format: uuid */
+                            subject_id: string;
+                            subject_type?: string;
+                            value: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFinanceController.reset_member_override": {
+        parameters: {
+            query?: {
+                subscription_id?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+                field: "status" | "ends_on";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Ended override */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        override: {
+                            computed_value?: string | null;
+                            end_reason?: string | null;
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            ended_by_name?: string | null;
+                            field: string;
+                            /** Format: uuid */
+                            id: string;
+                            reason?: string | null;
+                            /** Format: date-time */
+                            set_at: string;
+                            /** Format: uuid */
+                            set_by_id?: string | null;
+                            set_by_name?: string | null;
+                            /** Format: uuid */
+                            subject_id: string;
+                            subject_type?: string;
+                            value: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminFinanceController.assign_package": {
         parameters: {
             query?: never;
@@ -72297,6 +78356,19 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        packages: ({
+                            /** Format: uuid */
+                            id: string;
+                            /**
+                             * @description ADR-271: `visible` (listed and bought online); otherwise why not: `inactive`, `free` (price 0), `off` (front desk only), `purpose_off` (its purpose is off in «Τι πληρώνεται online»), `no_provider` (listed, bought once online payments connect)
+                             * @enum {string}
+                             */
+                            online_visibility: "visible" | "free" | "off" | "purpose_off" | "no_provider" | "inactive";
+                            sold_online: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                    } & {
                         [key: string]: unknown;
                     };
                 };
@@ -72320,6 +78392,8 @@ export interface operations {
                     code?: string | null;
                     currency?: string;
                     description?: string | null;
+                    /** @description Required with `exempt`: the article of the VAT law printed on the document. */
+                    exemption_reason?: string | null;
                     /** @description Entitlement catalog v2 field values keyed by catalog field key (ADR-096) */
                     fields?: {
                         "booking.cancellation_cutoff_hours"?: number | null;
@@ -72426,7 +78500,13 @@ export interface operations {
                     name: string;
                     /** @enum {string} */
                     package_type: "membership" | "class_pack" | "drop_in" | "trial" | "pt_pack" | "add_on" | "shared" | "corporate";
+                    sold_online?: boolean;
                     tags?: string[];
+                    /**
+                     * @description ADR-244: the tax category printed on fiscal documents; one the business's country offers (`/admin/fiscal/countries`). Empty means `standard` (`sales_tax` in the US).
+                     * @enum {string|null}
+                     */
+                    tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                 };
             };
         };
@@ -72438,7 +78518,18 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        package: {
+                            /** Format: uuid */
+                            id: string;
+                            /**
+                             * @description ADR-271: `visible` (listed and bought online); otherwise why not: `inactive`, `free` (price 0), `off` (front desk only), `purpose_off` (its purpose is off in «Τι πληρώνεται online»), `no_provider` (listed, bought once online payments connect)
+                             * @enum {string}
+                             */
+                            online_visibility: "visible" | "free" | "off" | "purpose_off" | "no_provider" | "inactive";
+                            sold_online: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        };
                     };
                 };
             };
@@ -72462,7 +78553,18 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        package: {
+                            /** Format: uuid */
+                            id: string;
+                            /**
+                             * @description ADR-271: `visible` (listed and bought online); otherwise why not: `inactive`, `free` (price 0), `off` (front desk only), `purpose_off` (its purpose is off in «Τι πληρώνεται online»), `no_provider` (listed, bought once online payments connect)
+                             * @enum {string}
+                             */
+                            online_visibility: "visible" | "free" | "off" | "purpose_off" | "no_provider" | "inactive";
+                            sold_online: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        };
                     };
                 };
             };
@@ -72487,6 +78589,8 @@ export interface operations {
                     code?: string | null;
                     currency?: string;
                     description?: string | null;
+                    /** @description Required with `exempt`: the article of the VAT law printed on the document. */
+                    exemption_reason?: string | null;
                     /** @description Entitlement catalog v2 field values keyed by catalog field key (ADR-096) */
                     fields?: {
                         "booking.cancellation_cutoff_hours"?: number | null;
@@ -72593,7 +78697,13 @@ export interface operations {
                     name?: string;
                     /** @enum {string} */
                     package_type?: "membership" | "class_pack" | "drop_in" | "trial" | "pt_pack" | "add_on" | "shared" | "corporate";
+                    sold_online?: boolean;
                     tags?: string[];
+                    /**
+                     * @description ADR-244: the tax category printed on fiscal documents; one the business's country offers (`/admin/fiscal/countries`). Empty means `standard` (`sales_tax` in the US).
+                     * @enum {string|null}
+                     */
+                    tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                 };
             };
         };
@@ -72605,7 +78715,18 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: unknown;
+                        package: {
+                            /** Format: uuid */
+                            id: string;
+                            /**
+                             * @description ADR-271: `visible` (listed and bought online); otherwise why not: `inactive`, `free` (price 0), `off` (front desk only), `purpose_off` (its purpose is off in «Τι πληρώνεται online»), `no_provider` (listed, bought once online payments connect)
+                             * @enum {string}
+                             */
+                            online_visibility: "visible" | "free" | "off" | "purpose_off" | "no_provider" | "inactive";
+                            sold_online: boolean;
+                        } & {
+                            [key: string]: unknown;
+                        };
                     };
                 };
             };
@@ -73912,6 +80033,3142 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminFiscalController.archive": {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description ZIP archive */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/zip": string;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalReportingController.connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The myDATA connection; the subscription key is never returned. `error_code` says why it needs a check (ADR-273). */
+                        connection: {
+                            /** @enum {string} */
+                            authority: "mydata";
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_subscription_key: boolean;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            user_id?: string | null;
+                        } | null;
+                        environments: ("sandbox" | "test" | "production")[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalReportingController.save_connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    environment: "sandbox" | "test" | "production";
+                    /** @description Leave out to keep the saved key. */
+                    subscription_key?: string | null;
+                    user_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The result of «Δοκιμή σύνδεσης». */
+                        check: {
+                            detail: {
+                                /** @description Registry: the name AADE has for it. */
+                                legal_name?: string | null;
+                                /** @description Registry: the ΑΦΜ looked up. */
+                                tax_id?: string;
+                            };
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            /**
+                             * @description `invalid`: refused (the connection is marked invalid); `unreachable`: it could not be checked (provider down, AADE quota, or the business's own ΑΦΜ missing or unknown to the registry; see `error_code`), nothing changed and it is checked again soon.
+                             * @enum {string}
+                             */
+                            result: "ok" | "invalid" | "unreachable";
+                        } | null;
+                        /** @description The myDATA connection; the subscription key is never returned. `error_code` says why it needs a check (ADR-273). */
+                        connection: {
+                            /** @enum {string} */
+                            authority: "mydata";
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_subscription_key: boolean;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            user_id?: string | null;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalController.closings": {
+        parameters: {
+            query?: {
+                kind?: "day" | "month" | "year";
+                from?: string;
+                to?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Closings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        closings: {
+                            /** Format: date-time */
+                            closed_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            journal_position: number;
+                            /** Format: date */
+                            period_end: string;
+                            /** @enum {string} */
+                            period_kind: "day" | "month" | "year";
+                            /** Format: date */
+                            period_start: string;
+                            totals: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalConnectionsController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Connections */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        connections: {
+                            /** @description The myDATA connection; the subscription key is never returned. `error_code` says why it needs a check (ADR-273). */
+                            mydata?: {
+                                /** @enum {string} */
+                                authority: "mydata";
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_subscription_key: boolean;
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                                user_id?: string | null;
+                            } | null;
+                            /** @description The Peppol connection; the API key, secret and webhook token are never returned. `storecove` is a retired provider of old connections: they show as invalid (`provider_retired`) until reconnected. */
+                            peppol?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /**
+                                 * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
+                                 * @enum {string}
+                                 */
+                                credentials_source: "own" | "till_connection" | "none";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                has_webhook_token: boolean;
+                                /** @description fiskaly: the business's E-INVOICE System id. */
+                                legal_entity_id?: string | null;
+                                /** @enum {string} */
+                                network: "peppol";
+                                /** @example 0208:0123456749 */
+                                peppol_id: string;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly" | "storecove";
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The AADE registry connection; the password is never returned. `username` is the same field the save takes (ADR-273). */
+                            registry?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                environment: "sandbox" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_password: boolean;
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                                username?: string | null;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            rksv?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            sign_fr?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            tse?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                        };
+                        country: string | null;
+                        kinds: ("mydata" | "registry" | "tse" | "rksv" | "sign_fr" | "peppol")[];
+                        /**
+                         * @description `palee`: the Palee team manages them; staff see them but cannot save.
+                         * @enum {string}
+                         */
+                        managed_by: "owner" | "palee";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalConnectionsController.check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Which connection */
+                kind: "mydata" | "registry" | "tse" | "rksv" | "sign_fr" | "peppol";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Check */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The result of «Δοκιμή σύνδεσης». */
+                        check: {
+                            detail: {
+                                /** @description Registry: the name AADE has for it. */
+                                legal_name?: string | null;
+                                /** @description Registry: the ΑΦΜ looked up. */
+                                tax_id?: string;
+                            };
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            /**
+                             * @description `invalid`: refused (the connection is marked invalid); `unreachable`: it could not be checked (provider down, AADE quota, or the business's own ΑΦΜ missing or unknown to the registry; see `error_code`), nothing changed and it is checked again soon.
+                             * @enum {string}
+                             */
+                            result: "ok" | "invalid" | "unreachable";
+                        } | null;
+                        connection: ({
+                            /** @enum {string} */
+                            authority: "mydata";
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_subscription_key: boolean;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            user_id?: string | null;
+                        } | ({
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            environment: "sandbox" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_password: boolean;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            username?: string | null;
+                        } | null) | {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            device: "tse" | "rksv" | "sign_fr";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly";
+                            /** Format: date-time */
+                            provisioned_at?: string | null;
+                            public_key?: string | null;
+                            /** Format: uuid */
+                            register_id: string;
+                            register_serial?: string | null;
+                            /** @enum {string} */
+                            status: "provisioning" | "active" | "invalid";
+                            /** Format: uuid */
+                            unit_id: string;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        } | {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /**
+                             * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
+                             * @enum {string}
+                             */
+                            credentials_source: "own" | "till_connection" | "none";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            has_webhook_token: boolean;
+                            /** @description fiskaly: the business's E-INVOICE System id. */
+                            legal_entity_id?: string | null;
+                            /** @enum {string} */
+                            network: "peppol";
+                            /** @example 0208:0123456749 */
+                            peppol_id: string;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly" | "storecove";
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        }) | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalController.countries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Countries */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        countries: {
+                            /** @enum {string} */
+                            authority: "mydata" | "none";
+                            country: string;
+                            currency: string;
+                            einvoicing: string[];
+                            languages: string[];
+                            /** @enum {string} */
+                            register: "nf525" | "standard";
+                            required_fields: string[];
+                            retention_years: number;
+                            tax_categories: string[];
+                            tax_office: boolean;
+                            /** @enum {string} */
+                            tax_system: "vat" | "sales_tax";
+                            /** @enum {string} */
+                            till_device: "tse" | "rksv" | "sign_fr" | "none";
+                        }[];
+                        vat_schemes: string[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalController.documents": {
+        parameters: {
+            query?: {
+                kind?: "receipt" | "invoice" | "credit_note";
+                from?: string;
+                to?: string;
+                number?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Documents */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        documents: {
+                            buyer?: {
+                                [key: string]: unknown;
+                            } | null;
+                            content_hash: string;
+                            /** Format: uuid */
+                            corrects_document_id?: string | null;
+                            country_code: string;
+                            /**
+                             * @description Why a credit note was issued (ADR-265); null on other documents.
+                             * @enum {string|null}
+                             */
+                            credit_reason?: "product_return" | "billing_error" | "subscription_cancelled" | "other" | null;
+                            currency: string;
+                            /** @description The document's Peppol submission (ADR-250). */
+                            einvoice?: {
+                                attempts: number;
+                                /** Format: date-time */
+                                delivered_at?: string | null;
+                                /** Format: uuid */
+                                document_id: string;
+                                environment?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                /** @enum {string} */
+                                network: "peppol";
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                polls?: number;
+                                provider_submission_id?: string | null;
+                                recipient_identifier: string;
+                                recipient_scheme: string;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                                /** Format: date-time */
+                                submitted_at?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
+                            gross_cents: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            issue_date: string;
+                            /** Format: date-time */
+                            issued_at: string;
+                            journal_position: number;
+                            /** @enum {string} */
+                            kind: "receipt" | "invoice" | "credit_note";
+                            language: string;
+                            lines?: {
+                                amount_cents: number;
+                                corrects_position?: number | null;
+                                description: string;
+                                discount_cents: number;
+                                exemption_reason?: string | null;
+                                gross_cents: number;
+                                net_cents: number;
+                                position: number;
+                                quantity: number;
+                                rate_bp: number;
+                                tax_category: string;
+                                tax_cents: number;
+                                unit_price_cents: number;
+                            }[];
+                            net_cents: number;
+                            number: string;
+                            payment_method?: string | null;
+                            prices_include_tax: boolean;
+                            seller: {
+                                [key: string]: unknown;
+                            };
+                            sequence: number;
+                            series: string;
+                            /** Format: uuid */
+                            source_id?: string | null;
+                            source_type?: string | null;
+                            tax_breakdown: {
+                                gross_cents: number;
+                                net_cents: number;
+                                rate_bp: number;
+                                tax_category: string;
+                                tax_cents: number;
+                            }[];
+                            tax_cents: number;
+                            /** @description A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints. */
+                            till_signature?: {
+                                attempts: number;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** Format: uuid */
+                                document_id?: string | null;
+                                environment?: string | null;
+                                /** Format: date-time */
+                                failed_at?: string | null;
+                                /** Format: date-time */
+                                finished_at_device?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                /** @enum {string} */
+                                kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                /** Format: date */
+                                period?: string | null;
+                                print: {
+                                    label: string;
+                                    value?: string | null;
+                                }[];
+                                qr_code_data?: string | null;
+                                receipt_number?: string | null;
+                                register_serial?: string | null;
+                                signature_algorithm?: string | null;
+                                signature_counter?: number | null;
+                                signature_value?: string | null;
+                                /** Format: date-time */
+                                signed_at?: string | null;
+                                /** Format: date-time */
+                                started_at_device?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                                time_format?: string | null;
+                                transaction_number?: number | null;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
+                            /** @description The document's report to the tax authority (ADR-243). */
+                            transmission?: {
+                                /** Format: date-time */
+                                accepted_at?: string | null;
+                                attempts: number;
+                                authentication_code?: string | null;
+                                /** @enum {string} */
+                                authority: "mydata";
+                                /** Format: uuid */
+                                document_id: string;
+                                environment?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                mark?: string | null;
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                qr_url?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "accepted" | "rejected" | "failed";
+                                uid?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalController.document": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Document */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        document: {
+                            buyer?: {
+                                [key: string]: unknown;
+                            } | null;
+                            content_hash: string;
+                            /** Format: uuid */
+                            corrects_document_id?: string | null;
+                            country_code: string;
+                            credit_notes?: {
+                                buyer?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                content_hash: string;
+                                /** Format: uuid */
+                                corrects_document_id?: string | null;
+                                country_code: string;
+                                /**
+                                 * @description Why a credit note was issued (ADR-265); null on other documents.
+                                 * @enum {string|null}
+                                 */
+                                credit_reason?: "product_return" | "billing_error" | "subscription_cancelled" | "other" | null;
+                                currency: string;
+                                /** @description The document's Peppol submission (ADR-250). */
+                                einvoice?: {
+                                    attempts: number;
+                                    /** Format: date-time */
+                                    delivered_at?: string | null;
+                                    /** Format: uuid */
+                                    document_id: string;
+                                    environment?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    /** Format: date-time */
+                                    inserted_at?: string;
+                                    last_error_code?: string | null;
+                                    last_error_message?: string | null;
+                                    /** @enum {string} */
+                                    network: "peppol";
+                                    /** Format: date-time */
+                                    next_attempt_at?: string | null;
+                                    polls?: number;
+                                    provider_submission_id?: string | null;
+                                    recipient_identifier: string;
+                                    recipient_scheme: string;
+                                    /** @enum {string} */
+                                    status: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                                    /** Format: date-time */
+                                    submitted_at?: string | null;
+                                    /** Format: date-time */
+                                    updated_at?: string;
+                                } | null;
+                                gross_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date */
+                                issue_date: string;
+                                /** Format: date-time */
+                                issued_at: string;
+                                journal_position: number;
+                                /** @enum {string} */
+                                kind: "receipt" | "invoice" | "credit_note";
+                                language: string;
+                                lines?: {
+                                    amount_cents: number;
+                                    corrects_position?: number | null;
+                                    description: string;
+                                    discount_cents: number;
+                                    exemption_reason?: string | null;
+                                    gross_cents: number;
+                                    net_cents: number;
+                                    position: number;
+                                    quantity: number;
+                                    rate_bp: number;
+                                    tax_category: string;
+                                    tax_cents: number;
+                                    unit_price_cents: number;
+                                }[];
+                                net_cents: number;
+                                number: string;
+                                payment_method?: string | null;
+                                prices_include_tax: boolean;
+                                seller: {
+                                    [key: string]: unknown;
+                                };
+                                sequence: number;
+                                series: string;
+                                /** Format: uuid */
+                                source_id?: string | null;
+                                source_type?: string | null;
+                                tax_breakdown: {
+                                    gross_cents: number;
+                                    net_cents: number;
+                                    rate_bp: number;
+                                    tax_category: string;
+                                    tax_cents: number;
+                                }[];
+                                tax_cents: number;
+                                /** @description A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints. */
+                                till_signature?: {
+                                    attempts: number;
+                                    /** @enum {string} */
+                                    device: "tse" | "rksv" | "sign_fr";
+                                    /** Format: uuid */
+                                    document_id?: string | null;
+                                    environment?: string | null;
+                                    /** Format: date-time */
+                                    failed_at?: string | null;
+                                    /** Format: date-time */
+                                    finished_at_device?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    /** Format: date-time */
+                                    inserted_at?: string;
+                                    /** @enum {string} */
+                                    kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                                    last_error_code?: string | null;
+                                    last_error_message?: string | null;
+                                    /** Format: date-time */
+                                    next_attempt_at?: string | null;
+                                    /** Format: date */
+                                    period?: string | null;
+                                    print: {
+                                        label: string;
+                                        value?: string | null;
+                                    }[];
+                                    qr_code_data?: string | null;
+                                    receipt_number?: string | null;
+                                    register_serial?: string | null;
+                                    signature_algorithm?: string | null;
+                                    signature_counter?: number | null;
+                                    signature_value?: string | null;
+                                    /** Format: date-time */
+                                    signed_at?: string | null;
+                                    /** Format: date-time */
+                                    started_at_device?: string | null;
+                                    /** @enum {string} */
+                                    status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                                    time_format?: string | null;
+                                    transaction_number?: number | null;
+                                    unit_serial?: string | null;
+                                    /** Format: date-time */
+                                    updated_at?: string;
+                                } | null;
+                                /** @description The document's report to the tax authority (ADR-243). */
+                                transmission?: {
+                                    /** Format: date-time */
+                                    accepted_at?: string | null;
+                                    attempts: number;
+                                    authentication_code?: string | null;
+                                    /** @enum {string} */
+                                    authority: "mydata";
+                                    /** Format: uuid */
+                                    document_id: string;
+                                    environment?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    /** Format: date-time */
+                                    inserted_at?: string;
+                                    last_error_code?: string | null;
+                                    last_error_message?: string | null;
+                                    mark?: string | null;
+                                    /** Format: date-time */
+                                    next_attempt_at?: string | null;
+                                    qr_url?: string | null;
+                                    /** @enum {string} */
+                                    status: "pending" | "sending" | "accepted" | "rejected" | "failed";
+                                    uid?: string | null;
+                                    /** Format: date-time */
+                                    updated_at?: string;
+                                } | null;
+                            }[];
+                            /**
+                             * @description Why a credit note was issued (ADR-265); null on other documents.
+                             * @enum {string|null}
+                             */
+                            credit_reason?: "product_return" | "billing_error" | "subscription_cancelled" | "other" | null;
+                            currency: string;
+                            /** @description The document's Peppol submission (ADR-250). */
+                            einvoice?: {
+                                attempts: number;
+                                /** Format: date-time */
+                                delivered_at?: string | null;
+                                /** Format: uuid */
+                                document_id: string;
+                                environment?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                /** @enum {string} */
+                                network: "peppol";
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                polls?: number;
+                                provider_submission_id?: string | null;
+                                recipient_identifier: string;
+                                recipient_scheme: string;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                                /** Format: date-time */
+                                submitted_at?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
+                            gross_cents: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            issue_date: string;
+                            /** Format: date-time */
+                            issued_at: string;
+                            journal_position: number;
+                            /** @enum {string} */
+                            kind: "receipt" | "invoice" | "credit_note";
+                            language: string;
+                            lines?: {
+                                amount_cents: number;
+                                corrects_position?: number | null;
+                                description: string;
+                                discount_cents: number;
+                                exemption_reason?: string | null;
+                                gross_cents: number;
+                                net_cents: number;
+                                position: number;
+                                quantity: number;
+                                rate_bp: number;
+                                tax_category: string;
+                                tax_cents: number;
+                                unit_price_cents: number;
+                            }[];
+                            net_cents: number;
+                            number: string;
+                            payment_method?: string | null;
+                            prices_include_tax: boolean;
+                            refund_option?: {
+                                card_brand?: string | null;
+                                card_last4?: string | null;
+                                provider: string;
+                                refundable_cents: number;
+                            } | null;
+                            seller: {
+                                [key: string]: unknown;
+                            };
+                            sequence: number;
+                            series: string;
+                            /** Format: uuid */
+                            source_id?: string | null;
+                            source_type?: string | null;
+                            tax_breakdown: {
+                                gross_cents: number;
+                                net_cents: number;
+                                rate_bp: number;
+                                tax_category: string;
+                                tax_cents: number;
+                            }[];
+                            tax_cents: number;
+                            /** @description A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints. */
+                            till_signature?: {
+                                attempts: number;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** Format: uuid */
+                                document_id?: string | null;
+                                environment?: string | null;
+                                /** Format: date-time */
+                                failed_at?: string | null;
+                                /** Format: date-time */
+                                finished_at_device?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                /** @enum {string} */
+                                kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                /** Format: date */
+                                period?: string | null;
+                                print: {
+                                    label: string;
+                                    value?: string | null;
+                                }[];
+                                qr_code_data?: string | null;
+                                receipt_number?: string | null;
+                                register_serial?: string | null;
+                                signature_algorithm?: string | null;
+                                signature_counter?: number | null;
+                                signature_value?: string | null;
+                                /** Format: date-time */
+                                signed_at?: string | null;
+                                /** Format: date-time */
+                                started_at_device?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                                time_format?: string | null;
+                                transaction_number?: number | null;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
+                            /** @description The document's report to the tax authority (ADR-243). */
+                            transmission?: {
+                                /** Format: date-time */
+                                accepted_at?: string | null;
+                                attempts: number;
+                                authentication_code?: string | null;
+                                /** @enum {string} */
+                                authority: "mydata";
+                                /** Format: uuid */
+                                document_id: string;
+                                environment?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                mark?: string | null;
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                qr_url?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "accepted" | "rejected" | "failed";
+                                uid?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalController.credit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    idempotency_key: string;
+                    lines?: {
+                        position: number;
+                        quantity: number;
+                    }[];
+                    /** @enum {string} */
+                    reason: "product_return" | "billing_error" | "subscription_cancelled" | "other";
+                    /** @description Give the money back to the card the document was paid with (ADR-265). */
+                    refund?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description The credit note of an earlier identical request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        document: {
+                            buyer?: {
+                                [key: string]: unknown;
+                            } | null;
+                            content_hash: string;
+                            /** Format: uuid */
+                            corrects_document_id?: string | null;
+                            country_code: string;
+                            /**
+                             * @description Why a credit note was issued (ADR-265); null on other documents.
+                             * @enum {string|null}
+                             */
+                            credit_reason?: "product_return" | "billing_error" | "subscription_cancelled" | "other" | null;
+                            currency: string;
+                            /** @description The document's Peppol submission (ADR-250). */
+                            einvoice?: {
+                                attempts: number;
+                                /** Format: date-time */
+                                delivered_at?: string | null;
+                                /** Format: uuid */
+                                document_id: string;
+                                environment?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                /** @enum {string} */
+                                network: "peppol";
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                polls?: number;
+                                provider_submission_id?: string | null;
+                                recipient_identifier: string;
+                                recipient_scheme: string;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                                /** Format: date-time */
+                                submitted_at?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
+                            gross_cents: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            issue_date: string;
+                            /** Format: date-time */
+                            issued_at: string;
+                            journal_position: number;
+                            /** @enum {string} */
+                            kind: "receipt" | "invoice" | "credit_note";
+                            language: string;
+                            lines?: {
+                                amount_cents: number;
+                                corrects_position?: number | null;
+                                description: string;
+                                discount_cents: number;
+                                exemption_reason?: string | null;
+                                gross_cents: number;
+                                net_cents: number;
+                                position: number;
+                                quantity: number;
+                                rate_bp: number;
+                                tax_category: string;
+                                tax_cents: number;
+                                unit_price_cents: number;
+                            }[];
+                            net_cents: number;
+                            number: string;
+                            payment_method?: string | null;
+                            prices_include_tax: boolean;
+                            seller: {
+                                [key: string]: unknown;
+                            };
+                            sequence: number;
+                            series: string;
+                            /** Format: uuid */
+                            source_id?: string | null;
+                            source_type?: string | null;
+                            tax_breakdown: {
+                                gross_cents: number;
+                                net_cents: number;
+                                rate_bp: number;
+                                tax_category: string;
+                                tax_cents: number;
+                            }[];
+                            tax_cents: number;
+                            /** @description A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints. */
+                            till_signature?: {
+                                attempts: number;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** Format: uuid */
+                                document_id?: string | null;
+                                environment?: string | null;
+                                /** Format: date-time */
+                                failed_at?: string | null;
+                                /** Format: date-time */
+                                finished_at_device?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                /** @enum {string} */
+                                kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                /** Format: date */
+                                period?: string | null;
+                                print: {
+                                    label: string;
+                                    value?: string | null;
+                                }[];
+                                qr_code_data?: string | null;
+                                receipt_number?: string | null;
+                                register_serial?: string | null;
+                                signature_algorithm?: string | null;
+                                signature_counter?: number | null;
+                                signature_value?: string | null;
+                                /** Format: date-time */
+                                signed_at?: string | null;
+                                /** Format: date-time */
+                                started_at_device?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                                time_format?: string | null;
+                                transaction_number?: number | null;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
+                            /** @description The document's report to the tax authority (ADR-243). */
+                            transmission?: {
+                                /** Format: date-time */
+                                accepted_at?: string | null;
+                                attempts: number;
+                                authentication_code?: string | null;
+                                /** @enum {string} */
+                                authority: "mydata";
+                                /** Format: uuid */
+                                document_id: string;
+                                environment?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                mark?: string | null;
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                qr_url?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "accepted" | "rejected" | "failed";
+                                uid?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
+                        } | null;
+                        refund: {
+                            amount_cents: number;
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            currency: string;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_reversal_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            reason?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "succeeded" | "failed";
+                        } | null;
+                    };
+                };
+            };
+            /** @description Credit note */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        document: {
+                            buyer?: {
+                                [key: string]: unknown;
+                            } | null;
+                            content_hash: string;
+                            /** Format: uuid */
+                            corrects_document_id?: string | null;
+                            country_code: string;
+                            /**
+                             * @description Why a credit note was issued (ADR-265); null on other documents.
+                             * @enum {string|null}
+                             */
+                            credit_reason?: "product_return" | "billing_error" | "subscription_cancelled" | "other" | null;
+                            currency: string;
+                            /** @description The document's Peppol submission (ADR-250). */
+                            einvoice?: {
+                                attempts: number;
+                                /** Format: date-time */
+                                delivered_at?: string | null;
+                                /** Format: uuid */
+                                document_id: string;
+                                environment?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                /** @enum {string} */
+                                network: "peppol";
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                polls?: number;
+                                provider_submission_id?: string | null;
+                                recipient_identifier: string;
+                                recipient_scheme: string;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                                /** Format: date-time */
+                                submitted_at?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
+                            gross_cents: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date */
+                            issue_date: string;
+                            /** Format: date-time */
+                            issued_at: string;
+                            journal_position: number;
+                            /** @enum {string} */
+                            kind: "receipt" | "invoice" | "credit_note";
+                            language: string;
+                            lines?: {
+                                amount_cents: number;
+                                corrects_position?: number | null;
+                                description: string;
+                                discount_cents: number;
+                                exemption_reason?: string | null;
+                                gross_cents: number;
+                                net_cents: number;
+                                position: number;
+                                quantity: number;
+                                rate_bp: number;
+                                tax_category: string;
+                                tax_cents: number;
+                                unit_price_cents: number;
+                            }[];
+                            net_cents: number;
+                            number: string;
+                            payment_method?: string | null;
+                            prices_include_tax: boolean;
+                            seller: {
+                                [key: string]: unknown;
+                            };
+                            sequence: number;
+                            series: string;
+                            /** Format: uuid */
+                            source_id?: string | null;
+                            source_type?: string | null;
+                            tax_breakdown: {
+                                gross_cents: number;
+                                net_cents: number;
+                                rate_bp: number;
+                                tax_category: string;
+                                tax_cents: number;
+                            }[];
+                            tax_cents: number;
+                            /** @description A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints. */
+                            till_signature?: {
+                                attempts: number;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** Format: uuid */
+                                document_id?: string | null;
+                                environment?: string | null;
+                                /** Format: date-time */
+                                failed_at?: string | null;
+                                /** Format: date-time */
+                                finished_at_device?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                /** @enum {string} */
+                                kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                /** Format: date */
+                                period?: string | null;
+                                print: {
+                                    label: string;
+                                    value?: string | null;
+                                }[];
+                                qr_code_data?: string | null;
+                                receipt_number?: string | null;
+                                register_serial?: string | null;
+                                signature_algorithm?: string | null;
+                                signature_counter?: number | null;
+                                signature_value?: string | null;
+                                /** Format: date-time */
+                                signed_at?: string | null;
+                                /** Format: date-time */
+                                started_at_device?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                                time_format?: string | null;
+                                transaction_number?: number | null;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
+                            /** @description The document's report to the tax authority (ADR-243). */
+                            transmission?: {
+                                /** Format: date-time */
+                                accepted_at?: string | null;
+                                attempts: number;
+                                authentication_code?: string | null;
+                                /** @enum {string} */
+                                authority: "mydata";
+                                /** Format: uuid */
+                                document_id: string;
+                                environment?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string;
+                                last_error_code?: string | null;
+                                last_error_message?: string | null;
+                                mark?: string | null;
+                                /** Format: date-time */
+                                next_attempt_at?: string | null;
+                                qr_url?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "sending" | "accepted" | "rejected" | "failed";
+                                uid?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                            } | null;
+                        } | null;
+                        refund: {
+                            amount_cents: number;
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            currency: string;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_reversal_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            reason?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "succeeded" | "failed";
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalEInvoicingController.retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Submission */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The document's Peppol submission (ADR-250). */
+                        submission: {
+                            attempts: number;
+                            /** Format: date-time */
+                            delivered_at?: string | null;
+                            /** Format: uuid */
+                            document_id: string;
+                            environment?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            /** @enum {string} */
+                            network: "peppol";
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            polls?: number;
+                            provider_submission_id?: string | null;
+                            recipient_identifier: string;
+                            recipient_scheme: string;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                            /** Format: date-time */
+                            submitted_at?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTaxController.email_document": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    language?: "el" | "en" | "de" | "fr" | "it" | "nl" | "es";
+                    /** @description The address; the buyer's email on the document when left out. */
+                    to?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The email of an earlier identical request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            recipient: "buyer" | "address";
+                            status: string;
+                            to: string;
+                        };
+                    };
+                };
+            };
+            /** @description Queued */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            recipient: "buyer" | "address";
+                            status: string;
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTaxController.document_html": {
+        parameters: {
+            query?: {
+                /** @description Render in this language instead of the document's own */
+                language?: "el" | "en" | "de" | "fr" | "it" | "nl" | "es";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description HTML */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTaxController.document_pdf": {
+        parameters: {
+            query?: {
+                /** @description Render in this language instead of the document's own */
+                language?: "el" | "en" | "de" | "fr" | "it" | "nl" | "es";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PDF */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalReportingController.retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Transmission */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The document's report to the tax authority (ADR-243). */
+                        transmission: {
+                            /** Format: date-time */
+                            accepted_at?: string | null;
+                            attempts: number;
+                            authentication_code?: string | null;
+                            /** @enum {string} */
+                            authority: "mydata";
+                            /** Format: uuid */
+                            document_id: string;
+                            environment?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            mark?: string | null;
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            qr_url?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "accepted" | "rejected" | "failed";
+                            uid?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalEInvoicingController.index": {
+        parameters: {
+            query?: {
+                status?: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Submissions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        counts: {
+                            [key: string]: number;
+                        };
+                        submissions: {
+                            attempts: number;
+                            /** Format: date-time */
+                            delivered_at?: string | null;
+                            /** Format: uuid */
+                            document_id: string;
+                            environment?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            /** @enum {string} */
+                            network: "peppol";
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            polls?: number;
+                            provider_submission_id?: string | null;
+                            recipient_identifier: string;
+                            recipient_scheme: string;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                            /** Format: date-time */
+                            submitted_at?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalEInvoicingController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Submission */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The document's Peppol submission (ADR-250). */
+                        submission: {
+                            attempts: number;
+                            attempts_log: {
+                                attempt: number;
+                                duration_ms?: number | null;
+                                environment: string;
+                                error?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                operation: string;
+                                outcome: string;
+                                response_status?: number | null;
+                                /** Format: date-time */
+                                started_at: string;
+                            }[];
+                            /** Format: date-time */
+                            delivered_at?: string | null;
+                            /** Format: uuid */
+                            document_id: string;
+                            environment?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            /** @enum {string} */
+                            network: "peppol";
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            polls?: number;
+                            provider_submission_id?: string | null;
+                            recipient_identifier: string;
+                            recipient_scheme: string;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "submitted" | "delivered" | "rejected" | "failed" | "uncertain";
+                            /** Format: date-time */
+                            submitted_at?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTaxController.export_formats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Formats */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        formats: {
+                            content_type: string;
+                            description: string;
+                            file_extension: string;
+                            file_prefix: string;
+                            id: string;
+                            name: string;
+                            options: {
+                                default: unknown;
+                                description: string;
+                                key: string;
+                                /** @enum {string} */
+                                type: "string" | "integer" | "boolean" | "enum" | "map";
+                                values?: string[];
+                            }[];
+                        }[];
+                        settings: {
+                            format: string;
+                            name: string;
+                            options: {
+                                [key: string]: unknown;
+                            };
+                            saved: boolean;
+                            /** Format: date-time */
+                            updated_at: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTaxController.save_export_settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                format: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    options: {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Setting */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        setting: {
+                            format: string;
+                            name: string;
+                            options: {
+                                [key: string]: unknown;
+                            };
+                            saved: boolean;
+                            /** Format: date-time */
+                            updated_at: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTaxController.export": {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path: {
+                format: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Export file */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/octet-stream": string;
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalController.identity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Identity */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        complete: boolean;
+                        identity: {
+                            activity_code?: string | null;
+                            branch_code: number;
+                            building_number?: string | null;
+                            city?: string | null;
+                            country_code: string;
+                            currency: string;
+                            document_language?: string | null;
+                            email?: string | null;
+                            fiscal_year_start_month: number;
+                            iban?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            legal_name?: string | null;
+                            phone?: string | null;
+                            postal_code?: string | null;
+                            qr_iban?: string | null;
+                            region?: string | null;
+                            registration_number?: string | null;
+                            street?: string | null;
+                            tax_id?: string | null;
+                            tax_office?: string | null;
+                            trade_name?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                            vat_number?: string | null;
+                            /** @enum {string} */
+                            vat_scheme: "standard" | "small_business" | "exempt";
+                        } | null;
+                        missing: string[];
+                        profile: {
+                            /** @enum {string} */
+                            authority: "mydata" | "none";
+                            country: string;
+                            currency: string;
+                            einvoicing: string[];
+                            languages: string[];
+                            /** @enum {string} */
+                            register: "nf525" | "standard";
+                            required_fields: string[];
+                            retention_years: number;
+                            tax_categories: string[];
+                            tax_office: boolean;
+                            /** @enum {string} */
+                            tax_system: "vat" | "sales_tax";
+                            /** @enum {string} */
+                            till_device: "tse" | "rksv" | "sign_fr" | "none";
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalController.save_identity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    activity_code?: string | null;
+                    branch_code?: number;
+                    building_number?: string | null;
+                    city?: string | null;
+                    country_code?: string;
+                    document_language?: string | null;
+                    email?: string | null;
+                    fiscal_year_start_month?: number;
+                    iban?: string | null;
+                    legal_name?: string | null;
+                    phone?: string | null;
+                    postal_code?: string | null;
+                    qr_iban?: string | null;
+                    region?: string | null;
+                    registration_number?: string | null;
+                    street?: string | null;
+                    tax_id?: string | null;
+                    tax_office?: string | null;
+                    trade_name?: string | null;
+                    vat_number?: string | null;
+                    /** @enum {string} */
+                    vat_scheme?: "standard" | "small_business" | "exempt";
+                };
+            };
+        };
+        responses: {
+            /** @description Identity */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        complete: boolean;
+                        identity: {
+                            activity_code?: string | null;
+                            branch_code: number;
+                            building_number?: string | null;
+                            city?: string | null;
+                            country_code: string;
+                            currency: string;
+                            document_language?: string | null;
+                            email?: string | null;
+                            fiscal_year_start_month: number;
+                            iban?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            legal_name?: string | null;
+                            phone?: string | null;
+                            postal_code?: string | null;
+                            qr_iban?: string | null;
+                            region?: string | null;
+                            registration_number?: string | null;
+                            street?: string | null;
+                            tax_id?: string | null;
+                            tax_office?: string | null;
+                            trade_name?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                            vat_number?: string | null;
+                            /** @enum {string} */
+                            vat_scheme: "standard" | "small_business" | "exempt";
+                        } | null;
+                        missing: string[];
+                        profile: {
+                            /** @enum {string} */
+                            authority: "mydata" | "none";
+                            country: string;
+                            currency: string;
+                            einvoicing: string[];
+                            languages: string[];
+                            /** @enum {string} */
+                            register: "nf525" | "standard";
+                            required_fields: string[];
+                            retention_years: number;
+                            tax_categories: string[];
+                            tax_office: boolean;
+                            /** @enum {string} */
+                            tax_system: "vat" | "sales_tax";
+                            /** @enum {string} */
+                            till_device: "tse" | "rksv" | "sign_fr" | "none";
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalController.verify_journal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Verification */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        verification: {
+                            broken_at?: number;
+                            entries: number;
+                            head?: string;
+                            reason?: string;
+                            valid: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalEInvoicingController.connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The Peppol connection; the API key, secret and webhook token are never returned. `storecove` is a retired provider of old connections: they show as invalid (`provider_retired`) until reconnected. */
+                        connection: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /**
+                             * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
+                             * @enum {string}
+                             */
+                            credentials_source: "own" | "till_connection" | "none";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            has_webhook_token: boolean;
+                            /** @description fiskaly: the business's E-INVOICE System id. */
+                            legal_entity_id?: string | null;
+                            /** @enum {string} */
+                            network: "peppol";
+                            /** @example 0208:0123456749 */
+                            peppol_id: string;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly" | "storecove";
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        } | null;
+                        environments: ("sandbox" | "test" | "production")[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalEInvoicingController.save_connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Leave out to keep the saved key, or (fiskaly) to use the fiskaly till connection's key and secret. */
+                    api_key?: string | null;
+                    /** @description Leave out to keep the saved secret. */
+                    api_secret?: string | null;
+                    /** @enum {string} */
+                    environment: "sandbox" | "test" | "production";
+                    /** @description fiskaly: the business's E-INVOICE System id. */
+                    legal_entity_id?: string | null;
+                    /** @description `scheme:identifier`; defaults to `0208:` + the enterprise number. */
+                    peppol_id?: string | null;
+                    /**
+                     * @description Access point outside the sandbox; defaults to `fiskaly`.
+                     * @enum {string}
+                     */
+                    provider?: "fiskaly";
+                    rotate_webhook_token?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The result of «Δοκιμή σύνδεσης». */
+                        check: {
+                            detail: {
+                                /** @description Registry: the name AADE has for it. */
+                                legal_name?: string | null;
+                                /** @description Registry: the ΑΦΜ looked up. */
+                                tax_id?: string;
+                            };
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            /**
+                             * @description `invalid`: refused (the connection is marked invalid); `unreachable`: it could not be checked (provider down, AADE quota, or the business's own ΑΦΜ missing or unknown to the registry; see `error_code`), nothing changed and it is checked again soon.
+                             * @enum {string}
+                             */
+                            result: "ok" | "invalid" | "unreachable";
+                        } | null;
+                        /** @description The Peppol connection; the API key, secret and webhook token are never returned. `storecove` is a retired provider of old connections: they show as invalid (`provider_retired`) until reconnected. */
+                        connection: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /**
+                             * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
+                             * @enum {string}
+                             */
+                            credentials_source: "own" | "till_connection" | "none";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            has_webhook_token: boolean;
+                            /** @description fiskaly: the business's E-INVOICE System id. */
+                            legal_entity_id?: string | null;
+                            /** @enum {string} */
+                            network: "peppol";
+                            /** @example 0208:0123456749 */
+                            peppol_id: string;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly" | "storecove";
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalRegistryController.connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The AADE registry connection; the password is never returned. `username` is the same field the save takes (ADR-273). */
+                        connection: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            environment: "sandbox" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_password: boolean;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            username?: string | null;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalRegistryController.save_connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    environment: "sandbox" | "production";
+                    /** Format: password */
+                    password?: string;
+                    username?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The result of «Δοκιμή σύνδεσης». */
+                        check: {
+                            detail: {
+                                /** @description Registry: the name AADE has for it. */
+                                legal_name?: string | null;
+                                /** @description Registry: the ΑΦΜ looked up. */
+                                tax_id?: string;
+                            };
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            /**
+                             * @description `invalid`: refused (the connection is marked invalid); `unreachable`: it could not be checked (provider down, AADE quota, or the business's own ΑΦΜ missing or unknown to the registry; see `error_code`), nothing changed and it is checked again soon.
+                             * @enum {string}
+                             */
+                            result: "ok" | "invalid" | "unreachable";
+                        } | null;
+                        /** @description The AADE registry connection; the password is never returned. `username` is the same field the save takes (ADR-273). */
+                        connection: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            environment: "sandbox" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_password: boolean;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            username?: string | null;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalRegistryController.lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The ΑΦΜ (9 digits) */
+                tax_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Business */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        business: {
+                            active: boolean;
+                            activities: {
+                                code: string;
+                                description?: string | null;
+                                main: boolean;
+                            }[];
+                            activity_code?: string | null;
+                            activity_description?: string | null;
+                            building_number?: string | null;
+                            city?: string | null;
+                            legal_name?: string | null;
+                            legal_status?: string | null;
+                            postal_code?: string | null;
+                            street?: string | null;
+                            tax_id: string;
+                            tax_office?: string | null;
+                            tax_office_code?: string | null;
+                            trade_name?: string | null;
+                            vat_registered: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTaxController.sales_tax_rates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sales tax rates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        applies: boolean;
+                        rates: {
+                            /** Format: uuid */
+                            id?: string;
+                            label: string | null;
+                            rate_bp: number;
+                            state: string;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            zip: string | null;
+                        }[];
+                        states: string[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTaxController.save_sales_tax_rates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    rates: {
+                        label?: string | null;
+                        rate_bp: number;
+                        state: string;
+                        zip?: string | null;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description Sales tax rates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        applies: boolean;
+                        rates: {
+                            /** Format: uuid */
+                            id?: string;
+                            label: string | null;
+                            rate_bp: number;
+                            state: string;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            zip: string | null;
+                        }[];
+                        states: string[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTaxController.tax_categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tax categories */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        categories: string[];
+                        country: string | null;
+                        default: string;
+                        max_exemption_reason: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTillSigningController.connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device: "tse" | "rksv" | "sign_fr";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                        connection: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            device: "tse" | "rksv" | "sign_fr";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly";
+                            /** Format: date-time */
+                            provisioned_at?: string | null;
+                            public_key?: string | null;
+                            /** Format: uuid */
+                            register_id: string;
+                            register_serial?: string | null;
+                            /** @enum {string} */
+                            status: "provisioning" | "active" | "invalid";
+                            /** Format: uuid */
+                            unit_id: string;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        } | null;
+                        environments: ("sandbox" | "test" | "production")[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTillSigningController.save_connection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                device: "tse" | "rksv" | "sign_fr";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    api_key?: string | null;
+                    api_secret?: string | null;
+                    /** @enum {string} */
+                    environment: "sandbox" | "test" | "production";
+                    /** @description Create a new TSS/client (DE), signature unit/cash register (AT) or taxpayer/location/System (SIGN FR). */
+                    reprovision?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The result of «Δοκιμή σύνδεσης». */
+                        check: {
+                            detail: {
+                                /** @description Registry: the name AADE has for it. */
+                                legal_name?: string | null;
+                                /** @description Registry: the ΑΦΜ looked up. */
+                                tax_id?: string;
+                            };
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            /**
+                             * @description `invalid`: refused (the connection is marked invalid); `unreachable`: it could not be checked (provider down, AADE quota, or the business's own ΑΦΜ missing or unknown to the registry; see `error_code`), nothing changed and it is checked again soon.
+                             * @enum {string}
+                             */
+                            result: "ok" | "invalid" | "unreachable";
+                        } | null;
+                        /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                        connection: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            device: "tse" | "rksv" | "sign_fr";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly";
+                            /** Format: date-time */
+                            provisioned_at?: string | null;
+                            public_key?: string | null;
+                            /** Format: uuid */
+                            register_id: string;
+                            register_serial?: string | null;
+                            /** @enum {string} */
+                            status: "provisioning" | "active" | "invalid";
+                            /** Format: uuid */
+                            unit_id: string;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTillSigningController.index": {
+        parameters: {
+            query?: {
+                status?: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                device?: "tse" | "rksv" | "sign_fr";
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signatures */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        counts: {
+                            [key: string]: number;
+                        };
+                        signatures: {
+                            attempts: number;
+                            /** @enum {string} */
+                            device: "tse" | "rksv" | "sign_fr";
+                            /** Format: uuid */
+                            document_id?: string | null;
+                            environment?: string | null;
+                            /** Format: date-time */
+                            failed_at?: string | null;
+                            /** Format: date-time */
+                            finished_at_device?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @enum {string} */
+                            kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            /** Format: date */
+                            period?: string | null;
+                            print: {
+                                label: string;
+                                value?: string | null;
+                            }[];
+                            qr_code_data?: string | null;
+                            receipt_number?: string | null;
+                            register_serial?: string | null;
+                            signature_algorithm?: string | null;
+                            signature_counter?: number | null;
+                            signature_value?: string | null;
+                            /** Format: date-time */
+                            signed_at?: string | null;
+                            /** Format: date-time */
+                            started_at_device?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                            time_format?: string | null;
+                            transaction_number?: number | null;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTillSigningController.null_receipt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signature */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints. */
+                        signature: {
+                            attempts: number;
+                            /** @enum {string} */
+                            device: "tse" | "rksv" | "sign_fr";
+                            /** Format: uuid */
+                            document_id?: string | null;
+                            environment?: string | null;
+                            /** Format: date-time */
+                            failed_at?: string | null;
+                            /** Format: date-time */
+                            finished_at_device?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @enum {string} */
+                            kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            /** Format: date */
+                            period?: string | null;
+                            print: {
+                                label: string;
+                                value?: string | null;
+                            }[];
+                            qr_code_data?: string | null;
+                            receipt_number?: string | null;
+                            register_serial?: string | null;
+                            signature_algorithm?: string | null;
+                            signature_counter?: number | null;
+                            signature_value?: string | null;
+                            /** Format: date-time */
+                            signed_at?: string | null;
+                            /** Format: date-time */
+                            started_at_device?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                            time_format?: string | null;
+                            transaction_number?: number | null;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTillSigningController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signature */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints. */
+                        signature: {
+                            attempts: number;
+                            attempts_log: {
+                                attempt: number;
+                                duration_ms?: number | null;
+                                environment: string;
+                                error?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                operation: string;
+                                outcome: string;
+                                response_status?: number | null;
+                                /** Format: date-time */
+                                started_at: string;
+                            }[];
+                            /** @enum {string} */
+                            device: "tse" | "rksv" | "sign_fr";
+                            /** Format: uuid */
+                            document_id?: string | null;
+                            environment?: string | null;
+                            /** Format: date-time */
+                            failed_at?: string | null;
+                            /** Format: date-time */
+                            finished_at_device?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @enum {string} */
+                            kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            /** Format: date */
+                            period?: string | null;
+                            print: {
+                                label: string;
+                                value?: string | null;
+                            }[];
+                            qr_code_data?: string | null;
+                            receipt_number?: string | null;
+                            register_serial?: string | null;
+                            signature_algorithm?: string | null;
+                            signature_counter?: number | null;
+                            signature_value?: string | null;
+                            /** Format: date-time */
+                            signed_at?: string | null;
+                            /** Format: date-time */
+                            started_at_device?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                            time_format?: string | null;
+                            transaction_number?: number | null;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalTillSigningController.retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signature */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description A receipt's TSE/RKSV signature (ADR-251); `print` is what the receipt prints. */
+                        signature: {
+                            attempts: number;
+                            /** @enum {string} */
+                            device: "tse" | "rksv" | "sign_fr";
+                            /** Format: uuid */
+                            document_id?: string | null;
+                            environment?: string | null;
+                            /** Format: date-time */
+                            failed_at?: string | null;
+                            /** Format: date-time */
+                            finished_at_device?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @enum {string} */
+                            kind: "receipt" | "start" | "null" | "monthly" | "yearly" | "closing";
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            /** Format: date */
+                            period?: string | null;
+                            print: {
+                                label: string;
+                                value?: string | null;
+                            }[];
+                            qr_code_data?: string | null;
+                            receipt_number?: string | null;
+                            register_serial?: string | null;
+                            signature_algorithm?: string | null;
+                            signature_counter?: number | null;
+                            signature_value?: string | null;
+                            /** Format: date-time */
+                            signed_at?: string | null;
+                            /** Format: date-time */
+                            started_at_device?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "signed" | "uncertain" | "device_failed" | "rejected" | "failed";
+                            time_format?: string | null;
+                            transaction_number?: number | null;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminFiscalReportingController.transmissions": {
+        parameters: {
+            query?: {
+                status?: "pending" | "sending" | "accepted" | "rejected" | "failed";
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Transmissions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        counts: {
+                            [key: string]: number;
+                        };
+                        total: number;
+                        transmissions: {
+                            /** Format: date-time */
+                            accepted_at?: string | null;
+                            attempts: number;
+                            authentication_code?: string | null;
+                            /** @enum {string} */
+                            authority: "mydata";
+                            /** Format: uuid */
+                            document_id: string;
+                            environment?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error_code?: string | null;
+                            last_error_message?: string | null;
+                            mark?: string | null;
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            qr_url?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "sending" | "accepted" | "rejected" | "failed";
+                            uid?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminFacilityController.search_addresses": {
         parameters: {
             query: {
@@ -74044,6 +83301,714 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Imports */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        imports: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description The CSV file (≤ 5 MB)
+                     */
+                    file: string;
+                    /** @enum {string|null} */
+                    source?: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel" | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Import */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        import: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Catalog */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        date_orders: ("dmy" | "mdy" | "ymd")[];
+                        encodings: ("utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253")[];
+                        errors: ("missing_person" | "missing_name")[];
+                        fields: {
+                            /** @enum {string} */
+                            group: "person" | "package" | "credit" | "payment" | "visit";
+                            /** @enum {string} */
+                            key: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date";
+                            /** @enum {string} */
+                            type: "text" | "email" | "phone" | "role" | "date" | "status" | "money" | "payment_method";
+                        }[];
+                        limits: {
+                            max_bytes: number;
+                            max_invitations: number;
+                            max_rows: number;
+                            undo_days: number;
+                        };
+                        outcomes: ("create_person" | "update_person" | "already_imported" | "duplicate_row" | "invalid")[];
+                        presets: {
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            key: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            name: string;
+                        }[];
+                        roles: ("member" | "athlete")[];
+                        row_statuses: ("pending" | "applied" | "skipped" | "failed" | "undone")[];
+                        statuses: ("draft" | "queued" | "applying" | "applied" | "failed" | "undone")[];
+                        warnings: ("invalid_email" | "invalid_phone" | "invalid_date" | "invalid_amount" | "invalid_role" | "invalid_status" | "negative_balance" | "payment_without_date" | "package_created" | "subscription_exists" | "visit_exists" | "credit_already_imported" | "not_a_client" | "undecodable_bytes")[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Import */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        import: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.apply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Import */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        import: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    limit?: number;
+                    person_ids?: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Invitations */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        failed: number;
+                        remaining: number;
+                        results: {
+                            email: string;
+                            error: string | null;
+                            /** Format: uuid */
+                            person_id: string;
+                            /** @enum {string} */
+                            status: "queued" | "failed";
+                        }[];
+                        sent: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    date_order?: "dmy" | "mdy" | "ymd";
+                    /** @enum {string} */
+                    default_role?: "member" | "athlete";
+                    mapping?: {
+                        column: number;
+                        /** @enum {string|null} */
+                        field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description Import */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        import: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.rows": {
+        parameters: {
+            query?: {
+                status?: "pending" | "applied" | "skipped" | "failed" | "undone";
+                outcome?: "create_person" | "update_person" | "already_imported" | "duplicate_row" | "invalid";
+                after_row?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Rows */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        next_after_row: number | null;
+                        rows: {
+                            /** Format: date-time */
+                            applied_at?: string | null;
+                            cells: string[];
+                            error_code?: string | null;
+                            errors: {
+                                /** @enum {string} */
+                                code: "missing_person" | "missing_name";
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string|null} */
+                            outcome?: "create_person" | "update_person" | "already_imported" | "duplicate_row" | "invalid" | null;
+                            result: {
+                                [key: string]: unknown;
+                            };
+                            row_number: number;
+                            /** @enum {string} */
+                            status: "pending" | "applied" | "skipped" | "failed" | "undone";
+                            /** Format: uuid */
+                            user_id?: string | null;
+                            warnings: {
+                                /** @enum {string} */
+                                code: "invalid_email" | "invalid_phone" | "invalid_date" | "invalid_amount" | "invalid_role" | "invalid_status" | "negative_balance" | "payment_without_date" | "package_created" | "subscription_exists" | "visit_exists" | "credit_already_imported" | "not_a_client" | "undecodable_bytes";
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminImportController.undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Import */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        import: {
+                            byte_size: number;
+                            counts?: {
+                                outcomes: {
+                                    [key: string]: number;
+                                };
+                                statuses: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            date_order: "dmy" | "mdy" | "ymd";
+                            /** @enum {string} */
+                            default_role: "member" | "athlete";
+                            delimiter: string;
+                            /** @enum {string} */
+                            encoding: "utf8" | "utf16le" | "utf16be" | "windows1252" | "iso88597" | "windows1253";
+                            file_warnings?: string[];
+                            filename: string;
+                            /** Format: date-time */
+                            finished_at?: string | null;
+                            header: string[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            last_error?: string | null;
+                            mapping: {
+                                column: number;
+                                /** @enum {string|null} */
+                                field: "full_name" | "first_name" | "last_name" | "email" | "phone" | "role" | "joined_on" | "membership_status" | "notes" | "external_id" | "package_name" | "package_price" | "package_starts_on" | "package_ends_on" | "credit_balance" | "payment_amount" | "payment_date" | "payment_method" | "payment_note" | "visit_date" | null;
+                            }[];
+                            preview?: {
+                                actions?: {
+                                    [key: string]: number;
+                                };
+                                outcomes?: {
+                                    [key: string]: number;
+                                };
+                                rows?: number;
+                                warnings?: {
+                                    [key: string]: number;
+                                };
+                            } | null;
+                            /** Format: date-time */
+                            previewed_at?: string | null;
+                            /** Format: date-time */
+                            queued_at?: string | null;
+                            row_count: number;
+                            /** @enum {string} */
+                            source: "wodify" | "pushpress" | "zen_planner" | "arbox" | "excel";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "queued" | "applying" | "applied" | "failed" | "undone";
+                            summary?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: date-time */
+                            undo_until?: string | null;
+                            /** Format: date-time */
+                            undone_at?: string | null;
+                        };
                     };
                 };
             };
@@ -74465,6 +84430,1868 @@ export interface operations {
                         name: string;
                         slug: string;
                         status: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.index": {
+        parameters: {
+            query?: {
+                status?: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                user_id?: string;
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payments */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payments: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Account */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        account: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            connection: "keys" | "platform";
+                            credentials_set: string[];
+                            /** @enum {string} */
+                            environment: "test" | "live";
+                            /** Format: uuid */
+                            id: string;
+                            last_error?: string | null;
+                            options: {
+                                notify_member: boolean;
+                                notify_staff: boolean;
+                                purposes: {
+                                    autopay: boolean;
+                                    drop_in: boolean;
+                                    packages: boolean;
+                                    personal_training: boolean;
+                                    shop: boolean;
+                                };
+                            };
+                            /** @description ADR-271: connecting put `count` paid packages on sale online; shown until the owner closes it */
+                            packages_notice: {
+                                count: number;
+                                /** Format: date-time */
+                                opened_at: string;
+                            } | null;
+                            /** @enum {string} */
+                            provider: "sandbox" | "viva" | "stripe";
+                            settings: {
+                                [key: string]: string;
+                            };
+                            status: string;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            webhook_url: string;
+                        } | null;
+                        /** @description Providers that connect with one button, per environment (ADR-261) */
+                        connect_providers: {
+                            [key: string]: string[];
+                        };
+                        environments: string[];
+                        /** @description ADR-271: of the active paid packages (`packages`), how many are sold online */
+                        online_sales: {
+                            packages: number;
+                            sold_online: number;
+                        };
+                        providers: string[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.save_account": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    credentials?: {
+                        api_key?: string;
+                        client_id?: string;
+                        client_secret?: string;
+                        merchant_id?: string;
+                        secret_key?: string;
+                        webhook_secret?: string;
+                    };
+                    /** @enum {string} */
+                    environment: "test" | "live";
+                    /** @enum {string} */
+                    provider: "sandbox" | "viva" | "stripe";
+                    settings?: {
+                        source_code?: string;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Account */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        account: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            connection: "keys" | "platform";
+                            credentials_set: string[];
+                            /** @enum {string} */
+                            environment: "test" | "live";
+                            /** Format: uuid */
+                            id: string;
+                            last_error?: string | null;
+                            options: {
+                                notify_member: boolean;
+                                notify_staff: boolean;
+                                purposes: {
+                                    autopay: boolean;
+                                    drop_in: boolean;
+                                    packages: boolean;
+                                    personal_training: boolean;
+                                    shop: boolean;
+                                };
+                            };
+                            /** @description ADR-271: connecting put `count` paid packages on sale online; shown until the owner closes it */
+                            packages_notice: {
+                                count: number;
+                                /** Format: date-time */
+                                opened_at: string;
+                            } | null;
+                            /** @enum {string} */
+                            provider: "sandbox" | "viva" | "stripe";
+                            settings: {
+                                [key: string]: string;
+                            };
+                            status: string;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            webhook_url: string;
+                        } | null;
+                        /** @description Providers that connect with one button, per environment (ADR-261) */
+                        connect_providers: {
+                            [key: string]: string[];
+                        };
+                        environments: string[];
+                        /** @description ADR-271: of the active paid packages (`packages`), how many are sold online */
+                        online_sales: {
+                            packages: number;
+                            sold_online: number;
+                        };
+                        providers: string[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.disconnect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Account */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        account: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            connection: "keys" | "platform";
+                            credentials_set: string[];
+                            /** @enum {string} */
+                            environment: "test" | "live";
+                            /** Format: uuid */
+                            id: string;
+                            last_error?: string | null;
+                            options: {
+                                notify_member: boolean;
+                                notify_staff: boolean;
+                                purposes: {
+                                    autopay: boolean;
+                                    drop_in: boolean;
+                                    packages: boolean;
+                                    personal_training: boolean;
+                                    shop: boolean;
+                                };
+                            };
+                            /** @description ADR-271: connecting put `count` paid packages on sale online; shown until the owner closes it */
+                            packages_notice: {
+                                count: number;
+                                /** Format: date-time */
+                                opened_at: string;
+                            } | null;
+                            /** @enum {string} */
+                            provider: "sandbox" | "viva" | "stripe";
+                            settings: {
+                                [key: string]: string;
+                            };
+                            status: string;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            webhook_url: string;
+                        } | null;
+                        /** @description Providers that connect with one button, per environment (ADR-261) */
+                        connect_providers: {
+                            [key: string]: string[];
+                        };
+                        environments: string[];
+                        /** @description ADR-271: of the active paid packages (`packages`), how many are sold online */
+                        online_sales: {
+                            packages: number;
+                            sold_online: number;
+                        };
+                        providers: string[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.save_options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    notify_member?: boolean;
+                    notify_staff?: boolean;
+                    purposes?: {
+                        autopay?: boolean;
+                        drop_in?: boolean;
+                        packages?: boolean;
+                        personal_training?: boolean;
+                        shop?: boolean;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Account */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        account: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            connection: "keys" | "platform";
+                            credentials_set: string[];
+                            /** @enum {string} */
+                            environment: "test" | "live";
+                            /** Format: uuid */
+                            id: string;
+                            last_error?: string | null;
+                            options: {
+                                notify_member: boolean;
+                                notify_staff: boolean;
+                                purposes: {
+                                    autopay: boolean;
+                                    drop_in: boolean;
+                                    packages: boolean;
+                                    personal_training: boolean;
+                                    shop: boolean;
+                                };
+                            };
+                            /** @description ADR-271: connecting put `count` paid packages on sale online; shown until the owner closes it */
+                            packages_notice: {
+                                count: number;
+                                /** Format: date-time */
+                                opened_at: string;
+                            } | null;
+                            /** @enum {string} */
+                            provider: "sandbox" | "viva" | "stripe";
+                            settings: {
+                                [key: string]: string;
+                            };
+                            status: string;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            webhook_url: string;
+                        } | null;
+                        /** @description Providers that connect with one button, per environment (ADR-261) */
+                        connect_providers: {
+                            [key: string]: string[];
+                        };
+                        environments: string[];
+                        /** @description ADR-271: of the active paid packages (`packages`), how many are sold online */
+                        online_sales: {
+                            packages: number;
+                            sold_online: number;
+                        };
+                        providers: string[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.dismiss_packages_notice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Account */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        account: {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            connection: "keys" | "platform";
+                            credentials_set: string[];
+                            /** @enum {string} */
+                            environment: "test" | "live";
+                            /** Format: uuid */
+                            id: string;
+                            last_error?: string | null;
+                            options: {
+                                notify_member: boolean;
+                                notify_staff: boolean;
+                                purposes: {
+                                    autopay: boolean;
+                                    drop_in: boolean;
+                                    packages: boolean;
+                                    personal_training: boolean;
+                                    shop: boolean;
+                                };
+                            };
+                            /** @description ADR-271: connecting put `count` paid packages on sale online; shown until the owner closes it */
+                            packages_notice: {
+                                count: number;
+                                /** Format: date-time */
+                                opened_at: string;
+                            } | null;
+                            /** @enum {string} */
+                            provider: "sandbox" | "viva" | "stripe";
+                            settings: {
+                                [key: string]: string;
+                            };
+                            status: string;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                            webhook_url: string;
+                        } | null;
+                        /** @description Providers that connect with one button, per environment (ADR-261) */
+                        connect_providers: {
+                            [key: string]: string[];
+                        };
+                        environments: string[];
+                        /** @description ADR-271: of the active paid packages (`packages`), how many are sold online */
+                        online_sales: {
+                            packages: number;
+                            sold_online: number;
+                        };
+                        providers: string[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.attention": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payments */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payments: ({
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        } & {
+                            member_name: string | null;
+                        })[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @default live
+                     * @enum {string}
+                     */
+                    environment?: "test" | "live";
+                    /** @enum {string} */
+                    provider: "viva" | "stripe";
+                };
+            };
+        };
+        responses: {
+            /** @description Provider page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDeskBuyersController.make_guest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    email?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    user_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Already buying here */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The person became a guest of the box now. */
+                        added: boolean;
+                        /** @description A new, held profile was made for a walk-in (ADR-254). */
+                        created_profile: boolean;
+                        person: {
+                            avatar_url: string | null;
+                            /** Format: date-time */
+                            checked_in_at: string | null;
+                            name: string | null;
+                            /**
+                             * @description Box member, athlete, guest of the box, or not in the box yet.
+                             * @enum {string}
+                             */
+                            relation: "member" | "athlete" | "guest" | "none";
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Guest */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The person became a guest of the box now. */
+                        added: boolean;
+                        /** @description A new, held profile was made for a walk-in (ADR-254). */
+                        created_profile: boolean;
+                        person: {
+                            avatar_url: string | null;
+                            /** Format: date-time */
+                            checked_in_at: string | null;
+                            name: string | null;
+                            /**
+                             * @description Box member, athlete, guest of the box, or not in the box yet.
+                             * @enum {string}
+                             */
+                            relation: "member" | "athlete" | "guest" | "none";
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDeskBuyersController.options": {
+        parameters: {
+            query?: {
+                user_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Options */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        options: {
+                            invoices: {
+                                balance_due_cents: number;
+                                currency: string;
+                                description: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                number: string | null;
+                            }[];
+                            packages: {
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                price_cents: number;
+                            }[];
+                            /** @enum {string} */
+                            relation: "walk_in" | "member" | "athlete" | "guest" | "none";
+                            renewal: {
+                                currency: string;
+                                /** Format: date */
+                                ends_on?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                price_cents: number;
+                            } | null;
+                            shop_orders: {
+                                currency: string;
+                                customer_name: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                number: number;
+                                summary: string;
+                                total_cents: number;
+                            }[];
+                            /** Format: uuid */
+                            user_id: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminDeskBuyersController.people": {
+        parameters: {
+            query?: {
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description People */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        people: {
+                            avatar_url: string | null;
+                            /** Format: date-time */
+                            checked_in_at: string | null;
+                            name: string | null;
+                            /**
+                             * @description Box member, athlete, guest of the box, or not in the box yet.
+                             * @enum {string}
+                             */
+                            relation: "member" | "athlete" | "guest" | "none";
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    amount_cents: number;
+                    /** @enum {string|null} */
+                    charge_category?: "product" | "personal_training" | "event" | "other" | null;
+                    description?: string | null;
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    purpose: "finance_invoice" | "membership_package" | "shop_order" | "free_sale";
+                    /** Format: uuid */
+                    purpose_id?: string | null;
+                    /**
+                     * @description Where the payment was started (ADR-272), for its tip: on the staff member's phone (default) or at the desk.
+                     * @enum {string|null}
+                     */
+                    started_on?: "phone" | "desk" | null;
+                    /**
+                     * Format: uuid
+                     * @description The member; none for a walk-in (a shop order or a free sale, ADR-264).
+                     */
+                    user_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            /** @description What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched. */
+                            app_request?: {
+                                params: {
+                                    [key: string]: string;
+                                };
+                                scheme: string;
+                                url: string;
+                            } | null;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            document: {
+                                authority: string | null;
+                                currency: string;
+                                gross_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                issued_at?: string | null;
+                                /** @enum {string} */
+                                kind: "receipt" | "invoice";
+                                number: string;
+                                /** @description A walk-in's receipt as an open, signed link (90 days) for the QR on the phone. */
+                                receipt_url: string | null;
+                                /**
+                                 * @description Its transmission to the tax authority; none where the country has none.
+                                 * @enum {string|null}
+                                 */
+                                transmission_status: "pending" | "sending" | "accepted" | "rejected" | "failed" | null;
+                            } | null;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            /** Format: uuid */
+                            fiscal_document_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            /** @description The signed reference the terminal app keeps (clientTransactionId). */
+                            reference: string;
+                            refunded_cents: number;
+                            retries: number;
+                            /** Format: uuid */
+                            started_by_id?: string | null;
+                            /** @enum {string} */
+                            started_on: "phone" | "desk";
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
+                            surcharge_cents: number;
+                            /**
+                             * @description Whose tip it is (ADR-272): who started the payment on their phone, the box's only front desk person, or the front desk role unpersonalised.
+                             * @enum {string|null}
+                             */
+                            tip_attribution: "started_payment" | "sole_front_desk" | "front_desk_role" | null;
+                            /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
+                            tip_cents: number;
+                            /** @enum {string|null} */
+                            tip_recipient_role?: "front_desk" | null;
+                            /** Format: uuid */
+                            tip_recipient_user_id: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Availability */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        available: boolean;
+                        provider: string | null;
+                        /**
+                         * @description Why not (ADR-272): no payment account, Stripe (no terminal app in Palee), another provider without one, or an account that is not active. Whether the phone has the terminal app is known on the phone only.
+                         * @enum {string|null}
+                         */
+                        reason: "no_viva" | "stripe_only" | "provider_without_terminal" | "account_not_ready" | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.result": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    message?: string | null;
+                    reference: string;
+                    status: string;
+                    transaction_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            /** @description What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched. */
+                            app_request?: {
+                                params: {
+                                    [key: string]: string;
+                                };
+                                scheme: string;
+                                url: string;
+                            } | null;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            document: {
+                                authority: string | null;
+                                currency: string;
+                                gross_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                issued_at?: string | null;
+                                /** @enum {string} */
+                                kind: "receipt" | "invoice";
+                                number: string;
+                                /** @description A walk-in's receipt as an open, signed link (90 days) for the QR on the phone. */
+                                receipt_url: string | null;
+                                /**
+                                 * @description Its transmission to the tax authority; none where the country has none.
+                                 * @enum {string|null}
+                                 */
+                                transmission_status: "pending" | "sending" | "accepted" | "rejected" | "failed" | null;
+                            } | null;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            /** Format: uuid */
+                            fiscal_document_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            /** @description The signed reference the terminal app keeps (clientTransactionId). */
+                            reference: string;
+                            refunded_cents: number;
+                            retries: number;
+                            /** Format: uuid */
+                            started_by_id?: string | null;
+                            /** @enum {string} */
+                            started_on: "phone" | "desk";
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
+                            surcharge_cents: number;
+                            /**
+                             * @description Whose tip it is (ADR-272): who started the payment on their phone, the box's only front desk person, or the front desk role unpersonalised.
+                             * @enum {string|null}
+                             */
+                            tip_attribution: "started_payment" | "sole_front_desk" | "front_desk_role" | null;
+                            /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
+                            tip_cents: number;
+                            /** @enum {string|null} */
+                            tip_recipient_role?: "front_desk" | null;
+                            /** Format: uuid */
+                            tip_recipient_user_id: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            /** @description What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched. */
+                            app_request?: {
+                                params: {
+                                    [key: string]: string;
+                                };
+                                scheme: string;
+                                url: string;
+                            } | null;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            document: {
+                                authority: string | null;
+                                currency: string;
+                                gross_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                issued_at?: string | null;
+                                /** @enum {string} */
+                                kind: "receipt" | "invoice";
+                                number: string;
+                                /** @description A walk-in's receipt as an open, signed link (90 days) for the QR on the phone. */
+                                receipt_url: string | null;
+                                /**
+                                 * @description Its transmission to the tax authority; none where the country has none.
+                                 * @enum {string|null}
+                                 */
+                                transmission_status: "pending" | "sending" | "accepted" | "rejected" | "failed" | null;
+                            } | null;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            /** Format: uuid */
+                            fiscal_document_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            /** @description The signed reference the terminal app keeps (clientTransactionId). */
+                            reference: string;
+                            refunded_cents: number;
+                            retries: number;
+                            /** Format: uuid */
+                            started_by_id?: string | null;
+                            /** @enum {string} */
+                            started_on: "phone" | "desk";
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
+                            surcharge_cents: number;
+                            /**
+                             * @description Whose tip it is (ADR-272): who started the payment on their phone, the box's only front desk person, or the front desk role unpersonalised.
+                             * @enum {string|null}
+                             */
+                            tip_attribution: "started_payment" | "sole_front_desk" | "front_desk_role" | null;
+                            /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
+                            tip_cents: number;
+                            /** @enum {string|null} */
+                            tip_recipient_role?: "front_desk" | null;
+                            /** Format: uuid */
+                            tip_recipient_user_id: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            /** @description What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched. */
+                            app_request?: {
+                                params: {
+                                    [key: string]: string;
+                                };
+                                scheme: string;
+                                url: string;
+                            } | null;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            document: {
+                                authority: string | null;
+                                currency: string;
+                                gross_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                issued_at?: string | null;
+                                /** @enum {string} */
+                                kind: "receipt" | "invoice";
+                                number: string;
+                                /** @description A walk-in's receipt as an open, signed link (90 days) for the QR on the phone. */
+                                receipt_url: string | null;
+                                /**
+                                 * @description Its transmission to the tax authority; none where the country has none.
+                                 * @enum {string|null}
+                                 */
+                                transmission_status: "pending" | "sending" | "accepted" | "rejected" | "failed" | null;
+                            } | null;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            /** Format: uuid */
+                            fiscal_document_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            /** @description The signed reference the terminal app keeps (clientTransactionId). */
+                            reference: string;
+                            refunded_cents: number;
+                            retries: number;
+                            /** Format: uuid */
+                            started_by_id?: string | null;
+                            /** @enum {string} */
+                            started_on: "phone" | "desk";
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
+                            surcharge_cents: number;
+                            /**
+                             * @description Whose tip it is (ADR-272): who started the payment on their phone, the box's only front desk person, or the front desk role unpersonalised.
+                             * @enum {string|null}
+                             */
+                            tip_attribution: "started_payment" | "sole_front_desk" | "front_desk_role" | null;
+                            /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
+                            tip_cents: number;
+                            /** @enum {string|null} */
+                            tip_recipient_role?: "front_desk" | null;
+                            /** Format: uuid */
+                            tip_recipient_user_id: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.receipt_email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    language?: "el" | "en" | "de" | "fr" | "it" | "nl" | "es";
+                    /** @description Required for a walk-in; a member's account email when left out. */
+                    to?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description The email of an earlier identical request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            recipient: "buyer" | "address";
+                            status: string;
+                            to: string;
+                        };
+                    };
+                };
+            };
+            /** @description Queued */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            recipient: "buyer" | "address";
+                            status: string;
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTerminalPaymentsController.sandbox_complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description What the card paid in all, to try a mismatch (default: amount + extras). */
+                    amount_cents?: number | null;
+                    /** @enum {string} */
+                    outcome: "succeeded" | "failed" | "cancelled";
+                    surcharge_cents?: number | null;
+                    tip_cents?: number | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            /** @description What the phone hands to the provider's terminal app (Viva: an Android intent or iOS URL); absent once the request may no longer be launched. */
+                            app_request?: {
+                                params: {
+                                    [key: string]: string;
+                                };
+                                scheme: string;
+                                url: string;
+                            } | null;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            document: {
+                                authority: string | null;
+                                currency: string;
+                                gross_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                issued_at?: string | null;
+                                /** @enum {string} */
+                                kind: "receipt" | "invoice";
+                                number: string;
+                                /** @description A walk-in's receipt as an open, signed link (90 days) for the QR on the phone. */
+                                receipt_url: string | null;
+                                /**
+                                 * @description Its transmission to the tax authority; none where the country has none.
+                                 * @enum {string|null}
+                                 */
+                                transmission_status: "pending" | "sending" | "accepted" | "rejected" | "failed" | null;
+                            } | null;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            /** Format: uuid */
+                            fiscal_document_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            /** @description The signed reference the terminal app keeps (clientTransactionId). */
+                            reference: string;
+                            refunded_cents: number;
+                            retries: number;
+                            /** Format: uuid */
+                            started_by_id?: string | null;
+                            /** @enum {string} */
+                            started_on: "phone" | "desk";
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** @description Card surcharge the provider added on top of the amount (ADR-264): part of the sale's price, on its receipt. */
+                            surcharge_cents: number;
+                            /**
+                             * @description Whose tip it is (ADR-272): who started the payment on their phone, the box's only front desk person, or the front desk role unpersonalised.
+                             * @enum {string|null}
+                             */
+                            tip_attribution: "started_payment" | "sole_front_desk" | "front_desk_role" | null;
+                            /** @description Tip the provider confirmed on top of the amount (ADR-264): the staff's, not revenue of the sale. */
+                            tip_cents: number;
+                            /** @enum {string|null} */
+                            tip_recipient_role?: "front_desk" | null;
+                            /** Format: uuid */
+                            tip_recipient_user_id: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminTipsController.index": {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Tips */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        currency: string | null;
+                        /** Format: date */
+                        from: string;
+                        rows: {
+                            /** @enum {string} */
+                            kind: "person" | "front_desk_role" | "unattributed";
+                            name: string | null;
+                            payments: number;
+                            tip_cents: number;
+                            /** Format: uuid */
+                            user_id: string | null;
+                        }[];
+                        /** Format: date */
+                        to: string;
+                        total_cents: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        } & {
+                            refunds: {
+                                amount_cents: number;
+                                /** Format: date-time */
+                                completed_at?: string | null;
+                                currency: string;
+                                failure_message?: string | null;
+                                /** Format: uuid */
+                                finance_reversal_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at?: string | null;
+                                reason?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "succeeded" | "failed";
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.card_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.dismiss_charge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.refund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    amount_cents: number;
+                    idempotency_key: string;
+                    reason?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Refund */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        refund: {
+                            amount_cents: number;
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            currency: string;
+                            failure_message?: string | null;
+                            /** Format: uuid */
+                            finance_reversal_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            reason?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "succeeded" | "failed";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPaymentsController.retry_charge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
                     };
                 };
             };
@@ -79056,6 +90883,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description ADR-255 (CP-H1): catalog keys (`<section>.<field>`, e.g. `finance.subscription_grace_days`) of the settings the web keeps under «Προχωρημένα», closed by default */
+                        advanced_settings: string[];
                         finance: {
                             /** @enum {string} */
                             document_mode: "invoice" | "receipt";
@@ -79187,6 +91016,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description ADR-255 (CP-H1): catalog keys (`<section>.<field>`, e.g. `finance.subscription_grace_days`) of the settings the web keeps under «Προχωρημένα», closed by default */
+                        advanced_settings: string[];
                         finance: {
                             /** @enum {string} */
                             document_mode: "invoice" | "receipt";
@@ -79289,6 +91120,380 @@ export interface operations {
                             source: "confirmed" | "inferred" | null;
                             timezone: string;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminSetupController.recipes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Recipes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        applications: {
+                            /** Format: date-time */
+                            applied_at: string;
+                            /** Format: uuid */
+                            applied_by_id: string | null;
+                            change_count: number;
+                            changes: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            manual: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            recipe_key: string;
+                            recipe_version: number;
+                        }[];
+                        /** @description Only the owner applies a recipe */
+                        can_apply: boolean;
+                        /** @description ISO currency of the suggested prices */
+                        currency: string;
+                        recipes: {
+                            class_types: string[];
+                            documents: string[];
+                            key: string;
+                            /** @description In the business's language */
+                            name: string;
+                            /** @description The same text in English and Greek */
+                            names: {
+                                el: string;
+                                en: string;
+                            };
+                            packages: {
+                                base_price_cents: number;
+                                billing_period: string;
+                                code: string;
+                                name: string;
+                                package_type: string;
+                            }[];
+                            /** @enum {string} */
+                            provider_kind: "coach" | "gym" | "organiser";
+                            role_grants: {
+                                [key: string]: string[];
+                            };
+                            settings: {
+                                advanced: boolean;
+                                key: string;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                value: unknown;
+                            }[];
+                            /** @description The same text in English and Greek */
+                            summaries: {
+                                el: string;
+                                en: string;
+                            };
+                            summary: string;
+                            version: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminSetupController.apply_recipe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description all (default): change every setting; defaults_only: keep the ones the owner changed
+                     * @enum {string}
+                     */
+                    mode?: "all" | "defaults_only";
+                    /** @description The owner's prices for the recipe's packages: package code => cents */
+                    prices?: {
+                        [key: string]: number;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Applied */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description An applied recipe: which, when, by whom and what changed */
+                        application: {
+                            /** Format: date-time */
+                            applied_at: string;
+                            /** Format: uuid */
+                            applied_by_id: string | null;
+                            change_count: number;
+                            changes: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            manual: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            recipe_key: string;
+                            recipe_version: number;
+                        };
+                        /** @description What applying the recipe changes now (a dry run until applied) */
+                        plan: {
+                            change_count: number;
+                            changes: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            /** @description Settings left at the owner's own value (mode defaults_only) */
+                            kept: string[];
+                            manual: {
+                                /** @enum {string} */
+                                action: "add" | "create" | "manual" | "set";
+                                advanced: boolean;
+                                /** @enum {string} */
+                                area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                                /** @description A setting value: boolean, number, text, list or null */
+                                from: unknown;
+                                key: string;
+                                name: string | null;
+                                /** @description The current value is the owner's own choice, not the default */
+                                owner_changed?: boolean;
+                                /** @description A setting value: boolean, number, text, list or null */
+                                to: unknown;
+                            }[];
+                            name: string;
+                            recipe: string;
+                            unchanged: string[];
+                            version: number;
+                        };
+                    };
+                };
+            };
+            /** @description Not the owner */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        step?: string;
+                    };
+                };
+            };
+            /** @description No such recipe */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        step?: string;
+                    };
+                };
+            };
+            /** @description A step failed or a price is not valid; nothing changed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        step?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminSetupController.preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Plan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        change_count: number;
+                        changes: {
+                            /** @enum {string} */
+                            action: "add" | "create" | "manual" | "set";
+                            advanced: boolean;
+                            /** @enum {string} */
+                            area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                            /** @description A setting value: boolean, number, text, list or null */
+                            from: unknown;
+                            key: string;
+                            name: string | null;
+                            /** @description The current value is the owner's own choice, not the default */
+                            owner_changed?: boolean;
+                            /** @description A setting value: boolean, number, text, list or null */
+                            to: unknown;
+                        }[];
+                        /** @description Settings left at the owner's own value (mode defaults_only) */
+                        kept: string[];
+                        manual: {
+                            /** @enum {string} */
+                            action: "add" | "create" | "manual" | "set";
+                            advanced: boolean;
+                            /** @enum {string} */
+                            area: "class_type" | "document" | "package" | "provider" | "role_grant" | "setting";
+                            /** @description A setting value: boolean, number, text, list or null */
+                            from: unknown;
+                            key: string;
+                            name: string | null;
+                            /** @description The current value is the owner's own choice, not the default */
+                            owner_changed?: boolean;
+                            /** @description A setting value: boolean, number, text, list or null */
+                            to: unknown;
+                        }[];
+                        name: string;
+                        recipe: string;
+                        unchanged: string[];
+                        version: number;
+                    };
+                };
+            };
+            /** @description No such recipe */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                        step?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminSetupController.settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settings catalog */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        advanced_settings: string[];
+                        counts: {
+                            advanced: number;
+                            basic: number;
+                            derive: number;
+                            remove: number;
+                        };
+                        settings: {
+                            advanced: boolean;
+                            /** @description A setting value: boolean, number, text, list or null */
+                            default: unknown;
+                            field: string;
+                            /** @description `<section>.<field>` */
+                            key: string;
+                            section: string;
+                            set_by_recipe: boolean;
+                            /** @enum {string} */
+                            verdict: "advanced" | "basic" | "derive" | "remove";
+                        }[];
                     };
                 };
             };
@@ -81848,7 +94053,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    roles: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete")[];
+                    roles: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete" | "guest")[];
                 };
             };
         };
@@ -89371,6 +101576,312 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.ClassScreenController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Scheduled class ID */
+                slot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Screens of the class */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        screens: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        }[];
+                        /** @description What the person may pin: a coach `timer`, `leaderboard` and `wod` */
+                        views: ("wod" | "timer" | "leaderboard" | "bookings" | "class")[];
+                    };
+                };
+            };
+            /** @description Not this class's coach today */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description No such class */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ClassScreenController.put_override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Scheduled class ID */
+                slot_id: string;
+                screen_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: date-time
+                     * @description When the screen goes back to automatic (within 24 hours); null to keep it
+                     */
+                    until?: string | null;
+                    /** @enum {string} */
+                    view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                };
+            };
+        };
+        responses: {
+            /** @description Box screen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Not this class's coach today */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description No such class or screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Invalid choice */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ClassScreenController.delete_override": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Scheduled class ID */
+                slot_id: string;
+                screen_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Box screen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxScreen */
+                        screen: {
+                            /** @description Who last changed what the screen shows, and when */
+                            focus_changed: {
+                                /** Format: date-time */
+                                at: string;
+                                by: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string | null;
+                                } | null;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date-time */
+                            last_seen_at: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The branch; null for the whole box
+                             */
+                            location_id: string | null;
+                            name: string;
+                            /**
+                             * BoxScreenOverride
+                             * @description What staff pinned on the screen; null when it follows the day automatically
+                             */
+                            override: {
+                                /** Format: uuid */
+                                slot_id: string | null;
+                                /** Format: date-time */
+                                until: string | null;
+                                /** @enum {string} */
+                                view: "wod" | "timer" | "leaderboard" | "bookings" | "class";
+                            } | null;
+                            paired: boolean;
+                            /** Format: date-time */
+                            paired_at: string | null;
+                            /**
+                             * Format: date-time
+                             * @description When the pending pairing code stops working; null without one
+                             */
+                            pairing_expires_at: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Not this class's coach, or another choice is pinned */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description No such class or screen */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.CommunityController.join_channel": {
         parameters: {
             query?: never;
@@ -93326,6 +105837,474 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.MyDocumentsController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description My documents */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        documents: {
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description Mandatory and not signed */
+                            outstanding: boolean;
+                            /** @description Staff asked for it */
+                            requested: boolean;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            signature: {
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                signed_at: string;
+                                version_number: number;
+                            } | null;
+                            /** @enum {string} */
+                            status: "signed" | "unsigned" | "resign_required";
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        }[];
+                        health_certificate: {
+                            certificate: {
+                                byte_size: number;
+                                /** @enum {string} */
+                                content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                                /**
+                                 * Format: date
+                                 * @description The first day it is no longer valid
+                                 */
+                                expires_on: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                /** Format: date */
+                                issued_on: string;
+                                /** Format: uuid */
+                                uploaded_by_id: string | null;
+                                /** Format: uuid */
+                                user_id: string;
+                            } | null;
+                            required: boolean;
+                            /** @enum {string} */
+                            status: "missing" | "valid" | "expiring" | "expired";
+                        };
+                        outstanding: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.create_health_certificate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                    /**
+                     * Format: date
+                     * @description Default: the issue date plus the box's validity (12 months)
+                     */
+                    expires_on?: string;
+                    file_key: string;
+                    /** Format: date */
+                    issued_on: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Health certificate */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        health_certificate: {
+                            byte_size: number;
+                            /** @enum {string} */
+                            content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                            /**
+                             * Format: date
+                             * @description The first day it is no longer valid
+                             */
+                            expires_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date */
+                            issued_on: string;
+                            /** Format: uuid */
+                            uploaded_by_id: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.request_health_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                        file_key: string;
+                        max_bytes: number;
+                        /** @enum {string} */
+                        method: "PUT";
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.delete_health_certificate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Health certificate */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        health_certificate: {
+                            byte_size: number;
+                            /** @enum {string} */
+                            content_type: "application/pdf" | "image/jpeg" | "image/png" | "image/webp";
+                            /**
+                             * Format: date
+                             * @description The first day it is no longer valid
+                             */
+                            expires_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: date */
+                            issued_on: string;
+                            /** Format: uuid */
+                            uploaded_by_id: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.health_file": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description File */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        content_type: string;
+                        /** @description Short-lived link; the look is audited */
+                        url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.signatures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Signatures */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        signatures: {
+                            /** @description The signer's account at signing time */
+                            account: {
+                                [key: string]: unknown;
+                            };
+                            content_hash: string;
+                            evidence_byte_size: number;
+                            evidence_hash: string;
+                            evidence_sha256: string;
+                            has_drawn_signature: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            ip_address: string | null;
+                            /** @enum {string} */
+                            level: "simple" | "advanced" | "qualified";
+                            provider: string;
+                            /** Format: uuid */
+                            request_id: string | null;
+                            /** Format: date-time */
+                            signed_at: string;
+                            /** Format: uuid */
+                            template_id: string;
+                            typed_name: string | null;
+                            user_agent: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** Format: uuid */
+                            version_id: string;
+                            version_number: number;
+                        }[];
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Certificate */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        byte_size: number;
+                        sha256: string;
+                        /** @description Short-lived link to the PDF certificate */
+                        url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Document */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        status: string | null;
+                        template: {
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            current_version_id: string | null;
+                            current_version_number: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "waiver" | "terms" | "privacy" | "health_certificate" | "other";
+                            /** @description The latest major version; older signatures no longer count */
+                            required_version_number: number;
+                            /** @enum {string} */
+                            requirement: "mandatory" | "optional";
+                            /** @enum {string} */
+                            status: "active" | "archived";
+                            title: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            versions?: {
+                                /** @description Only when one version is read */
+                                body?: string;
+                                /** @enum {string} */
+                                change_kind: "major" | "minor";
+                                content_hash: string;
+                                /** Format: uuid */
+                                id: string;
+                                language: string;
+                                number: number;
+                                /** Format: date-time */
+                                published_at: string;
+                                /** Format: uuid */
+                                published_by_id: string | null;
+                                /** Format: uuid */
+                                template_id: string;
+                                title: string;
+                            }[];
+                        };
+                        version: {
+                            /** @description Only when one version is read */
+                            body?: string;
+                            /** @enum {string} */
+                            change_kind: "major" | "minor";
+                            content_hash: string;
+                            /** Format: uuid */
+                            id: string;
+                            language: string;
+                            number: number;
+                            /** Format: date-time */
+                            published_at: string;
+                            /** Format: uuid */
+                            published_by_id: string | null;
+                            /** Format: uuid */
+                            template_id: string;
+                            title: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyDocumentsController.sign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description I have read and accept the text */
+                    agreed: boolean;
+                    drawn_signature?: {
+                        height: number;
+                        strokes: number[][][];
+                        width: number;
+                    };
+                    typed_name?: string;
+                    /**
+                     * Format: uuid
+                     * @description The version read
+                     */
+                    version_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Signature */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        signature: {
+                            /** @description The signer's account at signing time */
+                            account: {
+                                [key: string]: unknown;
+                            };
+                            content_hash: string;
+                            evidence_byte_size: number;
+                            evidence_hash: string;
+                            evidence_sha256: string;
+                            has_drawn_signature: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            ip_address: string | null;
+                            /** @enum {string} */
+                            level: "simple" | "advanced" | "qualified";
+                            provider: string;
+                            /** Format: uuid */
+                            request_id: string | null;
+                            /** Format: date-time */
+                            signed_at: string;
+                            /** Format: uuid */
+                            template_id: string;
+                            typed_name: string | null;
+                            user_agent: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** Format: uuid */
+                            version_id: string;
+                            version_number: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.MyFinanceController.entitlement": {
         parameters: {
             query?: never;
@@ -93920,6 +106899,116 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.MyPaymentsController.pay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description With save_card: pay what falls due with this card */
+                    autopay?: boolean;
+                    consent_accepted?: boolean;
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    language?: "el" | "en";
+                    save_card?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.terms": {
+        parameters: {
+            query?: {
+                language?: "el" | "en";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Terms */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        amount_cents: number;
+                        available: boolean;
+                        consent_text: string;
+                        consent_version: string;
+                        currency: string;
+                        /** @description The provider members pay through, or null when online payment is off */
+                        provider: string | null;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.MyMembershipController.leave": {
         parameters: {
             query?: never;
@@ -94104,6 +107193,498 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.buy_package": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description With save_card: pay what falls due with this card */
+                    autopay?: boolean;
+                    /** Format: uuid */
+                    book_slot_id?: string;
+                    consent_accepted?: boolean;
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    language?: "el" | "en";
+                    save_card?: boolean;
+                    start_now?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.package_terms": {
+        parameters: {
+            query?: {
+                language?: "el" | "en";
+                /** @description The class bought for: a drop-in or trial for it has no withdrawal */
+                book_slot_id?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Terms */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        available: boolean;
+                        consent_text: string;
+                        consent_version: string;
+                        package: {
+                            base_price_cents: number;
+                            billing_period: string;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            package_type: string;
+                            /** @description The package's in-person services (ADR-256): the store apps sell only packages with one */
+                            services: {
+                                [key: string]: unknown;
+                            };
+                        };
+                        /** @description The provider members pay through, or null when online payment is off */
+                        provider: string | null;
+                        start_now_text: string | null;
+                        withdrawal_days: number | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.methods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cards */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment_methods: {
+                            autopay: boolean;
+                            brand?: string | null;
+                            consent_version?: string | null;
+                            /** Format: date-time */
+                            consented_at?: string | null;
+                            currency: string;
+                            exp_month?: number | null;
+                            exp_year?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            last4?: string | null;
+                            max_amount_cents: number;
+                            provider: string;
+                            /** @enum {string} */
+                            status: "active" | "revoked";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.revoke_method": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Card */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment_method: {
+                            autopay: boolean;
+                            brand?: string | null;
+                            consent_version?: string | null;
+                            /** Format: date-time */
+                            consented_at?: string | null;
+                            currency: string;
+                            exp_month?: number | null;
+                            exp_year?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            last4?: string | null;
+                            max_amount_cents: number;
+                            provider: string;
+                            /** @enum {string} */
+                            status: "active" | "revoked";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.set_autopay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    autopay: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Card */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment_method: {
+                            autopay: boolean;
+                            brand?: string | null;
+                            consent_version?: string | null;
+                            /** Format: date-time */
+                            consented_at?: string | null;
+                            currency: string;
+                            exp_month?: number | null;
+                            exp_year?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            last4?: string | null;
+                            max_amount_cents: number;
+                            provider: string;
+                            /** @enum {string} */
+                            status: "active" | "revoked";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.returned": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    payment_id?: string;
+                    provider_ref?: string;
+                    transaction_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.sandbox_complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    decline_card?: boolean;
+                    /** @enum {string} */
+                    outcome: "succeeded" | "failed" | "cancelled";
+                    provider_ref: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Withdrawal */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        refund: {
+                            [key: string]: unknown;
+                        };
+                        refunded_cents: number;
                     };
                 };
             };
@@ -94696,7 +108277,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    roles: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete")[];
+                    roles: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete" | "guest")[];
                 };
             };
         };
@@ -95637,6 +109218,80 @@ export interface operations {
                             status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
                             subtotal_cents?: number;
                             total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.pay_shop_order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    idempotency_key: string;
+                    /** @enum {string} */
+                    language?: "el" | "en";
+                };
+            };
+        };
+        responses: {
+            /** @description Payment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment: {
+                            amount_cents: number;
+                            attention_resolution?: string | null;
+                            /** Format: date-time */
+                            attention_resolved_at?: string | null;
+                            card_brand?: string | null;
+                            card_last4?: string | null;
+                            currency: string;
+                            declines: number;
+                            description: string;
+                            environment: string;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            failure_code?: string | null;
+                            /** Format: uuid */
+                            finance_payment_id?: string | null;
+                            fulfilment_status: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            initiation: "payer" | "merchant" | "terminal";
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            metadata?: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: date-time */
+                            next_attempt_at?: string | null;
+                            provider: string;
+                            provider_transaction_id?: string | null;
+                            /** Format: uuid */
+                            purpose_id: string;
+                            purpose_type: string;
+                            redirect_url?: string | null;
+                            refunded_cents: number;
+                            retries: number;
+                            /** @enum {string} */
+                            status: "scheduled" | "awaiting_payer" | "processing" | "succeeded" | "failed" | "cancelled" | "expired";
+                            /** Format: date-time */
+                            succeeded_at?: string | null;
                             /** Format: uuid */
                             user_id?: string | null;
                         };
@@ -102558,6 +116213,8 @@ export interface operations {
                             archived_at?: string | null;
                             category?: string | null;
                             description?: string | null;
+                            /** @description Required with exempt: the article of the VAT law printed on the document */
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
@@ -102588,6 +116245,11 @@ export interface operations {
                             sell_in_app?: boolean;
                             /** @enum {string} */
                             status: "draft" | "published" | "archived";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                             title: string;
                             variants: {
                                 /** Format: date-time */
@@ -102596,6 +116258,7 @@ export interface operations {
                                 compare_at_price_cents?: number | null;
                                 cost_price_cents?: number | null;
                                 currency: string;
+                                exemption_reason?: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 low_stock_threshold?: number | null;
@@ -102622,6 +116285,15 @@ export interface operations {
                                 };
                                 /** @enum {string} */
                                 stock_status: "ok" | "low" | "critical" | "out";
+                                /**
+                                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                                 * @enum {string|null}
+                                 */
+                                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                                /**
+                                 * @deprecated
+                                 * @description Use tax_category (ADR-244)
+                                 */
                                 tax_class?: string | null;
                                 title?: string | null;
                                 track_inventory?: boolean;
@@ -102647,6 +116319,8 @@ export interface operations {
                     all_locations?: boolean;
                     category?: string | null;
                     description?: string | null;
+                    /** @description Required with exempt: the article of the VAT law printed on the document */
+                    exemption_reason?: string | null;
                     location_ids?: string[];
                     media_ids?: string[];
                     member_discount_applies?: boolean;
@@ -102664,12 +116338,19 @@ export interface operations {
                      * @enum {string}
                      */
                     status?: "draft" | "published" | "archived";
+                    /**
+                     * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                     * @enum {string|null}
+                     */
+                    tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                     title: string;
                     variants?: {
                         barcode?: string | null;
                         compare_at_price_cents?: number | null;
                         cost_price_cents?: number | null;
                         currency?: string;
+                        /** @description Required with exempt: the article of the VAT law printed on the document */
+                        exemption_reason?: string | null;
                         initial_quantity?: number;
                         /** Format: uuid */
                         location_id?: string | null;
@@ -102680,7 +116361,16 @@ export interface operations {
                         position?: number;
                         price_cents: number;
                         sku?: string | null;
-                        /** @enum {string|null} */
+                        /**
+                         * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                         * @enum {string|null}
+                         */
+                        tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                        /**
+                         * @deprecated
+                         * @description Deprecated alias of tax_category (ADR-244)
+                         * @enum {string|null}
+                         */
                         tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
                         title?: string | null;
                         track_inventory?: boolean;
@@ -102705,6 +116395,8 @@ export interface operations {
                             archived_at?: string | null;
                             category?: string | null;
                             description?: string | null;
+                            /** @description Required with exempt: the article of the VAT law printed on the document */
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
@@ -102735,6 +116427,11 @@ export interface operations {
                             sell_in_app?: boolean;
                             /** @enum {string} */
                             status: "draft" | "published" | "archived";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                             title: string;
                             variants: {
                                 /** Format: date-time */
@@ -102743,6 +116440,7 @@ export interface operations {
                                 compare_at_price_cents?: number | null;
                                 cost_price_cents?: number | null;
                                 currency: string;
+                                exemption_reason?: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 low_stock_threshold?: number | null;
@@ -102769,6 +116467,15 @@ export interface operations {
                                 };
                                 /** @enum {string} */
                                 stock_status: "ok" | "low" | "critical" | "out";
+                                /**
+                                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                                 * @enum {string|null}
+                                 */
+                                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                                /**
+                                 * @deprecated
+                                 * @description Use tax_category (ADR-244)
+                                 */
                                 tax_class?: string | null;
                                 title?: string | null;
                                 track_inventory?: boolean;
@@ -102806,6 +116513,8 @@ export interface operations {
                             archived_at?: string | null;
                             category?: string | null;
                             description?: string | null;
+                            /** @description Required with exempt: the article of the VAT law printed on the document */
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
@@ -102836,6 +116545,11 @@ export interface operations {
                             sell_in_app?: boolean;
                             /** @enum {string} */
                             status: "draft" | "published" | "archived";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                             title: string;
                             variants: {
                                 /** Format: date-time */
@@ -102844,6 +116558,7 @@ export interface operations {
                                 compare_at_price_cents?: number | null;
                                 cost_price_cents?: number | null;
                                 currency: string;
+                                exemption_reason?: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 low_stock_threshold?: number | null;
@@ -102870,6 +116585,15 @@ export interface operations {
                                 };
                                 /** @enum {string} */
                                 stock_status: "ok" | "low" | "critical" | "out";
+                                /**
+                                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                                 * @enum {string|null}
+                                 */
+                                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                                /**
+                                 * @deprecated
+                                 * @description Use tax_category (ADR-244)
+                                 */
                                 tax_class?: string | null;
                                 title?: string | null;
                                 track_inventory?: boolean;
@@ -102897,6 +116621,8 @@ export interface operations {
                     all_locations?: boolean;
                     category?: string | null;
                     description?: string | null;
+                    /** @description Required with exempt: the article of the VAT law printed on the document */
+                    exemption_reason?: string | null;
                     location_ids?: string[];
                     media_ids?: string[];
                     member_discount_applies?: boolean;
@@ -102910,6 +116636,11 @@ export interface operations {
                     sell_in_app?: boolean;
                     /** @enum {string} */
                     status?: "draft" | "published" | "archived";
+                    /**
+                     * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                     * @enum {string|null}
+                     */
+                    tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                     title?: string;
                     /** @description The full list of live variants: with id edited, without one added (with optional opening stock), live ones left out archived. Written with the product in one transaction. */
                     variants?: {
@@ -102917,6 +116648,8 @@ export interface operations {
                         compare_at_price_cents?: number | null;
                         cost_price_cents?: number | null;
                         currency?: string;
+                        /** @description Required with exempt: the article of the VAT law printed on the document */
+                        exemption_reason?: string | null;
                         /** Format: uuid */
                         id?: string | null;
                         initial_quantity?: number;
@@ -102929,7 +116662,16 @@ export interface operations {
                         position?: number;
                         price_cents?: number;
                         sku?: string | null;
-                        /** @enum {string|null} */
+                        /**
+                         * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                         * @enum {string|null}
+                         */
+                        tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                        /**
+                         * @deprecated
+                         * @description Deprecated alias of tax_category (ADR-244)
+                         * @enum {string|null}
+                         */
                         tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
                         title?: string | null;
                         track_inventory?: boolean;
@@ -102954,6 +116696,8 @@ export interface operations {
                             archived_at?: string | null;
                             category?: string | null;
                             description?: string | null;
+                            /** @description Required with exempt: the article of the VAT law printed on the document */
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
@@ -102984,6 +116728,11 @@ export interface operations {
                             sell_in_app?: boolean;
                             /** @enum {string} */
                             status: "draft" | "published" | "archived";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                             title: string;
                             variants: {
                                 /** Format: date-time */
@@ -102992,6 +116741,7 @@ export interface operations {
                                 compare_at_price_cents?: number | null;
                                 cost_price_cents?: number | null;
                                 currency: string;
+                                exemption_reason?: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 low_stock_threshold?: number | null;
@@ -103018,6 +116768,15 @@ export interface operations {
                                 };
                                 /** @enum {string} */
                                 stock_status: "ok" | "low" | "critical" | "out";
+                                /**
+                                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                                 * @enum {string|null}
+                                 */
+                                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                                /**
+                                 * @deprecated
+                                 * @description Use tax_category (ADR-244)
+                                 */
                                 tax_class?: string | null;
                                 title?: string | null;
                                 track_inventory?: boolean;
@@ -103431,6 +117190,8 @@ export interface operations {
                             archived_at?: string | null;
                             category?: string | null;
                             description?: string | null;
+                            /** @description Required with exempt: the article of the VAT law printed on the document */
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             location_ids?: string[];
@@ -103461,6 +117222,11 @@ export interface operations {
                             sell_in_app?: boolean;
                             /** @enum {string} */
                             status: "draft" | "published" | "archived";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
                             title: string;
                             variants: {
                                 /** Format: date-time */
@@ -103469,6 +117235,7 @@ export interface operations {
                                 compare_at_price_cents?: number | null;
                                 cost_price_cents?: number | null;
                                 currency: string;
+                                exemption_reason?: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 low_stock_threshold?: number | null;
@@ -103495,6 +117262,15 @@ export interface operations {
                                 };
                                 /** @enum {string} */
                                 stock_status: "ok" | "low" | "critical" | "out";
+                                /**
+                                 * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                                 * @enum {string|null}
+                                 */
+                                tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                                /**
+                                 * @deprecated
+                                 * @description Use tax_category (ADR-244)
+                                 */
                                 tax_class?: string | null;
                                 title?: string | null;
                                 track_inventory?: boolean;
@@ -103523,6 +117299,8 @@ export interface operations {
                     compare_at_price_cents?: number | null;
                     cost_price_cents?: number | null;
                     currency?: string;
+                    /** @description Required with exempt: the article of the VAT law printed on the document */
+                    exemption_reason?: string | null;
                     low_stock_threshold?: number | null;
                     option_values?: {
                         [key: string]: string;
@@ -103530,7 +117308,16 @@ export interface operations {
                     position?: number;
                     price_cents?: number;
                     sku?: string | null;
-                    /** @enum {string|null} */
+                    /**
+                     * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                     * @enum {string|null}
+                     */
+                    tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                    /**
+                     * @deprecated
+                     * @description Deprecated alias of tax_category (ADR-244)
+                     * @enum {string|null}
+                     */
                     tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
                     title?: string | null;
                     track_inventory?: boolean;
@@ -103553,6 +117340,7 @@ export interface operations {
                             compare_at_price_cents?: number | null;
                             cost_price_cents?: number | null;
                             currency: string;
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             low_stock_threshold?: number | null;
@@ -103579,6 +117367,15 @@ export interface operations {
                             };
                             /** @enum {string} */
                             stock_status: "ok" | "low" | "critical" | "out";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                            /**
+                             * @deprecated
+                             * @description Use tax_category (ADR-244)
+                             */
                             tax_class?: string | null;
                             title?: string | null;
                             track_inventory?: boolean;
@@ -103605,6 +117402,8 @@ export interface operations {
                     compare_at_price_cents?: number | null;
                     cost_price_cents?: number | null;
                     currency?: string;
+                    /** @description Required with exempt: the article of the VAT law printed on the document */
+                    exemption_reason?: string | null;
                     low_stock_threshold?: number | null;
                     option_values?: {
                         [key: string]: string;
@@ -103612,7 +117411,16 @@ export interface operations {
                     position?: number;
                     price_cents?: number;
                     sku?: string | null;
-                    /** @enum {string|null} */
+                    /**
+                     * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                     * @enum {string|null}
+                     */
+                    tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                    /**
+                     * @deprecated
+                     * @description Deprecated alias of tax_category (ADR-244)
+                     * @enum {string|null}
+                     */
                     tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
                     title?: string | null;
                     track_inventory?: boolean;
@@ -103635,6 +117443,7 @@ export interface operations {
                             compare_at_price_cents?: number | null;
                             cost_price_cents?: number | null;
                             currency: string;
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             low_stock_threshold?: number | null;
@@ -103661,6 +117470,15 @@ export interface operations {
                             };
                             /** @enum {string} */
                             stock_status: "ok" | "low" | "critical" | "out";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                            /**
+                             * @deprecated
+                             * @description Use tax_category (ADR-244)
+                             */
                             tax_class?: string | null;
                             title?: string | null;
                             track_inventory?: boolean;
@@ -103697,6 +117515,7 @@ export interface operations {
                             compare_at_price_cents?: number | null;
                             cost_price_cents?: number | null;
                             currency: string;
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             low_stock_threshold?: number | null;
@@ -103723,6 +117542,15 @@ export interface operations {
                             };
                             /** @enum {string} */
                             stock_status: "ok" | "low" | "critical" | "out";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                            /**
+                             * @deprecated
+                             * @description Use tax_category (ADR-244)
+                             */
                             tax_class?: string | null;
                             title?: string | null;
                             track_inventory?: boolean;
@@ -104084,6 +117912,7 @@ export interface operations {
                             compare_at_price_cents?: number | null;
                             cost_price_cents?: number | null;
                             currency: string;
+                            exemption_reason?: string | null;
                             /** Format: uuid */
                             id: string;
                             low_stock_threshold?: number | null;
@@ -104110,6 +117939,15 @@ export interface operations {
                             };
                             /** @enum {string} */
                             stock_status: "ok" | "low" | "critical" | "out";
+                            /**
+                             * @description ADR-244: the tax category on fiscal documents (one the business's country offers). Empty: standard (sales_tax in the US) on a product, the product's on a variant.
+                             * @enum {string|null}
+                             */
+                            tax_category?: "standard" | "reduced" | "second_reduced" | "super_reduced" | "special" | "zero" | "exempt" | "sales_tax" | null;
+                            /**
+                             * @deprecated
+                             * @description Use tax_category (ADR-244)
+                             */
                             tax_class?: string | null;
                             title?: string | null;
                             track_inventory?: boolean;
@@ -110471,6 +124309,814 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.PlatformFiscalConnectionsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Connections */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        connections: {
+                            /** @description The myDATA connection; the subscription key is never returned. `error_code` says why it needs a check (ADR-273). */
+                            mydata?: {
+                                /** @enum {string} */
+                                authority: "mydata";
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_subscription_key: boolean;
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                                user_id?: string | null;
+                            } | null;
+                            /** @description The Peppol connection; the API key, secret and webhook token are never returned. `storecove` is a retired provider of old connections: they show as invalid (`provider_retired`) until reconnected. */
+                            peppol?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /**
+                                 * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
+                                 * @enum {string}
+                                 */
+                                credentials_source: "own" | "till_connection" | "none";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                has_webhook_token: boolean;
+                                /** @description fiskaly: the business's E-INVOICE System id. */
+                                legal_entity_id?: string | null;
+                                /** @enum {string} */
+                                network: "peppol";
+                                /** @example 0208:0123456749 */
+                                peppol_id: string;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly" | "storecove";
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The AADE registry connection; the password is never returned. `username` is the same field the save takes (ADR-273). */
+                            registry?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                environment: "sandbox" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_password: boolean;
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                                username?: string | null;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            rksv?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            sign_fr?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            tse?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                        };
+                        country: string | null;
+                        kinds: ("mydata" | "registry" | "tse" | "rksv" | "sign_fr" | "peppol")[];
+                        /**
+                         * @description `palee`: the Palee team manages them; staff see them but cannot save.
+                         * @enum {string}
+                         */
+                        managed_by: "owner" | "palee";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformFiscalConnectionsController.managed_by": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    managed_by: "owner" | "palee";
+                };
+            };
+        };
+        responses: {
+            /** @description Connections */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        connections: {
+                            /** @description The myDATA connection; the subscription key is never returned. `error_code` says why it needs a check (ADR-273). */
+                            mydata?: {
+                                /** @enum {string} */
+                                authority: "mydata";
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_subscription_key: boolean;
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                                user_id?: string | null;
+                            } | null;
+                            /** @description The Peppol connection; the API key, secret and webhook token are never returned. `storecove` is a retired provider of old connections: they show as invalid (`provider_retired`) until reconnected. */
+                            peppol?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /**
+                                 * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
+                                 * @enum {string}
+                                 */
+                                credentials_source: "own" | "till_connection" | "none";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                has_webhook_token: boolean;
+                                /** @description fiskaly: the business's E-INVOICE System id. */
+                                legal_entity_id?: string | null;
+                                /** @enum {string} */
+                                network: "peppol";
+                                /** @example 0208:0123456749 */
+                                peppol_id: string;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly" | "storecove";
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The AADE registry connection; the password is never returned. `username` is the same field the save takes (ADR-273). */
+                            registry?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                environment: "sandbox" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_password: boolean;
+                                /** @enum {string} */
+                                status: "active" | "invalid";
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                                username?: string | null;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            rksv?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            sign_fr?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                            /** @description The TSE (DE), RKSV (AT) or SIGN FR (FR) connection; key, secret and admin PIN are never returned. */
+                            tse?: {
+                                /** Format: date-time */
+                                checked_at?: string | null;
+                                /** @enum {string} */
+                                device: "tse" | "rksv" | "sign_fr";
+                                /** @enum {string} */
+                                environment: "sandbox" | "test" | "production";
+                                /**
+                                 * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                                 * @enum {string|null}
+                                 */
+                                error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                                has_api_key: boolean;
+                                has_api_secret: boolean;
+                                /** @enum {string} */
+                                provider: "sandbox" | "fiskaly";
+                                /** Format: date-time */
+                                provisioned_at?: string | null;
+                                public_key?: string | null;
+                                /** Format: uuid */
+                                register_id: string;
+                                register_serial?: string | null;
+                                /** @enum {string} */
+                                status: "provisioning" | "active" | "invalid";
+                                /** Format: uuid */
+                                unit_id: string;
+                                unit_serial?: string | null;
+                                /** Format: date-time */
+                                updated_at?: string;
+                                /** Format: uuid */
+                                updated_by_id?: string | null;
+                                /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                                updated_by_name?: string | null;
+                                /** @description Saved last by the Palee team from the vendor console. */
+                                updated_by_platform: boolean;
+                            } | null;
+                        };
+                        country: string | null;
+                        kinds: ("mydata" | "registry" | "tse" | "rksv" | "sign_fr" | "peppol")[];
+                        /**
+                         * @description `palee`: the Palee team manages them; staff see them but cannot save.
+                         * @enum {string}
+                         */
+                        managed_by: "owner" | "palee";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformFiscalConnectionsController.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                kind: "mydata" | "registry" | "tse" | "rksv" | "sign_fr" | "peppol";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    api_key?: string | null;
+                    api_secret?: string | null;
+                    /** @enum {string} */
+                    environment: "sandbox" | "test" | "production";
+                    legal_entity_id?: string | null;
+                    /** Format: password */
+                    password?: string;
+                    peppol_id?: string | null;
+                    reprovision?: boolean;
+                    subscription_key?: string | null;
+                    user_id?: string | null;
+                    username?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Connection */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The result of «Δοκιμή σύνδεσης». */
+                        check: {
+                            detail: {
+                                /** @description Registry: the name AADE has for it. */
+                                legal_name?: string | null;
+                                /** @description Registry: the ΑΦΜ looked up. */
+                                tax_id?: string;
+                            };
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            /**
+                             * @description `invalid`: refused (the connection is marked invalid); `unreachable`: it could not be checked (provider down, AADE quota, or the business's own ΑΦΜ missing or unknown to the registry; see `error_code`), nothing changed and it is checked again soon.
+                             * @enum {string}
+                             */
+                            result: "ok" | "invalid" | "unreachable";
+                        } | null;
+                        connection: ({
+                            /** @enum {string} */
+                            authority: "mydata";
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_subscription_key: boolean;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            user_id?: string | null;
+                        } | ({
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            environment: "sandbox" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_password: boolean;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            username?: string | null;
+                        } | null) | {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            device: "tse" | "rksv" | "sign_fr";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly";
+                            /** Format: date-time */
+                            provisioned_at?: string | null;
+                            public_key?: string | null;
+                            /** Format: uuid */
+                            register_id: string;
+                            register_serial?: string | null;
+                            /** @enum {string} */
+                            status: "provisioning" | "active" | "invalid";
+                            /** Format: uuid */
+                            unit_id: string;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        } | {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /**
+                             * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
+                             * @enum {string}
+                             */
+                            credentials_source: "own" | "till_connection" | "none";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            has_webhook_token: boolean;
+                            /** @description fiskaly: the business's E-INVOICE System id. */
+                            legal_entity_id?: string | null;
+                            /** @enum {string} */
+                            network: "peppol";
+                            /** @example 0208:0123456749 */
+                            peppol_id: string;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly" | "storecove";
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        }) | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformFiscalConnectionsController.check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                kind: "mydata" | "registry" | "tse" | "rksv" | "sign_fr" | "peppol";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Check */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The result of «Δοκιμή σύνδεσης». */
+                        check: {
+                            detail: {
+                                /** @description Registry: the name AADE has for it. */
+                                legal_name?: string | null;
+                                /** @description Registry: the ΑΦΜ looked up. */
+                                tax_id?: string;
+                            };
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            /**
+                             * @description `invalid`: refused (the connection is marked invalid); `unreachable`: it could not be checked (provider down, AADE quota, or the business's own ΑΦΜ missing or unknown to the registry; see `error_code`), nothing changed and it is checked again soon.
+                             * @enum {string}
+                             */
+                            result: "ok" | "invalid" | "unreachable";
+                        } | null;
+                        connection: ({
+                            /** @enum {string} */
+                            authority: "mydata";
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_subscription_key: boolean;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            user_id?: string | null;
+                        } | ({
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            environment: "sandbox" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_password: boolean;
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                            username?: string | null;
+                        } | null) | {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /** @enum {string} */
+                            device: "tse" | "rksv" | "sign_fr";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly";
+                            /** Format: date-time */
+                            provisioned_at?: string | null;
+                            public_key?: string | null;
+                            /** Format: uuid */
+                            register_id: string;
+                            register_serial?: string | null;
+                            /** @enum {string} */
+                            status: "provisioning" | "active" | "invalid";
+                            /** Format: uuid */
+                            unit_id: string;
+                            unit_serial?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        } | {
+                            /** Format: date-time */
+                            checked_at?: string | null;
+                            /**
+                             * @description `till_connection`: no key of its own, the fiskaly till connection's is used.
+                             * @enum {string}
+                             */
+                            credentials_source: "own" | "till_connection" | "none";
+                            /** @enum {string} */
+                            environment: "sandbox" | "test" | "production";
+                            /**
+                             * @description Why the last check (or the provider, while working) refused the connection; screens turn it into a plain message. Provider text is never returned.
+                             * @enum {string|null}
+                             */
+                            error_code?: "credentials_rejected" | "credentials_missing" | "unit_not_found" | "unit_not_ready" | "system_not_found" | "tax_id_missing" | "tax_id_not_found" | "siren_missing" | "limit_reached" | "unreachable" | "provisioning_failed" | "provider_retired" | null;
+                            has_api_key: boolean;
+                            has_api_secret: boolean;
+                            has_webhook_token: boolean;
+                            /** @description fiskaly: the business's E-INVOICE System id. */
+                            legal_entity_id?: string | null;
+                            /** @enum {string} */
+                            network: "peppol";
+                            /** @example 0208:0123456749 */
+                            peppol_id: string;
+                            /** @enum {string} */
+                            provider: "sandbox" | "fiskaly" | "storecove";
+                            /** @enum {string} */
+                            status: "active" | "invalid";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** Format: uuid */
+                            updated_by_id?: string | null;
+                            /** @description Who saved it last (the connections overview only; nil for the Palee team). */
+                            updated_by_name?: string | null;
+                            /** @description Saved last by the Palee team from the vendor console. */
+                            updated_by_platform: boolean;
+                        }) | null;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.PlatformOrganizationController.invite": {
         parameters: {
             query?: never;
@@ -110633,8 +125279,8 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string} */
-                    role?: "owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete";
-                    roles?: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete")[];
+                    role?: "owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete" | "guest";
+                    roles?: ("owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete" | "guest")[];
                 };
             };
         };
@@ -113294,6 +127940,57 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.PublicBoxController.packages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The gym's slug or one of its former slugs */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Packages */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        online_payments: boolean;
+                        packages: {
+                            base_price_cents: number;
+                            billing_period: string;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            package_type: string;
+                            /** @description The package's in-person services (ADR-256): the store apps sell only packages with one */
+                            services: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        /** @description The provider members pay through, or null when online payment is off */
+                        provider: string | null;
+                        withdrawal_days: number | null;
+                    };
+                };
+            };
+            /** @description No published box with this slug */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "PaleeWeb.PerkVerificationController.show": {
         parameters: {
             query?: never;
@@ -113498,6 +128195,28 @@ export interface operations {
                             trial_days: number;
                         }[];
                     };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PublicReceiptsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The receipt */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
                 };
             };
         };

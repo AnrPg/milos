@@ -24,6 +24,11 @@ defmodule Palee.Organizations.Domain.AccessPolicy do
     view_billing_contacts: :all,
     view_client_training: :all,
     view_health: :all,
+    # ADR-252: clients' health certificates (dates and files, GDPR art. 9).
+    manage_health_certificates: :all,
+    view_health_certificates: :all,
+    # ADR-252: ask clients to sign the box's documents and see who has not.
+    request_signatures: :all,
     view_feedback: :all,
     manage_packages: :all,
     view_package_catalog: :all,
@@ -123,7 +128,12 @@ defmodule Palee.Organizations.Domain.AccessPolicy do
     edit_space_details: :all,
     set_space_unavailable: :all,
     manage_inventory: :all,
-    sell_shop: :all
+    sell_shop: :all,
+    # ADR-252 (product owner, 2026-10-29): the desk chases signatures and
+    # sees clients' health certificates; uploading or deleting one stays
+    # `manage_health_certificates`, which a box may grant.
+    request_signatures: :all,
+    view_health_certificates: :all
   }
 
   @accountant %{
@@ -149,7 +159,8 @@ defmodule Palee.Organizations.Domain.AccessPolicy do
     accountant: @accountant,
     janitor: @janitor,
     member: %{},
-    athlete: %{}
+    athlete: %{},
+    guest: %{}
   }
 
   # What a gym may unlock for a role on top of its defaults (ADR-099,
@@ -162,7 +173,9 @@ defmodule Palee.Organizations.Domain.AccessPolicy do
       :view_finance_reports,
       :manage_shop,
       # ADR-202: adding and archiving spaces and drawing floor plans.
-      :manage_spaces
+      :manage_spaces,
+      # ADR-252: the desk collecting clients' health certificates.
+      :manage_health_certificates
     ]
   }
 

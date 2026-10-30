@@ -17,6 +17,7 @@ import { segmentLabel } from "@/lib/segment-label";
 import { type CueMode, primeCueAudio, readCueMode, storeCueMode } from "@/lib/timer-cues";
 import { getFormatLabels } from "@/types/workout";
 
+import { ClassScreenPin } from "./ClassScreenPin";
 import { ClassTimerFace } from "./ClassTimerFace";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
@@ -104,6 +105,7 @@ export function ClassTimerControl({ slotId }: { slotId: string }) {
             <button type="button" onClick={() => void copyDisplayLink()} className="min-h-11 rounded-xl px-3 text-sm font-semibold" style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}>
               {copied ? i18n("classTimerLinkCopied") : i18n("classTimerCopyLink")}
             </button>
+            <ClassScreenPin token={tokens?.access_token} slotId={slotId} />
             <button
               type="button"
               onClick={() => {

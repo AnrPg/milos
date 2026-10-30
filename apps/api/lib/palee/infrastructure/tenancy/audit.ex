@@ -19,6 +19,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     finance_document_counters finance_refund_receipts finance_reconciliation_records
     finance_accounting_exports
     finance_entitlement_usage_entries finance_settings finance_subscription_freezes
+    finance_value_overrides
     facility_locations facility_check_ins facility_check_in_settings
     membership_location_scopes
     facility_visitor_scans facility_member_codes wallet_passes content_videos
@@ -50,6 +51,19 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     shop_products shop_variants shop_stock_movements shop_stock_levels
     shop_orders shop_order_lines shop_promotion_codes shop_stock_alerts
     shop_variant_price_changes shop_pricing_targets
+    fiscal_business_identities fiscal_sequences fiscal_documents fiscal_document_lines
+    fiscal_journal_heads fiscal_journal_entries fiscal_period_closings
+    fiscal_authority_connections fiscal_transmissions fiscal_transmission_attempts
+    fiscal_sales_tax_rates fiscal_export_settings
+    fiscal_network_connections fiscal_einvoice_submissions fiscal_einvoice_attempts
+    fiscal_till_connections fiscal_till_signatures fiscal_till_signature_attempts
+    fiscal_connection_settings
+    payment_accounts payment_methods payment_intents payment_refunds payment_webhook_events
+    box_screens
+    document_settings document_templates document_versions document_signature_requests
+    document_signatures document_audit_events health_certificates
+    setup_recipe_applications
+    imports import_rows imported_people
     review_questionnaires reviews review_answers
     messaging_threads
     messaging_participants messaging_messages seasonal_challenges
@@ -116,6 +130,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     account_provider_selections journal_coach_audience_exclusions journal_entry_audiences
     user_insights guide_progress notification_preferences
     training_goals
+    personal_data_exports
   )
 
   def report do

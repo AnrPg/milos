@@ -43,6 +43,8 @@ function fieldMessage(field: string, raw: string[], t: Translate): string | null
       return taken ? t("emailInUseUnknown") : t("emailInvalid");
     case "password":
       return t("passwordRule");
+    case "age_confirmed":
+      return t("minimumAgeRule");
     default:
       return null;
   }

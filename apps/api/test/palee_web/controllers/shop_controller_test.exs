@@ -348,6 +348,48 @@ defmodule PaleeWeb.ShopControllerTest do
              |> json_response(409)
   end
 
+  test "ADR-248: an online order is paid on the provider's page through the box's account",
+       ctx do
+    {_id, %{"TEE-S" => small}} = create_published_tee(ctx)
+
+    assert %{"account" => %{"provider" => "sandbox"}} =
+             ctx.owner_conn
+             |> send_json(:put, "/api/org/#{ctx.organization.slug}/admin/payments/account", %{
+               provider: "sandbox",
+               environment: "test"
+             })
+             |> json_response(200)
+
+    %{"order" => %{"id" => order_id}} =
+      ctx.member_conn
+      |> send_json(:post, "#{ctx.me}/orders", %{
+        lines: [%{variant_id: small["id"], quantity: 1}],
+        payment_mode: "online",
+        idempotency_key: key()
+      })
+      |> json_response(201)
+
+    %{"payment" => payment} =
+      ctx.member_conn
+      |> send_json(:post, "#{ctx.me}/orders/#{order_id}/pay-online", %{idempotency_key: key()})
+      |> json_response(200)
+
+    assert payment["amount_cents"] == 2_500
+    ref = URI.decode_query(URI.parse(payment["redirect_url"]).query)["sandbox_checkout"]
+
+    assert %{"payment" => %{"status" => "succeeded", "fulfilment_status" => "done"}} =
+             ctx.member_conn
+             |> send_json(
+               :post,
+               "/api/org/#{ctx.organization.slug}/me/payments/sandbox/complete",
+               %{provider_ref: ref, outcome: "succeeded"}
+             )
+             |> json_response(200)
+
+    assert %{"order" => %{"state" => "paid", "paid_cents" => 2_500}} =
+             ctx.member_conn |> get_json("#{ctx.me}/orders/#{order_id}") |> json_response(200)
+  end
+
   test "a member cancels an unpaid order: the stock comes back and the invoice is void", ctx do
     {_id, %{"TEE-S" => small}} = create_published_tee(ctx, 1)
 

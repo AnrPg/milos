@@ -104,3 +104,20 @@ config :palee, :native_push_senders, %{
 
 # ADR-161: Garmin is faked; tests turn it on and script its answers.
 config :palee, :garmin_client, Palee.FakeGarminClient
+
+# ADR-242: a fixed test key for the fiscal journal (never used outside tests).
+config :palee, Palee.Infrastructure.Fiscal.Ed25519JournalSigner,
+  signing_key: "test-1:" <> Base.encode64(:binary.copy(<<7>>, 32))
+
+# ADR-246: the sandbox payment provider and stubbed provider HTTP in tests.
+config :palee, :payments_sandbox, true
+
+config :palee, :stripe_connect, %{
+  "test" => %{client_id: "ca_test_platform", secret_key: "sk_test_platform"}
+}
+
+config :palee, :payments_http, req_options: [plug: {Req.Test, Palee.PaymentsHttp}]
+# ADR-250/251/266: fiskaly calls go to a test plug.
+config :palee, :fiscal_http, req_options: [plug: {Req.Test, Palee.FiscalHttp}]
+# ADR-273: myDATA (saving a test or production connection checks it) too.
+config :palee, :mydata, req_options: [plug: {Req.Test, Palee.FiscalHttp}, retry: false]

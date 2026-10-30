@@ -12,6 +12,7 @@ import { checkInErrorKey } from "./errors";
 import { CameraError, scannerSource, type StopScanner } from "./scanner";
 import { SPARK_GO_STYLE } from "@/lib/spark";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { clockFormat } from "@/lib/clock";
 
 const AUTO_KEY = "palee:desk-auto-check-in";
 const SAME_CODE_MS = 4_000;
@@ -262,7 +263,7 @@ function DeskResultCard({
 }) {
   const t = useTranslations("CheckIn");
   const locale = useLocale();
-  const clock = (iso: string) => new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+  const clock = (iso: string) => clockFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
   const date = (iso: string) => new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", year: "numeric" }).format(new Date(iso));
   const name = result.member.display_name || result.member.nickname || "";
   const bookings = result.bookings ?? [];

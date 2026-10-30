@@ -1,10 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
 import { ApiError } from "@/api/client";
+import type { DocumentsRequired } from "@/api/documents";
+import { DocumentsGate } from "@/components/documents/DocumentsGate";
+import { gateReady, gateSteps } from "@/components/documents/documents-model";
 import {
   cancelBooking,
   joinWaitlist,
@@ -64,6 +67,7 @@ export function ClassSheet({
   onClose,
   onChanged,
   onCancelled,
+  documentsGate = null,
 }: {
   slot: ScheduleSlot;
   /** ADR-179: the gym's zone; the class shows on its clock. */
@@ -80,6 +84,12 @@ export function ClassSheet({
   onChanged: () => void;
   /** The member withdrew their booking; the sheet closes. */
   onCancelled: (result: { lateCancellation: boolean }) => void;
+  /**
+   * ADR-252: the booking answered `documents_required`. The sheet then lists
+   * what to sign or upload, opens each in place, and «Κράτηση» books again
+   * once everything is done (mockup s7, option B).
+   */
+  documentsGate?: DocumentsRequired | null;
 }) {
   const t = useTranslations("BoxSchedule");
   const i18n = useUiTranslations();
@@ -92,6 +102,10 @@ export function ClassSheet({
   const [messageText, setMessageText] = useState("");
   const [messageState, setMessageState] = useState<"idle" | "sending" | "sent">("idle");
   const [messageError, setMessageError] = useState<string | null>(null);
+  const steps = useMemo(() => (documentsGate ? gateSteps(documentsGate) : []), [documentsGate]);
+  const [gateDone, setGateDone] = useState<Set<string>>(() => new Set());
+  const [gateOpen, setGateOpen] = useState<string | null>(null);
+  const gating = steps.length > 0 && state.kind === "bookable";
 
   const start = new Date(slot.scheduled_at);
   const when = formatInZone(start, timeZone, locale, { weekday: "long", day: "numeric", month: "long" });
@@ -168,7 +182,19 @@ export function ClassSheet({
   const primary = "min-h-12 w-full rounded-2xl text-base font-bold disabled:opacity-50";
   const quiet = "min-h-12 w-full rounded-2xl text-sm font-bold disabled:opacity-50";
   let footer: ReactNode = null;
-  if (state.kind === "bookable") {
+  if (gating) {
+    footer = gateOpen ? null : (
+      <button
+        type="button"
+        onClick={onBook}
+        disabled={busy || !gateReady(steps, gateDone)}
+        className={primary}
+        style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+      >
+        {t("book")}
+      </button>
+    );
+  } else if (state.kind === "bookable") {
     footer = (
       <button
         type="button"
@@ -275,6 +301,16 @@ export function ClassSheet({
         </div>
       }
     >
+      {gating ? (
+        <DocumentsGate
+          steps={steps}
+          done={gateDone}
+          openKey={gateOpen}
+          onOpen={setGateOpen}
+          onDone={(key) => setGateDone((current) => new Set(current).add(key))}
+        />
+      ) : (
+        <>
           <ClassStateNotice slot={slot} className="mb-4" />
           <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
             {coachName ? <Fact label={t("coach")}>{coachName}</Fact> : null}
@@ -412,6 +448,8 @@ export function ClassSheet({
               </button>
             )}
           </section>
+        </>
+      )}
     </Dialog>
   );
 }

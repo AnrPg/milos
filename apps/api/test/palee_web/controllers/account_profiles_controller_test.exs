@@ -14,7 +14,14 @@ defmodule PaleeWeb.AccountProfilesControllerTest do
   defp register(params) do
     build_conn()
     |> put_req_header("content-type", "application/json")
-    |> post("/api/auth/register", Jason.encode!(params))
+    |> post("/api/auth/register", Jason.encode!(with_age_confirmed(params)))
+  end
+
+  # ADR-267: every sign-up confirms the minimum age.
+  defp with_age_confirmed(params) when is_map(params) do
+    if Enum.any?(Map.keys(params), &is_binary/1),
+      do: Map.put_new(params, "age_confirmed", true),
+      else: Map.put_new(params, :age_confirmed, true)
   end
 
   defp login(params) do

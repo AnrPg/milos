@@ -19,6 +19,11 @@ defmodule PaleeWeb.Endpoint do
     websocket: true,
     longpoll: false
 
+  # ADR-253: box screens, with their display token only.
+  socket "/box_screen_socket", PaleeWeb.BoxScreenSocket,
+    websocket: true,
+    longpoll: false
+
   # Serve at "/" the static files from "priv/static" directory.
   #
   # When code reloading is disabled (e.g., in production),
@@ -50,6 +55,8 @@ defmodule PaleeWeb.Endpoint do
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
+    # ADR-246: payment webhooks keep their raw body for signature checks.
+    body_reader: {PaleeWeb.Plugs.CacheRawBody, :read_body, []},
     json_decoder: Phoenix.json_library()
 
   plug Plug.MethodOverride

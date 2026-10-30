@@ -1,3 +1,4 @@
+import type { ValueOverride } from "@/components/admin/finance/shared/member-standing";
 import type { DurationAdjustment } from "@/api/executions";
 import { apiRequest } from "@/api/client";
 import type { paths } from "@/api/generated/schema";
@@ -69,6 +70,8 @@ export type AdminUserFinance = {
   details: {
     membership: null | Record<string, unknown>;
     package_subscriptions: Array<Record<string, unknown>>;
+    /** ADR-274: every value staff set by hand, newest first. */
+    overrides?: ValueOverride[];
     referral_claims: Array<Record<string, unknown>>;
     referred_members: Array<Record<string, unknown>>;
     referral_rewards: Array<Record<string, unknown>>;

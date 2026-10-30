@@ -16,6 +16,8 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { rememberSelectedOrganization } from "@/lib/organization-slug";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { AgeConfirmationField } from "@/components/auth/AgeConfirmationField";
+import { useTranslations } from "next-intl";
 
 type FieldErrors = Record<string, string[]>;
 
@@ -45,6 +47,7 @@ const INITIAL_FORM: AdminRegisterForm = {
   password: "",
   email: "",
   invitation_token: "",
+  age_confirmed: false,
 };
 
 function validRegistrationPassword(password: string) {
@@ -70,6 +73,8 @@ function summarizeFieldErrors(errors: FieldErrors, fieldLabels: Record<string, s
 
 export function AdminRegistrationConsole() {
   const i18n = useUiTranslations();
+  const tAuth = useTranslations("authRecovery");
+  const tLegal = useTranslations("legal");
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signUpAdmin, acceptInvitation, signOut, status, currentUser } = useSession();
@@ -145,6 +150,11 @@ export function AdminRegistrationConsole() {
       setFieldErrors({ password: [i18n("passwordRules0c63f14")] });
       return;
     }
+    if (!form.age_confirmed) {
+      setError(null);
+      setFieldErrors({ age_confirmed: [tAuth("minimumAgeRule")] });
+      return;
+    }
 
     setBusy(true);
     setError(null);
@@ -166,6 +176,7 @@ export function AdminRegistrationConsole() {
         setFieldErrors({ email: [], password: [""] });
       } else if (caught instanceof ApiError) {
         const nextFieldErrors = flatFieldErrors(caught.payload.errors);
+        if (nextFieldErrors.age_confirmed) nextFieldErrors.age_confirmed = [tAuth("minimumAgeRule")];
         setFieldErrors(nextFieldErrors);
         setError(
           Object.keys(nextFieldErrors).length > 0
@@ -174,6 +185,7 @@ export function AdminRegistrationConsole() {
                 nickname: i18n("nicknamece2bd99"),
                 password: i18n("password8be3c94"),
                 invitation_token: i18n("adminRegistrationCode"),
+                age_confirmed: tLegal("minimumAge"),
               })
             : localizeError(caught, i18n),
         );
@@ -432,6 +444,15 @@ export function AdminRegistrationConsole() {
               </span>
             </div>
           ) : null}
+
+          <AgeConfirmationField
+            checked={form.age_confirmed === true}
+            errors={fieldErrors.age_confirmed}
+            onChange={(age_confirmed) => {
+              setFieldErrors((current) => ({ ...current, age_confirmed: [] }));
+              setForm((current) => ({ ...current, age_confirmed }));
+            }}
+          />
 
           {error ? (
             <ErrorNotice>{error}</ErrorNotice>

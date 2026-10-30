@@ -24,7 +24,7 @@ type MembershipStatusResponse = Json<Op["PaleeWeb.AdminUserController.membership
 type LocationScopeResponse = Json<Op["PaleeWeb.StaffLocationScopeController.update"]["responses"][200]>;
 
 export type MembershipRoles = MembershipRolesResponse["membership"];
-export type RoleName = "owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete";
+export type RoleName = "owner" | "admin" | "coach" | "front_desk" | "accountant" | "janitor" | "member" | "athlete" | "guest";
 export type RoleAccess = RoleAccessResponse;
 export type CoachingRelationship = RelationshipsResponse["relationships"][number];
 export type CoachNote = NotesResponse["notes"][number];
@@ -36,7 +36,18 @@ export type CleaningArea = AreasResponse["areas"][number];
 export type CleaningEntry = EntriesResponse["entries"][number];
 export type MembershipStatus = MembershipStatusResponse["membership_status"];
 
-export const ALL_ROLES: RoleName[] = ["owner", "admin", "coach", "front_desk", "accountant", "janitor", "member", "athlete"];
+export const ALL_ROLES: RoleName[] = [
+  "owner",
+  "admin",
+  "coach",
+  "front_desk",
+  "accountant",
+  "janitor",
+  "member",
+  "athlete",
+  // ADR-272: a guest of the box, the lowest client-type role.
+  "guest",
+];
 
 export async function updateMemberRoles(token: string, userId: string, roles: RoleName[]) {
   const response = await apiRequest<MembershipRolesResponse>(`/admin/users/${userId}/roles`, {

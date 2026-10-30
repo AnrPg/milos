@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Your data is ready to download"
+msgstr "Your data is ready to download"
+
+msgid "The copy of your data you asked for is ready: one ZIP file with your profile, bookings, journal, wellness, devices, the messages you wrote, payments, receipts and signed documents."
+msgstr "The copy of your data you asked for is ready: one ZIP file with your profile, bookings, journal, wellness, devices, the messages you wrote, payments, receipts and signed documents."
+
+msgid "Download it from Settings while you are signed in. It is kept for %{days} days."
+msgstr "Download it from Settings while you are signed in. It is kept for %{days} days."
+
+msgid "Open Settings"
+msgstr "Open Settings"
+
+msgid "If you didn't ask for this, change your password: someone else may know it."
+msgstr "If you didn't ask for this, change your password: someone else may know it."

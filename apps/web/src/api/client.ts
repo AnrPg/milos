@@ -55,8 +55,11 @@ type ApiRequestOptions = {
   method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   token?: string | null;
   body?: unknown;
-  /** "text" returns the raw body of a successful response (e.g. a printable HTML document). */
-  responseType?: "json" | "text";
+  /**
+   * "text" returns the raw body of a successful response (e.g. a printable HTML document);
+   * "blob" returns it as a Blob (a PDF, a ZIP or an export file to save).
+   */
+  responseType?: "json" | "text" | "blob";
   /** Cancels the request (react-query passes one so stale searches stop). */
   signal?: AbortSignal;
   /**
@@ -121,6 +124,7 @@ const TENANT_SCOPED_PREFIXES = [
   "/locations",
   "/me/appointments",
   "/me/corporate-enrollment",
+  "/me/documents",
   "/me/entitlement",
   "/me/finance",
   "/me/form-reviews",
@@ -364,15 +368,17 @@ export async function apiRequest<T>(
     options.scope === "account" ? null : await resolveOrganizationSlugForRequest(path, token);
   const requestPath = tenantScopedPath(path, organizationSlug);
 
+  // A FormData body (a file upload, ADR-254) goes as multipart: the browser sets its boundary.
+  const multipart = typeof FormData !== "undefined" && options.body instanceof FormData;
   const response = await fetch(`${API_BASE_URL}${requestPath}`, {
     method: options.method ?? "GET",
     headers: {
-      "Content-Type": "application/json",
+      ...(multipart ? {} : { "Content-Type": "application/json" }),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...(organizationSlug ? { "X-Organization-Slug": organizationSlug } : {}),
       ...options.headers,
     },
-    body: options.body ? JSON.stringify(options.body) : undefined,
+    body: multipart ? (options.body as FormData) : options.body ? JSON.stringify(options.body) : undefined,
     credentials: "same-origin",
     signal: options.signal,
   });
@@ -396,6 +402,10 @@ export async function apiRequest<T>(
 
   if (options.responseType === "text" && response.ok) {
     return (await response.text()) as T;
+  }
+
+  if (options.responseType === "blob" && response.ok) {
+    return (await response.blob()) as T;
   }
 
   const payload = (await response.json().catch(() => ({}))) as T | ApiErrorPayload;

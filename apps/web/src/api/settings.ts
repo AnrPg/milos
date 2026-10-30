@@ -65,6 +65,8 @@ export type TimeZoneStatus = {
 };
 
 export type AdminSettingsPayload = {
+  /** ADR-255: catalog keys of the settings kept under «Προχωρημένα». */
+  advanced_settings?: string[];
   /** ADR-176: the gym's time zone. */
   time_zone?: TimeZoneStatus;
   gamification: GamificationSettings;

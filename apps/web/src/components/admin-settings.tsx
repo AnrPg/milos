@@ -7,7 +7,7 @@
 import {useUiTranslations} from "@/i18n/ui";
 import { useTranslations } from "next-intl";
 import { localizeError } from "@/i18n/presentation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
@@ -33,7 +33,9 @@ import { PublicPageLink } from "@/components/admin/public-page/PublicPageLink";
 import { TrialsLink } from "@/components/admin/trials/TrialsLink";
 import { CommunitySettingsLink } from "@/components/admin/community/CommunitySettings";
 import { CheckInSettingsLink } from "@/components/check-in/CheckInSettings";
+import { FiscalIdentityLink } from "@/components/fiscal/FiscalIdentityLink";
 import { SpacesSettingsLink } from "@/components/spaces/SpacesSettings";
+import { BoxScreensSettingsLink } from "@/components/box-screen/BoxScreensSettings";
 import { RoleAccessSettings } from "@/components/admin/RoleAccessSettings";
 import { OrganizationOwnerSettings } from "@/components/admin/OrganizationOwnerSettings";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
@@ -53,6 +55,31 @@ import { PlanCard, PlanNotice } from "@/components/solo-coach/PlanCard";
 import { Dialog } from "@/components/ui/Dialog";
 import { Popover } from "@/components/ui/Popover";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { OnlinePaymentsSettings } from "@/components/admin/payments/OnlinePaymentsSettings";
+import { useSettingLevels, type SettingLevels } from "@/components/settings/AdvancedSettings";
+import { AdvancedSettingsCard } from "@/components/settings/AdvancedSettingsCard";
+
+// ADR-255 (mockup s10 A): every form below shows either its basic fields (the
+// main screen) or its advanced ones (inside «Προχωρημένα»).
+type Part = "basic" | "advanced";
+
+function partShows(levels: SettingLevels, part: Part) {
+  return (key: string) => (part === "basic" ? levels.basic(key) : levels.advanced(key));
+}
+
+/**
+ * The basic and the advanced part of one area are two forms over the same
+ * settings. When the other part saves, take the new server values but keep
+ * what was typed here and not saved yet.
+ */
+export function mergeServerForm<F extends Record<string, unknown>>(form: F, lastServer: F | null, next: F): F {
+  if (!lastServer) return next;
+  const merged = { ...next };
+  for (const key of Object.keys(next) as Array<keyof F>) {
+    if (JSON.stringify(form[key]) !== JSON.stringify(lastServer[key])) merged[key] = form[key];
+  }
+  return merged;
+}
 
 // ── Shared sub-components ────────────────────────────────────────────────────
 
@@ -246,9 +273,10 @@ function formFromSettings(s: GamificationSettings): GamificationFormState {
   };
 }
 
-function GamificationSection({ token }: { token: string }) {
+export function GamificationSection({ token, part = "basic" }: { token: string; part?: Part }) {
   const i18n = useUiTranslations();
   const t = useTranslations("TrainingGoal");
+  const show = partShows(useSettingLevels(), part);
   const queryClient = useQueryClient();
   const [form, setForm] = useState<GamificationFormState>({
     streakShields: "1",
@@ -263,19 +291,28 @@ function GamificationSection({ token }: { token: string }) {
     queryFn: () => fetchAdminSettings(token),
   });
 
+  const lastServer = useRef<GamificationFormState | null>(null);
   useEffect(() => {
     if (!settingsQuery.data?.gamification) return;
     const next = formFromSettings(settingsQuery.data.gamification);
-    queueMicrotask(() => { setForm(next); setInitialized(true); });
+    queueMicrotask(() => {
+      const previous = lastServer.current;
+      setForm((current) => mergeServerForm(current, previous, next));
+      lastServer.current = next;
+      setInitialized(true);
+    });
   }, [settingsQuery.data]);
 
+  // Each part saves only the settings it shows.
   const saveMutation = useMutation({
     mutationFn: () =>
       updateAdminSettings(token, {
         gamification: {
-          streak_shields: Number(form.streakShields),
-          streak_shield_reset_day: form.streakShieldResetDay.trim() ? Number(form.streakShieldResetDay) : null,
-          leaderboard_enabled: form.leaderboardEnabled,
+          ...(show("gamification.streak_shields") ? { streak_shields: Number(form.streakShields) } : {}),
+          ...(show("gamification.streak_shield_reset_day")
+            ? { streak_shield_reset_day: form.streakShieldResetDay.trim() ? Number(form.streakShieldResetDay) : null }
+            : {}),
+          ...(show("gamification.leaderboard_enabled") ? { leaderboard_enabled: form.leaderboardEnabled } : {}),
         },
       }),
     onSuccess: (data) => {
@@ -294,10 +331,13 @@ function GamificationSection({ token }: { token: string }) {
 
   return (
     <div className="max-w-3xl space-y-4">
-      <p className="rounded-[1.4rem] px-4 py-3 text-sm leading-6" style={{ background: "var(--panel-muted)", color: "var(--muted)" }} data-testid="weekly-goal-is-personal">
-        {t("box.goalIsPersonal")}
-      </p>
+      {part === "basic" ? (
+        <p className="rounded-[1.4rem] px-4 py-3 text-sm leading-6" style={{ background: "var(--panel-muted)", color: "var(--muted)" }} data-testid="weekly-goal-is-personal">
+          {t("box.goalIsPersonal")}
+        </p>
+      ) : null}
 
+      {show("gamification.streak_shields") ? (
       <label className="relative block space-y-2 rounded-[1.4rem] p-3">
         <span className="flex items-center justify-between gap-3">
           <span id="streak-shields-label" className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
@@ -328,7 +368,9 @@ function GamificationSection({ token }: { token: string }) {
           {t("box.shieldsHint")}
         </span>
       </label>
+      ) : null}
 
+      {show("gamification.streak_shield_reset_day") ? (
       <label className="relative block space-y-2 rounded-[1.4rem] p-3">
         <span className="flex items-center justify-between gap-3">
           <span id="streak-shield-renewal-label" className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
@@ -359,7 +401,9 @@ function GamificationSection({ token }: { token: string }) {
           {form.streakShieldResetDay.trim() ? t("box.renewalOnDay", { day: form.streakShieldResetDay.trim() }) : t("box.renewalOnSignup")}
         </span>
       </label>
+      ) : null}
 
+      {show("gamification.leaderboard_enabled") ? (
       <label
         className="relative flex items-start gap-3 rounded-[1.6rem] border px-4 py-4"
         style={{ background: "var(--panel-muted)", borderColor: "var(--border)" }}
@@ -388,6 +432,7 @@ function GamificationSection({ token }: { token: string }) {
           </span>
         </span>
       </label>
+      ) : null}
 
       <SaveBar
         dirty={dirty}
@@ -419,7 +464,7 @@ function levelCodes(levels: ScaleLevel[]) {
   });
 }
 
-function LevelTaxonomySection({ token }: { token: string }) {
+export function LevelTaxonomySection({ token }: { token: string }) {
   const i18n = useUiTranslations();
   const queryClient = useQueryClient();
   const [levels, setLevels] = useState<ScaleLevel[]>([]);
@@ -597,9 +642,10 @@ function DaysField({
   );
 }
 
-function FinanceSection({ token }: { token: string }) {
+export function FinanceSection({ token, part = "basic" }: { token: string; part?: Part }) {
   const i18n = useUiTranslations();
   const queryClient = useQueryClient();
+  const show = partShows(useSettingLevels(), part);
   const [form, setForm] = useState({
     paymentReminderIntervalDays: "7",
     expiryReminderDays: "5",
@@ -652,8 +698,11 @@ function FinanceSection({ token }: { token: string }) {
       form.graceDays !== (serverForm?.graceDays ?? "3") ||
       form.packageModules.join(",") !== serverModules);
 
+  const anyField = ["finance.payment_reminder_interval_days", "finance.subscription_expiry_reminder_days", "finance.subscription_grace_days", "finance.document_mode", "finance.package_modules"].some(show);
+
   return (
     <div className="space-y-5">
+      {show("finance.payment_reminder_interval_days") ? (
       <div className="space-y-1.5">
         <label
           className="block text-xs font-semibold uppercase tracking-[0.18em]"
@@ -680,6 +729,8 @@ function FinanceSection({ token }: { token: string }) {
           }}
         />
       </div>
+      ) : null}
+      {show("finance.subscription_expiry_reminder_days") ? (
       <DaysField
         id="expiry-reminder-days"
         label={i18n("subscriptionExpiryReminderDays")}
@@ -688,6 +739,8 @@ function FinanceSection({ token }: { token: string }) {
         value={form.expiryReminderDays}
         onChange={(value) => setForm((current) => ({ ...current, expiryReminderDays: value }))}
       />
+      ) : null}
+      {show("finance.subscription_grace_days") ? (
       <DaysField
         id="grace-days"
         label={i18n("subscriptionGraceDays")}
@@ -696,6 +749,8 @@ function FinanceSection({ token }: { token: string }) {
         value={form.graceDays}
         onChange={(value) => setForm((current) => ({ ...current, graceDays: value }))}
       />
+      ) : null}
+      {show("finance.document_mode") ? (
       <fieldset className="space-y-3">
         <legend className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
           {i18n("featureFinanceDocumentWorkflow")}
@@ -731,6 +786,8 @@ function FinanceSection({ token }: { token: string }) {
           ))}
         </div>
       </fieldset>
+      ) : null}
+      {show("finance.package_modules") ? (
       <fieldset className="space-y-3">
         <legend className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
           {i18n("pkgModulesTitle")}
@@ -768,6 +825,8 @@ function FinanceSection({ token }: { token: string }) {
           })}
         </div>
       </fieldset>
+      ) : null}
+      {anyField ? (
       <SaveBar
         dirty={dirty}
         pending={saveMutation.isPending}
@@ -776,8 +835,9 @@ function FinanceSection({ token }: { token: string }) {
         onSave={() => saveMutation.mutate()}
         onReset={() => setForm(serverForm ?? { paymentReminderIntervalDays: serverDays, expiryReminderDays: "5", graceDays: "3", documentMode: serverMode, packageModules: serverModules.split(",") })}
       />
+      ) : null}
 
-      <FinanceCleanupSection token={token} />
+      {part === "basic" ? <FinanceCleanupSection token={token} /> : null}
     </div>
   );
 }
@@ -1025,26 +1085,34 @@ function schedulingFormFromSettings(value: SchedulingSettings): SchedulingForm {
   };
 }
 
-function SchedulingDefaultsSection({ token }: { token: string }) {
+export function SchedulingDefaultsSection({ token, part = "basic" }: { token: string; part?: Part }) {
   const rules = useTranslations("BookingRules");
+  const show = partShows(useSettingLevels(), part);
   const queryClient = useQueryClient();
   const settingsQuery = useQuery({ queryKey: ["admin", "settings"], queryFn: () => fetchAdminSettings(token) });
   const [form, setForm] = useState<SchedulingForm>({ capacity: 12, timeout: 60, autoApprove: false, windowDays: null, cutoffMinutes: null });
 
+  const lastServer = useRef<SchedulingForm | null>(null);
   useEffect(() => {
     const value = settingsQuery.data?.scheduling;
     if (value) {
-      queueMicrotask(() => setForm(schedulingFormFromSettings(value)));
+      const next = schedulingFormFromSettings(value);
+      queueMicrotask(() => {
+        const previous = lastServer.current;
+        setForm((current) => mergeServerForm(current, previous, next));
+        lastServer.current = next;
+      });
     }
   }, [settingsQuery.data?.scheduling]);
 
+  // Each part saves only the settings it shows.
   const save = useMutation({
     mutationFn: () => updateAdminSettings(token, { scheduling: {
-      default_capacity: form.capacity,
-      default_booking_timeout_minutes: form.timeout,
-      default_auto_approve: form.autoApprove,
-      default_booking_window_days: form.windowDays,
-      default_cancellation_cutoff_minutes: form.cutoffMinutes,
+      ...(show("scheduling.default_capacity") ? { default_capacity: form.capacity } : {}),
+      ...(show("scheduling.default_booking_timeout_minutes") ? { default_booking_timeout_minutes: form.timeout } : {}),
+      ...(show("scheduling.default_auto_approve") ? { default_auto_approve: form.autoApprove } : {}),
+      ...(show("scheduling.default_booking_window_days") ? { default_booking_window_days: form.windowDays } : {}),
+      ...(show("scheduling.default_cancellation_cutoff_minutes") ? { default_cancellation_cutoff_minutes: form.cutoffMinutes } : {}),
     } }),
     onSuccess: (data) => queryClient.setQueryData(["admin", "settings"], data),
   });
@@ -1053,19 +1121,21 @@ function SchedulingDefaultsSection({ token }: { token: string }) {
   const dirty = Boolean(saved) && (Object.keys(form) as Array<keyof SchedulingForm>).some((key) => form[key] !== saved![key]);
 
   // ADR-226: every rule says what it does, for whom, and what "no limit" means.
-  return <div className="grid max-w-3xl gap-5 sm:grid-cols-2" data-testid="class-booking-defaults">
-    <div className="text-sm font-semibold">
+  // The approval wait means nothing while bookings are confirmed automatically (audit §C).
+  const showTimeout = show("scheduling.default_booking_timeout_minutes") && !form.autoApprove;
+  return <div className="grid max-w-3xl gap-5 sm:grid-cols-2" data-testid={part === "basic" ? "class-booking-defaults" : "class-booking-defaults-advanced"}>
+    {show("scheduling.default_capacity") ? <div className="text-sm font-semibold">
       <label htmlFor="class-default-capacity">{rules("capacityLabel")}</label>
       <IntegerInput id="class-default-capacity" data-testid="class-default-capacity" min={1} max={500} emptyValue={1} className="mt-2 w-full rounded-xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={form.capacity} onValueChange={(capacity) => setForm({ ...form, capacity: capacity ?? 1 })} />
       <p className="mt-1 text-xs font-normal" style={{ color: "var(--dim)" }}>{rules("capacityHelp")}</p>
-    </div>
-    <div className="text-sm font-semibold">
+    </div> : null}
+    {show("scheduling.default_auto_approve") ? <div className="text-sm font-semibold">
       <label className="flex items-center gap-3"><input type="checkbox" data-testid="class-default-auto-approve" checked={form.autoApprove} onChange={(event) => setForm({ ...form, autoApprove: event.target.checked })} />{rules("autoApproveLabel")}</label>
       <p className="mt-1 text-xs font-normal" style={{ color: "var(--dim)" }}>{rules("autoApproveHelp")}</p>
-    </div>
-    <DurationLimitField testId="class-default-approval-wait" label={rules("approvalWaitLabel")} help={rules("approvalWaitHelp")} noLimitLabel={rules("approvalWaitNoLimit")} value={form.timeout} min={1} max={10080} fallback={60} onChange={(timeout) => setForm({ ...form, timeout })} />
-    <OptionalLimitField testId="class-default-booking-window" label={rules("bookingWindowLabel")} hint={rules("bookingWindowHelp")} unit={rules("days")} noLimitLabel={rules("noLimit")} value={form.windowDays} min={1} max={365} fallback={14} onChange={(windowDays) => setForm({ ...form, windowDays })} />
-    <DurationLimitField testId="class-default-late-cancellation" label={rules("lateCancellationLabel")} help={rules("lateCancellationHelp")} noLimitLabel={rules("noLimit")} value={form.cutoffMinutes} min={0} max={10080} fallback={720} onChange={(cutoffMinutes) => setForm({ ...form, cutoffMinutes })} />
+    </div> : null}
+    {showTimeout ? <DurationLimitField testId="class-default-approval-wait" label={rules("approvalWaitLabel")} help={rules("approvalWaitHelp")} noLimitLabel={rules("approvalWaitNoLimit")} value={form.timeout} min={1} max={10080} fallback={60} onChange={(timeout) => setForm({ ...form, timeout })} /> : null}
+    {show("scheduling.default_booking_window_days") ? <OptionalLimitField testId="class-default-booking-window" label={rules("bookingWindowLabel")} hint={rules("bookingWindowHelp")} unit={rules("days")} noLimitLabel={rules("noLimit")} value={form.windowDays} min={1} max={365} fallback={14} onChange={(windowDays) => setForm({ ...form, windowDays })} /> : null}
+    {show("scheduling.default_cancellation_cutoff_minutes") ? <DurationLimitField testId="class-default-late-cancellation" label={rules("lateCancellationLabel")} help={rules("lateCancellationHelp")} noLimitLabel={rules("noLimit")} value={form.cutoffMinutes} min={0} max={10080} fallback={720} onChange={(cutoffMinutes) => setForm({ ...form, cutoffMinutes })} /> : null}
     <div className="sm:col-span-2"><SaveBar dirty={dirty} pending={save.isPending} success={save.isSuccess} error={save.error} onSave={() => save.mutate()} onReset={() => saved && setForm(saved)} /></div>
   </div>;
 }
@@ -1089,19 +1159,6 @@ function WorkoutTypesSection({ token }: { token: string }) {
   );
 }
 
-function AiAssistantSection({ token }: { token: string }) {
-  const t = useTranslations("Scaling");
-  return (
-    <CollapsibleSection id="ai-assistant" title={t("settings.title")} description={t("settings.description")} defaultOpen={false}>
-      {/* ADR-180: the WOD assistant runs on the platform's credits, so it needs no key of the gym's. */}
-      <div className="mb-5 border-b pb-5" style={{ borderColor: "var(--border)" }}>
-        <WodAssistantSetting token={token} />
-      </div>
-      <AiScalingSettings token={token} />
-    </CollapsibleSection>
-  );
-}
-
 // ADR-170: the organization's Palee plan (owners and admins).
 function PlanSection({ token }: { token: string }) {
   const t = useTranslations("SoloCoach");
@@ -1112,20 +1169,20 @@ function PlanSection({ token }: { token: string }) {
   );
 }
 
-function WorkoutDefaultsSection({ token }: { token: string }) {
-  const t = useTranslations("WodGoals");
-  return (
-    <CollapsibleSection id="workout-defaults" title={t("settings.sectionTitle")} description={t("settings.sectionDescription")}>
-      <WodGoalsDefaultSetting token={token} />
-    </CollapsibleSection>
-  );
-}
 
 export function AdminSettingsHub() {
   const i18n = useUiTranslations();
+  const paymentsT = useTranslations("OnlinePayments");
+  const adv = useTranslations("AdvancedSettings");
   const { tokens, currentUser } = useSession();
   const token = tokens?.access_token;
   const { membership, selectedOrganizationSlug } = useSelectedMembershipRole();
+  const levels = useSettingLevels();
+  const settingsQuery = useQuery({
+    queryKey: ["admin", "settings"],
+    queryFn: () => fetchAdminSettings(token!),
+    enabled: Boolean(token),
+  });
 
   // ADR-186: a branch manager edits their own branches, not the business.
   if (membership && !can(membership, "manage_settings") && can(membership, "manage_locations")) {
@@ -1138,6 +1195,9 @@ export function AdminSettingsHub() {
               <LocationSettings token={token} />
               <div className="mt-3">
                 <SpacesSettingsLink />
+              </div>
+              <div className="mt-3">
+                <BoxScreensSettingsLink />
               </div>
             </CollapsibleSection>
           ) : (
@@ -1161,14 +1221,16 @@ export function AdminSettingsHub() {
           <>
             <PlanSection token={token} />
 
-            {/* ADR-176: the zone every gym-local rule reads. */}
-            <CollapsibleSection
-              id="time-zone"
-              title={i18n("gymTimeZoneTitle")}
-              description={i18n("gymTimeZoneDescription")}
-            >
-              <GymTimeZoneSetting token={token} />
-            </CollapsibleSection>
+            {/* ADR-176: the zone every gym-local rule reads. Derived (ADR-255): asked only until it is confirmed. */}
+            {settingsQuery.data?.time_zone && !settingsQuery.data.time_zone.confirmed ? (
+              <CollapsibleSection
+                id="time-zone"
+                title={i18n("gymTimeZoneTitle")}
+                description={i18n("gymTimeZoneDescription")}
+              >
+                <GymTimeZoneSetting token={token} />
+              </CollapsibleSection>
+            ) : null}
 
             <CollapsibleSection
               id="branding"
@@ -1178,21 +1240,36 @@ export function AdminSettingsHub() {
               <BrandingSection token={token} />
             </CollapsibleSection>
 
-            <ProviderKindSection token={token} />
+            {levels.basic("provider.kind") ? <ProviderKindSection token={token} /> : null}
 
-            <CollapsibleSection
-              id="gamification"
-              title={i18n("gamificatione32e404")}
-              description={i18n("streaksStreakShieldsLeaderboardaa8cd0c")}
-            >
-              <GamificationSection token={token} />
-            </CollapsibleSection>
+            {levels.basic("gamification.leaderboard_enabled") ? (
+              <CollapsibleSection
+                id="gamification"
+                title={i18n("gamificatione32e404")}
+                description={i18n("streaksStreakShieldsLeaderboardaa8cd0c")}
+              >
+                <GamificationSection token={token} />
+              </CollapsibleSection>
+            ) : null}
+
+            {/* Mockup s3 B (ADR-246/260/261): the provider sends the owner back to ?tab=payments. */}
+            {can(membership, "manage_billing") ? (
+              <CollapsibleSection id="payments" title={paymentsT("sectionTitle")} description={paymentsT("sectionDescription")}>
+                <Suspense>
+                  <OnlinePaymentsSettings token={token} />
+                </Suspense>
+              </CollapsibleSection>
+            ) : null}
 
             <CollapsibleSection
               id="finance"
               title={i18n("finance1b48d3f")}
               description={i18n("paymentReminders64c6e44")}
             >
+              {/* Mockup s1 (ADR-240): the business's billing details. */}
+              <div className="mb-3">
+                <FiscalIdentityLink />
+              </div>
               <FinanceSection token={token} />
             </CollapsibleSection>
 
@@ -1211,12 +1288,6 @@ export function AdminSettingsHub() {
               <div className="mt-3">
                 <TrialsLink />
               </div>
-              <div className="mt-3">
-                <CommunitySettingsLink />
-              </div>
-              <div className="mt-3">
-                <CheckInSettingsLink />
-              </div>
             </CollapsibleSection>
 
             <CollapsibleSection
@@ -1229,6 +1300,9 @@ export function AdminSettingsHub() {
               <div className="mt-3">
                 <SpacesSettingsLink />
               </div>
+              <div className="mt-3">
+                <BoxScreensSettingsLink />
+              </div>
             </CollapsibleSection>
 
             <CollapsibleSection
@@ -1238,17 +1312,6 @@ export function AdminSettingsHub() {
             >
               <SchedulingDefaultsSection token={token} />
             </CollapsibleSection>
-
-            {can(membership, "grant_staff_roles") ? (
-              <CollapsibleSection
-                id="role-access"
-                title={i18n("roleAccessTitle")}
-                description={i18n("roleAccessDescription")}
-                defaultOpen={false}
-              >
-                <RoleAccessSettings token={token} />
-              </CollapsibleSection>
-            ) : null}
 
             {can(membership, "manage_organization_lifecycle") ? (
               <CollapsibleSection
@@ -1261,17 +1324,74 @@ export function AdminSettingsHub() {
               </CollapsibleSection>
             ) : null}
 
-            <WorkoutDefaultsSection token={token} />
-
-            {can(membership, "manage_settings") ? <AiAssistantSection token={token} /> : null}
-
-            <CollapsibleSection
-              id="level-taxonomy"
-              title={i18n("levelTaxonomyd6fdd60")}
-              description={i18n("globalWorkoutLevelDefinitionsInheritedByAllWorkoutsd5fbba7")}
-            >
-              <LevelTaxonomySection token={token} />
-            </CollapsibleSection>
+            <AdvancedSettingsCard
+              count={levels.advancedCount}
+              groups={[
+                {
+                  id: "bookings",
+                  title: adv("groups.bookings"),
+                  keywords: [adv("keywords.bookings"), i18n("featureClassCreationDefaults")],
+                  content: (
+                    <>
+                      <SchedulingDefaultsSection token={token} part="advanced" />
+                      <CheckInSettingsLink />
+                    </>
+                  ),
+                },
+                {
+                  id: "payments",
+                  title: adv("groups.payments"),
+                  keywords: [adv("keywords.payments"), i18n("subscriptionGraceDays"), i18n("subscriptionExpiryReminderDays"), i18n("reminderIntervalDaysee3ba34")],
+                  content: <FinanceSection token={token} part="advanced" />,
+                },
+                {
+                  id: "motivation",
+                  title: adv("groups.motivation"),
+                  keywords: [adv("keywords.motivation"), i18n("streakShieldResetDayd22b9ea"), i18n("levelTaxonomyd6fdd60")],
+                  content: (
+                    <>
+                      <GamificationSection token={token} part="advanced" />
+                      <div id="level-taxonomy">
+                        <p className="mb-2 text-sm font-semibold" style={{ color: "var(--text)" }}>{i18n("levelTaxonomyd6fdd60")}</p>
+                        <LevelTaxonomySection token={token} />
+                      </div>
+                    </>
+                  ),
+                },
+                {
+                  id: "training",
+                  title: adv("groups.training"),
+                  keywords: [adv("keywords.training")],
+                  content: (
+                    <>
+                      <WodGoalsDefaultSetting token={token} />
+                      {can(membership, "manage_settings") ? (
+                        <>
+                          <WodAssistantSetting token={token} />
+                          <AiScalingSettings token={token} />
+                        </>
+                      ) : null}
+                    </>
+                  ),
+                },
+                {
+                  id: "community",
+                  title: adv("groups.community"),
+                  keywords: [adv("keywords.community")],
+                  content: <CommunitySettingsLink />,
+                },
+                ...(can(membership, "grant_staff_roles")
+                  ? [
+                      {
+                        id: "role-access",
+                        title: i18n("roleAccessTitle"),
+                        keywords: [adv("keywords.access"), i18n("roleAccessDescription")],
+                        content: <RoleAccessSettings token={token} />,
+                      },
+                    ]
+                  : []),
+              ]}
+            />
           </>
         ) : (
           <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>

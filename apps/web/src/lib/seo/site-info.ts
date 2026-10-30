@@ -32,6 +32,9 @@ export const PUBLIC_PAGES = [
   { path: "/register", title: "Create an account" },
   { path: "/register/business", title: "Register a gym or coaching business" },
   { path: "/login", title: "Sign in" },
+  // ADR-267: the stores and GDPR (articles 13-14) need both public.
+  { path: "/privacy", title: "Privacy policy" },
+  { path: "/terms", title: "Terms of use" },
 ] as const;
 
 function absolute(path: string, origin: URL) {

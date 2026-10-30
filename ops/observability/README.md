@@ -56,7 +56,8 @@ To turn it off, run `docker compose --profile observability stop` and clear
 ## Exposure
 
 - **Caddy routes none of these services.** The Caddyfile only proxies
-  `/api/*` and `/socket/*` to the API and everything else to the web app.
+  `/api/*`, `/socket/*` and `/box_screen_socket/*` to the API and everything
+  else to the web app.
 - The API's metrics listener is a **separate Bandit server** on
   `METRICS_PORT`. It is not part of the Phoenix endpoint, so `/metrics` cannot
   be reached through `https://<site>/...`. Compose never publishes that port,

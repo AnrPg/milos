@@ -117,6 +117,18 @@ defmodule Mix.Tasks.Palee.Architecture do
     business_accounts/business_account_store
     perks/perk_store
     shop/shop_report_store
+    fiscal/fiscal_store
+    fiscal/transmission_store
+    fiscal/tax_store
+    fiscal/einvoice_store
+    fiscal/till_signature_store
+    payments/payment_store
+    box_screens/box_screen_store
+    documents/document_store
+    setup/recipe_application_store
+    imports/import_store
+    personal_data/export_store
+    personal_data/record_source
   )
 
   defp tenant_scope_violations do

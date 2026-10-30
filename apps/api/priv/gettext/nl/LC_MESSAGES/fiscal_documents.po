@@ -1,0 +1,209 @@
+msgid ""
+msgstr ""
+"Language: nl\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Receipt"
+msgstr "Kassabon"
+
+msgid "Invoice"
+msgstr "Factuur"
+
+msgid "Credit note"
+msgstr "Creditnota"
+
+msgid "Retail sales receipt"
+msgstr "Kassabon detailhandel"
+
+msgid "Service receipt"
+msgstr "Bon dienstverlening"
+
+msgid "Retail credit note"
+msgstr "Creditnota detailhandel"
+
+msgid "Sales invoice"
+msgstr "Verkoopfactuur"
+
+msgid "Service invoice"
+msgstr "Factuur dienstverlening"
+
+msgid "Credit invoice"
+msgstr "Creditfactuur"
+
+msgid "Number"
+msgstr "Nummer"
+
+msgid "Date of issue"
+msgstr "Uitgiftedatum"
+
+msgid "Seller"
+msgstr "Verkoper"
+
+msgid "Customer"
+msgstr "Klant"
+
+msgid "Payment method"
+msgstr "Betaalwijze"
+
+msgid "Cash"
+msgstr "Contant"
+
+msgid "Card"
+msgstr "Kaart"
+
+msgid "Bank transfer"
+msgstr "Bankoverschrijving"
+
+msgid "Online payment"
+msgstr "Online betaling"
+
+msgid "Other"
+msgstr "Overig"
+
+msgid "Corrects document"
+msgstr "Corrigeert document"
+
+msgid "Description"
+msgstr "Omschrijving"
+
+msgid "Qty"
+msgstr "Aantal"
+
+msgid "Unit price"
+msgstr "Stukprijs"
+
+msgid "Discount"
+msgstr "Korting"
+
+msgid "VAT"
+msgstr "Btw"
+
+msgid "Amount"
+msgstr "Bedrag"
+
+msgid "VAT breakdown"
+msgstr "Btw-overzicht"
+
+msgid "Rate"
+msgstr "Tarief"
+
+msgid "Net"
+msgstr "Netto"
+
+msgid "Gross"
+msgstr "Bruto"
+
+msgid "Total excluding VAT"
+msgstr "Totaal excl. btw"
+
+msgid "Total VAT"
+msgstr "Totaal btw"
+
+msgid "Total"
+msgstr "Totaal"
+
+msgid "Sales tax"
+msgstr "Omzetbelasting (VS)"
+
+msgid "Total sales tax"
+msgstr "Totaal omzetbelasting (VS)"
+
+msgid "Subtotal"
+msgstr "Subtotaal"
+
+msgid "Prices include VAT."
+msgstr "Prijzen incl. btw."
+
+msgid "Exempt"
+msgstr "Vrijgesteld"
+
+msgid "Zero-rated"
+msgstr "Nultarief"
+
+msgid "Tax ID (AFM)"
+msgstr "Fiscaal nummer (AFM)"
+
+msgid "Tax office (DOY)"
+msgstr "Belastingkantoor (DOY)"
+
+msgid "Tax number"
+msgstr "Fiscaal nummer"
+
+msgid "VAT number"
+msgstr "Btw-nummer"
+
+msgid "SIREN/SIRET"
+msgstr "SIREN/SIRET"
+
+msgid "Trade register number"
+msgstr "Handelsregisternummer"
+
+msgid "EIN"
+msgstr "EIN"
+
+msgid "Enterprise number"
+msgstr "Ondernemingsnummer"
+
+msgid "UID (myDATA)"
+msgstr "UID (myDATA)"
+
+msgid "UID"
+msgstr "UID"
+
+msgid "Email"
+msgstr "E-mail"
+
+msgid "Phone"
+msgstr "Telefoon"
+
+msgid "myDATA (AADE)"
+msgstr "myDATA (AADE)"
+
+msgid "MARK"
+msgstr "MARK"
+
+msgid "Authentication code"
+msgstr "Authenticatiecode"
+
+msgid "Reporting to myDATA (AADE) is pending."
+msgstr "De melding aan myDATA (AADE) is nog niet verwerkt."
+
+msgid "Bank details"
+msgstr "Bankgegevens"
+
+msgid "IBAN"
+msgstr "IBAN"
+
+msgid "Category of operation: provision of services"
+msgstr "Soort handeling: dienstverlening"
+
+msgid "Late payment: penalties at three times the legal interest rate and a fixed recovery fee of 40 euros (Commercial Code, art. L441-10 and D441-5). No discount for early payment."
+msgstr "Bij te late betaling: boete van driemaal de wettelijke rente en een forfaitaire invorderingsvergoeding van 40 euro (Code de commerce, art. L441-10 en D441-5). Geen korting bij vervroegde betaling."
+
+msgid "This document is recorded in the inalterable fiscal journal of the business."
+msgstr "Dit document is vastgelegd in het onveranderbare fiscale journaal van de onderneming."
+
+msgid "Document fingerprint (SHA-256)"
+msgstr "Vingerafdruk van het document (SHA-256)"
+
+msgid "Page"
+msgstr "Pagina"
+
+msgid "Reason for the credit note"
+msgstr "Reden van de creditnota"
+
+msgid "Product returned"
+msgstr "Product geretourneerd"
+
+msgid "Billing error"
+msgstr "Factuurfout"
+
+msgid "Subscription cancelled"
+msgstr "Abonnement opgezegd"
+
+msgid "Technical security system (TSE)"
+msgstr "Technische beveiligingsvoorziening (TSE)"
+
+msgid "Cash register security device (RKSV)"
+msgstr "Beveiligingsvoorziening van het kassasysteem (RKSV)"

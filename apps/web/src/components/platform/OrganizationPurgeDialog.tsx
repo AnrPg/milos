@@ -16,6 +16,7 @@ import {
 import { formatPurgeCopy, platformOrganizationPurgeCopy } from "@/i18n/platform-organization-purge";
 import { Dialog } from "@/components/ui/Dialog";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { formatClock } from "@/lib/clock";
 
 const cancellableStatuses = new Set<OrganizationPurge["status"]>(["requested", "exported"]);
 const workingStatuses = new Set<OrganizationPurge["status"]>(["requested", "exporting", "approved", "purging"]);
@@ -174,7 +175,7 @@ export function OrganizationPurgeDialog({
               </div>
               <div>
                 <dt className="text-xs font-semibold uppercase text-[var(--text-soft)]">{copy.requestedAt}</dt>
-                <dd className="mt-1 text-[var(--text)]">{new Date(purge.requested_at).toLocaleString(locale)}</dd>
+                <dd className="mt-1 text-[var(--text)]">{formatClock(new Date(purge.requested_at), locale, { dateStyle: "medium", timeStyle: "short" })}</dd>
               </div>
               {purge.approval_mode ? (
                 <div>

@@ -42,6 +42,7 @@ import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { AdditionalPeoplePicker, type PickedPerson } from "@/components/admin/users/AdditionalPeoplePicker";
 import { GroupOutcomeList } from "@/components/workouts/GroupOutcomeList";
 import { groupOutcomeRows, type GroupOutcomeRow } from "@/lib/group-variations";
+import { clockFormat } from "@/lib/clock";
 
 type Props = {
   token: string;
@@ -241,7 +242,7 @@ export function UserProgrammingSchedule({ token, userId, role, nickname, assignR
   const longDate = dayFormatter(locale, { weekday: "long", day: "numeric", month: "long" });
   const shortDate = dayFormatter(locale, { day: "numeric", month: "short" });
   const dayCardDate = dayFormatter(locale, { weekday: "short", day: "numeric" });
-  const classTime = new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit", ...(zone ? { timeZone: zone } : {}) });
+  const classTime = clockFormat(locale, { hour: "numeric", minute: "2-digit", ...(zone ? { timeZone: zone } : {}) });
 
   function classLabel(item: Record<string, unknown>) {
     const title = itemTitle(item, i18n("featureScheduledClass"));

@@ -39,6 +39,8 @@ import { SPARK_CREATE_STYLE } from "@/lib/spark";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { useStatusLabel } from "@/components/admin/finance/shared/MemberStandingCells";
+import { shownStatus, statusTone, toneStyle } from "@/components/admin/finance/shared/member-standing";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -87,6 +89,7 @@ export function MemberPanel({
 }) {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
+  const statusLabel = useStatusLabel();
   const receiveT = useTranslations("ReceivePayment");
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
@@ -280,8 +283,9 @@ export function MemberPanel({
                 <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("membership53bc967")}</p>
                 {profile.membership ? (
                   <>
-                    <InfoRow label={i18n("statusbae7d5b")} value={semanticLabel(field(profile.membership, "status"), i18n)} color={statusColor(field(profile.membership, "status"))} />
-                    <InfoRow label={i18n("expiresa99be3d")} value={field(profile.membership, "expires_on") || "—"} />
+                    {/* ADR-274: the worked-out status and the running subscription's last day. */}
+                    <InfoRow label={i18n("statusbae7d5b")} value={statusLabel(shownStatus(profile))} color={toneStyle(statusTone(shownStatus(profile))).color} />
+                    <InfoRow label={i18n("expiresa99be3d")} value={field(packageSubscriptions[0], "ends_on") || field(profile.membership, "expires_on") || "—"} />
                     <InfoRow label={i18n("entitlement8994749")} value={field(profile.membership, "entitlement_status") ? semanticLabel(field(profile.membership, "entitlement_status"), i18n) : "—"} />
                     <InfoRow label={i18n("creditBalance471f025")} value={money(uiLocale, profile.credit_balance)} />
                   </>

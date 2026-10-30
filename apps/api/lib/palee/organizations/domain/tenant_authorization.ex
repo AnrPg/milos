@@ -98,9 +98,11 @@ defmodule Palee.Organizations.Domain.TenantAuthorization do
   def roles(%{role: role}) when not is_nil(role), do: [role]
   def roles(_context), do: []
 
-  @doc "Whether the account works at the gym (any role besides member/athlete)."
-  def staff?(context),
-    do: context |> roles() |> Enum.any?(&(&1 not in MembershipPolicy.client_roles()))
+  @doc """
+  Whether the account works at the gym: any staff role (owner and admin
+  included), never a client or guest role (ADR-272).
+  """
+  def staff?(context), do: context |> roles() |> MembershipPolicy.staff?()
 
   def any_role?(context, roles) when is_list(roles),
     do: context |> roles() |> Enum.any?(&(&1 in roles))

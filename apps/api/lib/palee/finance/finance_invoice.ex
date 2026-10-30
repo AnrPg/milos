@@ -70,7 +70,7 @@ defmodule Palee.Finance.FinanceInvoice do
       :total_cents,
       :currency
     ])
-    |> validate_inclusion(:invoice_type, ["manual", "renewal", "adjustment"])
+    |> validate_inclusion(:invoice_type, ["manual", "renewal", "adjustment", "subscription"])
     |> validate_inclusion(:status, [
       "draft",
       "issued",
@@ -90,6 +90,9 @@ defmodule Palee.Finance.FinanceInvoice do
     )
     |> unique_constraint(:service_period_start,
       name: :finance_renewal_invoices_period_unique_index
+    )
+    |> unique_constraint(:membership_package_subscription_id,
+      name: :finance_subscription_charges_unique_index
     )
     |> foreign_key_constraint(:membership_id)
     |> foreign_key_constraint(:user_id)

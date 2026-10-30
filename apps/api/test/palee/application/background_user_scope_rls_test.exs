@@ -53,6 +53,7 @@ defmodule Palee.Application.BackgroundUserScopeRLSTest do
     ProcessWorkoutCompletionJob,
     ReconcileBookingReleaseJob,
     ReconcileEntitlementReservationsJob,
+    SubscriptionChargesJob,
     SubscriptionExpiryJob
   }
 
@@ -247,6 +248,7 @@ defmodule Palee.Application.BackgroundUserScopeRLSTest do
             PackageExpiryReminderJob,
             PaymentReminderJob,
             ReconcileEntitlementReservationsJob,
+            SubscriptionChargesJob,
             SubscriptionExpiryJob
           ] do
         clear_session!()

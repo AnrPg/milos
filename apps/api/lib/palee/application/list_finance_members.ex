@@ -1,5 +1,5 @@
 defmodule Palee.Application.ListFinanceMembers do
-  alias Palee.Application.BranchReport
+  alias Palee.Application.{BranchReport, FinanceValueOverrides}
   alias Palee.{Finance, Identity, Organizations}
   alias Palee.Organizations.Domain.MembershipPolicy
 
@@ -76,6 +76,11 @@ defmodule Palee.Application.ListFinanceMembers do
       outstanding_balance_cents: profile && Map.get(profile, :outstanding_balance_cents, 0),
       last_payment_on: profile && Map.get(profile, :last_payment_on),
       last_payment_amount_cents: profile && Map.get(profile, :last_payment_amount_cents),
+      # ADR-274: the oldest charge that fell due unpaid, and the values staff
+      # set by hand (shown with a dot and a tooltip in the ledger).
+      oldest_unpaid_due_on: profile && Map.get(profile, :oldest_unpaid_due_on),
+      overrides:
+        FinanceValueOverrides.with_names((profile && Map.get(profile, :overrides)) || []),
       notes: membership && Map.get(membership, :notes)
     }
   end

@@ -10,11 +10,25 @@ defmodule Palee.Application.RegisterProfile do
   ADR-211: an address a login changed away from in the last 7 days is held
   for it (`Identity.email_reserved_for_other?/1`): `{:error, :email_reserved}`,
   with nothing created.
+
+  ADR-267: every sign-up confirms the minimum age (`age_confirmed: true`,
+  `Identity.confirm_minimum_age/1`) before anything is looked up; a missing
+  confirmation answers a field error and creates nothing. The time is kept on
+  the login.
   """
   alias Palee.Application.PasswordVerifier
   alias Palee.Identity
 
-  def call(params) when is_map(params) do
+  def call(params, now \\ DateTime.utc_now()) when is_map(params) do
+    # ADR-267: the minimum age is confirmed before anything is looked up.
+    with :ok <- Identity.confirm_minimum_age(params),
+         {:ok, profile} <- register(params) do
+      :ok = Identity.record_age_confirmation(profile.login_id, now)
+      {:ok, profile}
+    end
+  end
+
+  defp register(params) do
     case Identity.find_login_by_email(value(params, :email)) do
       nil -> if_not_reserved(params, &create_login/1)
       login -> add_to_existing(login, params)

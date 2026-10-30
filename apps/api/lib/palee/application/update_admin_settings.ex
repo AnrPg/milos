@@ -35,7 +35,8 @@ defmodule Palee.Application.UpdateAdminSettings do
          finance: finance_settings,
          scheduling: scheduling_settings,
          workouts: workout_settings,
-         provider: GetAdminSettings.provider(context)
+         provider: GetAdminSettings.provider(context),
+         advanced_settings: Palee.Setup.advanced_settings()
        }}
     end
   end

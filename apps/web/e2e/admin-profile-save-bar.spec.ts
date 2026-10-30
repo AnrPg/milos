@@ -1,5 +1,5 @@
 import { expect, test, type Page, type Request } from "./support/test";
-import { chooseDate, chooseOption } from "./support/select";
+import { chooseDate } from "./support/select";
 
 // ADR-276: on a box member's profile (Finance tab) staff edits stay a draft
 // until «Save». The save bar shows only while something changed, with undo,
@@ -97,14 +97,15 @@ test.describe("admin profile save bar", () => {
     });
 
     await page.goto("/admin/users/u-2?tab=finance");
-    const status = page.getByTestId("membership-status");
+    // ADR-274: the status is worked out from payments, so the draft edits the dates.
+    const starts = page.getByTestId("membership-starts_on");
     const expires = page.getByTestId("membership-expires_on");
     const bar = page.getByTestId("profile-save-bar");
     const count = page.getByTestId("profile-save-bar-count");
-    await expect(status).toHaveAttribute("data-value", "trial");
+    await expect(starts).toHaveAttribute("data-value", isoDay(-2));
     await expect(bar).toHaveCount(0);
 
-    await chooseOption(page, status, "active");
+    await chooseDate(page, starts, isoDay(-1));
     await expect(count).toHaveText("1 unsaved change");
     await expect(page.getByTestId("changed-mark")).toHaveCount(1);
     await chooseDate(page, expires, isoDay(30));
@@ -127,17 +128,17 @@ test.describe("admin profile save bar", () => {
 
     await page.getByTestId("profile-save-bar-save").click();
     await expect(bar).toContainText("Changes saved.");
-    expect(patches).toEqual([{ status: "active", expires_on: isoDay(30) }]);
-    await expect(status).toHaveAttribute("data-value", "active");
+    expect(patches).toEqual([{ starts_on: isoDay(-1), expires_on: isoDay(30) }]);
+    await expect(starts).toHaveAttribute("data-value", isoDay(-1));
 
     // «Cancel» drops the draft and goes back to what was saved.
-    await chooseOption(page, status, "paused");
+    await chooseDate(page, starts, isoDay(-3));
     await bar.getByRole("button", { name: "Cancel" }).click();
-    await expect(status).toHaveAttribute("data-value", "active");
+    await expect(starts).toHaveAttribute("data-value", isoDay(-1));
     await expect(count).toHaveCount(0);
 
     // Discarding on the way out leaves the tab without saving.
-    await chooseOption(page, status, "paused");
+    await chooseDate(page, starts, isoDay(-3));
     await page.getByRole("tab", { name: "Overview" }).click();
     await page.getByTestId("unsaved-changes-dialog").getByRole("button", { name: "Discard" }).click();
     await expect(page).toHaveURL(/tab=overview/);

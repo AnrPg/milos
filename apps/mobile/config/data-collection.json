@@ -1,0 +1,183 @@
+{
+  "$comment": "ADR-256: what the apps really collect, read from apps/api (tables) and apps/web (what leaves the device) on 2026-10-29. One source for the iOS privacy manifest (ios/App/App/PrivacyInfo.xcprivacy, checked by scripts/store-readiness.test.mjs), the App Store Connect App Privacy answers and the Google Play Data safety form (docs/release/data-safety.md). 'Collected' means it leaves the phone and is kept longer than one request. Nothing is used for tracking or advertising. Re-check before every submission.",
+  "tracking": false,
+  "items": [
+    {
+      "id": "name",
+      "what": "Display name and @handle",
+      "where": ["users"],
+      "required": true,
+      "apple": "NSPrivacyCollectedDataTypeName",
+      "google": ["Personal info", "Name"],
+      "purposes": ["app_functionality"]
+    },
+    {
+      "id": "email",
+      "what": "Email address (login and messages from Palee)",
+      "where": ["logins"],
+      "required": true,
+      "apple": "NSPrivacyCollectedDataTypeEmailAddress",
+      "google": ["Personal info", "Email address"],
+      "purposes": ["app_functionality", "account_management"],
+      "processors": ["Brevo (sends the email)"]
+    },
+    {
+      "id": "phone",
+      "what": "Phone number (trial request, check-in buddy, business request, box legal details)",
+      "where": ["trial requests", "buddy_links", "business requests", "fiscal legal identity"],
+      "required": false,
+      "apple": "NSPrivacyCollectedDataTypePhoneNumber",
+      "google": ["Personal info", "Phone number"],
+      "purposes": ["app_functionality"]
+    },
+    {
+      "id": "user_id",
+      "what": "Palee account id",
+      "where": ["users"],
+      "required": true,
+      "apple": "NSPrivacyCollectedDataTypeUserID",
+      "google": ["Personal info", "User IDs"],
+      "purposes": ["app_functionality", "account_management"]
+    },
+    {
+      "id": "gender",
+      "what": "Gender and partner gender preference (Training partners, optional)",
+      "where": ["partner_profiles"],
+      "required": false,
+      "apple": "NSPrivacyCollectedDataTypeOtherDataTypes",
+      "google": ["Personal info", "Other info"],
+      "purposes": ["app_functionality"]
+    },
+    {
+      "id": "health",
+      "what": "Injuries, health certificate, wellbeing check-ins, cravings, health consents, Apple Health / Health Connect sleep and heart rate",
+      "where": ["injury_reports", "user_health_consents", "wellbeing_check_ins", "craving_entries", "device_activities", "documents (V3-M8)"],
+      "required": false,
+      "apple": "NSPrivacyCollectedDataTypeHealth",
+      "google": ["Health and fitness", "Health info"],
+      "purposes": ["app_functionality"]
+    },
+    {
+      "id": "fitness",
+      "what": "Workouts, scores, PRs, journal, body measurements and weight, steps, nutrition",
+      "where": ["execution", "journal", "body_snapshots", "device_activities", "nutrition_plans"],
+      "required": false,
+      "apple": "NSPrivacyCollectedDataTypeFitness",
+      "google": ["Health and fitness", "Fitness info"],
+      "purposes": ["app_functionality"],
+      "processors": ["Garmin (only when the person connects it)"]
+    },
+    {
+      "id": "coarse_location",
+      "what": "The areas chosen for Around me (a GPS point is rounded to about 100 m and used for one search only)",
+      "where": ["saved Around me areas"],
+      "required": false,
+      "apple": "NSPrivacyCollectedDataTypeCoarseLocation",
+      "google": ["Location", "Approximate location"],
+      "purposes": ["app_functionality"],
+      "note": "The arrival reminder's location stays on the phone (geofence) and is not collected."
+    },
+    {
+      "id": "photos",
+      "what": "Profile photo, body photos, photos in posts, messages and documents",
+      "where": ["media_account_objects", "media_tenant_objects", "body_snapshot_photos"],
+      "required": false,
+      "apple": "NSPrivacyCollectedDataTypePhotosorVideos",
+      "google": ["Photos and videos", "Photos"],
+      "purposes": ["app_functionality"]
+    },
+    {
+      "id": "audio",
+      "what": "Voice logging of a workout: sent for transcription, never stored",
+      "where": ["none (ADR-175)"],
+      "required": false,
+      "apple": "NSPrivacyCollectedDataTypeAudioData",
+      "google": ["Audio", "Voice or sound recordings"],
+      "purposes": ["app_functionality"],
+      "ephemeral": true,
+      "processors": ["Google Gemini (transcription)", "Anthropic (analysis of the transcribed text)"]
+    },
+    {
+      "id": "messages",
+      "what": "Messages between people (buddies, coach, check-in buddy chats)",
+      "where": ["person_messages", "messaging_messages"],
+      "required": false,
+      "apple": "NSPrivacyCollectedDataTypeEmailsOrTextMessages",
+      "google": ["Messages", "Other in-app messages"],
+      "purposes": ["app_functionality"]
+    },
+    {
+      "id": "user_content",
+      "what": "Posts, comments, notes, signed documents and other content people write",
+      "where": ["community", "journal comments", "documents (V3-M8)"],
+      "required": false,
+      "apple": "NSPrivacyCollectedDataTypeOtherUserContent",
+      "google": ["App activity", "Other user-generated content"],
+      "purposes": ["app_functionality"]
+    },
+    {
+      "id": "files",
+      "what": "Uploaded files: health certificate, signed documents, receipts",
+      "where": ["documents (V3-M8)", "finance attachments"],
+      "required": false,
+      "apple": "NSPrivacyCollectedDataTypeOtherUserContent",
+      "google": ["Files and docs", "Files and docs"],
+      "purposes": ["app_functionality"]
+    },
+    {
+      "id": "purchases",
+      "what": "Bookings, packages bought, invoices, payments and receipts",
+      "where": ["finance_invoices", "payment_intents", "fiscal_documents", "scheduling"],
+      "required": false,
+      "apple": "NSPrivacyCollectedDataTypePurchaseHistory",
+      "google": ["Financial info", "Purchase history"],
+      "purposes": ["app_functionality"],
+      "processors": ["Viva / Stripe (the box's payment provider)", "myDATA provider (Greek tax reporting)"]
+    },
+    {
+      "id": "financial_other",
+      "what": "Card brand and last 4 digits, payment status, saved-card consent. The card number is typed only on the provider's page and never reaches Palee",
+      "where": ["payment_methods", "payment_intents"],
+      "required": false,
+      "apple": "NSPrivacyCollectedDataTypeOtherFinancialInfo",
+      "google": ["Financial info", "Other financial info"],
+      "purposes": ["app_functionality"]
+    },
+    {
+      "id": "device_id",
+      "what": "Push token and a hash of the login device",
+      "where": ["native_push_tokens", "login_devices", "wallet_device_registrations"],
+      "required": true,
+      "apple": "NSPrivacyCollectedDataTypeDeviceID",
+      "google": ["Device or other IDs", "Device or other IDs"],
+      "purposes": ["app_functionality", "fraud_prevention_security"],
+      "processors": ["Apple APNs", "Google FCM"]
+    },
+    {
+      "id": "product_interaction",
+      "what": "Which features are used (Palee's own analytics, no third-party SDK)",
+      "where": ["analytics_events", "notification_click_events"],
+      "required": true,
+      "apple": "NSPrivacyCollectedDataTypeProductInteraction",
+      "google": ["App activity", "App interactions"],
+      "purposes": ["app_functionality", "analytics"]
+    },
+    {
+      "id": "search_history",
+      "what": "Saved filters and searches",
+      "where": ["saved_filters"],
+      "required": false,
+      "apple": "NSPrivacyCollectedDataTypeSearchHistory",
+      "google": ["App activity", "In-app search history"],
+      "purposes": ["app_functionality"]
+    }
+  ],
+  "notCollected": [
+    "Contacts or address book",
+    "Date of birth",
+    "Precise location (the arrival reminder stays on the phone)",
+    "Advertising identifiers (no ads, no App Tracking Transparency prompt)",
+    "Crash or performance data from an SDK in the app",
+    "Card numbers (only on the provider's page)"
+  ]
+}

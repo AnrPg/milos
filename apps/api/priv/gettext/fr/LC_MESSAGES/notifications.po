@@ -720,3 +720,35 @@ msgstr "Un membre de la box s'en va"
 
 msgid "%{nickname} is leaving the box. Last day: %{date}."
 msgstr "%{nickname} quitte la box. Dernier jour : %{date}."
+
+msgid "Card payment failed"
+msgstr "Le paiement par carte a échoué"
+
+msgid "%{amount} for %{what} was declined. We will try again automatically, or you can pay now with another card."
+msgstr "Le paiement de %{amount} pour %{what} a été refusé. Nous réessaierons automatiquement, ou vous pouvez payer maintenant avec une autre carte."
+
+msgid "%{amount} for %{what} was declined and will not be tried again. Pay with another card to keep it."
+msgstr "Le paiement de %{amount} pour %{what} a été refusé et ne sera pas retenté. Payez avec une autre carte pour le conserver."
+
+msgid "A card payment needs attention"
+msgstr "Un paiement par carte demande votre attention"
+
+msgid "%{amount} for %{what} failed after every retry."
+msgstr "Le paiement de %{amount} pour %{what} a échoué après toutes les tentatives."
+msgid "A document to sign"
+msgstr "Un document à signer"
+
+msgid "%{business} asks you to read and sign «%{title}»."
+msgstr "%{business} te demande de lire et de signer « %{title} »."
+
+msgid "Your health certificate expires soon"
+msgstr "Ton certificat médical expire bientôt"
+
+msgid "Upload a new health certificate before %{date}."
+msgstr "Ajoute un nouveau certificat médical avant le %{date}."
+
+msgid "A fiscal connection needs attention"
+msgstr "Une connexion fiscale demande votre attention"
+
+msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
+msgstr "%{connection} ne fonctionne plus. Ouvrez Données de facturation › Connexions pour corriger."

@@ -17,6 +17,7 @@ import { mapsUrl, readApple, serverApple, subscribeNever } from "@/lib/maps";
 import { AboutTab, OpeningHours } from "./AboutTab";
 import { BoxEvents } from "./BoxEvents";
 import { BoxPosts } from "./BoxPosts";
+import { GuestBanner } from "./GuestBanner";
 import { Icon } from "./Icon";
 import { LockedTab } from "./LockedTab";
 import { PhotoViewer } from "./PhotoViewer";
@@ -141,6 +142,12 @@ export function PublicBoxView({ page }: { page: PublicBoxPage }) {
           </div>
         </div>
       </header>
+
+      {signedIn && !club && !clubs.isPending ? (
+        <div className="mx-auto max-w-[75rem] lg:mt-6 lg:px-6">
+          <GuestBanner token={tokens!.access_token} box={page.box} />
+        </div>
+      ) : null}
 
       <div className="mx-auto max-w-[75rem] lg:mt-8 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-10 lg:px-6">
         <main className="min-w-0">

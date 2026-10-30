@@ -19,6 +19,8 @@ defmodule Palee.Finance.FinanceStore do
   @impl true
   def list_packages, do: adapter().list_packages()
   @impl true
+  def open_packages_online(ids), do: adapter().open_packages_online(ids)
+  @impl true
   def get_package(id), do: adapter().get_package(id)
   @impl true
   def upsert_membership(user_id, params), do: adapter().upsert_membership(user_id, params)
@@ -57,7 +59,13 @@ defmodule Palee.Finance.FinanceStore do
     do: adapter().reverse_credit_ledger_entry(membership_id, entry_id, params)
 
   @impl true
+  def reverse_credit_grant(membership_id, entry_id, params),
+    do: adapter().reverse_credit_grant(membership_id, entry_id, params)
+
+  @impl true
   def get_invoice(invoice_id), do: adapter().get_invoice(invoice_id)
+  @impl true
+  def invoice_lines(invoice_id), do: adapter().invoice_lines(invoice_id)
   @impl true
   def update_invoice_params(invoice_id, params),
     do: adapter().update_invoice_params(invoice_id, params)
@@ -141,6 +149,10 @@ defmodule Palee.Finance.FinanceStore do
   @impl true
   def list_expiring_memberships(days), do: adapter().list_expiring_memberships(days)
   @impl true
+  def package_holder_user_ids(package_id, date),
+    do: adapter().package_holder_user_ids(package_id, date)
+
+  @impl true
   def operational_queues(params), do: adapter().operational_queues(params)
   @impl true
   def financial_summary(params), do: adapter().financial_summary(params)
@@ -183,6 +195,10 @@ defmodule Palee.Finance.FinanceStore do
   @impl true
   def extend_current_subscription(membership_id, days),
     do: adapter().extend_current_subscription(membership_id, days)
+
+  @impl true
+  def cancel_subscription(membership_id, subscription_id),
+    do: adapter().cancel_subscription(membership_id, subscription_id)
 
   @impl true
   def create_referral_event(params), do: adapter().create_referral_event(params)
@@ -231,6 +247,13 @@ defmodule Palee.Finance.FinanceStore do
     do: adapter().subscriptions_needing_expiry_notice(kind, days)
 
   @impl true
+  def withdrawal_facts(payment_id), do: adapter().withdrawal_facts(payment_id)
+
+  @impl true
+  def withdraw_subscription(subscription_id, today),
+    do: adapter().withdraw_subscription(subscription_id, today)
+
+  @impl true
   def set_subscription_auto_renew(user_id, subscription_id, auto_renew, by),
     do: adapter().set_subscription_auto_renew(user_id, subscription_id, auto_renew, by)
 
@@ -249,6 +272,24 @@ defmodule Palee.Finance.FinanceStore do
 
   @impl true
   def refresh_entitlement_snapshots, do: adapter().refresh_entitlement_snapshots()
+
+  @impl true
+  def charge_due_subscriptions(today), do: adapter().charge_due_subscriptions(today)
+
+  @impl true
+  def charge_subscription_now(subscription_id),
+    do: adapter().charge_subscription_now(subscription_id)
+
+  @impl true
+  def set_value_override(user_id, field, params),
+    do: adapter().set_value_override(user_id, field, params)
+
+  @impl true
+  def reset_value_override(user_id, field, params),
+    do: adapter().reset_value_override(user_id, field, params)
+
+  @impl true
+  def list_value_overrides(user_id), do: adapter().list_value_overrides(user_id)
 
   @impl true
   def total_outstanding_balance_cents, do: adapter().total_outstanding_balance_cents()

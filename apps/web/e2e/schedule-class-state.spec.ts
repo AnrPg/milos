@@ -279,7 +279,7 @@ test.describe("Schedule › pause, cancel and delete classes", () => {
     await openClass(page);
     await expect(page.getByRole("dialog").getByRole("heading", { level: 2 })).toHaveText("Morning WOD");
     const notice = page.getByTestId("class-wod-notice");
-    await expect(notice).toHaveAttribute("role", "alert");
+    await expect(notice).toHaveAttribute("role", "status");
     await expect(notice).toContainText("Not published: no WOD");
     await expect(notice).toContainText("Clients can't see or book this class until you add a WOD.");
     await expect(notice.getByRole("button", { name: "Choose a WOD" })).toBeVisible();

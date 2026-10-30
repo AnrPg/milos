@@ -9,12 +9,20 @@ import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { fetchFinanceQueues, type FinanceRecord } from "@/api/finance";
+import { FailedChargesList, useFailedCharges } from "@/components/admin/payments/FailedCharges";
+import { ReceivePaymentDialog } from "@/components/admin/finance/payments/ReceivePaymentDialog";
+import { useStatusLabel } from "@/components/admin/finance/shared/MemberStandingCells";
+import { statusTone, toneStyle } from "@/components/admin/finance/shared/member-standing";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { can } from "@/lib/role-navigation";
 
-type QueueKey = "expiring" | "pending" | "overdue" | "rewards" | "promos";
+type QueueKey = "debts" | "expiring" | "failed" | "rewards" | "promos";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -36,16 +44,29 @@ function dateText(value: unknown) {
 export function QueuesTab({ locationIds }: { locationIds?: string } = {}) {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
+  const paymentsT = useTranslations("OnlinePayments");
+  const receiveT = useTranslations("ReceivePayment");
+  const standingT = useTranslations("MemberStanding");
+  const statusLabel = useStatusLabel();
+  const [receiveFrom, setReceiveFrom] = useState<{ userId: string; nickname: string } | null>(null);
+  const { membership } = useSelectedMembershipRole();
+  // ADR-260: saved-card charges that need a person, for whoever handles billing or takes payments.
+  const seesFailedCharges = can(membership, "manage_billing") || can(membership, "take_payments");
+  // ADR-274: one «Οφειλές» list (one row per person, oldest debt first)
+  // replaces the separate pending-payment and overdue-invoice lists.
   const CHIPS: Array<{ id: QueueKey; label: string }> = [
+    { id: "debts", label: standingT("debtsQueue") },
     { id: "expiring", label: i18n("expiringb98d672") },
-    { id: "pending", label: i18n("pendingPayments9126c11") },
-    { id: "overdue", label: i18n("overdueInvoices739b616") },
+    ...(seesFailedCharges ? [{ id: "failed" as const, label: paymentsT("queueChip") }] : []),
     { id: "rewards", label: i18n("pendingRewardse6d6885") },
     { id: "promos", label: i18n("promoRedemptions2388269") },
   ];
   const { tokens } = useSession();
   const token = tokens?.access_token;
-  const [active, setActive] = useState<QueueKey>("expiring");
+  // The staff notice of a failed charge opens `?tab=queues&queue=failed_charges`.
+  const requested = useSearchParams().get("queue");
+  const [active, setActive] = useState<QueueKey>(requested === "failed_charges" ? "failed" : "debts");
+  const failedQuery = useFailedCharges(token, seesFailedCharges);
 
   // Same key and params as the page's attention summary, so both share one read.
   const queuesQuery = useQuery({
@@ -58,9 +79,9 @@ export function QueuesTab({ locationIds }: { locationIds?: string } = {}) {
   const queues = (queuesQuery.data?.queues ?? {}) as Record<string, FinanceRecord[]>;
 
   const rowsByKey: Record<QueueKey, FinanceRecord[]> = {
+    debts: queues.open_charges ?? [],
     expiring: queues.expiring_memberships ?? [],
-    pending: queues.pending_payments ?? [],
-    overdue: queues.overdue_invoices ?? [],
+    failed: (failedQuery.data ?? []) as unknown as FinanceRecord[],
     rewards: queues.pending_referral_rewards ?? [],
     promos: queues.promotion_redemptions ?? [],
   };
@@ -101,7 +122,16 @@ export function QueuesTab({ locationIds }: { locationIds?: string } = {}) {
 
       {/* Queue list */}
       <div className="rounded-[2rem] overflow-hidden" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-        {queuesQuery.isLoading ? (
+        {active === "failed" ? (
+          seesFailedCharges && token ? (
+            <FailedChargesList
+              token={token}
+              charges={failedQuery.data ?? []}
+              loading={failedQuery.isLoading}
+              canRetry={can(membership, "manage_billing")}
+            />
+          ) : null
+        ) : queuesQuery.isLoading ? (
           <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>{i18n("loadingQueuea1e2a39")}</p>
         ) : rows.length === 0 ? (
           <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>{i18n("noItemsInThisQueuec992fc9")}</p>
@@ -114,19 +144,40 @@ export function QueuesTab({ locationIds }: { locationIds?: string } = {}) {
               </QueueRow>
             ))}
 
-            {active === "pending" && rows.map((row, i) => (
-              <QueueRow key={field(row, "id", String(i))} last={i === rows.length - 1}>
-                <span style={{ color: "var(--text)" }}>{field(row, "nickname", field(row, "membership_id"))}</span>
-                <span style={{ color: "var(--muted)" }}>{money(uiLocale, row.amount_cents)}</span>
-              </QueueRow>
-            ))}
-
-            {active === "overdue" && rows.map((row, i) => (
-              <QueueRow key={field(row, "id", String(i))} last={i === rows.length - 1}>
-                <span style={{ color: "var(--text)" }}>{field(row, "invoice_number")}</span>
-                <span style={{ color: "var(--primary-strong)" }}>{money(uiLocale, row.balance_due_cents)} {i18n("overdueba2fff4")}</span>
-              </QueueRow>
-            ))}
+            {active === "debts" && rows.map((row, i) => {
+              const state = field(row, "state");
+              const status = state === "overdue" ? "overdue" : state === "unpaid" ? "unpaid" : "";
+              return (
+                <QueueRow key={field(row, "id", String(i))} last={i === rows.length - 1}>
+                  <span className="min-w-0" style={{ color: "var(--text)" }}>
+                    <span className="font-semibold">{field(row, "user_label", field(row, "user_id"))}</span>
+                    {row.oldest_due_on ? (
+                      <span style={{ color: "var(--muted)" }}> · {standingT("dueSince", { date: dateText(row.oldest_due_on) })}</span>
+                    ) : null}
+                  </span>
+                  <span className="flex flex-wrap items-center justify-end gap-2">
+                    {status ? (
+                      <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold" data-debt-state={status} style={toneStyle(statusTone(status))}>
+                        {statusLabel(status)}
+                      </span>
+                    ) : null}
+                    <span className="font-semibold" style={{ color: "var(--text)" }}>{money(uiLocale, row.balance_due_cents)}</span>
+                    <button
+                      type="button"
+                      onClick={() => setReceiveFrom({ userId: field(row, "user_id"), nickname: field(row, "user_label") })}
+                      className="rounded-full px-2.5 py-1 text-xs font-semibold"
+                      style={{
+                        background: "color-mix(in srgb, var(--success) 12%, transparent)",
+                        border: "1px solid color-mix(in srgb, var(--success) 24%, transparent)",
+                        color: "var(--success)",
+                      }}
+                    >
+                      {receiveT("rowButton")}
+                    </button>
+                  </span>
+                </QueueRow>
+              );
+            })}
 
             {active === "rewards" && rows.map((row, i) => (
               <QueueRow key={field(row, "id", String(i))} last={i === rows.length - 1}>
@@ -144,6 +195,10 @@ export function QueuesTab({ locationIds }: { locationIds?: string } = {}) {
           </div>
         )}
       </div>
+
+      {receiveFrom ? (
+        <ReceivePaymentDialog userId={receiveFrom.userId} nickname={receiveFrom.nickname} onClose={() => setReceiveFrom(null)} />
+      ) : null}
     </div>
   );
 }

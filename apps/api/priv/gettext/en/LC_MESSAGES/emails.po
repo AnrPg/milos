@@ -207,3 +207,21 @@ msgstr "The link works for 24 hours."
 
 msgid "You're receiving this email because someone asked to use this address for a %{product} account."
 msgstr "You're receiving this email because someone asked to use this address for a %{product} account."
+
+msgid "%{title} %{number} from %{business}"
+msgstr "%{title} %{number} from %{business}"
+
+msgid "%{business} sent you this document. You'll find it attached as a PDF."
+msgstr "%{business} sent you this document. You'll find it attached as a PDF."
+
+msgid "Document"
+msgstr "Document"
+
+msgid "Date of issue"
+msgstr "Date of issue"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Keep it for your records. For questions about it, contact the business."
+msgstr "Keep it for your records. For questions about it, contact the business."

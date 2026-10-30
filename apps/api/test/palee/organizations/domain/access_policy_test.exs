@@ -107,6 +107,32 @@ defmodule Palee.Organizations.Domain.AccessPolicyTest do
     assert :manage_spaces in AccessPolicy.grantable().front_desk
   end
 
+  test "health certificate files are for owners and admins, grantable to front desk (ADR-252)" do
+    assert AccessPolicy.scope(caps([:owner]), :manage_health_certificates) == :all
+    assert AccessPolicy.scope(caps([:admin]), :manage_health_certificates) == :all
+
+    for role <- [:front_desk, :coach, :head_coach, :member, :athlete] do
+      refute AccessPolicy.can?(caps([role]), :manage_health_certificates)
+    end
+
+    assert :manage_health_certificates in AccessPolicy.grantable().front_desk
+
+    granted = caps([:front_desk], role_grants: %{"front_desk" => ["manage_health_certificates"]})
+    assert AccessPolicy.can?(granted, :manage_health_certificates)
+  end
+
+  test "front desk requests signatures and sees health certificates by default (ADR-252)" do
+    for role <- [:owner, :admin, :front_desk] do
+      assert AccessPolicy.scope(caps([role]), :request_signatures) == :all
+      assert AccessPolicy.scope(caps([role]), :view_health_certificates) == :all
+    end
+
+    for role <- [:coach, :head_coach, :accountant, :janitor, :member, :athlete] do
+      refute AccessPolicy.can?(caps([role]), :request_signatures)
+      refute AccessPolicy.can?(caps([role]), :view_health_certificates)
+    end
+  end
+
   test "rights are the union of roles and the wider scope wins" do
     both = caps([:coach, :admin])
     assert AccessPolicy.scope(both, :manage_coaching) == :all

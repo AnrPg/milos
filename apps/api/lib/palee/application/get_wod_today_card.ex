@@ -3,14 +3,13 @@ defmodule Palee.Application.GetWodTodayCard do
   The `#wod-σήμερα` card (ADR-138 D6): the gym's class WOD for one local
   day, its classes, and a leaderboard of that day's results (in-app
   executions and logged scores) from members who opted in to leaderboards,
-  ranked by the WOD's scored section. A result kept `private` in its
-  owner's journal never shows. Read in the gym's scope.
+  ranked by the WOD's scored section (`WorkoutDayLeaderboard`, shared with
+  the box screen). A result kept `private` in its owner's journal never
+  shows. Read in the gym's scope.
   """
 
-  alias Palee.{Execution, Gamification, Identity, Scheduling, Workouts}
-  alias Palee.Application.ClubScope
-
-  @leaderboard_size 20
+  alias Palee.{Execution, Identity, Scheduling, Workouts}
+  alias Palee.Application.{ClubScope, WorkoutDayLeaderboard}
 
   def call(%{organization_id: _organization_id, user_id: user_id} = context, params) do
     with {:ok, timezone} <- timezone(param(params, :timezone)),
@@ -26,7 +25,7 @@ defmodule Palee.Application.GetWodTodayCard do
 
         workout_id ->
           workout = Workouts.get_workout(context, workout_id)
-          section = ranked_section(workout)
+          section = WorkoutDayLeaderboard.ranked_section(workout)
 
           {:ok,
            %{
@@ -39,7 +38,7 @@ defmodule Palee.Application.GetWodTodayCard do
                |> Enum.filter(&(&1.master_workout_id == workout_id))
                |> Enum.map(&%{id: &1.id, scheduled_at: &1.scheduled_at}),
              score: section && Map.take(section, [:id, :name, :score_type, :unit]),
-             leaderboard: leaderboard(context, workout_id, section, from, to, user_id),
+             leaderboard: leaderboard(context, workout, from, to, user_id),
              logged_by_me: logged?(context, workout_id, from, to, user_id)
            }}
       end
@@ -57,33 +56,13 @@ defmodule Palee.Application.GetWodTodayCard do
       logged_by_me: false
     }
 
-  defp leaderboard(context, workout_id, section, from, to, viewer_id) do
-    results =
-      context
-      |> Execution.list_workout_results(workout_id, from, to)
-      |> Enum.reject(&(&1.journal_visibility == "private"))
+  defp leaderboard(context, workout, from, to, viewer_id) do
+    %{rows: rows} =
+      WorkoutDayLeaderboard.rank(context, workout, from, to, include_user_id: viewer_id)
 
-    opted_in =
-      Gamification.with_tenant_context(context, fn ->
-        results
-        |> Enum.map(& &1.user_id)
-        |> Enum.uniq()
-        |> Gamification.leaderboard_opted_in_user_ids()
-      end)
-      |> MapSet.new()
+    people = rows |> Enum.map(& &1.user_id) |> people()
 
-    # The viewer sees their own place even before opting in; others only see
-    # members who opted in.
-    ranked =
-      results
-      |> Enum.filter(&(MapSet.member?(opted_in, &1.user_id) or &1.user_id == viewer_id))
-      |> Execution.rank_workout_results(section)
-      |> Enum.reject(&is_nil(&1.rank))
-      |> Enum.take(@leaderboard_size)
-
-    people = ranked |> Enum.map(& &1.user_id) |> people()
-
-    Enum.map(ranked, fn row ->
+    Enum.map(rows, fn row ->
       person = Map.get(people, row.user_id, %{})
 
       %{
@@ -92,21 +71,12 @@ defmodule Palee.Application.GetWodTodayCard do
         nickname: Map.get(person, :nickname),
         avatar_url: Map.get(person, :avatar_url),
         scale_level_slug: row.scale_level_slug,
-        value: row.score && to_string(row.score["value"] || row.score[:value]),
-        unit: row.score && (row.score["unit"] || row.score[:unit]),
+        value: row.value,
+        unit: row.unit,
         me: row.user_id == viewer_id,
-        opted_in: MapSet.member?(opted_in, row.user_id)
+        opted_in: row.opted_in
       }
     end)
-  end
-
-  # The WOD's scored section; for a workout written in text sections
-  # (ADR-180), the first score its coach set.
-  defp ranked_section(workout) do
-    case Execution.training_log_scoreable_sections(workout) do
-      [section | _rest] -> section
-      [] -> workout |> Execution.text_section_metrics() |> List.first()
-    end
   end
 
   defp logged?(context, workout_id, from, to, user_id) do

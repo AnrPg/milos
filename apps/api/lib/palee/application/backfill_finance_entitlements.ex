@@ -118,6 +118,9 @@ defmodule Palee.Application.BackfillFinanceEntitlements do
            Finance.assign_package(action.context, membership.id, action.package_id, %{
              starts_on: Date.utc_today(),
              status: "active",
+             # ADR-274: these people paid outside Palee; bill from the next period.
+             charges_from: "next_period",
+             charge_now: false,
              params: %{
                "backfilled_by" => "TD-017",
                "backfilled_on" => Date.to_iso8601(Date.utc_today())

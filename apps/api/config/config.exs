@@ -31,6 +31,7 @@ config :palee, Oban,
        {"*/15 * * * *", Palee.Workers.RefreshFinanceAggregatesJob},
        {"*/15 * * * *", Palee.Workers.RefreshCoachingAggregatesJob},
        {"0 2 * * *", Palee.Workers.MarkOverdueInvoicesJob},
+       {"9 * * * *", Palee.Workers.SubscriptionChargesJob},
        {"17 * * * *", Palee.Workers.ReconcileEntitlementReservationsJob},
        {"0 9 * * *", Palee.Workers.PaymentReminderJob},
        {"41 * * * *", Palee.Workers.ExecutionAbandonmentSweepJob},
@@ -64,7 +65,21 @@ config :palee, Oban,
        {"15 3 * * *", Palee.Workers.EmailRetentionJob},
        {"5 7 * * *", Palee.Workers.SmtpKeyExpiryJob},
        # ADR-211: self-service account deletions whose grace is over.
-       {"19 * * * *", Palee.Workers.ExecuteAccountDeletionsJob}
+       {"19 * * * *", Palee.Workers.ExecuteAccountDeletionsJob},
+       # ADR-242: fiscal day/month/year closings on each gym's own clock.
+       {"20 * * * *", Palee.Workers.CloseFiscalPeriodsJob},
+       # ADR-243: retries and deferred reports to the tax authority.
+       {"*/5 * * * *", Palee.Workers.TransmitFiscalDocumentsJob},
+       # ADR-250/251: Peppol sends and delivery polls; TSE/RKSV signatures.
+       {"*/5 * * * *", Palee.Workers.SendEInvoicesJob},
+       {"*/2 * * * *", Palee.Workers.SignTillReceiptsJob},
+       # ADR-273: «Δοκιμή σύνδεσης» of fiscal connections that are due (every 3 months, sooner after a failure).
+       {"43 * * * *", Palee.Workers.CheckFiscalConnectionsJob},
+       # ADR-246/247: settle online payments; hourly autopay of due invoices.
+       {"*/3 * * * *", Palee.Workers.ProcessPaymentsJob},
+       {"11 * * * *", Palee.Workers.ProcessPaymentsJob, args: %{"autopay" => true}},
+       # ADR-252: reminders before a client's health certificate expires.
+       {"45 8 * * *", Palee.Workers.HealthCertificateRemindersJob}
      ]}
   ],
   queues: [
@@ -76,7 +91,13 @@ config :palee, Oban,
     media: 2,
     # ADR-203: outbox delivery. Two at a time keeps the daily budget close
     # to exact (each job counts today's sent mail before it sends).
-    email: 2
+    email: 2,
+    # ADR-243: reports to the tax authority (one HTTP call per document).
+    fiscal: 2,
+    # ADR-246: provider calls for online payments.
+    payments: 2,
+    # ADR-254: CSV imports, one at a time per node (each row its own transaction).
+    imports: 1
   ]
 
 config :palee, Palee.Infrastructure.Auth.Guardian,
@@ -147,6 +168,116 @@ config :palee,
 
 # ADR-202: the spaces of each branch, their floor plans and unavailability.
 config :palee, :space_store, Palee.Infrastructure.Spaces.EctoSpaceStore
+# ADR-240–242: Fiscal (legal identity, documents, inalterable journal).
+config :palee, :fiscal_store, Palee.Infrastructure.Fiscal.EctoFiscalStore
+config :palee, :fiscal_journal_signer, Palee.Infrastructure.Fiscal.Ed25519JournalSigner
+config :palee, :fiscal_transmission_store, Palee.Infrastructure.Fiscal.EctoTransmissionStore
+
+# ADR-255: setup recipes.
+config :palee,
+       :setup_recipe_application_store,
+       Palee.Infrastructure.Setup.EctoRecipeApplicationStore
+
+config :palee, :setup_business_configurator, Palee.Application.Setup.ServicesConfigurator
+
+# ADR-243: the gateway that reports documents, per connection environment.
+# ADR-265: the AADE registry (RgWsPublic2) adapter, per connection environment.
+config :palee, :fiscal_business_registries, %{
+  "sandbox" => Palee.Infrastructure.Fiscal.SandboxBusinessRegistry,
+  "production" => Palee.Infrastructure.Fiscal.AadeRegistry
+}
+
+config :palee, :fiscal_authority_gateways, %{
+  "sandbox" => Palee.Infrastructure.Fiscal.SandboxAuthorityGateway,
+  "test" => Palee.Infrastructure.Fiscal.MyDataGateway,
+  "production" => Palee.Infrastructure.Fiscal.MyDataGateway
+}
+
+# ADR-244: tax and export settings, and the sales tax calculator (manual
+# rate table now; Stripe Tax or Avalara later behind the same port).
+config :palee, :fiscal_tax_store, Palee.Infrastructure.Fiscal.EctoTaxStore
+
+config :palee,
+       :fiscal_sales_tax_calculator,
+       Palee.Infrastructure.Fiscal.RateTableSalesTaxCalculator
+
+# ADR-245: accounting export formats, by id (the order is the API's order).
+config :palee, :fiscal_accounting_export_formats, [
+  Palee.Infrastructure.Fiscal.Exports.Datev,
+  Palee.Infrastructure.Fiscal.Exports.Xero,
+  Palee.Infrastructure.Fiscal.Exports.QuickBooks,
+  Palee.Infrastructure.Fiscal.Exports.Sage,
+  Palee.Infrastructure.Fiscal.Exports.Bexio,
+  Palee.Infrastructure.Fiscal.Exports.GenericCsv,
+  Palee.Infrastructure.Fiscal.Exports.GenericJson
+]
+
+# ADR-250: Peppol e-invoicing, the access point per connection provider (fiskaly
+# E-INVOICE since 2026-10-29; Storecove retired, old rows show as invalid).
+config :palee, :fiscal_einvoice_store, Palee.Infrastructure.Fiscal.EctoEInvoiceStore
+
+config :palee, :fiscal_einvoice_networks, %{
+  "sandbox" => Palee.Infrastructure.Fiscal.SandboxEInvoiceNetwork,
+  "fiskaly" => Palee.Infrastructure.Fiscal.FiskalyEInvoiceNetwork
+}
+
+# ADR-251/266: TSE (DE), RKSV (AT) and SIGN FR (FR) signing, the provider per connection.
+config :palee, :fiscal_till_store, Palee.Infrastructure.Fiscal.EctoTillSignatureStore
+
+# ADR-273: who hears that a fiscal connection stopped working.
+config :palee, :fiscal_connection_notifier, Palee.Application.Fiscal.ConnectionFailureNotices
+
+config :palee, :fiscal_cash_register_security, %{
+  {"tse", "sandbox"} => Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity,
+  {"rksv", "sandbox"} => Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity,
+  {"tse", "fiskaly"} => Palee.Infrastructure.Fiscal.FiskalySignDe,
+  {"rksv", "fiskaly"} => Palee.Infrastructure.Fiscal.FiskalySignAt,
+  {"sign_fr", "sandbox"} => Palee.Infrastructure.Fiscal.SandboxCashRegisterSecurity,
+  {"sign_fr", "fiskaly"} => Palee.Infrastructure.Fiscal.FiskalySignFr
+}
+
+# ADR-246/247: online payments through the business's own provider account.
+config :palee, :payment_store, Palee.Infrastructure.Payments.EctoPaymentStore
+config :palee, :payment_fulfilment, Palee.Application.Payments.FinanceFulfilment
+config :palee, :payment_notifier, Palee.Application.Payments.FailureNotices
+
+# ADR-261: one-button connection; platform credentials come from runtime.exs.
+config :palee, :payment_connect, %{"stripe" => Palee.Infrastructure.Payments.StripeConnect}
+config :palee, :stripe_connect, %{}
+
+config :palee, :payment_gateways, %{
+  "sandbox" => Palee.Infrastructure.Payments.SandboxGateway,
+  "viva" => Palee.Infrastructure.Payments.VivaGateway,
+  "stripe" => Palee.Infrastructure.Payments.StripeGateway
+}
+
+# ADR-252: documents and signatures. The evidence store is where an advanced
+# e-signature provider plugs in later.
+config :palee, :documents_store, Palee.Infrastructure.Documents.EctoDocumentStore
+
+config :palee,
+       :documents_evidence_store,
+       Palee.Infrastructure.Documents.StorageSignatureEvidenceStore
+
+config :palee,
+       :documents_certificate_renderer,
+       Palee.Infrastructure.Documents.PdfCertificateRenderer
+
+# ADR-254: CSV imports (upload, dry run, apply, undo).
+config :palee, :import_store, Palee.Infrastructure.Imports.EctoImportStore
+config :palee, :import_clock, Palee.Infrastructure.Imports.SystemClock
+
+# ADR-249: Tap to Pay through the provider's terminal app on a staff phone
+# (providers without one are absent). The phone app's id and the callback
+# the terminal app answers on.
+config :palee, :payment_terminals, %{
+  "sandbox" => Palee.Infrastructure.Payments.SandboxTerminalGateway,
+  "viva" => Palee.Infrastructure.Payments.VivaTerminalGateway
+}
+
+config :palee, :payment_terminal_app,
+  app_id: "app.palee.member",
+  callback: "palee-terminal://result"
 
 # ADR-190: the e-shop and Finance's revenue streams.
 config :palee, :shop_store, Palee.Infrastructure.Shop.EctoShopStore
@@ -214,18 +345,26 @@ config :palee, :domain_event_handlers, %{
   attendance_recorded: [
     Palee.Application.TrialReactions,
     Palee.Application.ReferralReactions,
-    Palee.Application.WalletReactions
+    Palee.Application.WalletReactions,
+    Palee.Application.BoxScreenReactions
   ],
   # ADR-156: the invite funnel follows events, trials, joining and paying.
   event_attendance_recorded: [Palee.Application.ReferralReactions],
   membership_payment_recorded: [Palee.Application.ReferralReactions],
   booking_cancelled: [
     Palee.Application.TrialReactions,
-    Palee.Application.WalletReactions
+    Palee.Application.WalletReactions,
+    Palee.Application.BoxScreenReactions
   ],
-  booking_made: [Palee.Application.WalletReactions],
-  class_cancelled: [Palee.Application.TrialReactions]
+  booking_made: [Palee.Application.WalletReactions, Palee.Application.BoxScreenReactions],
+  class_cancelled: [Palee.Application.TrialReactions, Palee.Application.BoxScreenReactions],
+  # ADR-253: box screens refresh their leaderboards.
+  workout_result_recorded: [Palee.Application.BoxScreenReactions]
 }
+
+# ADR-253: box screens (store and the clock they run on).
+config :palee, :box_screen_store, Palee.Infrastructure.BoxScreens.EctoBoxScreenStore
+config :palee, :box_screen_clock, Palee.Infrastructure.BoxScreens.SystemClock
 
 config :palee,
        :saved_filter_store,

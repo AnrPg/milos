@@ -140,14 +140,17 @@ defmodule Palee.Finance.PackagePhaseBTest do
     {:ok, subscription} = Finance.assign_package(membership.id, package.id, %{})
     assert subscription.commitment_ends_on
 
+    # ADR-274: staff cancel by setting the status by hand.
     assert {:error, {:package_commitment_active, %{commitment_ends_on: _}}} =
-             Finance.upsert_membership(user.id, %{status: "cancelled"})
+             Finance.set_value_override(user.id, "status", %{value: "cancelled"})
 
-    assert {:ok, %{status: "cancelled"}} =
-             Finance.upsert_membership(user.id, %{
-               status: "cancelled",
+    assert {:ok, %{value: "cancelled"}} =
+             Finance.set_value_override(user.id, "status", %{
+               value: "cancelled",
                commitment_override_reason: "Relocation"
              })
+
+    assert Finance.get_member_profile(user.id).membership.status == "cancelled"
   end
 
   test "joining fees and member discounts are applied to invoices" do
@@ -163,13 +166,13 @@ defmodule Palee.Finance.PackagePhaseBTest do
         }
       })
 
-    {_user, membership} = member()
+    {user, membership} = member()
     {:ok, subscription} = Finance.assign_package(membership.id, package.id, %{})
 
-    assert {:ok, invoice} =
-             Finance.create_invoice(membership.id, %{
-               "membership_package_subscription_id" => subscription.id
-             })
+    # ADR-274: the first period's charge carries the joining fee.
+    assert [invoice] = Finance.get_member_profile(user.id).invoices
+    assert invoice.invoice_type == "subscription"
+    invoice = Map.put(invoice, :lines, Palee.Finance.FinanceStore.invoice_lines(invoice.id))
 
     descriptions = Enum.map(invoice.lines, & &1.description)
     assert "Joining fee" in descriptions

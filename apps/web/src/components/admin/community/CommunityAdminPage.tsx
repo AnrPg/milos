@@ -27,9 +27,11 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { can } from "@/lib/role-navigation";
 
 import { MemberGroupsSetting, PartnersSetting } from "./CommunitySettings";
+import { AdvancedDisclosure } from "@/components/settings/AdvancedSettings";
 import { EventsTab } from "./EventsTab";
 import { OpenClubsTab } from "./OpenClubsTab";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
+import { clockFormat } from "@/lib/clock";
 
 type Tab = "groups" | "events" | "reports" | "clubs";
 const TABS: Tab[] = ["groups", "events", "reports", "clubs"];
@@ -100,10 +102,11 @@ function GroupsTab() {
   return (
     <>
       {can(membership, "manage_community") ? (
-        <>
+        // ADR-255: both settings have a good default, so they sit under «Προχωρημένα».
+        <AdvancedDisclosure count={2} testId="community-advanced">
           <MemberGroupsSetting current={settings.member_groups} />
           <PartnersSetting current={settings.partners_enabled} />
-        </>
+        </AdvancedDisclosure>
       ) : null}
       {pending.length > 0 ? (
         <Panel title={t("groupsPending", { count: pending.length })}>
@@ -224,7 +227,7 @@ function ReportItem({ row }: { row: ReportRow }) {
   const reasons = Object.entries(row.reasons)
     .sort((a, b) => b[1] - a[1])
     .map(([reason, count]) => `${tClubs(`reason_${reason}`)} ×${count}`);
-  const when = new Intl.DateTimeFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(
+  const when = clockFormat(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(
     new Date(row.last_reported_at),
   );
 

@@ -19,6 +19,7 @@ import {
 } from "@/api/auth";
 import { ApiError } from "@/api/client";
 import { undoAccountDeletionAndSignIn } from "@/api/account-deletion";
+import { AgeConfirmationField } from "@/components/auth/AgeConfirmationField";
 import { AuthField } from "@/components/auth/AuthField";
 import { CheckInboxNotice } from "@/components/auth/CheckInboxNotice";
 import { AuthNotice } from "@/components/auth/AuthShell";
@@ -43,10 +44,18 @@ type RegisterForm = {
   email: string;
   password: string;
   role: "member" | "athlete";
+  age_confirmed: boolean;
 };
 type LoginForm = { identifier: string; password: string };
 
-const initialRegister: RegisterForm = { display_name: "", handle: "", password: "", role: "member", email: "" };
+const initialRegister: RegisterForm = {
+  display_name: "",
+  handle: "",
+  password: "",
+  role: "member",
+  email: "",
+  age_confirmed: false,
+};
 const initialLogin: LoginForm = { identifier: "", password: "" };
 
 const MAX_DISPLAY_NAME_LENGTH = 50;
@@ -62,6 +71,7 @@ function invalidRegisterFields(form: RegisterForm, t: (key: string) => string): 
   }
   if (form.handle.trim().length < 3) errors.handle = [t("handleRule")];
   if (!passwordLongEnough(form.password)) errors.password = [t("passwordRule")];
+  if (!form.age_confirmed) errors.age_confirmed = [t("minimumAgeRule")];
 
   return errors;
 }
@@ -406,6 +416,11 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                   </div>
                 ) : null}
 
+                <AgeConfirmationField
+                  checked={registerForm.age_confirmed}
+                  errors={fieldErrors.age_confirmed}
+                  onChange={(age_confirmed) => setRegisterForm((f) => ({ ...f, age_confirmed }))}
+                />
 
                 <button
                   className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-60"
@@ -421,6 +436,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                       display_name: registerForm.display_name.trim(),
                       email: registerForm.email.trim(),
                       password: registerForm.password,
+                      age_confirmed: registerForm.age_confirmed,
                     };
                     void runAction("register", async () => {
                       // Hold the redirect: recovery codes are offered first.

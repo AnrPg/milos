@@ -227,7 +227,36 @@ must have an ADR. See `template.md` for the format.
 | ADR-230 | Day WODs: one WOD for a whole day, inherited by its classes (all or chosen class types), overridable per class | Accepted |
 | ADR-231 | The profile's «Πολυμέσα» grid: photos and videos from posts, same visibility as posts | Accepted |
 | ADR-232 | Staff book or move a member into a class: one transaction, no late charge, server-listed choices | Accepted |
+| ADR-240 | Fiscal context, business legal identity and country profiles (GR, CY, DE, AT, CH, LI, LU, FR, BE, MC, GB, US) | Accepted |
+| ADR-241 | Immutable fiscal documents, gapless series, VAT by rate group, credit notes only | Accepted |
+| ADR-242 | Inalterable fiscal journal: hash chain, Ed25519 signatures, period closings, audit archive | Accepted |
+| ADR-243 | Reporting fiscal documents to myDATA: outbox, sandbox and AADE gateways, document mapping | Accepted |
+| ADR-244 | Tax categories on packages, products and variants; stable sale lines for `Fiscal.issue`; US sales tax port with a manual rate table | Accepted |
+| ADR-245 | Country document templates (PDF/HTML, Swiss QR-bill, myDATA mentions) and accounting exports (DATEV, Xero, QuickBooks, Sage, bexio, CSV, JSON) | Accepted |
+| ADR-246 | Online payments through the business's own provider account (Viva, Stripe, sandbox), webhooks as hints | Accepted |
+| ADR-247 | Saved cards, recurring charges within the payer's consent, autopay and dunning | Accepted |
+| ADR-248 | Selling packages and shop orders online, booking after payment, 14-day withdrawal | Accepted |
+| ADR-249 | Tap to Pay at the desk through the Viva.com Terminal app: signed app-to-app request, result confirmed with Viva, `card_terminal` money with its document | Accepted |
+| ADR-250 | Peppol e-invoicing: UBL 2.1 / BIS Billing 3.0, outbox with uncertain never resent, access point port (sandbox, fiskaly E-INVOICE since 2026-10-29; Storecove retired) | Accepted |
+| ADR-251 | Till security devices: cloud TSE (DE), RKSV (AT) and SIGN FR (FR, ADR-266) through fiskaly, signatures on a side table, outages recorded; invoices paid at the till signed too (update 2026-10-29) | Accepted |
+| ADR-252 | Documents and simple electronic signatures (evidence, PDF certificate), health certificates, booking gate | Accepted |
+| ADR-253 | Box screen: TV paired with a code, display token, today's classes/WODs/leaderboards, automatic focus and staff override; the class's coach pins their own class (update 2026-10-29) | Accepted |
+| ADR-254 | Importing clients from a CSV file: Imports context, dry run, idempotent apply, held profiles, undo | Accepted |
+| ADR-255 | Setup recipes per box type and the settings catalog («Προχωρημένα») | Accepted |
+| ADR-256 | Store apps: physical services paid through the box's provider in the in-app browser, digital-only packages and Plan (Palee) not sold in the apps, /pay/return app link | Accepted |
+| ADR-260 | What members pay online (per-purpose switches), failed saved-card charges: member and staff notices, Εκκρεμότητες tab | Accepted |
+| ADR-261 | One-button connection of the business's Stripe (Connect OAuth) or Viva (ISV) account; platform credentials, signed state, disconnect | Accepted |
+| ADR-262 | Every recorded payment (desk or online) issues its fiscal receipt once the fiscal identity is complete; part payments split per tax group; idempotent per payment | Accepted |
+| ADR-263 | Member payment screens: buy a subscription package, pay an invoice, saved cards and autopay, withdrawal, /pay/return with the sandbox page, the box's sales page; API adds provider, services, autopay at checkout, dated visits without withdrawal | Accepted |
+| ADR-264 | Tap to Pay for walk-ins' free sales (memberless Finance stream sale with its receipt, idempotent per intent); tips (staff's, not revenue) and card surcharges (revenue on the sale's receipt) Viva confirms on top of the amount | Accepted |
+| ADR-265 | Credit note reason (immutable, hashed, printed, UBL note) and refund to the card that issues the note; «Αποστολή με email» of a document PDF through the outbox (attachments); «Συμπλήρωση από το ΑΦΜ» from AADE RgWsPublic2 with the business's own encrypted credentials | Accepted |
+| ADR-266 | French till receipts signed through fiskaly SIGN FR next to Palee's own journal (ADR-241/242); fiskaly must confirm certification coverage in writing; Monaco not covered | Accepted |
+| ADR-267 | Draft `/privacy` and `/terms` pages (12 locales, sub-processors from the code); minimum age 16 as an explicit confirmation enforced in the API (no date of birth); «Λήψη των δεδομένων μου»: one ZIP of the person's own data across contexts, built by a job in the person's own sessions, short-lived links, email notice, one a day | Accepted |
 | ADR-270 | Structured WOD plan: flow, set structure and add-ons (presets as shortcuts), values stored as typed in `workout_sections.plan` | Accepted |
+| ADR-271 | «Πωλείται online»: connecting a payment provider puts active paid packages on sale once and tells the owner; the owner's per-package choice is stamped and never overridden; `online_visibility` on staff package rows from one rule module (`PackageSale`) shared with the public Σελίδα πακέτων | Accepted |
+| ADR-272 | «Είσπραξη» step by step with Tap to Pay on the staff phone (mockup pilot-gaps 2 A); the terminal result names its fiscal document and availability its reason; box role `guest` («Επισκέπτης», lowest client tier, granted at the desk through a definer function, no member-app access); tip owner written once (who started it, the sole front desk person, or the front desk role); walk-in receipt as a signed QR link; walk-in renamed «Πελάτης χωρίς λογαριασμό» | Accepted |
+| ADR-273 | Fiscal «Συνδέσεις» in Στοιχεία τιμολόγησης: «Δοκιμή σύνδεσης» behind every fiscal port (on save, on demand, about every 3 months, sooner after failures), stable error codes instead of provider text, owner notified when a connection becomes invalid; per-box `managed_by` lets the Palee team fill a box's connections from the vendor console, audited without secrets | Accepted |
+| ADR-274 | Member status from subscription charges: every priced subscription period is charged (assignment + hourly run), `status_shown` folds money into the status staff see, values staff set by hand are kept with who/when/from/to in `finance_value_overrides` (status overrides lapse when the automatic value changes), «Οφειλές» in «Εκκρεμότητες» | Accepted |
 | ADR-275 | Workout types: one fixed list grouped in families (martial arts and dance included), the gym chooses which its editors offer; stats, badges and colours read the family | Accepted |
 | ADR-276 | Unsaved edits on staff forms: draft with undo/redo, save bar, ask before leaving a tab | Accepted |
 | ADR-300 | Operation registry: one spec per use case generates REST, MCP and LLM tools; previewable commands, problem details, idempotency keys, ETags (v4) | Proposed |

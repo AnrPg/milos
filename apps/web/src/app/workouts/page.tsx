@@ -28,6 +28,7 @@ import { useExecutionStore } from "@/stores/execution";
 import { PageHeader } from "@/components/PageHeader";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { BackButton } from "@/components/ui/BackLink";
+import { formatClock } from "@/lib/clock";
 
 type Step = "type" | "week" | "preview";
 
@@ -59,7 +60,7 @@ function formatDayLabel(locale: string, iso: string): string {
 }
 
 function formatTime(locale: string, iso: string): string {
-  return new Date(iso).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+  return formatClock(new Date(iso), locale, { hour: "2-digit", minute: "2-digit" });
 }
 
 function scaleTone(label: string) {

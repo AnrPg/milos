@@ -15,7 +15,8 @@ defmodule Palee.Application.EmailVerificationTest do
           "display_name" => "Ελένη",
           "password" => "S3cur3P@ss!42",
           "role" => "member",
-          "email" => "verify_#{unique}@example.com"
+          "email" => "verify_#{unique}@example.com",
+          "age_confirmed" => true
         },
         attrs
       )

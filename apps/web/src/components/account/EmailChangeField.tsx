@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useFormatter, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 
 import {
   cancelEmailChange,
@@ -15,6 +15,7 @@ import { useSession } from "@/components/session-provider";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { withClock } from "@/lib/clock";
 
 const inputStyle = { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" };
 const quietButtonClass = "rounded-xl px-4 py-2 text-sm font-semibold disabled:opacity-50";
@@ -30,6 +31,7 @@ export function EmailChangeField() {
   const t = useTranslations("emailChange");
   const ui = useUiTranslations();
   const format = useFormatter();
+  const locale = useLocale();
   const { tokens, currentUser } = useSession();
   const [status, setStatus] = useState<EmailChangeStatus | null>(null);
   const [editing, setEditing] = useState(false);
@@ -141,7 +143,7 @@ export function EmailChangeField() {
             {sent ? `${t("sent")} ` : ""}
             {t("pendingBody", {
               current,
-              until: format.dateTime(new Date(pending.expires_at), { dateStyle: "medium", timeStyle: "short" }),
+              until: format.dateTime(new Date(pending.expires_at), withClock(locale, { dateStyle: "medium", timeStyle: "short" })),
             })}
           </p>
           <div className="flex flex-wrap gap-2">

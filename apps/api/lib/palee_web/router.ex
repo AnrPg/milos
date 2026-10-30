@@ -51,6 +51,17 @@ defmodule PaleeWeb.Router do
     )
   end
 
+  # ADR-267: asking for "Download my data" is also capped per hour here, on
+  # top of the service's one request in progress and one a day.
+  pipeline :data_export_rate_limited do
+    plug(PaleeWeb.Plugs.RateLimit,
+      max: 5,
+      interval: 3_600_000,
+      bucket: "data-exports",
+      methods: ["POST"]
+    )
+  end
+
   # ADR-157: one upload per picked file, plus its completion.
   pipeline :media_upload_rate_limited do
     plug(PaleeWeb.Plugs.RateLimit,
@@ -150,6 +161,27 @@ defmodule PaleeWeb.Router do
     plug(PaleeWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "widget")
   end
 
+  # ADR-253: box screens. Pairing has no sign-in, so a tight budget per
+  # address bounds guessing codes; a paired screen polls with its own token.
+  pipeline :box_screen_pairing do
+    plug(PaleeWeb.Plugs.RateLimit, max: 10, interval: 60_000, bucket: "box-screen-pair")
+  end
+
+  pipeline :box_screen do
+    plug(PaleeWeb.Plugs.AuthenticateBoxScreen)
+    plug(PaleeWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "box-screen")
+  end
+
+  # Staff create screens and pairing codes (each POST makes a code).
+  pipeline :box_screen_code_rate_limited do
+    plug(PaleeWeb.Plugs.RateLimit,
+      max: 30,
+      interval: 3_600_000,
+      bucket: "box-screen-codes",
+      methods: ["POST"]
+    )
+  end
+
   # ADR-155: door scans and the desk; generous for a busy door, bounded for guessing.
   pipeline :check_in_rate_limited do
     plug(PaleeWeb.Plugs.RateLimit, max: 60, interval: 60_000, bucket: "check-in")
@@ -174,6 +206,15 @@ defmodule PaleeWeb.Router do
   pipeline :email_provider_webhook do
     plug(PaleeWeb.Plugs.RateLimit, max: 1200, interval: 60_000, bucket: "brevo-webhook")
     plug(PaleeWeb.Plugs.WebhookSecret, config_key: :brevo_webhook_secret)
+  end
+
+  pipeline :payment_provider_webhook do
+    plug(PaleeWeb.Plugs.RateLimit, max: 600, interval: 60_000, bucket: "payment-webhook")
+  end
+
+  # ADR-261: the payment provider sends the owner back after connecting.
+  pipeline :payment_connect_callback do
+    plug(PaleeWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "payment-connect")
   end
 
   pipeline :email_unsubscribe do
@@ -280,6 +321,15 @@ defmodule PaleeWeb.Router do
     pipe_through([:api, :public_box_rate_limited])
 
     get("/:slug", PublicBoxController, :show)
+    # ADR-248: the packages a box sells online.
+    get("/:slug/packages", PublicBoxController, :packages)
+  end
+
+  # ADR-272: a walk-in's receipt behind the QR on the staff phone.
+  scope "/api/public/receipts", PaleeWeb do
+    pipe_through([:api, :public_box_rate_limited])
+
+    get("/:token", PublicReceiptsController, :show)
   end
 
   # ADR-170: the public platform plan catalog (pricing, coach onboarding).
@@ -339,6 +389,27 @@ defmodule PaleeWeb.Router do
     pipe_through([:email_provider_webhook])
 
     post("/brevo", BrevoWebhookController, :create)
+  end
+
+  # ADR-246: payment providers' webhooks (one URL per business account).
+  scope "/api/webhooks/payments", PaleeWeb do
+    pipe_through([:payment_provider_webhook])
+
+    get("/:organization_id/:account_id", PaymentWebhookController, :show)
+    post("/:organization_id/:account_id", PaymentWebhookController, :create)
+  end
+
+  scope "/api/payments/connect", PaleeWeb do
+    pipe_through([:payment_connect_callback])
+
+    get("/callback", PaymentConnectController, :callback)
+  end
+
+  # ADR-250: the Peppol access point's webhook (one secret URL per business).
+  scope "/api/webhooks/peppol", PaleeWeb do
+    pipe_through([:payment_provider_webhook])
+
+    post("/:organization_id/:token", PeppolWebhookController, :create)
   end
 
   scope "/api/email/unsubscribe", PaleeWeb do
@@ -417,6 +488,20 @@ defmodule PaleeWeb.Router do
     post("/account-deletion", AccountDeletionController, :create)
   end
 
+  # ADR-267: "Download my data" (GDPR articles 15 and 20).
+  scope "/api", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :data_export_rate_limited
+    ])
+
+    get("/me/data-exports", PersonalDataExportController, :index)
+    post("/me/data-exports", PersonalDataExportController, :create)
+  end
+
   # ADR-187: the password reset requests the signed-in person can handle
   # (vendor, box owner/admin/front desk, the person's coach).
   scope "/api/password-resets", PaleeWeb do
@@ -435,6 +520,8 @@ defmodule PaleeWeb.Router do
     pipe_through([:api, :authenticated, :authenticated_rate_limited])
 
     get("/memberships", OrganizationAccessController, :memberships)
+    # ADR-272: the boxes the account is only a guest of (the box page's banner).
+    get("/memberships/guest-boxes", OrganizationAccessController, :guest_boxes)
     post("/organizations", OwnerOrganizationController, :create)
     # ADR-170: an account opens its practice as an independent coach.
     post("/coach-practices", CoachPracticeController, :create)
@@ -483,6 +570,42 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/finance", MyFinanceController, :index)
+    # ADR-246/247: paying invoices online and saved cards.
+    get("/invoices/:id/payment-terms", MyPaymentsController, :terms)
+    post("/invoices/:id/pay", MyPaymentsController, :pay)
+    post("/payments/return", MyPaymentsController, :returned)
+    post("/payments/sandbox/complete", MyPaymentsController, :sandbox_complete)
+    get("/payments/:id", MyPaymentsController, :show)
+    get("/payment-methods", MyPaymentsController, :methods)
+    delete("/payment-methods/:id", MyPaymentsController, :revoke_method)
+    put("/payment-methods/:id/autopay", MyPaymentsController, :set_autopay)
+    # ADR-248: buying packages online, withdrawal, paying shop orders.
+    get("/packages/:id/purchase-terms", MyPaymentsController, :package_terms)
+    post("/packages/:id/buy", MyPaymentsController, :buy_package)
+    post("/payments/:id/withdraw", MyPaymentsController, :withdraw)
+    post("/shop/orders/:id/pay-online", MyPaymentsController, :pay_shop_order)
+    # ADR-252: Box › Documents (sign, certificates, health certificate).
+    get("/documents", MyDocumentsController, :index)
+    get("/documents/signatures", MyDocumentsController, :signatures)
+    get("/documents/signatures/:id/evidence", MyDocumentsController, :evidence)
+
+    post(
+      "/documents/health-certificate/uploads",
+      MyDocumentsController,
+      :request_health_upload
+    )
+
+    post("/documents/health-certificate", MyDocumentsController, :create_health_certificate)
+    get("/documents/health-certificate/:id/file", MyDocumentsController, :health_file)
+
+    delete(
+      "/documents/health-certificate/:id",
+      MyDocumentsController,
+      :delete_health_certificate
+    )
+
+    get("/documents/:id", MyDocumentsController, :show)
+    post("/documents/:id/sign", MyDocumentsController, :sign)
     # ADR-220: the member's renewal choice and leaving the box.
     put(
       "/membership/subscriptions/:id/auto-renew",
@@ -689,6 +812,22 @@ defmodule PaleeWeb.Router do
 
     get("/class-timers/:slot_id", ClassTimerController, :show)
     post("/class-timers/:slot_id/commands", ClassTimerController, :command)
+
+    # ADR-253 update 2026-10-29: «Στην οθόνη», the class's coach pins it on a box screen.
+    get("/class-timers/:slot_id/screens", ClassScreenController, :index)
+
+    put(
+      "/class-timers/:slot_id/screens/:screen_id/override",
+      ClassScreenController,
+      :put_override
+    )
+
+    delete(
+      "/class-timers/:slot_id/screens/:screen_id/override",
+      ClassScreenController,
+      :delete_override
+    )
+
     # TD-092: challenges are tenant rows; these run in the gym's scope.
     get("/challenges/:id/leaderboard", ChallengeController, :leaderboard)
     post("/challenges/:id/opt_in", ChallengeController, :opt_in)
@@ -883,6 +1022,26 @@ defmodule PaleeWeb.Router do
     post("/appointments/:id/cancel", AppointmentsController, :cancel)
   end
 
+  # ADR-253: box screens, their pairing codes and overrides.
+  scope "/api/org/:organization_slug/admin", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :admin_only,
+      :tenant_write_rate_limited,
+      :box_screen_code_rate_limited
+    ])
+
+    get("/box-screens", AdminBoxScreenController, :index)
+    post("/box-screens", AdminBoxScreenController, :create)
+    patch("/box-screens/:id", AdminBoxScreenController, :update)
+    delete("/box-screens/:id", AdminBoxScreenController, :delete)
+    post("/box-screens/:id/pairing-code", AdminBoxScreenController, :pairing_code)
+    put("/box-screens/:id/override", AdminBoxScreenController, :put_override)
+    delete("/box-screens/:id/override", AdminBoxScreenController, :delete_override)
+  end
+
   scope "/api/org/:organization_slug/admin", PaleeWeb do
     pipe_through([
       :api,
@@ -1008,6 +1167,11 @@ defmodule PaleeWeb.Router do
     patch("/onboarding", AdminOnboardingController, :update)
     patch("/settings", AdminSettingsController, :update)
     put("/settings/time-zone", AdminSettingsController, :update_time_zone)
+    # ADR-255: the settings catalog («Προχωρημένα») and the setup recipes.
+    get("/setup/settings", AdminSetupController, :settings)
+    get("/setup/recipes", AdminSetupController, :recipes)
+    post("/setup/recipes/:key/preview", AdminSetupController, :preview)
+    post("/setup/recipes/:key/apply", AdminSetupController, :apply_recipe)
     # ADR-174: the gym's AI settings (own key, scaling switch, usage).
     get("/ai-settings", AdminAiSettingsController, :show)
     put("/ai-settings", AdminAiSettingsController, :update)
@@ -1148,6 +1312,151 @@ defmodule PaleeWeb.Router do
 
     get("/athletes/:id/drill-down", AdminCoachingController, :drill_down)
     get("/finance/summary", AdminFinanceController, :summary)
+    # ADR-240–242: legal identity, fiscal documents, journal, closings.
+    get("/fiscal/countries", AdminFiscalController, :countries)
+    get("/fiscal/identity", AdminFiscalController, :identity)
+    put("/fiscal/identity", AdminFiscalController, :save_identity)
+    get("/fiscal/documents", AdminFiscalController, :documents)
+    get("/fiscal/documents/:id", AdminFiscalController, :document)
+    post("/fiscal/documents/:id/credit-notes", AdminFiscalController, :credit)
+    get("/fiscal/journal/verification", AdminFiscalController, :verify_journal)
+    get("/fiscal/closings", AdminFiscalController, :closings)
+    get("/fiscal/archive", AdminFiscalController, :archive)
+    # ADR-244/245: tax categories, US sales tax, document files, accounting exports.
+    get("/fiscal/tax-categories", AdminFiscalTaxController, :tax_categories)
+    get("/fiscal/sales-tax-rates", AdminFiscalTaxController, :sales_tax_rates)
+    put("/fiscal/sales-tax-rates", AdminFiscalTaxController, :save_sales_tax_rates)
+    get("/fiscal/documents/:id/pdf", AdminFiscalTaxController, :document_pdf)
+    get("/fiscal/documents/:id/html", AdminFiscalTaxController, :document_html)
+    post("/fiscal/documents/:id/email", AdminFiscalTaxController, :email_document)
+    get("/fiscal/registry-connection", AdminFiscalRegistryController, :connection)
+    put("/fiscal/registry-connection", AdminFiscalRegistryController, :save_connection)
+    get("/fiscal/registry/businesses/:tax_id", AdminFiscalRegistryController, :lookup)
+    # ADR-273: the box's fiscal connections as one set and «Δοκιμή σύνδεσης».
+    get("/fiscal/connections", AdminFiscalConnectionsController, :index)
+    post("/fiscal/connections/:kind/check", AdminFiscalConnectionsController, :check)
+    get("/fiscal/exports/formats", AdminFiscalTaxController, :export_formats)
+    put("/fiscal/exports/settings/:format", AdminFiscalTaxController, :save_export_settings)
+    get("/fiscal/exports/:format", AdminFiscalTaxController, :export)
+    # ADR-243: reporting to the tax authority (myDATA).
+    get("/fiscal/authority-connection", AdminFiscalReportingController, :connection)
+    put("/fiscal/authority-connection", AdminFiscalReportingController, :save_connection)
+    get("/fiscal/transmissions", AdminFiscalReportingController, :transmissions)
+
+    post(
+      "/fiscal/documents/:id/transmission/retry",
+      AdminFiscalReportingController,
+      :retry
+    )
+
+    # ADR-249: Tap to Pay at the desk (the provider's terminal app on a staff phone).
+    get("/payments/terminal/availability", AdminTerminalPaymentsController, :availability)
+    post("/payments/terminal", AdminTerminalPaymentsController, :create)
+    post("/payments/terminal/result", AdminTerminalPaymentsController, :result)
+    get("/payments/terminal/:id", AdminTerminalPaymentsController, :show)
+    post("/payments/terminal/:id/cancel", AdminTerminalPaymentsController, :cancel)
+    # ADR-272: the receipt by email, who pays and what, guests, tips.
+    post("/payments/terminal/:id/receipt-email", AdminTerminalPaymentsController, :receipt_email)
+    get("/payments/desk/people", AdminDeskBuyersController, :people)
+    get("/payments/desk/options", AdminDeskBuyersController, :options)
+    post("/payments/desk/guests", AdminDeskBuyersController, :make_guest)
+    get("/payments/tips", AdminTipsController, :index)
+
+    post(
+      "/payments/terminal/:id/sandbox-complete",
+      AdminTerminalPaymentsController,
+      :sandbox_complete
+    )
+
+    # ADR-250: Peppol e-invoicing.
+    get("/fiscal/peppol-connection", AdminFiscalEInvoicingController, :connection)
+    put("/fiscal/peppol-connection", AdminFiscalEInvoicingController, :save_connection)
+    get("/fiscal/einvoices", AdminFiscalEInvoicingController, :index)
+    get("/fiscal/einvoices/:id", AdminFiscalEInvoicingController, :show)
+    post("/fiscal/documents/:id/einvoice/retry", AdminFiscalEInvoicingController, :retry)
+    # ADR-251: TSE (DE) and RKSV (AT) receipt signing.
+    get("/fiscal/till-connections/:device", AdminFiscalTillSigningController, :connection)
+    put("/fiscal/till-connections/:device", AdminFiscalTillSigningController, :save_connection)
+    get("/fiscal/till-signatures", AdminFiscalTillSigningController, :index)
+
+    post(
+      "/fiscal/till-signatures/null-receipts",
+      AdminFiscalTillSigningController,
+      :null_receipt
+    )
+
+    get("/fiscal/till-signatures/:id", AdminFiscalTillSigningController, :show)
+    post("/fiscal/till-signatures/:id/retry", AdminFiscalTillSigningController, :retry)
+
+    # ADR-246/247: online payments through the business's provider account.
+    get("/payments/account", AdminPaymentsController, :account)
+    put("/payments/account", AdminPaymentsController, :save_account)
+    put("/payments/account/options", AdminPaymentsController, :save_options)
+
+    delete(
+      "/payments/account/packages-notice",
+      AdminPaymentsController,
+      :dismiss_packages_notice
+    )
+
+    delete("/payments/account", AdminPaymentsController, :disconnect)
+    post("/payments/connect", AdminPaymentsController, :connect)
+    get("/payments/attention", AdminPaymentsController, :attention)
+    get("/payments", AdminPaymentsController, :index)
+    get("/payments/:id", AdminPaymentsController, :show)
+    post("/payments/:id/refunds", AdminPaymentsController, :refund)
+    post("/payments/:id/retry", AdminPaymentsController, :retry)
+    post("/payments/:id/retry-charge", AdminPaymentsController, :retry_charge)
+    post("/payments/:id/dismiss", AdminPaymentsController, :dismiss_charge)
+    post("/payments/:id/card-link", AdminPaymentsController, :card_link)
+    # ADR-252: documents, signatures and health certificates.
+    get("/documents/templates", AdminDocumentsController, :index)
+    post("/documents/templates", AdminDocumentsController, :create)
+    get("/documents/starters", AdminDocumentsController, :starters)
+    get("/documents/outstanding", AdminDocumentsController, :outstanding)
+    get("/documents/templates/:id", AdminDocumentsController, :show)
+    get("/documents/templates/:id/versions/:version_id", AdminDocumentsController, :version)
+    post("/documents/templates/:id/versions", AdminDocumentsController, :publish)
+    put("/documents/templates/:id/requirement", AdminDocumentsController, :set_requirement)
+    post("/documents/templates/:id/archive", AdminDocumentsController, :archive)
+    post("/documents/templates/:id/requests", AdminDocumentsController, :request)
+    get("/documents/requests", AdminDocumentsController, :requests)
+    post("/documents/requests/:id/cancel", AdminDocumentsController, :cancel_request)
+    get("/documents/signatures", AdminDocumentsController, :signatures)
+    get("/documents/signatures/:id/evidence", AdminDocumentsController, :evidence)
+    get("/documents/members/:user_id", AdminDocumentsController, :member)
+    get("/documents/settings", AdminDocumentsController, :settings)
+    put("/documents/settings", AdminDocumentsController, :save_settings)
+    get("/documents/audit", AdminDocumentsController, :audit)
+    get("/documents/health-certificates", AdminHealthCertificatesController, :index)
+
+    get(
+      "/documents/health-certificates/members/:user_id",
+      AdminHealthCertificatesController,
+      :client
+    )
+
+    post(
+      "/documents/health-certificates/uploads",
+      AdminHealthCertificatesController,
+      :request_upload
+    )
+
+    post("/documents/health-certificates", AdminHealthCertificatesController, :create)
+    get("/documents/health-certificates/:id/file", AdminHealthCertificatesController, :file)
+    delete("/documents/health-certificates/:id", AdminHealthCertificatesController, :delete)
+    # ADR-254: CSV imports.
+    get("/imports/catalog", AdminImportController, :catalog)
+    get("/imports", AdminImportController, :index)
+    post("/imports", AdminImportController, :create)
+    get("/imports/:id", AdminImportController, :show)
+    get("/imports/:id/rows", AdminImportController, :rows)
+    post("/imports/:id/preview", AdminImportController, :preview)
+    post("/imports/:id/apply", AdminImportController, :apply)
+    post("/imports/:id/invitations", AdminImportController, :invitations)
+    post("/imports/:id/undo", AdminImportController, :undo)
+    delete("/imports/:id", AdminImportController, :delete)
+
     # ADR-192: shop reports, pricing indicators and revenue reconciliation.
     get("/shop/reports/overview", AdminShopReportController, :overview)
     get("/shop/reports/sales", AdminShopReportController, :sales)
@@ -1215,6 +1524,15 @@ defmodule PaleeWeb.Router do
     get("/finance/members", AdminFinanceController, :members)
     get("/finance/members/:id", AdminFinanceController, :member)
     patch("/finance/members/:id", AdminFinanceController, :update_member)
+    get("/finance/members/:id/overrides", AdminFinanceController, :member_overrides)
+    put("/finance/members/:id/overrides/:field", AdminFinanceController, :set_member_override)
+
+    delete(
+      "/finance/members/:id/overrides/:field",
+      AdminFinanceController,
+      :reset_member_override
+    )
+
     post("/finance/members/:id/packages", AdminFinanceController, :assign_package)
     # ADR-220: renewal choice and leaving the box.
     put(
@@ -1409,6 +1727,26 @@ defmodule PaleeWeb.Router do
     get("/organizations/:id/slug-impact", PlatformOrganizationController, :slug_impact)
     patch("/organizations/:id/slug", PlatformOrganizationController, :rename_slug)
     patch("/organizations/:id/settings", PlatformOrganizationController, :settings)
+    # ADR-273: a box's fiscal connections, filled by the Palee team when it manages them.
+    get("/organizations/:id/fiscal-connections", PlatformFiscalConnectionsController, :show)
+
+    put(
+      "/organizations/:id/fiscal-connections/managed-by",
+      PlatformFiscalConnectionsController,
+      :managed_by
+    )
+
+    put(
+      "/organizations/:id/fiscal-connections/:kind",
+      PlatformFiscalConnectionsController,
+      :save
+    )
+
+    post(
+      "/organizations/:id/fiscal-connections/:kind/check",
+      PlatformFiscalConnectionsController,
+      :check
+    )
 
     post(
       "/organizations/:id/branding/logo/upload-url",
@@ -1855,6 +2193,21 @@ defmodule PaleeWeb.Router do
     get("/me/check-in/geofences", ScanCheckInController, :geofences)
     get("/me/connected-devices", WalletController, :devices)
     delete("/me/wallet-passes/:id", WalletController, :revoke)
+  end
+
+  # ADR-253: the box screen (a TV): pairing, then its display token only.
+  scope "/api/box-screen", PaleeWeb do
+    pipe_through([:api, :box_screen_pairing])
+
+    post("/pair", BoxScreenController, :pair)
+  end
+
+  scope "/api/box-screen", PaleeWeb do
+    pipe_through([:api, :box_screen])
+
+    get("/today", BoxScreenController, :today)
+    post("/token", BoxScreenController, :token)
+    get("/classes/:slot_id/timer", BoxScreenController, :class_timer)
   end
 
   scope "/api/widget", PaleeWeb do

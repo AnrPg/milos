@@ -44,7 +44,30 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
   def create_demo_person(organization_id, params) when is_binary(organization_id),
     do: create_login(params, organization_id)
 
-  defp create_login(params, demo_organization_id) do
+  # ADR-254: a profile an import holds until the person claims it.
+  @impl true
+  def create_held_person(organization_id, params) when is_binary(organization_id),
+    do: create_login(params, nil, organization_id)
+
+  @impl true
+  def profiles_by_emails([]), do: %{}
+
+  def profiles_by_emails(emails) when is_list(emails) do
+    normalized = emails |> Enum.map(&InvitationEmail.normalize/1) |> Enum.uniq()
+
+    from(user in User,
+      join: login in assoc(user, :login),
+      where: fragment("lower(?)", login.email) in ^normalized,
+      order_by: [asc: user.inserted_at],
+      select: {fragment("lower(?)", login.email), user.id, user.held_by_organization_id}
+    )
+    |> Repo.all()
+    |> Enum.group_by(&elem(&1, 0), fn {_email, id, held} ->
+      %{id: id, held_by_organization_id: held}
+    end)
+  end
+
+  defp create_login(params, demo_organization_id, held_by_organization_id \\ nil) do
     Repo.transaction(fn ->
       login_changeset = params |> Login.create_changeset() |> maybe_put_password_hash()
       profile_changeset = User.profile_create_changeset(%User{}, nil, params)
@@ -56,6 +79,7 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
              %User{}
              |> User.profile_create_changeset(login.id, params)
              |> Ecto.Changeset.put_change(:demo_organization_id, demo_organization_id)
+             |> Ecto.Changeset.put_change(:held_by_organization_id, held_by_organization_id)
              |> Repo.insert(),
            {:ok, _login} <- login |> Login.last_used_changeset(user.id) |> Repo.update() do
         load_account(user.id)
@@ -186,6 +210,16 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
     end)
   end
 
+  @impl true
+  def confirm_age(login_id, now) do
+    {_count, _rows} =
+      Login
+      |> where([l], l.id == ^login_id and is_nil(l.age_confirmed_at))
+      |> Repo.update_all(set: [age_confirmed_at: now, updated_at: now])
+
+    :ok
+  end
+
   @doc "ADR-187: sets a new password on a login and revokes every profile's sessions."
   @impl true
   def mark_email_verified(login_id, email, now) do
@@ -197,9 +231,19 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
       |> where([l], is_nil(l.email_verified_at))
       |> Repo.update_all(set: [email_verified_at: now, updated_at: now])
 
-    if count == 1 or email_verified_as?(login_id, normalized),
-      do: :ok,
-      else: {:error, :email_mismatch}
+    if count == 1 or email_verified_as?(login_id, normalized) do
+      release_held_profiles(login_id)
+      :ok
+    else
+      {:error, :email_mismatch}
+    end
+  end
+
+  # ADR-254: proving the inbox claims the profiles an import held.
+  defp release_held_profiles(login_id) do
+    User
+    |> where([user], user.login_id == ^login_id and not is_nil(user.held_by_organization_id))
+    |> Repo.update_all(set: [held_by_organization_id: nil])
   end
 
   defp email_verified_as?(login_id, normalized) do
@@ -227,6 +271,7 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
         |> case do
           {:ok, _login} ->
             Repo.delete_all(from(p in PendingEmailChange, where: p.login_id == ^login_id))
+            release_held_profiles(login_id)
             :ok
 
           {:error, changeset} ->
@@ -694,7 +739,11 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
 
     hidden =
       User
-      |> where([user], user.id in ^ids and not is_nil(user.demo_organization_id))
+      |> where(
+        [user],
+        user.id in ^ids and
+          (not is_nil(user.demo_organization_id) or not is_nil(user.held_by_organization_id))
+      )
       |> where(
         [user],
         not fragment("palee_demo_user_visible(?, ?)", user.id, type(^viewer_id, Ecto.UUID))
@@ -708,7 +757,14 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
 
   # ADR-184: person discovery never lists mock people (there is no viewer
   # who could be their staff in a global search).
-  defp discoverable(query), do: where(query, [user], is_nil(user.demo_organization_id))
+  # ADR-254: nor held people an import brought in and nobody claimed.
+  defp discoverable(query),
+    do:
+      where(
+        query,
+        [user],
+        is_nil(user.demo_organization_id) and is_nil(user.held_by_organization_id)
+      )
 
   defp profiles_query do
     from(user in User, join: login in assoc(user, :login), preload: [login: login])
@@ -851,6 +907,7 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
       email_verified_at: login.email_verified_at,
       inserted_at: user.inserted_at,
       demo_organization_id: user.demo_organization_id,
+      held_by_organization_id: user.held_by_organization_id,
       completed_tours: user.completed_tours || []
     }
   end

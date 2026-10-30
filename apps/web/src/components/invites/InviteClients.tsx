@@ -38,6 +38,8 @@ import {
   type StaffInvite,
 } from "@/components/invites/StaffInviteFields";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
+import { AdvancedDisclosure } from "@/components/settings/AdvancedSettings";
+import { formatClock } from "@/lib/clock";
 
 type Tab = "link" | "bulk" | "public" | "pending";
 type Translate = ReturnType<typeof useTranslations>;
@@ -322,7 +324,7 @@ function PersonalInvite({ t, slug, token }: { t: Translate; slug: string; token:
 
   if (demo) return <DemoNotice />;
 
-  const expiry = (value: string) => new Date(value).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" });
+  const expiry = (value: string) => formatClock(new Date(value), locale, { dateStyle: "medium", timeStyle: "short" });
 
   if (issued?.email) {
     return (
@@ -522,7 +524,10 @@ function PublicJoinLink({ t, slug, token }: { t: Translate; slug: string; token:
     <div className="space-y-4">
       <p className="text-sm leading-6" style={{ color: "var(--text-soft)" }}>{t("publicIntro")}</p>
       <JoinLinkCard t={t} slug={slug} role="member" enabled={data?.member?.enabled ?? false} save={save} />
-      <JoinLinkCard t={t} slug={slug} role="athlete" enabled={data?.athlete?.enabled ?? false} athleteKey={data?.athlete?.key} save={save} />
+      {/* ADR-255: the athlete link is off by default and few boxes need it, so it sits under «Προχωρημένα». */}
+      <AdvancedDisclosure count={1} testId="join-link-advanced">
+        <JoinLinkCard t={t} slug={slug} role="athlete" enabled={data?.athlete?.enabled ?? false} athleteKey={data?.athlete?.key} save={save} />
+      </AdvancedDisclosure>
       <p className="text-xs" style={{ color: "var(--muted)" }}>{t("publicStaffNote")}</p>
       {save.error ? <ErrorNotice>{localizeError(save.error, uiT)}</ErrorNotice> : null}
     </div>
@@ -665,7 +670,7 @@ function PendingInvitations({ t, slug, token }: { t: Translate; slug: string; to
               </p>
             ) : null}
             <p className="text-xs" style={{ color: "var(--muted)" }}>
-              {t("expires", { date: new Date(invitation.expires_at).toLocaleString(locale, { dateStyle: "medium", timeStyle: "short" }) })}
+              {t("expires", { date: formatClock(new Date(invitation.expires_at), locale, { dateStyle: "medium", timeStyle: "short" }) })}
             </p>
           </div>
           {confirming === invitation.id ? (

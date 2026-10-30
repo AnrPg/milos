@@ -12,6 +12,13 @@ defmodule Palee.Identity.UserStore do
 
   @impl true
   def demo_user_ids(organization_id), do: impl().demo_user_ids(organization_id)
+
+  @impl true
+  def create_held_person(organization_id, params),
+    do: impl().create_held_person(organization_id, params)
+
+  @impl true
+  def profiles_by_emails(emails), do: impl().profiles_by_emails(emails)
   @impl true
   def visible_user_ids(user_ids, viewer_id), do: impl().visible_user_ids(user_ids, viewer_id)
   @impl true
@@ -33,6 +40,9 @@ defmodule Palee.Identity.UserStore do
   @impl true
   def mark_email_verified(login_id, email, now),
     do: impl().mark_email_verified(login_id, email, now)
+
+  @impl true
+  def confirm_age(login_id, now), do: impl().confirm_age(login_id, now)
 
   @impl true
   def reset_login_password(login_id, password),

@@ -54,10 +54,12 @@ defmodule PaleeWeb.Plugs.RateLimit do
     :telemetry.execute([:palee, :rate_limit, :rejected], %{count: 1}, %{bucket: bucket})
   end
 
+  # A device without a person (a box screen, ADR-253) names itself, so
+  # screens behind one gym address do not share a budget.
   defp actor_identifier(conn) do
     case conn.assigns[:user_context] do
       %{user_id: id} when is_binary(id) -> id
-      _other -> "anonymous"
+      _other -> conn.assigns[:rate_limit_actor] || "anonymous"
     end
   end
 

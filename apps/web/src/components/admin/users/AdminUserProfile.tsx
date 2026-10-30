@@ -34,13 +34,14 @@ import {
   membershipChangeCount,
   membershipDraftFrom,
   membershipSaveRequests,
-  statusOptions,
   type MembershipDraft,
 } from "@/components/admin/users/membership-draft";
 import { ChangedMark } from "@/components/ui/ChangedMark";
 import { DraftFormsProvider, PageSaveBar, UnsavedChangesDialog, useDraftForm, useDraftForms } from "@/components/ui/DraftForms";
 import { CommitmentOverridePrompt } from "@/components/admin/finance/shared/CommitmentOverridePrompt";
 import { commitmentConflict } from "@/components/admin/finance/shared/membership-commitment";
+import { MemberStatusCell, SubscriptionEndCell } from "@/components/admin/finance/shared/MemberStandingCells";
+import { overrideFor } from "@/components/admin/finance/shared/member-standing";
 import {
   ADMIN_PROFILE_SECTION_REQUEST,
   openAdminProfileSection,
@@ -58,6 +59,7 @@ import { allowanceLabel, localizeError, semanticLabel } from "@/i18n/presentatio
 import { MemberRolesEditor } from "@/components/admin/users/MemberRolesEditor";
 import { CoachAssignmentPanel } from "@/components/admin/users/CoachAssignmentPanel";
 import { BoxMessagePanel } from "@/components/admin/users/BoxMessagePanel";
+import { MemberDocumentsPanel } from "@/components/documents/staff/MemberDocumentsPanel";
 import { CoachNotesPanel, type CoachNoteSubjectOption } from "@/components/admin/users/CoachNotesPanel";
 import { ClientTrainingGoalPanel } from "@/components/training-goal/ClientTrainingGoalPanel";
 import { CoachBodyPanel } from "@/components/body/CoachBodyPanel";
@@ -342,6 +344,10 @@ function FinanceDetails({
   const renewalChanges = changedRenewals(form.history);
   const edit = form.edit;
   const fieldStyle = { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" };
+  // ADR-274: «Λήγει» follows the running subscription's period.
+  const currentSubscription = subscriptions.find((subscription) => subscription.status === "active") ?? null;
+  const currentPeriod = (currentSubscription?.current_period ?? null) as { ends_on?: string | null; renews?: boolean } | null;
+  const currentEnds = String(currentPeriod?.ends_on ?? currentSubscription?.ends_on ?? "").slice(0, 10);
   const packageContent = subscriptions
     .map((subscription) => {
       const label = packageSubscriptionLabel(subscription);
@@ -359,13 +365,27 @@ function FinanceDetails({
         {membership ? (
           <div className="space-y-2">
             <div className="grid gap-2 sm:grid-cols-2">
-              <EditableFinanceCard label={i18n("statusbae7d5b")} changed={changed.has("status")}>
-                <Select aria-label={i18n("statusbae7d5b")} className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft.status} disabled={form.saving} onValueChange={(status) => edit({ status })} data-testid="membership-status">
-                  {statusOptions(draft.status).map((status) => <option key={status} value={status}>{semanticLabel(status, i18n)}</option>)}
-                </Select>
-              </EditableFinanceCard>
+              {/* ADR-274: worked out from the subscription and payments; set by hand only with a trace. */}
+              <EditableFinanceCard
+                label={i18n("statusbae7d5b")}
+                value={<MemberStatusCell userId={userId} status={valueText(membership.status_shown) === "—" ? draft.status : valueText(membership.status_shown)} override={overrideFor(finance.details.overrides, "status")} />}
+              />
               <EditableFinanceCard label={i18n("packageSubscriptions09a33f1")} value={packageContent || "—"} />
-              {([['starts_on', i18n("startsOn6d888f7")], ['expires_on', i18n("expiresOn549cabe")]] as const).map(([key, label]) => (
+              {currentSubscription ? (
+                <EditableFinanceCard
+                  label={i18n("expiresOn549cabe")}
+                  value={
+                    <SubscriptionEndCell
+                      userId={userId}
+                      subscriptionId={valueText(currentSubscription.id)}
+                      endsOn={currentEnds}
+                      renews={currentPeriod?.renews === true}
+                      override={overrideFor(finance.details.overrides, "ends_on", valueText(currentSubscription.id))}
+                    />
+                  }
+                />
+              ) : null}
+              {(currentSubscription ? ([['starts_on', i18n("startsOn6d888f7")]] as const) : ([['starts_on', i18n("startsOn6d888f7")], ['expires_on', i18n("expiresOn549cabe")]] as const)).map(([key, label]) => (
                 <EditableFinanceCard key={key} label={label} changed={changed.has(key)}>
                   <DateInput aria-label={label} className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft[key]} disabled={form.saving} onValueChange={(value) => edit({ [key]: value })} data-testid={`membership-${key}`} />
                 </EditableFinanceCard>
@@ -798,6 +818,9 @@ export function AdminUserProfile({ userId }: { userId: string }) {
               <StatGrid items={overviewItems} />
             </Panel>
           ) : null}
+
+          {/* ADR-252: the client's documents, signatures and health certificate. */}
+          {isClient && tab === "overview" ? <MemberDocumentsPanel userId={userId} name={profile.identity.nickname} /> : null}
 
           {inTab("box_message") ? (
             <Panel id="box_message" title={i18n("bmTitle")}>

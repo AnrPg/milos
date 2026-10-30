@@ -720,3 +720,35 @@ msgstr "Участник бокса уходит"
 
 msgid "%{nickname} is leaving the box. Last day: %{date}."
 msgstr "%{nickname} уходит из бокса. Последний день: %{date}."
+
+msgid "Card payment failed"
+msgstr "Платёж картой не прошёл"
+
+msgid "%{amount} for %{what} was declined. We will try again automatically, or you can pay now with another card."
+msgstr "Платёж %{amount} за %{what} отклонён. Мы попробуем ещё раз автоматически, или вы можете оплатить сейчас другой картой."
+
+msgid "%{amount} for %{what} was declined and will not be tried again. Pay with another card to keep it."
+msgstr "Платёж %{amount} за %{what} отклонён и повторяться не будет. Оплатите другой картой, чтобы сохранить его."
+
+msgid "A card payment needs attention"
+msgstr "Платёж картой требует внимания"
+
+msgid "%{amount} for %{what} failed after every retry."
+msgstr "Платёж %{amount} за %{what} не прошёл после всех повторных попыток."
+msgid "A document to sign"
+msgstr "Документ на подпись"
+
+msgid "%{business} asks you to read and sign «%{title}»."
+msgstr "%{business} просит тебя прочитать и подписать «%{title}»."
+
+msgid "Your health certificate expires soon"
+msgstr "Срок твоей медицинской справки скоро истекает"
+
+msgid "Upload a new health certificate before %{date}."
+msgstr "Загрузи новую медицинскую справку до %{date}."
+
+msgid "A fiscal connection needs attention"
+msgstr "Фискальное подключение требует внимания"
+
+msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
+msgstr "%{connection} перестало работать. Откройте Платёжные реквизиты › Подключения, чтобы исправить."

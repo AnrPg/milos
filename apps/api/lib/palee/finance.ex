@@ -91,6 +91,16 @@ defmodule Palee.Finance do
   def package_quota_periods, do: Palee.Finance.Domain.PackageCatalog.quota_periods()
   def get_package_catalog(context), do: scoped(context, fn -> get_package_catalog() end)
   def get_package(context, id), do: scoped(context, fn -> get_package(id) end)
+
+  @doc """
+  ADR-271: switches «Πωλείται online» on for these packages, skipping any
+  whose owner already chose. Returns how many changed.
+  """
+  def open_packages_online(_context, []), do: 0
+
+  def open_packages_online(context, ids),
+    do: scoped(context, fn -> FinanceStore.open_packages_online(ids) end)
+
   defdelegate upsert_membership(user_id, params), to: UpsertMembership, as: :call
 
   def upsert_membership(context, user_id, params),
@@ -155,8 +165,21 @@ defmodule Palee.Finance do
   def reverse_credit_ledger_entry(context, membership_id, entry_id, params),
     do: scoped(context, fn -> reverse_credit_ledger_entry(membership_id, entry_id, params) end)
 
+  @doc """
+  ADR-254: takes back a manual credit grant (an import being undone) with a
+  negative reversal entry. Params: `amount_cents`, `request_id`, `reason`,
+  `created_by_id`.
+  """
+  def reverse_credit_grant(context, membership_id, entry_id, params),
+    do:
+      scoped(context, fn -> FinanceStore.reverse_credit_grant(membership_id, entry_id, params) end)
+
   defdelegate get_invoice(invoice_id), to: FinanceStore, as: :get_invoice
   def get_invoice(context, invoice_id), do: scoped(context, fn -> get_invoice(invoice_id) end)
+
+  @doc "ADR-262: an invoice's lines (description, amounts, package code, charge category)."
+  def invoice_lines(context, invoice_id),
+    do: scoped(context, fn -> FinanceStore.invoice_lines(invoice_id) end)
 
   defdelegate update_invoice_params(invoice_id, params),
     to: FinanceStore,
@@ -293,6 +316,10 @@ defmodule Palee.Finance do
   def list_expiring_memberships(context, days),
     do: scoped(context, fn -> list_expiring_memberships(days) end)
 
+  @doc "ADR-252: people whose subscription to `package_id` covers `date` (bulk document requests)."
+  def package_holder_user_ids(context, package_id, %Date{} = date),
+    do: scoped(context, fn -> FinanceStore.package_holder_user_ids(package_id, date) end)
+
   defdelegate operational_queues(params \\ %{}), to: OperationalQueues, as: :call
 
   def operational_queues(context, params),
@@ -371,6 +398,14 @@ defmodule Palee.Finance do
   def extend_current_subscription(context, membership_id, days),
     do: scoped(context, fn -> FinanceStore.extend_current_subscription(membership_id, days) end)
 
+  @doc """
+  ADR-254: cancels one subscription of `membership_id` (undoing an import
+  that assigned it) and refreshes the member's entitlement.
+  """
+  def cancel_subscription(context, membership_id, subscription_id),
+    do:
+      scoped(context, fn -> FinanceStore.cancel_subscription(membership_id, subscription_id) end)
+
   defdelegate create_referral_event(params), to: CreateReferralEvent, as: :call
 
   def create_referral_event(context, params),
@@ -439,6 +474,13 @@ defmodule Palee.Finance do
   def subscriptions_needing_expiry_notice(context, kind, days),
     do: scoped(context, fn -> FinanceStore.subscriptions_needing_expiry_notice(kind, days) end)
 
+  # ADR-248: withdrawal (14 days) from a package bought online.
+  def withdrawal_facts(context, payment_id),
+    do: scoped(context, fn -> FinanceStore.withdrawal_facts(payment_id) end)
+
+  def withdraw_subscription(context, subscription_id, %Date{} = today),
+    do: scoped(context, fn -> FinanceStore.withdraw_subscription(subscription_id, today) end)
+
   # ADR-220: renewal choice and leaving the box.
   def set_subscription_auto_renew(context, user_id, subscription_id, auto_renew, by),
     do:
@@ -461,6 +503,38 @@ defmodule Palee.Finance do
 
   def refresh_entitlement_snapshots(context),
     do: scoped(context, fn -> FinanceStore.refresh_entitlement_snapshots() end)
+
+  @doc "ADR-274: issues the charges every subscription owes on `today`."
+  defdelegate charge_due_subscriptions(today), to: FinanceStore
+
+  @doc "ADR-274: issues the charges one subscription owes today."
+  defdelegate charge_subscription_now(subscription_id), to: FinanceStore
+
+  def charge_due_subscriptions(context, today),
+    do: scoped(context, fn -> FinanceStore.charge_due_subscriptions(today) end)
+
+  @doc "ADR-274: staff set a worked-out value (`status`, `ends_on`) by hand."
+  defdelegate set_value_override(user_id, field, params), to: FinanceStore
+
+  def set_value_override(context, user_id, field, params),
+    do: scoped(context, fn -> FinanceStore.set_value_override(user_id, field, params) end)
+
+  @doc "ADR-274: puts a value set by hand back to automatic."
+  defdelegate reset_value_override(user_id, field, params), to: FinanceStore
+
+  def reset_value_override(context, user_id, field, params),
+    do: scoped(context, fn -> FinanceStore.reset_value_override(user_id, field, params) end)
+
+  @doc "ADR-274: the period a subscription is in on `today` (first and last day, renews?)."
+  defdelegate subscription_current_period(subscription, membership, today),
+    to: Palee.Finance.Domain.SubscriptionCharges,
+    as: :current_period
+
+  @doc "ADR-274: every value set by hand for a member, newest first."
+  defdelegate list_value_overrides(user_id), to: FinanceStore
+
+  def list_value_overrides(context, user_id),
+    do: scoped(context, fn -> FinanceStore.list_value_overrides(user_id) end)
 
   defdelegate total_outstanding_balance_cents(),
     to: FinanceStore,
@@ -704,6 +778,12 @@ defmodule Palee.Finance do
 
   @doc "The payment of a stream invoice; idempotent per `source_type` / `source_id`."
   def record_stream_payment(context, attrs), do: RevenueStreamStore.record_payment(context, attrs)
+
+  @doc """
+  ADR-264: an invoice and the payment that settles it at once (a walk-in's
+  sale, a card surcharge); idempotent per the payment's source.
+  """
+  def record_stream_sale(context, attrs), do: RevenueStreamStore.record_sale(context, attrs)
 
   @doc "A refund of a stream payment; the reversal keeps the payment's stream and source."
   def reverse_stream_payment(context, attrs),
