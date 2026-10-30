@@ -205,6 +205,12 @@ msgstr "Ο/Η %{reader} διάβασε τη σημείωσή σου για το�
 msgid "A machine needs attention"
 msgstr "Ένα μηχάνημα χρειάζεται προσοχή"
 
+msgid "A room was not fully cleaned"
+msgstr "Ένας χώρος δεν καθαρίστηκε πλήρως"
+
+msgid "%{space}: %{notes}"
+msgstr "%{space}: %{notes}"
+
 msgid "%{machine}: %{note}"
 msgstr "%{machine}: %{note}"
 

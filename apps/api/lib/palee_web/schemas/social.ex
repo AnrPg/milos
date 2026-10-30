@@ -121,9 +121,36 @@ defmodule PaleeWeb.Schemas.Social do
           type: :array,
           description: "The box's open clubs (ADR-143, board 7 Q6)",
           items: PaleeWeb.Schemas.CommunityGroups.open_club()
+        },
+        rooms: %Schema{
+          type: :array,
+          description: "ADR-290: rooms with the photos their staff put on the public page",
+          items: %Schema{
+            type: :object,
+            properties: %{
+              id: %Schema{type: :string, format: :uuid},
+              name: %Schema{type: :string},
+              description: %Schema{type: :string, nullable: true},
+              photos: %Schema{
+                type: :array,
+                items: %Schema{
+                  type: :object,
+                  properties: %{
+                    id: %Schema{type: :string, format: :uuid},
+                    url: %Schema{type: :string, nullable: true},
+                    width: %Schema{type: :integer, nullable: true},
+                    height: %Schema{type: :integer, nullable: true},
+                    caption: %Schema{type: :string, nullable: true}
+                  },
+                  required: [:id]
+                }
+              }
+            },
+            required: [:id, :name, :photos]
+          }
         }
       },
-      required: [:box, :profile, :followers_count, :locations, :open_clubs]
+      required: [:box, :profile, :followers_count, :locations, :open_clubs, :rooms]
     }
   end
 

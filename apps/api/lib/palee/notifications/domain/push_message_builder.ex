@@ -1184,6 +1184,18 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("cleaning_point_not_cleaned", payload, localize) do
+    %{
+      title: localize.("A room was not fully cleaned", %{}),
+      body:
+        localize.("%{space}: %{notes}", %{
+          space: payload["space_name"] || "",
+          notes: payload["notes"] || ""
+        }),
+      url: payload["url"] || "/admin/cleaning"
+    }
+  end
+
   def build("inventory_stock_low", %{"status" => "reported"} = payload, localize) do
     %{
       title: localize.("Reported running low", %{}),

@@ -6,7 +6,7 @@ defmodule Palee.Infrastructure.Spaces.EctoSpaceStore do
   import Ecto.Query
 
   alias Palee.Repo
-  alias Palee.Spaces.{FloorPlan, Space, Unavailability}
+  alias Palee.Spaces.{CleaningPoint, FloorPlan, Photo, Settings, Space, Unavailability}
 
   @space_fields [
     :id,
@@ -183,6 +183,117 @@ defmodule Palee.Infrastructure.Spaces.EctoSpaceStore do
     end
   end
 
+  # ── ADR-290 ─────────────────────────────────────────────────────────────
+
+  @impl true
+  def get_settings(%{organization_id: organization_id}) do
+    case Repo.get(Settings, organization_id) do
+      nil -> %{floor_plans_in_classes: false}
+      settings -> normalize_settings(settings)
+    end
+  end
+
+  @impl true
+  def put_settings(%{organization_id: organization_id}, attrs) do
+    (Repo.get(Settings, organization_id) || %Settings{organization_id: organization_id})
+    |> Settings.changeset(attrs)
+    |> Repo.insert_or_update()
+    |> result(&normalize_settings/1)
+  end
+
+  @impl true
+  def list_photos(%{organization_id: organization_id}, kind, filters) do
+    kind
+    |> schema()
+    |> where([p], p.organization_id == ^organization_id)
+    |> then(fn query ->
+      case filters[:space_ids] do
+        nil -> query
+        ids -> where(query, [p], p.space_id in ^Enum.flat_map(ids, &cast_ids/1))
+      end
+    end)
+    |> then(fn query ->
+      if filters[:public], do: where(query, [p], p.public == true), else: query
+    end)
+    |> order_by([p], asc: p.space_id, asc: p.sort_order, asc: p.inserted_at)
+    |> Repo.all()
+    |> Enum.map(&normalize_photo(kind, &1))
+  end
+
+  @impl true
+  def get_photo(%{organization_id: organization_id}, kind, id) do
+    case fetch_photo(organization_id, kind, id) do
+      nil -> nil
+      photo -> normalize_photo(kind, photo)
+    end
+  end
+
+  @impl true
+  def save_photo(%{organization_id: organization_id}, kind, nil, attrs) do
+    attrs
+    |> Map.put(:organization_id, organization_id)
+    |> schema(kind).create_changeset()
+    |> Repo.insert()
+    |> result(&normalize_photo(kind, &1))
+  end
+
+  def save_photo(%{organization_id: organization_id}, kind, id, attrs) do
+    case fetch_photo(organization_id, kind, id) do
+      nil ->
+        {:error, :not_found}
+
+      photo ->
+        photo
+        |> schema(kind).update_changeset(attrs)
+        |> Repo.update()
+        |> result(&normalize_photo(kind, &1))
+    end
+  end
+
+  @impl true
+  def delete_photo(%{organization_id: organization_id}, kind, id) do
+    case fetch_photo(organization_id, kind, id) do
+      nil -> {:error, :not_found}
+      photo -> photo |> Repo.delete() |> result(&normalize_photo(kind, &1))
+    end
+  end
+
+  @impl true
+  def order_photos(%{organization_id: organization_id}, kind, order) do
+    Repo.transaction(fn ->
+      Enum.each(order, fn {id, sort_order} ->
+        kind
+        |> schema()
+        |> where([p], p.organization_id == ^organization_id and p.id == ^id)
+        |> Repo.update_all(set: [sort_order: sort_order, updated_at: DateTime.utc_now()])
+      end)
+    end)
+
+    :ok
+  end
+
+  defp schema(:photos), do: Photo
+  defp schema(:points), do: CleaningPoint
+
+  defp fetch_photo(organization_id, kind, id) do
+    with {:ok, id} <- Ecto.UUID.cast(id) do
+      kind
+      |> schema()
+      |> where([p], p.organization_id == ^organization_id and p.id == ^id)
+      |> Repo.one()
+    else
+      _invalid -> nil
+    end
+  end
+
+  defp normalize_settings(settings), do: Map.take(settings, [:floor_plans_in_classes])
+
+  defp normalize_photo(:photos, photo),
+    do: Map.take(photo, [:id, :space_id, :media_id, :caption, :public, :sort_order])
+
+  defp normalize_photo(:points, point),
+    do: Map.take(point, [:id, :space_id, :media_id, :instruction, :sort_order])
+
   defp cast_ids(id) do
     case Ecto.UUID.cast(id) do
       {:ok, id} -> [id]
@@ -193,7 +304,7 @@ defmodule Palee.Infrastructure.Spaces.EctoSpaceStore do
   defp normalize_space(space), do: Map.take(space, @space_fields)
 
   defp normalize_plan(plan),
-    do: Map.take(plan, [:id, :location_id, :name, :media_id, :sort_order])
+    do: Map.take(plan, [:id, :location_id, :name, :media_id, :sort_order, :shown_in_classes])
 
   defp normalize_window(window),
     do: Map.take(window, [:id, :space_id, :starts_at, :ends_at, :reason, :created_by_id])

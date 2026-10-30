@@ -59,6 +59,37 @@ defmodule Palee.Media.Domain.MediaPolicy do
       types: @client_image_types,
       max_bytes: 8 * @mb
     },
+    # ADR-290: photos of a room (to get an idea of it), of the points of its
+    # visual cleaning checklist and of a janitor's "after", and of a line of
+    # a machine's log. Private like floor plans; the public box page shows
+    # the room photos its staff chose, through signed URLs.
+    "space_photo" => %{
+      scope: :tenant,
+      bucket: :media_private,
+      folder: "media/spaces",
+      kind: "image",
+      processing: :inspect,
+      types: @client_image_types,
+      max_bytes: 8 * @mb
+    },
+    "cleaning_photo" => %{
+      scope: :tenant,
+      bucket: :media_private,
+      folder: "media/cleaning",
+      kind: "image",
+      processing: :inspect,
+      types: @client_image_types,
+      max_bytes: 8 * @mb
+    },
+    "machine_photo" => %{
+      scope: :tenant,
+      bucket: :media_private,
+      folder: "media/machines",
+      kind: "image",
+      processing: :inspect,
+      types: @client_image_types,
+      max_bytes: 8 * @mb
+    },
     # ADR-158: body photos go through the post pipeline (server-stripped
     # renditions) but never into a post; private bucket, signed URLs only.
     "body_photo" => %{

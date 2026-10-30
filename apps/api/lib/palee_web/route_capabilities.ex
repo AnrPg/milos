@@ -525,6 +525,30 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.SpacesController, :create_floor_plan} => [:manage_spaces],
     {W.SpacesController, :update_floor_plan} => [:manage_spaces],
     {W.SpacesController, :delete_floor_plan} => [:manage_spaces],
+    # ADR-290: owners, admins and front desk manage room photos and cleaning
+    # points; a janitor also uploads the "after" photo of a point.
+    {W.SpacesController, :settings} => [:manage_spaces],
+    {W.SpacesController, :put_settings} => [:manage_spaces],
+    {W.SpacesController, :space_photo_upload} => [:manage_spaces, :edit_space_details],
+    {W.SpacesController, :complete_space_photo_upload} => [:manage_spaces, :edit_space_details],
+    {W.SpacesController, :cleaning_photo_upload} => [
+      :manage_spaces,
+      :edit_space_details,
+      :record_cleaning
+    ],
+    {W.SpacesController, :complete_cleaning_photo_upload} => [
+      :manage_spaces,
+      :edit_space_details,
+      :record_cleaning
+    ],
+    {W.SpacesController, :add_photo} => [:manage_spaces, :edit_space_details],
+    {W.SpacesController, :update_photo} => [:manage_spaces, :edit_space_details],
+    {W.SpacesController, :delete_photo} => [:manage_spaces, :edit_space_details],
+    {W.SpacesController, :order_photos} => [:manage_spaces, :edit_space_details],
+    {W.SpacesController, :add_point} => [:manage_spaces, :edit_space_details],
+    {W.SpacesController, :update_point} => [:manage_spaces, :edit_space_details],
+    {W.SpacesController, :delete_point} => [:manage_spaces, :edit_space_details],
+    {W.SpacesController, :order_points} => [:manage_spaces, :edit_space_details],
 
     # Invitations
     {W.OrganizationAccessController, :issue} => [:invite_clients],
@@ -538,6 +562,11 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.InventoryController, :machines} => [:manage_inventory, :report_inventory],
     {W.InventoryController, :machine_events} => [:manage_inventory, :report_inventory],
     {W.InventoryController, :log_machine_event} => [:manage_inventory, :report_inventory],
+    {W.InventoryController, :machine_photo_upload} => [:manage_inventory, :report_inventory],
+    {W.InventoryController, :complete_machine_photo_upload} => [
+      :manage_inventory,
+      :report_inventory
+    ],
     {W.InventoryController, :supplies} => [:manage_inventory, :report_inventory],
     {W.InventoryController, :report_low} => [:manage_inventory, :report_inventory],
     {W.InventoryController, :supply_reports} => [:manage_inventory, :report_inventory],

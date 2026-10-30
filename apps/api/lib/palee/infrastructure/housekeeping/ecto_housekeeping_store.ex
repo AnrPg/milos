@@ -110,7 +110,17 @@ defmodule Palee.Infrastructure.Housekeeping.EctoHousekeepingStore do
   defp until(query, %DateTime{} = to), do: where(query, [e], e.started_at < ^to)
 
   defp normalize_entry(entry),
-    do: Map.take(entry, [:id, :area_id, :user_id, :started_at, :finished_at, :tasks_done, :note])
+    do:
+      Map.take(entry, [
+        :id,
+        :area_id,
+        :user_id,
+        :started_at,
+        :finished_at,
+        :tasks_done,
+        :note,
+        :point_results
+      ])
 
   defp normalize_schedule(schedule),
     do: Map.take(schedule, [:id, :space_id, :weekdays, :times, :comment])

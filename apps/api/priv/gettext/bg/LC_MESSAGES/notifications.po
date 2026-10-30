@@ -205,6 +205,12 @@ msgstr "%{reader} прочете бележката ви за %{client} в %{tim
 msgid "A machine needs attention"
 msgstr "Уред се нуждае от внимание"
 
+msgid "A room was not fully cleaned"
+msgstr "Помещение не е почистено изцяло"
+
+msgid "%{space}: %{notes}"
+msgstr "%{space}: %{notes}"
+
 msgid "%{machine}: %{note}"
 msgstr "%{machine}: %{note}"
 

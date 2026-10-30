@@ -79,7 +79,18 @@ defmodule PaleeWeb.FallbackController do
       {:unprocessable_entity, "Choose at least one day, and times as HH:MM"},
     invalid_placement: {:unprocessable_entity, "Choose a space and a quantity"},
     placement_exceeds_quantity:
-      {:unprocessable_entity, "More are placed than the gym owns of this machine"}
+      {:unprocessable_entity, "More are placed than the gym owns of this machine"},
+    # ADR-290: room photos, cleaning points, machine pins and photos.
+    space_photos_full: {:unprocessable_entity, "A room holds at most 30 photos of each kind"},
+    invalid_point_results:
+      {:unprocessable_entity, "Answer each cleaning point once: cleaned or not cleaned"},
+    cleaning_point_unanswered:
+      {:unprocessable_entity, "Answer every cleaning point before finishing"},
+    cleaning_point_note_required: {:unprocessable_entity, "Say why a point was not cleaned"},
+    invalid_machine_position:
+      {:unprocessable_entity, "Place each pin inside the floor plan, one per item at most"},
+    space_not_on_plan: {:unprocessable_entity, "Draw that space on a floor plan first"},
+    too_many_machine_photos: {:unprocessable_entity, "Add at most 10 photos"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@space_errors, reason) do

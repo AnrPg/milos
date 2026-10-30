@@ -11,6 +11,7 @@ defmodule Palee.Application.ClassSpace do
     flags them (`space_overlap`) so staff see it.
   """
 
+  alias Palee.Application.ClassRoom
   alias Palee.{Scheduling, Spaces}
   alias Palee.Scheduling.Domain.{RecurrenceRule, SeriesEdit}
 
@@ -183,7 +184,7 @@ defmodule Palee.Application.ClassSpace do
   end
 
   @doc """
-  Puts `space` (`%{id, name}` or nil) on each class and, for staff
+  Puts `space` (`%{id, name, viewable}` or nil) on each class and, for staff
   (`staff?`), `space_overlap` (another class shares the space at the same
   time) and `space_unavailable` (the space is unavailable at that time).
   """
@@ -197,10 +198,15 @@ defmodule Palee.Application.ClassSpace do
         slot |> Map.put(:space, nil) |> staff_flags(staff?, MapSet.new(), [])
       end)
     else
+      listed = Spaces.list_spaces(context, %{ids: ids, include_archived: true})
+      # ADR-290: whether «📍 room» in the class details has more to show.
+      viewable = ClassRoom.viewable_ids(context, listed)
+
       spaces =
-        context
-        |> Spaces.list_spaces(%{ids: ids, include_archived: true})
-        |> Map.new(&{&1.id, %{id: &1.id, name: &1.name}})
+        Map.new(listed, fn space ->
+          {space.id,
+           %{id: space.id, name: space.name, viewable: MapSet.member?(viewable, space.id)}}
+        end)
 
       {overlaps, windows} =
         if staff? do

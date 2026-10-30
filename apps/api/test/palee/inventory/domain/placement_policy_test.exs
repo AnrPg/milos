@@ -15,7 +15,11 @@ defmodule Palee.Inventory.Domain.PlacementPolicyTest do
                6
              )
 
-    assert placed == [%{space_id: "cardio", quantity: 5}, %{space_id: "rehab", quantity: 1}]
+    assert placed == [
+             %{space_id: "cardio", quantity: 5, positions: []},
+             %{space_id: "rehab", quantity: 1, positions: []}
+           ]
+
     assert PlacementPolicy.unassigned(6, placed) == 0
     assert PlacementPolicy.unassigned(8, placed) == 2
   end
@@ -39,6 +43,28 @@ defmodule Palee.Inventory.Domain.PlacementPolicyTest do
 
     assert PlacementPolicy.normalize([%{quantity: 1}], 6) == {:error, :invalid_placement}
     assert PlacementPolicy.normalize(:nope, 6) == {:error, :invalid_placement}
+  end
+
+  test "ADR-290: items pinned on the floor plan, at most one pin per item there" do
+    assert {:ok, [%{space_id: "cardio", quantity: 2, positions: [[0.1235, 0.5], [0.3, 1.0]]}]} =
+             PlacementPolicy.normalize(
+               [
+                 %{space_id: "cardio", quantity: 1, positions: [[0.123456, 0.5]]},
+                 %{"space_id" => "cardio", "quantity" => 1, "positions" => [[0.3, 1]]}
+               ],
+               2
+             )
+
+    assert PlacementPolicy.normalize(
+             [%{space_id: "a", quantity: 1, positions: [[0.1, 0.1], [0.2, 0.2]]}],
+             3
+           ) == {:error, :invalid_machine_position}
+
+    assert PlacementPolicy.normalize([%{space_id: "a", quantity: 1, positions: [[1.5, 0]]}], 1) ==
+             {:error, :invalid_machine_position}
+
+    assert PlacementPolicy.normalize([%{space_id: "a", quantity: 1, positions: "x"}], 1) ==
+             {:error, :invalid_machine_position}
   end
 
   test "a machine cannot own fewer than are placed" do

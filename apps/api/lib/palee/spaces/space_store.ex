@@ -38,4 +38,21 @@ defmodule Palee.Spaces.SpaceStore do
   @impl true
   def delete_unavailability(context, space_id, id),
     do: tenant_call(context, :delete_unavailability, [space_id, id])
+
+  @impl true
+  def get_settings(context), do: tenant_call(context, :get_settings, [])
+  @impl true
+  def put_settings(context, attrs), do: tenant_call(context, :put_settings, [attrs])
+  @impl true
+  def list_photos(context, kind, filters), do: tenant_call(context, :list_photos, [kind, filters])
+  @impl true
+  def get_photo(context, kind, id), do: tenant_call(context, :get_photo, [kind, id])
+  @impl true
+  def save_photo(context, kind, id, attrs),
+    do: tenant_call(context, :save_photo, [kind, id, attrs])
+
+  @impl true
+  def delete_photo(context, kind, id), do: tenant_call(context, :delete_photo, [kind, id])
+  @impl true
+  def order_photos(context, kind, order), do: tenant_call(context, :order_photos, [kind, order])
 end

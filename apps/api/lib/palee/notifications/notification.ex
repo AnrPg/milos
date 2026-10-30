@@ -37,6 +37,7 @@ defmodule Palee.Notifications.Notification do
     :class_cancelled,
     :coach_client_assigned,
     :inventory_repair_needed,
+    :cleaning_point_not_cleaned,
     :inventory_stock_low,
     :inventory_digest,
     :shop_stock_low,

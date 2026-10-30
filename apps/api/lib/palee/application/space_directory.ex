@@ -15,7 +15,7 @@ defmodule Palee.Application.SpaceDirectory do
   branches; a space without a branch belongs to the whole gym.
   """
 
-  alias Palee.Application.{ClassLocation, MediaUrls}
+  alias Palee.Application.{ClassLocation, MediaUrls, SpacePhotos}
   alias Palee.{Inventory, Media, Organizations, Scheduling, Spaces}
 
   @classes_ahead_days 60
@@ -39,18 +39,26 @@ defmodule Palee.Application.SpaceDirectory do
 
     %{
       spaces: Enum.map(spaces, &Map.put(&1, :unavailability, Map.get(by_space, &1.id, []))),
-      floor_plans: plans
+      floor_plans: plans,
+      settings: Spaces.get_settings(context)
     }
   end
 
-  @doc "One space with its windows, upcoming classes and machines."
+  @doc "ADR-290: the gym's choices about its spaces (`floor_plans_in_classes`)."
+  def settings(context), do: Spaces.get_settings(context)
+
+  def put_settings(context, params),
+    do: Spaces.put_settings(context, Map.take(params, [:floor_plans_in_classes]))
+
+  @doc "One space with its windows, upcoming classes, machines, photos and cleaning points."
   def show(context, id, now \\ DateTime.utc_now()) do
     with {:ok, space} <- fetch(context, id) do
       {:ok,
        space
        |> Map.put(:unavailability, Spaces.list_unavailabilities(context, [space.id], now))
        |> Map.put(:classes, upcoming_classes(context, space.id, now))
-       |> Map.put(:equipment, equipment(context, space.id))}
+       |> Map.put(:equipment, equipment(context, space.id))
+       |> Map.merge(SpacePhotos.for_space(context, space.id))}
     end
   end
 
@@ -182,9 +190,10 @@ defmodule Palee.Application.SpaceDirectory do
     end
   end
 
-  defp present_plans([], _context), do: []
+  @doc "Floor plans with the URL and size of their image."
+  def present_plans([], _context), do: []
 
-  defp present_plans(plans, context) do
+  def present_plans(plans, context) do
     media =
       context
       |> Media.list(:tenant, plans |> Enum.map(& &1.media_id) |> Enum.uniq())

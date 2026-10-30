@@ -88,6 +88,18 @@ defmodule Palee.Application.RequestMediaUpload do
       else: {:error, :forbidden}
   end
 
+  # ADR-290: room photos and cleaning points, by whoever edits the spaces
+  # (owner, admin, front desk); a janitor's "after" photo while cleaning;
+  # a photo on a machine's log line, by whoever may write in that log.
+  defp authorize(context, "space_photo"),
+    do: any_right(context, [:manage_spaces, :edit_space_details])
+
+  defp authorize(context, "cleaning_photo"),
+    do: any_right(context, [:manage_spaces, :edit_space_details, :record_cleaning])
+
+  defp authorize(context, "machine_photo"),
+    do: any_right(context, [:manage_inventory, :report_inventory])
+
   defp authorize(%{user_id: user_id}, purpose)
        when purpose in ["post_photo", "post_video"] and is_binary(user_id),
        do: :ok
@@ -96,5 +108,11 @@ defmodule Palee.Application.RequestMediaUpload do
     if purpose in Media.purposes(),
       do: {:error, :forbidden},
       else: {:error, :invalid_media_purpose}
+  end
+
+  defp any_right(context, capabilities) do
+    if Enum.any?(capabilities, &Organizations.can?(context, &1)),
+      do: :ok,
+      else: {:error, :forbidden}
   end
 end
