@@ -1113,8 +1113,8 @@
     "prZoneRounds9799ad4": "Rondas na zona de PR",
     "maxRoundsc005103": "Máximo de rondas",
     "intraSetRest46c5759": "Descanso intra-série",
-    "hrCeilingStopWork3e9d698": "Teto de RH (parar o trabalho)",
-    "hrFloorResumeWork82d77a0": "Piso de RH (retomar trabalho)",
+    "hrCeilingStopWork3e9d698": "Limite superior de FC (parar)",
+    "hrFloorResumeWork82d77a0": "Limite inferior de FC (retomar)",
     "effortCapf1d0911": "Limite de esforço",
     "minReps96a7464": "Repetições mínimas",
     "addExerciseToSelectedSection23b8456": "Adicionar exercício à seção selecionada",
@@ -1975,12 +1975,12 @@
     "instructionEdt": "EDT {duration} · acumule o máximo de repetições, reduza conforme necessário",
     "instructionDeathByWithMax": "EMOM · +N/rodada por exercício até a falha · máx. {rounds} rodadas",
     "instructionDeathBy": "EMOM · +N/rodada por exercício até a falha",
-    "instructionTabata": "Tabata · {work} ligado / {rest} desligado × {rounds} rodadas",
-    "instructionCustomHiit": "{work} ligado / {rest} desligado × {rounds} rodadas",
+    "instructionTabata": "Tabata · {work} de trabalho / {rest} de descanso × {rounds} rondas",
+    "instructionCustomHiit": "{work} de trabalho / {rest} de descanso × {rounds} rondas",
     "instructionClusterWithRest": "Conjuntos de cluster · {rest} descanso intraconjunto",
     "instructionCluster": "Séries cluster",
-    "instructionHrrWithCycles": "Trabalhar → descansar até {floor}bpm · retomar em {ceiling}bpm · {cycles} ciclos",
-    "instructionHrr": "Trabalhar → descansar em {floor}bpm · retomar em {ceiling}bpm",
+    "instructionHrrWithCycles": "Trabalho → descanso até {floor} bpm · retomar a {ceiling} bpm · {cycles} ciclos",
+    "instructionHrr": "Trabalho → descanso até {floor} bpm · retomar a {ceiling} bpm",
     "instructionLadderAscendingWithCap": "Escada ↑ · limite {cap}",
     "instructionLadderAscending": "Escada ↑",
     "instructionLadderDescendingWithCap": "Escada ↓ (para tempo) · limite {cap}",
@@ -14470,5 +14470,13 @@
     "leaveStay": "Ficar aqui",
     "leaveDiscard": "Descartar",
     "changed": "Alterado"
+  },
+  "TimerNow": {
+    "now": "Agora",
+    "eachRound": "Cada ronda",
+    "section": "Esta parte",
+    "workout": "O WOD",
+    "upNext": "A seguir",
+    "every": "A cada {time}"
   }
 }

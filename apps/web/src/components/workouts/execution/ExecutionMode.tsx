@@ -30,6 +30,7 @@ import {
 import { subscribeToTopic } from "@/lib/realtime";
 import { segmentLabel } from "@/lib/segment-label";
 import { planCatchUp, segmentLimitMs } from "@/lib/timer-engine";
+import { timerNow } from "@/lib/timer-now";
 import {
   CUE_MODES,
   type CueMode,
@@ -1160,6 +1161,7 @@ export function ExecutionMode() {
           nextText={nextUpText}
           finalSeconds={isTimerRunning && clockSeconds.countsDown && clockSeconds.seconds > 0 && clockSeconds.seconds <= 3}
           paused={status === "paused"}
+          now={timerNow({ workout: null }, { segment: currentSegment, clock: timer.clock ?? null })}
           onExit={exitCastMode}
         />
       ) : null}

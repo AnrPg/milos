@@ -46,6 +46,13 @@ defmodule PaleeWeb.ClassTimerControllerTest do
     assert length(payload["segments"]) == 3
     assert payload["class"]["name"]
     assert payload["server_now"]
+
+    # Every screen shows what is done now from the body: segments point at its sections.
+    assert %{"kind" => "structured", "sections" => [%{"id" => section_id} = section]} =
+             payload["workout"]["body"]
+
+    assert [%{"name" => "Burpee"}] = section["exercises"]
+    assert Enum.all?(payload["segments"], &(&1["section_id"] == section_id))
   end
 
   test "coaches drive the timer; stale versions and members are refused", %{

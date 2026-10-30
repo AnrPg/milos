@@ -13,7 +13,8 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { type CueMode, primeCueAudio, readCueMode, storeCueMode } from "@/lib/timer-cues";
 
-import { ClassTimerFace, phaseOf, SegmentExercises } from "./ClassTimerFace";
+import { ClassTimerFace, phaseOf } from "./ClassTimerFace";
+import { TimerNowPanel, useTimerNow } from "./TimerNowPanel";
 
 /**
  * The gym's wall display (and members' "follow the class" view): a giant
@@ -30,6 +31,8 @@ export function ClassTimerDisplay({ slotId }: { slotId: string }) {
   const [cueMode, setCueMode] = useState<CueMode>(() => readCueMode());
   const [soundReady, setSoundReady] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+
+  const now = useTimerNow(timer.payload ?? null, timer.position);
 
   useScreenWakeLock(Boolean(timer.payload));
   useClassTimerCues(soundReady ? timer.position : null, cueMode);
@@ -66,7 +69,6 @@ export function ClassTimerDisplay({ slotId }: { slotId: string }) {
   const { payload, position } = timer;
   const phase = phaseOf(position);
   const tint = position?.status === "running" ? PHASE_COLORS[phase] : "var(--muted)";
-  const body = payload.workout?.free_text_body?.trim();
 
   return (
     <div
@@ -110,17 +112,17 @@ export function ClassTimerDisplay({ slotId }: { slotId: string }) {
         </div>
       </header>
 
-      <main className="grid min-h-0 flex-1 grid-cols-1 items-center gap-[3vmin] px-[3vmin] pb-[3vmin] landscape:grid-cols-[minmax(0,1fr)_auto]">
+      <main
+        className={`grid min-h-0 flex-1 grid-cols-1 gap-[3vmin] px-[3vmin] pb-[3vmin] ${
+          now
+            ? "grid-rows-[minmax(0,1fr)_auto] landscape:grid-cols-[minmax(0,1fr)_minmax(0,40vw)] landscape:grid-rows-[minmax(0,1fr)]"
+            : "grid-rows-[minmax(0,1fr)]"
+        }`}
+      >
         <ClassTimerFace payload={payload} position={position} size="wall" />
-        {body || (position?.segment?.exercises?.length ?? 0) > 0 ? (
-          <aside className="hidden max-w-[34vw] self-stretch overflow-hidden rounded-[2vmin] p-[2.5vmin] landscape:block" style={{ background: "color-mix(in srgb, var(--panel) 80%, transparent)" }}>
-            {body ? (
-              <pre className="whitespace-pre-wrap font-sans font-semibold leading-snug" style={{ fontSize: "clamp(0.9rem, 2.8vmin, 2.25rem)" }}>
-                {body}
-              </pre>
-            ) : (
-              <SegmentExercises position={position} />
-            )}
+        {now ? (
+          <aside className="max-h-[45vh] min-h-0 overflow-hidden rounded-[2vmin] p-[2.5vmin] landscape:max-h-full landscape:self-center" style={{ background: "color-mix(in srgb, var(--panel) 80%, transparent)" }}>
+            <TimerNowPanel now={now} size="wall" />
           </aside>
         ) : null}
       </main>
