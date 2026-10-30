@@ -70,9 +70,11 @@ export async function archiveMachine(token: string, id: string) {
   return response.machine;
 }
 
+export type MachinePlace = MachineEventsResponse["places"][number];
+
+/** The machine's log and, ADR-290, where its items stand on the floor plans. */
 export async function fetchMachineEvents(token: string, id: string) {
-  const response = await apiRequest<MachineEventsResponse>(`/staff/inventory/machines/${id}/events`, { token });
-  return response.events;
+  return apiRequest<MachineEventsResponse>(`/staff/inventory/machines/${id}/events`, { token });
 }
 
 export async function logMachineEvent(token: string, id: string, body: MachineEventInput) {

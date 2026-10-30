@@ -506,6 +506,8 @@ function NotificationCard({
         });
       case "inventory_repair_needed":
         return [text("machine_name"), text("body")].filter(Boolean).join(" · ");
+      case "cleaning_point_not_cleaned":
+        return [text("space_name"), text("notes")].filter(Boolean).join(" · ");
       case "inventory_stock_low":
         return text("status") === "reported"
           ? [text("supply_name"), text("place"), text("note")].filter(Boolean).join(" · ")
@@ -635,6 +637,8 @@ function NotificationCard({
         return i18n("ntfCoachNoteViewedTitle");
       case "inventory_repair_needed":
         return i18n("ntfRepairNeededTitle");
+      case "cleaning_point_not_cleaned":
+        return i18n("ntfCleaningPointNotCleanedTitle");
       case "inventory_stock_low":
         return i18n("ntfStockLowTitle");
       case "inventory_digest":

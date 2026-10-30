@@ -260,5 +260,6 @@ must have an ADR. See `template.md` for the format.
 | ADR-275 | Workout types: one fixed list grouped in families (martial arts and dance included), the gym chooses which its editors offer; stats, badges and colours read the family | Accepted |
 | ADR-276 | Unsaved edits on staff forms: draft with undo/redo, save bar, ask before leaving a tab | Accepted |
 | ADR-277 | The server makes and keeps the Web Push keys (encrypted); the platform console shows status, contact and «new keys» only | Accepted |
+| ADR-290 | Floor plans grow: the room of a class coloured on the plan from the class details (gym switch, per-floor when >1 floor), room photos (each off the public page until 🌐), a visual cleaning checklist answered point by point (note required when not cleaned, front desk told), up to 10 photos per machine log line, machine pins on the plan under the log | Accepted |
 | ADR-300 | Operation registry: one spec per use case generates REST, MCP and LLM tools; previewable commands, problem details, idempotency keys, ETags (v4) | Proposed |
 | ADR-301 | AI agents as delegated principals: rights intersected on every call, durable runs, Rule-of-Two policy, approvals, one LLM provider port, multi-agent via delegation (v4) | Proposed |

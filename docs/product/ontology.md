@@ -205,6 +205,8 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 | Branch manager | Υπεύθυνος παραρτήματος | role preset | Admin rights limited to chosen branches. | Owner. |
 | Space | Χώρος | `spaces` | A room or area of a branch (or of the whole box): where classes take place, what the cleaning staff clean, where the equipment stands. Can be made unavailable for a time. (ADR-202) | Branch («Παράρτημα», never «Χώρος»); Club and community spaces (§4.4). Was "cleaning area". |
 | Floor plan | Κάτοψη | `space_floor_plans` | An image of one floor of a branch, with the spaces drawn on it. A branch can have several. (ADR-202) | Map (Around). |
+| Room photos | Φωτογραφίες χώρου | `space_photos` | Photos of a space to get an idea of it; each one is on the public box page only when its uploader turns it on (🌐). (ADR-290) | Cleaning points. |
+| Cleaning point | Σημείο καθαριότητας | `space_cleaning_points` | A photo of a part of a space and what to clean there. The cleaning staff answer each one «Καθαρό» / «Δεν καθαρίστηκε» (with a note). (ADR-290) | Room photos; cleaning tasks (the text checklist). |
 | Plan (Palee) | Πακέτο Palee | `platform_plans` | What a business pays Palee. | Subscription package (what clients pay the business). |
 | Subscription package | Πακέτο συνδρομής | `membership_packages`, `package_type` | What a client buys or is given by a box: recurring membership, visit pack, trial, season, corporate. Always the full name, never a bare "package" / «πακέτο». Trial type: "Trial" / «Δοκιμαστικό» (never «Δίκη»). | Plan (Palee), personal training package. |
 

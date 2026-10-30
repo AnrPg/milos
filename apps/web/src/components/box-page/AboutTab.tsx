@@ -8,6 +8,7 @@ import { useLocale, useTranslations } from "next-intl";
 import type { PublicBoxPage } from "@/api/social";
 import { languageNames } from "@/components/admin/public-page/languages";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
+import { RoomPhotoStrip } from "@/components/spaces/RoomPhotoStrip";
 
 import { Icon } from "./Icon";
 
@@ -174,6 +175,21 @@ export function AboutTab({ page, onOpenPhoto }: { page: PublicBoxPage; onOpenPho
                   </span>
                   <span aria-hidden="true" style={{ color: "var(--dim)" }}>›</span>
                 </Link>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      ) : null}
+
+      {(page.rooms ?? []).length > 0 ? (
+        // ADR-290: the room photos their uploader chose to show here.
+        <Section title={t("rooms")}>
+          <ul className="flex flex-col gap-4" data-testid="box-rooms">
+            {page.rooms.map((room) => (
+              <li key={room.id} className="flex flex-col gap-2">
+                <span className="font-bold" style={{ color: "var(--text)" }}>{room.name}</span>
+                {room.description ? <span className="text-sm" style={{ color: "var(--text-soft)" }}>{room.description}</span> : null}
+                <RoomPhotoStrip photos={room.photos} />
               </li>
             ))}
           </ul>

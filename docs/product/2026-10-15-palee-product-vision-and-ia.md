@@ -257,6 +257,8 @@ Why swipe works for people and not for clubs: swipe makes sense when **both side
 
 *Decision (ADR-226, 2026-10-28):* a class without automatic confirmation shows members «Απαιτεί έγκριση · απάντηση μέσα σε …» (or «έως την έναρξη» when the box set no limit). It never shows a booking deadline: bookings stay open until the class starts. Late cancellation is set in hours and minutes.
 
+*Decision (ADR-290, 2026-10-30):* the class details (opened by tapping a class, never the schedule cards) show «📍 Χώρος · Δες στην κάτοψη» when the box turned on «Εμφάνιση κάτοψης στα τμήματα» (Ρυθμίσεις › Χώροι; per floor when a branch has more than one). It opens a sheet with the floor plan, the room coloured, how to get there and the room's photos. Room photos are off the public box page until whoever uploaded them taps the floating 🌐.
+
 ### 7.5 Check-in with QR (fewest taps) [PARTIAL]
 | Method | Taps | Web? | Notes |
 |---|---|---|---|
