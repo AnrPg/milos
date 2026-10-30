@@ -14467,5 +14467,13 @@
     "leaveStay": "Hier blijven",
     "leaveDiscard": "Weggooien",
     "changed": "Gewijzigd"
+  },
+  "TimerNow": {
+    "now": "Nu",
+    "eachRound": "Elke ronde",
+    "section": "Dit onderdeel",
+    "workout": "De WOD",
+    "upNext": "Hierna",
+    "every": "Elke {time}"
   }
 }

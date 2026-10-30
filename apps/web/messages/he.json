@@ -14467,5 +14467,13 @@
     "leaveStay": "להישאר כאן",
     "leaveDiscard": "מחיקת השינויים",
     "changed": "שונה"
+  },
+  "TimerNow": {
+    "now": "עכשיו",
+    "eachRound": "בכל סבב",
+    "section": "החלק הזה",
+    "workout": "ה-WOD",
+    "upNext": "הבא",
+    "every": "כל {time}"
   }
 }

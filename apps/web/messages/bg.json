@@ -14467,5 +14467,13 @@
     "leaveStay": "Оставам тук",
     "leaveDiscard": "Отхвърляне",
     "changed": "Променено"
+  },
+  "TimerNow": {
+    "now": "Сега",
+    "eachRound": "Всеки кръг",
+    "section": "Тази част",
+    "workout": "WOD",
+    "upNext": "Следва",
+    "every": "На всеки {time}"
   }
 }

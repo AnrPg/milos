@@ -14467,5 +14467,13 @@
     "leaveStay": "Rester ici",
     "leaveDiscard": "Abandonner",
     "changed": "Modifié"
+  },
+  "TimerNow": {
+    "now": "Maintenant",
+    "eachRound": "Chaque tour",
+    "section": "Cette partie",
+    "workout": "Le WOD",
+    "upNext": "Ensuite",
+    "every": "Toutes les {time}"
   }
 }

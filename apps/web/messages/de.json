@@ -14467,5 +14467,13 @@
     "leaveStay": "Hierbleiben",
     "leaveDiscard": "Verwerfen",
     "changed": "Geändert"
+  },
+  "TimerNow": {
+    "now": "Jetzt",
+    "eachRound": "Jede Runde",
+    "section": "Dieser Teil",
+    "workout": "Das WOD",
+    "upNext": "Gleich",
+    "every": "Alle {time}"
   }
 }

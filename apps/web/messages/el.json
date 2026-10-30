@@ -14467,5 +14467,13 @@
     "leaveStay": "Μένω εδώ",
     "leaveDiscard": "Απόρριψη",
     "changed": "Αλλαγμένο"
+  },
+  "TimerNow": {
+    "now": "Τώρα",
+    "eachRound": "Κάθε γύρο",
+    "section": "Αυτή η ενότητα",
+    "workout": "Το WOD",
+    "upNext": "Ετοιμάσου για",
+    "every": "Κάθε {time}"
   }
 }

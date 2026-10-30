@@ -1,5 +1,6 @@
 import { apiRequest } from "@/api/client";
 import type { TimerSegment } from "@/api/executions";
+import type { WorkoutBody } from "@/api/workouts";
 import type { FreeTextTimerPreset } from "@/lib/free-text-timer";
 
 export type ClassTimerStatus = "ready" | "running" | "paused" | "finished";
@@ -18,7 +19,14 @@ export type ClassTimerState = {
 
 export type ClassTimerPayload = {
   class: { id: string; name: string; scheduled_at: string; duration_minutes: number };
-  workout: { id: string; title: string; authoring_mode?: string | null; free_text_body?: string | null } | null;
+  workout: {
+    id: string;
+    title: string;
+    authoring_mode?: string | null;
+    free_text_body?: string | null;
+    /** ADR-224: the WOD as written; each segment's `section_id` points at one of its sections. */
+    body?: WorkoutBody | null;
+  } | null;
   segments: TimerSegment[];
   timer: ClassTimerState;
   server_now: string;

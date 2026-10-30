@@ -19,6 +19,7 @@ import { getFormatLabels } from "@/types/workout";
 
 import { ClassScreenPin } from "./ClassScreenPin";
 import { ClassTimerFace } from "./ClassTimerFace";
+import { TimerNowPanel, useTimerNow } from "./TimerNowPanel";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 const COUNTDOWN_CHOICES = [0, 5, 10, 15];
@@ -37,6 +38,7 @@ export function ClassTimerControl({ slotId }: { slotId: string }) {
 
   useScreenWakeLock(timer.position?.status === "running");
   useClassTimerCues(timer.position, cueMode);
+  const now = useTimerNow(timer.payload ?? null, timer.position);
 
   const displayHref = adminHref(`/class-timer/${slotId}/display`, organizationSlug);
 
@@ -124,6 +126,9 @@ export function ClassTimerControl({ slotId }: { slotId: string }) {
 
         <section className="rounded-3xl border p-5" style={{ borderColor: "var(--border)", background: "var(--panel)" }}>
           <ClassTimerFace payload={payload} position={position} size="panel" />
+          {now ? (
+            <TimerNowPanel now={now} size="panel" style={{ marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid var(--border)" }} />
+          ) : null}
         </section>
 
         {problemText && timer.problem !== "conflict" ? <ErrorNotice>{problemText}</ErrorNotice> : null}
