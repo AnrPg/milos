@@ -790,3 +790,12 @@ msgstr "Jemand, für den du gebürgt hast, wurde gesperrt"
 
 msgid "You can vouch again from %{date}. Your own access stays."
 msgstr "Du kannst ab %{date} wieder bürgen. Dein eigener Zugang bleibt."
+
+msgid "%{by} brought you into a conversation"
+msgstr "%{by} hat dich zu einem Gespräch geholt"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "%{nickname} hat %{box} geschrieben"
+
+msgid "%{nickname} sent the box a message."
+msgstr "%{nickname} hat der Box geschrieben."

@@ -790,3 +790,12 @@ msgstr "تم إيقاف شخص ضمنته"
 
 msgid "You can vouch again from %{date}. Your own access stays."
 msgstr "يمكنك الضمان مجددًا اعتبارًا من %{date}. يبقى وصولك كما هو."
+
+msgid "%{by} brought you into a conversation"
+msgstr "أضافك %{by} إلى محادثة"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "كتب %{nickname} إلى %{box}"
+
+msgid "%{nickname} sent the box a message."
+msgstr "أرسل %{nickname} رسالة إلى الصالة."

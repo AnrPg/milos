@@ -13,6 +13,7 @@ import {
   type BoxScreenWorkout,
 } from "@/api/box-screens";
 import { ClassTimerFace } from "@/components/class-timer/ClassTimerFace";
+import { TimerNowPanel, useTimerNow } from "@/components/class-timer/TimerNowPanel";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { useScreenWakeLock } from "@/hooks/useScreenWakeLock";
 import { useUiLocale } from "@/i18n/use-ui-locale";
@@ -287,9 +288,7 @@ function SceneBody({
       const finished = scene.leaderboard?.entries ?? [];
       return (
         <div className={`${grid} grid-rows-[1fr_auto]`}>
-          <div className="grid min-h-0 place-items-center" data-testid="tv-timer">
-            {timer.payload ? <ClassTimerFace payload={timer.payload} position={timer.position} size="wall" /> : <ClassClock slot={scene.slot} now={now} />}
-          </div>
+          <TimerScene timer={timer} slot={scene.slot} now={now} />
           {finished.length > 0 ? (
             <section className="flex flex-wrap items-center gap-[1vw] p-[1.4vw]" style={tv.panel} data-testid="tv-finished">
               <h2 className="font-bold uppercase" style={tv.eyebrow}>{t("tvFinished")}</h2>
@@ -341,6 +340,34 @@ function SceneBody({
         </div>
       );
   }
+}
+
+/** The class clock, with what the room does now beside it (below it on a portrait screen). */
+function TimerScene({ timer, slot, now }: { timer: ReturnType<typeof useBoxScreenTimer>; slot: BoxScreenClass; now: number }) {
+  const doing = useTimerNow(timer.payload, timer.position);
+  return (
+    <div
+      className={`grid min-h-0 gap-[1.6vw] ${
+        doing
+          ? "grid-rows-[minmax(0,1fr)_auto] landscape:grid-cols-[minmax(0,1fr)_minmax(0,40vw)] landscape:grid-rows-[minmax(0,1fr)]"
+          : "grid-rows-[minmax(0,1fr)]"
+      }`}
+      data-testid="tv-timer"
+    >
+      {timer.payload ? (
+        <ClassTimerFace payload={timer.payload} position={timer.position} size="wall" />
+      ) : (
+        <div className="grid min-h-0 place-items-center">
+          <ClassClock slot={slot} now={now} />
+        </div>
+      )}
+      {doing ? (
+        <div className="max-h-[45vh] min-h-0 overflow-hidden p-[1.6vw] landscape:max-h-full landscape:self-center" style={tv.panel}>
+          <TimerNowPanel now={doing} size="wall" />
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 /** Without a class timer: how long the class has run. */

@@ -790,3 +790,12 @@ msgstr "Някой, за когото гарантира, беше спрян"
 
 msgid "You can vouch again from %{date}. Your own access stays."
 msgstr "Можеш да гарантираш отново от %{date}. Твоят достъп остава."
+
+msgid "%{by} brought you into a conversation"
+msgstr "%{by} те включи в разговор"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "%{nickname} писа на %{box}"
+
+msgid "%{nickname} sent the box a message."
+msgstr "%{nickname} изпрати съобщение на бокса."

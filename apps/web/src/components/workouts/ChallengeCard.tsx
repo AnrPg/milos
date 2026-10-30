@@ -128,10 +128,11 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
         style={{ color: "var(--muted)" }}
       >
         <span>
-          {challenge.progress}/{challenge.target}
-          {isCustom ? i18n("pts4abdfc6") : ""}
+          {isCustom
+            ? i18n("challengeProgressPoints", { progress: challenge.progress, target: challenge.target })
+            : `${challenge.progress}/${challenge.target}`}
           {pastTarget && challenge.is_opted_in
-            ? "· " + (challenge.progress - challenge.target) + i18n("ptsBonus2c2dc1b")
+            ? " · " + i18n("challengeBonusPoints", { count: challenge.progress - challenge.target })
             : ""}
         </span>
         <span style={{ color: challenge.completed ? "var(--success)" : "var(--muted)" }}>
@@ -240,7 +241,7 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
                               {isMine ? i18n("youMarker") : ""}
                             </span>
                             <span className="shrink-0 text-[11px]" style={{ color: "var(--muted)" }}>
-                              {entry.progress} {i18n("pts4abdfc6")}
+                              {i18n("pointCount", { count: entry.progress })}
                             </span>
                           </div>
                           <div

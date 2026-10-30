@@ -303,6 +303,23 @@ defmodule Palee.Notifications do
         url: "/messages/#{field(payload, :conversation_id)}"
       })
 
+  # ADR-282: someone wrote to the box; its inbox (or the coach brought in)
+  # hears who, about what, and the opening of the message.
+  def process_event("box_inbox_message", payload),
+    do:
+      enqueue_simple(:box_inbox_message, payload, %{
+        thread_id: field(payload, :thread_id),
+        message_id: field(payload, :message_id),
+        sender_id: field(payload, :sender_id),
+        nickname: field(payload, :sender_nickname),
+        box_name: field(payload, :box_name),
+        topic: field(payload, :topic),
+        body: field(payload, :body),
+        brought_in_by: field(payload, :brought_in_by),
+        dedupe_key: field(payload, :dedupe_key),
+        url: field(payload, :url)
+      })
+
   def process_event("message_request", payload),
     do:
       enqueue_simple(:message_request, payload, %{

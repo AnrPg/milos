@@ -790,3 +790,12 @@ msgstr "Someone you vouched for was suspended"
 
 msgid "You can vouch again from %{date}. Your own access stays."
 msgstr "You can vouch again from %{date}. Your own access stays."
+
+msgid "%{by} brought you into a conversation"
+msgstr "%{by} brought you into a conversation"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "%{nickname} wrote to %{box}"
+
+msgid "%{nickname} sent the box a message."
+msgstr "%{nickname} sent the box a message."

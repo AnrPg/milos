@@ -788,4 +788,12 @@ msgid "Someone you vouched for was suspended"
 msgstr ""
 
 msgid "You can vouch again from %{date}. Your own access stays."
+
+msgid "%{by} brought you into a conversation"
+msgstr ""
+
+msgid "%{nickname} wrote to %{box}"
+msgstr ""
+
+msgid "%{nickname} sent the box a message."
 msgstr ""

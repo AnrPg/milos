@@ -464,7 +464,7 @@ export function MemberPanel({
                           ...invoiceForm,
                           membership_package_subscription_id,
                           amount_cents: priceCents !== null ? String(priceCents / 100) : invoiceForm.amount_cents,
-                          description: packageName ? i18n("package5544677") + (packageName) : invoiceForm.description,
+                          description: packageName ? i18n("packageDescription", { name: packageName }) : invoiceForm.description,
                         });
                       }}
                     >
@@ -579,7 +579,7 @@ export function MemberPanel({
                           <span className="truncate text-xs" style={{ color: "var(--muted)" }}>
                             {field(pay, "paid_on")}
                             {field(pay, "finance_invoice_id")
-                              ? i18n("linkedToInvoice541dca8") + (invoiceNumberById.get(field(pay, "finance_invoice_id")) ?? field(pay, "finance_invoice_id"))
+                              ? " · " + i18n("linkedToInvoiceNumber", { invoice: invoiceNumberById.get(field(pay, "finance_invoice_id")) ?? field(pay, "finance_invoice_id") })
                               : ""}
                           </span>
                           <PaymentRollbackIconButton
@@ -710,7 +710,7 @@ function InvoiceCard({
         headers: { "Content-Type": content_type },
         body: file,
       });
-      if (!res.ok) throw new Error(i18n("uploadFailed7c67e1c") + (res.status));
+      if (!res.ok) throw new Error(i18n("uploadFailedStatus", { status: res.status }));
       onUploaded();
     } catch (err) {
       setUploadError(err instanceof Error ? localizeError(err, i18n) : i18n("uploadFailedad0d060"));

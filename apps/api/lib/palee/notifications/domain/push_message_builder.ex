@@ -202,6 +202,22 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-282: a message to the box's inbox; a coach brought in hears by whom.
+  def build("box_inbox_message", payload, localize) do
+    bindings = %{nickname: payload["nickname"] || "", box: payload["box_name"] || ""}
+
+    title =
+      if payload["brought_in_by"],
+        do: localize.("%{by} brought you into a conversation", %{by: payload["brought_in_by"]}),
+        else: localize.("%{nickname} wrote to %{box}", bindings)
+
+    %{
+      title: title,
+      body: payload["body"] || localize.("%{nickname} sent the box a message.", bindings),
+      url: payload["url"] || "/messages?filter=clubs"
+    }
+  end
+
   def build("message_request", payload, localize) do
     %{
       title: localize.("Message request", %{}),

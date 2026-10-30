@@ -101,8 +101,8 @@ defmodule Palee.Application.GetOrCreateMessagingThread do
       when is_binary(organization_id) and is_binary(member_id) do
     with :ok <- Organizations.authorize_capability(context, :message_from_box),
          true <-
-           (active_member?(member_id, organization_id) or trial_guest?(context, member_id)) ||
-             {:error, :not_found},
+           (active_member?(member_id, organization_id) or trial_guest?(context, member_id) or
+              wrote_to_box?(context, member_id)) || {:error, :not_found},
          {:ok, thread} <-
            Messaging.with_tenant_context(context, fn ->
              Messaging.get_or_create_thread(%{
@@ -114,7 +114,11 @@ defmodule Palee.Application.GetOrCreateMessagingThread do
            end),
          {:ok, _participant} <-
            Messaging.with_tenant_context(context, fn ->
-             Messaging.add_participant(thread.id, actor.id)
+             Messaging.add_participant(thread.id, member_id, :member)
+           end),
+         {:ok, _participant} <-
+           Messaging.with_tenant_context(context, fn ->
+             Messaging.add_participant(thread.id, actor.id, :staff)
            end) do
       Messaging.with_tenant_context(context, fn -> Messaging.get_thread(thread.id, actor.id) end)
       |> TrackMessagingAnalytics.call()
@@ -171,6 +175,13 @@ defmodule Palee.Application.GetOrCreateMessagingThread do
       _ -> {:error, :forbidden}
     end
   end
+
+  # ADR-282: and to anyone who wrote to the box.
+  defp wrote_to_box?(context, user_id),
+    do:
+      Messaging.with_tenant_context(context, fn ->
+        not is_nil(Messaging.find_context_thread(:box, user_id))
+      end)
 
   # ADR-144: staff also write to people who tried a class (board 6 Q4).
   defp trial_guest?(context, user_id),

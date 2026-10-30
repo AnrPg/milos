@@ -23,7 +23,7 @@ export function UnitCycler<T extends string>({ options, value, onChange, labels 
       onClick={cycle}
       className="cursor-pointer select-none text-sm font-medium transition-colors"
       style={{ color: "var(--muted)" }}
-      title={i18n("clickToCyclee521647") + (options.map((option) => labels?.[option] ?? option).join(" -> "))}
+      title={i18n("clickToCycleOptions", { options: options.map((option) => labels?.[option] ?? option).join(" → ") })}
     >
       {labels?.[value] ?? value}
     </button>

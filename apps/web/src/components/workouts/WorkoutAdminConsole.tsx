@@ -633,7 +633,7 @@ export function WorkoutAdminConsole() {
           {planSummary.length > 0 ? <PlanSummaryList entries={planSummary} /> : (workout.sections ?? []).map((section) => (
             <div key={(workout.id) + "-" + (section.order)} className="flex items-center justify-between gap-4">
               <span>{section.name}</span>
-              <span style={{ color: "var(--dim)" }}>{section.exercises.length} {i18n("exercises0ee6e81")}</span>
+              <span style={{ color: "var(--dim)" }}>{i18n("exerciseCount", { count: section.exercises.length })}</span>
             </div>
           ))}
         </div>

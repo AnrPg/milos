@@ -1,11 +1,13 @@
 defmodule Palee.Application.DispatchMessageDelivery do
   alias Palee.Application.{
+    BoxInbox,
     InvalidateLandingPages,
     RealtimePublisher,
     RecordCommunicationMessage
   }
 
   alias Palee.{Finance, Identity, Messaging, Notifications, Organizations}
+  alias Palee.Messaging.Domain.BoxInboxPolicy
 
   def call(tenant_context, %{"organization_id" => organization_id} = delivery) do
     with true <- tenant_organization_id(tenant_context) == organization_id do
@@ -64,6 +66,26 @@ defmodule Palee.Application.DispatchMessageDelivery do
     )
   end
 
+  # ADR-282: a box thread tells the box's inbox about the person's message
+  # (whoever answered last, else everyone in it) and the person about the
+  # box's answer.
+  defp notify_participants(%{context_type: :box} = thread, message) do
+    recent = recent_messages(thread, message)
+
+    thread
+    |> BoxInboxPolicy.recipients(
+      message.sender_id,
+      BoxInboxPolicy.handler(thread, Enum.drop(recent, 1)),
+      BoxInbox.audience(thread)
+    )
+    |> Enum.reduce_while(:ok, fn user_id, :ok ->
+      case notify_box_recipient(thread, message, user_id) do
+        :ok -> {:cont, :ok}
+        {:error, reason} -> {:halt, {:error, reason}}
+      end
+    end)
+  end
+
   defp notify_participants(thread, message) do
     thread.participants
     |> Enum.reject(&(&1.user_id == message.sender_id))
@@ -86,16 +108,92 @@ defmodule Palee.Application.DispatchMessageDelivery do
     end)
   end
 
-  # ADR-144: someone who is not a member (yet) talks to the box from its
-  # page, so their link opens that conversation there, not the gym's inbox.
-  defp thread_url(%{context_type: :box, context_id: user_id} = thread, user_id) do
-    if Organizations.membership_standing(thread.organization_id, user_id) == :member do
-      "/messages?thread=#{thread.id}"
-    else
-      case Organizations.public_boxes([thread.organization_id]) do
-        [%{slug: slug}] -> "/b/#{slug}/chat"
-        _unpublished -> "/messages?thread=#{thread.id}"
+  @doc "«Φέρε τον coach»: the coach hears they were brought into the person's thread."
+  def notify_coach_brought_in(%{context_type: :box} = thread, coach_id, brought_by_id) do
+    last =
+      case Messaging.list_messages(thread.id, %{actor_id: brought_by_id, limit: 1}) do
+        {:ok, [message]} -> message
+        _none -> nil
       end
+
+    Notifications.dispatch_event(
+      :box_inbox_message,
+      box_inbox_payload(thread, last, coach_id)
+      |> Map.merge(%{
+        dedupe_key: "box_inbox_coach:#{thread.id}:#{coach_id}:#{last && last.id}",
+        brought_in_by: nickname(brought_by_id)
+      })
+    )
+  end
+
+  defp notify_box_recipient(%{context_id: person_id} = thread, message, person_id) do
+    Notifications.dispatch_event(notification_type(message), %{
+      user_id: person_id,
+      organization_id: thread.organization_id,
+      dedupe_key: dedupe_key(message),
+      thread_id: thread.id,
+      context_type: thread.context_type,
+      context_id: thread.context_id,
+      message_id: message.id,
+      sender_id: message.sender_id,
+      body: String.slice(message.body, 0, 100),
+      url: person_url(thread)
+    })
+  end
+
+  defp notify_box_recipient(thread, message, user_id) do
+    Notifications.dispatch_event(
+      :box_inbox_message,
+      box_inbox_payload(thread, message, user_id)
+      |> Map.put(:dedupe_key, "box_inbox_message:#{message.id}:#{user_id}")
+    )
+  end
+
+  defp box_inbox_payload(thread, message, user_id) do
+    %{
+      user_id: user_id,
+      organization_id: thread.organization_id,
+      thread_id: thread.id,
+      context_type: thread.context_type,
+      context_id: thread.context_id,
+      message_id: message && message.id,
+      sender_id: thread.context_id,
+      sender_nickname: nickname(thread.context_id),
+      box_name: box_name(thread.organization_id),
+      topic: message && message.topic,
+      body: message && String.slice(message.body, 0, 100),
+      url: "/messages?filter=clubs&thread=#{thread.id}"
+    }
+  end
+
+  defp nickname(user_id) do
+    case Identity.list_by_ids([user_id]) do
+      [%{nickname: nickname}] -> nickname
+      _missing -> nil
+    end
+  end
+
+  # The newest messages, the one being delivered first.
+  defp recent_messages(thread, message) do
+    case Messaging.list_messages(thread.id, %{actor_id: message.sender_id, limit: 50}) do
+      {:ok, messages} -> messages
+      _error -> [message]
+    end
+  end
+
+  # ADR-282: the person reads their thread with a box on its chat screen,
+  # members and newcomers alike (it works for unpublished boxes too).
+  defp person_url(%{organization_id: organization_id} = thread) do
+    case Organizations.brand_summary(organization_id) do
+      %{slug: slug} when is_binary(slug) -> "/b/#{slug}/chat"
+      _missing -> "/messages?thread=#{thread.id}"
+    end
+  end
+
+  defp box_name(organization_id) do
+    case Organizations.brand_summary(organization_id) do
+      %{name: name} -> name
+      _missing -> nil
     end
   end
 

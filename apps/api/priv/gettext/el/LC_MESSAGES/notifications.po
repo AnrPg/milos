@@ -790,3 +790,12 @@ msgstr "Κάποιος για τον οποίο εγγυήθηκες τέθηκ�
 
 msgid "You can vouch again from %{date}. Your own access stays."
 msgstr "Μπορείς να εγγυηθείς ξανά από %{date}. Η δική σου πρόσβαση μένει."
+
+msgid "%{by} brought you into a conversation"
+msgstr "%{by} σε έφερε σε μια συζήτηση"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "%{nickname} έγραψε στο %{box}"
+
+msgid "%{nickname} sent the box a message."
+msgstr "%{nickname} έστειλε μήνυμα στο box."

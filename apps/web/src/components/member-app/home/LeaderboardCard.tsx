@@ -75,8 +75,8 @@ export function LeaderboardCard({ leaderboard }: { leaderboard: LandingPayload["
                 <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{entry.nickname}</p>
                 <p className="text-xs" style={{ color: "var(--dim)" }}>
                   {mode === "weekly"
-                    ? entry.workouts_this_week + i18n("workoutsThisWeek0268fc5")
-                    : entry.prs_this_month + i18n("prsThisMonthd85bc56")}
+                    ? i18n("workoutsThisWeekCount", { count: entry.workouts_this_week })
+                    : i18n("prsThisMonthCount", { count: entry.prs_this_month })}
                 </p>
               </div>
             </div>

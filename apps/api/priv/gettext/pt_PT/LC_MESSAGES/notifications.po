@@ -790,3 +790,12 @@ msgstr "Alguém por quem garantiste foi suspenso"
 
 msgid "You can vouch again from %{date}. Your own access stays."
 msgstr "Podes voltar a garantir a partir de %{date}. O teu próprio acesso mantém-se."
+
+msgid "%{by} brought you into a conversation"
+msgstr "%{by} trouxe-te para uma conversa"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "%{nickname} escreveu para %{box}"
+
+msgid "%{nickname} sent the box a message."
+msgstr "%{nickname} enviou uma mensagem à box."

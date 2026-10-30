@@ -10,7 +10,9 @@ vi.mock("next-intl", () => ({
   useTranslations: () => (key: string, values?: Record<string, string>) =>
     values ? `${key}:${Object.values(values).join(",")}` : key,
 }));
-vi.mock("@/i18n/ui", () => ({ useUiTranslations: () => (key: string) => key }));
+vi.mock("@/i18n/ui", () => ({
+  useUiTranslations: () => (key: string, values?: Record<string, unknown>) => (values ? `${key}:${JSON.stringify(values)}` : key),
+}));
 
 function slot(id: string, scheduledAt: string, name = "CrossFit"): ScheduleSlot {
   return {
@@ -46,7 +48,7 @@ describe("CalendarView", () => {
     const dayButtons = screen.getAllByRole("button", { name: /^openDayView:Wednesday, Oct 14$/ });
     // The date number and "+2 more" both lead to the day.
     expect(dayButtons).toHaveLength(2);
-    expect(dayButtons[1]).toHaveTextContent("+2 moree7c95b4");
+    expect(dayButtons[1]).toHaveTextContent('moreCount:{"count":2}');
 
     fireEvent.click(dayButtons[0]);
     fireEvent.click(dayButtons[1]);

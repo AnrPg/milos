@@ -790,3 +790,12 @@ msgstr "Человека, за которого ты поручился(-ась)
 
 msgid "You can vouch again from %{date}. Your own access stays."
 msgstr "Поручаться снова можно с %{date}. Твой доступ сохраняется."
+
+msgid "%{by} brought you into a conversation"
+msgstr "%{by} добавил(а) тебя в разговор"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "%{nickname} написал(а) в %{box}"
+
+msgid "%{nickname} sent the box a message."
+msgstr "%{nickname} написал(а) в бокс."

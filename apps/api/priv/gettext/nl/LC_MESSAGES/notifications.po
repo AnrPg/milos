@@ -790,3 +790,12 @@ msgstr "Iemand voor wie je instond is geschorst"
 
 msgid "You can vouch again from %{date}. Your own access stays."
 msgstr "Je kunt vanaf %{date} weer instaan. Je eigen toegang blijft."
+
+msgid "%{by} brought you into a conversation"
+msgstr "%{by} heeft je bij een gesprek gehaald"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "%{nickname} schreef naar %{box}"
+
+msgid "%{nickname} sent the box a message."
+msgstr "%{nickname} stuurde de box een bericht."

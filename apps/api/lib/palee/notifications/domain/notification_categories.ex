@@ -39,7 +39,8 @@ defmodule Palee.Notifications.Domain.NotificationCategories do
       locked: false,
       audience: "everyone",
       types: ~w(
-        chat_message person_message message_request box_message coaching_message athlete_message
+        chat_message person_message message_request box_message box_inbox_message coaching_message
+        athlete_message
       )
     },
     %{

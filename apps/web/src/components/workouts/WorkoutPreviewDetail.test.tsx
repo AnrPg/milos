@@ -11,7 +11,7 @@ vi.mock("next-intl", () => ({
 vi.mock("@/i18n/ui", () => ({
   useUiTranslations: () => (key: string, values?: Record<string, unknown>) =>
     key === "supersetLabel" ? "Superset" :
-    key === "setsd6c8220" ? "sets" :
+    key === "setCount" ? `${values?.count} sets` :
     key === "value0Value1dca59cc" ? `${values?.value0} ${values?.value1}` : key,
 }));
 

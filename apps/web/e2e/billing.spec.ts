@@ -210,7 +210,7 @@ test.describe("billing", () => {
     await expect(page.getByRole("progressbar", { name: "Validity" })).toBeVisible();
     await expect(page.getByText("€40.00").first()).toBeVisible();
     await expect(page.getByText("Pay at the box")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Contact the box" })).toHaveAttribute("href", "/b/kypseli/chat");
+    await expect(page.getByRole("link", { name: "Contact the box" })).toHaveAttribute("href", "/b/kypseli/chat?topic=payment");
 
     // «Συνδρομή»: details and history.
     await expect(page.getByText("Subscription package history")).toBeVisible();

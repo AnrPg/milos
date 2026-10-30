@@ -26,7 +26,7 @@ import type { PRSupportingMetrics } from "@/api/gamification";
 import type { EffectiveEntitlement } from "@/api/my-finance";
 import { setFinanceMemberAutoRenew, updateFinanceMember } from "@/api/finance";
 import { shouldShowAllowanceQuota } from "@/components/finance/billing-entitlement-visibility";
-import { dossierMode, grantableAllowances, packageSubscriptionLabel, prSectionContentCount, visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
+import { dossierMode, grantableAllowances, membershipDateCards, packageSubscriptionLabel, prSectionContentCount, visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
 import { MembershipFreezes } from "@/components/admin/users/MembershipFreezes";
 import { MembershipLeaving } from "@/components/admin/users/MembershipLeaving";
 import {
@@ -272,7 +272,7 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
   return (
     <>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {Object.entries(entitlement?.allowances ?? {}).filter(([key]) => key !== "coaching_touchpoints").map(([key, allowance]) => allowance ? <div key={key} className="rounded-xl p-3" style={{ background: "var(--panel-muted)" }}><p className="font-semibold">{allowanceLabel(key, i18n, entitlement?.class_type_names)}</p>{shouldShowAllowanceQuota(allowance) ? <p>{String(allowance.remaining)} {i18n("remainingOf8553660")} {String(allowance.limit)}{allowance.extensions > 0 ? i18n("personalExtensionCount", { count: allowance.extensions }) : ""}</p> : null}<p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("resetsAftere96e46e")} {date(allowance.period_end)}</p></div> : null)}
+        {Object.entries(entitlement?.allowances ?? {}).filter(([key]) => key !== "coaching_touchpoints").map(([key, allowance]) => allowance ? <div key={key} className="rounded-xl p-3" style={{ background: "var(--panel-muted)" }}><p className="font-semibold">{allowanceLabel(key, i18n, entitlement?.class_type_names)}</p>{shouldShowAllowanceQuota(allowance) ? <p>{i18n("allowanceLeftOfLimit", { remaining: allowance.remaining, limit: allowance.limit })}{allowance.extensions > 0 ? i18n("personalExtensionCount", { count: allowance.extensions }) : ""}</p> : null}<p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("resetsAftere96e46e")} {date(allowance.period_end)}</p></div> : null)}
       </div>
       <div className="mt-5 space-y-5 rounded-2xl p-4" style={{ border: "1px solid var(--border)" }}>
         <form className="space-y-3" onSubmit={(event) => { event.preventDefault(); grant.mutate(); }}>
@@ -371,25 +371,32 @@ function FinanceDetails({
                 value={<MemberStatusCell userId={userId} status={valueText(membership.status_shown) === "—" ? draft.status : valueText(membership.status_shown)} override={overrideFor(finance.details.overrides, "status")} />}
               />
               <EditableFinanceCard label={i18n("packageSubscriptions09a33f1")} value={packageContent || "—"} />
-              {currentSubscription ? (
-                <EditableFinanceCard
-                  label={i18n("expiresOn549cabe")}
-                  value={
-                    <SubscriptionEndCell
-                      userId={userId}
-                      subscriptionId={valueText(currentSubscription.id)}
-                      endsOn={currentEnds}
-                      renews={currentPeriod?.renews === true}
-                      override={overrideFor(finance.details.overrides, "ends_on", valueText(currentSubscription.id))}
+              {/* Start comes before end, so it sits first (left). */}
+              {membershipDateCards(Boolean(currentSubscription)).map((key) => {
+                if (key === "subscription_end") {
+                  return (
+                    <EditableFinanceCard
+                      key={key}
+                      label={i18n("expiresOn549cabe")}
+                      value={
+                        <SubscriptionEndCell
+                          userId={userId}
+                          subscriptionId={valueText(currentSubscription?.id)}
+                          endsOn={currentEnds}
+                          renews={currentPeriod?.renews === true}
+                          override={overrideFor(finance.details.overrides, "ends_on", valueText(currentSubscription?.id))}
+                        />
+                      }
                     />
-                  }
-                />
-              ) : null}
-              {(currentSubscription ? ([['starts_on', i18n("startsOn6d888f7")]] as const) : ([['starts_on', i18n("startsOn6d888f7")], ['expires_on', i18n("expiresOn549cabe")]] as const)).map(([key, label]) => (
-                <EditableFinanceCard key={key} label={label} changed={changed.has(key)}>
-                  <DateInput aria-label={label} className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft[key]} disabled={form.saving} onValueChange={(value) => edit({ [key]: value })} data-testid={`membership-${key}`} />
-                </EditableFinanceCard>
-              ))}
+                  );
+                }
+                const label = key === "starts_on" ? i18n("startsOn6d888f7") : i18n("expiresOn549cabe");
+                return (
+                  <EditableFinanceCard key={key} label={label} changed={changed.has(key)}>
+                    <DateInput aria-label={label} className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft[key]} disabled={form.saving} onValueChange={(value) => edit({ [key]: value })} data-testid={`membership-${key}`} />
+                  </EditableFinanceCard>
+                );
+              })}
             </div>
             {commitment ? (
               <CommitmentOverridePrompt
@@ -863,7 +870,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
             </Panel>
           ) : null}
 
-          {inTab("health_incidents") ? <Panel id="health_incidents" title={i18n("healthIncidentse3ca869")} href={adminHref("/admin/metrics#health-incidents", organizationSlug)}><p>{incidents.data?.summary.active ?? 0} {i18n("active4c71073")} {incidents.data?.summary.total ?? 0} {i18n("total5a537e2")}</p><div className="mt-3 grid gap-3">{incidents.data?.incidents.length ? incidents.data.incidents.map((incident) => <GenericRecordCard key={incident.id} title={incident.body_area} meta={<><SemanticLabel value={incident.severity} /> · <SemanticLabel value={incident.status} /> · {date(incident.started_on)}</>} detail={incident.training_limitations ? <p style={{ color: "var(--muted)" }}>{incident.training_limitations}</p> : null} href={adminHref("/admin/metrics#health-incidents", organizationSlug)} />) : <Empty>{i18n("noHealthIncidentsRecorded91c9d4e")}</Empty>}</div></Panel> : null}
+          {inTab("health_incidents") ? <Panel id="health_incidents" title={i18n("healthIncidentse3ca869")} href={adminHref("/admin/metrics#health-incidents", organizationSlug)}><p>{i18n("healthIncidentSummary", { active: incidents.data?.summary.active ?? 0, total: incidents.data?.summary.total ?? 0 })}</p><div className="mt-3 grid gap-3">{incidents.data?.incidents.length ? incidents.data.incidents.map((incident) => <GenericRecordCard key={incident.id} title={incident.body_area} meta={<><SemanticLabel value={incident.severity} /> · <SemanticLabel value={incident.status} /> · {date(incident.started_on)}</>} detail={incident.training_limitations ? <p style={{ color: "var(--muted)" }}>{incident.training_limitations}</p> : null} href={adminHref("/admin/metrics#health-incidents", organizationSlug)} />) : <Empty>{i18n("noHealthIncidentsRecorded91c9d4e")}</Empty>}</div></Panel> : null}
 
           {token && showCoachNotes && tab === "wellbeing" ? (
             <Panel id="wellbeing_notes" title={i18n("rhCoachNotes")}>
@@ -892,7 +899,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
           {token && inTab("coach_notes") ? <Panel id="coach_notes" title={i18n("rhCoachNotes")}><CoachNotesPanel userId={userId} subjects={[...trainingSubjects, ...wellbeingSubjects]} /></Panel> : null}
 
 
-          {inTab("messages") ? <Panel id="messages" title={i18n("chat2ced57f")} href="/messages"><p>{messages.data?.summary.thread_count ?? 0} {i18n("threadS2bddeec")} {messages.data?.summary.unread_thread_count ?? 0} {i18n("unread1b9aebd")}</p><div className="mt-3 grid gap-3">{messages.data?.threads.length ? messages.data.threads.slice(0, 6).map((thread) => <GenericRecordCard key={thread.id} title={<SemanticLabel value={thread.context_type} />} meta={`${thread.message_count} ${i18n("threadS2bddeec")} · ${date(thread.latest_message?.inserted_at)}`} detail={<p>{thread.latest_message?.body ?? i18n("emptyThreadfee51b1")}</p>} href="/messages" />) : <Empty>{i18n("noConversationsRecordedd525265")}</Empty>}</div></Panel> : null}
+          {inTab("messages") ? <Panel id="messages" title={i18n("chat2ced57f")} href="/messages"><p>{i18n("conversationSummary", { threads: messages.data?.summary.thread_count ?? 0, unread: messages.data?.summary.unread_thread_count ?? 0 })}</p><div className="mt-3 grid gap-3">{messages.data?.threads.length ? messages.data.threads.slice(0, 6).map((thread) => <GenericRecordCard key={thread.id} title={<SemanticLabel value={thread.context_type} />} meta={`${i18n("messageCount", { count: thread.message_count })} · ${date(thread.latest_message?.inserted_at)}`} detail={<p>{thread.latest_message?.body ?? i18n("emptyThreadfee51b1")}</p>} href="/messages" />) : <Empty>{i18n("noConversationsRecordedd525265")}</Empty>}</div></Panel> : null}
 
           {inTab("admin_actions") ? (
             <Panel id="admin_actions" title={i18n("adminActionsfa81c61")}>

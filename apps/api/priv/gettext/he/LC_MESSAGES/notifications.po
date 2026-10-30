@@ -790,3 +790,12 @@ msgstr "מישהו שערבת לו הושעה"
 
 msgid "You can vouch again from %{date}. Your own access stays."
 msgstr "אפשר לערוב שוב החל מ-%{date}. הגישה שלך נשארת."
+
+msgid "%{by} brought you into a conversation"
+msgstr "%{by} צירף/ה אותך לשיחה"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "%{nickname} כתב/ה ל%{box}"
+
+msgid "%{nickname} sent the box a message."
+msgstr "%{nickname} שלח/ה הודעה לבוקס."

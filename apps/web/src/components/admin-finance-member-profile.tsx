@@ -668,7 +668,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                         amount: priceCents !== null ? euroInputValue(priceCents) : current.amount,
                       }));
                       if (selectedPackageLabel) {
-                        setReceiptDescription(i18n("package5544677") + selectedPackageLabel);
+                        setReceiptDescription(i18n("packageDescription", { name: selectedPackageLabel }));
                       }
                     }}
                     showPlaceholder={false}
@@ -701,7 +701,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 options={payableInvoices.map((invoice) => field(invoice, "id"))}
                 optionLabel={(id) => {
                   const invoice = payableInvoices.find((item) => field(item, "id") === id);
-                  return (field(invoice, "invoice_number", id)) + i18n("due6e49fc0") + (money(uiLocale, invoice?.balance_due_cents));
+                  return i18n("invoiceDueOption", { invoice: field(invoice, "invoice_number", id), amount: money(uiLocale, invoice?.balance_due_cents) });
                 }}
                 required={false}
                 onChange={(finance_invoice_id) => {
@@ -772,7 +772,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                     ...invoiceForm,
                     membership_package_subscription_id,
                     amount: priceCents !== null ? euroInputValue(priceCents) : invoiceForm.amount,
-                    description: selectedPackageLabel ? i18n("package5544677") + (selectedPackageLabel) : invoiceForm.description,
+                    description: selectedPackageLabel ? i18n("packageDescription", { name: selectedPackageLabel }) : invoiceForm.description,
                   });
                 }}
               />
@@ -944,7 +944,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 options={invoices.map((invoice) => field(invoice, "id"))}
                 optionLabel={(id) => {
                   const invoice = invoices.find((item) => field(item, "id") === id);
-                  return (field(invoice, "invoice_number", id)) + i18n("due6e49fc0") + (money(uiLocale, invoice?.balance_due_cents));
+                  return i18n("invoiceDueOption", { invoice: field(invoice, "invoice_number", id), amount: money(uiLocale, invoice?.balance_due_cents) });
                 }}
                 disabled={invoices.length === 0 || creditBalance <= 0}
                 onChange={(invoice_id) => setApplyInvoiceCreditForm({ ...applyInvoiceCreditForm, invoice_id })}
@@ -985,7 +985,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 options={reversiblePayments.map((payment) => field(payment, "id"))}
                 optionLabel={(id) => {
                   const payment = reversiblePayments.find((item) => field(item, "id") === id);
-                  return (money(uiLocale, payment?.net_amount_cents)) + i18n("remainingd475cb2") + (field(payment, "payment_method", "payment"));
+                  return i18n("amountRemainingOption", { amount: money(uiLocale, payment?.net_amount_cents), kind: field(payment, "payment_method", "payment") });
                 }}
                 disabled={reversiblePayments.length === 0}
                 onChange={(payment_id) => {
@@ -1030,7 +1030,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 options={reversibleCreditEntries.map((entry) => field(entry, "id"))}
                 optionLabel={(id) => {
                   const entry = reversibleCreditEntries.find((item) => field(item, "id") === id);
-                  return (money(uiLocale, entry?.remaining_reversible_cents)) + i18n("remainingd475cb2") + (field(entry, "entry_type", "credit"));
+                  return i18n("amountRemainingOption", { amount: money(uiLocale, entry?.remaining_reversible_cents), kind: field(entry, "entry_type", "credit") });
                 }}
                 disabled={reversibleCreditEntries.length === 0}
                 onChange={(credit_ledger_entry_id) => {
@@ -1171,7 +1171,7 @@ function Select({
       >
         {showPlaceholder ? (
           <option value="" disabled={required}>
-            {required ? i18n("select8598222") + (label.toLowerCase()) : i18n("no816c52f") + (label.toLowerCase())}
+            {required ? i18n("selectFieldPlaceholder", { field: label.toLowerCase() }) : i18n("noFieldOption", { field: label.toLowerCase() })}
           </option>
         ) : null}
         {options.map((option) => (
@@ -1298,7 +1298,7 @@ function InvoiceFileActions({
         headers: { "Content-Type": content_type },
         body: file,
       });
-      if (!res.ok) throw new Error(i18n("uploadFailed7c67e1c") + (res.status));
+      if (!res.ok) throw new Error(i18n("uploadFailedStatus", { status: res.status }));
       onRefresh();
     } catch (err) {
       setUploadError(err instanceof Error ? localizeError(err, i18n) : i18n("uploadFailedad0d060"));
