@@ -112,6 +112,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     ai_usage/ai_usage_store
     places/discovery_store
     places/home_area_store
+    partners/suggestion_store
     interests/interests_store
     wallet/wallet_store
     business_accounts/business_account_store
