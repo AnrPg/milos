@@ -103,7 +103,7 @@ export function ClassWorkoutNotice({
   return (
     <div
       className="mt-4 space-y-3 rounded-[1.4rem] p-4"
-      role="alert"
+      role="status"
       aria-busy={busy}
       data-testid="class-wod-notice"
       style={{ background: `color-mix(in srgb, ${tone} 10%, transparent)`, border: `2px solid ${tone}` }}
