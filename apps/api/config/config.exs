@@ -475,6 +475,11 @@ config :palee,
        :push_subscription_store,
        Palee.Infrastructure.Notifications.EctoPushSubscriptionStore
 
+# ADR-277: the installation's Web Push key pair (made by the server itself).
+config :palee, :push_key_store, Palee.Infrastructure.Notifications.EctoPushKeyStore
+config :palee, :web_push_auto_keys, true
+config :palee, :web_push_default_subject, "mailto:alerts@palee.app"
+
 config :palee,
        :notification_store,
        Palee.Infrastructure.Notifications.EctoNotificationStore

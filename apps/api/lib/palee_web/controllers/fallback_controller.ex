@@ -33,7 +33,12 @@ defmodule PaleeWeb.FallbackController do
     unknown_category: {:not_found, "There is no such notification category"},
     locked_category:
       {:unprocessable_entity, "Account and payment notifications cannot be switched off"},
-    invalid_change: {:unprocessable_entity, "Send true or false for a channel of this category"}
+    invalid_change: {:unprocessable_entity, "Send true or false for a channel of this category"},
+    # ADR-277: the platform's Web Push keys and contact.
+    invalid_push_contact:
+      {:unprocessable_entity, "Enter an email address or a web address that starts with https://"},
+    push_managed_by_server:
+      {:conflict, "The server's WEB_PUSH_* settings are in use; change them in gitops"}
   }
 
   # ADR-203: what `Palee.Email.enqueue/4` refuses. `:not_live` answers as

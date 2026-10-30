@@ -215,7 +215,7 @@ must have an ADR. See `template.md` for the format.
 | ADR-215 | Client data freshness by kind, and one shared realtime connection | Accepted |
 | ADR-216 | One join link per client role: box-member link and athlete link (with a secret key), each on or off | Accepted |
 | ADR-217 | People are shown by their roles in the business, never `users.role`; only clients have a finance profile | Accepted |
-| ADR-218 | Web Push keys belong to the platform console, not to a gym's settings (moves ADR-049's editor) | Accepted |
+| ADR-218 | Web Push keys belong to the platform console, not to a gym's settings (moves ADR-049's editor) | Accepted (key editor superseded by ADR-277) |
 | ADR-219 | Role hierarchy enforced downwards (vendor › owner › admin › staff › clients); self-added roles below one's top role | Accepted |
 | ADR-221 | Find a box or coach by name; publishing the public page is a setup step | Accepted |
 | ADR-222 | Record money received at the desk; the billing setup picks the receipt, paid invoice or invoice it settles | Accepted |
@@ -259,5 +259,6 @@ must have an ADR. See `template.md` for the format.
 | ADR-274 | Member status from subscription charges: every priced subscription period is charged (assignment + hourly run), `status_shown` folds money into the status staff see, values staff set by hand are kept with who/when/from/to in `finance_value_overrides` (status overrides lapse when the automatic value changes), «Οφειλές» in «Εκκρεμότητες» | Accepted |
 | ADR-275 | Workout types: one fixed list grouped in families (martial arts and dance included), the gym chooses which its editors offer; stats, badges and colours read the family | Accepted |
 | ADR-276 | Unsaved edits on staff forms: draft with undo/redo, save bar, ask before leaving a tab | Accepted |
+| ADR-277 | The server makes and keeps the Web Push keys (encrypted); the platform console shows status, contact and «new keys» only | Accepted |
 | ADR-300 | Operation registry: one spec per use case generates REST, MCP and LLM tools; previewable commands, problem details, idempotency keys, ETags (v4) | Proposed |
 | ADR-301 | AI agents as delegated principals: rights intersected on every call, durable runs, Rule-of-Two policy, approvals, one LLM provider port, multi-agent via delegation (v4) | Proposed |

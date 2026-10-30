@@ -101,10 +101,12 @@ config :palee, :anthropic,
   # ADR-175: voice logging turns the transcript into a draft entry.
   voice_model: System.get_env("ANTHROPIC_VOICE_MODEL", "claude-sonnet-5-5")
 
-config :web_push_elixir,
-  vapid_public_key: System.get_env("WEB_PUSH_PUBLIC_KEY"),
-  vapid_private_key: System.get_env("WEB_PUSH_PRIVATE_KEY"),
-  vapid_subject: System.get_env("WEB_PUSH_SUBJECT")
+# ADR-277: Web Push keys given to the server win over the pair Palee makes and
+# stores itself; the platform console then shows «Από τον server».
+config :palee, :web_push_server_keys,
+  public_key: System.get_env("WEB_PUSH_PUBLIC_KEY"),
+  private_key: System.get_env("WEB_PUSH_PRIVATE_KEY"),
+  subject: System.get_env("WEB_PUSH_SUBJECT")
 
 minio_endpoint =
   System.get_env("MINIO_ENDPOINT") ||

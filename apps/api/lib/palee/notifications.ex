@@ -8,7 +8,9 @@ defmodule Palee.Notifications do
   alias Palee.Notifications.Commands.EnqueueNotificationEvent
   alias Palee.Notifications.Commands.MarkAllRead
   alias Palee.Notifications.Commands.MarkNotificationRead
+  alias Palee.Notifications.Commands.ReplacePushKeys
   alias Palee.Notifications.Commands.SaveNativePushToken
+  alias Palee.Notifications.Commands.SavePushContact
   alias Palee.Notifications.Commands.SavePushSubscription
   alias Palee.Notifications.Domain.NotificationCategories
   alias Palee.Notifications.Domain.NotificationDedupe
@@ -18,6 +20,7 @@ defmodule Palee.Notifications do
   alias Palee.Notifications.Queries.ListNativePushTokens
   alias Palee.Notifications.Queries.GetUnreadCount
   alias Palee.Notifications.Queries.ListInboxPage
+  alias Palee.Notifications.Queries.GetPlatformPushStatus
   alias Palee.Notifications.Queries.GetPushSubscriptionStatus
   alias Palee.Notifications.Queries.ListPushSubscriptions
   alias Palee.Notifications.NotificationPreferenceStore
@@ -106,9 +109,11 @@ defmodule Palee.Notifications do
     do: NotificationStore.get_notification_organization_id(user_id, notification_id)
 
   def push_config do
+    config = PushConfig.config()
+
     %{
-      enabled: PushConfig.enabled?(),
-      vapid_public_key: PushConfig.public_key(),
+      enabled: PushConfig.ready?(config),
+      vapid_public_key: config.vapid_public_key,
       native_providers: NativePush.configured_providers()
     }
   end
@@ -190,9 +195,15 @@ defmodule Palee.Notifications do
 
   def notification_categories, do: NotificationCategories.category_ids()
 
-  def get_push_settings, do: NotificationStore.get_push_settings()
+  # ADR-277: the platform console's view of browser alerts. Callers are the
+  # vendor pipeline; the device figures answer only to an active vendor.
+  def platform_push_status(vendor_user_id),
+    do: GetPlatformPushStatus.call(vendor_user_id)
 
-  def update_push_settings(params), do: NotificationStore.update_push_settings(params)
+  def save_push_contact(subject), do: SavePushContact.call(subject)
+
+  def replace_push_keys(vendor_user_id),
+    do: ReplacePushKeys.call(vendor_user_id)
 
   def save_push_subscription(user_id, attrs) do
     PushSubscriptionStore.with_user_context(%{user_id: user_id}, fn ->

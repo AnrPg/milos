@@ -2,115 +2,76 @@
 
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 import { ApiError } from "@/api/client";
 import {
   fetchPlatformPushSettings,
-  updatePlatformPushSettings,
-  type NotificationPushSettings,
-  type NotificationPushUpdate,
+  replacePlatformPushKeys,
+  updatePlatformPushContact,
+  type PlatformPushStatus,
 } from "@/api/settings";
 import { useSession } from "@/components/session-provider";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
-import { generateVapidKeyPair, normalizePushContact } from "@/lib/web-push-keys";
 import { BackLink } from "@/components/ui/BackLink";
+import { formatInZone } from "@/lib/zoned-time";
 
 /**
- * ADR-218: browser alerts are signed with one key pair for the whole Palee
- * installation, so the keys live here, in the platform console, and never on
- * a gym's settings page. Each person still turns alerts on per device.
+ * ADR-218 / ADR-277: browser alerts for the whole Palee installation. The
+ * server makes and keeps the key pair itself, so this page shows only whether
+ * alerts work, how many devices allow them and the contact for push services.
+ * Replacing the keys is the one rare action, behind «Advanced».
  */
-
-type PushForm = { publicKey: string; privateKey: string; subject: string; clearPrivateKey: boolean };
 
 const QUERY_KEY = ["platform", "push-settings"] as const;
 
-function formFrom(settings: NotificationPushSettings): PushForm {
-  return {
-    publicKey: settings.vapid_public_key ?? "",
-    privateKey: "",
-    subject: settings.vapid_subject ?? "",
-    clearPrivateKey: false,
-  };
-}
-
 const fieldStyle = { background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" };
-
-function Field({ id, label, help, children }: { id: string; label: string; help: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-2">
-      <label htmlFor={id} className="block text-sm font-semibold text-[var(--text)]">
-        {label}
-      </label>
-      {children}
-      <p id={`${id}-help`} className="text-xs leading-5 text-[var(--text-soft)]">
-        {help}
-      </p>
-    </div>
-  );
-}
+const primary = { background: "var(--primary)", color: "var(--primary-contrast)" };
+const quiet = { background: "var(--panel-muted)", color: "var(--muted)" };
 
 export function PlatformPushSettingsPage() {
   const t = useTranslations("PlatformPush");
+  const locale = useLocale();
   const { tokens } = useSession();
   const token = tokens?.access_token;
   const queryClient = useQueryClient();
-  const [form, setForm] = useState<PushForm>({ publicKey: "", privateKey: "", subject: "", clearPrivateKey: false });
-  const [generateError, setGenerateError] = useState(false);
-  const [generated, setGenerated] = useState(false);
+  const [subject, setSubject] = useState("");
+  const [confirming, setConfirming] = useState(false);
 
-  const settings = useQuery({
+  const status = useQuery({
     queryKey: QUERY_KEY,
     queryFn: () => fetchPlatformPushSettings(token!),
     enabled: Boolean(token),
   });
 
   useEffect(() => {
-    if (!settings.data) return;
-    const next = formFrom(settings.data);
-    queueMicrotask(() => setForm(next));
-  }, [settings.data]);
+    const saved = status.data?.vapid_subject ?? "";
+    queueMicrotask(() => setSubject(saved));
+  }, [status.data?.vapid_subject]);
 
-  const save = useMutation({
-    mutationFn: () => {
-      const payload: NotificationPushUpdate = {
-        vapid_public_key: form.publicKey.trim() || null,
-        vapid_subject: normalizePushContact(form.subject),
-      };
-      const privateKey = form.privateKey.trim();
-      if (privateKey || form.clearPrivateKey) payload.vapid_private_key = privateKey || null;
-      return updatePlatformPushSettings(token!, payload);
-    },
+  const store = (data: PlatformPushStatus) => queryClient.setQueryData(QUERY_KEY, data);
+
+  const saveContact = useMutation({
+    mutationFn: () => updatePlatformPushContact(token!, subject),
+    onSuccess: store,
+  });
+
+  const rotate = useMutation({
+    mutationFn: () => replacePlatformPushKeys(token!),
     onSuccess: (data) => {
-      queryClient.setQueryData(QUERY_KEY, data);
-      setForm(formFrom(data));
-      setGenerated(false);
+      store(data);
+      setConfirming(false);
     },
   });
 
-  const forbidden = settings.error instanceof ApiError && settings.error.status === 403;
-  const server = settings.data ? formFrom(settings.data) : null;
-  const dirty =
-    server !== null &&
-    (form.publicKey !== server.publicKey ||
-      form.subject !== server.subject ||
-      form.privateKey.trim() !== "" ||
-      form.clearPrivateKey);
-  const enabled = Boolean(settings.data?.enabled);
-  const privateKeySaved = Boolean(settings.data?.vapid_private_key_configured);
-  const replacingKeys = generated && Boolean(settings.data?.vapid_public_key);
-
-  async function generate() {
-    setGenerateError(false);
-    try {
-      const pair = await generateVapidKeyPair();
-      setForm((current) => ({ ...current, publicKey: pair.publicKey, privateKey: pair.privateKey, clearPrivateKey: false }));
-      setGenerated(true);
-    } catch {
-      setGenerateError(true);
-    }
-  }
+  const forbidden = status.error instanceof ApiError && status.error.status === 403;
+  const data = status.data;
+  const fromServer = data?.source === "server";
+  const subjectFromServer = data?.subject_source === "server";
+  const dirty = Boolean(data) && subject.trim() !== (data?.vapid_subject ?? "");
+  const contactInvalid =
+    saveContact.error instanceof ApiError && saveContact.error.payload?.code === "invalid_push_contact";
+  const when = (at: string) => formatInZone(at, null, locale, "date-time");
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 pb-24 pt-8 sm:px-6">
@@ -121,126 +82,134 @@ export function PlatformPushSettingsPage() {
       </header>
 
       {forbidden ? <p className="mt-6 text-[var(--text-soft)]">{t("forbidden")}</p> : null}
-      {settings.isError && !forbidden ? <ErrorNotice className="mt-6">{t("loadError")}</ErrorNotice> : null}
-      {settings.isPending && token ? <p className="mt-6 text-sm text-[var(--dim)]">{t("loading")}</p> : null}
+      {status.isError && !forbidden ? <ErrorNotice className="mt-6">{t("loadError")}</ErrorNotice> : null}
+      {status.isPending && token ? <p className="mt-6 text-sm text-[var(--dim)]">{t("loading")}</p> : null}
 
-      {settings.data ? (
+      {data ? (
         <div className="mt-6 space-y-6">
-          <section className="space-y-2 text-sm leading-6 text-[var(--text-soft)]">
-            <p>{t("howItWorks")}</p>
-            <p>{t("howMembersChoose")}</p>
+          <section
+            className="space-y-3 rounded-[1.4rem] border p-5"
+            style={{ background: "var(--panel)", borderColor: "var(--border)" }}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-lg font-semibold text-[var(--text)]">{t("statusHeading")}</h2>
+              <span
+                data-testid="push-status"
+                className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold"
+                style={{
+                  background: data.enabled
+                    ? "color-mix(in srgb, var(--success) 14%, var(--panel-muted))"
+                    : "var(--panel-muted)",
+                  color: data.enabled ? "var(--success)" : "var(--muted)",
+                }}
+              >
+                <span aria-hidden className="h-2 w-2 rounded-full" style={{ background: "currentColor" }} />
+                {data.enabled ? t("statusOn") : t("statusOff")}
+              </span>
+            </div>
+            <p className="text-sm leading-6 text-[var(--text-soft)]">{t("howMembersChoose")}</p>
+            <p data-testid="push-stats" className="text-xs leading-5 text-[var(--text-soft)]">
+              {t("deviceCount", { count: data.device_count })}
+              {" · "}
+              {data.last_sent_at ? t("lastSent", { when: when(data.last_sent_at) }) : t("neverSent")}
+            </p>
+            {fromServer ? <p className="text-xs leading-5 text-[var(--text-soft)]">{t("sourceServer")}</p> : null}
           </section>
 
-          <div
-            data-testid="push-status"
-            className="rounded-[1.4rem] border p-4 text-sm"
-            style={{
-              background: enabled ? "color-mix(in srgb, var(--success) 10%, var(--panel-muted))" : "var(--panel-muted)",
-              borderColor: "var(--border)",
-              color: enabled ? "var(--success)" : "var(--muted)",
-            }}
-          >
-            {enabled ? t("statusOn") : t("statusOff")}
-          </div>
-
           <div className="space-y-2">
-            <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() => void generate()}
-                className="rounded-full px-4 py-2 text-sm font-semibold"
-                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-              >
-                {privateKeySaved ? t("generateReplace") : t("generate")}
-              </button>
-              {privateKeySaved ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setForm({ publicKey: "", privateKey: "", subject: "", clearPrivateKey: true });
-                    setGenerated(false);
-                  }}
-                  className="rounded-full px-4 py-2 text-sm font-semibold"
-                  style={{ background: "var(--panel-muted)", color: "var(--muted)" }}
-                >
-                  {t("turnOff")}
-                </button>
-              ) : null}
-            </div>
-            <p className="text-xs leading-5 text-[var(--text-soft)]">{t("generateHelp")}</p>
-            {privateKeySaved ? <p className="text-xs leading-5 text-[var(--text-soft)]">{t("turnOffHelp")}</p> : null}
-          </div>
-          {generateError ? <ErrorNotice>{t("generateError")}</ErrorNotice> : null}
-          {replacingKeys ? <ErrorNotice>{t("replaceWarning")}</ErrorNotice> : null}
-
-          <Field id="push-subject" label={t("subjectLabel")} help={t("subjectHelp")}>
+            <label htmlFor="push-subject" className="block text-sm font-semibold text-[var(--text)]">
+              {t("subjectLabel")}
+            </label>
             <input
               id="push-subject"
               aria-describedby="push-subject-help"
-              className="w-full rounded-2xl border px-4 py-3 text-sm"
+              aria-invalid={contactInvalid || undefined}
+              className="w-full rounded-2xl border px-4 py-3 text-sm disabled:opacity-70"
+              disabled={subjectFromServer}
               placeholder={t("subjectPlaceholder")}
-              style={fieldStyle}
-              value={form.subject}
-              onChange={(e) => setForm((current) => ({ ...current, subject: e.target.value, clearPrivateKey: false }))}
+              style={{ ...fieldStyle, ...(contactInvalid ? { borderColor: "var(--danger)" } : null) }}
+              value={subject}
+              onChange={(e) => {
+                setSubject(e.target.value);
+                saveContact.reset();
+              }}
             />
-          </Field>
-
-          <Field id="push-public-key" label={t("publicKeyLabel")} help={t("publicKeyHelp")}>
-            <textarea
-              id="push-public-key"
-              aria-describedby="push-public-key-help"
-              className="min-h-24 w-full rounded-2xl border px-4 py-3 font-mono text-xs"
-              spellCheck={false}
-              style={fieldStyle}
-              value={form.publicKey}
-              onChange={(e) => setForm((current) => ({ ...current, publicKey: e.target.value, clearPrivateKey: false }))}
-            />
-          </Field>
-
-          <Field
-            id="push-private-key"
-            label={privateKeySaved ? t("privateKeyReplaceLabel") : t("privateKeyLabel")}
-            help={t("privateKeyHelp")}
-          >
-            <textarea
-              id="push-private-key"
-              aria-describedby="push-private-key-help"
-              className="min-h-24 w-full rounded-2xl border px-4 py-3 font-mono text-xs"
-              placeholder={privateKeySaved ? t("privateKeyKeep") : ""}
-              spellCheck={false}
-              style={fieldStyle}
-              value={form.privateKey}
-              onChange={(e) => setForm((current) => ({ ...current, privateKey: e.target.value, clearPrivateKey: false }))}
-            />
-          </Field>
-
-          {save.isError ? <ErrorNotice>{t("saveError")}</ErrorNotice> : null}
-
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              disabled={!dirty || save.isPending}
-              onClick={() => save.mutate()}
-              className="rounded-full px-5 py-3 text-sm font-semibold disabled:opacity-60"
-              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-            >
-              {save.isPending ? t("saving") : t("save")}
-            </button>
-            {dirty ? (
-              <button
-                type="button"
-                onClick={() => {
-                  if (server) setForm(server);
-                  setGenerated(false);
-                }}
-                className="rounded-full px-4 py-2 text-sm font-semibold"
-                style={{ background: "var(--panel-muted)", color: "var(--muted)" }}
-              >
-                {t("reset")}
-              </button>
+            {contactInvalid ? (
+              <p className="text-xs leading-5" style={{ color: "var(--danger)" }}>{t("subjectInvalid")}</p>
             ) : null}
-            {save.isSuccess && !dirty ? <span className="text-sm" style={{ color: "var(--success)" }}>{t("saved")}</span> : null}
+            <p id="push-subject-help" className="text-xs leading-5 text-[var(--text-soft)]">
+              {subjectFromServer ? t("subjectServer") : t("subjectHelp")}
+            </p>
+            {subjectFromServer ? null : (
+              <div className="flex flex-wrap items-center gap-3 pt-1">
+                <button
+                  type="button"
+                  disabled={!dirty || saveContact.isPending}
+                  onClick={() => saveContact.mutate()}
+                  className="rounded-full px-5 py-2.5 text-sm font-semibold disabled:opacity-60"
+                  style={primary}
+                >
+                  {saveContact.isPending ? t("saving") : t("save")}
+                </button>
+                {saveContact.isSuccess && !dirty ? (
+                  <span className="text-sm" style={{ color: "var(--success)" }}>{t("saved")}</span>
+                ) : null}
+              </div>
+            )}
+            {saveContact.isError && !contactInvalid ? <ErrorNotice>{t("saveError")}</ErrorNotice> : null}
           </div>
+
+          {fromServer ? null : (
+            <details className="rounded-[1.3rem] p-4" style={{ border: "1px solid var(--border)" }}>
+              <summary className="cursor-pointer text-sm font-semibold text-[var(--muted)]">{t("advanced")}</summary>
+              <div className="mt-3 space-y-3">
+                <p className="text-sm leading-6 text-[var(--text-soft)]">{t("rotateHelp")}</p>
+                {data.keys_created_at ? (
+                  <p className="text-xs text-[var(--text-soft)]">{t("keysSince", { when: when(data.keys_created_at) })}</p>
+                ) : null}
+                {confirming ? (
+                  <div
+                    aria-live="polite"
+                    data-testid="push-rotate-confirm"
+                    className="space-y-3 rounded-2xl p-4 text-sm"
+                    style={{ background: "color-mix(in srgb, var(--danger) 10%, var(--panel-muted))", color: "var(--danger)" }}
+                  >
+                    <p>{t("rotateConfirm", { count: data.device_count })}</p>
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        disabled={rotate.isPending}
+                        onClick={() => rotate.mutate()}
+                        className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-60"
+                        style={{ background: "var(--danger)", color: "var(--primary-contrast)" }}
+                      >
+                        {rotate.isPending ? t("rotating") : t("rotateConfirmButton")}
+                      </button>
+                      <button type="button" onClick={() => setConfirming(false)} className="rounded-full px-4 py-2 text-sm font-semibold" style={quiet}>
+                        {t("cancel")}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        rotate.reset();
+                        setConfirming(true);
+                      }}
+                      className="rounded-full px-4 py-2 text-sm font-semibold"
+                      style={quiet}
+                    >
+                      {t("rotate")}
+                    </button>
+                    {rotate.isSuccess ? <span className="text-sm" style={{ color: "var(--success)" }}>{t("rotated")}</span> : null}
+                  </div>
+                )}
+                {rotate.isError ? <ErrorNotice>{t("rotateError")}</ErrorNotice> : null}
+              </div>
+            </details>
+          )}
         </div>
       ) : null}
     </main>

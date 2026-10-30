@@ -1,6 +1,6 @@
 # ADR-218: Web Push keys belong to the platform console, not to a gym's settings
 Date: 2026-10-28
-Status: Accepted (supersedes the placement in ADR-049)
+Status: Accepted (supersedes the placement in ADR-049; key editor superseded by ADR-277)
 
 ## Context
 ADR-049 moved the Web Push (VAPID) key pair out of environment variables into a

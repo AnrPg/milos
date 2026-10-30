@@ -62,8 +62,8 @@ defmodule PaleeWeb.AdminSettingsControllerTest do
     })
     |> json_response(200)
 
-    assert Palee.Notifications.get_push_settings().vapid_private_key_configured == false
-    assert Palee.Notifications.get_push_settings().vapid_public_key == nil
+    assert Palee.Notifications.PushKeyStore.get().vapid_private_key == nil
+    assert Palee.Notifications.PushKeyStore.get().vapid_public_key == nil
   end
 
   test "a gym's first finance settings save is stored for that gym", %{conn: conn} do
