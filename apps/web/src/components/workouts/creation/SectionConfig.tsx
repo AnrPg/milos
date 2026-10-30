@@ -173,9 +173,9 @@ export function SectionConfig({ section }: Props) {
                   <div className="flex flex-col gap-2">
                     {Array.from({ length: totalMinutes }, (_, i) => i + 1).map((min) => (
                       <div key={min} className="flex items-center justify-between gap-2">
-                        <span className="text-xs" style={{ color: "var(--muted)" }}>{i18n("min7eb0cee")} {min}</span>
+                        <span className="text-xs" style={{ color: "var(--muted)" }}>{i18n("minuteNumber", { number: min })}</span>
                         <TimeInput
-                          ariaLabel={`${i18n("min7eb0cee")} ${min}`}
+                          ariaLabel={i18n("minuteNumber", { number: min })}
                           value={((section.formatParams["interval_seconds_" + (min)] as number)
                             ?? (section.formatParams.interval_seconds as number)
                             ?? 60)}
@@ -202,7 +202,7 @@ export function SectionConfig({ section }: Props) {
                   }}
                 >
                   <span>
-                    {remainder}{i18n("sLeftover34f149a")} {toMMSS(suggestedDuration)} {i18n("fitsExactly1b0f633")}
+                    {i18n("sectionLeftoverSeconds", { count: remainder, duration: toMMSS(suggestedDuration) })}
                   </span>
                   <button
                     type="button"

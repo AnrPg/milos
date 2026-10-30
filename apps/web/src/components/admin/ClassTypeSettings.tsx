@@ -263,7 +263,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
           }
         >
             <p className="text-sm leading-6" style={{ color: "var(--muted)" }}>
-              {archiveMapping.futureCount} {i18n("futureClass2a2682f")}{archiveMapping.futureCount === 1 ? "" : "es"} {i18n("use04489a1")} {archiveMapping.source.name}{i18n("pastAndCurrentClassesWillRetainItFor19acc8f")}
+              {i18n("classTypeArchiveFutureUse", { count: archiveMapping.futureCount, name: archiveMapping.source.name })}
             </p>
             <Select
               className="mt-5 w-full rounded-2xl px-4 py-3 text-sm outline-none"

@@ -333,7 +333,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
                   {i18n("athletesda22204")}
                   {selectedIds.length > 0 ? (
                     <span className="ms-2 rounded-full px-1.5 py-0.5 text-[10px]" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
-                      {selectedIds.length} {i18n("selected835f3b5")}
+                      {i18n("selectedCount", { count: selectedIds.length })}
                     </span>
                   ) : null}
                 </p>

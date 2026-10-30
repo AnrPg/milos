@@ -191,7 +191,7 @@ export function CalendarView({
                     style={{ color: "var(--dim)" }}
                     type="button"
                   >
-                    +{daySlots.length - 3} {i18n("moree7c95b4")}
+                    {i18n("moreCount", { count: daySlots.length - 3 })}
                   </button>
                 ) : null}
               </section>
@@ -434,7 +434,7 @@ function SlotCard({
       </div>
 
       <div className="mt-3 flex items-center justify-between text-xs" style={{ color: "var(--dim)" }}>
-        <span>{slot.approved_booking_count}/{slot.capacity} {i18n("booked67fbe17")}</span>
+        <span>{i18n("bookedOfCapacity", { booked: slot.approved_booking_count, capacity: slot.capacity })}</span>
         <span style={{ color: slot.current_user_booking ? "var(--primary)" : isUnavailable ? "var(--border-strong)" : "var(--dim)" }}>
           {slotStatusLabel(slot, isPast)}
         </span>

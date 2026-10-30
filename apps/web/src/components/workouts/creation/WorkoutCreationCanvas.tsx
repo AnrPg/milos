@@ -57,7 +57,7 @@ function ExerciseDragPreview({ exercise, section }: { exercise: DraftExercise; s
         : exercise.intervalAssignment === 2 ? i18n("even9e767ad")
         : null
       : ctx.intervalMode === "minute" && exercise.intervalAssignment !== null
-        ? i18n("min7eb0cee") + (exercise.intervalAssignment)
+        ? i18n("minuteNumber", { number: exercise.intervalAssignment })
         : null;
 
   const hasLoad = ctx.showLoad && exercise.loadMode !== "bw" && exercise.loadValue != null;

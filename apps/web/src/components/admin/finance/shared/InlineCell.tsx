@@ -315,7 +315,7 @@ export function InlineToggle({
       }}
       onClick={() => onSave(next.value)}
       type="button"
-      title={i18n("clickToSet1c43780") + (next.label)}
+      title={i18n("clickToSetValue", { value: next.label })}
     >
       {current.label}
     </button>

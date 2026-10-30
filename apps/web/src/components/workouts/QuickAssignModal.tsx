@@ -328,7 +328,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                           <textarea
                             className="mt-2 min-h-20 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
                             style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)", resize: "vertical" }}
-                            placeholder={i18n("coachNoteFor3d1b8c2") + (athlete.nickname) + "..."}
+                            placeholder={i18n("coachNoteForName", { name: athlete.nickname })}
                             value={athleteNotes[athlete.id] ?? ""}
                             onChange={(event) =>
                               setAthleteNotes((current) => ({

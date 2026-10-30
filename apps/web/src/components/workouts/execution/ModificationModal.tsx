@@ -233,8 +233,8 @@ export function ModificationModal({
             <div>
               <label className="block text-xs font-semibold mb-1" style={{ color: "var(--muted)" }}>
                 {exercise.load_mode === "pct_1rm"
-                  ? i18n("loadRmPrescribed659bd8a") + (exercise.load_value) + "%)"
-                  : i18n("loadKgPrescribed1134141") + (exercise.load_value) + " " + semanticLabel("kg", i18n) + ")"}
+                  ? i18n("loadPercentRmPrescribed", { value: exercise.load_value ?? 0 })
+                  : i18n("loadKgPrescribed", { value: exercise.load_value ?? 0, unit: semanticLabel("kg", i18n) })}
               </label>
               <input
                 type="number"
