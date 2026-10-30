@@ -868,11 +868,6 @@
     "monthlyRanking5999a91": "Μηνιαία κατάταξη:",
     "countsPersonalRecordsPrsLoggedInTheCurrentf701a4e": "Μετρά τα PR που κατέγραψες αυτόν τον μήνα.",
     "theLeaderboardIsOptInOnlyYourData3e23cde": "Ο πίνακας κατάταξης είναι προαιρετικός. Τα δεδομένα σου δεν τα βλέπει κανείς, εκτός αν επιλέξεις να συμμετέχεις.",
-    "consistencyScore4c4624c": "Βαθμός συνέπειας",
-    "thePercentageOfWeeksInTheLast12b38b745": "Το ποσοστό των τελευταίων 12 εβδομάδων στις οποίες ολοκλήρωσες τουλάχιστον",
-    "showUpConsistentlyCompleteAtLeast7695825": "Έλα με συνέπεια: ολοκλήρωσε τουλάχιστον",
-    "perWeekToCountThatWeekTowardYourc1cfc10": "την εβδομάδα για να μετρήσει η εβδομάδα στον βαθμό σου.",
-    "consistencyOverTimePredictsLongTermAthleticProgress04e2415": "Η συνέπεια στον χρόνο προβλέπει τη μακροπρόθεσμη πρόοδο καλύτερα από οποιαδήποτε άλλη μέτρηση.",
     "whatTheyAree294e57": "Τι είναι:",
     "timeLimitedGoalsSetByYourCoachOreba26f4": "Στόχοι με προθεσμία από τον coach σου ή το Palee, για να έχει η προπόνησή σου σκοπό και ενέργεια.",
     "howToParticipate3af38ca": "Τρόπος συμμετοχής:",
@@ -4792,7 +4787,13 @@
     "semanticWorkoutDanceFitness": "Χορευτική γυμναστική (Zumba)",
     "semanticWorkoutPoleAerial": "Pole & εναέρια",
     "semanticWorkoutOutdoorTraining": "Υπαίθρια προπόνηση",
-    "semanticWorkoutClimbingBouldering": "Αναρρίχηση & bouldering"
+    "semanticWorkoutClimbingBouldering": "Αναρρίχηση & bouldering",
+    "motivationHelpWhat": "Το ποσοστό των τελευταίων 10 εβδομάδων στις οποίες έπιασες τον εβδομαδιαίο στόχο σου: {workouts}.",
+    "motivationHelpHow": "Πιάσε τον στόχο σου κάθε εβδομάδα. Κάθε εβδομάδα στον στόχο ανεβάζει τον βαθμό κατά 10 μονάδες.",
+    "motivationHelpWhy": "Δείχνει αν η προπόνηση έγινε σταθερή συνήθεια τους τελευταίους μήνες, όχι μόνο αυτή την εβδομάδα.",
+    "perseveranceHelpWhat": "Πόσο πιστά ακολούθησες το πρόγραμμα στις τελευταίες 7 ημέρες προπόνησης (οι ημέρες ξεκούρασης δεν μετρούν). Κάθε άσκηση που παρέλειψες, ή που έκανες με άλλα κιλά ή επαναλήψεις από όσα έγραφε το WOD, τον μειώνει, ανάλογα με το πόσο απείχες.",
+    "perseveranceHelpHow": "Κάνε τις ασκήσεις όπως είναι γραμμένες. Αν δεν έχεις καταγράψει καμία αλλαγή, ο βαθμός είναι 100%.",
+    "perseveranceHelpWhy": "Το πρόγραμμα του coach σου είναι φτιαγμένο να προοδεύει βήμα βήμα. Όσο πιο κοντά του μένεις, τόσο καλύτερα δουλεύει."
   },
   "PrSharing": {
     "gymLabel": "Πού πέτυχες αυτό το PR;",

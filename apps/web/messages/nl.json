@@ -868,11 +868,6 @@
     "monthlyRanking5999a91": "Maandelijkse ranglijst:",
     "countsPersonalRecordsPrsLoggedInTheCurrentf701a4e": "Telt persoonlijke records (PR's) geregistreerd in de huidige maand.",
     "theLeaderboardIsOptInOnlyYourData3e23cde": "Het klassement is alleen opt-in. Uw gegevens zijn nooit zichtbaar voor anderen, tenzij u zich expliciet aansluit.",
-    "consistencyScore4c4624c": "Consistentiescore",
-    "thePercentageOfWeeksInTheLast12b38b745": "Het percentage weken in de afgelopen 12 weken waarin u minimaal hebt afgerond",
-    "showUpConsistentlyCompleteAtLeast7695825": "Consequent verschijnen – tenminste compleet",
-    "perWeekToCountThatWeekTowardYourc1cfc10": "per week om die week mee te tellen voor uw score.",
-    "consistencyOverTimePredictsLongTermAthleticProgress04e2415": "Consistentie in de loop van de tijd voorspelt atletische vooruitgang op de lange termijn beter dan welke afzonderlijke maatstaf dan ook.",
     "whatTheyAree294e57": "Wat ze zijn:",
     "timeLimitedGoalsSetByYourCoachOreba26f4": "Tijdgebonden doelen gesteld door uw coach of het platform om uw training doelgericht en energiek te houden.",
     "howToParticipate3af38ca": "Hoe deelnemen:",
@@ -4792,7 +4787,13 @@
     "semanticWorkoutDanceFitness": "Dansfitness (Zumba)",
     "semanticWorkoutPoleAerial": "Paaldansen & aerial",
     "semanticWorkoutOutdoorTraining": "Buitentraining",
-    "semanticWorkoutClimbingBouldering": "Klimmen & boulderen"
+    "semanticWorkoutClimbingBouldering": "Klimmen & boulderen",
+    "motivationHelpWhat": "Het deel van de afgelopen 10 weken waarin je je weekdoel van {workouts} haalde.",
+    "motivationHelpHow": "Haal elke week je doel. Elke week op doel telt 10 punten op bij de score.",
+    "motivationHelpWhy": "Het laat zien of trainen de afgelopen maanden een vaste gewoonte is geworden, niet alleen deze week.",
+    "perseveranceHelpWhat": "Hoe nauwkeurig je het programma volgde op je laatste 7 trainingsdagen (rustdagen tellen niet). Elke oefening die je oversloeg, of deed met ander gewicht of andere herhalingen dan in de WOD stond, verlaagt de score naar gelang je afweek.",
+    "perseveranceHelpHow": "Doe de oefeningen zoals ze zijn geschreven. Als je geen wijzigingen hebt vastgelegd, is de score 100%.",
+    "perseveranceHelpWhy": "Het programma van je coach is gemaakt om stap voor stap op te bouwen. Hoe dichter je erbij blijft, hoe beter het werkt."
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",

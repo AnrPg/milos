@@ -868,11 +868,6 @@
     "monthlyRanking5999a91": "الترتيب الشهري:",
     "countsPersonalRecordsPrsLoggedInTheCurrentf701a4e": "حساب السجلات الشخصية (PRs) التي تم تسجيلها في الشهر الحالي.",
     "theLeaderboardIsOptInOnlyYourData3e23cde": "لوحة المتصدرين قابلة للاشتراك فقط. لن تكون بياناتك مرئية للآخرين أبدًا ما لم تنضم صراحةً.",
-    "consistencyScore4c4624c": "درجة الاتساق",
-    "thePercentageOfWeeksInTheLast12b38b745": "النسبة المئوية للأسابيع في آخر 12 أسبوعًا التي أكملت فيها على الأقل",
-    "showUpConsistentlyCompleteAtLeast7695825": "اظهر باستمرار – أكمل على الأقل",
-    "perWeekToCountThatWeekTowardYourc1cfc10": "في الأسبوع لحساب هذا الأسبوع ضمن درجاتك.",
-    "consistencyOverTimePredictsLongTermAthleticProgress04e2415": "يتنبأ الاتساق مع مرور الوقت بالتقدم الرياضي على المدى الطويل بشكل أفضل من أي مقياس واحد.",
     "whatTheyAree294e57": "ما هم:",
     "timeLimitedGoalsSetByYourCoachOreba26f4": "أهداف محددة زمنيًا حددها مدربك أو المنصة للحفاظ على تدريبك هادفًا ونشطًا.",
     "howToParticipate3af38ca": "كيفية المشاركة:",
@@ -4792,7 +4787,13 @@
     "semanticWorkoutDanceFitness": "لياقة الرقص (زومبا)",
     "semanticWorkoutPoleAerial": "البول والرياضات الهوائية",
     "semanticWorkoutOutdoorTraining": "التدريب في الهواء الطلق",
-    "semanticWorkoutClimbingBouldering": "التسلق والبولدرينغ"
+    "semanticWorkoutClimbingBouldering": "التسلق والبولدرينغ",
+    "motivationHelpWhat": "نسبة الأسابيع العشرة الأخيرة التي حققت فيها هدفك الأسبوعي: {workouts}.",
+    "motivationHelpHow": "حقق هدفك كل أسبوع. كل أسبوع تحقق فيه الهدف يضيف 10 نقاط إلى النتيجة.",
+    "motivationHelpWhy": "يوضح ما إذا كان التدريب قد أصبح عادة ثابتة في الأشهر الأخيرة، لا هذا الأسبوع فقط.",
+    "perseveranceHelpWhat": "مدى التزامك بالبرنامج في آخر 7 أيام تدريب (أيام الراحة لا تُحتسب). كل تمرين تخطيته، أو أديته بوزن أو تكرارات مختلفة عما في WOD، يخفضه بقدر ابتعادك.",
+    "perseveranceHelpHow": "أدِّ التمارين كما هي مكتوبة. إذا لم تسجل أي تغييرات فالنتيجة 100%.",
+    "perseveranceHelpWhy": "برنامج مدربك مصمم ليتقدم خطوة بخطوة. كلما بقيت أقرب إليه، كان أكثر فعالية."
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",

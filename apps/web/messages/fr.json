@@ -868,11 +868,6 @@
     "monthlyRanking5999a91": "Classement mensuel :",
     "countsPersonalRecordsPrsLoggedInTheCurrentf701a4e": "Compte les records personnels (PR) enregistrés pendant le mois en cours.",
     "theLeaderboardIsOptInOnlyYourData3e23cde": "Le classement se fait uniquement sur inscription. Tes données ne sont jamais visibles par les autres, sauf si tu le rejoins explicitement.",
-    "consistencyScore4c4624c": "Score de régularité",
-    "thePercentageOfWeeksInTheLast12b38b745": "Le pourcentage de semaines, sur les 12 dernières, pendant lesquelles tu as terminé au moins",
-    "showUpConsistentlyCompleteAtLeast7695825": "Viens régulièrement : termine au moins",
-    "perWeekToCountThatWeekTowardYourc1cfc10": "par semaine pour que la semaine compte dans ton score.",
-    "consistencyOverTimePredictsLongTermAthleticProgress04e2415": "La régularité dans le temps prédit mieux la progression sportive à long terme que n’importe quel indicateur isolé.",
     "whatTheyAree294e57": "Ce que c’est :",
     "timeLimitedGoalsSetByYourCoachOreba26f4": "Des objectifs limités dans le temps, fixés par ton coach ou la plateforme pour garder un entraînement motivant et ciblé.",
     "howToParticipate3af38ca": "Comment participer :",
@@ -4792,7 +4787,13 @@
     "semanticWorkoutDanceFitness": "Danse fitness (Zumba)",
     "semanticWorkoutPoleAerial": "Pole dance & aérien",
     "semanticWorkoutOutdoorTraining": "Entraînement en plein air",
-    "semanticWorkoutClimbingBouldering": "Escalade & bloc"
+    "semanticWorkoutClimbingBouldering": "Escalade & bloc",
+    "motivationHelpWhat": "La part des 10 dernières semaines où tu as atteint ton objectif hebdomadaire de {workouts}.",
+    "motivationHelpHow": "Atteins ton objectif chaque semaine. Chaque semaine réussie ajoute 10 points au score.",
+    "motivationHelpWhy": "Il montre si l’entraînement est devenu une habitude stable ces derniers mois, pas seulement cette semaine.",
+    "perseveranceHelpWhat": "À quel point tu as suivi le programme pendant tes 7 derniers jours d’entraînement (les jours de repos ne comptent pas). Chaque exercice sauté, ou fait avec une autre charge ou d’autres répétitions que celles du WOD, le fait baisser selon l’écart.",
+    "perseveranceHelpHow": "Fais les exercices tels qu’ils sont écrits. Si tu n’as noté aucun changement, le score est de 100%.",
+    "perseveranceHelpWhy": "Le programme de ton coach est conçu pour progresser pas à pas. Plus tu le suis de près, mieux il fonctionne."
   },
   "PrSharing": {
     "gymLabel": "Où as-tu réalisé ce PR ?",

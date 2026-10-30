@@ -868,11 +868,6 @@
     "monthlyRanking5999a91": "Clasificación mensual:",
     "countsPersonalRecordsPrsLoggedInTheCurrentf701a4e": "Cuenta las marcas personales (PR) registradas en el mes actual.",
     "theLeaderboardIsOptInOnlyYourData3e23cde": "La clasificación es voluntaria. Tus datos nunca son visibles para otros a menos que te unas expresamente.",
-    "consistencyScore4c4624c": "Puntuación de constancia",
-    "thePercentageOfWeeksInTheLast12b38b745": "El porcentaje de semanas de las últimas 12 en las que completaste al menos",
-    "showUpConsistentlyCompleteAtLeast7695825": "Sé constante: completa al menos",
-    "perWeekToCountThatWeekTowardYourc1cfc10": "por semana para que esa semana cuente en tu puntuación.",
-    "consistencyOverTimePredictsLongTermAthleticProgress04e2415": "La constancia a lo largo del tiempo predice el progreso deportivo a largo plazo mejor que cualquier métrica individual.",
     "whatTheyAree294e57": "Qué son:",
     "timeLimitedGoalsSetByYourCoachOreba26f4": "Objetivos con fecha límite que fija tu coach o la plataforma para que tu entrenamiento tenga propósito y energía.",
     "howToParticipate3af38ca": "Cómo participar:",
@@ -4792,7 +4787,13 @@
     "semanticWorkoutDanceFitness": "Baile fitness (Zumba)",
     "semanticWorkoutPoleAerial": "Pole y aéreos",
     "semanticWorkoutOutdoorTraining": "Entrenamiento al aire libre",
-    "semanticWorkoutClimbingBouldering": "Escalada y búlder"
+    "semanticWorkoutClimbingBouldering": "Escalada y búlder",
+    "motivationHelpWhat": "El porcentaje de las últimas 10 semanas en las que alcanzaste tu objetivo semanal de {workouts}.",
+    "motivationHelpHow": "Alcanza tu objetivo cada semana. Cada semana en objetivo suma 10 puntos a la puntuación.",
+    "motivationHelpWhy": "Muestra si entrenar se ha convertido en un hábito estable en los últimos meses, no solo esta semana.",
+    "perseveranceHelpWhat": "Hasta qué punto seguiste el programa en tus últimos 7 días de entrenamiento (los días de descanso no cuentan). Cada ejercicio que omitiste, o que hiciste con otro peso u otras repeticiones distintas de las del WOD, lo reduce según cuánto te desviaste.",
+    "perseveranceHelpHow": "Haz los ejercicios tal como están escritos. Si no has registrado cambios, la puntuación es 100%.",
+    "perseveranceHelpWhy": "El programa de tu coach está pensado para progresar paso a paso. Cuanto más te ciñes a él, mejor funciona."
   },
   "PrSharing": {
     "gymLabel": "¿Dónde conseguiste este PR?",

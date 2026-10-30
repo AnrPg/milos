@@ -868,11 +868,6 @@
     "monthlyRanking5999a91": "דירוג חודשי:",
     "countsPersonalRecordsPrsLoggedInTheCurrentf701a4e": "סופר רשומות אישיות (PRs) שנרשמו בחודש הנוכחי.",
     "theLeaderboardIsOptInOnlyYourData3e23cde": "ה-Leaderboard הוא הצטרפות בלבד. הנתונים שלך לעולם אינם גלויים לאחרים אלא אם כן אתה מצטרף במפורש.",
-    "consistencyScore4c4624c": "ציון עקביות",
-    "thePercentageOfWeeksInTheLast12b38b745": "אחוז השבועות ב-12 השבועות האחרונים שבהם השלמת לפחות",
-    "showUpConsistentlyCompleteAtLeast7695825": "הצג באופן עקבי - השלם לפחות",
-    "perWeekToCountThatWeekTowardYourc1cfc10": "לשבוע כדי לספור את השבוע הזה לקראת הציון שלך.",
-    "consistencyOverTimePredictsLongTermAthleticProgress04e2415": "עקביות לאורך זמן מנבאת התקדמות אתלטית ארוכת טווח טוב יותר מכל מדד בודד.",
     "whatTheyAree294e57": "מה הם:",
     "timeLimitedGoalsSetByYourCoachOreba26f4": "יעדים מוגבלים בזמן שהוגדרו על ידי המאמן שלך או הפלטפורמה כדי לשמור על האימון שלך תכליתי ומלא אנרגיה.",
     "howToParticipate3af38ca": "איך להשתתף:",
@@ -4792,7 +4787,13 @@
     "semanticWorkoutDanceFitness": "פיטנס ריקודי (זומבה)",
     "semanticWorkoutPoleAerial": "פול ואקרובטיקה אווירית",
     "semanticWorkoutOutdoorTraining": "אימון בחוץ",
-    "semanticWorkoutClimbingBouldering": "טיפוס ובולדרינג"
+    "semanticWorkoutClimbingBouldering": "טיפוס ובולדרינג",
+    "motivationHelpWhat": "החלק מתוך 10 השבועות האחרונים שבהם עמדת ביעד השבועי שלך: {workouts}.",
+    "motivationHelpHow": "עמוד ביעד שלך בכל שבוע. כל שבוע ביעד מוסיף 10 נקודות לציון.",
+    "motivationHelpWhy": "הוא מראה אם האימון הפך להרגל קבוע בחודשים האחרונים, ולא רק השבוע.",
+    "perseveranceHelpWhat": "עד כמה עקבת אחר התוכנית ב-7 ימי האימון האחרונים (ימי מנוחה לא נספרים). כל תרגיל שדילגת עליו, או שביצעת במשקל או בחזרות שונים ממה שנכתב ב-WOD, מוריד אותו לפי מידת הסטייה.",
+    "perseveranceHelpHow": "בצע את התרגילים כפי שהם כתובים. אם לא רשמת שינויים, הציון הוא 100%.",
+    "perseveranceHelpWhy": "התוכנית של המאמן שלך בנויה להתקדם צעד אחר צעד. ככל שתישאר קרוב אליה, היא תעבוד טוב יותר."
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",

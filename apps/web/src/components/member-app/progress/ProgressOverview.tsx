@@ -22,7 +22,7 @@ const GRID_COLUMNS = ["", "", "sm:grid-cols-2", "sm:grid-cols-3"] as const;
 export function ProgressOverview() {
   const i18n = useUiTranslations();
   const landing = useLanding();
-  const [explainVolume, setExplainVolume] = useState(false);
+  const [explain, setExplain] = useState<ScoreKind | null>(null);
 
   if (landing.noGym) return null;
   if (landing.isPending) return <LoadingLine />;
@@ -43,7 +43,7 @@ export function ProgressOverview() {
       <ScoreCard
         key="motivation"
         label={i18n("motivationd6a0619")}
-        help={<HelpIcon tooltip={i18n("workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce")} onClick={() => setExplainVolume(true)} />}
+        help={<HelpIcon tooltip={i18n("workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce")} onClick={() => setExplain("motivation")} />}
         value={`${motivation}%`}
         color="var(--success)"
         caption={i18n("last10WeeksVsTarget153cf63")}
@@ -55,7 +55,7 @@ export function ProgressOverview() {
       <ScoreCard
         key="perseverance"
         label={i18n("perseverance3b53f48")}
-        help={<HelpIcon tooltip={i18n("howCloselyYouFollowedPrescribedExercises760e833")} onClick={() => setExplainVolume(true)} />}
+        help={<HelpIcon tooltip={i18n("howCloselyYouFollowedPrescribedExercises760e833")} onClick={() => setExplain("perseverance")} />}
         value={`${perseverance}%`}
         color="var(--primary)"
         caption={i18n("last7TrainingDays5c44037")}
@@ -83,20 +83,59 @@ export function ProgressOverview() {
       <MilestoneBadges advancementCount={stats?.advancement_count ?? 0} badges={gamification.badges} />
       {cards.length > 0 ? <section className={`grid gap-4 ${GRID_COLUMNS[cards.length]}`}>{cards}</section> : null}
 
-      {explainVolume ? (
-        <InfoModal title={i18n("consistencyScore4c4624c")} onClose={() => setExplainVolume(false)}>
-          <p>
-            <strong style={{ color: "var(--text)" }}>{i18n("whatItMeasuresbbab752")}</strong> {i18n("thePercentageOfWeeksInTheLast12b38b745")} {i18n("workoutCount", { count: weeklyWorkoutTarget })}.
-          </p>
-          <p>
-            <strong style={{ color: "var(--text)" }}>{i18n("howToImprove1fadc66")}</strong> {i18n("showUpConsistentlyCompleteAtLeast7695825")} {i18n("workoutCount", { count: weeklyWorkoutTarget })} {i18n("perWeekToCountThatWeekTowardYourc1cfc10")}
-          </p>
-          <p>
-            <strong style={{ color: "var(--text)" }}>{i18n("whyItMatterscdfa2a6")}</strong> {i18n("consistencyOverTimePredictsLongTermAthleticProgress04e2415")}
-          </p>
-        </InfoModal>
+      {explain ? (
+        <ScoreExplainer kind={explain} weeklyWorkoutTarget={weeklyWorkoutTarget} onClose={() => setExplain(null)} />
       ) : null}
     </div>
+  );
+}
+
+type ScoreKind = "motivation" | "perseverance";
+
+/**
+ * Each score explains itself (ANR 2026-10-30): Κίνητρο is weeks on the
+ * person's weekly goal over 10 weeks (`MotivationCalculator`), Επιμονή is how
+ * closely the last 7 training days followed the prescription
+ * (`PerseveranceCalculator`). Keep this copy in step with those modules.
+ */
+function ScoreExplainer({
+  kind,
+  weeklyWorkoutTarget,
+  onClose,
+}: {
+  kind: ScoreKind;
+  weeklyWorkoutTarget: number;
+  onClose: () => void;
+}) {
+  const i18n = useUiTranslations();
+  const workouts = i18n("workoutCount", { count: weeklyWorkoutTarget });
+  const copy =
+    kind === "motivation"
+      ? {
+          title: i18n("motivationd6a0619"),
+          what: i18n("motivationHelpWhat", { workouts }),
+          how: i18n("motivationHelpHow"),
+          why: i18n("motivationHelpWhy"),
+        }
+      : {
+          title: i18n("perseverance3b53f48"),
+          what: i18n("perseveranceHelpWhat"),
+          how: i18n("perseveranceHelpHow"),
+          why: i18n("perseveranceHelpWhy"),
+        };
+
+  return (
+    <InfoModal title={copy.title} onClose={onClose}>
+      <p>
+        <strong style={{ color: "var(--text)" }}>{i18n("whatItMeasuresbbab752")}</strong> {copy.what}
+      </p>
+      <p>
+        <strong style={{ color: "var(--text)" }}>{i18n("howToImprove1fadc66")}</strong> {copy.how}
+      </p>
+      <p>
+        <strong style={{ color: "var(--text)" }}>{i18n("whyItMatterscdfa2a6")}</strong> {copy.why}
+      </p>
+    </InfoModal>
   );
 }
 

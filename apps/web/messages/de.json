@@ -868,11 +868,6 @@
     "monthlyRanking5999a91": "Monatsrangliste:",
     "countsPersonalRecordsPrsLoggedInTheCurrentf701a4e": "Zählt die im aktuellen Monat eingetragenen persönlichen Rekorde (PRs).",
     "theLeaderboardIsOptInOnlyYourData3e23cde": "Die Teilnahme an der Rangliste ist freiwillig. Deine Daten sind für andere nur sichtbar, wenn du ausdrücklich beitrittst.",
-    "consistencyScore4c4624c": "Beständigkeitswert",
-    "thePercentageOfWeeksInTheLast12b38b745": "Der Anteil der Wochen in den letzten 12 Wochen, in denen du mindestens Folgendes geschafft hast:",
-    "showUpConsistentlyCompleteAtLeast7695825": "Bleib dran – schaffe mindestens",
-    "perWeekToCountThatWeekTowardYourc1cfc10": "pro Woche, damit die Woche für deinen Wert zählt.",
-    "consistencyOverTimePredictsLongTermAthleticProgress04e2415": "Beständigkeit über die Zeit sagt langfristigen sportlichen Fortschritt besser voraus als jeder einzelne Messwert.",
     "whatTheyAree294e57": "Was sie sind:",
     "timeLimitedGoalsSetByYourCoachOreba26f4": "Zeitlich begrenzte Ziele von deinem Coach oder der Plattform, damit dein Training zielgerichtet und motivierend bleibt.",
     "howToParticipate3af38ca": "So machst du mit:",
@@ -4792,7 +4787,13 @@
     "semanticWorkoutDanceFitness": "Tanz-Fitness (Zumba)",
     "semanticWorkoutPoleAerial": "Pole & Aerial",
     "semanticWorkoutOutdoorTraining": "Outdoor-Training",
-    "semanticWorkoutClimbingBouldering": "Klettern & Bouldern"
+    "semanticWorkoutClimbingBouldering": "Klettern & Bouldern",
+    "motivationHelpWhat": "Der Anteil der letzten 10 Wochen, in denen du dein Wochenziel von {workouts} erreicht hast.",
+    "motivationHelpHow": "Erreiche dein Ziel jede Woche. Jede Woche im Ziel bringt dem Wert 10 Punkte.",
+    "motivationHelpWhy": "Er zeigt, ob Training in den letzten Monaten zur festen Gewohnheit geworden ist, nicht nur diese Woche.",
+    "perseveranceHelpWhat": "Wie genau du an deinen letzten 7 Trainingstagen dem Programm gefolgt bist (Ruhetage zählen nicht). Jede Übung, die du ausgelassen oder mit anderem Gewicht oder anderen Wiederholungen als im WOD gemacht hast, senkt ihn, je nachdem wie stark du abgewichen bist.",
+    "perseveranceHelpHow": "Mach die Übungen so, wie sie geschrieben sind. Wenn du keine Änderungen eingetragen hast, liegt der Wert bei 100%.",
+    "perseveranceHelpWhy": "Das Programm deines Coaches ist darauf ausgelegt, Schritt für Schritt aufzubauen. Je näher du daran bleibst, desto besser wirkt es."
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",

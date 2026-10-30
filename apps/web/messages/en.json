@@ -868,11 +868,6 @@
     "monthlyRanking5999a91": "Monthly ranking:",
     "countsPersonalRecordsPrsLoggedInTheCurrentf701a4e": "Counts personal records (PRs) logged in the current month.",
     "theLeaderboardIsOptInOnlyYourData3e23cde": "The leaderboard is opt-in only. Your data is never visible to others unless you explicitly join.",
-    "consistencyScore4c4624c": "Consistency Score",
-    "thePercentageOfWeeksInTheLast12b38b745": "The percentage of weeks in the last 12 weeks in which you completed at least",
-    "showUpConsistentlyCompleteAtLeast7695825": "Show up consistently — complete at least",
-    "perWeekToCountThatWeekTowardYourc1cfc10": "per week to count that week toward your score.",
-    "consistencyOverTimePredictsLongTermAthleticProgress04e2415": "Consistency over time predicts long-term athletic progress better than any single metric.",
     "whatTheyAree294e57": "What they are:",
     "timeLimitedGoalsSetByYourCoachOreba26f4": "Time-limited goals set by your coach or the platform to keep your training purposeful and energised.",
     "howToParticipate3af38ca": "How to participate:",
@@ -4792,7 +4787,13 @@
     "semanticWorkoutDanceFitness": "Dance fitness (Zumba)",
     "semanticWorkoutPoleAerial": "Pole & aerial",
     "semanticWorkoutOutdoorTraining": "Outdoor training",
-    "semanticWorkoutClimbingBouldering": "Climbing & bouldering"
+    "semanticWorkoutClimbingBouldering": "Climbing & bouldering",
+    "motivationHelpWhat": "The share of the last 10 weeks in which you reached your weekly goal of {workouts}.",
+    "motivationHelpHow": "Reach your weekly goal every week. Each week on goal adds 10 points to the score.",
+    "motivationHelpWhy": "It shows whether training has become a steady habit over the last few months, not just this week.",
+    "perseveranceHelpWhat": "How closely you followed the programme on your last 7 training days (rest days do not count). Every exercise you skipped, or did with different weight or reps from what the WOD said, lowers it, by as much as you strayed.",
+    "perseveranceHelpHow": "Do the exercises as they are written. If you have logged no changes, the score is 100%.",
+    "perseveranceHelpWhy": "Your coach's programme is built to progress step by step. The closer you stay to it, the better it works."
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",
