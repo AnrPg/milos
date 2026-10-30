@@ -7,7 +7,7 @@ defmodule Palee.Infrastructure.Wellbeing.EctoWellbeingStore do
   alias Palee.Infrastructure.Tenancy.RepoContext
   alias Palee.Repo
   alias Palee.Infrastructure.Journal.{FeedBound, FeedScope}
-  alias Palee.Wellbeing.{CheckIn, InjuryReport, InjuryStatusEvent}
+  alias Palee.Wellbeing.{CheckIn, InjuryAccessEntry, InjuryReport, InjuryStatusEvent}
   alias Palee.Wellbeing.Domain.CheckInQuestions
 
   @impl true
@@ -164,13 +164,37 @@ defmodule Palee.Infrastructure.Wellbeing.EctoWellbeingStore do
     |> Enum.map(&normalize_injury/1)
   end
 
-  # ADR-124 staff safety warnings: organization-provenance only. The tenant
-  # predicate (not the owner-or-tenant disjunction) keeps the acting staff
-  # member's own injuries and every personal self-report out of the result.
+  # ADR-286: what the gym's staff read about one member: every report filed
+  # at the gym (also `admin_only` ones) and the member's own reports they
+  # shared with their boxes.
+  @impl true
+  def list_box_injuries_for_user(user_id) do
+    InjuryReport
+    |> scoped_to_box_reader()
+    |> where([injury], injury.user_id == ^user_id)
+    |> order_by([injury], desc: injury.inserted_at)
+    |> preload(:events)
+    |> Repo.all()
+    |> Enum.map(&normalize_injury/1)
+  end
+
+  @impl true
+  def get_box_injury(injury_report_id) do
+    with {:ok, id} <- Ecto.UUID.cast(injury_report_id),
+         %InjuryReport{} = injury <- InjuryReport |> scoped_to_box_reader() |> Repo.get(id) do
+      normalize_injury(injury)
+    else
+      _missing -> nil
+    end
+  end
+
+  # ADR-124 staff safety warnings: the gym's reports and the shared ones
+  # (ADR-286). The box-reader predicate (not the owner-or-tenant
+  # disjunction) keeps the acting staff member's own injuries out.
   @impl true
   def list_active_tenant_injuries_for_users(user_ids) when is_list(user_ids) do
     InjuryReport
-    |> scoped_to_tenant()
+    |> scoped_to_box_reader()
     |> where([injury], injury.user_id in ^user_ids and injury.status == "active")
     |> order_by([injury], desc: injury.inserted_at)
     |> Repo.all()
@@ -182,7 +206,8 @@ defmodule Palee.Infrastructure.Wellbeing.EctoWellbeingStore do
     filters = string_key_map(filters || %{})
 
     InjuryReport
-    |> scoped_to_tenant()
+    |> scoped_to_box_reader()
+    |> injuries_of(filters["user_ids"])
     |> maybe_filter(:status, filters["status"])
     |> maybe_filter(:severity, filters["severity"])
     |> maybe_filter(:body_area, filters["body_area"])
@@ -237,6 +262,7 @@ defmodule Palee.Infrastructure.Wellbeing.EctoWellbeingStore do
       training_limitations: injury_report.training_limitations,
       tags: injury_report.tags || [],
       visibility: injury_report.visibility,
+      shared_with_box: injury_report.shared_with_box,
       journal_visibility: injury_report.journal_visibility,
       params: injury_report.params || %{},
       events: normalize_events(injury_report.events),
@@ -288,7 +314,7 @@ defmodule Palee.Infrastructure.Wellbeing.EctoWellbeingStore do
 
   defp count_injuries(since, users) do
     InjuryReport
-    |> scoped_to_tenant()
+    |> scoped_to_box_reader()
     |> injuries_of(users)
     |> where([injury], injury.inserted_at >= ^since)
     |> Repo.aggregate(:count)
@@ -309,7 +335,7 @@ defmodule Palee.Infrastructure.Wellbeing.EctoWellbeingStore do
 
   defp count_status(status, since, users) do
     InjuryReport
-    |> scoped_to_tenant()
+    |> scoped_to_box_reader()
     |> injuries_of(users)
     |> where([injury], injury.status == ^status)
     |> where([injury], injury.inserted_at >= ^since)
@@ -318,7 +344,7 @@ defmodule Palee.Infrastructure.Wellbeing.EctoWellbeingStore do
 
   defp count_injuries_by(field, since, users) do
     InjuryReport
-    |> scoped_to_tenant()
+    |> scoped_to_box_reader()
     |> injuries_of(users)
     |> where([injury], injury.inserted_at >= ^since)
     |> group_by([injury], field(injury, ^field))
@@ -340,18 +366,70 @@ defmodule Palee.Infrastructure.Wellbeing.EctoWellbeingStore do
     end
   end
 
-  # Organization-scoped reads: the admin injury list and the analytics summary
-  # describe ONE organization, so they must never widen to the acting admin's
-  # own reports filed elsewhere. Fails closed with no organization open rather
-  # than reading across every tenant.
-  defp scoped_to_tenant(query) do
+  # Organization-scoped reads (ADR-286): the admin injury list, a member's
+  # profile, safety warnings and the analytics summary describe ONE gym, so
+  # they never widen to the acting staff member's own reports. They hold the
+  # gym's own reports, plus the reports members recorded themselves and
+  # shared with their boxes (the database function checks the reader's role
+  # and the member's active membership). Fails closed with no organization.
+  defp scoped_to_box_reader(query) do
     case RepoContext.current_setting("app.organization_id") do
       organization_id when is_binary(organization_id) ->
-        where(query, [row], row.organization_id == ^organization_id)
+        where(
+          query,
+          [row],
+          row.organization_id == ^organization_id or
+            (is_nil(row.organization_id) and row.visibility == "user_and_admin" and
+               row.shared_with_box and
+               fragment("palee_injury_reaches_acting_staff(?)", row.user_id))
+        )
 
       _missing_scope ->
         where(query, [row], false)
     end
+  end
+
+  # ADR-286: only the member's own reports (no gym provenance) carry the switch.
+  @impl true
+  def set_injury_box_sharing(id, user_id, shared?) do
+    with {:ok, id} <- Ecto.UUID.cast(id),
+         %InjuryReport{organization_id: nil} = injury <-
+           Repo.get_by(InjuryReport, id: id, user_id: user_id, visibility: "user_and_admin") do
+      injury
+      |> InjuryReport.box_sharing_changeset(shared?)
+      |> Repo.update()
+      |> case do
+        {:ok, updated} -> {:ok, updated |> Repo.preload(:events) |> normalize_injury()}
+        error -> error
+      end
+    else
+      _missing -> {:error, :not_found}
+    end
+  end
+
+  @impl true
+  def record_injury_access(attrs) do
+    now = DateTime.utc_now()
+
+    entry =
+      attrs
+      |> Map.take([:organization_id, :user_id, :reader_user_id, :surface, :injury_ids])
+      |> Map.merge(%{id: Ecto.UUID.generate(), read_at: now, inserted_at: now})
+
+    {1, _rows} = Repo.insert_all(InjuryAccessEntry, [entry])
+    :ok
+  end
+
+  @impl true
+  def list_injury_access_log(user_id, limit) do
+    InjuryAccessEntry
+    |> where([entry], entry.user_id == ^user_id)
+    |> order_by([entry], desc: entry.read_at, desc: entry.id)
+    |> limit(^limit)
+    |> Repo.all()
+    |> Enum.map(
+      &Map.take(&1, [:id, :organization_id, :reader_user_id, :surface, :injury_ids, :read_at])
+    )
   end
 
   # Owner-scoped reads: personal injury records deliberately follow the member

@@ -5619,7 +5619,19 @@
       "notePlaceholder": "Πώς πάει; (προαιρετικά)",
       "save": "Αποθήκευση ενημέρωσης",
       "saving": "Αποθήκευση…",
-      "cancel": "Άκυρο"
+      "cancel": "Άκυρο",
+      "accessTitle": "Ποιος είδε τους τραυματισμούς μου",
+      "accessEmpty": "Κανείς ακόμα.",
+      "aStaffMember": "Κάποιος από το προσωπικό",
+      "accessProfile": "{reader} στο προφίλ σου · {date}",
+      "accessBoxList": "{reader} στη λίστα του box · {date}",
+      "accessSafetyWarning": "{reader} σε προειδοποίηση ασφαλείας WOD · {date}",
+      "fromMember": "Από το μέλος",
+      "staffOnly": "Μόνο για το προσωπικό",
+      "shareLabel": "Να το δει το box μου",
+      "shareHint": "Η διοίκηση και οι coach που σε προπονούν, σε κάθε box όπου είσαι μέλος, για να προσαρμόζουν την προπόνηση.",
+      "sharingTitle": "Οι τραυματισμοί μου",
+      "sharingNote": "Κάθε τραυματισμός που γράφεις έχει τον διακόπτη «Να το δει το box μου»: τον αλλάζεις στον τραυματισμό, στην Ευεξία. Όσους καταγράφει το ίδιο το box τους βλέπει πάντα το box."
     },
     "mePosts": "Αναρτήσεις",
     "mePostsHint": "Ό,τι έχεις δημοσιεύσει στα clubs σου",
@@ -5863,7 +5875,6 @@
     "sharing": {
       "coachSeesTitle": "Ο coach μου βλέπει",
       "coachSeesHint": "Τι φτάνει στους coaches σου χωρίς να το στείλεις κάθε φορά.",
-      "injuriesAlways": "Οι τραυματισμοί φαίνονται πάντα στον coach, για την ασφάλειά σου.",
       "communityTitle": "Κοινότητα",
       "communityHint": "Πού εμφανίζεσαι στα clubs και στους άλλους.",
       "prCelebrations": "PR celebrations",

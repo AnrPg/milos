@@ -16535,6 +16535,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/wellbeing/injuries/access-log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Which staff of your boxes read your injuries, and when (ADR-286) */
+        get: operations["PaleeWeb.WellbeingController.access_log"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/wellbeing/injuries/{id}": {
         parameters: {
             query?: never;
@@ -16580,6 +16597,23 @@ export interface paths {
         put?: never;
         /** Reopen a healed injury */
         post: operations["PaleeWeb.WellbeingController.reopen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/wellbeing/injuries/{id}/sharing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Share one of your own injuries with your boxes, or stop (ADR-286) */
+        put: operations["PaleeWeb.WellbeingController.share"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -31109,6 +31143,28 @@ export interface components {
                 scope: "body_photos" | "health_data";
                 /** Format: date-time */
                 withdrawn_at?: string | null;
+            }[];
+        };
+        /** InjuryAccessLog */
+        InjuryAccessLog: {
+            entries: {
+                /** Format: uuid */
+                id: string;
+                injury_ids: string[];
+                organization: {
+                    /** Format: uuid */
+                    id?: string;
+                    name?: string | null;
+                };
+                /** Format: date-time */
+                read_at: string;
+                reader: {
+                    /** Format: uuid */
+                    id?: string | null;
+                    nickname?: string | null;
+                };
+                /** @enum {string} */
+                surface: "profile" | "box_list" | "safety_warning";
             }[];
         };
         /** Insight */
@@ -97048,6 +97104,7 @@ export interface operations {
                             inserted_at: string;
                             /** Format: uuid */
                             organization_id?: string | null;
+                            owned_by_member?: boolean;
                             params: {
                                 [key: string]: unknown;
                             };
@@ -97057,6 +97114,7 @@ export interface operations {
                             reported_by_role: "self" | "admin";
                             /** @enum {string} */
                             severity: "mild" | "moderate" | "severe";
+                            shared_with_box?: boolean;
                             /** Format: date */
                             started_on?: string | null;
                             /** @enum {string} */
@@ -97136,6 +97194,7 @@ export interface operations {
                             inserted_at: string;
                             /** Format: uuid */
                             organization_id?: string | null;
+                            owned_by_member?: boolean;
                             params: {
                                 [key: string]: unknown;
                             };
@@ -97145,6 +97204,7 @@ export interface operations {
                             reported_by_role: "self" | "admin";
                             /** @enum {string} */
                             severity: "mild" | "moderate" | "severe";
+                            shared_with_box?: boolean;
                             /** Format: date */
                             started_on?: string | null;
                             /** @enum {string} */
@@ -97219,6 +97279,7 @@ export interface operations {
                             inserted_at: string;
                             /** Format: uuid */
                             organization_id?: string | null;
+                            owned_by_member?: boolean;
                             params: {
                                 [key: string]: unknown;
                             };
@@ -97228,6 +97289,7 @@ export interface operations {
                             reported_by_role: "self" | "admin";
                             /** @enum {string} */
                             severity: "mild" | "moderate" | "severe";
+                            shared_with_box?: boolean;
                             /** Format: date */
                             started_on?: string | null;
                             /** @enum {string} */
@@ -97295,6 +97357,7 @@ export interface operations {
                             inserted_at: string;
                             /** Format: uuid */
                             organization_id?: string | null;
+                            owned_by_member?: boolean;
                             params: {
                                 [key: string]: unknown;
                             };
@@ -97304,6 +97367,7 @@ export interface operations {
                             reported_by_role: "self" | "admin";
                             /** @enum {string} */
                             severity: "mild" | "moderate" | "severe";
+                            shared_with_box?: boolean;
                             /** Format: date */
                             started_on?: string | null;
                             /** @enum {string} */
@@ -97488,6 +97552,7 @@ export interface operations {
                             inserted_at: string;
                             /** Format: uuid */
                             organization_id?: string | null;
+                            owned_by_member?: boolean;
                             params: {
                                 [key: string]: unknown;
                             };
@@ -97497,6 +97562,7 @@ export interface operations {
                             reported_by_role: "self" | "admin";
                             /** @enum {string} */
                             severity: "mild" | "moderate" | "severe";
+                            shared_with_box?: boolean;
                             /** Format: date */
                             started_on?: string | null;
                             /** @enum {string} */
@@ -132710,6 +132776,7 @@ export interface operations {
                             inserted_at: string;
                             /** Format: uuid */
                             organization_id?: string | null;
+                            owned_by_member?: boolean;
                             params: {
                                 [key: string]: unknown;
                             };
@@ -132719,6 +132786,7 @@ export interface operations {
                             reported_by_role: "self" | "admin";
                             /** @enum {string} */
                             severity: "mild" | "moderate" | "severe";
+                            shared_with_box?: boolean;
                             /** Format: date */
                             started_on?: string | null;
                             /** @enum {string} */
@@ -132754,6 +132822,7 @@ export interface operations {
                     } | null;
                     /** @enum {string} */
                     severity: "mild" | "moderate" | "severe";
+                    shared_with_box?: boolean | null;
                     /** Format: date */
                     started_on?: string | null;
                     tags?: string[] | null;
@@ -132800,6 +132869,7 @@ export interface operations {
                             inserted_at: string;
                             /** Format: uuid */
                             organization_id?: string | null;
+                            owned_by_member?: boolean;
                             params: {
                                 [key: string]: unknown;
                             };
@@ -132809,6 +132879,7 @@ export interface operations {
                             reported_by_role: "self" | "admin";
                             /** @enum {string} */
                             severity: "mild" | "moderate" | "severe";
+                            shared_with_box?: boolean;
                             /** Format: date */
                             started_on?: string | null;
                             /** @enum {string} */
@@ -132822,6 +132893,46 @@ export interface operations {
                             /** @enum {string} */
                             visibility: "admin_only" | "user_and_admin";
                         };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.WellbeingController.access_log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Access log */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: {
+                            /** Format: uuid */
+                            id: string;
+                            injury_ids: string[];
+                            organization: {
+                                /** Format: uuid */
+                                id?: string;
+                                name?: string | null;
+                            };
+                            /** Format: date-time */
+                            read_at: string;
+                            reader: {
+                                /** Format: uuid */
+                                id?: string | null;
+                                nickname?: string | null;
+                            };
+                            /** @enum {string} */
+                            surface: "profile" | "box_list" | "safety_warning";
+                        }[];
                     };
                 };
             };
@@ -132888,6 +132999,7 @@ export interface operations {
                             inserted_at: string;
                             /** Format: uuid */
                             organization_id?: string | null;
+                            owned_by_member?: boolean;
                             params: {
                                 [key: string]: unknown;
                             };
@@ -132897,6 +133009,7 @@ export interface operations {
                             reported_by_role: "self" | "admin";
                             /** @enum {string} */
                             severity: "mild" | "moderate" | "severe";
+                            shared_with_box?: boolean;
                             /** Format: date */
                             started_on?: string | null;
                             /** @enum {string} */
@@ -132971,6 +133084,7 @@ export interface operations {
                             inserted_at: string;
                             /** Format: uuid */
                             organization_id?: string | null;
+                            owned_by_member?: boolean;
                             params: {
                                 [key: string]: unknown;
                             };
@@ -132980,6 +133094,7 @@ export interface operations {
                             reported_by_role: "self" | "admin";
                             /** @enum {string} */
                             severity: "mild" | "moderate" | "severe";
+                            shared_with_box?: boolean;
                             /** Format: date */
                             started_on?: string | null;
                             /** @enum {string} */
@@ -133047,6 +133162,7 @@ export interface operations {
                             inserted_at: string;
                             /** Format: uuid */
                             organization_id?: string | null;
+                            owned_by_member?: boolean;
                             params: {
                                 [key: string]: unknown;
                             };
@@ -133056,6 +133172,91 @@ export interface operations {
                             reported_by_role: "self" | "admin";
                             /** @enum {string} */
                             severity: "mild" | "moderate" | "severe";
+                            shared_with_box?: boolean;
+                            /** Format: date */
+                            started_on?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "healed";
+                            tags: string[];
+                            training_limitations?: string | null;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_and_admin";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.WellbeingController.share": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    shared_with_box: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Injury report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        injury: {
+                            body_area: string;
+                            description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
+                            /** Format: date */
+                            healed_on?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            owned_by_member?: boolean;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            reported_by_id: string;
+                            /** @enum {string} */
+                            reported_by_role: "self" | "admin";
+                            /** @enum {string} */
+                            severity: "mild" | "moderate" | "severe";
+                            shared_with_box?: boolean;
                             /** Format: date */
                             started_on?: string | null;
                             /** @enum {string} */

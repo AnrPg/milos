@@ -12,6 +12,13 @@ defmodule Palee.Wellbeing.Ports.WellbeingStore do
 
   @callback get_injury_for_user(Ecto.UUID.t(), Ecto.UUID.t()) :: map() | nil
   @callback list_injuries_for_user(Ecto.UUID.t()) :: [map()]
+  # ADR-286: what a gym's staff read about one member, and the audit of it.
+  @callback list_box_injuries_for_user(Ecto.UUID.t()) :: [map()]
+  @callback get_box_injury(Ecto.UUID.t()) :: map() | nil
+  @callback set_injury_box_sharing(Ecto.UUID.t(), Ecto.UUID.t(), boolean()) ::
+              {:ok, map()} | {:error, :not_found | Ecto.Changeset.t()}
+  @callback record_injury_access(map()) :: :ok
+  @callback list_injury_access_log(Ecto.UUID.t(), pos_integer()) :: [map()]
   @callback list_active_tenant_injuries_for_users([Ecto.UUID.t()]) :: [map()]
   @callback list_injuries(map()) :: [map()]
   @callback injury_summary(map()) :: map()

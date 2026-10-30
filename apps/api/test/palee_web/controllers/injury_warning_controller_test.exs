@@ -53,7 +53,9 @@ defmodule PaleeWeb.InjuryWarningControllerTest do
     {:ok, _personal} =
       ReportInjury.call(athlete_context, athlete.id, %{
         "body_area" => "ankle",
-        "severity" => "mild"
+        "severity" => "mild",
+        # ADR-286: kept to themselves; a shared one is tested below.
+        "shared_with_box" => false
       })
 
     %{
@@ -71,6 +73,38 @@ defmodule PaleeWeb.InjuryWarningControllerTest do
       %{workout_id: ctx.workout.id, user_ids: [ctx.athlete.id], surface: "assign_dialog"},
       extra
     )
+  end
+
+  # ADR-286: a self-report the member shares reaches the box's warnings too,
+  # and each warning shown is logged for the member.
+  test "staff see a member's shared self-report in warnings, and the read is logged",
+       %{conn: conn} = ctx do
+    {:ok, shared} =
+      ReportInjury.call(ctx.athlete_context, ctx.athlete.id, %{
+        "body_area" => "ankle",
+        "severity" => "moderate"
+      })
+
+    response =
+      conn
+      |> put_bearer_token(ctx.owner)
+      |> post("/api/org/#{ctx.org.slug}/admin/wellbeing/injury-warnings", staff_body(ctx))
+      |> json_response(200)
+
+    [%{"warnings" => warnings}] = response["athletes"]
+    assert Enum.any?(warnings, &(&1["injury_id"] == shared.id and &1["provenance"] == "personal"))
+
+    assert %{"entries" => entries} =
+             conn
+             |> recycle()
+             |> put_bearer_token(ctx.athlete)
+             |> get("/api/wellbeing/injuries/access-log")
+             |> json_response(200)
+
+    assert Enum.any?(
+             entries,
+             &(&1["surface"] == "safety_warning" and shared.id in &1["injury_ids"])
+           )
   end
 
   test "staff evaluate athletes and only see organization-provenance injuries",

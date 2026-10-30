@@ -78,6 +78,9 @@ defmodule Palee.Application.ScalingSuggestions do
           |> Wellbeing.with_tenant_context(fn ->
             Wellbeing.list_active_injuries_for_users(athlete_ids)
           end)
+          # ADR-286: a member's own shared reports inform the coach, never
+          # the AI advisor, which reads the gym's records only.
+          |> Enum.reject(&is_nil(&1.organization_id))
           |> Enum.group_by(& &1.user_id)
 
     for assignment <- assignments,

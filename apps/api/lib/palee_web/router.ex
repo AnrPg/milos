@@ -1998,8 +1998,12 @@ defmodule PaleeWeb.Router do
     delete("/me/widget-tokens/:id", WidgetController, :delete_token)
 
     get("/wellbeing/injuries", WellbeingController, :index)
+    # ADR-286: who of your boxes' staff read your injuries.
+    get("/wellbeing/injuries/access-log", WellbeingController, :access_log)
     post("/wellbeing/injuries", WellbeingController, :create)
     patch("/wellbeing/injuries/:id/heal", WellbeingController, :heal)
+    # ADR-286: «Να το δει το box μου» per injury.
+    put("/wellbeing/injuries/:id/sharing", WellbeingController, :share)
     patch("/wellbeing/injuries/:id", WellbeingController, :update)
     post("/wellbeing/injuries/:id/reopen", WellbeingController, :reopen)
     get("/wellbeing/check-ins", CheckInController, :index)

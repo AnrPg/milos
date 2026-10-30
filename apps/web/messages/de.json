@@ -5619,7 +5619,19 @@
       "notePlaceholder": "Wie geht es? (optional)",
       "save": "Update speichern",
       "saving": "Wird gespeichert …",
-      "cancel": "Abbrechen"
+      "cancel": "Abbrechen",
+      "accessTitle": "Wer meine Verletzungen gesehen hat",
+      "accessEmpty": "Noch niemand.",
+      "aStaffMember": "Ein Teammitglied",
+      "accessProfile": "{reader} in deinem Profil · {date}",
+      "accessBoxList": "{reader} in der Liste der Box · {date}",
+      "accessSafetyWarning": "{reader} in einer WOD-Sicherheitswarnung · {date}",
+      "fromMember": "Vom Mitglied",
+      "staffOnly": "Nur fürs Team",
+      "shareLabel": "Meine Box darf es sehen",
+      "shareHint": "Die Leitung und die Coaches, die dich trainieren, in jeder Box, in der du Mitglied bist, damit sie dein Training anpassen.",
+      "sharingTitle": "Meine Verletzungen",
+      "sharingNote": "Jede Verletzung, die du einträgst, hat den Schalter «Meine Box darf es sehen»: Du änderst ihn bei der Verletzung, unter Wohlbefinden. Was die Box selbst einträgt, sieht die Box immer."
     },
     "mePosts": "Beiträge",
     "mePostsHint": "Alles, was du in deinen Clubs gepostet hast",
@@ -5863,7 +5875,6 @@
     "sharing": {
       "coachSeesTitle": "Mein Coach sieht",
       "coachSeesHint": "Was deine Coaches erreicht, ohne dass du es jedes Mal schickst.",
-      "injuriesAlways": "Verletzungen sieht dein Coach immer, zu deiner Sicherheit.",
       "communityTitle": "Community",
       "communityHint": "Wo du in Clubs und für andere erscheinst.",
       "prCelebrations": "PR-Feiern",

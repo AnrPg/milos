@@ -139,6 +139,10 @@ export type AdminUserIncident = {
   status: string;
   training_limitations: string | null;
   started_on: string | null;
+  /** ADR-286: `admin_only` reports show here too; the member does not see them. */
+  visibility?: "admin_only" | "user_and_admin";
+  /** ADR-286: the member filed it in the app and keeps it up to date. */
+  owned_by_member?: boolean;
 };
 
 export type AdminUserMessageThread = {

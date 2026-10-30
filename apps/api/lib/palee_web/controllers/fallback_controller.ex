@@ -3308,6 +3308,9 @@ defmodule PaleeWeb.FallbackController do
     not_a_client: {:unprocessable_entity, "That person is not a member or athlete here"},
     only_athletes_self_assigned: {:unprocessable_entity, "Coaches can take athletes only"},
     not_your_client: {:forbidden, "Not one of your clients"},
+    # ADR-286: a member's own injury report is theirs to change.
+    injury_owned_by_member: {:forbidden, "The member keeps this report up to date"},
+    invalid_sharing: {:unprocessable_entity, "Choose whether your box sees it"},
     roles_required: {:unprocessable_entity, "Choose at least one role"},
     invalid_role: {:unprocessable_entity, "Unknown role"},
     invalid_payment_amount: {:unprocessable_entity, "Enter an amount above zero"},

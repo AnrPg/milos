@@ -23,6 +23,15 @@ defmodule Palee.Wellbeing.WellbeingStore do
 
   def list_injuries_for_user(user_id), do: adapter().list_injuries_for_user(user_id)
 
+  def list_box_injuries_for_user(user_id), do: adapter().list_box_injuries_for_user(user_id)
+  def get_box_injury(injury_report_id), do: adapter().get_box_injury(injury_report_id)
+
+  def set_injury_box_sharing(id, user_id, shared?),
+    do: adapter().set_injury_box_sharing(id, user_id, shared?)
+
+  def record_injury_access(attrs), do: adapter().record_injury_access(attrs)
+  def list_injury_access_log(user_id, limit), do: adapter().list_injury_access_log(user_id, limit)
+
   def list_active_tenant_injuries_for_users(user_ids),
     do: adapter().list_active_tenant_injuries_for_users(user_ids)
 

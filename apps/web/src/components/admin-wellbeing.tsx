@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -24,6 +25,7 @@ import { ErrorNotice } from "@/components/ui/ErrorNotice";
 
 export function AdminWellbeing() {
   const i18n = useUiTranslations();
+  const tInjury = useTranslations("MemberApp.injury");
   const { tokens } = useSession();
   const queryClient = useQueryClient();
   const [offset, setOffset] = useState(0);
@@ -190,9 +192,11 @@ export function AdminWellbeing() {
                   </p>
                   <p className="text-sm text-[var(--muted)]">
                     {i18n("statusbae7d5b")} <SemanticLabel value={injury.status} /> {i18n("userefbb4ac")} {String(injury.user_id)} · <SemanticLabel value={injury.visibility} />
+                    {injury.owned_by_member ? <> · {tInjury("fromMember")}</> : null}
                   </p>
                 </div>
-                {injury.status === "active" ? (
+                {/* ADR-286: the member keeps their own reports; staff only read them. */}
+                {injury.status === "active" && !injury.owned_by_member ? (
                   <button
                     className="rounded-full border border-[color:var(--border)] px-4 py-2 text-xs font-bold text-[var(--primary)] disabled:opacity-50"
                     disabled={healMutation.isPending}

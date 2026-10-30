@@ -2,7 +2,14 @@ defmodule PaleeWeb.WellbeingController do
   use PaleeWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias Palee.Application.{ChangeInjury, ListMyInjuries, MarkMyInjuryHealed, ReportInjury}
+  alias Palee.Application.{
+    ChangeInjury,
+    ListMyInjuries,
+    MarkMyInjuryHealed,
+    MyInjuryAccessLog,
+    ReportInjury
+  }
+
   alias PaleeWeb.Schemas.FeedbackWellbeing
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
@@ -20,6 +27,8 @@ defmodule PaleeWeb.WellbeingController do
       description: %Schema{type: :string, nullable: true},
       training_limitations: %Schema{type: :string, nullable: true},
       tags: %Schema{type: :array, items: %Schema{type: :string}, nullable: true},
+      # ADR-286: «Να το δει το box μου», on unless the member turns it off.
+      shared_with_box: %Schema{type: :boolean, nullable: true},
       params: %Schema{type: :object, additionalProperties: true, nullable: true}
     },
     required: [:body_area, :severity],
@@ -34,6 +43,19 @@ defmodule PaleeWeb.WellbeingController do
     required: true,
     content: %{"application/json" => %MediaType{schema: @injury_report_schema}}
   }
+  @sharing_request_body %RequestBody{
+    required: true,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          properties: %{shared_with_box: %Schema{type: :boolean}},
+          required: [:shared_with_box],
+          additionalProperties: false
+        }
+      }
+    }
+  }
   @heal_request_body %RequestBody{
     required: true,
     content: %{"application/json" => %MediaType{schema: @heal_schema}}
@@ -41,8 +63,48 @@ defmodule PaleeWeb.WellbeingController do
 
   plug(
     OpenApiSpex.Plug.CastAndValidate,
-    [json_render_error_v2: true] when action in [:create, :heal, :update]
+    [json_render_error_v2: true] when action in [:create, :heal, :update, :share]
   )
+
+  operation(:share,
+    summary: "Share one of your own injuries with your boxes, or stop (ADR-286)",
+    parameters: [
+      %Parameter{
+        name: :id,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      }
+    ],
+    request_body: @sharing_request_body,
+    responses: [ok: {"Injury report", "application/json", FeedbackWellbeing.injury_response()}]
+  )
+
+  def share(conn, params) do
+    current_user = Guardian.Plug.current_resource(conn)
+
+    with {:ok, injury} <-
+           ChangeInjury.share_mine(
+             conn.assigns.user_context,
+             current_user.id,
+             params["id"] || params[:id],
+             Map.get(conn.body_params, :shared_with_box, conn.body_params["shared_with_box"])
+           ) do
+      json(conn, %{injury: injury})
+    end
+  end
+
+  operation(:access_log,
+    summary: "Which staff of your boxes read your injuries, and when (ADR-286)",
+    responses: [
+      ok: {"Access log", "application/json", FeedbackWellbeing.injury_access_log_response()}
+    ]
+  )
+
+  def access_log(conn, _params) do
+    with {:ok, entries} <- MyInjuryAccessLog.call(conn.assigns.user_context),
+         do: json(conn, %{entries: entries})
+  end
 
   operation(:index,
     summary: "List the current user's injury history",

@@ -29,6 +29,14 @@ defmodule Palee.Wellbeing do
   def list_injuries_for_user(context, user_id),
     do: with_tenant_context(context, fn -> list_injuries_for_user(user_id) end)
 
+  # ADR-286: a gym's view of one member (also `admin_only` and shared
+  # self-reports), the member's per-report switch and the audit of staff reads.
+  defdelegate list_box_injuries_for_user(user_id), to: WellbeingStore
+  defdelegate get_box_injury(injury_report_id), to: WellbeingStore
+  defdelegate set_injury_box_sharing(id, user_id, shared?), to: WellbeingStore
+  defdelegate record_injury_access(attrs), to: WellbeingStore
+  defdelegate list_injury_access_log(user_id, limit), to: WellbeingStore
+
   defdelegate list_injuries(filters \\ %{}), to: ListInjuries, as: :call
   defdelegate injury_summary(filters \\ %{}), to: InjurySummary, as: :call
 

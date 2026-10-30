@@ -84,7 +84,7 @@ Researched Oct 2026. Many figures come from interested parties (vendors, Strava,
 2. **Stable, predictable screens.** Content refreshes, but card order never changes. A card with nothing in it is hidden, not shown as an empty state (ANR 2026-10-24): on Feed no WOD, no events, no challenges or no posts means no card. Box without a membership at any box or coach shows only «Βρες box» (near me in Γύρω μου, or by name, ADR-221).
 3. **⊕ means "post for others".** It exists only on the Feed, in the top bar next to the bell (owner, 2026-10-24). Writing for yourself is always a labelled button: `Νέα καταχώρηση`, `Καταγραφή`, `Έναρξη`. No unlabelled `+` anywhere else.
 4. **Comparison with others lives in clubs and is opt-in. Comparison with yourself lives in the Journal.**
-5. **Private by default.** Notes, body data, photos and cravings are private unless the user explicitly widens visibility (§8.2). Injuries are the one exception: coaches always see them, for safety.
+5. **Private by default.** Notes, body data, photos and cravings are private unless the user explicitly widens visibility (§8.2). Injuries are the one exception: each injury a member records carries «Να το δει το box μου», on by default, so management and the coaches who train them see it for safety unless the member turns it off; every staff read is logged for the member (ADR-286). Injuries a box records itself are always the box's.
 6. **Club ≠ Box.** The same gym plays two roles: a *social space* (Feed: talk, see, participate) and a *service relationship* (Box: book, train, pay, ask). Never mix them.
 7. **Swipe only for people, and only with mutual consent.** Only verified adults take part: verified by an active membership at a box or coach, or by two sponsors and a check by the Palee team (ANR 2026-10-30, ADR-280).
 8. **No "More" drawer.** Secondary things live in `Εγώ`. Gym things live in `Box`'s action row.
@@ -187,7 +187,7 @@ Box   (title ▾ switches provider: gym or independent coach)
 | Season | Box (purchase) | Journal (program), crew channel |
 | Workout log | Ημερολόγιο | Post attachment, WOD leaderboard |
 | PR | Ημερολόγιο › Πρόοδος (Pantheon) | Εγώ (only PRs chosen per PR in Κοινοποίηση; the rest counted as private, ADR-196), posts |
-| Measurements, wellness, injuries, cravings | Ημερολόγιο | Never public. Coach only with permission (injuries always). |
+| Measurements, wellness, injuries, cravings | Ημερολόγιο | Never public. Coach only with permission (injuries: on by default, one switch per injury, ADR-286). |
 | Profile, settings, payments | Εγώ | n/a |
 
 ---
@@ -418,7 +418,7 @@ Every member-facing capability in today's code has a surface. The full ~50-row t
 Current member navigation is defined in `apps/web/src/lib/role-navigation.ts` (Home · Training · Journal with ~10 sub-tabs). This document supersedes that structure for members.
 
 ### 8.2 Visibility model (suggested)
-Use a single enum across entry types: `private | coach_can_view | coach_reply_requested | rated | posted(audience)`. Store `audience` separately for posts: `club_channel(id) | followers | public`. Injuries ignore `private` for coaches of active coaching relationships. Every coach read of sensitive data should be audit-logged, as coach-note reads already are.
+Use a single enum across entry types: `private | coach_can_view | coach_reply_requested | rated | posted(audience)`. Store `audience` separately for posts: `club_channel(id) | followers | public`. Injuries ignore `private` for coaches of active coaching relationships; a member's own injuries reach staff while their per-injury `shared_with_box` switch is on (ADR-286). Every coach read of sensitive data should be audit-logged, as coach-note reads already are (injuries: `injury_access_log`).
 
 ### 8.3 Suggested new entities (sketch, not final)
 `Club(id, org_id?, kind: gym|open|member_group|pt_squad|season, visibility, join_policy)`, `Channel(id, club_id, kind: announcements|wod|challenges|class_slot|season|custom, write_policy)`, `ClubMembership(user, club, role, notify_level)`, `Post(id, author, audience, channel_id?, body, media[], attachment{type, id})`, `Event(id, club_id, starts_at, capacity, price, open_to_non_members, guest_pass_allowed)`, `TrialSlotPolicy(org_id, per_week, per_person)`, `PartnerProfile/PartnerSwipe/PartnerMatch`, `MeasurementSnapshot(user, taken_at, metrics{}, photos[], visibility)`, `WellnessEntry(user, kind: water|sleep|meal|mood|stress, value, at, visibility)`, `CravingEntry(user, intensity, triggers[], outcome, support_requested, at)`, `SupportBuddy(user, buddy, status, summary_opt_in)`, `ReferralLink(user, org, code)`, `WorkoutGoals(workout_id, muscles[{group, role}], qualities[], stimulus, visible_to_members)`, `GoalFeedback(log_entry_id, felt_muscles[], felt_qualities[])`, `SavedFilter(user, surface, params)`, `CheckInToken(location_id, rotating_secret)`, `WalletPass(user, org)`.
