@@ -26,6 +26,7 @@ import { SeasonsEntry } from "@/components/seasons/MySeasons";
 import { useHasBillingProviders } from "@/lib/billing-providers";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { boxLayoutFor, boxTitle, type BoxLayout } from "@/lib/solo-coach";
+import { boxChatHref } from "@/components/trials/box-chat-links";
 
 /**
  * Box (brief §6.1, §7.4, mockup 08): "where and with whom do I train?".
@@ -95,6 +96,10 @@ export function BoxHub() {
           ) : null}
           {membership ? (
             <HubButton href={`/me/referrals?box=${encodeURIComponent(membership.organization.slug)}`}>{t("membershipReferral")}</HubButton>
+          ) : null}
+          {/* ADR-282: write to the box about the membership. */}
+          {membership && layout !== "coach" ? (
+            <HubButton href={boxChatHref(membership.organization.slug, "membership")}>{t("membershipContactBox")}</HubButton>
           ) : null}
           <DocumentsButton />
         </div>

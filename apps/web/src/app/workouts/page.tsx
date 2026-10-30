@@ -519,7 +519,7 @@ function WorkoutsPageContent() {
                                     {slot.workout?.title ?? i18n("untitledWorkout579b8a6")}
                                   </div>
                                   <div className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
-                                    {formatTime(uiLocale, slot.scheduled_at)} · {slot.spots_remaining} {i18n("spotsLeftd65a24f")}
+                                    {formatTime(uiLocale, slot.scheduled_at)} · {i18n("spotsLeftCount", { count: slot.spots_remaining })}
                                   </div>
                                 </div>
                               </div>

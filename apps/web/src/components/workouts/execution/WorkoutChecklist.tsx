@@ -119,7 +119,7 @@ export function WorkoutChecklist({
       )}
 
       <div className="flex items-center justify-between text-xs" style={{ color: "var(--dim)" }}>
-        <span>{doneCount}/{steps.length} {i18n("donee5fd9cf")}</span>
+        <span>{i18n("stepsDoneOfTotal", { done: doneCount, total: steps.length })}</span>
       </div>
 
       <ul className="flex flex-col gap-1.5">

@@ -956,7 +956,7 @@ export function SlotPopup({
           workoutId={slot.workout.id}
           workoutTitle={slot.workout.title}
           accessToken={accessToken}
-          context={{ kind: "slot", sourceId: slot.id, sourceLabel: i18n("classOn5e673bd") + (slot.scheduled_at) }}
+          context={{ kind: "slot", sourceId: slot.id, sourceLabel: i18n("classOnDate", { date: slot.scheduled_at }) }}
           onClose={() => setEditWorkoutOpen(false)}
         />
       ) : null}

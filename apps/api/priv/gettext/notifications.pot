@@ -757,3 +757,12 @@ msgstr ""
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr ""
+
+msgid "%{by} brought you into a conversation"
+msgstr ""
+
+msgid "%{nickname} wrote to %{box}"
+msgstr ""
+
+msgid "%{nickname} sent the box a message."
+msgstr ""

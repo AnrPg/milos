@@ -87,7 +87,7 @@ function ScoreTooltip({ scores }: { scores: SectionScore[] }) {
         {scores.map((s, i) => (
           <div key={i} className="flex items-baseline justify-between gap-2">
             <span className="truncate text-[10px]" style={{ color: "var(--muted)" }}>
-              {s.section_name ?? i18n("sectionf2c6b56") + (i + 1)}
+              {s.section_name ?? i18n("sectionNumber", { number: i + 1 })}
             </span>
             <span className="shrink-0 text-[11px] font-semibold" style={{ color: "var(--success)" }}>
               <LocalizedScore value={s.value} scoreType={s.score_type} unit={s.unit} />
@@ -334,7 +334,7 @@ function DroppableMonthCell({
       ))}
       {assignments.length > 2 ? (
         <p className="mt-0.5 text-[9px]" style={{ color: "var(--dim)" }}>
-          +{assignments.length - 2} {i18n("moree7c95b4")}
+          {i18n("moreCount", { count: assignments.length - 2 })}
         </p>
       ) : null}
     </div>
@@ -692,7 +692,7 @@ export function AssignedWorkoutsConsole({
       setRequestedDates((current) =>
         current.includes(requestDate) ? current : [...current, requestDate],
       );
-      setRequestStatus(i18n("requestSentFor0b1804b") + (requestDate) + ".");
+      setRequestStatus(i18n("requestSentForDate", { date: requestDate }));
       setRequestingDate(null);
       setRequestNote("");
     } catch (requestError) {
@@ -1663,7 +1663,7 @@ export function AssignedWorkoutsConsole({
           context={{
             kind: "assignment",
             sourceId: editWorkoutTarget.id,
-            sourceLabel: i18n("assignmentOn11220d0") + (editWorkoutTarget.scheduled_for),
+            sourceLabel: i18n("assignmentOnDate", { date: editWorkoutTarget.scheduled_for }),
           }}
           onClose={() => setEditWorkoutTarget(null)}
         />

@@ -758,3 +758,12 @@ msgstr "Eine Steuerverbindung braucht Aufmerksamkeit"
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr "%{connection} funktioniert nicht mehr. Öffne Rechnungsdaten › Verbindungen, um es zu beheben."
+
+msgid "%{by} brought you into a conversation"
+msgstr "%{by} hat dich zu einem Gespräch geholt"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "%{nickname} hat %{box} geschrieben"
+
+msgid "%{nickname} sent the box a message."
+msgstr "%{nickname} hat der Box geschrieben."

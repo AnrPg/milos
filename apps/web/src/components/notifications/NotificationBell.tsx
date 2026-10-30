@@ -47,6 +47,7 @@ import { SegmentPicker } from "@/components/filters/SegmentPicker";
 import { NavIcon } from "@/components/nav/NavIcons";
 import { Dialog } from "@/components/ui/Dialog";
 import { clockFormat } from "@/lib/clock";
+import { boxInboxNotificationText } from "@/components/chat/inbox/box-inbox-notices";
 
 function formatTimestamp(uiLocale: string, isoString: string) {
   return clockFormat(uiLocale, {
@@ -242,6 +243,8 @@ function NotificationCard({
     if (partner !== null) return partner;
     const conversation = conversationText(notification, "body");
     if (conversation !== null) return conversation;
+    const boxInbox = boxInboxNotificationText(notification.type, notification.payload, "body", i18n);
+    if (boxInbox !== null) return boxInbox;
     const device = deviceText(notification, "body");
     if (device !== null) return device;
     const checkIn = checkInText(notification, "body");
@@ -540,6 +543,8 @@ function NotificationCard({
     if (partner !== null) return partner;
     const conversation = conversationText(notification, "title");
     if (conversation !== null) return conversation;
+    const boxInbox = boxInboxNotificationText(notification.type, notification.payload, "title", i18n);
+    if (boxInbox !== null) return boxInbox;
     const device = deviceText(notification, "title");
     if (device !== null) return device;
     const checkIn = checkInText(notification, "title");

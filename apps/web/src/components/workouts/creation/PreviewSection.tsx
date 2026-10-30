@@ -213,12 +213,12 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
 
             const adv = exercise.advanced;
             const advancedLines: string[] = [];
-            if (adv.tempo.enabled) advancedLines.push(i18n("tempo899658e") + (adv.tempo.value));
-            if (adv.hrZone.enabled) advancedLines.push(i18n("hrZone227bd0b") + (adv.hrZone.value));
-            if (adv.restSeconds.enabled) advancedLines.push(i18n("restb79e5f4") + (adv.restSeconds.value) + "s");
-            if (adv.clusterRestSeconds.enabled) advancedLines.push(i18n("clusterRest7330841") + (adv.clusterRestSeconds.value) + "s");
-            if (adv.restPauseSeconds.enabled) advancedLines.push(i18n("restPause0acc186") + (adv.restPauseSeconds.value) + "s");
-            if (adv.pacing.enabled) advancedLines.push(i18n("pace7a9a622") + (adv.pacing.value) + "/km");
+            if (adv.tempo.enabled) advancedLines.push(i18n("advancedTempoValue", { value: adv.tempo.value }));
+            if (adv.hrZone.enabled) advancedLines.push(i18n("advancedHrZoneValue", { value: adv.hrZone.value }));
+            if (adv.restSeconds.enabled) advancedLines.push(i18n("advancedRestSeconds", { seconds: adv.restSeconds.value }));
+            if (adv.clusterRestSeconds.enabled) advancedLines.push(i18n("advancedClusterRestSeconds", { seconds: adv.clusterRestSeconds.value }));
+            if (adv.restPauseSeconds.enabled) advancedLines.push(i18n("advancedRestPauseSeconds", { seconds: adv.restPauseSeconds.value }));
+            if (adv.pacing.enabled) advancedLines.push(i18n("advancedPaceValue", { value: adv.pacing.value }));
 
             const ctx = FORMAT_EXERCISE_CONTEXT[section.format];
             const step = exercise.prescriptionStep ?? 1;
@@ -246,7 +246,7 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
             let prescriptionText = "";
             if (!ctx.showPrescription) {
               if (section.format === "train_to_exhaustion") {
-                prescriptionText = (resolved.sets) + i18n("setsToFailure4e16bb2");
+                prescriptionText = i18n("setsToFailureCount", { count: resolved.sets });
               }
             } else if (ctx.ladderPrescription) {
               if (section.format === "pyramid") {
@@ -258,7 +258,7 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
             } else if (ctx.prescriptionHint) {
               prescriptionText = (resolved.prescriptionUnit) + " — " + i18n(ctx.prescriptionHint);
             } else if (section.format === "cluster" && resolved.clustersPerSet) {
-              prescriptionText = (resolved.clustersPerSet) + i18n("clusters65add00") + (resolved.prescriptionValue) + " " + (resolved.prescriptionUnit);
+              prescriptionText = i18n("clusterPrescription", { count: resolved.clustersPerSet, value: resolved.prescriptionValue, unit: resolved.prescriptionUnit });
             } else if (ctx.showSets && !resolved.supersetGroupId && !resolved.alternatingGroupId) {
               const suffix = ctx.prescriptionSuffix ? "(" + i18n(ctx.prescriptionSuffix) + ")" : "";
               prescriptionText = (resolved.sets) + " × " + (resolved.prescriptionValue) + " " + (resolved.prescriptionUnit) + (suffix);
@@ -271,7 +271,7 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
             if (section.format === "even_odd" && exercise.intervalAssignment !== null) {
               prefixBadge = exercise.intervalAssignment === 1 ? i18n("odd710756a") : i18n("even70ca748");
             } else if (section.format === "complex_emom" && exercise.intervalAssignment !== null) {
-              prefixBadge = i18n("min7eb0cee") + (exercise.intervalAssignment);
+              prefixBadge = i18n("minuteNumber", { number: exercise.intervalAssignment });
             }
 
             const compositionId = resolved.supersetGroupId ?? resolved.alternatingGroupId;
@@ -284,7 +284,7 @@ export function PreviewSection({ section, activeScale, scaleLevels }: Props) {
 
             return (
               <div key={exercise.localId}>
-              {startsComposition ? <header className="mt-2 flex items-center gap-2 py-1 text-xs font-bold uppercase" style={{ color: compositionColor ?? undefined }}><span>{resolved.supersetGroupId ? i18n("supersetLabel") : i18n("alternatingSetsLabel")}</span><span>{resolved.sets} {i18n("setsd6c8220")}</span><span className="h-px flex-1 opacity-30" style={{ background: compositionColor ?? undefined }} /></header> : null}
+              {startsComposition ? <header className="mt-2 flex items-center gap-2 py-1 text-xs font-bold uppercase" style={{ color: compositionColor ?? undefined }}><span>{resolved.supersetGroupId ? i18n("supersetLabel") : i18n("alternatingSetsLabel")}</span><span>{i18n("setCount", { count: resolved.sets })}</span><span className="h-px flex-1 opacity-30" style={{ background: compositionColor ?? undefined }} /></header> : null}
               <div className="py-1 ps-2 text-xs" style={{ borderInlineStart: compositionColor ? `3px solid ${compositionColor}` : undefined }}>
                 <div className="flex flex-wrap items-baseline gap-1.5">
                   {prefixBadge ? (

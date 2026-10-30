@@ -758,3 +758,12 @@ msgstr "A fiscal connection needs attention"
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr "%{connection} stopped working. Open Billing details › Connections to fix it."
+
+msgid "%{by} brought you into a conversation"
+msgstr "%{by} brought you into a conversation"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "%{nickname} wrote to %{box}"
+
+msgid "%{nickname} sent the box a message."
+msgstr "%{nickname} sent the box a message."

@@ -119,8 +119,8 @@ export function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitle
           <div key={key} className="rounded-xl p-3" style={{ background: "var(--panel-muted)" }}>
             <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{allowanceLabel(key, i18n, entitlement.class_type_names)}</p>
             <p className="mt-1 text-2xl font-semibold" style={{ color: "var(--primary)" }}>{String(usage.remaining)}</p>
-            {shouldShowAllowanceQuota(usage) ? <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("remainingOf8553660")} {String(usage.limit)} {i18n("resets5de1b0d")} {formatDate(uiLocale, usage.period_end)}</p> : null}
-            {usage.extensions > 0 ? <p className="mt-1 text-xs" style={{ color: "var(--success)" }}>{i18n("includes820531f")}{usage.extensions} {i18n("personalExtension95a8d48")}</p> : null}
+            {shouldShowAllowanceQuota(usage) ? <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("allowanceLeftOfLimitResets", { remaining: usage.remaining, limit: usage.limit, date: formatDate(uiLocale, usage.period_end) })}</p> : null}
+            {usage.extensions > 0 ? <p className="mt-1 text-xs" style={{ color: "var(--success)" }}>{i18n("allowanceIncludesExtensions", { count: usage.extensions })}</p> : null}
           </div>
         ) : null)}
       </div>

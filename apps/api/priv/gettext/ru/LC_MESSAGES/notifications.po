@@ -758,3 +758,12 @@ msgstr "Фискальное подключение требует вниман�
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr "%{connection} перестало работать. Откройте Платёжные реквизиты › Подключения, чтобы исправить."
+
+msgid "%{by} brought you into a conversation"
+msgstr "%{by} добавил(а) тебя в разговор"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "%{nickname} написал(а) в %{box}"
+
+msgid "%{nickname} sent the box a message."
+msgstr "%{nickname} написал(а) в бокс."

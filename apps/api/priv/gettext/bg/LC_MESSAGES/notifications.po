@@ -758,3 +758,12 @@ msgstr "Фискална връзка се нуждае от внимание"
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr "%{connection} спря да работи. Отворете Данни за фактуриране › Връзки, за да го оправите."
+
+msgid "%{by} brought you into a conversation"
+msgstr "%{by} те включи в разговор"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "%{nickname} писа на %{box}"
+
+msgid "%{nickname} sent the box a message."
+msgstr "%{nickname} изпрати съобщение на бокса."

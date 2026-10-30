@@ -33,7 +33,7 @@ export function HelpIcon({ tooltip, onClick }: HelpIconProps) {
       title={tooltip}
       onClick={onClick}
       type="button"
-      aria-label={i18n("info3d071a5") + (tooltip)}
+      aria-label={i18n("infoWithText", { text: tooltip })}
     >
       ?
     </button>

@@ -272,6 +272,11 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 | Coach chat | Συνομιλία με coach | thread with a coach / assignment | Chats about your training with your coach; the «Coach» tab. |
 | Training partner chat | Συνομιλία συναθλητών | partner match thread | Opens when a training-partner match happens. |
 | Check-in buddy chat | Συνομιλία στήριξης | buddy support thread | Opens when a check-in buddy answers a support request. |
+| Box conversation | Συνομιλία με το box | `messaging_threads` context `box` (ADR-282) | Anyone with an account and one box. The person writes on `/b/:slug/chat`; the box answers as itself. «Επικοινωνία με το box» opens it. |
+| The box's inbox | Εισερχόμενα του box | capability `message_from_box` | Everyone who answers for the box (owner, admin, front desk, accountant), in Μηνύματα › Box. Filters «Αναπάντητα» and «Όλα». |
+| Newcomer | Νέος | `box_person.newcomer` | Someone writing to a box who is not, and was never, its client. Waits for an answer after three messages; may be blocked («Αποκλεισμός»). |
+| Bring in a coach | Φέρε τον coach | `joined_as: coach` | The inbox adds a coach of the box to one conversation; the topic «Προπόνηση» adds the person's coaches by itself. |
+| Topic | Θέμα | `messaging_messages.topic` | Κράτηση, Πληρωμή, Συνδρομή, Προπόνηση, Χώρος. |
 
 ### 4.6a Class booking rules (ADR-226)
 

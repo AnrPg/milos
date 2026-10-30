@@ -758,3 +758,12 @@ msgstr "اتصال ضريبي يحتاج إلى انتباه"
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr "توقف %{connection} عن العمل. افتح بيانات الفوترة › الاتصالات لإصلاحه."
+
+msgid "%{by} brought you into a conversation"
+msgstr "أضافك %{by} إلى محادثة"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "كتب %{nickname} إلى %{box}"
+
+msgid "%{nickname} sent the box a message."
+msgstr "أرسل %{nickname} رسالة إلى الصالة."

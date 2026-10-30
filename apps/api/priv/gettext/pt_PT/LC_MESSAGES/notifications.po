@@ -758,3 +758,12 @@ msgstr "Uma ligação fiscal precisa de atenção"
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr "%{connection} deixou de funcionar. Abra Dados de faturação › Ligações para corrigir."
+
+msgid "%{by} brought you into a conversation"
+msgstr "%{by} trouxe-te para uma conversa"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "%{nickname} escreveu para %{box}"
+
+msgid "%{nickname} sent the box a message."
+msgstr "%{nickname} enviou uma mensagem à box."

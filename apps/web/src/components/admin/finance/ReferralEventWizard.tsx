@@ -179,7 +179,7 @@ export function ReferralEventWizard({
   return (
     <SidePanel
       title={i18n("newReferralEvent6bb8253")}
-      subtitle={i18n("stepdc416e1") + (step) + i18n("of3e3d985f") + (stepLabel)}
+      subtitle={i18n("wizardStepOfThree", { step, label: stepLabel })}
       onClose={onClose}
     >
       {/* Step indicator */}

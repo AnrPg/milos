@@ -495,7 +495,7 @@ function ModificationsEditorStep({
                   {section.sectionName}
                 </span>
                 <span className="shrink-0 text-xs font-semibold" style={{ color: sectionModCount ? "var(--warning)" : "var(--dim)" }}>
-                  {sectionModCount ? `${sectionModCount} ${i18n("modified19a532c")}` : expanded ? "−" : "+"}
+                  {sectionModCount ? i18n("modifiedCount", { count: sectionModCount }) : expanded ? "−" : "+"}
                 </span>
               </button>
 

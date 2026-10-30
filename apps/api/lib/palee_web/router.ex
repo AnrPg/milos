@@ -672,6 +672,11 @@ defmodule PaleeWeb.Router do
     get("/threads/:id/messages", MessagingController, :list_messages)
     post("/threads/:id/messages", MessagingController, :send_message)
     post("/threads/:id/read", MessagingController, :mark_read)
+    # ADR-282: the box's shared inbox.
+    get("/threads/:id/coaches", MessagingController, :coach_candidates)
+    post("/threads/:id/coaches", MessagingController, :bring_coach)
+    put("/threads/:id/block", MessagingController, :block_sender)
+    delete("/threads/:id/block", MessagingController, :unblock_sender)
   end
 
   # ADR-138: a member's choices about their gym's club and its channels.
