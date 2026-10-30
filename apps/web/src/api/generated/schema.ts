@@ -1986,91 +1986,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/me/clubs/{club_id}/partners": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Partners in a club as it applies to you: offered?, your profile, the options */
-        get: operations["PaleeWeb.PartnersController.club"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/me/clubs/{club_id}/partners/deck": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** The next people of the club who opted in, best fit first */
-        get: operations["PaleeWeb.PartnersController.deck"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/me/clubs/{club_id}/partners/profile": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Opt in or change your Partners profile in a club (a member of the club only) */
-        put: operations["PaleeWeb.PartnersController.put_profile"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/me/clubs/{club_id}/partners/swipes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Like or pass; a like answered by a like makes a match */
-        post: operations["PaleeWeb.PartnersController.swipe"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/me/clubs/{club_id}/partners/swipes/{target_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Take back a swipe that made no match */
-        delete: operations["PaleeWeb.PartnersController.undo"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/me/clubs/{id}/members": {
         parameters: {
             query?: never;
@@ -3478,6 +3393,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/partners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Partners as it applies to you: verification, your profile, the options */
+        get: operations["PaleeWeb.PartnersController.overview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/deck": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The next verified people near you who opted in, best fit first */
+        get: operations["PaleeWeb.PartnersController.deck"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/partners/matches": {
         parameters: {
             query?: never;
@@ -3556,25 +3505,79 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Suggest a class in the conversation («Κλείστε μαζί») */
-        post: operations["PaleeWeb.PartnersController.plan"];
+        /** Propose a suggestion as a plan in the conversation */
+        post: operations["PaleeWeb.PartnerSuggestionsController.propose"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/me/partners/matches/{id}/sessions": {
+    "/api/me/partners/matches/{id}/suggestions": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** «Κλείστε μαζί»: the gym's next classes that suit you both */
-        get: operations["PaleeWeb.PartnersController.sessions"];
+        /**
+         * «Κλείστε μαζί»: up to three activities that suit you both
+         * @description Classes of a box you both belong to, and events and trial classes near both of you, in the next 7 days with free places. Says only whether you or your partner booked each one.
+         */
+        get: operations["PaleeWeb.PartnerSuggestionsController.index"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/matches/{id}/suggestions/feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** «Δεν ταιριάζει»: why a suggestion does not suit you */
+        post: operations["PaleeWeb.PartnerSuggestionsController.feedback"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Opt in or change your Partners profile (verified people; 18+ on the first save) */
+        put: operations["PaleeWeb.PartnersController.put_profile"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Report a person to the Palee team; it also blocks them */
+        post: operations["PaleeWeb.PartnersController.report"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3588,12 +3591,46 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Ρυθμίσεις › Partners: whether others in your clubs see you */
+        /** Ρυθμίσεις › Partners: whether you show in the deck */
         get: operations["PaleeWeb.PartnersController.settings"];
-        /** Pause or resume every Partners profile at once */
+        /** Pause or resume your Partners profile */
         put: operations["PaleeWeb.PartnersController.put_settings"];
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/swipes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Like or pass; a like answered by a like makes a match */
+        post: operations["PaleeWeb.PartnersController.swipe"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/swipes/{target_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Take back a swipe that made no match */
+        delete: operations["PaleeWeb.PartnersController.undo"];
         options?: never;
         head?: never;
         patch?: never;
@@ -15181,6 +15218,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/platform/partner-reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Partners reports by status, newest first (vendors) */
+        get: operations["PaleeWeb.PlatformPartnerReportController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/partner-reports/{id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Suspend the reported person or dismiss, for every open report on them (vendors) */
+        post: operations["PaleeWeb.PlatformPartnerReportController.decide"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/partner-suggestion-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daily «Κλείστε μαζί» counters of the last 30 days (vendors) */
+        get: operations["PaleeWeb.PartnerSuggestionsController.stats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/platform/password-reset-log": {
         parameters: {
             query?: never;
@@ -26599,7 +26687,6 @@ export interface components {
             /** @enum {string} */
             member_groups: "none" | "approval" | "free";
             needs_approval: boolean;
-            partners_enabled: boolean;
         };
         /** CommunityGroupUpdateRequest */
         CommunityGroupUpdateRequest: {
@@ -26720,7 +26807,6 @@ export interface components {
                 /** @enum {string} */
                 member_groups: "none" | "approval" | "free";
                 needs_approval: boolean;
-                partners_enabled: boolean;
             };
         };
         /** CommunityMember */
@@ -27717,7 +27803,7 @@ export interface components {
             /** Format: uuid */
             target_id: string;
             /** @enum {string} */
-            target_type: "post" | "comment" | "channel" | "partner";
+            target_type: "post" | "comment" | "channel";
         };
         /** CommunityReportActionResponse */
         CommunityReportActionResponse: {
@@ -27735,7 +27821,7 @@ export interface components {
             /** Format: uuid */
             target_id: string;
             /** @enum {string} */
-            target_type: "post" | "comment" | "channel" | "partner";
+            target_type: "post" | "comment" | "channel";
         };
         /** CommunityReportResponse */
         CommunityReportResponse: {
@@ -27794,7 +27880,7 @@ export interface components {
             /** Format: uuid */
             target_id: string;
             /** @enum {string} */
-            target_type: "post" | "comment" | "channel" | "partner";
+            target_type: "post" | "comment" | "channel";
         };
         /** CommunityReportsResponse */
         CommunityReportsResponse: {
@@ -27847,15 +27933,13 @@ export interface components {
                 /** Format: uuid */
                 target_id: string;
                 /** @enum {string} */
-                target_type: "post" | "comment" | "channel" | "partner";
+                target_type: "post" | "comment" | "channel";
             }[];
         };
         /** CommunitySettingsRequest */
         CommunitySettingsRequest: {
             /** @enum {string} */
             member_groups?: "none" | "approval" | "free";
-            /** @description Whether the gym's verified clubs offer Partners (ADR-169) */
-            partners_enabled?: boolean;
         };
         /** CommunitySettingsResponse */
         CommunitySettingsResponse: {
@@ -27866,7 +27950,6 @@ export interface components {
             };
             /** @enum {string} */
             member_groups: "none" | "approval" | "free";
-            partners_enabled: boolean;
         };
         /** CommunityStaffGroup */
         CommunityStaffGroup: {
@@ -28011,7 +28094,6 @@ export interface components {
                 /** @enum {string} */
                 member_groups: "none" | "approval" | "free";
                 needs_approval: boolean;
-                partners_enabled: boolean;
             };
         };
         /** ConnectedDevices */
@@ -32499,9 +32581,22 @@ export interface components {
             score: number;
             unit: string;
         };
+        /** PartnerBadge */
+        PartnerBadge: {
+            /** @description Set for `box` only: the box of an active membership */
+            box_name: string | null;
+            /** @enum {string} */
+            kind: "box" | "member" | "verified" | "sponsors";
+        };
         /** PartnerCard */
         PartnerCard: {
             about: string | null;
+            badge: {
+                /** @description Set for `box` only: the box of an active membership */
+                box_name: string | null;
+                /** @enum {string} */
+                kind: "box" | "member" | "verified" | "sponsors";
+            } | null;
             disciplines: string[];
             goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
             /** @enum {string} */
@@ -32528,6 +32623,12 @@ export interface components {
         PartnerDeck: {
             cards: {
                 about: string | null;
+                badge: {
+                    /** @description Set for `box` only: the box of an active membership */
+                    box_name: string | null;
+                    /** @enum {string} */
+                    kind: "box" | "member" | "verified" | "sponsors";
+                } | null;
                 disciplines: string[];
                 goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
                 /** @enum {string} */
@@ -32550,17 +32651,14 @@ export interface components {
                 };
                 times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
             }[];
-            /** Format: uuid */
-            club_id: string;
             swipes_remaining: number;
+            /** @enum {integer} */
+            within_km: 2 | 5 | 10 | 25;
         };
         /** PartnerMatch */
         PartnerMatch: {
-            /** Format: uuid */
-            club_id: string;
-            club_name: string | null;
             /** @enum {string|null} */
-            end_reason: "unmatched" | "blocked" | "reported" | "left" | "hidden" | null;
+            end_reason: "unmatched" | "blocked" | "reported" | "suspended" | null;
             ended_by_me: boolean;
             /** Format: uuid */
             id: string;
@@ -32570,9 +32668,9 @@ export interface components {
             matched_at: string;
             /**
              * Format: uuid
-             * @description The other person's profile in the club, what a report names
+             * @description The other person, what a report names (`target_id`)
              */
-            partner_profile_id: string | null;
+            partner_id: string;
             /** PartnerPerson */
             person: {
                 avatar_url: string | null;
@@ -32580,8 +32678,6 @@ export interface components {
                 id: string;
                 nickname: string | null;
             };
-            /** @description «Κλείστε μαζί» offers the gym's classes */
-            plannable: boolean;
             read_only: boolean;
             /** @enum {string} */
             status: "active" | "ended";
@@ -32597,11 +32693,8 @@ export interface components {
         /** PartnerMatches */
         PartnerMatches: {
             matches: {
-                /** Format: uuid */
-                club_id: string;
-                club_name: string | null;
                 /** @enum {string|null} */
-                end_reason: "unmatched" | "blocked" | "reported" | "left" | "hidden" | null;
+                end_reason: "unmatched" | "blocked" | "reported" | "suspended" | null;
                 ended_by_me: boolean;
                 /** Format: uuid */
                 id: string;
@@ -32611,9 +32704,9 @@ export interface components {
                 matched_at: string;
                 /**
                  * Format: uuid
-                 * @description The other person's profile in the club, what a report names
+                 * @description The other person, what a report names (`target_id`)
                  */
-                partner_profile_id: string | null;
+                partner_id: string;
                 /** PartnerPerson */
                 person: {
                     avatar_url: string | null;
@@ -32621,8 +32714,6 @@ export interface components {
                     id: string;
                     nickname: string | null;
                 };
-                /** @description «Κλείστε μαζί» offers the gym's classes */
-                plannable: boolean;
                 read_only: boolean;
                 /** @enum {string} */
                 status: "active" | "ended";
@@ -32650,11 +32741,13 @@ export interface components {
             mine: boolean;
             plan: {
                 /** Format: uuid */
-                class_id: string;
-                duration_minutes: number | null;
-                name: string | null;
+                id: string;
+                /** @enum {string} */
+                kind: "class" | "event" | "trial";
+                place: string | null;
                 /** Format: date-time */
-                scheduled_at: string;
+                starts_at: string;
+                title: string;
             } | null;
         };
         /** PartnerMessagePage */
@@ -32679,11 +32772,13 @@ export interface components {
                 mine: boolean;
                 plan: {
                     /** Format: uuid */
-                    class_id: string;
-                    duration_minutes: number | null;
-                    name: string | null;
+                    id: string;
+                    /** @enum {string} */
+                    kind: "class" | "event" | "trial";
+                    place: string | null;
                     /** Format: date-time */
-                    scheduled_at: string;
+                    starts_at: string;
+                    title: string;
                 } | null;
             }[];
             next_cursor: string | null;
@@ -32717,11 +32812,13 @@ export interface components {
                 mine: boolean;
                 plan: {
                     /** Format: uuid */
-                    class_id: string;
-                    duration_minutes: number | null;
-                    name: string | null;
+                    id: string;
+                    /** @enum {string} */
+                    kind: "class" | "event" | "trial";
+                    place: string | null;
                     /** Format: date-time */
-                    scheduled_at: string;
+                    starts_at: string;
+                    title: string;
                 } | null;
             };
         };
@@ -32733,9 +32830,10 @@ export interface components {
         PartnerOptions: {
             about_max: number;
             daily_swipes: number;
+            default_within_km: number;
             /** @description Box vocabulary keys a profile may name (ADR-197) */
             disciplines: string[];
-            /** @description The «Απόσταση» choices of an open club's deck (ADR-197) */
+            /** @description The «Απόσταση» choices of the deck (ADR-197, ADR-280) */
             distances_km: number[];
             gender_preferences: ("any" | "women" | "men")[];
             genders: ("woman" | "man" | "other")[];
@@ -32743,6 +32841,7 @@ export interface components {
             levels: ("beginner" | "intermediate" | "advanced")[];
             max_disciplines: number;
             max_goals: number;
+            report_reasons: ("unsafe" | "fake" | "minor" | "harassment" | "other")[];
             times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
         };
         /** PartnerPerson */
@@ -32755,24 +32854,27 @@ export interface components {
         /** PartnerPlan */
         PartnerPlan: {
             /** Format: uuid */
-            class_id: string;
-            duration_minutes: number | null;
-            name: string | null;
+            id: string;
+            /** @enum {string} */
+            kind: "class" | "event" | "trial";
+            place: string | null;
             /** Format: date-time */
-            scheduled_at: string;
+            starts_at: string;
+            title: string;
         };
         /** PartnerPlanRequest */
         PartnerPlanRequest: {
-            body?: string | null;
             /** Format: uuid */
-            class_id: string;
+            id: string;
+            /** @enum {string} */
+            kind: "class" | "event" | "trial";
         };
         /** PartnerProfile */
         PartnerProfile: {
             about: string | null;
             active: boolean;
-            /** Format: uuid */
-            club_id: string;
+            /** Format: date-time */
+            adult_confirmed_at: string;
             disciplines: string[];
             /**
              * @description Only used to honour preferences; never shown to anyone
@@ -32786,8 +32888,10 @@ export interface components {
             id: string;
             /** @enum {string} */
             level: "beginner" | "intermediate" | "advanced";
-            /** @description Staff hid it after a report */
-            suspended: boolean;
+            /** @description Switched off in Ρυθμίσεις */
+            paused: boolean;
+            /** @description «Δείξε το box μου»: the card names the box of an active membership */
+            show_box: boolean;
             times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
             /** Format: date-time */
             updated_at?: string;
@@ -32796,6 +32900,8 @@ export interface components {
         PartnerProfileRequest: {
             about?: string | null;
             active?: boolean;
+            /** @description «Είμαι 18 ετών ή μεγαλύτερος/η»: required true on the first save */
+            adult_confirmed?: boolean;
             disciplines?: string[];
             /** @enum {string|null} */
             gender?: "woman" | "man" | "other" | null;
@@ -32804,6 +32910,7 @@ export interface components {
             goals?: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
             /** @enum {string} */
             level?: "beginner" | "intermediate" | "advanced";
+            show_box?: boolean;
             times?: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
         };
         /** PartnerProfileResponse */
@@ -32812,8 +32919,8 @@ export interface components {
             profile: {
                 about: string | null;
                 active: boolean;
-                /** Format: uuid */
-                club_id: string;
+                /** Format: date-time */
+                adult_confirmed_at: string;
                 disciplines: string[];
                 /**
                  * @description Only used to honour preferences; never shown to anyone
@@ -32827,51 +32934,34 @@ export interface components {
                 id: string;
                 /** @enum {string} */
                 level: "beginner" | "intermediate" | "advanced";
-                /** @description Staff hid it after a report */
-                suspended: boolean;
+                /** @description Switched off in Ρυθμίσεις */
+                paused: boolean;
+                /** @description «Δείξε το box μου»: the card names the box of an active membership */
+                show_box: boolean;
                 times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
                 /** Format: date-time */
                 updated_at?: string;
             };
         };
-        /** PartnerSession */
-        PartnerSession: {
-            booked_by_me: boolean;
-            booked_by_partner: boolean;
+        /** PartnerReportRequest */
+        PartnerReportRequest: {
+            note?: string | null;
+            /** @enum {string} */
+            reason: "unsafe" | "fake" | "minor" | "harassment" | "other";
             /** Format: uuid */
-            class_id: string;
-            duration_minutes: number | null;
-            name: string | null;
-            /** Format: date-time */
-            scheduled_at: string;
-            /** @description In a time both of you chose */
-            shared_time: boolean;
-            spots_remaining: number;
+            target_id: string;
         };
-        /** PartnerSessions */
-        PartnerSessions: {
-            available: boolean;
-            sessions: {
-                booked_by_me: boolean;
-                booked_by_partner: boolean;
-                /** Format: uuid */
-                class_id: string;
-                duration_minutes: number | null;
-                name: string | null;
-                /** Format: date-time */
-                scheduled_at: string;
-                /** @description In a time both of you chose */
-                shared_time: boolean;
-                spots_remaining: number;
-            }[];
-            timezone: string | null;
+        /** PartnerReportResponse */
+        PartnerReportResponse: {
+            blocked: boolean;
+            reported: boolean;
+            /** Format: uuid */
+            target_id: string;
         };
         /** PartnerSettings */
         PartnerSettings: {
-            club_ids: string[];
-            /** @description Clubs where you have a profile */
-            clubs: number;
-            /** @description Whether any of your profiles is on */
+            has_profile: boolean;
+            /** @description Whether you show in the deck */
             visible: boolean;
         };
         /** PartnerSettingsRequest */
@@ -32884,6 +32974,108 @@ export interface components {
             goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
             same_level: boolean;
             times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+        };
+        /** PartnerSuggestion */
+        PartnerSuggestion: {
+            booked_by_me: boolean;
+            booked_by_partner: boolean;
+            /** @description From your neighbourhood and your partner's, to 0.1 km; null when unknown (a class of a box you both belong to) */
+            distances_km: (number | null)[];
+            /** Format: date-time */
+            ends_at?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** @description `kind:id`, what feedback names */
+            key: string;
+            /** @enum {string} */
+            kind: "class" | "event" | "trial";
+            place: string | null;
+            /** @description Why it is suggested: both_booked, one_booked, shared_time:<early|midday|afternoon|evening|weekend>, level_fit, near_both */
+            reasons: string[];
+            /** @description Free places; null when there is no limit */
+            spots_left?: number | null;
+            /** Format: date-time */
+            starts_at: string;
+            /** @description The activity's own IANA zone; times show in it */
+            time_zone?: string | null;
+            title: string | null;
+        };
+        /** PartnerSuggestionFeedback */
+        PartnerSuggestionFeedback: {
+            key: string;
+            /** @enum {string} */
+            reason: "not_near" | "bad_time" | "wrong_level" | "other";
+        };
+        /** PartnerSuggestionFeedbackReasons */
+        PartnerSuggestionFeedbackReasons: {
+            bad_time: number;
+            not_near: number;
+            other: number;
+            wrong_level: number;
+        };
+        /** PartnerSuggestionFeedbackRequest */
+        PartnerSuggestionFeedbackRequest: {
+            key: string;
+            /** @enum {string} */
+            reason: "not_near" | "bad_time" | "wrong_level" | "other";
+        };
+        /** PartnerSuggestionStats */
+        PartnerSuggestionStats: {
+            /** @description Oldest first, one per day */
+            days: {
+                booked_together: number;
+                /** Format: date */
+                day: string;
+                feedback: number;
+                proposed: number;
+                shown: number;
+            }[];
+            /** PartnerSuggestionFeedbackReasons */
+            feedback_reasons: {
+                bad_time: number;
+                not_near: number;
+                other: number;
+                wrong_level: number;
+            };
+            /** Format: date */
+            since: string;
+        };
+        /** PartnerSuggestionStatsDay */
+        PartnerSuggestionStatsDay: {
+            booked_together: number;
+            /** Format: date */
+            day: string;
+            feedback: number;
+            proposed: number;
+            shown: number;
+        };
+        /** PartnerSuggestions */
+        PartnerSuggestions: {
+            /** @description At most three, best first; empty hides the card («Πάμε μαζί;» stays) */
+            suggestions: {
+                booked_by_me: boolean;
+                booked_by_partner: boolean;
+                /** @description From your neighbourhood and your partner's, to 0.1 km; null when unknown (a class of a box you both belong to) */
+                distances_km: (number | null)[];
+                /** Format: date-time */
+                ends_at?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @description `kind:id`, what feedback names */
+                key: string;
+                /** @enum {string} */
+                kind: "class" | "event" | "trial";
+                place: string | null;
+                /** @description Why it is suggested: both_booked, one_booked, shared_time:<early|midday|afternoon|evening|weekend>, level_fit, near_both */
+                reasons: string[];
+                /** @description Free places; null when there is no limit */
+                spots_left?: number | null;
+                /** Format: date-time */
+                starts_at: string;
+                /** @description The activity's own IANA zone; times show in it */
+                time_zone?: string | null;
+                title: string | null;
+            }[];
         };
         /** PartnerSwipeRequest */
         PartnerSwipeRequest: {
@@ -32898,11 +33090,8 @@ export interface components {
             direction: "like" | "pass";
             /** @description Set when the like was mutual */
             match: {
-                /** Format: uuid */
-                club_id: string;
-                club_name: string | null;
                 /** @enum {string|null} */
-                end_reason: "unmatched" | "blocked" | "reported" | "left" | "hidden" | null;
+                end_reason: "unmatched" | "blocked" | "reported" | "suspended" | null;
                 ended_by_me: boolean;
                 /** Format: uuid */
                 id: string;
@@ -32912,9 +33101,9 @@ export interface components {
                 matched_at: string;
                 /**
                  * Format: uuid
-                 * @description The other person's profile in the club, what a report names
+                 * @description The other person, what a report names (`target_id`)
                  */
-                partner_profile_id: string | null;
+                partner_id: string;
                 /** PartnerPerson */
                 person: {
                     avatar_url: string | null;
@@ -32922,8 +33111,6 @@ export interface components {
                     id: string;
                     nickname: string | null;
                 };
-                /** @description «Κλείστε μαζί» offers the gym's classes */
-                plannable: boolean;
                 read_only: boolean;
                 /** @enum {string} */
                 status: "active" | "ended";
@@ -32939,25 +33126,36 @@ export interface components {
             target_id: string;
             undone: boolean;
         };
-        /** PartnersClubOverview */
-        PartnersClubOverview: {
-            /** Format: uuid */
-            club_id: string;
-            /**
-             * @description Open clubs only (ADR-197): «Απόσταση» works once the viewer has «Η περιοχή μου» and shows in Γύρω μου
-             * @enum {string|null}
-             */
-            distance: "available" | "needs_area" | null;
-            /** @description Whether the viewer is a member of the club now */
-            member: boolean;
-            offered: boolean;
+        /** PartnersEligibility */
+        PartnersEligibility: {
+            /** @enum {string|null} */
+            method: "membership" | "sponsors" | null;
+            /** @description What the verification flow asks for next (the verification side's word) */
+            next_step: string | null;
+            /** @enum {string} */
+            status: "verified" | "needs_verification" | "in_review" | "rejected" | "suspended";
+        };
+        /** PartnersOverview */
+        PartnersOverview: {
+            /** @enum {string} */
+            distance: "available" | "needs_area";
+            /** PartnersEligibility */
+            eligibility: {
+                /** @enum {string|null} */
+                method: "membership" | "sponsors" | null;
+                /** @description What the verification flow asks for next (the verification side's word) */
+                next_step: string | null;
+                /** @enum {string} */
+                status: "verified" | "needs_verification" | "in_review" | "rejected" | "suspended";
+            };
             /** PartnerOptions */
             options: {
                 about_max: number;
                 daily_swipes: number;
+                default_within_km: number;
                 /** @description Box vocabulary keys a profile may name (ADR-197) */
                 disciplines: string[];
-                /** @description The «Απόσταση» choices of an open club's deck (ADR-197) */
+                /** @description The «Απόσταση» choices of the deck (ADR-197, ADR-280) */
                 distances_km: number[];
                 gender_preferences: ("any" | "women" | "men")[];
                 genders: ("woman" | "man" | "other")[];
@@ -32965,13 +33163,14 @@ export interface components {
                 levels: ("beginner" | "intermediate" | "advanced")[];
                 max_disciplines: number;
                 max_goals: number;
+                report_reasons: ("unsafe" | "fake" | "minor" | "harassment" | "other")[];
                 times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
             };
             profile: {
                 about: string | null;
                 active: boolean;
-                /** Format: uuid */
-                club_id: string;
+                /** Format: date-time */
+                adult_confirmed_at: string;
                 disciplines: string[];
                 /**
                  * @description Only used to honour preferences; never shown to anyone
@@ -32985,15 +33184,15 @@ export interface components {
                 id: string;
                 /** @enum {string} */
                 level: "beginner" | "intermediate" | "advanced";
-                /** @description Staff hid it after a report */
-                suspended: boolean;
+                /** @description Switched off in Ρυθμίσεις */
+                paused: boolean;
+                /** @description «Δείξε το box μου»: the card names the box of an active membership */
+                show_box: boolean;
                 times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
                 /** Format: date-time */
                 updated_at?: string;
             } | null;
             swipes_remaining: number;
-            /** @enum {string|null} */
-            unavailable_reason: "disabled" | "not_offered" | null;
         };
         /** PeopleSearchPerson */
         PeopleSearchPerson: {
@@ -35495,6 +35694,88 @@ export interface components {
                         } | null;
                     }[];
                 } | null;
+            }[];
+        };
+        /** PlatformPartnerReport */
+        PlatformPartnerReport: {
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            decided_at: string | null;
+            decision_note: string | null;
+            /** Format: uuid */
+            id: string;
+            note: string | null;
+            /** @enum {string} */
+            reason: "unsafe" | "fake" | "minor" | "harassment" | "other";
+            /** PartnerPerson */
+            reporter: {
+                avatar_url: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            };
+            /** @description Reports of this status on the same person */
+            reports_on_target: number;
+            /** @enum {string} */
+            status: "open" | "actioned" | "dismissed";
+            /** PartnerPerson */
+            target: {
+                avatar_url: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            };
+        };
+        /** PlatformPartnerReportDecision */
+        PlatformPartnerReportDecision: {
+            /** @enum {string} */
+            decision: "suspend" | "dismiss";
+            /** Format: uuid */
+            id: string;
+            penalized_sponsors: number;
+            /** @description Open reports on the person it closed */
+            resolved: number;
+            /** Format: uuid */
+            target_id: string;
+        };
+        /** PlatformPartnerReportDecisionRequest */
+        PlatformPartnerReportDecisionRequest: {
+            /** @enum {string} */
+            decision: "suspend" | "dismiss";
+            note?: string | null;
+        };
+        /** PlatformPartnerReports */
+        PlatformPartnerReports: {
+            reports: {
+                /** Format: date-time */
+                created_at: string;
+                /** Format: date-time */
+                decided_at: string | null;
+                decision_note: string | null;
+                /** Format: uuid */
+                id: string;
+                note: string | null;
+                /** @enum {string} */
+                reason: "unsafe" | "fake" | "minor" | "harassment" | "other";
+                /** PartnerPerson */
+                reporter: {
+                    avatar_url: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                };
+                /** @description Reports of this status on the same person */
+                reports_on_target: number;
+                /** @enum {string} */
+                status: "open" | "actioned" | "dismissed";
+                /** PartnerPerson */
+                target: {
+                    avatar_url: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                };
             }[];
         };
         /** PlatformPlan */
@@ -53770,301 +54051,6 @@ export interface operations {
             };
         };
     };
-    "PaleeWeb.PartnersController.club": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                club_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Overview */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** Format: uuid */
-                        club_id: string;
-                        /**
-                         * @description Open clubs only (ADR-197): «Απόσταση» works once the viewer has «Η περιοχή μου» and shows in Γύρω μου
-                         * @enum {string|null}
-                         */
-                        distance: "available" | "needs_area" | null;
-                        /** @description Whether the viewer is a member of the club now */
-                        member: boolean;
-                        offered: boolean;
-                        /** PartnerOptions */
-                        options: {
-                            about_max: number;
-                            daily_swipes: number;
-                            /** @description Box vocabulary keys a profile may name (ADR-197) */
-                            disciplines: string[];
-                            /** @description The «Απόσταση» choices of an open club's deck (ADR-197) */
-                            distances_km: number[];
-                            gender_preferences: ("any" | "women" | "men")[];
-                            genders: ("woman" | "man" | "other")[];
-                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
-                            levels: ("beginner" | "intermediate" | "advanced")[];
-                            max_disciplines: number;
-                            max_goals: number;
-                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
-                        };
-                        profile: {
-                            about: string | null;
-                            active: boolean;
-                            /** Format: uuid */
-                            club_id: string;
-                            disciplines: string[];
-                            /**
-                             * @description Only used to honour preferences; never shown to anyone
-                             * @enum {string|null}
-                             */
-                            gender: "woman" | "man" | "other" | null;
-                            /** @enum {string} */
-                            gender_preference: "any" | "women" | "men";
-                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
-                            /** Format: uuid */
-                            id: string;
-                            /** @enum {string} */
-                            level: "beginner" | "intermediate" | "advanced";
-                            /** @description Staff hid it after a report */
-                            suspended: boolean;
-                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
-                            /** Format: date-time */
-                            updated_at?: string;
-                        } | null;
-                        swipes_remaining: number;
-                        /** @enum {string|null} */
-                        unavailable_reason: "disabled" | "not_offered" | null;
-                    };
-                };
-            };
-        };
-    };
-    "PaleeWeb.PartnersController.deck": {
-        parameters: {
-            query?: {
-                time?: "early" | "midday" | "afternoon" | "evening" | "weekend";
-                level?: "beginner" | "intermediate" | "advanced";
-                goal?: "strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency";
-                /** @description People who named this discipline, a box vocabulary key (ADR-197) */
-                discipline?: string;
-                /** @description Open clubs only (ADR-197): people who show in Γύρω μου with a main neighbourhood this close to yours */
-                within_km?: 2 | 5 | 10 | 25;
-            };
-            header?: never;
-            path: {
-                club_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Deck */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        cards: {
-                            about: string | null;
-                            disciplines: string[];
-                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
-                            /** @enum {string} */
-                            level: "beginner" | "intermediate" | "advanced";
-                            /** PartnerPerson */
-                            person: {
-                                avatar_url: string | null;
-                                /** Format: uuid */
-                                id: string;
-                                nickname: string | null;
-                            };
-                            /** Format: uuid */
-                            profile_id: string;
-                            /** PartnerShared */
-                            shared: {
-                                disciplines: string[];
-                                goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
-                                same_level: boolean;
-                                times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
-                            };
-                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
-                        }[];
-                        /** Format: uuid */
-                        club_id: string;
-                        swipes_remaining: number;
-                    };
-                };
-            };
-        };
-    };
-    "PaleeWeb.PartnersController.put_profile": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                club_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    about?: string | null;
-                    active?: boolean;
-                    disciplines?: string[];
-                    /** @enum {string|null} */
-                    gender?: "woman" | "man" | "other" | null;
-                    /** @enum {string} */
-                    gender_preference?: "any" | "women" | "men";
-                    goals?: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
-                    /** @enum {string} */
-                    level?: "beginner" | "intermediate" | "advanced";
-                    times?: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
-                };
-            };
-        };
-        responses: {
-            /** @description Profile */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** PartnerProfile */
-                        profile: {
-                            about: string | null;
-                            active: boolean;
-                            /** Format: uuid */
-                            club_id: string;
-                            disciplines: string[];
-                            /**
-                             * @description Only used to honour preferences; never shown to anyone
-                             * @enum {string|null}
-                             */
-                            gender: "woman" | "man" | "other" | null;
-                            /** @enum {string} */
-                            gender_preference: "any" | "women" | "men";
-                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
-                            /** Format: uuid */
-                            id: string;
-                            /** @enum {string} */
-                            level: "beginner" | "intermediate" | "advanced";
-                            /** @description Staff hid it after a report */
-                            suspended: boolean;
-                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
-                            /** Format: date-time */
-                            updated_at?: string;
-                        };
-                    };
-                };
-            };
-        };
-    };
-    "PaleeWeb.PartnersController.swipe": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                club_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": {
-                    /** @enum {string} */
-                    direction: "like" | "pass";
-                    /** Format: uuid */
-                    target_id: string;
-                };
-            };
-        };
-        responses: {
-            /** @description Swipe */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @enum {string} */
-                        direction: "like" | "pass";
-                        /** @description Set when the like was mutual */
-                        match: {
-                            /** Format: uuid */
-                            club_id: string;
-                            club_name: string | null;
-                            /** @enum {string|null} */
-                            end_reason: "unmatched" | "blocked" | "reported" | "left" | "hidden" | null;
-                            ended_by_me: boolean;
-                            /** Format: uuid */
-                            id: string;
-                            /** Format: date-time */
-                            last_message_at: string | null;
-                            /** Format: date-time */
-                            matched_at: string;
-                            /**
-                             * Format: uuid
-                             * @description The other person's profile in the club, what a report names
-                             */
-                            partner_profile_id: string | null;
-                            /** PartnerPerson */
-                            person: {
-                                avatar_url: string | null;
-                                /** Format: uuid */
-                                id: string;
-                                nickname: string | null;
-                            };
-                            /** @description «Κλείστε μαζί» offers the gym's classes */
-                            plannable: boolean;
-                            read_only: boolean;
-                            /** @enum {string} */
-                            status: "active" | "ended";
-                            unread: number;
-                        } | null;
-                        swipes_remaining: number;
-                        /** Format: uuid */
-                        target_id: string;
-                    };
-                };
-            };
-        };
-    };
-    "PaleeWeb.PartnersController.undo": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                club_id: string;
-                target_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Undone */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** Format: uuid */
-                        target_id: string;
-                        undone: boolean;
-                    };
-                };
-            };
-        };
-    };
     "PaleeWeb.OpenClubController.members": {
         parameters: {
             query?: {
@@ -56295,7 +56281,7 @@ export interface operations {
                     /** Format: uuid */
                     target_id: string;
                     /** @enum {string} */
-                    target_type: "post" | "comment" | "channel" | "partner";
+                    target_type: "post" | "comment" | "channel";
                 };
             };
         };
@@ -62623,6 +62609,145 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.PartnersController.overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Overview */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        distance: "available" | "needs_area";
+                        /** PartnersEligibility */
+                        eligibility: {
+                            /** @enum {string|null} */
+                            method: "membership" | "sponsors" | null;
+                            /** @description What the verification flow asks for next (the verification side's word) */
+                            next_step: string | null;
+                            /** @enum {string} */
+                            status: "verified" | "needs_verification" | "in_review" | "rejected" | "suspended";
+                        };
+                        /** PartnerOptions */
+                        options: {
+                            about_max: number;
+                            daily_swipes: number;
+                            default_within_km: number;
+                            /** @description Box vocabulary keys a profile may name (ADR-197) */
+                            disciplines: string[];
+                            /** @description The «Απόσταση» choices of the deck (ADR-197, ADR-280) */
+                            distances_km: number[];
+                            gender_preferences: ("any" | "women" | "men")[];
+                            genders: ("woman" | "man" | "other")[];
+                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                            levels: ("beginner" | "intermediate" | "advanced")[];
+                            max_disciplines: number;
+                            max_goals: number;
+                            report_reasons: ("unsafe" | "fake" | "minor" | "harassment" | "other")[];
+                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                        };
+                        profile: {
+                            about: string | null;
+                            active: boolean;
+                            /** Format: date-time */
+                            adult_confirmed_at: string;
+                            disciplines: string[];
+                            /**
+                             * @description Only used to honour preferences; never shown to anyone
+                             * @enum {string|null}
+                             */
+                            gender: "woman" | "man" | "other" | null;
+                            /** @enum {string} */
+                            gender_preference: "any" | "women" | "men";
+                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            level: "beginner" | "intermediate" | "advanced";
+                            /** @description Switched off in Ρυθμίσεις */
+                            paused: boolean;
+                            /** @description «Δείξε το box μου»: the card names the box of an active membership */
+                            show_box: boolean;
+                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                            /** Format: date-time */
+                            updated_at?: string;
+                        } | null;
+                        swipes_remaining: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnersController.deck": {
+        parameters: {
+            query?: {
+                time?: "early" | "midday" | "afternoon" | "evening" | "weekend";
+                level?: "beginner" | "intermediate" | "advanced";
+                goal?: "strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency";
+                /** @description People who named this discipline, a box vocabulary key (ADR-197) */
+                discipline?: string;
+                /** @description People whose main neighbourhood is this close to yours (default 10); needs «Η περιοχή μου» */
+                within_km?: 2 | 5 | 10 | 25;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deck */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        cards: {
+                            about: string | null;
+                            badge: {
+                                /** @description Set for `box` only: the box of an active membership */
+                                box_name: string | null;
+                                /** @enum {string} */
+                                kind: "box" | "member" | "verified" | "sponsors";
+                            } | null;
+                            disciplines: string[];
+                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                            /** @enum {string} */
+                            level: "beginner" | "intermediate" | "advanced";
+                            /** PartnerPerson */
+                            person: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            /** Format: uuid */
+                            profile_id: string;
+                            /** PartnerShared */
+                            shared: {
+                                disciplines: string[];
+                                goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                                same_level: boolean;
+                                times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                            };
+                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                        }[];
+                        swipes_remaining: number;
+                        /** @enum {integer} */
+                        within_km: 2 | 5 | 10 | 25;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.PartnersController.matches": {
         parameters: {
             query?: never;
@@ -62640,11 +62765,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         matches: {
-                            /** Format: uuid */
-                            club_id: string;
-                            club_name: string | null;
                             /** @enum {string|null} */
-                            end_reason: "unmatched" | "blocked" | "reported" | "left" | "hidden" | null;
+                            end_reason: "unmatched" | "blocked" | "reported" | "suspended" | null;
                             ended_by_me: boolean;
                             /** Format: uuid */
                             id: string;
@@ -62654,9 +62776,9 @@ export interface operations {
                             matched_at: string;
                             /**
                              * Format: uuid
-                             * @description The other person's profile in the club, what a report names
+                             * @description The other person, what a report names (`target_id`)
                              */
-                            partner_profile_id: string | null;
+                            partner_id: string;
                             /** PartnerPerson */
                             person: {
                                 avatar_url: string | null;
@@ -62664,8 +62786,6 @@ export interface operations {
                                 id: string;
                                 nickname: string | null;
                             };
-                            /** @description «Κλείστε μαζί» offers the gym's classes */
-                            plannable: boolean;
                             read_only: boolean;
                             /** @enum {string} */
                             status: "active" | "ended";
@@ -62744,11 +62864,13 @@ export interface operations {
                             mine: boolean;
                             plan: {
                                 /** Format: uuid */
-                                class_id: string;
-                                duration_minutes: number | null;
-                                name: string | null;
+                                id: string;
+                                /** @enum {string} */
+                                kind: "class" | "event" | "trial";
+                                place: string | null;
                                 /** Format: date-time */
-                                scheduled_at: string;
+                                starts_at: string;
+                                title: string;
                             } | null;
                         }[];
                         next_cursor: string | null;
@@ -62804,11 +62926,13 @@ export interface operations {
                             mine: boolean;
                             plan: {
                                 /** Format: uuid */
-                                class_id: string;
-                                duration_minutes: number | null;
-                                name: string | null;
+                                id: string;
+                                /** @enum {string} */
+                                kind: "class" | "event" | "trial";
+                                place: string | null;
                                 /** Format: date-time */
-                                scheduled_at: string;
+                                starts_at: string;
+                                title: string;
                             } | null;
                         };
                     };
@@ -62840,7 +62964,7 @@ export interface operations {
             };
         };
     };
-    "PaleeWeb.PartnersController.plan": {
+    "PaleeWeb.PartnerSuggestionsController.propose": {
         parameters: {
             query?: never;
             header?: never;
@@ -62852,9 +62976,10 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    body?: string | null;
                     /** Format: uuid */
-                    class_id: string;
+                    id: string;
+                    /** @enum {string} */
+                    kind: "class" | "event" | "trial";
                 };
             };
         };
@@ -62887,11 +63012,13 @@ export interface operations {
                             mine: boolean;
                             plan: {
                                 /** Format: uuid */
-                                class_id: string;
-                                duration_minutes: number | null;
-                                name: string | null;
+                                id: string;
+                                /** @enum {string} */
+                                kind: "class" | "event" | "trial";
+                                place: string | null;
                                 /** Format: date-time */
-                                scheduled_at: string;
+                                starts_at: string;
+                                title: string;
                             } | null;
                         };
                     };
@@ -62899,7 +63026,7 @@ export interface operations {
             };
         };
     };
-    "PaleeWeb.PartnersController.sessions": {
+    "PaleeWeb.PartnerSuggestionsController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -62910,28 +63037,174 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Sessions */
+            /** @description Suggestions */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": {
-                        available: boolean;
-                        sessions: {
+                        /** @description At most three, best first; empty hides the card («Πάμε μαζί;» stays) */
+                        suggestions: {
                             booked_by_me: boolean;
                             booked_by_partner: boolean;
-                            /** Format: uuid */
-                            class_id: string;
-                            duration_minutes: number | null;
-                            name: string | null;
+                            /** @description From your neighbourhood and your partner's, to 0.1 km; null when unknown (a class of a box you both belong to) */
+                            distances_km: (number | null)[];
                             /** Format: date-time */
-                            scheduled_at: string;
-                            /** @description In a time both of you chose */
-                            shared_time: boolean;
-                            spots_remaining: number;
+                            ends_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description `kind:id`, what feedback names */
+                            key: string;
+                            /** @enum {string} */
+                            kind: "class" | "event" | "trial";
+                            place: string | null;
+                            /** @description Why it is suggested: both_booked, one_booked, shared_time:<early|midday|afternoon|evening|weekend>, level_fit, near_both */
+                            reasons: string[];
+                            /** @description Free places; null when there is no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** @description The activity's own IANA zone; times show in it */
+                            time_zone?: string | null;
+                            title: string | null;
                         }[];
-                        timezone: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerSuggestionsController.feedback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    key: string;
+                    /** @enum {string} */
+                    reason: "not_near" | "bad_time" | "wrong_level" | "other";
+                };
+            };
+        };
+        responses: {
+            /** @description Feedback */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        key: string;
+                        /** @enum {string} */
+                        reason: "not_near" | "bad_time" | "wrong_level" | "other";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnersController.put_profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    about?: string | null;
+                    active?: boolean;
+                    /** @description «Είμαι 18 ετών ή μεγαλύτερος/η»: required true on the first save */
+                    adult_confirmed?: boolean;
+                    disciplines?: string[];
+                    /** @enum {string|null} */
+                    gender?: "woman" | "man" | "other" | null;
+                    /** @enum {string} */
+                    gender_preference?: "any" | "women" | "men";
+                    goals?: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                    /** @enum {string} */
+                    level?: "beginner" | "intermediate" | "advanced";
+                    show_box?: boolean;
+                    times?: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                };
+            };
+        };
+        responses: {
+            /** @description Profile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PartnerProfile */
+                        profile: {
+                            about: string | null;
+                            active: boolean;
+                            /** Format: date-time */
+                            adult_confirmed_at: string;
+                            disciplines: string[];
+                            /**
+                             * @description Only used to honour preferences; never shown to anyone
+                             * @enum {string|null}
+                             */
+                            gender: "woman" | "man" | "other" | null;
+                            /** @enum {string} */
+                            gender_preference: "any" | "women" | "men";
+                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            level: "beginner" | "intermediate" | "advanced";
+                            /** @description Switched off in Ρυθμίσεις */
+                            paused: boolean;
+                            /** @description «Δείξε το box μου»: the card names the box of an active membership */
+                            show_box: boolean;
+                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnersController.report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    note?: string | null;
+                    /** @enum {string} */
+                    reason: "unsafe" | "fake" | "minor" | "harassment" | "other";
+                    /** Format: uuid */
+                    target_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Reported */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        blocked: boolean;
+                        reported: boolean;
+                        /** Format: uuid */
+                        target_id: string;
                     };
                 };
             };
@@ -62953,10 +63226,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        club_ids: string[];
-                        /** @description Clubs where you have a profile */
-                        clubs: number;
-                        /** @description Whether any of your profiles is on */
+                        has_profile: boolean;
+                        /** @description Whether you show in the deck */
                         visible: boolean;
                     };
                 };
@@ -62985,11 +63256,98 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        club_ids: string[];
-                        /** @description Clubs where you have a profile */
-                        clubs: number;
-                        /** @description Whether any of your profiles is on */
+                        has_profile: boolean;
+                        /** @description Whether you show in the deck */
                         visible: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnersController.swipe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    direction: "like" | "pass";
+                    /** Format: uuid */
+                    target_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Swipe */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        direction: "like" | "pass";
+                        /** @description Set when the like was mutual */
+                        match: {
+                            /** @enum {string|null} */
+                            end_reason: "unmatched" | "blocked" | "reported" | "suspended" | null;
+                            ended_by_me: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            last_message_at: string | null;
+                            /** Format: date-time */
+                            matched_at: string;
+                            /**
+                             * Format: uuid
+                             * @description The other person, what a report names (`target_id`)
+                             */
+                            partner_id: string;
+                            /** PartnerPerson */
+                            person: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            read_only: boolean;
+                            /** @enum {string} */
+                            status: "active" | "ended";
+                            unread: number;
+                        } | null;
+                        swipes_remaining: number;
+                        /** Format: uuid */
+                        target_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnersController.undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Undone */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        target_id: string;
+                        undone: boolean;
                     };
                 };
             };
@@ -74495,7 +74853,6 @@ export interface operations {
                             /** @enum {string} */
                             member_groups: "none" | "approval" | "free";
                             needs_approval: boolean;
-                            partners_enabled: boolean;
                         };
                     };
                 };
@@ -74672,7 +75029,7 @@ export interface operations {
                             /** Format: uuid */
                             target_id: string;
                             /** @enum {string} */
-                            target_type: "post" | "comment" | "channel" | "partner";
+                            target_type: "post" | "comment" | "channel";
                         }[];
                     };
                 };
@@ -74694,7 +75051,7 @@ export interface operations {
                     /** Format: uuid */
                     target_id: string;
                     /** @enum {string} */
-                    target_type: "post" | "comment" | "channel" | "partner";
+                    target_type: "post" | "comment" | "channel";
                 };
             };
         };
@@ -74728,8 +75085,6 @@ export interface operations {
                 "application/json": {
                     /** @enum {string} */
                     member_groups?: "none" | "approval" | "free";
-                    /** @description Whether the gym's verified clubs offer Partners (ADR-169) */
-                    partners_enabled?: boolean;
                 };
             };
         };
@@ -74748,7 +75103,6 @@ export interface operations {
                         };
                         /** @enum {string} */
                         member_groups: "none" | "approval" | "free";
-                        partners_enabled: boolean;
                     };
                 };
             };
@@ -102161,7 +102515,6 @@ export interface operations {
                             /** @enum {string} */
                             member_groups: "none" | "approval" | "free";
                             needs_approval: boolean;
-                            partners_enabled: boolean;
                         };
                     };
                 };
@@ -125934,6 +126287,139 @@ export interface operations {
                             slug: string;
                         }[];
                         purge_open: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformPartnerReportController.index": {
+        parameters: {
+            query?: {
+                /** @description Default open */
+                status?: "open" | "actioned" | "dismissed";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reports */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        reports: {
+                            /** Format: date-time */
+                            created_at: string;
+                            /** Format: date-time */
+                            decided_at: string | null;
+                            decision_note: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            note: string | null;
+                            /** @enum {string} */
+                            reason: "unsafe" | "fake" | "minor" | "harassment" | "other";
+                            /** PartnerPerson */
+                            reporter: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            /** @description Reports of this status on the same person */
+                            reports_on_target: number;
+                            /** @enum {string} */
+                            status: "open" | "actioned" | "dismissed";
+                            /** PartnerPerson */
+                            target: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlatformPartnerReportController.decide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    decision: "suspend" | "dismiss";
+                    note?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Decision */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        decision: "suspend" | "dismiss";
+                        /** Format: uuid */
+                        id: string;
+                        penalized_sponsors: number;
+                        /** @description Open reports on the person it closed */
+                        resolved: number;
+                        /** Format: uuid */
+                        target_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PartnerSuggestionsController.stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Stats */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Oldest first, one per day */
+                        days: {
+                            booked_together: number;
+                            /** Format: date */
+                            day: string;
+                            feedback: number;
+                            proposed: number;
+                            shown: number;
+                        }[];
+                        /** PartnerSuggestionFeedbackReasons */
+                        feedback_reasons: {
+                            bad_time: number;
+                            not_near: number;
+                            other: number;
+                            wrong_level: number;
+                        };
+                        /** Format: date */
+                        since: string;
                     };
                 };
             };
