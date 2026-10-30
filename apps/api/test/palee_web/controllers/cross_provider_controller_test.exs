@@ -124,6 +124,9 @@ defmodule PaleeWeb.CrossProviderControllerTest do
 
     assert narrowed["totals"]["sessions"] == 1
     assert narrowed["active_filter_count"] == 2
+    # ADR-285: the «Πηγή» chip's choices do not shrink with the filter.
+    assert Enum.sort([ctx.box.id, ctx.coach_org.id]) == progress["available_sources"]
+    assert narrowed["available_sources"] == progress["available_sources"]
 
     vault = authed(ctx) |> get("/api/me/vault?benchmark=fran") |> json_response(200)
 

@@ -838,7 +838,6 @@
     "loadingYourTrainingOverview39806c7": "Deine Trainingsübersicht wird geladen …",
     "yourTrainingOverviewIsUnavailable0a82b18": "Deine Trainingsübersicht ist nicht verfügbar.",
     "refreshSessionf2ed411": "Sitzung aktualisieren",
-    "last10WeeksVsTarget153cf63": "Letzte 10 Wochen im Vergleich zum Ziel",
     "last7TrainingDays5c44037": "Letzte 7 Trainingstage",
     "trainingVolume11e038b": "Trainingsvolumen",
     "bestStreak04df811": "beste Serie",
@@ -1275,7 +1274,6 @@
     "dismiss70afe9e": "Ausblenden",
     "advancements7f59df0": "Fortschritte",
     "retry9f5cd8a": "Erneut versuchen",
-    "motivationd6a0619": "Motivation",
     "perseverance3b53f48": "Durchhaltevermögen",
     "create6e157c5": "Erstellen",
     "leaderboard0381247": "Rangliste",
@@ -1638,7 +1636,6 @@
     "yourTrainingIsInMotioncfd94f0": "Dein Training läuft.",
     "executionNotAvailablea9817d4": "Workout nicht verfügbar.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "Die Zielseite konnte nicht geladen werden.",
-    "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "Workout-Häufigkeit im Vergleich zum Wochenziel – letzte 10 Wochen",
     "howCloselyYouFollowedPrescribedExercises760e833": "Wie genau du die vorgegebenen Übungen umgesetzt hast",
     "prs80e1569": "PRs ·",
     "whatAreChallengesfdf13a8": "Was sind Challenges?",
@@ -4788,12 +4785,30 @@
     "semanticWorkoutPoleAerial": "Pole & Aerial",
     "semanticWorkoutOutdoorTraining": "Outdoor-Training",
     "semanticWorkoutClimbingBouldering": "Klettern & Bouldern",
-    "motivationHelpWhat": "Der Anteil der letzten 10 Wochen, in denen du dein Wochenziel von {workouts} erreicht hast.",
-    "motivationHelpHow": "Erreiche dein Ziel jede Woche. Jede Woche im Ziel bringt dem Wert 10 Punkte.",
-    "motivationHelpWhy": "Er zeigt, ob Training in den letzten Monaten zur festen Gewohnheit geworden ist, nicht nur diese Woche.",
     "perseveranceHelpWhat": "Wie genau du an deinen letzten 7 Trainingstagen dem Programm gefolgt bist (Ruhetage zählen nicht). Jede Übung, die du ausgelassen oder mit anderem Gewicht oder anderen Wiederholungen als im WOD gemacht hast, senkt ihn, je nachdem wie stark du abgewichen bist.",
     "perseveranceHelpHow": "Mach die Übungen so, wie sie geschrieben sind. Wenn du keine Änderungen eingetragen hast, liegt der Wert bei 100%.",
-    "perseveranceHelpWhy": "Das Programm deines Coaches ist darauf ausgelegt, Schritt für Schritt aufzubauen. Je näher du daran bleibst, desto besser wirkt es."
+    "perseveranceHelpWhy": "Das Programm deines Coaches ist darauf ausgelegt, Schritt für Schritt aufzubauen. Je näher du daran bleibst, desto besser wirkt es.",
+    "scoreLevel": "XP-Level",
+    "scoreLevelTooltip": "Punkte für alles, was du machst, und das Level, das sie erreichen",
+    "scoreLevelCaption": "{xp, number} / {next, number} XP bis Level {level}",
+    "scoreLevelHelpWhat": "Die Erfahrungspunkte (XP), die du sammelst: ein Training +{workouts}, ein PR +{prs}, eine Woche mit erreichtem Wochenziel +{weeks}, eine abgeschlossene Challenge +{challenges}.",
+    "scoreLevelHelpHow": "Trainiere, stelle PRs auf, erreiche dein Wochenziel und schließe Challenges ab. Jedes Level braucht etwas mehr XP als das vorige.",
+    "scoreLevelHelpWhy": "Jedes Training zählt für etwas Sichtbares, auch wenn der nächste PR noch auf sich warten lässt.",
+    "scoreStrength": "Kraftzuwachs",
+    "scoreStrengthTooltip": "Wie stark dein geschätztes 1RM in den letzten 8 Wochen gestiegen ist",
+    "scoreStrengthCaption": "Geschätztes 1RM, letzte {weeks} Wochen gegenüber davor",
+    "scoreStrengthLifts": "Gestiegene Übungen",
+    "scoreStrengthHelpWhat": "Wie stark das geschätzte One-Rep-Max deiner Gewichts-PRs in den letzten 8 Wochen im Schnitt gestiegen ist, verglichen mit deinem Bestwert davor. Jede Übung zählt gleich, ob leicht oder schwer.",
+    "scoreStrengthHelpHow": "Trage deine PRs mit Gewicht und Wiederholungen ein. Jeder neue PR hebt die Schätzung, auch mehr Wiederholungen beim gleichen Gewicht.",
+    "scoreStrengthHelpWhy": "Du siehst, dass sich die Arbeit lohnt, auch zwischen zwei Maximalversuchen.",
+    "scoreNextMilestone": "Nächster Meilenstein",
+    "scoreNextMilestoneTooltip": "Wie weit du vom nächsten Abzeichen entfernt bist, das du noch nicht hast",
+    "scoreNextMilestoneWorkouts": "{remaining, plural, one {Training} other {Trainings}} bis zum Abzeichen {target} Trainings",
+    "scoreNextMilestonePrs": "{remaining, plural, one {PR} other {PRs}} bis zum Abzeichen {target} PRs",
+    "scoreNextMilestoneStreak": "{remaining, plural, one {Tag} other {Tage}} Serie bis zum Abzeichen {target} Tage Serie",
+    "scoreNextMilestoneHelpWhat": "Wie weit du vom nächsten Abzeichen entfernt bist, das du noch nicht verdient hast: Trainings, PRs oder Trainingstage am Stück.",
+    "scoreNextMilestoneHelpHow": "Mach, was die Karte sagt. Sobald du das Abzeichen hast, zeigt die Karte das nächste.",
+    "scoreNextMilestoneHelpWhy": "Ein nahes, konkretes Ziel ist leichter zu erreichen als ein fernes."
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",
@@ -8740,7 +8755,8 @@
       "exercise": "Übung",
       "exercisePlaceholder": "z. B. Back Squat",
       "empty": "Nichts passt zu diesen Filtern.",
-      "clear": "Filter zurücksetzen"
+      "clear": "Filter zurücksetzen",
+      "period": "Zeitraum"
     },
     "range": {
       "4w": "4 Wochen",
@@ -8748,6 +8764,13 @@
       "6m": "6 Monate",
       "1y": "1 Jahr",
       "all": "Gesamt"
+    },
+    "rangeShort": {
+      "4w": "4 W",
+      "12w": "3 M",
+      "6m": "6 M",
+      "1y": "1 J",
+      "all": "Alle"
     },
     "progress": {
       "bySource": "Einheiten nach Quelle"

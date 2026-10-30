@@ -118,6 +118,7 @@ export const FEATURE_SECTIONS: FeatureSection[] = [
     summaryKey: "progressSummary",
     details: [
       "Consistency heatmap and streaks, perseverance (adherence to programmed work), strength (estimated 1RM), benchmarks and retest reminders",
+      "XP level from workouts, PRs, weeks on goal and challenges; strength gain over the last 8 weeks; the next milestone badge with the steps left",
       "Volume by modality, muscle coverage with push/pull and quad/hamstring balance, radar of the ten general physical skills",
       "Training load (session RPE, acute:chronic ratio as an indicator)",
       "Insights such as sleep versus performance and best time of day, only after enough data",

@@ -247,6 +247,7 @@ defmodule PaleeWeb.Schemas.CrossProvider do
         :score_history,
         :pr_timeline,
         :by_source,
+        :available_sources,
         :filter,
         :active_filter_count
       ],
@@ -315,6 +316,14 @@ defmodule PaleeWeb.Schemas.CrossProvider do
             required: [:source, :sessions],
             properties: %{source: source(), sessions: %Schema{type: :integer}}
           }
+        },
+        available_sources: %Schema{
+          type: :array,
+          items: %Schema{type: :string},
+          description:
+            "Source tokens (organization id, `freeform`, `device`) the person has any completed " <>
+              "workout from, whatever the filter or range: the «Πηγή» chip shows only with two " <>
+              "or more (ADR-285)."
         },
         filter: %Schema{type: :object, additionalProperties: true},
         active_filter_count: %Schema{type: :integer}

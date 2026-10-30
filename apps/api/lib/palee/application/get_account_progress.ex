@@ -6,7 +6,8 @@ defmodule Palee.Application.GetAccountProgress do
   history, PR timeline), built from every completed workout of the account,
   with score history grouped by canonical workout identity so one benchmark
   done at two providers is one line. Points and PRs carry their source;
-  `by_source` counts sessions per source.
+  `by_source` counts sessions per source; `available_sources` lists every
+  source with a completed workout, unfiltered (ADR-285: the «Πηγή» chip).
 
   Filters (`ProgressFilter`): `range`, `sources`, `exercise`. The weekly
   chart, consistency and its day grid span the range (ADR-194). The
@@ -44,6 +45,7 @@ defmodule Palee.Application.GetAccountProgress do
        stats
        |> Map.update!(:score_history, &label_points(&1, labels))
        |> Map.put(:by_source, by_source(executions))
+       |> Map.put(:available_sources, available_sources(loaded.executions))
        |> Map.put(:pr_timeline, pr_timeline(context, loaded.directory, filter, since))
        |> Map.put(:filter, Analytics.progress_filter_params(filter))
        |> Map.put(:active_filter_count, Analytics.progress_filter_active_count(filter))}
@@ -71,6 +73,17 @@ defmodule Palee.Application.GetAccountProgress do
     |> Enum.frequencies_by(& &1.source_label)
     |> Enum.map(fn {source, sessions} -> %{source: source, sessions: sessions} end)
     |> Enum.sort_by(&{-&1.sessions, &1.source.name || ""})
+  end
+
+  # ADR-285: what the «Πηγή» chip could narrow to, before any filter, so the
+  # chip neither hides a source the range happens to leave out nor vanishes
+  # while a source is picked.
+  defp available_sources(executions) do
+    executions
+    |> Enum.filter(&(&1.status == "completed" and &1.completed_at_utc))
+    |> Enum.map(&AccountTraining.token(&1.source_label))
+    |> Enum.uniq()
+    |> Enum.sort()
   end
 
   # PRs are the member's own across providers (ADR-129); each keeps the

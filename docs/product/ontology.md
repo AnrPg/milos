@@ -322,6 +322,10 @@ pt-PT, nl, bg, ar and he got only these terms and the class fixes; their full re
 | Streak | Σερί | `user_stats.current_streak` | Days or weeks in a row of training. One streak only (ADR-194). | |
 | Streak shield | Ασπίδα σερί | `gamification_settings.streak_shields` | Saves a streak in a week that missed the weekly goal. The box sets how many each client gets (0–5) and when they renew. (ADR-229) | |
 | Shield renewal | Ανανέωση ασπίδων | `streak_shield_reset_day` | When shields are topped up: a day of the month for everyone, or each client's sign-up day. | |
+| XP level | Επίπεδο XP | `Gamification.Domain.Level` | Experience points from workouts, PRs, weeks on the weekly goal and finished challenges, and the level they reach. Worked out from the stats, never stored. (ADR-285) | Scale level («Επίπεδο scale», Rx/Scaled): always say «Επίπεδο XP» for this one. |
+| Strength gain | Βελτίωση δύναμης | `Pantheon.Domain.StrengthTrend` | Mean rise of the estimated 1RM of weight PRs over the last 8 weeks against the best before them. (ADR-285) | The «Δύναμη» workout-type family. |
+| Next milestone | Επόμενο ορόσημο | `AchievementRules.next_milestone/2` | The closest workout, PR or day-streak badge not earned yet, with the steps left. (ADR-285) | Challenges (time-limited, set by the box). |
+| Perseverance | Επιμονή | `PerseveranceCalculator` | How closely the last 7 training days followed the prescription; skipped or changed exercises lower it. | Consistency («Συνέπεια», weeks on the weekly goal). |
 
 ### 4.10 Box screen (ADR-253)
 

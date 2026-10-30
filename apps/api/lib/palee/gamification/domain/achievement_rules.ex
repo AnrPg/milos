@@ -51,6 +51,53 @@ defmodule Palee.Gamification.Domain.AchievementRules do
     Enum.uniq(workout_badges ++ pr_badges ++ streak_badges ++ mastery_badges)
   end
 
+  @doc """
+  «Επόμενο ορόσημο» (ADR-285): the milestone badge the person is closest to
+  and has not earned yet, from the workout, PR and day-streak ladders, as
+  `%{badge_key, kind, current, target, remaining}`. Closest is the largest
+  share of the way done; a tie goes to the fewest steps left. Nil once every
+  ladder is complete.
+  """
+  @spec next_milestone(map() | nil, [String.t()]) :: map() | nil
+  def next_milestone(stats, earned_badge_keys \\ []) do
+    stats = stats || %{}
+    earned = MapSet.new(earned_badge_keys)
+
+    [
+      {"workouts", @attendance_thresholds, stat(stats, :total_workouts)},
+      {"prs", @pr_thresholds, stat(stats, :total_prs)},
+      {"streak", @streak_thresholds, stat(stats, :current_streak)}
+    ]
+    |> Enum.flat_map(fn {kind, thresholds, current} ->
+      thresholds
+      |> Enum.find(&(&1 > current and not MapSet.member?(earned, "#{kind}_#{&1}")))
+      |> case do
+        nil ->
+          []
+
+        target ->
+          [
+            %{
+              badge_key: "#{kind}_#{target}",
+              kind: kind,
+              current: current,
+              target: target,
+              remaining: target - current
+            }
+          ]
+      end
+    end)
+    |> Enum.sort_by(&{-(&1.current / &1.target), &1.remaining})
+    |> List.first()
+  end
+
+  defp stat(stats, key) do
+    case Map.get(stats, key) do
+      value when is_integer(value) and value > 0 -> value
+      _missing -> 0
+    end
+  end
+
   def visible_badge?(badge_key), do: not String.starts_with?(badge_key, "pr_event:")
 
   def badge_label("workouts_" <> count), do: "#{count} Workouts"

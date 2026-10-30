@@ -298,6 +298,9 @@ Coach notes about an athlete (`/staff/clients/{id}/coach-notes`, read-audited) s
 |---|---|---|---|
 | Consistency | calendar heatmap, streak, weeks on target | log, executions | EXISTS |
 | Perseverance | adherence to programmed work | executions, modifications | EXISTS |
+| XP level («Επίπεδο XP») | level and XP from workouts, PRs, weeks on goal, challenges; replaced Motivation, which repeated Consistency (ADR-285, ANR 2026-10-30) | user stats | EXISTS |
+| Strength gain («Βελτίωση δύναμης») | mean estimated-1RM gain of weight PRs, last 8 weeks vs before (ADR-285) | PR history | EXISTS |
+| Next milestone («Επόμενο ορόσημο») | the closest unearned workout / PR / streak badge, with steps left (ADR-285) | user stats, badges | EXISTS |
 | Strength | estimated 1RM per lift over time | logged loads, PR history | PARTIAL |
 | Benchmarks | Fran/Murph/2k row trends, "retest due" | PR history, Vault | PARTIAL |
 | Volume by modality | strength/gymnastics/aerobic/flexibility/recovery | workout categories | PARTIAL |
@@ -390,7 +393,7 @@ Profile tabs (Αναρτήσεις grid · Πολυμέσα · shared PRs · Clu
 Every member-facing capability in today's code has a surface. The full ~50-row table is in the mockup ("Κάλυψη"). Highlights:
 | Today (route/component) | New home |
 |---|---|
-| Home dashboard: Motivation, Perseverance, Training volume, streak (`landing-page.tsx`) | Ημερολόγιο › Πρόοδος |
+| Home dashboard: Motivation, Perseverance, Training volume, streak (`landing-page.tsx`) | Ημερολόγιο › Πρόοδος (Motivation replaced by XP level, Strength gain and Next milestone, ADR-285) |
 | Seasonal challenges, opt-in leaderboard | Club channels (#challenges, #wod-σήμερα) + own progress in Πρόοδος |
 | Recent completions, history (`/my-workouts/history`) | Ημερολόγιο › Ροή |
 | "Κοινοποίηση στο Palee", shared PRs (ADR-129/132) | ⊕ post with attachment; Εγώ › PRs; Πρόοδος › Pantheon |

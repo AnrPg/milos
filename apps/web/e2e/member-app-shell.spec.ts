@@ -62,10 +62,27 @@ const landing = {
       total_prs: 6,
       current_streak_shields: 0,
       consistency_score: 80,
-      motivation_score: 76,
       perseverance_score: 91,
       advancement_count: 2,
+      weeks_on_goal: 9,
+      challenges_completed: 1,
       last_workout_at: null,
+    },
+    // ADR-285: the scores that replaced «Motivation».
+    level: {
+      level: 8,
+      xp: 4_550,
+      level_start_xp: 4_100,
+      next_level_xp: 5_000,
+      points: { workouts: 50, prs: 100, weeks_on_goal: 150, challenges: 300 },
+    },
+    next_milestone: { badge_key: "workouts_50", kind: "workouts", current: 42, target: 50, remaining: 8 },
+    strength: {
+      percent: 6.4,
+      window_days: 56,
+      lifts: [{ name: "Back squat", from_kg: 100, to_kg: 108, gain_kg: 8 }],
+      compared_lifts: 2,
+      new_lifts: 0,
     },
     preferences: { off_days: [] },
     badges: [{ id: "badge-1", badge_key: "workouts_10", label: "10 workouts" }],
@@ -615,8 +632,45 @@ test.describe("member app shell", () => {
     await expect(flow.getByRole("button", { name: /Share in Palee: Fran/ })).toBeVisible();
     await page.screenshot({ path: "test-results/member-app/journal-flow.png", fullPage: true });
 
+    // ADR-285 (mockup Φ3): a period bar, and «Source» only with two or more sources.
+    const progressQueries: string[] = [];
+    await page.route("**/api/me/progress?**", (route) => {
+      progressQueries.push(new URL(route.request().url()).search);
+      return route.fulfill(
+        json({
+          progress: {
+            totals: { sessions: 3, minutes: 120, workouts: 3 },
+            weekly: [],
+            days: [],
+            consistency: { current_streak_weeks: 0 },
+            sources: {},
+            score_history: [],
+            pr_timeline: [],
+            by_source: [],
+            available_sources: ["freeform", "device"],
+            filter: {},
+            active_filter_count: 0,
+          },
+        }),
+      );
+    });
     await page.goto("/journal/progress");
-    await expect(page.getByText("76%")).toBeVisible();
+    await expect(page.getByRole("button", { name: /^Filters/ })).toHaveCount(0);
+    await page.getByRole("group", { name: "Period" }).getByRole("button", { name: "6 months" }).click();
+    await expect.poll(() => progressQueries.some((query) => query.includes("range=6m"))).toBe(true);
+    await page.getByRole("button", { name: "Source" }).click();
+    await page.getByRole("menuitemcheckbox", { name: "Device" }).click();
+    await expect.poll(() => progressQueries.some((query) => query.includes("sources=device"))).toBe(true);
+    await page.keyboard.press("Escape");
+    // ADR-285: «Motivation» repeated Consistency; three scores took its place.
+    await expect(page.getByText("Motivation", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("4,550 / 5,000 XP to level 9")).toBeVisible();
+    await expect(page.getByText("+6.4%")).toBeVisible();
+    await expect(page.getByText("workouts to the 50 workouts badge")).toBeVisible();
+    await expect(page.getByText("91%")).toBeVisible();
+    await page.getByRole("button", { name: /Points from everything you do/ }).click();
+    await expect(page.getByRole("dialog", { name: "XP level" })).toContainText("a workout +50");
+    await page.keyboard.press("Escape");
     await expect(page.getByText("10 workouts")).toBeVisible();
     // ANR 2026-10-24: PRs are one section of Progress; the history export lives in Vault.
     await expect(page.getByRole("region", { name: "Personal Records" })).toBeVisible();

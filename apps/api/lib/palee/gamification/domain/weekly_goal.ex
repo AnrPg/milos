@@ -1,7 +1,7 @@
 defmodule Palee.Gamification.Domain.WeeklyGoal do
   @moduledoc """
   A person's weekly workout goal (ADR-229): how many completed workouts make
-  a week count for their streak shields, consistency and motivation scores.
+  a week count for their streak shields, consistency and level (ADR-285).
 
   The goal is the person's own. They set it; so may the coach who coaches
   them, or the owner/admin of a box they belong to when that staff member

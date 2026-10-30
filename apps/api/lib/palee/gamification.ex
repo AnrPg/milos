@@ -10,7 +10,7 @@ defmodule Palee.Gamification do
     UpdateSeasonalChallenge
   }
 
-  alias Palee.Gamification.Domain.AchievementRules
+  alias Palee.Gamification.Domain.{AchievementRules, Level}
   alias Palee.Gamification.GamificationStore
 
   alias Palee.Gamification.Queries.{
@@ -52,6 +52,12 @@ defmodule Palee.Gamification do
   defdelegate increment_advancement(user_id, occurred_at), to: IncrementAdvancement, as: :call
 
   defdelegate get_user_preferences(user_id), to: GamificationStore
+
+  @doc "«Επίπεδο» (ADR-285): XP and level, worked out from the person's stats."
+  defdelegate level(stats), to: Level, as: :present
+
+  @doc "«Επόμενο ορόσημο» (ADR-285): the closest milestone badge not earned yet."
+  defdelegate next_milestone(stats, earned_badge_keys), to: AchievementRules
 
   defdelegate upsert_user_preferences(user_id, params), to: GamificationStore
 

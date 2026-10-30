@@ -838,7 +838,6 @@
     "loadingYourTrainingOverview39806c7": "جارٍ تحميل نظرة عامة على التدريب الخاص بك...",
     "yourTrainingOverviewIsUnavailable0a82b18": "نظرة عامة على التدريب الخاص بك غير متوفرة.",
     "refreshSessionf2ed411": "تحديث الجلسة",
-    "last10WeeksVsTarget153cf63": "آخر 10 أسابيع مقابل الهدف",
     "last7TrainingDays5c44037": "آخر 7 أيام تدريبية",
     "trainingVolume11e038b": "حجم التدريب",
     "bestStreak04df811": "أفضل خط",
@@ -1275,7 +1274,6 @@
     "dismiss70afe9e": "رفض",
     "advancements7f59df0": "التقدم",
     "retry9f5cd8a": "أعد المحاولة",
-    "motivationd6a0619": "تحفيز",
     "perseverance3b53f48": "مثابرة",
     "create6e157c5": "يخلق",
     "leaderboard0381247": "المتصدرين",
@@ -1638,7 +1636,6 @@
     "yourTrainingIsInMotioncfd94f0": "التدريب الخاص بك في الحركة.",
     "executionNotAvailablea9817d4": "التنفيذ غير متاح.",
     "theLandingPageCouldNotBeLoaded0cdbfb4": "تعذر تحميل الصفحة المقصودة.",
-    "workoutFrequencyVsWeeklyTargetLast10Weeks28c26ce": "تكرار التمرين مقابل الهدف الأسبوعي – آخر 10 أسابيع",
     "howCloselyYouFollowedPrescribedExercises760e833": "مدى التزامك بالتمارين الموصوفة",
     "prs80e1569": "PR ·",
     "whatAreChallengesfdf13a8": "ما هي التحديات؟",
@@ -4788,12 +4785,30 @@
     "semanticWorkoutPoleAerial": "البول والرياضات الهوائية",
     "semanticWorkoutOutdoorTraining": "التدريب في الهواء الطلق",
     "semanticWorkoutClimbingBouldering": "التسلق والبولدرينغ",
-    "motivationHelpWhat": "نسبة الأسابيع العشرة الأخيرة التي حققت فيها هدفك الأسبوعي: {workouts}.",
-    "motivationHelpHow": "حقق هدفك كل أسبوع. كل أسبوع تحقق فيه الهدف يضيف 10 نقاط إلى النتيجة.",
-    "motivationHelpWhy": "يوضح ما إذا كان التدريب قد أصبح عادة ثابتة في الأشهر الأخيرة، لا هذا الأسبوع فقط.",
     "perseveranceHelpWhat": "مدى التزامك بالبرنامج في آخر 7 أيام تدريب (أيام الراحة لا تُحتسب). كل تمرين تخطيته، أو أديته بوزن أو تكرارات مختلفة عما في WOD، يخفضه بقدر ابتعادك.",
     "perseveranceHelpHow": "أدِّ التمارين كما هي مكتوبة. إذا لم تسجل أي تغييرات فالنتيجة 100%.",
-    "perseveranceHelpWhy": "برنامج مدربك مصمم ليتقدم خطوة بخطوة. كلما بقيت أقرب إليه، كان أكثر فعالية."
+    "perseveranceHelpWhy": "برنامج مدربك مصمم ليتقدم خطوة بخطوة. كلما بقيت أقرب إليه، كان أكثر فعالية.",
+    "scoreLevel": "مستوى XP",
+    "scoreLevelTooltip": "نقاط على كل ما تفعله والمستوى الذي تبلغه",
+    "scoreLevelCaption": "{xp, number} / {next, number} XP للوصول إلى المستوى {level}",
+    "scoreLevelHelpWhat": "نقاط الخبرة (XP) التي تجمعها: تمرين +{workouts}، رقم قياسي +{prs}، أسبوع حققت فيه هدفك الأسبوعي +{weeks}، تحدٍّ أكملته +{challenges}.",
+    "scoreLevelHelpHow": "تمرّن وحطّم أرقامك القياسية وحقق هدفك الأسبوعي وأكمل التحديات. كل مستوى يحتاج إلى نقاط أكثر قليلًا من سابقه.",
+    "scoreLevelHelpWhy": "كل تمرين يُحتسب في شيء تراه، حتى عندما يتأخر الرقم القياسي التالي.",
+    "scoreStrength": "زيادة القوة",
+    "scoreStrengthTooltip": "كم ارتفع الحد الأقصى المقدّر لتكرار واحد خلال آخر 8 أسابيع",
+    "scoreStrengthCaption": "الحد الأقصى المقدّر، آخر {weeks} أسابيع مقارنة بما قبلها",
+    "scoreStrengthLifts": "تمارين ارتفعت",
+    "scoreStrengthHelpWhat": "كم ارتفع في المتوسط الحد الأقصى المقدّر لتكرار واحد في أرقامك القياسية بالأوزان خلال آخر 8 أسابيع، مقارنة بأفضل نتيجة قبلها. لكل تمرين الوزن نفسه، خفيفًا كان أو ثقيلًا.",
+    "scoreStrengthHelpHow": "سجّل أرقامك القياسية بالوزن والتكرارات. كل رقم جديد يرفع التقدير، حتى تكرارات أكثر بالوزن نفسه.",
+    "scoreStrengthHelpWhy": "ترى ثمرة العمل بين رقم قياسي لتكرار واحد وآخر، لا فقط يوم تحطيمه.",
+    "scoreNextMilestone": "المحطة التالية",
+    "scoreNextMilestoneTooltip": "كم تبعد عن أقرب شارة لم تحصل عليها بعد",
+    "scoreNextMilestoneWorkouts": "{remaining, plural, one {تمرين} other {تمارين}} للحصول على شارة {target} تمرينًا",
+    "scoreNextMilestonePrs": "{remaining, plural, one {رقم قياسي} other {أرقام قياسية}} للحصول على شارة {target} رقمًا قياسيًا",
+    "scoreNextMilestoneStreak": "{remaining, plural, one {يوم} other {أيام}} متتالية للحصول على شارة {target} يومًا متتاليًا",
+    "scoreNextMilestoneHelpWhat": "كم تبعد عن أقرب شارة لم تكسبها بعد: تمارين أو أرقام قياسية أو أيام تدريب متتالية.",
+    "scoreNextMilestoneHelpHow": "افعل ما تقوله البطاقة. عندما تكسب الشارة، تعرض البطاقة الشارة التالية.",
+    "scoreNextMilestoneHelpWhy": "الهدف القريب والمحدد أسهل تحقيقًا من الهدف البعيد."
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",
@@ -8740,7 +8755,8 @@
       "exercise": "التمرين",
       "exercisePlaceholder": "مثلًا: سكوات خلفي",
       "empty": "لا نتائج تطابق هذه الفلاتر.",
-      "clear": "مسح الفلاتر"
+      "clear": "مسح الفلاتر",
+      "period": "الفترة"
     },
     "range": {
       "4w": "4 أسابيع",
@@ -8748,6 +8764,13 @@
       "6m": "6 أشهر",
       "1y": "سنة",
       "all": "كل الوقت"
+    },
+    "rangeShort": {
+      "4w": "4 أ",
+      "12w": "3 ش",
+      "6m": "6 ش",
+      "1y": "1 س",
+      "all": "الكل"
     },
     "progress": {
       "bySource": "الجلسات حسب المصدر"

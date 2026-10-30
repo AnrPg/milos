@@ -254,6 +254,13 @@
           "active_filter_count": {
             "type": "integer"
           },
+          "available_sources": {
+            "description": "Source tokens (organization id, `freeform`, `device`) the person has any completed workout from, whatever the filter or range: the «Πηγή» chip shows only with two or more (ADR-285).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "by_source": {
             "items": {
               "properties": {
@@ -480,6 +487,7 @@
           "score_history",
           "pr_timeline",
           "by_source",
+          "available_sources",
           "filter",
           "active_filter_count"
         ],
@@ -492,6 +500,13 @@
             "properties": {
               "active_filter_count": {
                 "type": "integer"
+              },
+              "available_sources": {
+                "description": "Source tokens (organization id, `freeform`, `device`) the person has any completed workout from, whatever the filter or range: the «Πηγή» chip shows only with two or more (ADR-285).",
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
               },
               "by_source": {
                 "items": {
@@ -719,6 +734,7 @@
               "score_history",
               "pr_timeline",
               "by_source",
+              "available_sources",
               "filter",
               "active_filter_count"
             ],
@@ -142585,6 +142601,13 @@
                         "active_filter_count": {
                           "type": "integer"
                         },
+                        "available_sources": {
+                          "description": "Source tokens (organization id, `freeform`, `device`) the person has any completed workout from, whatever the filter or range: the «Πηγή» chip shows only with two or more (ADR-285).",
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
                         "by_source": {
                           "items": {
                             "properties": {
@@ -142811,6 +142834,7 @@
                         "score_history",
                         "pr_timeline",
                         "by_source",
+                        "available_sources",
                         "filter",
                         "active_filter_count"
                       ],

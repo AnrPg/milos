@@ -17,6 +17,11 @@ defmodule Palee.Pantheon do
   defdelegate get_pr_history(id, user_id), to: GetPRHistory, as: :call
   defdelegate share_pr(id, user_id), to: SharePR, as: :call
 
+  @doc "«Δύναμη» (ADR-285): strength gained over the last 8 weeks, or nil."
+  defdelegate strength_trend(user_id, today),
+    to: Palee.Pantheon.Queries.GetStrengthTrend,
+    as: :call
+
   # Bounded-context API used by cross-context application orchestration. These
   # operations expose Pantheon capabilities without leaking its store port.
   defdelegate list_records(user_id), to: Palee.Pantheon.PRStore, as: :list_user_prs

@@ -100,7 +100,6 @@ defmodule Palee.Infrastructure.Gamification.EctoGamificationStore do
       total_prs: 0,
       current_streak_shields: 1,
       consistency_score: 0.0,
-      motivation_score: 0.0,
       perseverance_score: 0.0,
       advancement_count: 1,
       updated_at: occurred_at
@@ -445,9 +444,10 @@ defmodule Palee.Infrastructure.Gamification.EctoGamificationStore do
       current_streak_shields: stats.current_streak_shields,
       last_workout_at: stats.last_workout_at,
       consistency_score: stats.consistency_score,
-      motivation_score: stats.motivation_score,
       perseverance_score: stats.perseverance_score,
       advancement_count: stats.advancement_count,
+      weeks_on_goal: stats.weeks_on_goal,
+      challenges_completed: stats.challenges_completed,
       updated_at: stats.updated_at
     }
   end

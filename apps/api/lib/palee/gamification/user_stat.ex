@@ -13,9 +13,11 @@ defmodule Palee.Gamification.UserStat do
     field :current_streak_shields, :integer, default: 1
     field :last_workout_at, :utc_datetime_usec
     field :consistency_score, :float, default: 0.0
-    field :motivation_score, :float, default: 0.0
     field :perseverance_score, :float, default: 0.0
     field :advancement_count, :integer, default: 0
+    # ADR-285: the facts «Επίπεδο» needs besides workouts and PRs.
+    field :weeks_on_goal, :integer, default: 0
+    field :challenges_completed, :integer, default: 0
     field :user_id, :binary_id
 
     timestamps(inserted_at: false, type: :utc_datetime_usec)
@@ -32,9 +34,10 @@ defmodule Palee.Gamification.UserStat do
       :current_streak_shields,
       :last_workout_at,
       :consistency_score,
-      :motivation_score,
       :perseverance_score,
       :advancement_count,
+      :weeks_on_goal,
+      :challenges_completed,
       :updated_at
     ])
     |> validate_required([
@@ -52,6 +55,8 @@ defmodule Palee.Gamification.UserStat do
     |> validate_number(:total_workouts, greater_than_or_equal_to: 0)
     |> validate_number(:total_prs, greater_than_or_equal_to: 0)
     |> validate_number(:current_streak_shields, greater_than_or_equal_to: 0)
+    |> validate_number(:weeks_on_goal, greater_than_or_equal_to: 0)
+    |> validate_number(:challenges_completed, greater_than_or_equal_to: 0)
     |> unique_constraint(:user_id)
     |> foreign_key_constraint(:user_id)
   end

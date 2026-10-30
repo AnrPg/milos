@@ -1,8 +1,9 @@
 defmodule Palee.Application.GetLandingPage do
   alias Palee.Application.{GetLeaderboardSnippet, ListWorkoutExecutions}
-  alias Palee.{Finance, Gamification, Messaging, Organizations, Scheduling}
+  alias Palee.{Finance, Gamification, Messaging, Organizations, Pantheon, Scheduling}
   alias Palee.Gamification.Domain.{ChallengeCriteria, ChallengeProgress, WeeklyGoal}
   alias Palee.Application.LandingCache
+  alias Palee.TimeZones.ZonedTime
 
   # TD-092: the whole payload is read inside the member's tenant scope. Without
   # it every gamification, execution and messaging read here was empty under
@@ -29,9 +30,10 @@ defmodule Palee.Application.GetLandingPage do
       "total_prs" => 0,
       "current_streak_shields" => 0,
       "consistency_score" => 0.0,
-      "motivation_score" => 0.0,
       "perseverance_score" => 0.0,
       "advancement_count" => 0,
+      "weeks_on_goal" => 0,
+      "challenges_completed" => 0,
       "last_workout_at" => nil
     }
 
@@ -42,6 +44,9 @@ defmodule Palee.Application.GetLandingPage do
         "settings" => Gamification.get_settings(),
         "goal" => nil,
         "stats" => empty_stats,
+        "level" => nil,
+        "next_milestone" => nil,
+        "strength" => nil,
         "preferences" => nil,
         "badges" => [],
         "active_challenges" => [],
@@ -68,9 +73,10 @@ defmodule Palee.Application.GetLandingPage do
           total_prs: 0,
           current_streak_shields: 1,
           consistency_score: 0.0,
-          motivation_score: 0.0,
           perseverance_score: 100.0,
           advancement_count: 0,
+          weeks_on_goal: 0,
+          challenges_completed: 0,
           last_workout_at: nil
         }
 
@@ -128,6 +134,7 @@ defmodule Palee.Application.GetLandingPage do
       end)
 
     {:ok, executions} = ListWorkoutExecutions.call(user.id)
+    badges = Gamification.list_visible_achievements(user.id)
 
     %{
       "role" => to_string(context.role),
@@ -136,8 +143,12 @@ defmodule Palee.Application.GetLandingPage do
         # ADR-229: the person's own weekly goal (the default until set).
         "goal" => user.id |> Gamification.get_training_goal() |> WeeklyGoal.present(),
         "stats" => stats,
+        # ADR-285: the three scores that replaced «Κίνητρο».
+        "level" => Gamification.level(stats),
+        "next_milestone" => Gamification.next_milestone(stats, Enum.map(badges, & &1.badge_key)),
+        "strength" => Pantheon.strength_trend(user.id, person_today(user)),
         "preferences" => preferences,
-        "badges" => Gamification.list_visible_achievements(user.id),
+        "badges" => badges,
         "active_challenges" => active_challenges,
         "leaderboard" => GetLeaderboardSnippet.call(user)
       },
@@ -150,6 +161,10 @@ defmodule Palee.Application.GetLandingPage do
         |> Enum.take(12)
     }
   end
+
+  # ADR-179: «the last 8 weeks» end on the person's own date.
+  defp person_today(user),
+    do: ZonedTime.local_date(DateTime.utc_now(), ZonedTime.or_default(Map.get(user, :time_zone)))
 
   defp admin_metrics(context) do
     %{
