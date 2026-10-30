@@ -79,7 +79,18 @@ defmodule PaleeWeb.FallbackController do
       {:unprocessable_entity, "Choose at least one day, and times as HH:MM"},
     invalid_placement: {:unprocessable_entity, "Choose a space and a quantity"},
     placement_exceeds_quantity:
-      {:unprocessable_entity, "More are placed than the gym owns of this machine"}
+      {:unprocessable_entity, "More are placed than the gym owns of this machine"},
+    # ADR-290: room photos, cleaning points, machine pins and photos.
+    space_photos_full: {:unprocessable_entity, "A room holds at most 30 photos of each kind"},
+    invalid_point_results:
+      {:unprocessable_entity, "Answer each cleaning point once: cleaned or not cleaned"},
+    cleaning_point_unanswered:
+      {:unprocessable_entity, "Answer every cleaning point before finishing"},
+    cleaning_point_note_required: {:unprocessable_entity, "Say why a point was not cleaned"},
+    invalid_machine_position:
+      {:unprocessable_entity, "Place each pin inside the floor plan, one per item at most"},
+    space_not_on_plan: {:unprocessable_entity, "Draw that space on a floor plan first"},
+    too_many_machine_photos: {:unprocessable_entity, "Add at most 10 photos"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@space_errors, reason) do
@@ -541,6 +552,37 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{
       code: "box_message_outside_box_thread",
       error: "A message from the box is sent in the gym's thread with the member"
+    })
+  end
+
+  # ADR-282: the box's shared inbox.
+  def call(conn, {:error, :blocked_by_box}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{code: "blocked_by_box", error: "This box no longer receives your messages"})
+  end
+
+  def call(conn, {:error, :awaiting_box_reply}) do
+    conn
+    |> put_status(:too_many_requests)
+    |> json(%{
+      code: "awaiting_box_reply",
+      error: "Wait for the box to answer before you send more messages"
+    })
+  end
+
+  def call(conn, {:error, :not_a_coach}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "not_a_coach", error: "Only a coach of the box can be brought in"})
+  end
+
+  def call(conn, {:error, :client_not_blockable}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "client_not_blockable",
+      error: "Only someone who is not a client of the box can be blocked"
     })
   end
 
@@ -2844,15 +2886,51 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: Atom.to_string(reason), error: message})
   end
 
-  # ADR-169 Partners.
+  # ADR-280 verification
+  @partner_verification_errors %{
+    partner_verification_required: {:forbidden, "Verify your account to use Training partners"},
+    partner_suspended: {:forbidden, "Your Training partners access is suspended"},
+    partner_already_verified: {:conflict, "Your account is already verified"},
+    partner_verification_in_review: {:conflict, "Your request is with the Palee team"},
+    partner_verification_request_open: {:conflict, "You already have an open request"},
+    partner_consent_required: {:conflict, "Agree to the Palee check first"},
+    partner_sponsor_not_eligible: {:unprocessable_entity, "This person can't vouch for you"},
+    partner_sponsor_quota: {:too_many_requests, "This sponsor vouched 5 times in 30 days"},
+    partner_sponsor_penalty: {:forbidden, "Vouching is paused for now"},
+    partner_sponsor_declined: {:conflict, "This person declined"},
+    partner_sponsor_already_asked: {:conflict, "You already asked this person"},
+    partner_vouch_request_closed: {:conflict, "This request was already answered"},
+    invalid_partner_vouch_decision: {:unprocessable_entity, "Vouch or decline"},
+    partner_link_expired: {:gone, "This link has expired or was already used"},
+    partner_phone_invalid: {:unprocessable_entity, "Enter a mobile number"},
+    partner_phone_taken: {:conflict, "This number verifies another account"},
+    partner_phone_rate_limited: {:too_many_requests, "Too many codes; try again later"},
+    partner_code_invalid: {:unprocessable_entity, "That code is not right"},
+    partner_code_expired: {:gone, "The code expired; ask for a new one"},
+    partner_selfie_missing: {:unprocessable_entity, "Upload the selfie first"},
+    partner_selfie_invalid: {:unprocessable_entity, "The selfie must be a photo of at most 8 MB"},
+    partner_verification_incomplete:
+      {:conflict, "Two vouches and a confirmed phone are needed first"},
+    partner_verification_closed: {:conflict, "This request is not waiting for a decision"},
+    invalid_partner_verification_decision: {:unprocessable_entity, "Approve or reject"},
+    partner_decision_reason_required: {:unprocessable_entity, "Give a reason to reject"},
+    partner_decision_reason_too_long: {:unprocessable_entity, "At most 500 characters"},
+    invalid_partner_verification_status: {:unprocessable_entity, "Unknown status"},
+    sms_unavailable: {:service_unavailable, "Text messages are unavailable; try again later"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@partner_verification_errors, reason) do
+    {status, message} = Map.fetch!(@partner_verification_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: Atom.to_string(reason), error: message})
+  end
+
+  # ADR-280 deck: public Partners (ADR-169 codes still used, plus the deck's).
   @partner_errors %{
-    partners_disabled: {:forbidden, "This gym has switched Partners off"},
-    partners_not_offered:
-      {:forbidden, "Partners is only in clubs whose members the gym verified"},
-    not_club_member: {:forbidden, "Only members of this club take part"},
-    partner_profile_required: {:conflict, "Turn on your Partners profile in this club first"},
-    partner_profile_suspended:
-      {:forbidden, "Staff have hidden your Partners profile in this club"},
+    partner_adult_required: {:unprocessable_entity, "Partners is for people 18 or older"},
+    partner_profile_required: {:conflict, "Turn on your Partners profile first"},
     invalid_partner_level: {:unprocessable_entity, "Choose your level"},
     invalid_partner_times: {:unprocessable_entity, "Choose when you train"},
     invalid_partner_goals: {:unprocessable_entity, "Choose one to three goals"},
@@ -2860,6 +2938,7 @@ defmodule PaleeWeb.FallbackController do
     invalid_partner_gender: {:unprocessable_entity, "Unknown gender"},
     invalid_partner_gender_preference: {:unprocessable_entity, "Unknown preference"},
     invalid_partner_active: {:unprocessable_entity, "active must be true or false"},
+    invalid_partner_show_box: {:unprocessable_entity, "show_box must be true or false"},
     partner_about_too_long: {:unprocessable_entity, "At most 140 characters"},
     invalid_direction: {:unprocessable_entity, "Like or pass"},
     invalid_swipe: {:unprocessable_entity, "That swipe isn't possible"},
@@ -2869,16 +2948,37 @@ defmodule PaleeWeb.FallbackController do
     partner_match_ended: {:conflict, "This match has ended"},
     invalid_end_reason: {:unprocessable_entity, "Unknown reason"},
     partner_match_read_only: {:conflict, "This conversation is read-only"},
-    partner_plans_unavailable: {:unprocessable_entity, "Class plans are for a gym's own clubs"},
     invalid_partner_message: {:unprocessable_entity, "Check the message"},
+    invalid_partner_plan: {:unprocessable_entity, "That plan can't be shared"},
     invalid_partners_visible: {:unprocessable_entity, "visible must be true or false"},
-    invalid_partners_enabled: {:unprocessable_entity, "partners_enabled must be true or false"},
+    invalid_partner_report_reason: {:unprocessable_entity, "Choose a reason"},
+    partner_report_note_too_long: {:unprocessable_entity, "A note is at most 500 characters"},
+    cannot_report_self: {:unprocessable_entity, "You can't report yourself"},
+    invalid_partner_decision: {:unprocessable_entity, "Suspend or dismiss"},
+    partner_report_decided: {:conflict, "This report has already been decided"},
+    invalid_partner_report_status: {:unprocessable_entity, "Unknown status"},
     cannot_block_self: {:unprocessable_entity, "You can't block yourself"},
     invalid_user: {:unprocessable_entity, "Unknown person"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@partner_errors, reason) do
     {status, message} = Map.fetch!(@partner_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: Atom.to_string(reason), error: message})
+  end
+
+  # ADR-280 suggestions
+  @partner_suggestion_errors %{
+    partner_suggestion_unavailable:
+      {:conflict, "That is no longer a suggestion for you two; refresh the suggestions"},
+    invalid_partner_suggestion_key: {:unprocessable_entity, "Unknown suggestion"},
+    invalid_partner_suggestion_feedback: {:unprocessable_entity, "Choose why it doesn't suit you"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@partner_suggestion_errors, reason) do
+    {status, message} = Map.fetch!(@partner_suggestion_errors, reason)
 
     conn
     |> put_status(status)
@@ -3208,6 +3308,9 @@ defmodule PaleeWeb.FallbackController do
     not_a_client: {:unprocessable_entity, "That person is not a member or athlete here"},
     only_athletes_self_assigned: {:unprocessable_entity, "Coaches can take athletes only"},
     not_your_client: {:forbidden, "Not one of your clients"},
+    # ADR-286: a member's own injury report is theirs to change.
+    injury_owned_by_member: {:forbidden, "The member keeps this report up to date"},
+    invalid_sharing: {:unprocessable_entity, "Choose whether your box sees it"},
     roles_required: {:unprocessable_entity, "Choose at least one role"},
     invalid_role: {:unprocessable_entity, "Unknown role"},
     invalid_payment_amount: {:unprocessable_entity, "Enter an amount above zero"},

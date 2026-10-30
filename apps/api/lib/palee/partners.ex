@@ -1,37 +1,27 @@
 defmodule Palee.Partners do
   @moduledoc """
-  Partners bounded context (ADR-169, vision §7.3): training partners inside
-  a club the gym verified. A member opts in per club with a short profile,
-  swipes a deck of the club's other members who opted in, and a mutual like
+  Partners bounded context (ADR-169, ADR-280, vision §7.3): training
+  partners across Palee. A verified person keeps one account-level profile,
+  swipes one public deck of other verified people nearby, and a mutual like
   makes a match with its own conversation and «Κλείστε μαζί» plans.
 
-  Rows are tenant data of the club's gym. Who belongs to a club is not
-  stored here: use cases pass the club's current members on every read, so
-  eligibility is always the gym's word. Blocking is Community's (it applies
-  to a person, not to Partners); use cases live in `Palee.Application`
-  (`Partners`, `PartnerMatches`).
+  Rows are personal, not a gym's. Who may take part is the verification
+  side's word (`Palee.Application.PartnerEligibility`); blocking is
+  Community's (it applies to a person, not to Partners). Use cases live in
+  `Palee.Application` (`Partners`, `PartnerMatches`).
   """
 
   alias Palee.Partners.PartnerStore
 
   alias Palee.Partners.Domain.{
-    ClubEligibility,
+    BadgePolicy,
     DeckPolicy,
     MatchPolicy,
     MessagePolicy,
     ProfilePolicy,
-    SessionPolicy,
-    SwipePolicy,
-    TenantDataPolicy
+    ReportPolicy,
+    SwipePolicy
   }
-
-  def with_context(context, fun) when is_function(fun, 0),
-    do: PartnerStore.with_context(context, fun)
-
-  # Clubs.
-  defdelegate club_verified?(club), to: ClubEligibility, as: :verified?
-  defdelegate check_club(club, gym_enabled?), to: ClubEligibility, as: :check
-  defdelegate club_offered?(club, gym_enabled?), to: ClubEligibility, as: :offered?
 
   # Profiles.
   def levels, do: ProfilePolicy.levels()
@@ -47,18 +37,24 @@ defmodule Palee.Partners do
     to: ProfilePolicy,
     as: :normalize
 
-  defdelegate check_activation(profile, active), to: ProfilePolicy
+  defdelegate adult_confirmation(current, params, now), to: ProfilePolicy
   defdelegate profile_live?(profile), to: ProfilePolicy, as: :live?
+  defdelegate pause_changes(profile, visible, now), to: ProfilePolicy
 
   # The deck.
   def deck_page_size, do: DeckPolicy.page_size()
   def pass_cooldown_days, do: DeckPolicy.pass_cooldown_days()
   def distances_km, do: DeckPolicy.distances_km()
+  def default_within_km, do: DeckPolicy.default_within_km()
   defdelegate deck_filters(params), to: DeckPolicy, as: :filters
   defdelegate swiped_ids(swipes, now), to: DeckPolicy
   defdelegate deck(viewer, candidates, excluded, filters), to: DeckPolicy
   defdelegate swipeable?(viewer, other, excluded), to: DeckPolicy
   defdelegate shared(viewer, other), to: DeckPolicy
+
+  # Badges.
+  def badge_kinds, do: BadgePolicy.kinds()
+  defdelegate badge(verification, show_box), to: BadgePolicy
 
   # Swipes.
   def swipe_daily_limit, do: SwipePolicy.daily_limit()
@@ -79,51 +75,45 @@ defmodule Palee.Partners do
   defdelegate end_changes(match, reason, actor_id, now), to: MatchPolicy
   defdelegate read_field(match, user_id), to: MatchPolicy
   defdelegate read_at(match, user_id), to: MatchPolicy
-  defdelegate can_message?(match, both_members?), to: MatchPolicy
-  defdelegate read_only?(match, both_members?), to: MatchPolicy
+  defdelegate can_message?(match), to: MatchPolicy
+  defdelegate read_only?(match), to: MatchPolicy
 
   # Messages.
   def message_body_max, do: MessagePolicy.body_max()
+  def plan_kinds, do: MessagePolicy.plan_kinds()
   defdelegate normalize_message_body(body), to: MessagePolicy, as: :normalize_body
   defdelegate normalize_note(body), to: MessagePolicy
   defdelegate message_page_limit(value), to: MessagePolicy, as: :page_limit
   defdelegate decode_message_cursor(cursor), to: MessagePolicy, as: :decode_cursor
   defdelegate message_page(rows, limit), to: MessagePolicy, as: :page
-  defdelegate plan_snapshot(slot), to: MessagePolicy
+  defdelegate plan_snapshot(plan), to: MessagePolicy
 
-  # «Κλείστε μαζί».
-  def session_window_days, do: SessionPolicy.window_days()
-  defdelegate session_window(now), to: SessionPolicy, as: :window
+  # Reports.
+  def report_reasons, do: ReportPolicy.reasons()
+  def report_statuses, do: ReportPolicy.statuses()
+  def report_decisions, do: ReportPolicy.decisions()
+  def report_note_max, do: ReportPolicy.note_max()
+  defdelegate normalize_report(reporter_id, params), to: ReportPolicy, as: :normalize
+  defdelegate normalize_report_decision(params), to: ReportPolicy, as: :normalize_decision
 
-  defdelegate session_suggestions(slots, pair_ids, shared_times, timezone, now),
-    to: SessionPolicy,
-    as: :suggestions
+  defdelegate report_decision_changes(report, decision, by, note, now),
+    to: ReportPolicy,
+    as: :decision_changes
 
-  # Tenant data lifecycle (ADR-117).
-  def tenant_data_policy, do: TenantDataPolicy.policy()
-
-  def tenant_data_inventory(context),
-    do: Palee.TenantData.TableStore.inventory(tenant_data_policy(), context)
-
-  def export_tenant_data(context, mode \\ :full),
-    do: Palee.TenantData.TableStore.export(tenant_data_policy(), context, mode)
-
-  def purge_tenant_data(context),
-    do: Palee.TenantData.TableStore.purge(tenant_data_policy(), context)
+  defdelegate report_suspends?(decision), to: ReportPolicy, as: :suspends?
+  defdelegate suspension_profile_changes(), to: ReportPolicy
+  defdelegate suspension_end_reason(), to: ReportPolicy
 
   # Store.
-  defdelegate get_profile(context, club_id, user_id), to: PartnerStore
-  defdelegate get_profile_by_id(context, id), to: PartnerStore
-  defdelegate list_profiles_of(context, user_id), to: PartnerStore
-  defdelegate profile_ids_for(context, pairs), to: PartnerStore
-  defdelegate list_live_profiles(context, club_id, user_ids), to: PartnerStore
+  defdelegate get_profile(context, user_id), to: PartnerStore
+  defdelegate get_profiles(context, user_ids), to: PartnerStore
+  defdelegate list_live_profiles(context, excluded_ids), to: PartnerStore
   defdelegate create_profile(context, attrs), to: PartnerStore
   defdelegate update_profile(context, profile, changes), to: PartnerStore
-  defdelegate set_active_for_user(context, user_id, active), to: PartnerStore
-  defdelegate list_swipes_by(context, club_id, swiper_id), to: PartnerStore
+  defdelegate list_swipes_by(context, swiper_id), to: PartnerStore
   defdelegate count_swipes_since(context, swiper_id, since), to: PartnerStore
   defdelegate record_swipe(context, attrs, mutual?, now), to: PartnerStore
-  defdelegate delete_swipe(context, club_id, swiper_id, target_id), to: PartnerStore
+  defdelegate delete_swipe(context, swiper_id, target_id), to: PartnerStore
   defdelegate get_match(context, id), to: PartnerStore
   defdelegate list_matches(context, user_id), to: PartnerStore
   defdelegate active_match_between(context, a, b), to: PartnerStore
@@ -133,4 +123,8 @@ defmodule Palee.Partners do
   defdelegate list_messages(context, match_id, cursor, limit), to: PartnerStore
   defdelegate insert_message(context, attrs, now), to: PartnerStore
   defdelegate unread_counts(context, user_id, matches), to: PartnerStore
+  defdelegate insert_report(context, attrs), to: PartnerStore
+  defdelegate get_report(context, id), to: PartnerStore
+  defdelegate list_reports(context, status), to: PartnerStore
+  defdelegate decide_reports(context, target_id, changes), to: PartnerStore
 end

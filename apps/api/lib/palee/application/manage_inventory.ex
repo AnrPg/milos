@@ -6,16 +6,28 @@ defmodule Palee.Application.ManageInventory do
   told, except the person who made the change.
   """
 
-  alias Palee.{Inventory, Notifications, Organizations}
+  alias Palee.Application.{MediaUrls, SpaceDirectory}
+  alias Palee.{Inventory, Media, Notifications, Organizations, Spaces}
+
+  @max_photos 10
 
   # Who only reports (coaches, janitors) may add notes, issues and outages;
   # services, repairs, repair calls and retiring stay with who manages.
   @reporter_kinds ["note", "issue", "out_of_order", :note, :issue, :out_of_order]
 
   def log_machine_event(context, machine_id, params) do
+    media_ids = params |> Map.get(:media_ids) |> List.wrap() |> Enum.uniq()
+
     with :ok <- may_log(context, params[:kind]),
+         :ok <- check_photos(context, media_ids),
          {:ok, %{machine: machine, event: event} = result} <-
-           Inventory.log_machine_event(context, machine_id, params) do
+           Inventory.log_machine_event(
+             context,
+             machine_id,
+             Map.put(params, :media_ids, media_ids)
+           ) do
+      _ = Media.set_attached(context, :tenant, media_ids, DateTime.utc_now())
+
       if Inventory.alert_machine_event?(event.kind) do
         notify(context, "inventory_repair_needed", %{
           machine_id: machine.id,
@@ -45,6 +57,90 @@ defmodule Palee.Application.ManageInventory do
       end
 
       {:ok, result}
+    end
+  end
+
+  # ADR-290: up to 10 ready `machine_photo` uploads on a log line.
+  defp check_photos(_context, []), do: :ok
+
+  defp check_photos(_context, ids) when length(ids) > @max_photos,
+    do: {:error, :too_many_machine_photos}
+
+  defp check_photos(context, ids) do
+    with {:ok, _media} <- Media.fetch_ready(context, "machine_photo", ids), do: :ok
+  end
+
+  @doc "Log lines with their photos (`photos: [%{id, url, width, height}]`)."
+  def present_events(context, events) do
+    ids = events |> Enum.flat_map(&(Map.get(&1, :media_ids) || [])) |> Enum.uniq()
+
+    shown =
+      case ids do
+        [] ->
+          %{}
+
+        ids ->
+          context
+          |> Media.list(:tenant, ids)
+          |> Enum.filter(&(&1.status == "ready" and &1.purpose == "machine_photo"))
+          |> Map.new(&{&1.id, MediaUrls.present(context, &1)})
+      end
+
+    Enum.map(events, fn event ->
+      photos =
+        (Map.get(event, :media_ids) || [])
+        |> Enum.map(&Map.get(shown, &1))
+        |> Enum.reject(&is_nil/1)
+        |> Enum.map(&Map.take(&1, [:id, :url, :width, :height]))
+
+      Map.put(event, :photos, photos)
+    end)
+  end
+
+  @doc """
+  ADR-290: where a machine stands, to draw under its log: each space with
+  its floor plan (when it is drawn on one), its area and the machine's pins.
+  """
+  def places(context, machine) do
+    case Inventory.list_placements(context, %{machine_ids: [machine.id]}) do
+      [] ->
+        []
+
+      placements ->
+        spaces =
+          context
+          |> Spaces.list_spaces(%{
+            ids: Enum.map(placements, & &1.space_id),
+            include_archived: true
+          })
+          |> Map.new(&{&1.id, &1})
+
+        plans =
+          spaces
+          |> Map.values()
+          |> Enum.map(& &1.floor_plan_id)
+          |> Enum.reject(&is_nil/1)
+          |> Enum.uniq()
+          |> Enum.map(&Spaces.get_floor_plan(context, &1))
+          |> Enum.reject(&is_nil/1)
+          |> SpaceDirectory.present_plans(context)
+          |> Map.new(&{&1.id, &1})
+
+        placements
+        |> Enum.filter(&Map.has_key?(spaces, &1.space_id))
+        |> Enum.map(fn placement ->
+          space = spaces[placement.space_id]
+          plan = space.floor_plan_id && plans[space.floor_plan_id]
+
+          %{
+            space_id: space.id,
+            space_name: space.name,
+            quantity: placement.quantity,
+            positions: Map.get(placement, :positions) || [],
+            area: plan && space.area,
+            floor_plan: plan
+          }
+        end)
     end
   end
 

@@ -205,6 +205,12 @@ msgstr "قرأ %{reader} ملاحظتك عن %{client} في %{time}."
 msgid "A machine needs attention"
 msgstr "جهاز يحتاج إلى انتباه"
 
+msgid "A room was not fully cleaned"
+msgstr "لم يُنظَّف مكان بالكامل"
+
+msgid "%{space}: %{notes}"
+msgstr "%{space}: %{notes}"
+
 msgid "%{machine}: %{note}"
 msgstr "%{machine}: %{note}"
 
@@ -752,3 +758,50 @@ msgstr "اتصال ضريبي يحتاج إلى انتباه"
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr "توقف %{connection} عن العمل. افتح بيانات الفوترة › الاتصالات لإصلاحه."
+
+# ADR-280 verification: sponsors and the Palee check of Partners.
+
+msgid "Vouch for %{nickname}?"
+msgstr "هل تضمن %{nickname}؟"
+
+msgid "%{nickname} asks you to vouch for them for Training partners."
+msgstr "يطلب منك %{nickname} أن تضمنه في شركاء التدريب."
+
+msgid "%{nickname} vouched for you"
+msgstr "ضمنك %{nickname}"
+
+msgid "One step closer to Training partners."
+msgstr "خطوة أقرب إلى شركاء التدريب."
+
+msgid "You are verified"
+msgstr "تم التحقق منك"
+
+msgid "You can now use Training partners."
+msgstr "يمكنك الآن استخدام شركاء التدريب."
+
+msgid "Take a new selfie"
+msgstr "التقط صورة سيلفي جديدة"
+
+msgid "Your selfie was deleted after 7 days without a check. Take a new one to finish."
+msgstr "حُذفت صورة السيلفي بعد 7 أيام دون مراجعة. التقط صورة جديدة لإكمال التحقق."
+
+msgid "Verification not approved"
+msgstr "لم تتم الموافقة على التحقق"
+
+msgid "The Palee team could not verify your account. You can try again."
+msgstr "لم يتمكن فريق Palee من التحقق من حسابك. يمكنك المحاولة مرة أخرى."
+
+msgid "Someone you vouched for was suspended"
+msgstr "تم إيقاف شخص ضمنته"
+
+msgid "You can vouch again from %{date}. Your own access stays."
+msgstr "يمكنك الضمان مجددًا اعتبارًا من %{date}. يبقى وصولك كما هو."
+
+msgid "%{by} brought you into a conversation"
+msgstr "أضافك %{by} إلى محادثة"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "كتب %{nickname} إلى %{box}"
+
+msgid "%{nickname} sent the box a message."
+msgstr "أرسل %{nickname} رسالة إلى الصالة."

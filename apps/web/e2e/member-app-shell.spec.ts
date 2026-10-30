@@ -684,7 +684,8 @@ test.describe("member app shell", () => {
     await page.goto("/me");
     await page.getByRole("link", { name: /Sharing & visibility/ }).click();
     await expect(page).toHaveURL(/\/me\/sharing$/);
-    await expect(page.locator("#coach-sees")).toContainText("Injuries are always visible to your coach");
+    // ADR-286: each injury has its own «Let my box see it» switch; who read them is listed here.
+    await expect(page.locator("#coach-sees")).toContainText("Let my box see it");
     await expect(page.locator("#community").getByRole("button", { name: "Join leaderboard" })).toBeVisible();
     await expect(page.locator("#community").getByRole("switch", { name: /PR celebrations/ })).not.toBeChecked();
     await expect(page.locator("#community").getByRole("switch", { name: /Challenges/ })).toBeChecked();

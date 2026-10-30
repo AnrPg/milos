@@ -293,6 +293,14 @@ const API_ERROR_KEYS: Record<string, string> = {
   floor_plan_wrong_branch: "apiErrorFloorPlanWrongBranch",
   invalid_cleaning_schedule: "apiErrorInvalidCleaningSchedule",
   invalid_placement: "apiErrorInvalidPlacement",
+  // ADR-290: room photos, cleaning points, machine log photos and pins.
+  space_photos_full: "apiErrorSpacePhotosFull",
+  invalid_point_results: "apiErrorInvalidPointResults",
+  cleaning_point_unanswered: "apiErrorCleaningPointUnanswered",
+  cleaning_point_note_required: "apiErrorCleaningPointNoteRequired",
+  invalid_machine_position: "apiErrorInvalidMachinePosition",
+  space_not_on_plan: "apiErrorSpaceNotOnPlan",
+  too_many_machine_photos: "apiErrorTooManyMachinePhotos",
   placement_exceeds_quantity: "apiErrorPlacementExceedsQuantity",
   // ADR-200: how far an edit to a class of a series goes.
   invalid_series_scope: "apiErrorInvalidSeriesScope",

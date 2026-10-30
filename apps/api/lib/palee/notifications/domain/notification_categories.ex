@@ -39,7 +39,8 @@ defmodule Palee.Notifications.Domain.NotificationCategories do
       locked: false,
       audience: "everyone",
       types: ~w(
-        chat_message person_message message_request box_message coaching_message athlete_message
+        chat_message person_message message_request box_message box_inbox_message coaching_message
+        athlete_message
       )
     },
     %{
@@ -79,6 +80,8 @@ defmodule Palee.Notifications.Domain.NotificationCategories do
       types: ~w(
         partner_match partner_message buddy_invite buddy_accepted buddy_message
         buddy_weekly_summary support_request support_reply support_no_reply_nudge
+        partner_vouch_request partner_vouched partner_verification_decided
+        partner_sponsor_penalty
       )
     },
     %{
@@ -97,7 +100,7 @@ defmodule Palee.Notifications.Domain.NotificationCategories do
         booking_pending booking_timeout check_in_visitor member_leaving
         trial_requested trial_booked trial_cancelled season_requested class_workout_missing
         community_group_proposed community_report_created referral_review
-        inventory_repair_needed inventory_stock_low inventory_digest
+        inventory_repair_needed inventory_stock_low inventory_digest cleaning_point_not_cleaned
         shop_stock_low shop_order_placed payment_needs_attention fiscal_connection_failed
       )
     },

@@ -11,6 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 
 import { reportInjury, type ReportInjuryRequest } from "@/api/wellbeing";
 import { useSession } from "@/components/session-provider";
+import { InjuryShareField } from "@/components/member-app/wellbeing/InjurySharing";
 import { Dialog } from "@/components/ui/Dialog";
 import { Select } from "@/components/ui/Select";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
@@ -21,6 +22,8 @@ export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
   const [bodyArea, setBodyArea] = useState("");
   const [severity, setSeverity] = useState<ReportInjuryRequest["severity"]>("mild");
   const [limitations, setLimitations] = useState("");
+  // ADR-286: «Να το δει το box μου», on unless the member turns it off.
+  const [shareWithBox, setShareWithBox] = useState(true);
   const [submitted, setSubmitted] = useState(false);
 
   const reportMutation = useMutation({
@@ -29,6 +32,7 @@ export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
         body_area: bodyArea,
         severity,
         training_limitations: limitations,
+        shared_with_box: shareWithBox,
       }),
     onSuccess: () => {
       setBodyArea("");
@@ -127,6 +131,8 @@ export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
                 onChange={(e) => setLimitations(e.target.value)}
               />
             </div>
+
+            <InjuryShareField checked={shareWithBox} onChange={setShareWithBox} />
 
             {reportMutation.error instanceof Error && (
               <ErrorNotice>

@@ -1,9 +1,10 @@
 defmodule Palee.Partners.Profile do
   @moduledoc """
-  A member's Partners profile in one club (ADR-169): their opt-in, level,
-  times, goals, an optional line about themselves, and the optional gender
-  and preference used only to honour preferences (never shown). Staff
-  suspend it after a report.
+  A person's Partners profile (ADR-169, one per account since ADR-280):
+  their opt-in, the 18+ confirmation, whether the card names their box,
+  level, times, goals, disciplines, an optional line about themselves, the
+  optional gender and preference used only to honour preferences (never
+  shown), and `paused_at` (the Ρυθμίσεις switch).
   """
 
   use Ecto.Schema
@@ -17,10 +18,10 @@ defmodule Palee.Partners.Profile do
   @type t :: %__MODULE__{}
 
   schema "partner_profiles" do
-    field :organization_id, :binary_id, read_after_writes: true
-    field :club_id, :binary_id
     field :user_id, :binary_id
     field :active, :boolean, default: true
+    field :adult_confirmed_at, :utc_datetime_usec
+    field :show_box, :boolean, default: true
     field :level, :string
     field :times, {:array, :string}, default: []
     field :goals, {:array, :string}, default: []
@@ -28,25 +29,24 @@ defmodule Palee.Partners.Profile do
     field :about, :string
     field :gender, :string
     field :gender_preference, :string, default: "any"
-    field :suspended_at, :utc_datetime_usec
-    field :suspended_by_id, :binary_id
+    field :paused_at, :utc_datetime_usec
 
     timestamps(type: :utc_datetime_usec)
   end
 
-  @editable ~w(active level times goals disciplines about gender gender_preference)a
+  @editable ~w(active show_box level times goals disciplines about gender gender_preference)a
 
   def create_changeset(attrs) do
     %__MODULE__{}
-    |> cast(attrs, [:organization_id, :club_id, :user_id | @editable])
-    |> validate_required([:club_id, :user_id])
+    |> cast(attrs, [:user_id, :adult_confirmed_at | @editable])
+    |> validate_required([:user_id, :adult_confirmed_at])
     |> validate()
-    |> unique_constraint([:club_id, :user_id])
+    |> unique_constraint(:user_id)
   end
 
   def changeset(profile, attrs) do
     profile
-    |> cast(attrs, @editable ++ [:suspended_at, :suspended_by_id])
+    |> cast(attrs, [:paused_at | @editable])
     |> validate()
   end
 

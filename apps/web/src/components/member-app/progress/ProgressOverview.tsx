@@ -114,7 +114,7 @@ export function ProgressOverview() {
         label={i18n("trainingVolume11e038b")}
         value={String(stats.total_workouts)}
         color="var(--text)"
-        caption={`${stats.total_prs > 0 ? `${stats.total_prs} ${i18n("prs80e1569")} ` : ""}${i18n("bestStreak04df811")} ${stats.longest_streak} ${i18n("days5548ae4")}`}
+        caption={`${stats.total_prs > 0 ? `${i18n("prCount", { count: stats.total_prs })} · ` : ""}${i18n("bestStreakDays", { count: stats.longest_streak })}`}
       />,
     );
   }

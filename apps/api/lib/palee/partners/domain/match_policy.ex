@@ -1,16 +1,16 @@
 defmodule Palee.Partners.Domain.MatchPolicy do
   @moduledoc """
-  A match's life (ADR-169 §4, §7). Pure.
+  A match's life (ADR-169 §4, §7; one per pair since ADR-280). Pure.
 
-  The pair is stored ordered (`user_a_id < user_b_id`). Either person ends
-  it (`unmatched`); a block, a report, leaving the club or staff hiding a
-  profile end it too. Its conversation is writable only while the match is
-  active and both people still belong to the club; otherwise it is
-  read-only.
+  The pair is stored ordered (`user_a_id < user_b_id`), at most one active
+  match per pair. Either person ends it (`unmatched`); a block (`blocked`),
+  a report (`reported`) or the Palee team suspending one of them
+  (`suspended`) end it too. Its conversation takes messages only while the
+  match is active; otherwise it is read-only.
   """
 
   @statuses ~w(active ended)
-  @end_reasons ~w(unmatched blocked reported left hidden)
+  @end_reasons ~w(unmatched blocked reported suspended)
 
   def statuses, do: @statuses
   def end_reasons, do: @end_reasons
@@ -37,7 +37,7 @@ defmodule Palee.Partners.Domain.MatchPolicy do
   def active?(%{status: "active"}), do: true
   def active?(_match), do: false
 
-  @doc "The changes that end an active match."
+  @doc "The changes that end an active match; `actor_id` is nil when the Palee team ends it."
   def end_changes(%{status: "active"}, reason, actor_id, now) when reason in @end_reasons,
     do: {:ok, %{status: "ended", end_reason: reason, ended_by_id: actor_id, ended_at: now}}
 
@@ -47,9 +47,9 @@ defmodule Palee.Partners.Domain.MatchPolicy do
   def end_changes(_match, _reason, _actor_id, _now), do: {:error, :invalid_end_reason}
 
   @doc "Whether the conversation takes new messages."
-  def can_message?(match, both_members?) do
-    if active?(match) and both_members?, do: :ok, else: {:error, :partner_match_read_only}
+  def can_message?(match) do
+    if active?(match), do: :ok, else: {:error, :partner_match_read_only}
   end
 
-  def read_only?(match, both_members?), do: can_message?(match, both_members?) != :ok
+  def read_only?(match), do: can_message?(match) != :ok
 end

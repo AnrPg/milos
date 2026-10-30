@@ -849,7 +849,7 @@ function CanonicalPreview({ preview }: { preview: WorkoutDslPreview | null }) {
                 <div className="mt-2 space-y-2">
                   {presentCanonicalExercises(exercises).map((item, exerciseIndex) => item.type === "exercise"
                     ? <CanonicalExercise exercise={item.exercise} key={`${String(item.exercise.name)}:${exerciseIndex}`} />
-                    : <section className="rounded-lg border p-3" key={item.id} style={{ borderColor: item.color }}><header className="mb-2 flex items-center gap-2 text-xs font-bold uppercase" style={{ color: item.color }}><span>{item.kind === "superset" ? i18n("supersetLabel") : i18n("alternatingSetsLabel")}</span><span>{item.sets} {i18n("setsd6c8220")}</span><span className="h-px flex-1 opacity-30" style={{ background: item.color }} /></header><div className="space-y-2">{item.exercises.map((exercise, index) => <CanonicalExercise exercise={exercise} groupColor={item.color} key={`${item.id}:${index}`} />)}</div></section>
+                    : <section className="rounded-lg border p-3" key={item.id} style={{ borderColor: item.color }}><header className="mb-2 flex items-center gap-2 text-xs font-bold uppercase" style={{ color: item.color }}><span>{item.kind === "superset" ? i18n("supersetLabel") : i18n("alternatingSetsLabel")}</span><span>{i18n("setCount", { count: item.sets })}</span><span className="h-px flex-1 opacity-30" style={{ background: item.color }} /></header><div className="space-y-2">{item.exercises.map((exercise, index) => <CanonicalExercise exercise={exercise} groupColor={item.color} key={`${item.id}:${index}`} />)}</div></section>
                   )}
                 </div>
               </div>

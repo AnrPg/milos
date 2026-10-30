@@ -62,7 +62,7 @@ flowchart TB
   subgraph RELATIONS["Between people"]
     FOLLOW["Follow"]
     BUDDIES["Buddies (follow each other)"]
-    TPARTNER["Training partner (mutual match in a club)"]
+    TPARTNER["Training partner (mutual match among verified people)"]
     CHECKIN["Check-in buddy (support on request)"]
     COACHING["Coaching (coach ↔ client)"]
   end
@@ -91,7 +91,7 @@ flowchart TB
   ORG -- hosts --> EVENT
   PROFILE -- follows --> PROFILE
   FOLLOW -- both ways = --> BUDDIES
-  CLUB -- where people find --> TPARTNER
+  BIZ -- membership verifies --> TPARTNER
   PROFILE -- picks --> CHECKIN
   STAFF -- coach --> COACHING
   COACHING -- client --> CLIENT
@@ -139,7 +139,7 @@ flowchart TB
   subgraph RELATIONS["Μεταξύ ανθρώπων"]
     FOLLOW["Ακολουθώ"]
     BUDDIES["Φιλαράκια (ακολουθούν ο ένας τον άλλο)"]
-    TPARTNER["Συναθλητής (αμοιβαίο ταίριασμα σε club)"]
+    TPARTNER["Συναθλητής (αμοιβαίο ταίριασμα μεταξύ επαληθευμένων)"]
     CHECKIN["Φιλαράκι στήριξης (στήριξη όταν τη ζητήσω)"]
     COACHING["Coaching (coach ↔ πελάτης)"]
   end
@@ -168,7 +168,7 @@ flowchart TB
   ORG -- διοργανώνει --> EVENT
   PROFILE -- ακολουθεί --> PROFILE
   FOLLOW -- και αντίστροφα = --> BUDDIES
-  CLUB -- εκεί βρίσκεις --> TPARTNER
+  BIZ -- η συνδρομή επαληθεύει --> TPARTNER
   PROFILE -- διαλέγει --> CHECKIN
   STAFF -- coach --> COACHING
   COACHING -- πελάτης --> CLIENT
@@ -205,6 +205,8 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 | Branch manager | Υπεύθυνος παραρτήματος | role preset | Admin rights limited to chosen branches. | Owner. |
 | Space | Χώρος | `spaces` | A room or area of a branch (or of the whole box): where classes take place, what the cleaning staff clean, where the equipment stands. Can be made unavailable for a time. (ADR-202) | Branch («Παράρτημα», never «Χώρος»); Club and community spaces (§4.4). Was "cleaning area". |
 | Floor plan | Κάτοψη | `space_floor_plans` | An image of one floor of a branch, with the spaces drawn on it. A branch can have several. (ADR-202) | Map (Around). |
+| Room photos | Φωτογραφίες χώρου | `space_photos` | Photos of a space to get an idea of it; each one is on the public box page only when its uploader turns it on (🌐). (ADR-290) | Cleaning points. |
+| Cleaning point | Σημείο καθαριότητας | `space_cleaning_points` | A photo of a part of a space and what to clean there. The cleaning staff answer each one «Καθαρό» / «Δεν καθαρίστηκε» (with a note). (ADR-290) | Room photos; cleaning tasks (the text checklist). |
 | Plan (Palee) | Πακέτο Palee | `platform_plans` | What a business pays Palee. | Subscription package (what clients pay the business). |
 | Subscription package | Πακέτο συνδρομής | `membership_packages`, `package_type` | What a client buys or is given by a box: recurring membership, visit pack, trial, season, corporate. Always the full name, never a bare "package" / «πακέτο». Trial type: "Trial" / «Δοκιμαστικό» (never «Δίκη»). | Plan (Palee), personal training package. |
 
@@ -253,12 +255,25 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 |---|---|---|---|---|
 | Follow / follower | Ακολουθώ / ακόλουθος | `community_follows` | One-way. Instant for public profiles (the default), a request for private ones. | |
 | Buddies | Φιλαράκια | derived: mutual follows | Two people who follow each other. Can message each other anywhere. (ADR-193) | Check-in buddy. |
-| Training partner | Συναθλητής **(proposed)** | `partners` context | A match between two members of the same club who both said yes, to train together («Κλείστε μαζί»). Opt-in per club. (ADR-169) | Partner business. Today the Greek UI says "Partners". |
+| Training partner | Συναθλητής (plural «Συναθλητές») | `partners` context | A match between two verified adults anywhere on Palee who both said yes, to train together («Κλείστε μαζί»). One public deck, opened from Γύρω μου. (ADR-169, ADR-280 from 2026-10-30; it was one deck per club before) | Partner business; Buddies. |
 | Check-in buddy | Φιλαράκι στήριξης | `buddy_links` | One or two people you pick to hear from you when you ask for support (cravings, motivation); can get your weekly summary. (ADR-160) | Buddies (mutual follow). |
 | Coaching | Coaching | `coaching_relationships` | A coach and a client at one business. Decides what the coach sees and who can join their PT squad. | Follow. |
 | My clients | Οι πελάτες μου | coach view | The coach's list of active coaching clients (Box › Πελάτες μου). | Members of the box. |
 | PR sharing | Κοινοποίηση PR | `pr_sharing_grants` | A person lets a specific person see all their PRs. | Follow. |
 | Media (profile tab) | Πολυμέσα | `GET /api/people/:id/media` | The profile tab with a person's photos and videos: a grid of their profile posts that carry media, under the same audience as the posts. There are no separate «reels»: a video is a post with a video. (ADR-231) | Αναρτήσεις (every post, text included). |
+
+### 4.5a Training partners (ADR-280)
+
+| English | Ελληνικά | Code | What it is | Not to be confused with |
+|---|---|---|---|---|
+| Training partners nearby | Συναθλητές κοντά σου | Γύρω μου card → `/partners` | The Γύρω μου card that opens the deck. Hidden when there is nothing to show. | The club page's Μέλη tab (no Partners there any more). |
+| Deck | Κάρτες | `GET /me/partners/deck` | The full-screen cards of verified people to swipe. | Feed. |
+| Partners verification | Επαλήθευση | `partner_verifications` | Done once per account, never lapses with a subscription: by an active membership (box or independent coach) or by two sponsors plus the Palee check. Lost only by a suspension. | A box checking a member at the door (check-in). |
+| Sponsor | Εγγυητής | `partner_sponsorships` | A person verified through a membership who vouches that they know the candidate. At most 5 in 30 days. | Buddy; referral («Φέρε φίλο»). |
+| Vouch | Εγγυώμαι | `vouch` | What a sponsor does. The request reaches them from the candidate's Φιλαράκια list or a single-use QR/link (10 minutes). | Follow. |
+| Palee check | Έλεγχος από την ομάδα του Palee | `partner_verification_requests` | Sponsor path only: an SMS code to a mobile number, then a selfie holding a 4-digit code, compared with the avatar by a person of the Palee team. No face recognition. | Identity check with an ID card (not done). |
+| Badge | Σήμα | `badge` | On the card: «✓ Μέλος <box>», «✓ Μέλος box», «✓ Επαληθευμένος», «✓ Με εγγυητές». | Achievement badges (Pantheon). |
+| Partners report | Αναφορά | `partner_reports` | A report on a person in Partners, decided by the Palee team (platform console «Αναφορές Συναθλητών»), never by box staff. Also blocks. | Club report (ADR-143, box staff). |
 
 ### 4.6 Conversations (Μηνύματα)
 
@@ -270,6 +285,11 @@ Terms marked **(proposed)** change today's wording; see §5. Everything else mat
 | Coach chat | Συνομιλία με coach | thread with a coach / assignment | Chats about your training with your coach; the «Coach» tab. |
 | Training partner chat | Συνομιλία συναθλητών | partner match thread | Opens when a training-partner match happens. |
 | Check-in buddy chat | Συνομιλία στήριξης | buddy support thread | Opens when a check-in buddy answers a support request. |
+| Box conversation | Συνομιλία με το box | `messaging_threads` context `box` (ADR-282) | Anyone with an account and one box. The person writes on `/b/:slug/chat`; the box answers as itself. «Επικοινωνία με το box» opens it. |
+| The box's inbox | Εισερχόμενα του box | capability `message_from_box` | Everyone who answers for the box (owner, admin, front desk, accountant), in Μηνύματα › Box. Filters «Αναπάντητα» and «Όλα». |
+| Newcomer | Νέος | `box_person.newcomer` | Someone writing to a box who is not, and was never, its client. Waits for an answer after three messages; may be blocked («Αποκλεισμός»). |
+| Bring in a coach | Φέρε τον coach | `joined_as: coach` | The inbox adds a coach of the box to one conversation; the topic «Προπόνηση» adds the person's coaches by itself. |
+| Topic | Θέμα | `messaging_messages.topic` | Κράτηση, Πληρωμή, Συνδρομή, Προπόνηση, Χώρος. |
 
 ### 4.6a Class booking rules (ADR-226)
 
@@ -313,6 +333,25 @@ fails on the banned words.
 | he | שיעור | שיעור קבוע | שעת תחילת השיעור | חבילת מנוי | כיתה, משבצת, מכונת מזל |
 
 pt-PT, nl, bg, ar and he got only these terms and the class fixes; their full rewrite is TD-206.
+
+**Timer phases (ANR 2026-10-30).** The work phase of an interval is the word gyms use on their own timers, never
+a job («δουλειά») or a switch ("on/off"). One word per locale for the phase label, the plan parameter, the editor
+timeline and every "work time" compound; HR is heart rate («παλμοί», FC, Puls), never human resources.
+
+| Locale | Work (phase) | Rest (phase) |
+|---|---|---|
+| en | Work | Rest |
+| el | Άσκηση | Ξεκούραση |
+| de | Belastung | Pause |
+| fr | Effort | Repos |
+| es | Trabajo | Descanso |
+| it | Lavoro | Recupero |
+| ru | Работа | Отдых |
+| pt-PT | Trabalho | Descanso |
+| nl | Inspanning | Rust |
+| bg | Работа | Почивка |
+| ar | تمرين | راحة |
+| he | עבודה | מנוחה |
 
 ### 4.9 Goals and streaks
 
@@ -509,6 +548,8 @@ Each needs ANR's choice before the UI changes. The recommended option is first.
    - **Proposal:** training partner → EN "Training partner", EL «Συναθλητής»; partner business stays
      "Partner" / «Συνεργάτης» and appears only in perks screens; the inbox tab becomes
      "Training partners" / «Συναθλητές», and check-in buddy chats move to the «Άτομα» tab.
+   - **Decided (ANR 2026-10-30, ADR-280):** training partner is «Συναθλητής» / «Συναθλητές» in Greek;
+     partner business stays «Συνεργάτης».
 2. **"Buddies" and "Check-in buddy" sound like the same thing.**
    - **Proposal A (lighter):** keep both, but never write a bare "buddy" for the check-in kind; always the
      full name.

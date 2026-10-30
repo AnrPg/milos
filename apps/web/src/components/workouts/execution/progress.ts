@@ -152,20 +152,29 @@ export function shouldAutoAdvanceOnChecklistComplete(segment: TimerSegment) {
  * length, else the highest assignment); unassigned ones appear every window.
  */
 export function stepsForWindow(segment: TimerSegment, windowIndex: number | null) {
-  const steps = buildSegmentStepDefinitions(segment);
-  if (windowIndex === null || segment.kind !== "interval_cycle") return steps;
+  const inWindow = exerciseInWindow(segment, windowIndex);
+  return buildSegmentStepDefinitions(segment).filter((step) => inWindow(step.exercise));
+}
+
+/**
+ * Whether an exercise of an interval cycle is done in window `windowIndex`
+ * (the rule of `stepsForWindow`); every exercise when the segment does not
+ * rotate. The class timer's «Τώρα» panel shows the same exercises.
+ */
+export function exerciseInWindow(segment: TimerSegment, windowIndex: number | null) {
+  const every = () => true;
+  if (windowIndex === null || segment.kind !== "interval_cycle") return every;
 
   const pattern = segment.timer_config?.interval_pattern_seconds;
   const assignments = segment.exercises
     .map((exercise) => exercise.interval_assignment ?? 0)
     .filter((assignment) => assignment > 0);
   const rotation = Array.isArray(pattern) && pattern.length > 0 ? pattern.length : Math.max(0, ...assignments);
-  if (rotation === 0) return steps;
+  if (rotation === 0) return every;
 
   const slot = ((windowIndex - 1) % rotation) + 1;
-  return steps.filter(
-    (step) => step.exercise.interval_assignment == null || step.exercise.interval_assignment === slot,
-  );
+  return (exercise: TimerSegment["exercises"][number]) =>
+    exercise.interval_assignment == null || exercise.interval_assignment === slot;
 }
 
 /** Reps each exercise targets in a round of a growing/shrinking format. */

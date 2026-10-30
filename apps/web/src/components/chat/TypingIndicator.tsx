@@ -16,8 +16,8 @@ export function TypingIndicator({ typingUsers }: TypingIndicatorProps) {
 
   const label =
     typingUsers.length === 1
-      ? (typingUsers[0]!.nickname) + i18n("isTypingd4221d9")
-      : (typingUsers.map((u) => u.nickname).join(", ")) + i18n("areTypingd59b7c6");
+      ? i18n("personIsTyping", { name: typingUsers[0]!.nickname })
+      : i18n("peopleAreTyping", { names: typingUsers.map((u) => u.nickname).join(", ") });
 
   return (
     <div className="flex items-center gap-2 px-1 py-0.5">

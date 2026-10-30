@@ -11,16 +11,19 @@ defmodule Palee.Application.CleaningLog do
   Branch-scoped staff (ADR-186) see and clean the spaces of their branches.
   """
 
-  alias Palee.{Housekeeping, Organizations, Spaces}
-  alias Palee.Application.SpaceDirectory
+  alias Palee.{Housekeeping, Media, Notifications, Organizations, Spaces}
+  alias Palee.Application.{MediaUrls, SpaceDirectory, SpacePhotos}
   alias Palee.TimeZones.ZonedTime
 
   @doc "The spaces as cleaning areas, with when each was last cleaned."
   def areas(context, filters \\ %{}) do
     spaces = scoped_spaces(context, filters)
     last = Housekeeping.last_cleaned(context, Enum.map(spaces, & &1.id))
+    points = points_by_space(context, spaces)
 
-    Enum.map(spaces, &area(&1, Map.get(last, &1.id)))
+    Enum.map(spaces, fn space ->
+      space |> area(Map.get(last, space.id)) |> Map.put(:points, Map.get(points, space.id, []))
+    end)
   end
 
   @doc "Adds a cleaning area: a space with tasks (ADR-102's API)."
@@ -57,8 +60,65 @@ defmodule Palee.Application.CleaningLog do
   @doc "Finishes the caller's cleaning with the tasks done and an optional note."
   def finish(context, entry_id, params, now \\ DateTime.utc_now()) do
     with %{} = entry <- Housekeeping.get_entry(context, entry_id) || {:error, :not_found},
-         %{} = space <- Spaces.get_space(context, entry.area_id) || {:error, :not_found} do
-      Housekeeping.finish(context, context.user_id, entry, space, params, now)
+         %{} = space <- Spaces.get_space(context, entry.area_id) || {:error, :not_found},
+         points = Spaces.list_photos(context, :points, %{space_ids: [space.id]}),
+         {:ok, after_ids} <- after_photos(context, Map.get(params, :point_results)),
+         {:ok, finished} <-
+           Housekeeping.finish(
+             context,
+             context.user_id,
+             entry,
+             Map.put(space, :points, points),
+             params,
+             now
+           ) do
+      _ = Media.set_attached(context, :tenant, after_ids, now)
+      notify_not_cleaned(context, space, finished)
+      {:ok, finished |> List.wrap() |> present_results(context) |> hd()}
+    end
+  end
+
+  # ADR-290: a janitor's "after" photos are ready `cleaning_photo` uploads.
+  defp after_photos(_context, results) when not is_list(results), do: {:ok, []}
+
+  defp after_photos(context, results) do
+    ids =
+      results
+      |> Enum.map(&(Map.get(&1, :after_media_id) || Map.get(&1, "after_media_id")))
+      |> Enum.reject(&is_nil/1)
+      |> Enum.uniq()
+
+    case ids do
+      [] ->
+        {:ok, []}
+
+      ids ->
+        with {:ok, _media} <- Media.fetch_ready(context, "cleaning_photo", ids), do: {:ok, ids}
+    end
+  end
+
+  # Front desk (whoever reviews the cleaning log) hears about every point
+  # left not cleaned, with the janitor's note.
+  defp notify_not_cleaned(context, space, entry) do
+    case Housekeeping.not_cleaned(entry.point_results) do
+      [] ->
+        :ok
+
+      missed ->
+        context.organization_id
+        |> Organizations.list_user_ids_with_capability(:review_cleaning)
+        |> Enum.reject(&(&1 == context.user_id))
+        |> Enum.each(fn user_id ->
+          Notifications.process_event("cleaning_point_not_cleaned", %{
+            user_id: user_id,
+            organization_id: context.organization_id,
+            entry_id: entry.id,
+            space_id: space.id,
+            space_name: space.name,
+            count: length(missed),
+            notes: Enum.map_join(missed, " · ", &"#{&1["instruction"]}: #{&1["note"]}")
+          })
+        end)
     end
   end
 
@@ -72,14 +132,53 @@ defmodule Palee.Application.CleaningLog do
           else: Map.put(filters, :user_id, context.user_id)
       end)
 
-    case Organizations.location_scope(context) do
-      :all ->
-        Housekeeping.list_entries(context, filters)
+    entries =
+      case Organizations.location_scope(context) do
+        :all ->
+          Housekeeping.list_entries(context, filters)
 
-      _scoped ->
-        ids = context |> scoped_spaces(%{include_archived: true}) |> MapSet.new(& &1.id)
-        context |> Housekeeping.list_entries(filters) |> Enum.filter(&(&1.area_id in ids))
-    end
+        _scoped ->
+          ids = context |> scoped_spaces(%{include_archived: true}) |> MapSet.new(& &1.id)
+          context |> Housekeeping.list_entries(filters) |> Enum.filter(&(&1.area_id in ids))
+      end
+
+    present_results(entries, context)
+  end
+
+  @doc """
+  Entries with each point result's photo (`url`) and "after" photo
+  (`after_url`) as signed URLs.
+  """
+  def present_results(entries, context) do
+    ids =
+      entries
+      |> Enum.flat_map(&Map.get(&1, :point_results, []))
+      |> Enum.flat_map(&[&1["media_id"], &1["after_media_id"]])
+      |> Enum.reject(&is_nil/1)
+      |> Enum.uniq()
+
+    urls =
+      case ids do
+        [] ->
+          %{}
+
+        ids ->
+          context
+          |> Media.list(:tenant, ids)
+          |> Enum.filter(&(&1.status == "ready" and &1.purpose == "cleaning_photo"))
+          |> Map.new(&{&1.id, MediaUrls.present(context, &1).url})
+      end
+
+    Enum.map(entries, fn entry ->
+      Map.update(entry, :point_results, [], fn results ->
+        Enum.map(results, fn result ->
+          Map.merge(result, %{
+            "url" => Map.get(urls, result["media_id"]),
+            "after_url" => Map.get(urls, result["after_media_id"])
+          })
+        end)
+      end)
+    end)
   end
 
   # ── Schedule (ADR-202) ──────────────────────────────────────────────────
@@ -124,6 +223,7 @@ defmodule Palee.Application.CleaningLog do
 
     due = Housekeeping.due(spaces, schedules, finished, date)
     spaces_by_id = Map.new(spaces, &{&1.id, &1})
+    points = points_by_space(context, Enum.map(due, &spaces_by_id[&1.space_id]))
 
     floor_plan_ids =
       due
@@ -136,7 +236,10 @@ defmodule Palee.Application.CleaningLog do
       due:
         Enum.map(due, fn row ->
           space = spaces_by_id[row.space_id]
-          Map.merge(row, Map.take(space, [:name, :location_id, :tasks, :floor_plan_id, :area]))
+
+          row
+          |> Map.merge(Map.take(space, [:name, :location_id, :tasks, :floor_plan_id, :area]))
+          |> Map.put(:points, Map.get(points, space.id, []))
         end),
       open_entries:
         Enum.filter(entries, &(is_nil(&1.finished_at) and &1.user_id == context.user_id)),
@@ -167,6 +270,16 @@ defmodule Palee.Application.CleaningLog do
     if Map.has_key?(params, :location_id),
       do: Organizations.authorize_location(context, params.location_id),
       else: :ok
+  end
+
+  # ADR-290: each space's visual cleaning checklist, with photo URLs.
+  defp points_by_space(_context, []), do: %{}
+
+  defp points_by_space(context, spaces) do
+    context
+    |> Spaces.list_photos(:points, %{space_ids: Enum.map(spaces, & &1.id)})
+    |> then(&SpacePhotos.present(context, :points, &1))
+    |> Enum.group_by(& &1.space_id)
   end
 
   defp last_cleaned(context, id), do: context |> Housekeeping.last_cleaned([id]) |> Map.get(id)

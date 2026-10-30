@@ -82,3 +82,11 @@ export function grantableAllowances(allowances: Record<string, unknown> | null |
   const result = [...classKeys, ...perkKeys];
   return result.length > 0 ? result : ["class_visits"];
 }
+
+export type MembershipDateCard = "starts_on" | "expires_on" | "subscription_end";
+
+// Dates read left to right in time: the start always comes before the end.
+// With a current subscription the end is the computed subscription end, not an editable date.
+export function membershipDateCards(hasCurrentSubscription: boolean): MembershipDateCard[] {
+  return hasCurrentSubscription ? ["starts_on", "subscription_end"] : ["starts_on", "expires_on"];
+}

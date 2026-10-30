@@ -1,5 +1,5 @@
 defmodule Palee.Partners.Swipe do
-  @moduledoc "One person's like or pass on another in a club (ADR-169)."
+  @moduledoc "One person's like or pass on another in the public deck (ADR-169, ADR-280)."
 
   use Ecto.Schema
   import Ecto.Changeset
@@ -12,8 +12,6 @@ defmodule Palee.Partners.Swipe do
   @type t :: %__MODULE__{}
 
   schema "partner_swipes" do
-    field :organization_id, :binary_id, read_after_writes: true
-    field :club_id, :binary_id
     field :swiper_id, :binary_id
     field :target_id, :binary_id
     field :direction, :string
@@ -25,8 +23,8 @@ defmodule Palee.Partners.Swipe do
 
   def changeset(swipe \\ %__MODULE__{}, attrs) do
     swipe
-    |> cast(attrs, [:organization_id, :club_id, :swiper_id, :target_id, :direction])
-    |> validate_required([:club_id, :swiper_id, :target_id, :direction])
+    |> cast(attrs, [:swiper_id, :target_id, :direction])
+    |> validate_required([:swiper_id, :target_id, :direction])
     |> validate_inclusion(:direction, @directions)
     |> check_constraint(:target_id, name: :partner_swipes_pair_check)
   end

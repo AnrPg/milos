@@ -16,8 +16,10 @@ import {
   fetchSpace,
   fetchSpaces,
   makeSpaceUnavailable,
+  putSpaceSettings,
   requestFloorPlanUpload,
   restoreSpace,
+  updateFloorPlan,
   updateSpace,
   type FloorPlan,
   type Space,
@@ -25,6 +27,7 @@ import {
 } from "@/api/spaces";
 import { useSession } from "@/components/session-provider";
 import { FloorPlanCanvas, type PlanArea } from "@/components/spaces/FloorPlanCanvas";
+import { RoomPhotosEditor } from "@/components/spaces/RoomPhotosEditor";
 import { groupByBranch, spacesOnPlan, upcomingWindow, windowReady, type Point } from "@/components/spaces/floor-plan";
 import {
   StaffPanel,
@@ -136,6 +139,10 @@ export function SpacesSettings() {
         {spaces.isError ? <StatusText tone="error">{localizeError(spaces.error, ui)}</StatusText> : null}
         {archive.isError ? <StatusText tone="error">{localizeError(archive.error, ui)}</StatusText> : null}
 
+        {spaces.data && rights.manage ? (
+          <ClassPlansToggle token={token} on={spaces.data.settings?.floor_plans_in_classes ?? false} onChanged={refresh} />
+        ) : null}
+
         {spaces.data
           ? groups.map((group) => (
               <BranchSpaces
@@ -146,6 +153,7 @@ export function SpacesSettings() {
                 spaces={group.items}
                 plans={(spaces.data.floor_plans ?? []).filter((plan) => (plan.location_id ?? null) === group.locationId)}
                 rights={rights}
+                plansInClasses={spaces.data.settings?.floor_plans_in_classes ?? false}
                 onRefresh={refresh}
                 onOpen={setDetailId}
                 onEdit={setEditing}
@@ -195,6 +203,7 @@ function BranchSpaces({
   spaces,
   plans,
   rights,
+  plansInClasses,
   onRefresh,
   onOpen,
   onEdit,
@@ -207,6 +216,7 @@ function BranchSpaces({
   spaces: Space[];
   plans: FloorPlan[];
   rights: Rights;
+  plansInClasses: boolean;
   onRefresh: () => Promise<unknown>;
   onOpen: (id: string) => void;
   onEdit: (space: Space) => void;
@@ -227,6 +237,10 @@ function BranchSpaces({
       setDrawFor(null);
       await onRefresh();
     },
+  });
+  const showFloor = useMutation({
+    mutationFn: ({ id, shown }: { id: string; shown: boolean }) => updateFloorPlan(token, id, { shown_in_classes: shown }),
+    onSuccess: onRefresh,
   });
   const removePlan = useMutation({
     mutationFn: (id: string) => deleteFloorPlan(token, id),
@@ -283,6 +297,25 @@ function BranchSpaces({
               </button>
             ) : null}
           </div>
+          {/* ADR-290: with more than one floor, each floor can stay out of the classes. */}
+          {rights.manage && plansInClasses && plans.length > 1 ? (
+            <fieldset className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm" data-testid={`${groupId}-floors-in-classes`}>
+              <legend className="mb-1 text-xs" style={{ color: "var(--dim)" }}>{t("floorsInClasses")}</legend>
+              {plans.map((item) => (
+                <label key={item.id} className="flex min-h-9 items-center gap-2" style={{ color: "var(--text-soft)" }}>
+                  <input
+                    type="checkbox"
+                    checked={item.shown_in_classes}
+                    disabled={showFloor.isPending}
+                    data-testid={`floor-in-classes-${item.id}`}
+                    onChange={(event) => showFloor.mutate({ id: item.id, shown: event.target.checked })}
+                  />
+                  {item.name}
+                </label>
+              ))}
+            </fieldset>
+          ) : null}
+          {showFloor.isError ? <StatusText tone="error">{localizeError(showFloor.error, ui)}</StatusText> : null}
           {plan ? (
             <>
               {drawing ? (
@@ -720,6 +753,15 @@ function SpaceDetailDialog({
             </section>
           ) : null}
 
+          <RoomPhotosEditor
+            token={token}
+            spaceId={space.id}
+            photos={space.photos ?? []}
+            points={space.points ?? []}
+            canEdit={rights.details && !space.archived_at}
+            queryKey={key}
+          />
+
           <section data-testid="space-detail-unavailability">
             <h3 className={captionClass} style={captionStyle}>{t("unavailability")}</h3>
             {space.unavailability.length === 0 ? (
@@ -781,6 +823,39 @@ function SpaceDetailDialog({
         </div>
       ) : null}
     </Dialog>
+  );
+}
+
+/**
+ * ADR-290: one switch for the whole gym. On, the people who see a class open
+ * «Δες στην κάτοψη» in its details: its room coloured on the floor plan,
+ * with the room's photos.
+ */
+function ClassPlansToggle({ token, on, onChanged }: { token: string; on: boolean; onChanged: () => Promise<unknown> }) {
+  const t = useTranslations("Spaces");
+  const ui = useUiTranslations();
+  const save = useMutation({
+    mutationFn: (next: boolean) => putSpaceSettings(token, { floor_plans_in_classes: next }),
+    onSuccess: onChanged,
+  });
+  return (
+    <section className="rounded-2xl px-4 py-3" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+      <label className="flex items-start gap-3">
+        <input
+          type="checkbox"
+          className="mt-1"
+          checked={on}
+          disabled={save.isPending}
+          data-testid="plans-in-classes"
+          onChange={(event) => save.mutate(event.target.checked)}
+        />
+        <span className="flex flex-col">
+          <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>{t("plansInClasses")}</span>
+          <span className="text-sm" style={{ color: "var(--muted)" }}>{t("plansInClassesHint")}</span>
+        </span>
+      </label>
+      {save.isError ? <StatusText tone="error">{localizeError(save.error, ui)}</StatusText> : null}
+    </section>
   );
 }
 

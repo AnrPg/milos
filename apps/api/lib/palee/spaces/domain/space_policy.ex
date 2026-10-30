@@ -147,4 +147,16 @@ defmodule Palee.Spaces.Domain.SpacePolicy do
   def same_branch(%{location_id: location_id}, location_id), do: :ok
   def same_branch(%{location_id: nil}, _class_location), do: :ok
   def same_branch(_space, _class_location), do: {:error, :space_wrong_branch}
+
+  @doc "Trims text; blank becomes nil."
+  def blank_to_nil(nil), do: nil
+
+  def blank_to_nil(value) when is_binary(value) do
+    case String.trim(value) do
+      "" -> nil
+      trimmed -> trimmed
+    end
+  end
+
+  def blank_to_nil(value), do: value
 end

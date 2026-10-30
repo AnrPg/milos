@@ -85,6 +85,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     body/body_store
     buddies/buddy_store
     partners/partner_store
+    partners/verification_store
     wellness/wellness_store
     insights/insight_store
     devices/device_store
@@ -112,6 +113,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     ai_usage/ai_usage_store
     places/discovery_store
     places/home_area_store
+    partners/suggestion_store
     interests/interests_store
     wallet/wallet_store
     business_accounts/business_account_store

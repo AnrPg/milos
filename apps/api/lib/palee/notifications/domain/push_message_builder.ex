@@ -202,6 +202,22 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-282: a message to the box's inbox; a coach brought in hears by whom.
+  def build("box_inbox_message", payload, localize) do
+    bindings = %{nickname: payload["nickname"] || "", box: payload["box_name"] || ""}
+
+    title =
+      if payload["brought_in_by"],
+        do: localize.("%{by} brought you into a conversation", %{by: payload["brought_in_by"]}),
+        else: localize.("%{nickname} wrote to %{box}", bindings)
+
+    %{
+      title: title,
+      body: payload["body"] || localize.("%{nickname} sent the box a message.", bindings),
+      url: payload["url"] || "/messages?filter=clubs"
+    }
+  end
+
   def build("message_request", payload, localize) do
     %{
       title: localize.("Message request", %{}),
@@ -769,6 +785,69 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-280 verification. The pause never names who was suspended.
+  def build("partner_vouch_request", payload, localize) do
+    nickname = payload["nickname"] || ""
+
+    %{
+      title: localize.("Vouch for %{nickname}?", %{nickname: nickname}),
+      body:
+        localize.("%{nickname} asks you to vouch for them for Training partners.", %{
+          nickname: nickname
+        }),
+      url: payload["url"] || "/partners/vouch-requests"
+    }
+  end
+
+  def build("partner_vouched", payload, localize) do
+    nickname = payload["nickname"] || ""
+
+    %{
+      title: localize.("%{nickname} vouched for you", %{nickname: nickname}),
+      body: localize.("One step closer to Training partners.", %{}),
+      url: payload["url"] || "/partners/verify"
+    }
+  end
+
+  def build("partner_verification_decided", %{"outcome" => "approved"} = payload, localize) do
+    %{
+      title: localize.("You are verified", %{}),
+      body: localize.("You can now use Training partners.", %{}),
+      url: payload["url"] || "/partners"
+    }
+  end
+
+  def build("partner_verification_decided", %{"outcome" => "expired"} = payload, localize) do
+    %{
+      title: localize.("Take a new selfie", %{}),
+      body:
+        localize.(
+          "Your selfie was deleted after 7 days without a check. Take a new one to finish.",
+          %{}
+        ),
+      url: payload["url"] || "/partners/verify"
+    }
+  end
+
+  def build("partner_verification_decided", payload, localize) do
+    %{
+      title: localize.("Verification not approved", %{}),
+      body: localize.("The Palee team could not verify your account. You can try again.", %{}),
+      url: payload["url"] || "/partners/verify"
+    }
+  end
+
+  def build("partner_sponsor_penalty", payload, localize) do
+    %{
+      title: localize.("Someone you vouched for was suspended", %{}),
+      body:
+        localize.("You can vouch again from %{date}. Your own access stays.", %{
+          date: payload["until"] || ""
+        }),
+      url: payload["url"] || "/partners/vouch-requests"
+    }
+  end
+
   # ADR-160 §4: counts only, never craving times.
   def build("coach_wellness_summary", payload, localize) do
     bindings = %{
@@ -1181,6 +1260,18 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
           note: payload["body"] || ""
         }),
       url: payload["url"] || "/admin/inventory"
+    }
+  end
+
+  def build("cleaning_point_not_cleaned", payload, localize) do
+    %{
+      title: localize.("A room was not fully cleaned", %{}),
+      body:
+        localize.("%{space}: %{notes}", %{
+          space: payload["space_name"] || "",
+          notes: payload["notes"] || ""
+        }),
+      url: payload["url"] || "/admin/cleaning"
     }
   end
 

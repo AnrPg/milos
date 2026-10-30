@@ -75,3 +75,32 @@ export function threadsIn(threads: ChatThread[], selected: InboxSegment, context
   if (selected === "all") return threads;
   return threads.filter((thread) => threadSegment(thread, context) === selected);
 }
+
+/**
+ * ADR-282: a thread the box's inbox answers (a box thread with someone
+ * else). The person's own thread with a box lives in their box chats.
+ */
+export function isBoxInboxThread(thread: ChatThread, currentUserId: string | null) {
+  return thread.context_type === "box" && thread.context_id !== currentUserId;
+}
+
+/** «Αναπάντητα»: the person wrote last, so the box owes an answer. */
+export function awaitsBoxReply(thread: ChatThread) {
+  return thread.context_type === "box" && thread.last_message?.sender_id === thread.context_id;
+}
+
+export const BOX_FILTERS = ["unanswered", "all"] as const;
+export type BoxFilter = (typeof BOX_FILTERS)[number];
+
+/**
+ * Μηνύματα › Box for the box's inbox: «Αναπάντητα» keeps the box threads
+ * waiting for an answer, «Όλα» everything; newest message first.
+ */
+export function boxInboxThreads(threads: ChatThread[], filter: BoxFilter) {
+  const kept = filter === "unanswered" ? threads.filter(awaitsBoxReply) : threads;
+  return [...kept].sort((a, b) => lastActivity(b).localeCompare(lastActivity(a)));
+}
+
+function lastActivity(thread: ChatThread) {
+  return thread.last_message?.inserted_at ?? thread.inserted_at;
+}

@@ -23,9 +23,6 @@ defmodule Palee.Community.Commands.Groups do
           attrs.member_groups not in CommunitySettings.member_group_options() ->
         {:error, :invalid_member_groups}
 
-      Map.has_key?(attrs, :partners_enabled) and not is_boolean(attrs.partners_enabled) ->
-        {:error, :invalid_partners_enabled}
-
       true ->
         CommunityStore.put_community_settings(context, attrs)
     end

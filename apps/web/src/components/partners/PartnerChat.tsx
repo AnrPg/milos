@@ -18,28 +18,29 @@ import {
   sendPartnerMessage,
   type PartnerMessage,
 } from "@/api/partners";
-import { ReportSheet } from "@/components/community/ReportSheet";
 import { ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
+import { inboxHref } from "@/components/chat/inbox/inbox-model";
+import { BackLink } from "@/components/ui/BackLink";
+import { MoreMenu } from "@/components/ui/MoreMenu";
 import { useUiTranslations } from "@/i18n/ui";
+import { withClock } from "@/lib/clock";
+import { useRealtimeFallbackInterval } from "@/lib/realtime";
 
-import { PartnerPlanSheet } from "./PartnerPlanSheet";
+import { PartnerReportSheet } from "./PartnerReportSheet";
+import { PartnerSuggestions } from "./PartnerSuggestions";
 import { partnerErrorMessage } from "./errors";
+import { planHref } from "./partners-model";
 import { PARTNERS_FALLBACK_REFETCH_MS } from "./partners-realtime";
 import { usePartnerMatches, usePartnersToken } from "./use-partners";
-import { Popover } from "@/components/ui/Popover";
-import { inboxHref } from "@/components/chat/inbox/inbox-model";
-import { useRealtimeFallbackInterval } from "@/lib/realtime";
-import { BackLink } from "@/components/ui/BackLink";
-import { withClock } from "@/lib/clock";
 
 type Confirm = "end" | "block" | null;
 
 /**
- * A match's own conversation (ADR-169 §7, §8): messages, «Κλείστε μαζί» for
- * a class at the gym, and ⋯ to end the match, block or report the person.
- * An ended match, or one where someone left the club, stays readable but
- * nobody can write.
+ * A match's own conversation (ADR-280): «Βρήκατε συναθλητή» with up to three
+ * ideas to train together («Πρότεινε» posts one as a plan), «Πάμε μαζί;»
+ * next to the message box, and ⋯ to end the match, block or report the
+ * person to the Palee team. An ended match stays readable; nobody can write.
  */
 export function PartnerChat({ matchId }: { matchId: string }) {
   const t = useTranslations("Partners");
@@ -51,12 +52,10 @@ export function PartnerChat({ matchId }: { matchId: string }) {
   const queryClient = useQueryClient();
   const matches = usePartnerMatches();
   const [draft, setDraft] = useState("");
-  const [menu, setMenu] = useState(false);
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const [confirm, setConfirm] = useState<Confirm>(null);
   const [reporting, setReporting] = useState(false);
-  const [planning, setPlanning] = useState(false);
   const bottom = useRef<HTMLDivElement | null>(null);
+  const input = useRef<HTMLTextAreaElement | null>(null);
   const messagesKey = useMemo(() => partnerMessagesKey(matchId), [matchId]);
 
   const fallback = useRealtimeFallbackInterval(PARTNERS_FALLBACK_REFETCH_MS);
@@ -74,6 +73,7 @@ export function PartnerChat({ matchId }: { matchId: string }) {
   const first = pages.data?.pages[0];
   const readOnly = first?.read_only ?? match?.read_only ?? false;
   const unread = first?.unread ?? 0;
+  const active = match?.status === "active" && !readOnly;
 
   const messages = useMemo(() => {
     const all = (pages.data?.pages ?? []).flatMap((page) => page.messages ?? []);
@@ -111,7 +111,7 @@ export function PartnerChat({ matchId }: { matchId: string }) {
 
   const end = useMutation({
     mutationFn: async (kind: Exclude<Confirm, null>) => {
-      if (kind === "block" && match) await blockPerson(token!, match.person.id);
+      if (kind === "block" && match) await blockPerson(token!, match.partner_id);
       else await endPartnerMatch(token!, matchId);
       return kind;
     },
@@ -125,6 +125,12 @@ export function PartnerChat({ matchId }: { matchId: string }) {
     },
   });
 
+  /** «Πάμε μαζί;»: starts the message for me to finish with where and when. */
+  const goTogether = () => {
+    setDraft((current) => (current.trim() ? current : `${t("goTogetherDraft")} `));
+    input.current?.focus();
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-start justify-between gap-3">
@@ -134,48 +140,26 @@ export function PartnerChat({ matchId }: { matchId: string }) {
             <PersonAvatar name={name} url={match?.person.avatar_url} size={40} />
             <div className="min-w-0">
               <h1 className="truncate text-2xl font-extrabold" style={{ color: "var(--text)" }}>{name}</h1>
-              <p className="truncate text-xs" style={{ color: "var(--dim)" }}>
-                {match?.club_name ? t("chatSubtitle", { club: match.club_name }) : t("title")}
-              </p>
+              <p className="truncate text-xs" style={{ color: "var(--dim)" }}>{t("chatSubtitle")}</p>
             </div>
           </div>
         </div>
         {match ? (
-          <div className="relative">
-            <button
-              ref={menuButtonRef}
-              type="button"
-              aria-haspopup="menu"
-              aria-expanded={menu}
-              aria-label={t("moreActions")}
-              onClick={() => setMenu((open) => !open)}
-              className="mt-11 flex h-11 w-11 items-center justify-center rounded-full text-lg"
-              style={{ background: "var(--panel-raised)", color: "var(--text)" }}
-            >
-              ⋯
-            </button>
-            <Popover
-              anchorRef={menuButtonRef}
-              open={menu}
-              onClose={() => setMenu(false)}
-              align="end"
-              width={224}
-              className="rounded-2xl"
-              style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-            >
-              <ul role="menu" aria-label={t("moreActions")} className="flex flex-col">
-                {match.status === "active" ? (
-                  <MenuItem onClick={() => (setMenu(false), setConfirm("end"))}>{t("endMatch")}</MenuItem>
-                ) : null}
-                <MenuItem onClick={() => (setMenu(false), setConfirm("block"))}>{t("block", { name })}</MenuItem>
-                {match.partner_profile_id ? (
-                  <MenuItem danger onClick={() => (setMenu(false), setReporting(true))}>{t("report", { name })}</MenuItem>
-                ) : null}
-              </ul>
-            </Popover>
+          <div className="mt-11">
+            <MoreMenu
+              label={t("moreActions")}
+              testId="partner-more"
+              items={[
+                ...(match.status === "active" ? [{ label: t("endMatch"), onSelect: () => setConfirm("end") }] : []),
+                { label: t("block", { name }), onSelect: () => setConfirm("block"), tone: "danger" as const },
+                { label: t("report", { name }), onSelect: () => setReporting(true), tone: "danger" as const },
+              ]}
+            />
           </div>
         ) : null}
       </div>
+
+      {active ? <PartnerSuggestions matchId={matchId} name={name} onProposed={refresh} /> : null}
 
       <section
         aria-label={t("chatWith", { name })}
@@ -188,7 +172,7 @@ export function PartnerChat({ matchId }: { matchId: string }) {
             type="button"
             onClick={() => void pages.fetchNextPage()}
             disabled={pages.isFetchingNextPage}
-            className="self-center rounded-full px-3 py-1 text-xs font-semibold disabled:opacity-50"
+            className="min-h-9 self-center rounded-full px-3 text-xs font-semibold disabled:opacity-50"
             style={{ border: "1px solid var(--border)", color: "var(--text)" }}
           >
             {t("earlier")}
@@ -216,27 +200,17 @@ export function PartnerChat({ matchId }: { matchId: string }) {
           {t("chatReadOnly")}
         </p>
       ) : (
-        <>
-          {match?.plannable ? (
-            <button
-              type="button"
-              onClick={() => setPlanning(true)}
-              className="min-h-11 self-start rounded-full px-4 text-sm font-bold"
-              style={{ background: "color-mix(in srgb, var(--primary) 14%, var(--panel))", border: "1px solid var(--primary)", color: "var(--text)" }}
-              data-testid="partner-plan-open"
-            >
-              {t("planOpen")}
-            </button>
-          ) : null}
-          <form
-            className="flex gap-2"
-            onSubmit={(event) => {
-              event.preventDefault();
-              const body = draft.trim();
-              if (body) send.mutate(body);
-            }}
-          >
+        <form
+          className="flex flex-col gap-2"
+          onSubmit={(event) => {
+            event.preventDefault();
+            const body = draft.trim();
+            if (body) send.mutate(body);
+          }}
+        >
+          <div className="flex gap-2">
             <textarea
+              ref={input}
               value={draft}
               maxLength={2000}
               rows={2}
@@ -254,10 +228,19 @@ export function PartnerChat({ matchId }: { matchId: string }) {
             >
               {t("send")}
             </button>
-          </form>
-        </>
+          </div>
+          <button
+            type="button"
+            onClick={goTogether}
+            className="min-h-11 self-start rounded-full px-4 text-sm font-bold"
+            style={{ background: "color-mix(in srgb, var(--primary) 14%, var(--panel))", border: "1px solid var(--primary)", color: "var(--text)" }}
+            data-testid="partner-go-together"
+          >
+            {t("goTogether")}
+          </button>
+          <ErrorLine message={partnerErrorMessage(send.error, t, tUi)} />
+        </form>
       )}
-      <ErrorLine message={partnerErrorMessage(send.error, t, tUi)} />
 
       {confirm ? (
         <Sheet
@@ -277,35 +260,19 @@ export function PartnerChat({ matchId }: { matchId: string }) {
           <ErrorLine message={partnerErrorMessage(end.error, t, tUi)} />
         </Sheet>
       ) : null}
-      {reporting && match?.partner_profile_id ? (
-        <ReportSheet
-          target="partner"
-          targetId={match.partner_profile_id}
+      {reporting && match ? (
+        <PartnerReportSheet
+          targetId={match.partner_id}
+          name={name}
           onClose={() => setReporting(false)}
           onReported={() => {
             void queryClient.invalidateQueries({ queryKey: PARTNERS_KEY });
             void queryClient.invalidateQueries({ queryKey: BLOCKS_KEY });
+            router.push(inboxHref({ filter: "partners" }));
           }}
         />
       ) : null}
-      {planning ? <PartnerPlanSheet matchId={matchId} name={name} onClose={() => setPlanning(false)} onPlanned={refresh} /> : null}
     </div>
-  );
-}
-
-function MenuItem({ onClick, danger, children }: { onClick: () => void; danger?: boolean; children: string }) {
-  return (
-    <li role="none">
-      <button
-        type="button"
-        role="menuitem"
-        onClick={onClick}
-        className="min-h-11 w-full px-4 text-start text-sm font-semibold"
-        style={{ color: danger ? "var(--danger)" : "var(--text)" }}
-      >
-        {children}
-      </button>
-    </li>
   );
 }
 
@@ -315,19 +282,20 @@ function Bubble({ message, time }: { message: PartnerMessage; time: string }) {
   const locale = useLocale();
   const mine = message.mine;
   return (
-    <li className={["flex max-w-[85%] flex-col gap-0.5", mine ? "self-end items-end" : "self-start items-start"].join(" ")}>
+    <li className={["flex max-w-[85%] flex-col gap-0.5", mine ? "items-end self-end" : "items-start self-start"].join(" ")}>
       {message.kind === "plan" && message.plan ? (
         <Link
-          href={`/box/schedule?open_slot=${encodeURIComponent(message.plan.class_id)}`}
+          href={planHref(message.plan)}
           className="flex flex-col gap-0.5 rounded-2xl px-3 py-2 text-sm"
           style={{ background: "var(--panel-raised)", border: "1px solid var(--primary)", color: "var(--text)" }}
           data-testid="partner-plan"
         >
-          <span className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>{t("planEyebrow")}</span>
-          <span className="font-bold">{message.plan.name ?? t("planClass")}</span>
-          <span>{format.dateTime(new Date(message.plan.scheduled_at), withClock(locale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }))}</span>
+          <span className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>{t(`planKind_${message.plan.kind}`)}</span>
+          <span className="font-bold">{message.plan.title}</span>
+          <span>{format.dateTime(new Date(message.plan.starts_at), withClock(locale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }))}</span>
+          {message.plan.place ? <span style={{ color: "var(--text-soft)" }}>{message.plan.place}</span> : null}
           {message.body ? <span className="whitespace-pre-wrap" style={{ color: "var(--text-soft)" }}>{message.body}</span> : null}
-          <span className="text-xs font-semibold" style={{ color: "var(--primary)" }}>{t("planBook")}</span>
+          <span className="text-xs font-semibold" style={{ color: "var(--primary)" }}>{t(`planOpen_${message.plan.kind}`)}</span>
         </Link>
       ) : (
         <span

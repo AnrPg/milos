@@ -21,7 +21,6 @@ export const REPORT_ACTIONS: Record<ReportRow["target_type"], ReportAction[]> = 
   post: ["hide", "delete", "dismiss"],
   comment: ["hide", "delete", "dismiss"],
   channel: ["archive", "dismiss"],
-  partner: ["hide", "dismiss"],
 };
 
 export const STAFF_GROUPS_KEY = ["admin", "community", "groups"] as const;
@@ -50,7 +49,7 @@ export async function reopenStaffGroup(token: string, groupId: string) {
   return data.group;
 }
 
-export type CommunitySettingsChange = { member_groups?: MemberGroupsSetting; partners_enabled?: boolean };
+export type CommunitySettingsChange = { member_groups?: MemberGroupsSetting };
 
 /** Changes only the settings given; the rest stay. */
 export function updateCommunitySettings(token: string, change: CommunitySettingsChange) {

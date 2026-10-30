@@ -2,22 +2,32 @@ import { apiRequest } from "@/api/client";
 import type { components } from "@/api/generated/schema";
 
 /**
- * Partners (ADR-169): a training partner among the members of one club, with
- * an opt-in profile per club, a deck, mutual matches, the pair's own
- * conversation with «Κλείστε μαζί», the Ρυθμίσεις switch and blocked people.
+ * Partners («Συναθλητές», ADR-280): one public deck for all of Palee. The
+ * overview says whether I may take part (verification) and holds my profile;
+ * the deck, swipes, matches with their conversation and suggestions, the
+ * Ρυθμίσεις switch, reports and blocked people. Nothing here names a club.
  */
-export type PartnersClubOverview = components["schemas"]["PartnersClubOverview"];
+export type PartnersOverview = components["schemas"]["PartnersOverview"];
+export type PartnersEligibility = components["schemas"]["PartnersEligibility"];
+export type EligibilityStatus = PartnersEligibility["status"];
 export type PartnerOptions = components["schemas"]["PartnerOptions"];
 export type PartnerProfile = components["schemas"]["PartnerProfile"];
 export type PartnerProfileRequest = components["schemas"]["PartnerProfileRequest"];
 export type PartnerCard = components["schemas"]["PartnerCard"];
+export type PartnerBadge = components["schemas"]["PartnerBadge"];
 export type PartnerDeck = components["schemas"]["PartnerDeck"];
 export type PartnerSwipeResponse = components["schemas"]["PartnerSwipeResponse"];
 export type PartnerMatch = components["schemas"]["PartnerMatch"];
 export type PartnerMessage = components["schemas"]["PartnerMessage"];
 export type PartnerMessagePage = components["schemas"]["PartnerMessagePage"];
-export type PartnerSession = components["schemas"]["PartnerSession"];
-export type PartnerSessions = components["schemas"]["PartnerSessions"];
+export type PartnerPlan = components["schemas"]["PartnerPlan"];
+export type PartnerPlanRequest = components["schemas"]["PartnerPlanRequest"];
+export type PartnerSuggestion = components["schemas"]["PartnerSuggestion"];
+export type PartnerSuggestions = components["schemas"]["PartnerSuggestions"];
+export type SuggestionFeedbackReason = components["schemas"]["PartnerSuggestionFeedbackRequest"]["reason"];
+export type PartnerReportRequest = components["schemas"]["PartnerReportRequest"];
+export type PartnerReportReason = PartnerReportRequest["reason"];
+export type PartnerReportResponse = components["schemas"]["PartnerReportResponse"];
 export type PartnerSettings = components["schemas"]["PartnerSettings"];
 export type BlockedPerson = components["schemas"]["BlockedPeople"]["blocks"][number];
 export type PartnerLevel = PartnerProfile["level"];
@@ -32,21 +42,21 @@ export type PartnerFilters = {
   goal?: PartnerGoal | null;
   /** A discipline on the partner profile (ADR-197). */
   discipline?: string | null;
-  /** Open clubs only, between people shown in Γύρω μου (ADR-197). */
+  /** 2, 5, 10 or 25 km between neighbourhoods; left out, the API uses its default. */
   within_km?: number | null;
 };
 
+export const SUGGESTION_FEEDBACK_REASONS: readonly SuggestionFeedbackReason[] = ["not_near", "bad_time", "wrong_level", "other"];
+
 export const PARTNERS_KEY = ["my", "partners"] as const;
+export const PARTNERS_OVERVIEW_KEY = [...PARTNERS_KEY, "overview"] as const;
 export const PARTNER_MATCHES_KEY = [...PARTNERS_KEY, "matches"] as const;
 export const PARTNER_SETTINGS_KEY = [...PARTNERS_KEY, "settings"] as const;
 export const BLOCKS_KEY = ["my", "blocks"] as const;
 
-export const partnersClubKey = (clubId: string) => [...PARTNERS_KEY, "club", clubId] as const;
-export const partnerDeckKey = (clubId: string, filters: PartnerFilters = {}) =>
+export const partnerDeckKey = (filters: PartnerFilters = {}) =>
   [
     ...PARTNERS_KEY,
-    "club",
-    clubId,
     "deck",
     filters.time ?? null,
     filters.level ?? null,
@@ -55,7 +65,7 @@ export const partnerDeckKey = (clubId: string, filters: PartnerFilters = {}) =>
     filters.within_km ?? null,
   ] as const;
 export const partnerMessagesKey = (matchId: string) => [...PARTNER_MATCHES_KEY, matchId, "messages"] as const;
-export const partnerSessionsKey = (matchId: string) => [...PARTNER_MATCHES_KEY, matchId, "sessions"] as const;
+export const partnerSuggestionsKey = (matchId: string) => [...PARTNER_MATCHES_KEY, matchId, "suggestions"] as const;
 
 const id = (value: string) => encodeURIComponent(value);
 
@@ -68,17 +78,17 @@ function query(params: Record<string, string | null | undefined>) {
   return text ? `?${text}` : "";
 }
 
-export function fetchPartnersClub(token: string, clubId: string) {
-  return apiRequest<PartnersClubOverview>(`/me/clubs/${id(clubId)}/partners`, { token });
+export function fetchPartnersOverview(token: string) {
+  return apiRequest<PartnersOverview>("/me/partners", { token });
 }
 
-export async function putPartnerProfile(token: string, clubId: string, body: PartnerProfileRequest) {
-  return (await apiRequest<{ profile: PartnerProfile }>(`/me/clubs/${id(clubId)}/partners/profile`, { method: "PUT", token, body })).profile;
+export async function putPartnerProfile(token: string, body: PartnerProfileRequest) {
+  return (await apiRequest<{ profile: PartnerProfile }>("/me/partners/profile", { method: "PUT", token, body })).profile;
 }
 
-export function fetchPartnerDeck(token: string, clubId: string, filters: PartnerFilters = {}) {
+export function fetchPartnerDeck(token: string, filters: PartnerFilters = {}) {
   return apiRequest<PartnerDeck>(
-    `/me/clubs/${id(clubId)}/partners/deck${query({
+    `/me/partners/deck${query({
       time: filters.time,
       level: filters.level,
       goal: filters.goal,
@@ -89,19 +99,16 @@ export function fetchPartnerDeck(token: string, clubId: string, filters: Partner
   );
 }
 
-export function swipePartner(token: string, clubId: string, targetId: string, direction: SwipeDirection) {
-  return apiRequest<PartnerSwipeResponse>(`/me/clubs/${id(clubId)}/partners/swipes`, {
+export function swipePartner(token: string, targetId: string, direction: SwipeDirection) {
+  return apiRequest<PartnerSwipeResponse>("/me/partners/swipes", {
     method: "POST",
     token,
     body: { target_id: targetId, direction },
   });
 }
 
-export function undoPartnerSwipe(token: string, clubId: string, targetId: string) {
-  return apiRequest<{ target_id: string; undone: boolean }>(`/me/clubs/${id(clubId)}/partners/swipes/${id(targetId)}`, {
-    method: "DELETE",
-    token,
-  });
+export function undoPartnerSwipe(token: string, targetId: string) {
+  return apiRequest<{ target_id: string; undone: boolean }>(`/me/partners/swipes/${id(targetId)}`, { method: "DELETE", token });
 }
 
 export async function fetchPartnerMatches(token: string) {
@@ -125,18 +132,29 @@ export function markPartnerMessagesRead(token: string, matchId: string) {
   return apiRequest<{ read: number }>(`/me/partners/matches/${id(matchId)}/messages/read`, { method: "POST", token });
 }
 
-export function fetchPartnerSessions(token: string, matchId: string) {
-  return apiRequest<PartnerSessions>(`/me/partners/matches/${id(matchId)}/sessions`, { token });
+/** «Κλείστε μαζί»: at most three ideas, best first; none hides the card. */
+export async function fetchPartnerSuggestions(token: string, matchId: string) {
+  return (await apiRequest<PartnerSuggestions>(`/me/partners/matches/${id(matchId)}/suggestions`, { token })).suggestions ?? [];
 }
 
-export async function suggestPartnerPlan(token: string, matchId: string, classId: string, body?: string | null) {
-  return (
-    await apiRequest<{ message: PartnerMessage }>(`/me/partners/matches/${id(matchId)}/plans`, {
-      method: "POST",
-      token,
-      body: { class_id: classId, body: body ?? null },
-    })
-  ).message;
+/** «Πρότεινε»: posts the class, event or trial in the conversation as a plan. */
+export async function proposePartnerPlan(token: string, matchId: string, plan: PartnerPlanRequest) {
+  return (await apiRequest<{ message: PartnerMessage }>(`/me/partners/matches/${id(matchId)}/plans`, { method: "POST", token, body: plan }))
+    .message;
+}
+
+/** «Δεν ταιριάζει»: counted anonymously, never shown to the other person. */
+export function sendSuggestionFeedback(token: string, matchId: string, key: string, reason: SuggestionFeedbackReason) {
+  return apiRequest<{ key: string; reason: SuggestionFeedbackReason }>(`/me/partners/matches/${id(matchId)}/suggestions/feedback`, {
+    method: "POST",
+    token,
+    body: { key, reason },
+  });
+}
+
+/** A report to the Palee team; it also blocks the person (ADR-280). */
+export function reportPartner(token: string, body: PartnerReportRequest) {
+  return apiRequest<PartnerReportResponse>("/me/partners/reports", { method: "POST", token, body });
 }
 
 export function fetchPartnerSettings(token: string) {

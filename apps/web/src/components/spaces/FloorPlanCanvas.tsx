@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useRef, useState } from "react";
 
 import { labelPosition, normalizedPoint, rectangleFromDrag, svgPoints, type Point } from "@/components/spaces/floor-plan";
 
@@ -9,8 +9,11 @@ export type PlanArea = {
   label: string;
   points: number[][];
   /** How the area is drawn: the selected one, a done one, one still due. */
-  tone?: "default" | "selected" | "done" | "due" | "busy";
+  tone?: "default" | "selected" | "done" | "due" | "busy" | "fault";
 };
+
+/** ADR-290: a pin on the plan, e.g. where a machine stands (`[x, y]` within 0..1). */
+export type PlanPin = { id: string; at: number[]; label?: string };
 
 const fills: Record<NonNullable<PlanArea["tone"]>, { fill: string; stroke: string }> = {
   default: { fill: "color-mix(in srgb, var(--primary) 18%, transparent)", stroke: "var(--primary)" },
@@ -18,12 +21,15 @@ const fills: Record<NonNullable<PlanArea["tone"]>, { fill: string; stroke: strin
   done: { fill: "color-mix(in srgb, var(--success) 30%, transparent)", stroke: "var(--success)" },
   due: { fill: "color-mix(in srgb, var(--warning) 26%, transparent)", stroke: "var(--warning)" },
   busy: { fill: "color-mix(in srgb, var(--primary) 30%, transparent)", stroke: "var(--primary)" },
+  fault: { fill: "color-mix(in srgb, var(--danger) 28%, transparent)", stroke: "var(--danger)" },
 };
 
 /**
  * A floor plan image with the spaces drawn on it (ADR-202). Areas are
  * buttons: tapping one selects its space. While `drawing`, a drag draws a
  * rectangle and `onDraw` receives its four normalized points.
+ * ADR-290: `pins` mark points on the plan; with `onPin`, a tap on the plan
+ * gives its normalized point and a tap on a pin `onPinClick`.
  */
 export function FloorPlanCanvas({
   imageUrl,
@@ -32,6 +38,9 @@ export function FloorPlanCanvas({
   onAreaClick,
   drawing = false,
   onDraw,
+  pins = [],
+  onPin,
+  onPinClick,
   testId,
 }: {
   imageUrl: string | null | undefined;
@@ -40,13 +49,16 @@ export function FloorPlanCanvas({
   onAreaClick?: (id: string) => void;
   drawing?: boolean;
   onDraw?: (points: Point[]) => void;
+  pins?: PlanPin[];
+  onPin?: (point: Point) => void;
+  onPinClick?: (id: string) => void;
   testId?: string;
 }) {
   const boxRef = useRef<HTMLDivElement>(null);
   const [start, setStart] = useState<Point | null>(null);
   const [current, setCurrent] = useState<Point | null>(null);
 
-  const point = (event: ReactPointerEvent) => {
+  const point = (event: { clientX: number; clientY: number }) => {
     const box = boxRef.current?.getBoundingClientRect();
     return box ? normalizedPoint(event.clientX, event.clientY, box) : null;
   };
@@ -59,7 +71,12 @@ export function FloorPlanCanvas({
       className="relative w-full select-none overflow-hidden rounded-2xl"
       data-testid={testId}
       data-drawing={drawing ? "true" : "false"}
-      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", touchAction: drawing ? "none" : "auto", cursor: drawing ? "crosshair" : "default" }}
+      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", touchAction: drawing ? "none" : "auto", cursor: drawing || onPin ? "crosshair" : "default" }}
+      onClick={(event) => {
+        if (drawing || !onPin || (event.target as Element).closest("button")) return;
+        const at = point(event);
+        if (at) onPin(at);
+      }}
       onPointerDown={(event) => {
         if (!drawing) return;
         const at = point(event);
@@ -122,6 +139,21 @@ export function FloorPlanCanvas({
           </button>
         );
       })}
+      {pins.map((pin) => (
+        <button
+          key={pin.id}
+          type="button"
+          disabled={!onPinClick}
+          data-testid={`plan-pin-${pin.id}`}
+          aria-label={pin.label}
+          title={pin.label}
+          className="absolute flex h-7 w-7 -translate-x-1/2 -translate-y-full items-center justify-center text-xl leading-none disabled:cursor-default"
+          style={{ left: `${pin.at[0] * 100}%`, top: `${pin.at[1] * 100}%`, pointerEvents: onPinClick ? "auto" : "none" }}
+          onClick={() => onPinClick?.(pin.id)}
+        >
+          <span aria-hidden="true">📍</span>
+        </button>
+      ))}
     </div>
   );
 }

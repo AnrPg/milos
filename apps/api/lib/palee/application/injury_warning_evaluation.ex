@@ -5,9 +5,12 @@ defmodule Palee.Application.InjuryWarningEvaluation do
   Not a use case itself: the `*InjuryWarnings` application services call it so
   the visibility rules live in exactly one place.
 
-    * Staff (`for_athletes/3`) only ever see injuries with the acting
-      organization's provenance - never a member's personal self-reports,
-      never another tenant's reports (`Wellbeing.list_active_injuries_for_users/1`).
+    * Staff (`for_athletes/3`) see injuries with the acting organization's
+      provenance and members' own reports they share with their boxes
+      (ADR-286) - never another tenant's reports
+      (`Wellbeing.list_active_injuries_for_users/1`). Every coach running a
+      class gets them, for safety; each warning shown is logged for the
+      member (`injury_access_log`, surface `safety_warning`).
     * The athlete/member (`for_self/2`) sees every own injury they may see,
       including personal self-reports, because they own them (ADR-055).
     * Analytics only ever reflect organization-provenance injuries of the
@@ -18,7 +21,7 @@ defmodule Palee.Application.InjuryWarningEvaluation do
   (`Wellbeing.with_tenant_context/2`). Warnings inform; nothing here blocks.
   """
 
-  alias Palee.Application.TrackAnalyticsEvent
+  alias Palee.Application.{StaffInjuryAccess, TrackAnalyticsEvent}
   alias Palee.{Analytics, Wellbeing, Workouts}
 
   @staff_surfaces ~w(assign_dialog class_roster member_dossier)
@@ -40,11 +43,6 @@ defmodule Palee.Application.InjuryWarningEvaluation do
     |> Wellbeing.with_tenant_context(fn ->
       with {:ok, workout} <- fetch_workout(context, workout_id) do
         injuries = Wellbeing.list_active_injuries_for_users(user_ids)
-        {:ok, workout, injuries}
-      end
-    end)
-    |> case do
-      {:ok, workout, injuries} ->
         exercises = Workouts.exercise_descriptors(workout)
         by_user = Enum.group_by(injuries, & &1.user_id)
 
@@ -54,6 +52,20 @@ defmodule Palee.Application.InjuryWarningEvaluation do
             %{user_id: user_id, level: evaluation.level, warnings: evaluation.warnings}
           end)
 
+        shown =
+          MapSet.new(for athlete <- athletes, warning <- athlete.warnings, do: warning.injury_id)
+
+        StaffInjuryAccess.log_reads(
+          context,
+          "safety_warning",
+          Enum.filter(injuries, &MapSet.member?(shown, &1.id))
+        )
+
+        {:ok, workout, athletes}
+      end
+    end)
+    |> case do
+      {:ok, workout, athletes} ->
         {:ok,
          %{
            workout_id: workout.id,

@@ -9,6 +9,7 @@ import { BodyDefaultVisibilitySetting } from "@/components/body/BodyPreferenceSe
 import { WellnessSummarySharing } from "@/components/buddy/WellnessSummarySharing";
 import { BlockedPeople, PartnerVisibilitySetting } from "@/components/partners/PartnerSettings";
 import { BackToMe } from "@/components/member-app/me/BackToMe";
+import { InjurySharingSetting } from "@/components/member-app/wellbeing/InjurySharing";
 import { LeaderboardSetting } from "@/components/member-app/me/LeaderboardSetting";
 import { CommunityOptIns, EntryDefaultsSetting, ProfilePrsSetting } from "@/components/member-app/me/SharingSections";
 import { PRSharingSettings } from "@/components/pantheon/PRSharingSettings";
@@ -24,8 +25,8 @@ import { useUiTranslations } from "@/i18n/ui";
  * Εγώ › Κοινοποίηση & ορατότητα (brief §7.11, mockup «privacy», ADR-137):
  * everything that decides who sees what of me, in one place, grouped as the
  * mockup does (ADR-196): «Ο coach μου βλέπει» (PRs, the weekly wellness
- * summary of ADR-160, measurements; injuries always), «Κοινότητα»
- * (leaderboards, PR celebrations, challenges, Partners of ADR-169), the PRs on
+ * summary of ADR-160, measurements; injuries per injury, ADR-286), «Κοινότητα»
+ * (leaderboards, PR celebrations, challenges, Partners of ADR-280), the PRs on
  * my profile, PRs shared with accounts (ADR-129), the default for new entries
  * (ADR-139 §3), then the account and people-search switches of ADR-193 and
  * the people I blocked. Rest days moved to Ρυθμίσεις (ADR-196).
@@ -61,7 +62,8 @@ export function SharingPage() {
               <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{tBody("defaultVisibilityLabel")}</p>
               <BodyDefaultVisibilitySetting />
             </div>
-            <p className="text-xs" style={{ color: "var(--dim)" }}>{t("sharing.injuriesAlways")}</p>
+            {/* ADR-286: injuries reach the boxes per injury; who read them. */}
+            <InjurySharingSetting />
           </div>
         </CollapsibleSection>
         <CollapsibleSection id="community" title={t("sharing.communityTitle")} description={t("sharing.communityHint")} defaultOpen>

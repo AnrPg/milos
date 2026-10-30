@@ -766,7 +766,7 @@ export function WorkoutPreviewDetail({
 
                       const color = presentationGroupColor(item.id);
                       const label = item.title || (item.kind === "superset" ? i18n("supersetLabel") : i18n("alternatingSetsLabel"));
-                      const setLabel = item.sets ? ` · ${item.sets} ${i18n("setsd6c8220")}` : "";
+                      const setLabel = item.sets ? ` · ${i18n("setCount", { count: item.sets })}` : "";
                       return (
                         <section
                           aria-label={`${label}${setLabel}`}
@@ -777,7 +777,7 @@ export function WorkoutPreviewDetail({
                         >
                           <header className="mb-2 flex items-center gap-2 text-xs font-bold uppercase" style={{ color }}>
                             <span>{label}</span>
-                            {item.sets ? <span>{item.sets} {i18n("setsd6c8220")}</span> : null}
+                            {item.sets ? <span>{i18n("setCount", { count: item.sets })}</span> : null}
                             <span className="h-px flex-1" style={{ background: color, opacity: 0.3 }} />
                           </header>
                           <ul className="space-y-2">

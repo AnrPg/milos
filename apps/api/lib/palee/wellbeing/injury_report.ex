@@ -19,6 +19,8 @@ defmodule Palee.Wellbeing.InjuryReport do
     field :training_limitations, :string
     field :tags, {:array, :string}, default: []
     field :visibility, :string, default: "user_and_admin"
+    # ADR-286: a member's own report reaches their boxes' staff while on.
+    field :shared_with_box, :boolean, default: true
     field :params, :map, default: %{}
     # ADR-139 ladder rung; coaches always see injuries, so it is never private.
     field :journal_visibility, :string, default: "coach_can_view"
@@ -34,6 +36,10 @@ defmodule Palee.Wellbeing.InjuryReport do
     |> change(journal_visibility: rung)
     |> check_constraint(:journal_visibility, name: :injury_reports_journal_visibility_check)
   end
+
+  @doc "The member shares the report with their boxes, or stops (ADR-286)."
+  def box_sharing_changeset(%__MODULE__{} = injury_report, shared?) when is_boolean(shared?),
+    do: change(injury_report, shared_with_box: shared?)
 
   def changeset(injury_report \\ %__MODULE__{}, params) do
     injury_report
@@ -51,6 +57,7 @@ defmodule Palee.Wellbeing.InjuryReport do
       :training_limitations,
       :tags,
       :visibility,
+      :shared_with_box,
       :params
     ])
     |> validate_required([

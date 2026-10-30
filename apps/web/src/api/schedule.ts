@@ -175,7 +175,8 @@ export type ScheduleSlot = {
   location_id?: string | null;
   /** ADR-202: the room or area of the branch the class is held in. */
   space_id?: string | null;
-  space?: { id: string; name: string } | null;
+  /** ADR-290: `viewable` when «Δες στην κάτοψη» has something to show this viewer. */
+  space?: { id: string; name: string; viewable?: boolean } | null;
   /** Staff only: another class shares the space at an overlapping time (a warning). */
   space_overlap?: boolean;
   /** Staff only: the space was made unavailable for this class's time. */
@@ -569,4 +570,11 @@ export async function sendSlotMessage(token: string, slotId: string, body: strin
     token,
     body: { body },
   });
+}
+
+// ADR-290: the room of a class, as the people who see the class may see it.
+export type ClassRoom = operations["PaleeWeb.ScheduleController.slot_space"]["responses"][200]["content"]["application/json"];
+
+export async function fetchClassRoom(token: string, slotId: string) {
+  return apiRequest<ClassRoom>(`/schedule/slots/${slotId}/space`, { token });
 }

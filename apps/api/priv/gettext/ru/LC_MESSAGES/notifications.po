@@ -205,6 +205,12 @@ msgstr "%{reader} прочитал(а) вашу заметку о %{client} в %
 msgid "A machine needs attention"
 msgstr "Тренажёр требует внимания"
 
+msgid "A room was not fully cleaned"
+msgstr "Помещение убрано не полностью"
+
+msgid "%{space}: %{notes}"
+msgstr "%{space}: %{notes}"
+
 msgid "%{machine}: %{note}"
 msgstr "%{machine}: %{note}"
 
@@ -752,3 +758,50 @@ msgstr "Фискальное подключение требует вниман�
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr "%{connection} перестало работать. Откройте Платёжные реквизиты › Подключения, чтобы исправить."
+
+# ADR-280 verification: sponsors and the Palee check of Partners.
+
+msgid "Vouch for %{nickname}?"
+msgstr "Поручиться за %{nickname}?"
+
+msgid "%{nickname} asks you to vouch for them for Training partners."
+msgstr "%{nickname} просит тебя поручиться за него или неё в «Партнёрах по тренировкам»."
+
+msgid "%{nickname} vouched for you"
+msgstr "%{nickname} поручился(-ась) за тебя"
+
+msgid "One step closer to Training partners."
+msgstr "Ещё один шаг к «Партнёрам по тренировкам»."
+
+msgid "You are verified"
+msgstr "Ты прошёл(-ла) проверку"
+
+msgid "You can now use Training partners."
+msgstr "Теперь можно пользоваться «Партнёрами по тренировкам»."
+
+msgid "Take a new selfie"
+msgstr "Сделай новое селфи"
+
+msgid "Your selfie was deleted after 7 days without a check. Take a new one to finish."
+msgstr "Твоё селфи удалено через 7 дней без проверки. Сделай новое, чтобы завершить."
+
+msgid "Verification not approved"
+msgstr "Проверка не одобрена"
+
+msgid "The Palee team could not verify your account. You can try again."
+msgstr "Команда Palee не смогла подтвердить твой аккаунт. Можно попробовать снова."
+
+msgid "Someone you vouched for was suspended"
+msgstr "Человека, за которого ты поручился(-ась), заблокировали"
+
+msgid "You can vouch again from %{date}. Your own access stays."
+msgstr "Поручаться снова можно с %{date}. Твой доступ сохраняется."
+
+msgid "%{by} brought you into a conversation"
+msgstr "%{by} добавил(а) тебя в разговор"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "%{nickname} написал(а) в %{box}"
+
+msgid "%{nickname} sent the box a message."
+msgstr "%{nickname} написал(а) в бокс."

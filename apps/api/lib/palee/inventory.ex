@@ -80,7 +80,7 @@ defmodule Palee.Inventory do
     by_machine =
       context
       |> list_placements(%{machine_ids: Enum.map(machines, & &1.id)})
-      |> Enum.group_by(& &1.machine_id, &Map.take(&1, [:space_id, :quantity]))
+      |> Enum.group_by(& &1.machine_id, &Map.take(&1, [:space_id, :quantity, :positions]))
 
     Enum.map(machines, fn machine ->
       placements = Map.get(by_machine, machine.id, [])
@@ -102,6 +102,7 @@ defmodule Palee.Inventory do
         usable: params[:usable],
         body: params[:body],
         cost_cents: params[:cost_cents],
+        media_ids: params[:media_ids] || [],
         user_id: context.user_id,
         occurred_at: params[:occurred_at] || now
       })

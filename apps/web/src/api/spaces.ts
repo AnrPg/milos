@@ -114,3 +114,90 @@ export async function deleteCleaningSchedule(token: string, spaceId: string) {
 export async function fetchCleaningToday(token: string) {
   return apiRequest<TodayResponse>("/staff/cleaning/today", { token });
 }
+
+// ADR-290: the gym's space settings, room photos, the visual cleaning
+// checklist and the room of a class on the floor plan.
+
+type SettingsResponse = Json<SpacesOp<"settings">["responses"][200]>;
+type PhotoResponse = Json<SpacesOp<"add_photo">["responses"][201]>;
+type PointResponse = Json<SpacesOp<"add_point">["responses"][201]>;
+type PhotosOrderResponse = Json<SpacesOp<"order_photos">["responses"][200]>;
+type PointsOrderResponse = Json<SpacesOp<"order_points">["responses"][200]>;
+
+export type SpaceSettings = SettingsResponse["settings"];
+export type SpacePhoto = PhotoResponse["photo"];
+export type CleaningPoint = PointResponse["point"];
+export type SpacePhotoInput = Body<SpacesOp<"add_photo">>;
+export type CleaningPointInput = Body<SpacesOp<"add_point">>;
+export type PhotoKind = "photos" | "points";
+
+export async function fetchSpaceSettings(token: string) {
+  const response = await apiRequest<SettingsResponse>("/staff/space-settings", { token });
+  return response.settings;
+}
+
+export async function putSpaceSettings(token: string, body: { floor_plans_in_classes: boolean }) {
+  const response = await apiRequest<SettingsResponse>("/staff/space-settings", { method: "PUT", token, body });
+  return response.settings;
+}
+
+const UPLOAD_PATH: Record<PhotoKind | "machine", string> = {
+  photos: "/staff/space-photos/uploads",
+  points: "/staff/cleaning-photos/uploads",
+  machine: "/staff/inventory/machine-photos/uploads",
+};
+
+/** Reserves, uploads and verifies one photo; returns its media id. */
+export async function uploadRoomPhoto(
+  token: string,
+  kind: PhotoKind | "machine",
+  photo: { blob: Blob; contentType: string },
+  put: (url: string, blob: Blob, headers: UploadResponse["required_headers"]) => Promise<unknown>,
+) {
+  const reserved = await apiRequest<UploadResponse>(UPLOAD_PATH[kind], {
+    method: "POST",
+    token,
+    body: { content_type: photo.contentType, byte_size: photo.blob.size },
+  });
+  await put(reserved.upload_url, photo.blob, reserved.required_headers);
+  await apiRequest<unknown>(`${UPLOAD_PATH[kind]}/${reserved.media_id}/complete`, { method: "POST", token });
+  return reserved.media_id;
+}
+
+export async function addSpacePhoto(token: string, spaceId: string, body: SpacePhotoInput) {
+  const response = await apiRequest<PhotoResponse>(`/staff/spaces/${spaceId}/photos`, { method: "POST", token, body });
+  return response.photo;
+}
+
+export async function updateSpacePhoto(token: string, id: string, body: SpacePhotoInput) {
+  const response = await apiRequest<PhotoResponse>(`/staff/space-photos/${id}`, { method: "PATCH", token, body });
+  return response.photo;
+}
+
+export async function deleteSpacePhoto(token: string, id: string) {
+  await apiRequest<unknown>(`/staff/space-photos/${id}`, { method: "DELETE", token });
+}
+
+export async function orderSpacePhotos(token: string, spaceId: string, ids: string[]) {
+  const response = await apiRequest<PhotosOrderResponse>(`/staff/spaces/${spaceId}/photos/order`, { method: "PUT", token, body: { ids } });
+  return response.photos;
+}
+
+export async function addCleaningPoint(token: string, spaceId: string, body: CleaningPointInput) {
+  const response = await apiRequest<PointResponse>(`/staff/spaces/${spaceId}/cleaning-points`, { method: "POST", token, body });
+  return response.point;
+}
+
+export async function updateCleaningPoint(token: string, id: string, body: CleaningPointInput) {
+  const response = await apiRequest<PointResponse>(`/staff/cleaning-points/${id}`, { method: "PATCH", token, body });
+  return response.point;
+}
+
+export async function deleteCleaningPoint(token: string, id: string) {
+  await apiRequest<unknown>(`/staff/cleaning-points/${id}`, { method: "DELETE", token });
+}
+
+export async function orderCleaningPoints(token: string, spaceId: string, ids: string[]) {
+  const response = await apiRequest<PointsOrderResponse>(`/staff/spaces/${spaceId}/cleaning-points/order`, { method: "PUT", token, body: { ids } });
+  return response.points;
+}

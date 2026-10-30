@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import {
   archiveCleaningArea,
@@ -15,6 +16,9 @@ import {
 } from "@/api/roles";
 import { useSession } from "@/components/session-provider";
 import { CLEANING_TODAY_KEY, CleaningSchedules, CleaningToday } from "@/components/spaces/CleaningToday";
+import { CleaningPointsCarousel } from "@/components/spaces/CleaningPointsCarousel";
+import { firstUnanswered, resultCounts, toPointResults, type PointAnswer } from "@/components/spaces/cleaning-points";
+import { RoomPhotoStrip } from "@/components/spaces/RoomPhotoStrip";
 import { formatDateTime } from "@/components/client/format";
 import {
   StaffPanel,
@@ -147,6 +151,7 @@ export function CleaningLog() {
                     <span className="text-xs" style={{ color: "var(--text-soft)" }}>✓ {entry.tasks_done.join(" · ")}</span>
                   ) : null}
                   {entry.note ? <span className="text-xs" style={{ color: "var(--muted)" }}>{entry.note}</span> : null}
+                  <PointResults results={entry.point_results} />
                 </li>
               ))}
             </ul>
@@ -162,8 +167,17 @@ function OpenCleaning({ token, entry, area, onDone }: { token: string; entry: Cl
   const locale = useUiLocale();
   const [done, setDone] = useState<string[]>([]);
   const [note, setNote] = useState("");
+  const [answers, setAnswers] = useState<Record<string, PointAnswer>>({});
+  const spaceT = useTranslations("Spaces");
+  const points = area?.points ?? [];
+  const pending = firstUnanswered(points, answers);
   const finish = useMutation({
-    mutationFn: () => finishCleaning(token, entry.id, { tasks_done: done, note: note.trim() || null }),
+    mutationFn: () =>
+      finishCleaning(token, entry.id, {
+        tasks_done: done,
+        note: note.trim() || null,
+        ...(points.length > 0 ? { point_results: toPointResults(points, answers) } : {}),
+      }),
     onSuccess: onDone,
   });
 
@@ -185,15 +199,56 @@ function OpenCleaning({ token, entry, area, onDone }: { token: string; entry: Cl
           ))}
         </fieldset>
       ) : null}
+      {points.length > 0 ? (
+        <div className="mt-3">
+          <p className={captionClass} style={captionStyle}>{spaceT("cleaningPoints")}</p>
+          <div className="mt-2">
+            <CleaningPointsCarousel
+              token={token}
+              points={points}
+              answers={answers}
+              onChange={(pointId, answer) => setAnswers((current) => ({ ...current, [pointId]: answer }))}
+            />
+          </div>
+        </div>
+      ) : null}
       <label className="mt-3 block">
         <span className={captionClass} style={captionStyle}>{i18n("cleanNote")}</span>
         <textarea className={inputClass} style={inputStyle} rows={2} maxLength={1000} value={note} onChange={(event) => setNote(event.target.value)} />
       </label>
-      <button type="button" className={`mt-3 ${primaryButtonClass}`} style={primaryButtonStyle} disabled={finish.isPending} onClick={() => finish.mutate()}>
+      <button type="button" className={`mt-3 ${primaryButtonClass}`} style={primaryButtonStyle} disabled={finish.isPending || pending >= 0} data-testid="cleaning-finish" onClick={() => finish.mutate()}>
         {i18n("cleanFinish")}
       </button>
+      {pending >= 0 ? (
+        <p className="mt-2 text-xs" style={{ color: "var(--dim)" }}>{spaceT("cleaningPointsLeft", { count: points.length - points.filter((point) => answers[point.id]?.status).length })}</p>
+      ) : null}
       {finish.isError ? <StatusText tone="error">{localizeError(finish.error, i18n)}</StatusText> : null}
     </StaffPanel>
+  );
+}
+
+/** ADR-290: what the janitor answered for each cleaning point. */
+function PointResults({ results }: { results?: CleaningEntry["point_results"] }) {
+  const t = useTranslations("Spaces");
+  if (!results || results.length === 0) return null;
+  const { cleaned, notCleaned } = resultCounts(results);
+  const afterPhotos = results.filter((result) => result.after_url).map((result) => ({ id: result.point_id, url: result.after_url, caption: result.instruction }));
+  return (
+    <div className="flex flex-col gap-1" data-testid="cleaning-point-results">
+      <span className="text-xs" style={{ color: notCleaned > 0 ? "var(--danger)" : "var(--text-soft)" }}>
+        {[cleaned > 0 ? t("cleaningPointsCleaned", { count: cleaned }) : null, notCleaned > 0 ? t("cleaningPointsNotCleaned", { count: notCleaned }) : null]
+          .filter(Boolean)
+          .join(" · ")}
+      </span>
+      {results
+        .filter((result) => result.status === "not_cleaned")
+        .map((result) => (
+          <span key={result.point_id} className="text-xs" style={{ color: "var(--muted)" }}>
+            ✕ {result.instruction}: {result.note}
+          </span>
+        ))}
+      {afterPhotos.length > 0 ? <RoomPhotoStrip photos={afterPhotos} /> : null}
+    </div>
   );
 }
 

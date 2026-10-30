@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import {
   archiveMachine,
@@ -14,6 +15,7 @@ import {
   updateMachine,
   type Machine,
   type MachineEvent,
+  type MachinePlace,
   type MachineEventInput,
   type MachineEventKind,
   type MachineInput,
@@ -46,6 +48,11 @@ import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { Select } from "@/components/ui/Select";
 import { MachinePlacement } from "@/components/inventory/MachinePlacement";
+import { uploadRoomPhoto } from "@/api/spaces";
+import { FloorPlanCanvas } from "@/components/spaces/FloorPlanCanvas";
+import { RoomPhotoStrip } from "@/components/spaces/RoomPhotoStrip";
+import { preparePhoto } from "@/lib/media-files";
+import { putPresigned } from "@/lib/presigned-upload";
 import { DateInput } from "@/components/ui/DateInput";
 
 export const MACHINES_KEY = ["staff", "inventory", "machines"] as const;
@@ -194,7 +201,7 @@ function MachineRow({
           )}
           {editing ? null : <MachinePlacement token={token} machine={machine} machinesKey={MACHINES_KEY} />}
           {kinds.length > 0 ? <EventForm token={token} machine={machine} kinds={kinds} /> : null}
-          <EventLog token={token} machineId={machine.id} />
+          <EventLog token={token} machineId={machine.id} faulty={machine.status === "out_of_order"} />
         </div>
       ) : null}
     </li>
@@ -211,6 +218,7 @@ function EventForm({ token, machine, kinds }: { token: string; machine: Machine;
   const [usable, setUsable] = useState(true);
   const [cost, setCost] = useState("");
   const [body, setBody] = useState("");
+  const [photos, setPhotos] = useState<{ id: string; preview: string }[]>([]);
 
   const reset = () => {
     setKind(kinds[0]);
@@ -219,12 +227,13 @@ function EventForm({ token, machine, kinds }: { token: string; machine: Machine;
     setUsable(true);
     setCost("");
     setBody("");
+    setPhotos([]);
     setOpen(false);
   };
 
   const log = useMutation({
     mutationFn: () => {
-      const input: MachineEventInput = { kind, body: body.trim() || null };
+      const input: MachineEventInput = { kind, body: body.trim() || null, media_ids: photos.map((photo) => photo.id) };
       if (eventKindIsProblem(kind)) {
         input.severity = (severity || null) as MachineEventInput["severity"];
         input.symptom = (symptom || null) as MachineEventInput["symptom"];
@@ -309,6 +318,9 @@ function EventForm({ token, machine, kinds }: { token: string; machine: Machine;
       <Field label={i18n("invWhatHappened")} className="sm:col-span-2">
         <textarea className={inputClass} style={inputStyle} rows={2} maxLength={2000} value={body} onChange={(event) => setBody(event.target.value)} />
       </Field>
+      <div className="sm:col-span-2">
+        <MachinePhotosPicker token={token} photos={photos} onChange={setPhotos} />
+      </div>
       <div className="flex flex-wrap items-center gap-2 sm:col-span-2">
         <button type="submit" className={primaryButtonClass} style={primaryButtonStyle} disabled={log.isPending}>
           {i18n("invSave")}
@@ -322,7 +334,7 @@ function EventForm({ token, machine, kinds }: { token: string; machine: Machine;
   );
 }
 
-function EventLog({ token, machineId }: { token: string; machineId: string }) {
+function EventLog({ token, machineId, faulty }: { token: string; machineId: string; faulty: boolean }) {
   const i18n = useUiTranslations();
   const events = useQuery({ queryKey: eventsKey(machineId), queryFn: () => fetchMachineEvents(token, machineId) });
 
@@ -333,15 +345,16 @@ function EventLog({ token, machineId }: { token: string; machineId: string }) {
         <StatusText tone="muted">{i18n("loading33ce417")}</StatusText>
       ) : events.isError ? (
         <StatusText tone="error">{localizeError(events.error, i18n)}</StatusText>
-      ) : events.data.length === 0 ? (
+      ) : (events.data.events ?? []).length === 0 ? (
         <StatusText tone="muted">{i18n("invNoEvents")}</StatusText>
       ) : (
         <ul className="flex flex-col divide-y" style={{ borderColor: "var(--border)" }}>
-          {events.data.map((event) => (
+          {(events.data.events ?? []).map((event) => (
             <EventItem key={event.id} event={event} />
           ))}
         </ul>
       )}
+      {events.data ? <MachinePlaces places={events.data.places ?? []} faulty={faulty} /> : null}
     </div>
   );
 }
@@ -383,7 +396,107 @@ function EventItem({ event }: { event: MachineEvent }) {
           {event.body}
         </span>
       ) : null}
+      {(event.photos ?? []).length > 0 ? <RoomPhotoStrip photos={event.photos ?? []} testId={`event-photos-${event.id}`} /> : null}
     </li>
+  );
+}
+
+/**
+ * ADR-290: under the log, the floor plan of each space the machine stands
+ * in, its room coloured (red while the machine is out of order) and a pin
+ * where each item stands.
+ */
+function MachinePlaces({ places, faulty }: { places: MachinePlace[]; faulty: boolean }) {
+  const t = useTranslations("Spaces");
+  const shown = places.filter((place) => place.floor_plan && place.area);
+  if (shown.length === 0) return null;
+  return (
+    <div className="mt-2 flex flex-col gap-3" data-testid="machine-places">
+      <SectionHeading>{t("machineOnPlan")}</SectionHeading>
+      {shown.map((place) => (
+        <div key={place.space_id} className="flex flex-col gap-1">
+          <p className="text-xs" style={{ color: "var(--dim)" }}>
+            {place.floor_plan!.name} · {place.space_name} × {place.quantity}
+          </p>
+          <FloorPlanCanvas
+            testId={`machine-place-${place.space_id}`}
+            imageUrl={place.floor_plan!.image_url}
+            alt={t("planAlt", { name: place.floor_plan!.name })}
+            areas={[{ id: place.space_id, label: place.space_name, points: place.area!.points, tone: faulty ? "fault" : "selected" }]}
+            pins={(place.positions ?? []).map((at, index) => ({ id: `${place.space_id}-${index}`, at, label: place.space_name }))}
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const MAX_MACHINE_PHOTOS = 10;
+
+/** ADR-290: up to 10 photos on a log line, uploaded as soon as they are picked. */
+function MachinePhotosPicker({
+  token,
+  photos,
+  onChange,
+}: {
+  token: string;
+  photos: { id: string; preview: string }[];
+  onChange: (photos: { id: string; preview: string }[]) => void;
+}) {
+  const t = useTranslations("Spaces");
+  const ui = useUiTranslations();
+  const input = useRef<HTMLInputElement>(null);
+  const add = useMutation({
+    mutationFn: async (files: File[]) => {
+      const added: { id: string; preview: string }[] = [];
+      for (const file of files.slice(0, MAX_MACHINE_PHOTOS - photos.length)) {
+        const prepared = await preparePhoto(file, "original");
+        const id = await uploadRoomPhoto(token, "machine", prepared, putPresigned);
+        added.push({ id, preview: URL.createObjectURL(prepared.blob) });
+      }
+      return added;
+    },
+    onSuccess: (added) => onChange([...photos, ...added]),
+  });
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-wrap items-center gap-2">
+        {photos.map((photo) => (
+          <span key={photo.id} className="relative">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={photo.preview} alt="" className="h-14 w-14 rounded-lg object-cover" />
+            <button
+              type="button"
+              className="absolute -end-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full text-xs"
+              style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+              aria-label={t("machinePhotoRemove")}
+              onClick={() => onChange(photos.filter((item) => item.id !== photo.id))}
+            >
+              ✕
+            </button>
+          </span>
+        ))}
+        {photos.length < MAX_MACHINE_PHOTOS ? (
+          <button type="button" className={secondaryButtonClass} style={secondaryButtonStyle} disabled={add.isPending} data-testid="machine-photo-add" onClick={() => input.current?.click()}>
+            📷 {add.isPending ? t("uploading") : t("machinePhotoAdd", { max: MAX_MACHINE_PHOTOS - photos.length })}
+          </button>
+        ) : null}
+        <input
+          ref={input}
+          type="file"
+          accept="image/*"
+          multiple
+          hidden
+          data-testid="machine-photo-file"
+          onChange={(event) => {
+            const files = Array.from(event.target.files ?? []);
+            event.target.value = "";
+            if (files.length > 0) add.mutate(files);
+          }}
+        />
+      </div>
+      {add.isError ? <StatusText tone="error">{localizeError(add.error, ui)}</StatusText> : null}
+    </div>
   );
 }
 

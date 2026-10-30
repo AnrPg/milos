@@ -234,7 +234,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
                       <div className="flex items-center justify-between gap-4">
                         <p className="font-semibold" style={{ color: "var(--text)" }}>{section.name}</p>
                         <span className="text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                          {section.exercises.length} {i18n("exercises0ee6e81")}
+                          {i18n("exerciseCount", { count: section.exercises.length })}
                         </span>
                       </div>
                       <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>

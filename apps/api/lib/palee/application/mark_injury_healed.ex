@@ -1,11 +1,20 @@
 defmodule Palee.Application.MarkInjuryHealed do
-  alias Palee.Application.{BroadcastUserSync, RecordAnalyticsEvent, TenantStaffRecipients}
+  alias Palee.Application.{
+    BroadcastUserSync,
+    RecordAnalyticsEvent,
+    StaffInjuryAccess,
+    TenantStaffRecipients
+  }
+
   alias Palee.Wellbeing
 
+  # ADR-286: staff heal reports their gym keeps, about people they reach.
   def call(context, actor_id, injury_report_id, params),
     do:
       Palee.Wellbeing.WellbeingStore.with_context(context, fn ->
-        do_call(context, actor_id, injury_report_id, params)
+        with {:ok, _injury} <- StaffInjuryAccess.changeable(context, injury_report_id) do
+          do_call(context, actor_id, injury_report_id, params)
+        end
       end)
 
   def call(actor_id, injury_report_id, params \\ %{}),

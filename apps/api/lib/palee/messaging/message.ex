@@ -4,9 +4,10 @@ defmodule Palee.Messaging.Message do
 
   # ADR-140 §6: chat; a coaching message (a coach with an active coaching
   # relationship, metered); a message from the box (operational staff, about
-  # an optional topic); system.
+  # an optional topic); system. A person writing to the box picks a topic
+  # too; `training` brings in their coach (ADR-282).
   @message_types [:chat, :coaching_message, :box_message, :system]
-  @topics ~w(booking payment membership facility)
+  @topics ~w(booking payment membership facility training)
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -67,9 +68,9 @@ defmodule Palee.Messaging.Message do
         changeset
         |> validate_inclusion(:topic, @topics)
         |> then(fn changeset ->
-          if get_field(changeset, :message_type) == :box_message,
+          if get_field(changeset, :message_type) in [:box_message, :chat],
             do: changeset,
-            else: add_error(changeset, :topic, "is only for messages from the box")
+            else: add_error(changeset, :topic, "is only for messages to or from the box")
         end)
     end
   end

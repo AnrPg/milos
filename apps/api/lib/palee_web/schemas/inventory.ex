@@ -106,7 +106,22 @@ defmodule PaleeWeb.Schemas.Inventory do
         usable: %Schema{type: :boolean, nullable: true},
         body: @text,
         cost_cents: @cents,
-        occurred_at: %Schema{type: :string, format: :"date-time"}
+        occurred_at: %Schema{type: :string, format: :"date-time"},
+        media_ids: %Schema{type: :array, items: @uuid},
+        photos: %Schema{
+          type: :array,
+          description: "ADR-290: the line's photos, with signed URLs.",
+          items: %Schema{
+            type: :object,
+            properties: %{
+              id: @uuid,
+              url: %Schema{type: :string, nullable: true},
+              width: %Schema{type: :integer, nullable: true},
+              height: %Schema{type: :integer, nullable: true}
+            },
+            required: [:id]
+          }
+        }
       },
       required: [:id, :machine_id, :kind, :occurred_at]
     }
@@ -123,7 +138,13 @@ defmodule PaleeWeb.Schemas.Inventory do
         usable: %Schema{type: :boolean, nullable: true},
         body: %Schema{type: :string, maxLength: 4000, nullable: true},
         cost_cents: @cents,
-        occurred_at: %Schema{type: :string, format: :"date-time", nullable: true}
+        occurred_at: %Schema{type: :string, format: :"date-time", nullable: true},
+        media_ids: %Schema{
+          type: :array,
+          maxItems: 10,
+          description: "ADR-290: ready machine_photo uploads.",
+          items: @uuid
+        }
       },
       required: [:kind]
     }
@@ -322,4 +343,24 @@ defmodule PaleeWeb.Schemas.Inventory do
 
   def one(key, schema), do: %Schema{type: :object, properties: %{key => schema}, required: [key]}
   def many(key, schema), do: one(key, %Schema{type: :array, items: schema})
+
+  @doc "ADR-290: where a machine stands, to draw under its log."
+  def machine_place do
+    %Schema{
+      title: "InventoryMachinePlace",
+      type: :object,
+      properties: %{
+        space_id: @uuid,
+        space_name: %Schema{type: :string},
+        quantity: %Schema{type: :integer},
+        positions: %Schema{
+          type: :array,
+          items: %Schema{type: :array, items: %Schema{type: :number}}
+        },
+        area: PaleeWeb.Schemas.Spaces.area(),
+        floor_plan: Map.put(PaleeWeb.Schemas.Spaces.floor_plan(), :nullable, true)
+      },
+      required: [:space_id, :space_name, :quantity, :positions, :floor_plan]
+    }
+  end
 end

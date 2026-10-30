@@ -205,6 +205,12 @@ msgstr "Ο/Η %{reader} διάβασε τη σημείωσή σου για το�
 msgid "A machine needs attention"
 msgstr "Ένα μηχάνημα χρειάζεται προσοχή"
 
+msgid "A room was not fully cleaned"
+msgstr "Ένας χώρος δεν καθαρίστηκε πλήρως"
+
+msgid "%{space}: %{notes}"
+msgstr "%{space}: %{notes}"
+
 msgid "%{machine}: %{note}"
 msgstr "%{machine}: %{note}"
 
@@ -752,3 +758,50 @@ msgstr "Μια φορολογική σύνδεση θέλει προσοχή"
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
 msgstr "Το %{connection} σταμάτησε να λειτουργεί. Άνοιξε Στοιχεία τιμολόγησης › Συνδέσεις για να το διορθώσεις."
+
+# ADR-280 verification: sponsors and the Palee check of Partners.
+
+msgid "Vouch for %{nickname}?"
+msgstr "Εγγυάσαι για τον/την %{nickname};"
+
+msgid "%{nickname} asks you to vouch for them for Training partners."
+msgstr "Ο/Η %{nickname} σου ζητά να εγγυηθείς γι' αυτόν/ήν στους Συναθλητές."
+
+msgid "%{nickname} vouched for you"
+msgstr "Ο/Η %{nickname} εγγυήθηκε για σένα"
+
+msgid "One step closer to Training partners."
+msgstr "Ένα βήμα πιο κοντά στους Συναθλητές."
+
+msgid "You are verified"
+msgstr "Επαληθεύτηκες"
+
+msgid "You can now use Training partners."
+msgstr "Μπορείς πλέον να χρησιμοποιείς τους Συναθλητές."
+
+msgid "Take a new selfie"
+msgstr "Βγάλε νέα selfie"
+
+msgid "Your selfie was deleted after 7 days without a check. Take a new one to finish."
+msgstr "Η selfie σου διαγράφηκε μετά από 7 ημέρες χωρίς έλεγχο. Βγάλε νέα για να ολοκληρώσεις."
+
+msgid "Verification not approved"
+msgstr "Η επαλήθευση δεν εγκρίθηκε"
+
+msgid "The Palee team could not verify your account. You can try again."
+msgstr "Η ομάδα του Palee δεν μπόρεσε να επαληθεύσει τον λογαριασμό σου. Μπορείς να δοκιμάσεις ξανά."
+
+msgid "Someone you vouched for was suspended"
+msgstr "Κάποιος για τον οποίο εγγυήθηκες τέθηκε σε αναστολή"
+
+msgid "You can vouch again from %{date}. Your own access stays."
+msgstr "Μπορείς να εγγυηθείς ξανά από %{date}. Η δική σου πρόσβαση μένει."
+
+msgid "%{by} brought you into a conversation"
+msgstr "%{by} σε έφερε σε μια συζήτηση"
+
+msgid "%{nickname} wrote to %{box}"
+msgstr "%{nickname} έγραψε στο %{box}"
+
+msgid "%{nickname} sent the box a message."
+msgstr "%{nickname} έστειλε μήνυμα στο box."

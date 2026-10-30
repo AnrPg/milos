@@ -1,11 +1,24 @@
 defmodule Palee.Application.GetAdminUserIncidents do
-  @moduledoc false
+  @moduledoc """
+  A member's injuries on their staff profile (ADR-286): every report the gym
+  keeps (`admin_only` ones too) and the member's own reports they share with
+  their boxes. The controller checks `view_health` for this client; the read
+  is logged for the member.
+  """
 
+  alias Palee.Application.StaffInjuryAccess
   alias Palee.{Identity, Wellbeing}
 
   def call(context, user_id) do
     with %{} <- Identity.find_by_id(user_id) || {:error, :not_found} do
-      incidents = Wellbeing.list_injuries_for_user(context, user_id) |> Enum.map(&serialize/1)
+      reports =
+        Wellbeing.with_tenant_context(context, fn ->
+          reports = Wellbeing.list_box_injuries_for_user(user_id)
+          if reports != [], do: StaffInjuryAccess.log_reads(context, "profile", reports)
+          reports
+        end)
+
+      incidents = Enum.map(reports, &serialize/1)
 
       {:ok,
        %{
@@ -19,10 +32,11 @@ defmodule Palee.Application.GetAdminUserIncidents do
     end
   end
 
-  def call(user_id), do: call(%{}, user_id)
-
   defp serialize(report) do
-    Map.take(report, [
+    report
+    |> Map.put(:owned_by_member, StaffInjuryAccess.owned_by_member?(report))
+    |> Map.take([
+      :owned_by_member,
       :id,
       :body_area,
       :severity,

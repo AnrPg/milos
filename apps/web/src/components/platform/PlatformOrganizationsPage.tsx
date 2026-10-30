@@ -93,6 +93,7 @@ export function PlatformOrganizationsPage() {
   const tResets = useTranslations("passwordResets");
   const tPush = useTranslations("PlatformPush");
   const tBusiness = useTranslations("Business");
+  const tPartners = useTranslations("PlatformPartners");
   const { tokens } = useSession();
   const [form, setForm] = useState(defaultForm);
   const [submitting, setSubmitting] = useState(false);
@@ -316,6 +317,18 @@ export function PlatformOrganizationsPage() {
             className="border border-[var(--border)] px-4 py-3 text-sm font-semibold text-[var(--text-soft)]"
           >
             {tResets("logButton")}
+          </Link>
+          <Link
+            href="/platform/partner-verifications"
+            className="border border-[var(--border)] px-4 py-3 text-sm font-semibold text-[var(--text-soft)]"
+          >
+            {tPartners("verifications.title")}
+          </Link>
+          <Link
+            href="/platform/partner-reports"
+            className="border border-[var(--border)] px-4 py-3 text-sm font-semibold text-[var(--text-soft)]"
+          >
+            {tPartners("reports.title")}
           </Link>
           <button
             type="button"

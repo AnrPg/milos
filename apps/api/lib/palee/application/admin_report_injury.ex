@@ -1,14 +1,17 @@
 defmodule Palee.Application.AdminReportInjury do
-  alias Palee.Application.{BroadcastUserSync, RecordAnalyticsEvent}
+  alias Palee.Application.{BroadcastUserSync, RecordAnalyticsEvent, StaffInjuryAccess}
   alias Palee.{Identity, Organizations, Wellbeing}
 
+  # ADR-286: a coach records injuries for their own clients only.
   def call(%{organization_id: organization_id} = context, admin_id, user_id, params)
       when is_binary(organization_id) do
     params = Map.put(params, :organization_id, organization_id)
 
-    Palee.Wellbeing.WellbeingStore.with_context(context, fn ->
-      call(admin_id, user_id, params)
-    end)
+    with :ok <- StaffInjuryAccess.authorize_person(context, user_id) do
+      Palee.Wellbeing.WellbeingStore.with_context(context, fn ->
+        call(admin_id, user_id, params)
+      end)
+    end
   end
 
   def call(admin_id, user_id, params) do

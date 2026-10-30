@@ -129,6 +129,10 @@ defmodule PaleeWeb.Schemas.FeedbackWellbeing do
       training_limitations: %Schema{type: :string, nullable: true},
       tags: %Schema{type: :array, items: %Schema{type: :string}},
       visibility: %Schema{type: :string, enum: ["admin_only", "user_and_admin"]},
+      # ADR-286: a member's own report reaches their boxes while on.
+      shared_with_box: %Schema{type: :boolean},
+      # ADR-286, staff reads: the member filed it in the app and keeps it.
+      owned_by_member: %Schema{type: :boolean},
       params: %Schema{type: :object, additionalProperties: true},
       events: %Schema{type: :array, items: @injury_event},
       inserted_at: %Schema{type: :string, format: :"date-time"},
@@ -252,6 +256,43 @@ defmodule PaleeWeb.Schemas.FeedbackWellbeing do
   def injury, do: @injury
   def injury_collection, do: collection(:injuries, @injury)
   def injury_response, do: item(:injury, @injury)
+
+  @doc "ADR-286: who of your boxes' staff read your injuries."
+  def injury_access_log_response do
+    uuid = %Schema{type: :string, format: :uuid}
+
+    %Schema{
+      title: "InjuryAccessLog",
+      type: :object,
+      required: [:entries],
+      properties: %{
+        entries: %Schema{
+          type: :array,
+          items: %Schema{
+            type: :object,
+            required: [:id, :read_at, :surface, :injury_ids, :reader, :organization],
+            properties: %{
+              id: uuid,
+              read_at: %Schema{type: :string, format: :"date-time"},
+              surface: %Schema{type: :string, enum: ~w(profile box_list safety_warning)},
+              injury_ids: %Schema{type: :array, items: uuid},
+              reader: %Schema{
+                type: :object,
+                properties: %{
+                  id: %Schema{type: :string, format: :uuid, nullable: true},
+                  nickname: %Schema{type: :string, nullable: true}
+                }
+              },
+              organization: %Schema{
+                type: :object,
+                properties: %{id: uuid, name: %Schema{type: :string, nullable: true}}
+              }
+            }
+          }
+        }
+      }
+    }
+  end
 
   def injury_update_request do
     %Schema{

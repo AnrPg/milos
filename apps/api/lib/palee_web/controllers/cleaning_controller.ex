@@ -106,7 +106,8 @@ defmodule PaleeWeb.CleaningController do
         type: :object,
         properties: %{
           tasks_done: %Schema{type: :array, items: %Schema{type: :string}},
-          note: %Schema{type: :string, maxLength: 1000, nullable: true}
+          note: %Schema{type: :string, maxLength: 1000, nullable: true},
+          point_results: %Schema{type: :array, maxItems: 30, items: S.point_answer()}
         }
       }),
     responses: [ok: {"Entry", "application/json", S.one(:entry, S.entry())}]

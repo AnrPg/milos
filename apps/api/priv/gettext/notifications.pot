@@ -205,6 +205,12 @@ msgstr ""
 msgid "A machine needs attention"
 msgstr ""
 
+msgid "A room was not fully cleaned"
+msgstr ""
+
+msgid "%{space}: %{notes}"
+msgstr ""
+
 msgid "%{machine}: %{note}"
 msgstr ""
 
@@ -750,4 +756,50 @@ msgid "A fiscal connection needs attention"
 msgstr ""
 
 msgid "%{connection} stopped working. Open Billing details › Connections to fix it."
+msgstr ""
+
+# ADR-280 verification: sponsors and the Palee check of Partners.
+
+msgid "Vouch for %{nickname}?"
+msgstr ""
+
+msgid "%{nickname} asks you to vouch for them for Training partners."
+msgstr ""
+
+msgid "%{nickname} vouched for you"
+msgstr ""
+
+msgid "One step closer to Training partners."
+msgstr ""
+
+msgid "You are verified"
+msgstr ""
+
+msgid "You can now use Training partners."
+msgstr ""
+
+msgid "Take a new selfie"
+msgstr ""
+
+msgid "Your selfie was deleted after 7 days without a check. Take a new one to finish."
+msgstr ""
+
+msgid "Verification not approved"
+msgstr ""
+
+msgid "The Palee team could not verify your account. You can try again."
+msgstr ""
+
+msgid "Someone you vouched for was suspended"
+msgstr ""
+
+msgid "You can vouch again from %{date}. Your own access stays."
+
+msgid "%{by} brought you into a conversation"
+msgstr ""
+
+msgid "%{nickname} wrote to %{box}"
+msgstr ""
+
+msgid "%{nickname} sent the box a message."
 msgstr ""

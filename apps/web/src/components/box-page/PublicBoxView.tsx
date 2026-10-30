@@ -18,6 +18,8 @@ import { AboutTab, OpeningHours } from "./AboutTab";
 import { BoxEvents } from "./BoxEvents";
 import { BoxPosts } from "./BoxPosts";
 import { GuestBanner } from "./GuestBanner";
+import { boxChatHref } from "@/components/trials/box-chat-links";
+
 import { Icon } from "./Icon";
 import { LockedTab } from "./LockedTab";
 import { PhotoViewer } from "./PhotoViewer";
@@ -275,7 +277,11 @@ function Logo({ page, size = 80, className = "" }: { page: PublicBoxPage; size?:
   );
 }
 
-/** Follow and trial (board 4 Q9, board 6 Q1); members open their club instead. */
+/**
+ * Follow and trial (board 4 Q9, board 6 Q1); members open their club instead.
+ * Anyone may write to the box (ADR-282): «Μήνυμα» opens the chat, after
+ * signing in when needed.
+ */
 function Actions({
   page,
   token,
@@ -291,12 +297,28 @@ function Actions({
   const t = useTranslations("BoxPage");
   const tSocial = useTranslations("Social");
   if (loading) return <div className="h-11 animate-pulse rounded-2xl" style={{ background: "var(--panel-raised)" }} />;
+  const chat = boxChatHref(page.box.slug);
+  const message = (
+    <Link
+      href={signedIn ? chat : `/login?next=${encodeURIComponent(chat)}`}
+      aria-label={t("messageBox")}
+      title={t("messageBox")}
+      className="grid min-h-11 min-w-11 shrink-0 place-items-center rounded-2xl"
+      style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}
+      data-testid="box-page-message"
+    >
+      <Icon name="message-circle" size={18} />
+    </Link>
+  );
   if (clubId)
     return (
-      <Link href={`/clubs/${clubId}`} className="flex min-h-11 items-center justify-center gap-2 rounded-2xl text-sm font-bold" style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}>
-        <Icon name="check" size={16} />
-        {t("memberOpenClub")}
-      </Link>
+      <div className="flex items-start gap-2">
+        <Link href={`/clubs/${clubId}`} className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl text-sm font-bold" style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}>
+          <Icon name="check" size={16} />
+          {t("memberOpenClub")}
+        </Link>
+        {message}
+      </div>
     );
   return (
     <div className="flex items-start gap-2">
@@ -314,6 +336,7 @@ function Actions({
         )}
       </div>
       <TrialButton page={page} token={token} />
+      {message}
     </div>
   );
 }

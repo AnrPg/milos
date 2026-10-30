@@ -33,14 +33,15 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     journal_coach_reads
     body_access_log
     wellness_access_log
+    injury_access_log
     community_clubs community_channels community_club_memberships
     community_channel_memberships community_posts community_post_reactions
     community_post_comments community_reports community_settings
     community_events community_event_attendees community_event_cohosts
     community_event_view_days community_event_view_marks
-    partner_profiles partner_swipes partner_matches partner_messages
     media_tenant_objects organization_public_profiles profile_tag_suggestions
     spaces space_floor_plans space_unavailabilities
+    space_settings space_photos space_cleaning_points
     housekeeping_entries housekeeping_schedules
     inventory_machines
     inventory_machine_events
@@ -66,7 +67,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     imports import_rows imported_people
     review_questionnaires reviews review_answers
     messaging_threads
-    messaging_participants messaging_messages seasonal_challenges
+    messaging_participants messaging_messages messaging_box_blocks seasonal_challenges
     user_challenge_progress challenge_leaderboard_opt_ins leaderboard_opt_ins
     gamification_settings attendance_records communication_threads
     communication_messages analytics_events notification_click_events

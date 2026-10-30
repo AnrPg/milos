@@ -53,6 +53,7 @@ import {
 import { zonedText } from "@/lib/zoned-time";
 import { formatMinutes } from "@/lib/duration-parts";
 import { YourTime } from "@/components/zoned-time";
+import { ClassRoomDialog } from "@/components/spaces/ClassRoomDialog";
 import { Dialog } from "@/components/ui/Dialog";
 import { ErrorNotice } from "@/components/ui/ErrorNotice";
 import { MoreMenu } from "@/components/ui/MoreMenu";
@@ -124,6 +125,7 @@ export function SlotPopup({
   const i18n = useUiTranslations();
   const t = useTranslations("Schedule");
   const spaceT = useTranslations("Spaces");
+  const [roomOpen, setRoomOpen] = useState(false);
   const rulesT = useTranslations("BookingRules");
   const locale = useLocale();
   const organizationSlug = useOrganizationSlug();
@@ -275,7 +277,18 @@ export function SlotPopup({
   const spaceChips =
     slot.space || slot.space_unavailable || slot.space_overlap ? (
       <>
-              {slot.space ? (
+              {slot.space?.viewable ? (
+                // ADR-290: the room on the floor plan, from the class details only.
+                <button
+                  type="button"
+                  data-testid="slot-space"
+                  className="rounded-full px-3 py-1 text-xs font-semibold"
+                  style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 30%, transparent)", color: "var(--primary-strong)" }}
+                  onClick={() => setRoomOpen(true)}
+                >
+                  {spaceT("classSpaceAt", { space: slot.space.name })} · {spaceT("roomViewOnPlan")}
+                </button>
+              ) : slot.space ? (
                 <span
                   data-testid="slot-space"
                   className="rounded-full px-3 py-1 text-xs font-semibold"
@@ -943,7 +956,7 @@ export function SlotPopup({
           workoutId={slot.workout.id}
           workoutTitle={slot.workout.title}
           accessToken={accessToken}
-          context={{ kind: "slot", sourceId: slot.id, sourceLabel: i18n("classOn5e673bd") + (slot.scheduled_at) }}
+          context={{ kind: "slot", sourceId: slot.id, sourceLabel: i18n("classOnDate", { date: slot.scheduled_at }) }}
           onClose={() => setEditWorkoutOpen(false)}
         />
       ) : null}
@@ -955,6 +968,10 @@ export function SlotPopup({
           onClose={() => setVariationOpen(false)}
           onProgrammed={onSlotChanged}
         />
+      ) : null}
+
+      {roomOpen && slot.space ? (
+        <ClassRoomDialog slotId={slot.id} spaceName={slot.space.name} onClose={() => setRoomOpen(false)} />
       ) : null}
     </>
   );

@@ -170,6 +170,42 @@ test.describe("Ευεξία", () => {
     await expect(page.getByRole("dialog", { name: "Report injury" }).getByPlaceholder(/Body area/)).toBeVisible();
   });
 
+  test("each injury has «Let my box see it», on by default and switchable later (ADR-286)", async ({ page }) => {
+    await common(page, () => overview({}));
+    const posted: unknown[] = [];
+    const shared: unknown[] = [];
+    let injuries: unknown[] = [];
+    await page.route("**/api/wellbeing/injuries", (route) => {
+      if (route.request().method() === "POST") {
+        posted.push(bodyOf(route.request()));
+        injuries = [
+          { id: "i-1", organization_id: null, reported_by_role: "self", body_area: "Knee", severity: "mild", status: "active", shared_with_box: true, events: [], tags: [], visibility: "user_and_admin" },
+          { id: "i-2", organization_id: "org-1", reported_by_role: "admin", body_area: "Back", severity: "mild", status: "active", shared_with_box: true, events: [], tags: [], visibility: "user_and_admin" },
+        ];
+        return route.fulfill(json({ injury: injuries[0] }, 201));
+      }
+      return route.fulfill(json({ injuries }));
+    });
+    await page.route("**/api/wellbeing/injuries/i-1/sharing", (route) => {
+      shared.push(bodyOf(route.request()));
+      return route.fulfill(json({ injury: { ...(injuries[0] as object), shared_with_box: false } }));
+    });
+
+    await page.goto("/journal/wellbeing");
+    await page.getByRole("button", { name: "Report injury" }).click();
+    const dialog = page.getByRole("dialog", { name: "Report injury" });
+    await expect(dialog.getByRole("switch", { name: /Let my box see it/ })).toBeChecked();
+    await dialog.getByPlaceholder(/Body area/).fill("Knee");
+    await dialog.getByRole("button", { name: "Report injury" }).click();
+    await expect.poll(() => posted).toEqual([expect.objectContaining({ body_area: "Knee", shared_with_box: true })]);
+
+    // Only the member's own report carries the switch; the box's own does not.
+    const toggles = page.getByRole("switch", { name: /Let my box see it/ });
+    await expect(toggles).toHaveCount(1);
+    await toggles.click();
+    await expect.poll(() => shared).toEqual([{ shared_with_box: false }]);
+  });
+
   test("one tap adds a glass and the toast can undo it", async ({ page }) => {
     let waterMl = 500;
     await common(page, () => overview({ waterMl }));

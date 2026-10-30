@@ -369,6 +369,20 @@ if config_env() == :prod do
   # the webhook refuses every call.
   config :palee, :brevo_webhook_secret, System.get_env("BREVO_WEBHOOK_SECRET")
 
+  # ADR-280 verification: Partners' SMS codes through Brevo transactional SMS
+  # (prepaid credits). Without a key the phone step answers sms_unavailable.
+  case System.get_env("BREVO_API_KEY") do
+    key when is_binary(key) and key != "" ->
+      config :palee, :sms_sender, Palee.Infrastructure.Sms.BrevoSmsSender
+
+      config :palee, Palee.Infrastructure.Sms.BrevoSmsSender,
+        api_key: key,
+        sender: System.get_env("SMS_SENDER") || "Palee"
+
+    _missing ->
+      config :palee, :sms_sender, Palee.Infrastructure.Sms.UnavailableSmsSender
+  end
+
   # ADR-212: the SMTP key's expiry date (YYYY-MM-DD). A daily check alerts
   # vendors from 30 days before; mail stops when the key expires.
   smtp_key_expires_on =
