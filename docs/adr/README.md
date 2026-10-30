@@ -260,5 +260,6 @@ must have an ADR. See `template.md` for the format.
 | ADR-275 | Workout types: one fixed list grouped in families (martial arts and dance included), the gym chooses which its editors offer; stats, badges and colours read the family | Accepted |
 | ADR-276 | Unsaved edits on staff forms: draft with undo/redo, save bar, ask before leaving a tab | Accepted |
 | ADR-277 | The server makes and keeps the Web Push keys (encrypted); the platform console shows status, contact and «new keys» only | Accepted |
+| ADR-282 | Anyone writes to a box; the box answers from one shared inbox worked out from roles at read time, «Προπόνηση» and «Φέρε τον coach» bring in coaches, newcomers limited and blockable, notify all until someone answers | Accepted |
 | ADR-300 | Operation registry: one spec per use case generates REST, MCP and LLM tools; previewable commands, problem details, idempotency keys, ETags (v4) | Proposed |
 | ADR-301 | AI agents as delegated principals: rights intersected on every call, durable runs, Rule-of-Two policy, approvals, one LLM provider port, multi-agent via delegation (v4) | Proposed |

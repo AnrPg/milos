@@ -182,4 +182,33 @@ test.describe("trials", () => {
     await expect(page.getByText("Offer for new box members")).toBeVisible();
     await expect(page.getByLabel("Write a message")).toHaveValue(/I'd like to join/);
   });
+
+  test("«Contact the box» opens the chat with its topic, and a newcomer waits for an answer (ADR-282)", async ({ page }) => {
+    await visitor(page);
+    const sent: Record<string, unknown>[] = [];
+    await page.route(`**/api/boxes/${box.slug}/conversation**`, (route) =>
+      route.fulfill(json({ conversation: { thread_id: "thread-1", box, member: true, blocked: false, staff: [], last_read_message_id: null, conversion_package: null, messages: [] } })),
+    );
+    await page.route(`**/api/boxes/${box.slug}/conversation/messages`, (route) => {
+      sent.push(route.request().postDataJSON());
+      return sent.length === 1
+        ? route.fulfill(json({ message: { id: "m-1", sender_id: user.id, body: "Card declined?", message_type: "chat", topic: "payment", inserted_at: new Date().toISOString() } }, 201))
+        : route.fulfill(json({ code: "awaiting_box_reply", error: "awaiting_box_reply" }, 429));
+    });
+
+    await page.goto(`/b/${box.slug}/chat?topic=payment`);
+    const topics = page.getByTestId("box-chat-topics");
+    await expect(topics.getByRole("button", { name: "Payment" })).toHaveAttribute("aria-pressed", "true");
+    await topics.getByRole("button", { name: "Training" }).click();
+    await expect(topics.getByRole("button", { name: "Training" })).toHaveAttribute("aria-pressed", "true");
+    await topics.getByRole("button", { name: "Payment" }).click();
+
+    await page.getByLabel("Write a message").fill("Card declined?");
+    await page.getByRole("button", { name: "Send", exact: true }).click();
+    await expect.poll(() => sent[0]?.topic).toBe("payment");
+
+    await page.getByLabel("Write a message").fill("Hello?");
+    await page.getByRole("button", { name: "Send", exact: true }).click();
+    await expect(page.getByText("Wait for the box to answer before you send more.")).toBeVisible();
+  });
 });

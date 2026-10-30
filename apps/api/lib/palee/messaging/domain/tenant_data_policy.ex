@@ -14,6 +14,7 @@ defmodule Palee.Messaging.Domain.TenantDataPolicy do
             disposition: :purge,
             basis: "Direct messages are private communication with no retention obligation.",
             tables: [
+              %{table: "messaging_box_blocks"},
               %{table: "messaging_participants"},
               %{table: "messaging_messages"},
               %{table: "messaging_threads"}

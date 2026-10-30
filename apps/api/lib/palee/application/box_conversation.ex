@@ -1,37 +1,41 @@
 defmodule Palee.Application.BoxConversation do
   @moduledoc """
-  ADR-144, board 6 Q6: a person talks to a box from its page. It is the same
+  ADR-144, board 6 Q6; ADR-282: a person talks to a box. It is the same
   thread staff open with a member (context `box`, about that person), so the
-  conversation simply carries on once they join and the box's staff answer
-  it from their usual inbox.
+  conversation simply carries on when someone joins, and the box answers it
+  from its shared inbox (`BoxInbox`).
 
-  Someone who is not a member may open it once they have had (or asked for)
-  a trial at the box; members always may. Everything runs in the box's
-  scope for that person (`%{organization_id: box, user_id: person}`).
+  Anyone with an account may write to a published box (ADR-282 Q1); members
+  also to their own box when its page is not published. A newcomer («Νέος»)
+  sends a few messages until the box answers, and someone the box blocked
+  no longer can. Everything runs in the box's scope for that person
+  (`%{organization_id: box, user_id: person}`).
   """
 
-  alias Palee.Application.{PublicBox, SendMessage, TrackMessagingAnalytics}
+  alias Palee.Application.{BoxInbox, PublicBox, SendMessage, TrackMessagingAnalytics}
   alias Palee.{Finance, Identity, Messaging, Organizations, Trials}
+  alias Palee.Messaging.Domain.BoxInboxPolicy
 
-  @doc "Opens (or returns) the person's conversation with a published box."
+  @doc "Opens (or returns) the person's conversation with a box."
   def open(%{id: user_id}, slug) do
-    with {:ok, box, _scope} <- PublicBox.resolve(slug),
+    with {:ok, box} <- resolve(slug, user_id),
          context = scope(box, user_id),
-         :ok <- may_open(context, user_id) do
-      staff = Organizations.list_staff_user_ids(box.organization_id) -- [user_id]
-
-      with {:ok, thread} <-
-             Messaging.with_tenant_context(context, fn ->
-               Messaging.get_or_create_thread(%{
-                 context_type: :box,
-                 context_id: user_id,
-                 actor_id: user_id,
-                 participants: [user_id | staff]
-               })
-             end) do
-        TrackMessagingAnalytics.call({:ok, thread})
-        {:ok, present(context, box, thread, user_id)}
-      end
+         :ok <- may_open(context, user_id),
+         {:ok, thread} <-
+           Messaging.with_tenant_context(context, fn ->
+             with {:ok, thread} <-
+                    Messaging.get_or_create_thread(%{
+                      context_type: :box,
+                      context_id: user_id,
+                      actor_id: user_id,
+                      participants: [user_id]
+                    }),
+                  {:ok, _participant} <- Messaging.add_participant(thread.id, user_id, :member) do
+               {:ok, thread}
+             end
+           end) do
+      TrackMessagingAnalytics.call({:ok, thread})
+      {:ok, present(context, box, thread, user_id)}
     end
   end
 
@@ -53,16 +57,24 @@ defmodule Palee.Application.BoxConversation do
     end
   end
 
+  @doc """
+  The person writes to the box, optionally about a topic; «Προπόνηση»
+  brings in their coach (ADR-282).
+  """
   def send(%{id: user_id} = user, slug, params) do
     with {:ok, _box, context, thread} <- existing(slug, user_id),
+         :ok <- may_write(context, thread, user_id),
          {:ok, message} <-
            Messaging.with_tenant_context(context, fn ->
-             SendMessage.call(user, %{
-               thread_id: thread.id,
-               sender_id: user_id,
-               body: params[:body],
-               client_operation_id: params[:client_operation_id]
-             })
+             with :ok <- BoxInbox.route_topic(thread, params[:topic]) do
+               SendMessage.call(user, %{
+                 thread_id: thread.id,
+                 sender_id: user_id,
+                 body: params[:body],
+                 topic: params[:topic],
+                 client_operation_id: params[:client_operation_id]
+               })
+             end
            end) do
       {:ok, message(message)}
     end
@@ -76,18 +88,19 @@ defmodule Palee.Application.BoxConversation do
     end
   end
 
-  @doc "Every box the person talks to this way, latest message first."
+  @doc """
+  Every box the person talks to, latest message first: members and
+  newcomers alike read these in Μηνύματα › Box (ADR-282).
+  """
   def list(%{id: user_id}) do
     organization_ids = Messaging.list_box_conversation_organization_ids(%{user_id: user_id})
-    boxes = organization_ids |> Organizations.public_boxes() |> Map.new(&{&1.organization_id, &1})
+    boxes = boxes(organization_ids, user_id)
 
     organization_ids
     |> Enum.flat_map(fn organization_id ->
       context = %{organization_id: organization_id, user_id: user_id}
 
       with %{} = box <- boxes[organization_id],
-           # Members read this thread in the gym's own inbox.
-           true <- Organizations.membership_standing(organization_id, user_id) != :member,
            %{} = thread <- find(context, user_id) do
         [summary(context, box, thread, user_id)]
       else
@@ -101,16 +114,64 @@ defmodule Palee.Application.BoxConversation do
 
   defp scope(box, user_id), do: %{organization_id: box.organization_id, user_id: user_id}
 
-  defp may_open(context, user_id) do
-    cond do
-      Organizations.membership_standing(context.organization_id, user_id) == :member -> :ok
-      Trials.list_requests(context, %{user_id: user_id, limit: 1}) != [] -> :ok
-      true -> {:error, :forbidden}
+  # ADR-282 Q1: anyone may write, unless the box blocked them.
+  defp may_open(context, _user_id) do
+    if Messaging.with_tenant_context(context, fn -> Messaging.box_blocked?(context.user_id) end),
+      do: {:error, :blocked_by_box},
+      else: :ok
+  end
+
+  defp may_write(context, thread, user_id) do
+    with :ok <- may_open(context, user_id) do
+      unanswered =
+        Messaging.with_tenant_context(context, fn ->
+          case Messaging.list_messages(thread.id, %{
+                 actor_id: user_id,
+                 limit: BoxInboxPolicy.max_unanswered_from_newcomer()
+               }) do
+            {:ok, messages} -> BoxInboxPolicy.unanswered(thread, messages)
+            _error -> 0
+          end
+        end)
+
+      BoxInboxPolicy.may_write?(BoxInbox.standing(context.organization_id, user_id), unanswered)
     end
   end
 
+  # A published box by its slug, or a box the person belongs to even when
+  # its page is not published (they still need to reach it).
+  defp resolve(slug, user_id) do
+    case PublicBox.resolve(slug) do
+      {:ok, box, _scope} -> {:ok, box}
+      _not_public -> own_box(slug, user_id)
+    end
+  end
+
+  defp own_box(slug, user_id) do
+    user_id
+    |> Organizations.list_memberships()
+    |> Enum.find_value({:error, :not_found}, fn %{organization: organization} ->
+      if organization.slug == slug, do: {:ok, Organizations.brand_summary(organization.id)}
+    end)
+  end
+
+  defp boxes(organization_ids, user_id) do
+    public =
+      organization_ids |> Organizations.public_boxes() |> Map.new(&{&1.organization_id, &1})
+
+    organization_ids
+    |> Enum.reject(&Map.has_key?(public, &1))
+    |> Enum.filter(&(Organizations.membership_standing(&1, user_id) == :member))
+    |> Enum.reduce(public, fn organization_id, boxes ->
+      case Organizations.brand_summary(organization_id) do
+        %{} = box -> Map.put(boxes, organization_id, box)
+        _missing -> boxes
+      end
+    end)
+  end
+
   defp existing(slug, user_id) do
-    with {:ok, box, _scope} <- PublicBox.resolve(slug),
+    with {:ok, box} <- resolve(slug, user_id),
          context = scope(box, user_id),
          %{} = thread <- find(context, user_id) || {:error, :not_found} do
       {:ok, box, context, thread}
@@ -135,6 +196,7 @@ defmodule Palee.Application.BoxConversation do
       box: box,
       member: Organizations.membership_standing(box.organization_id, user_id) == :member,
       staff: staff(thread, user_id),
+      blocked: Messaging.with_tenant_context(context, fn -> Messaging.box_blocked?(user_id) end),
       last_read_message_id: last_read(thread, user_id),
       conversion_package: conversion_package(context)
     }
@@ -188,6 +250,7 @@ defmodule Palee.Application.BoxConversation do
       :sender_id,
       :body,
       :message_type,
+      :topic,
       :client_operation_id,
       :inserted_at
     ])

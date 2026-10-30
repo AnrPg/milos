@@ -4797,7 +4797,31 @@
     "advancedRestSeconds": "Descanso {seconds} s",
     "advancedClusterRestSeconds": "Descanso del cluster {seconds} s",
     "advancedRestPauseSeconds": "Descanso-pausa {seconds} s",
-    "advancedPaceValue": "Ritmo {value}/km"
+    "advancedPaceValue": "Ritmo {value}/km",
+    "msgTopicTraining": "Entrenamiento",
+    "inboxBringCoach": "Añadir a un coach",
+    "inboxBringCoachHint": "El coach se une a la conversación y puede responder por el box.",
+    "inboxLoadingCoaches": "Cargando coaches…",
+    "inboxNoCoaches": "El box aún no tiene coaches.",
+    "inboxCoachInThread": "En la conversación",
+    "inboxCoachTheirs": "Su coach",
+    "inboxMoreActions": "Más acciones",
+    "inboxBlock": "Bloquear",
+    "inboxUnblock": "Desbloquear",
+    "inboxBlockTitle": "¿Bloquear a {name}?",
+    "inboxBlockHint": "Ya no podrá escribir al box. Puedes desbloquearlo más tarde desde aquí.",
+    "inboxCancel": "Cancelar",
+    "inboxActionFailed": "No ha funcionado. Inténtalo de nuevo.",
+    "inboxBlockedNote": "El box ya no recibe mensajes de esta persona.",
+    "inboxBoxFilter": "Mensajes al box",
+    "inboxUnanswered": "Sin responder · {count}",
+    "inboxAllBox": "Todos",
+    "inboxNewcomer": "Nuevo",
+    "inboxNewcomerHint": "No es cliente del box",
+    "inboxAwaitsReply": "Espera respuesta",
+    "ntfBoxInboxTitle": "{name} ha escrito a {box}",
+    "ntfBoxInboxBroughtIn": "{by} te ha añadido a una conversación",
+    "ntfBoxInboxBody": "{name} ha escrito al box."
   },
   "PrSharing": {
     "gymLabel": "¿Dónde conseguiste este PR?",
@@ -5850,7 +5874,8 @@
       },
       "saveError": "No se ha guardado. Inténtalo de nuevo."
     },
-    "boxFindByName": "O busca por nombre"
+    "boxFindByName": "O busca por nombre",
+    "membershipContactBox": "Contactar con el box"
   },
   "Community": {
     "all": "Todo",
@@ -6491,7 +6516,8 @@
     "openClubMembers": "{count, plural, one {# miembro del club} other {# miembros del club}}",
     "guestTitle": "Eres visitante de {box}",
     "guestBody": "Pagas en recepción cada vez que vienes. Hazte socio del box para reservar clases y ver los entrenamientos.",
-    "guestAction": "Hazte socio del box"
+    "guestAction": "Hazte socio del box",
+    "messageBox": "Escribir al box"
   },
   "Trials": {
     "ask": "Pedir una clase de prueba",
@@ -6660,7 +6686,14 @@
     "error_trial_already_open": "Ya tienes una clase de prueba reservada aquí.",
     "error_invalid_trial_transition": "Esta clase de prueba ya ha cambiado. Actualiza la página.",
     "error_class_not_found": "Esta clase ya no está disponible.",
-    "error_package_not_found": "Elige un paquete de suscripción activo."
+    "error_package_not_found": "Elige un paquete de suscripción activo.",
+    "chatTeamAnswers": "Responde el equipo del box",
+    "chatEmptyBox": "Escribe al box. Te responderá quien del equipo esté libre.",
+    "chatFrom": "{name} · {box}",
+    "chatTopicLabel": "¿De qué se trata?",
+    "chatBlocked": "Este box ya no recibe tus mensajes.",
+    "chatAwaitingReply": "Espera a que el box responda antes de enviar más.",
+    "writeToBox": "Escribir a {box}"
   },
   "Clubs": {
     "loading": "Cargando…",

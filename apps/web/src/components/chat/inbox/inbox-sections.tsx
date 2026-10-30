@@ -31,7 +31,7 @@ export type InboxSource = {
   Section: ComponentType<InboxSectionProps>;
 };
 
-/** Conversations with boxes you are not a member of yet (board 6 Q6). */
+/** Your conversations with boxes, members and newcomers alike (board 6 Q6, ADR-282). */
 function BoxConversations({ onNavigate }: InboxSectionProps) {
   const { tokens } = useSession();
   return <BoxConversationsList token={tokens?.access_token ?? null} onNavigate={onNavigate} />;
