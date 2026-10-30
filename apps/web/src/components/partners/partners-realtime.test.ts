@@ -2,7 +2,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { describe, expect, it } from "vitest";
 
 import { BUDDIES_KEY } from "@/api/buddies";
-import { PARTNER_MATCHES_KEY, partnerDeckKey, partnerMessagesKey, partnersClubKey } from "@/api/partners";
+import { PARTNERS_OVERVIEW_KEY, PARTNER_MATCHES_KEY, partnerDeckKey, partnerMessagesKey } from "@/api/partners";
 
 import { applyPartnersEvent, parsePartnersEvent } from "./partners-realtime";
 
@@ -12,8 +12,8 @@ function seeded() {
     matches: [...PARTNER_MATCHES_KEY],
     chat1: [...partnerMessagesKey("m1")],
     chat2: [...partnerMessagesKey("m2")],
-    club: [...partnersClubKey("c1")],
-    deck: [...partnerDeckKey("c1")],
+    overview: [...PARTNERS_OVERVIEW_KEY],
+    deck: [...partnerDeckKey({ time: "early" })],
     buddy: [...BUDDIES_KEY],
   };
   Object.values(keys).forEach((key) => client.setQueryData(key, { seeded: true }));
@@ -41,7 +41,7 @@ describe("partners realtime", () => {
   it("a match change refreshes everything Partners but nothing else", () => {
     const { client, stale } = seeded();
     applyPartnersEvent(client, { kind: "partner_match_changed", match_id: "m2" });
-    expect(stale()).toEqual(["chat1", "chat2", "club", "deck", "matches"]);
+    expect(stale()).toEqual(["chat1", "chat2", "deck", "matches", "overview"]);
   });
 
   it("ignores unknown payloads", () => {

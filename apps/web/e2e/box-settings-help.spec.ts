@@ -67,7 +67,7 @@ async function stub(page: Page, user: ReturnType<typeof person>, writes: Array<{
     // Settings › Invitations shows the two join links (ADR-216).
     if (path === "/api/join-link") return json(route, { member: { enabled: false }, athlete: { enabled: false, key: null } });
     if (path === "/api/admin/community/groups") {
-      return json(route, { settings: { member_groups: "none", partners_enabled: false }, pending: [], groups: [] });
+      return json(route, { settings: { member_groups: "none" }, pending: [], groups: [] });
     }
     if (path === "/api/admin/scale-levels") {
       if (method === "PUT") {

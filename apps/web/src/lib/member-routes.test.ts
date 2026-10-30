@@ -22,7 +22,7 @@ describe("currentMemberPath", () => {
     expect(currentMemberPath("/me/messages/c-1")).toBe("/messages/c-1");
     expect(currentMemberPath("/box/shop/products/p-1")).toBe("/box/shop/product/p-1");
     expect(currentMemberPath("/journal/wellness")).toBe("/journal/wellbeing");
-    expect(currentMemberPath("/partners")).toBe("/messages?filter=partners");
+    expect(currentMemberPath("/partners")).toBe("/partners");
     expect(currentMemberPath("/partners/m-1")).toBe("/partners/m-1");
     expect(currentMemberPath("/me/settings/export")).toBe("/me/settings#journal-export");
   });

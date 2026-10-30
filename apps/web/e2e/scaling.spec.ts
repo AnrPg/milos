@@ -105,7 +105,7 @@ async function stubOwner(page: Page, puts: Array<Record<string, unknown>>, appro
     // Settings › Invitations shows the two join links (ADR-216).
     if (path === "/api/join-link") return json(route, { member: { enabled: false }, athlete: { enabled: false, key: null } });
     if (path === "/api/admin/community/groups") {
-      return json(route, { settings: { member_groups: "none", partners_enabled: false }, pending: [], groups: [] });
+      return json(route, { settings: { member_groups: "none" }, pending: [], groups: [] });
     }
     if (path === "/api/staff/scaling-suggestions") return json(route, { suggestions: queue });
     if (path === "/api/staff/scaling-suggestions/sug-1/approve") {

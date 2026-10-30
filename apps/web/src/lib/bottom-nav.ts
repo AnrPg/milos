@@ -44,6 +44,8 @@ export const BOTTOM_NAV_HIDDEN_ROUTES: ReadonlyArray<{ id: string; pattern: RegE
   // The check-in desk: the door kiosk, the printed poster, and the scan landing.
   { id: "checkInKiosk", pattern: /^\/admin\/check-in\/(?:door|poster)\/[^/]+\/?$/ },
   { id: "checkInScan", pattern: /^\/c\/[^/]+(?:\/|$)/ },
+  // The public Partners deck (ADR-280): one full-screen card at a time.
+  { id: "partnersDeck", pattern: /^\/partners\/?$/ },
   // Onboarding / first run.
   { id: "firstRun", pattern: /^\/welcome(?:\/|$)/ },
   // Auth and account set-up.
