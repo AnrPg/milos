@@ -1350,7 +1350,7 @@
     "setsd6c8220": "séries",
     "varsb9069e3": "Var.",
     "interval011efcd": "Intervalle",
-    "work00040ba": "Travail",
+    "work00040ba": "Effort",
     "restb79e5f4": "Repos",
     "cycles97f064a": "Cycles",
     "duration1370004": "Durée",
@@ -1993,7 +1993,7 @@
     "emomModeForQuality": "Qualité",
     "emomModeAmrap": "AMRAP",
     "emomModeToFailure": "Jusqu’à l’échec",
-    "emomModeForTimeDescription": "Sprinte à chaque fenêtre. Score = temps de travail cumulé (le plus bas est le mieux).",
+    "emomModeForTimeDescription": "Sprinte à chaque fenêtre. Score = temps d’effort cumulé (le plus bas est le mieux).",
     "emomModeForQualityDescription": "Priorité à une technique parfaite. Score = Réussi / Échoué.",
     "emomModeAmrapDescription": "Répétitions max. à chaque fenêtre. Score = total cumulé des répétitions.",
     "emomModeToFailureDescription": "Répétitions fixes à chaque fenêtre, continue jusqu’à l’échec. Score = fenêtres tenues.",
@@ -2070,11 +2070,11 @@
     "formatTooltip_emom_bestFor": "Entraînement fractionné avec objectifs définis",
     "formatTooltip_emom_trains": "Puissance, gestion du rythme, endurance ou technique",
     "formatTooltip_emom_how": "Même mouvement à chaque intervalle. Choisis un mode : For Time (sprint + repos), Qualité (focus sur la technique), AMRAP (répétitions max.) ou Jusqu’à l’échec (tenir le plus de fenêtres possible).",
-    "formatTooltip_emom_score": "Temps de travail cumulé / Réussi-Échoué / Total des répétitions / Fenêtres tenues",
+    "formatTooltip_emom_score": "Temps d’effort cumulé / Réussi-Échoué / Total des répétitions / Fenêtres tenues",
     "formatTooltip_complex_emom_bestFor": "Circuit training multi-modalités",
     "formatTooltip_complex_emom_trains": "Compétences variées, gestion du rythme, conditionnement multi-modal",
     "formatTooltip_complex_emom_how": "2 mouvements ou plus en rotation à chaque fenêtre. Choisis : For Time, Qualité, AMRAP (total général ou fenêtre la plus faible) ou Jusqu’à l’échec.",
-    "formatTooltip_complex_emom_score": "Temps de travail cumulé / Réussi-Échoué / Total des répétitions ou fenêtre la plus faible / Stations validées",
+    "formatTooltip_complex_emom_score": "Temps d’effort cumulé / Réussi-Échoué / Total des répétitions ou fenêtre la plus faible / Stations validées",
     "formatTooltip_even_odd_bestFor": "Entraînement en alternance de mouvements",
     "formatTooltip_even_odd_trains": "Compétences en alternance",
     "formatTooltip_even_odd_how": "Les minutes paires et impaires ont des tâches différentes.",
@@ -2242,7 +2242,7 @@
     "semanticLoad": "Charge",
     "semanticKilocalories": "Kilocalories",
     "semanticHeartRateDrop": "Baisse de la fréquence cardiaque",
-    "semanticAccumulatedWorkTime": "Temps de travail cumulé",
+    "semanticAccumulatedWorkTime": "Temps d’effort cumulé",
     "semanticPassFail": "Réussi / échoué",
     "semanticIntervalsSurvived": "Intervalles tenus",
     "semanticMinutesSeconds": "Minutes et secondes",
@@ -14084,7 +14084,7 @@
       "for_time": "termine le plus vite possible",
       "amrap": "le plus de tours possible dans le temps",
       "emom": "tu repars toutes les X minutes",
-      "intervals": "travail et repos à rythme fixe",
+      "intervals": "effort et repos à rythme fixe",
       "rest": "une pause entre les parties"
     },
     "param": {
@@ -14097,7 +14097,7 @@
       "dur": "Durée",
       "every": "Toutes les",
       "times": "Fois",
-      "work": "Travail",
+      "work": "Effort",
       "off": "Repos",
       "intEvery": "Interruption toutes les",
       "hrTarget": "Repos jusqu'à"
@@ -14251,8 +14251,8 @@
       "amrap": "Le plus de tours possible en {dur}.",
       "forTime": "{rounds, plural, one {Une fois} other {# tours}}, le plus vite possible.",
       "forTimeCap": "{rounds, plural, one {Une fois} other {# tours}}, le plus vite possible, limite {cap}.",
-      "intervals": "{rounds} tours : {work} de travail, {off} de repos.",
-      "intervalsHr": "{rounds} tours : {work} de travail, repos jusqu'à ce que ton pouls descende à {hr}.",
+      "intervals": "{rounds} tours : {work} d’effort, {off} de repos.",
+      "intervalsHr": "{rounds} tours : {work} d’effort, repos jusqu’à ce que ton pouls descende à {hr}.",
       "sets": "{sets} séries.",
       "setsRest": "{sets} séries, {rest} de repos entre.",
       "rest": "Repos {dur}.",
@@ -14467,5 +14467,13 @@
     "leaveStay": "Rester ici",
     "leaveDiscard": "Abandonner",
     "changed": "Modifié"
+  },
+  "TimerNow": {
+    "now": "Maintenant",
+    "eachRound": "Chaque tour",
+    "section": "Cette partie",
+    "workout": "Le WOD",
+    "upNext": "Ensuite",
+    "every": "Toutes les {time}"
   }
 }

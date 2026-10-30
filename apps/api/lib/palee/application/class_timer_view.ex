@@ -3,6 +3,11 @@ defmodule Palee.Application.ClassTimerView do
   Loads a scheduled class with its timer and the segments the timer runs, and
   shapes the payload every screen (wall display, coach remote, member phone)
   renders. `server_now` lets clients correct for their own clock being off.
+
+  `workout.body` is the workout in the shape it was written (ADR-224) for
+  every authoring mode: each segment's `section_id` points at one of its
+  sections, so a screen shows what is done now (the exercises of this
+  minute, round or section, or the section's text) from the same payload.
   """
 
   alias Palee.{Execution, Scheduling, Workouts}
@@ -64,9 +69,9 @@ defmodule Palee.Application.ClassTimerView do
             id: workout.id,
             title: workout.title,
             authoring_mode: Map.get(workout, :authoring_mode),
-            free_text_body: Map.get(workout, :free_text_body)
-          }
-          |> Map.merge(plan_body(workout)),
+            free_text_body: Map.get(workout, :free_text_body),
+            body: Map.get(workout, :body)
+          },
       segments: segments,
       timer:
         effective
@@ -78,13 +83,6 @@ defmodule Palee.Application.ClassTimerView do
       server_now: now
     }
   end
-
-  # ADR-270: the wall display and phones show a plan workout from its plan
-  # sections and their prescriptions (the `plan` body).
-  defp plan_body(%{authoring_mode: "structured_plan"} = workout),
-    do: %{body: Map.get(workout, :body)}
-
-  defp plan_body(_workout), do: %{}
 
   # A timer the coach picked for this class wins (e.g. an EMOM clock for an
   # untimed strength class). Otherwise structured workouts run their own

@@ -7,22 +7,25 @@ import type { ClassTimerPayload } from "@/api/class-timers";
 import { displaySeconds, formatClock, PHASE_COLORS, type TimerPhase } from "@/components/workouts/execution/TimerDisplay";
 import type { ClassTimerPosition } from "@/lib/class-timer";
 import { segmentLabel } from "@/lib/segment-label";
+import { windowRound } from "@/lib/timer-now";
 import { getFormatLabels, type SectionFormat } from "@/types/workout";
 
 export function phaseOf(position: ClassTimerPosition | null): TimerPhase {
   const phase = position?.segment?.phase;
-  return phase === "rest" || phase === "transition" ? phase : "work";
+  if (phase === "rest" || phase === "transition") return phase;
+  // A plan's intervals run work and rest as windows of one segment.
+  return windowRound(position?.segment ?? null, position?.clock?.window ?? null)?.rest ? "rest" : "work";
 }
 
 /** "Round 3/8", "Interval 4" or null, for the current segment. */
 export function useRoundText(position: ClassTimerPosition | null) {
   const i18n = useUiTranslations();
-  const window = position?.clock?.window ?? null;
   const segment = position?.segment ?? null;
+  const window = windowRound(segment, position?.clock?.window ?? null);
   if (window) {
-    return window.count
-      ? i18n("timerRoundLabel", { round: window.index, rounds: window.count })
-      : i18n("intervalWindowLabel", { window: window.index });
+    return window.rounds
+      ? i18n("timerRoundLabel", { round: window.round, rounds: window.rounds })
+      : i18n("intervalWindowLabel", { window: window.round });
   }
   if (segment?.round && segment.total_rounds) {
     return i18n("timerRoundLabel", { round: segment.round, rounds: segment.total_rounds });
@@ -73,14 +76,14 @@ export function ClassTimerFace({ payload, position, size }: Props) {
         .join(" · ")
     : null;
 
-  return (
+  const face = (
     <div
-      className={`flex flex-col items-center justify-center text-center ${wall ? "gap-[2vmin]" : "gap-2"}`}
+      className={`flex flex-col items-center justify-center text-center ${wall ? "h-full gap-[2.4cqmin]" : "gap-2"}`}
       style={{ color: "var(--text)" }}
     >
       <div
         className="font-bold uppercase tracking-widest"
-        style={{ color: position?.status === "running" ? color : "var(--text-soft)", fontSize: wall ? "clamp(1.25rem, 5vmin, 4.5rem)" : "1rem" }}
+        style={{ color: position?.status === "running" ? color : "var(--text-soft)", fontSize: wall ? "clamp(1.25rem, 7cqmin, 4.5rem)" : "1rem" }}
       >
         {statusText}
       </div>
@@ -92,8 +95,8 @@ export function ClassTimerFace({ payload, position, size }: Props) {
         style={{
           fontSize: wall
             ? (clock?.seconds ?? 0) >= 3600
-              ? "min(22vw, 44vh)"
-              : "min(30vw, 56vh)"
+              ? "min(16cqw, 40cqh)"
+              : "min(36cqw, 50cqh)"
             : "clamp(3.5rem, 16vw, 6rem)",
         }}
       >
@@ -101,19 +104,19 @@ export function ClassTimerFace({ payload, position, size }: Props) {
       </div>
 
       {sectionText ? (
-        <div className="max-w-[92vw] truncate font-semibold" style={{ color: "var(--text-soft)", fontSize: wall ? "clamp(1rem, 4.2vmin, 3.5rem)" : "1rem" }}>
+        <div className="max-w-full truncate font-semibold" style={{ color: "var(--text-soft)", fontSize: wall ? "clamp(1rem, 5.5cqmin, 3.5rem)" : "1rem" }}>
           {sectionText}
         </div>
       ) : null}
 
       {roundText ? (
-        <div className="font-bold tabular-nums" style={{ fontSize: wall ? "clamp(1rem, 4.5vmin, 3.75rem)" : "1rem" }}>
+        <div className="font-bold tabular-nums" style={{ fontSize: wall ? "clamp(1rem, 6cqmin, 3.75rem)" : "1rem" }}>
           {roundText}
         </div>
       ) : null}
 
       {next && position?.status !== "finished" ? (
-        <div className="max-w-[92vw] truncate" style={{ color: "var(--muted)", fontSize: wall ? "clamp(0.9rem, 3vmin, 2.25rem)" : "0.875rem" }}>
+        <div className="max-w-full truncate" style={{ color: "var(--muted)", fontSize: wall ? "clamp(0.9rem, 4cqmin, 2.25rem)" : "0.875rem" }}>
           {i18n("nextUpLabel", {
             label:
               next.section_id !== segment?.section_id && !next.between_sections
@@ -125,29 +128,13 @@ export function ClassTimerFace({ payload, position, size }: Props) {
       ) : null}
     </div>
   );
-}
 
-/** Exercise lines of the current segment, for the wall's side column. */
-export function SegmentExercises({ position }: { position: ClassTimerPosition | null }) {
-  const exercises = (position?.segment?.exercises ?? []).filter(
-    (exercise) => !exercise.excluded && exercise.item_type !== "header",
-  );
-  if (exercises.length === 0) return null;
-
-  return (
-    <ul className="space-y-[1.5vmin]" style={{ fontSize: "clamp(1rem, 3.4vmin, 2.75rem)" }}>
-      {exercises.map((exercise) => (
-        <li key={exercise.id} className="font-semibold leading-tight">
-          {exercise.prescription_value ? (
-            <span className="tabular-nums" style={{ color: "var(--primary)" }}>
-              {exercise.prescription_value}
-              {exercise.prescription_unit && exercise.prescription_unit !== "reps" ? ` ${exercise.prescription_unit}` : ""}{" "}
-            </span>
-          ) : null}
-          {exercise.name}
-          {exercise.load_value ? <span style={{ color: "var(--muted)" }}> · {exercise.load_value}</span> : null}
-        </li>
-      ))}
-    </ul>
+  // The wall face sizes its type to the space it is given (whole screen, or beside «Τώρα»).
+  return wall ? (
+    <div className="h-full min-h-0 w-full min-w-0" style={{ containerType: "size" }}>
+      {face}
+    </div>
+  ) : (
+    face
   );
 }

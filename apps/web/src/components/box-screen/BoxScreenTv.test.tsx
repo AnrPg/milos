@@ -12,6 +12,7 @@ import { newRow, newSection } from "@/lib/structured-plan/factory";
 import { BoxScreenTv, ScreenDay } from "./BoxScreenTv";
 
 const pairBoxScreen = vi.fn();
+let timerValue: { payload: unknown; position: unknown } = { payload: null, position: null };
 
 vi.mock("@/api/box-screens", async (original) => ({
   ...(await original<typeof import("@/api/box-screens")>()),
@@ -19,7 +20,7 @@ vi.mock("@/api/box-screens", async (original) => ({
 }));
 vi.mock("./useBoxScreen", () => ({
   useHydrated: () => true,
-  useBoxScreenTimer: () => ({ payload: null, position: null }),
+  useBoxScreenTimer: () => timerValue,
   useBoxScreenToday: () => ({ today: null, error: null, token: "display", now: Date.now() }),
 }));
 vi.mock("@/i18n/ui", () => ({ useUiTranslations: () => (key: string) => key }));
@@ -128,6 +129,41 @@ describe("the box screen on the TV", () => {
     expect(screen.getByTestId("tv-screen")).toHaveAttribute("data-scene", "timer");
     expect(screen.getByRole("timer")).toHaveTextContent("07:00");
     expect(screen.getByTestId("tv-finished")).toHaveTextContent("Eleni 3:42");
+  });
+
+  it("during the class: what the room does this EMOM minute beside the clock", () => {
+    const segment = {
+      segment_key: "s", section_id: "emom", section_name: "EMOM", format: "emom", kind: "interval_cycle", phase: "work",
+      duration_seconds: 60, round: null, total_rounds: 10, label: "EMOM",
+      timer_config: { interval_pattern_seconds: [60, 60] },
+      exercises: [
+        { id: "a", name: "Power clean", prescription_value: 3, prescription_unit: "reps", load_value: 70, load_mode: "absolute", interval_assignment: 1 },
+        { id: "b", name: "Burpee", prescription_value: 12, prescription_unit: "reps", interval_assignment: 2 },
+      ],
+    };
+    timerValue = {
+      payload: {
+        class: { id: "c18", name: "CrossFit", scheduled_at: T("18:00"), duration_minutes: 60 },
+        workout: { id: "fran", title: "Fran" },
+        segments: [segment],
+        timer: { status: "running", current_segment_index: 0, segment_started_at_utc: T("18:00"), paused_elapsed_ms: 0, duration_adjustments: {}, timer_preset: null, lock_version: 1 },
+        server_now: T("18:01"),
+      },
+      position: {
+        status: "running", index: 0, segment, startsInMs: 0,
+        clock: { elapsedMs: 70_000, remainingMs: 50_000, limitMs: 600_000, isExpired: false, progress: 0.2, window: { index: 2, count: 10, elapsedMs: 10_000, lengthMs: 60_000 } },
+      },
+    };
+    try {
+      render(wrap(<ScreenDay today={day({ view: "timer" })} token="display" now={at("18:01")} />));
+      const now = screen.getByTestId("timer-now");
+      expect(now).toHaveAttribute("data-scope", "step");
+      expect(now).toHaveTextContent("Now");
+      expect(now).toHaveTextContent("12 Burpee");
+      expect(now).not.toHaveTextContent("Power clean");
+    } finally {
+      timerValue = { payload: null, position: null };
+    }
   });
 
   it("after the class: the leaderboard, marking a score that just came in", () => {

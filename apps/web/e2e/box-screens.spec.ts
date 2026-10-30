@@ -77,6 +77,48 @@ test.describe("Box screen on the TV", () => {
     await expect(page.getByTestId("tv-leaderboard")).toContainText("Eleni");
   });
 
+  test("during a class: the clock with this EMOM minute's exercises beside it", async ({ page }) => {
+    await openTv(page);
+    await page.addInitScript(() => {
+      window.localStorage.setItem(
+        "palee:box-screen",
+        JSON.stringify({ token: "display-token", expires_at: "2999-01-01T00:00:00Z", screen: { id: "s1", name: "Room 1" }, box: { id: "org-1", name: "Box Kypseli" } }),
+      );
+    });
+    const day = today("timer", "staff");
+    day.classes[0] = { ...day.classes[0], scheduled_at: inMinutes(-2), ends_at: inMinutes(58) };
+    await page.route("**/api/box-screen/today", (route) => route.fulfill(json(day)));
+    const row = (id: string, name: string, dose: string, load = "") => ({ id, kind: "ex", name, dose, load, cells: [] });
+    const plan = { v: 1, flow: "emom", params: { every: "1:00", times: "10" }, blocks: [[row("r1", "Power clean", "3", "70kg")], [row("r2", "Burpee", "12")]], score: "" };
+    await page.route("**/api/box-screen/classes/c1/timer", (route) =>
+      route.fulfill(
+        json({
+          class: { id: "c1", name: "CrossFit", scheduled_at: inMinutes(-2), duration_minutes: 60 },
+          workout: { id: "fran", title: "Fran", authoring_mode: "structured_plan", body: { kind: "plan", sections: [{ id: "p1", name: "EMOM", plan }] } },
+          segments: [
+            {
+              segment_key: "plan:p1", section_id: "p1", section_name: "EMOM", format: "structured_plan", kind: "interval_cycle", phase: "work",
+              duration_seconds: 60, round: null, total_rounds: 10, label: "EMOM", scoreable: false, score_config: null, exercises: [],
+              timer_config: { plan_flow: "emom" },
+            },
+          ],
+          // Started 70 seconds ago: the second minute, the second kind of minute.
+          timer: { status: "running", current_segment_index: 0, segment_started_at_utc: new Date(Date.now() - 70_000).toISOString(), paused_elapsed_ms: 0, duration_adjustments: {}, timer_preset: null, lock_version: 2 },
+          server_now: new Date().toISOString(),
+        }),
+      ),
+    );
+
+    await page.goto("/tv");
+    await expect(page.getByTestId("tv-screen")).toHaveAttribute("data-scene", "timer");
+    const now = page.getByTestId("timer-now");
+    await expect(now).toHaveAttribute("data-scope", "step");
+    await expect(now).toContainText("Now");
+    await expect(now).toContainText("12 Burpee");
+    await expect(now).not.toContainText("Power clean");
+    await expect(page.getByTestId("tv-timer")).toContainText("Round 2/10");
+  });
+
   test("a removed screen goes back to the pairing code", async ({ page }) => {
     await openTv(page);
     await page.addInitScript(() => {

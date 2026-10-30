@@ -314,6 +314,25 @@ fails on the banned words.
 
 pt-PT, nl, bg, ar and he got only these terms and the class fixes; their full rewrite is TD-206.
 
+**Timer phases (ANR 2026-10-30).** The work phase of an interval is the word gyms use on their own timers, never
+a job («δουλειά») or a switch ("on/off"). One word per locale for the phase label, the plan parameter, the editor
+timeline and every "work time" compound; HR is heart rate («παλμοί», FC, Puls), never human resources.
+
+| Locale | Work (phase) | Rest (phase) |
+|---|---|---|
+| en | Work | Rest |
+| el | Άσκηση | Ξεκούραση |
+| de | Belastung | Pause |
+| fr | Effort | Repos |
+| es | Trabajo | Descanso |
+| it | Lavoro | Recupero |
+| ru | Работа | Отдых |
+| pt-PT | Trabalho | Descanso |
+| nl | Inspanning | Rust |
+| bg | Работа | Почивка |
+| ar | تمرين | راحة |
+| he | עבודה | מנוחה |
+
 ### 4.9 Goals and streaks
 
 | English | Ελληνικά | Code | What it is | Not to be confused with |
