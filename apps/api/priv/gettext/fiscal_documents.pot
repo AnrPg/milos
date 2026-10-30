@@ -200,6 +200,7 @@ msgid "Billing error"
 msgstr ""
 
 msgid "Subscription cancelled"
+msgstr ""
 
 msgid "Technical security system (TSE)"
 msgstr ""
