@@ -230,21 +230,21 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
           <KpiCard
             label={i18n("paidRevenue64c34e5")}
             value={formatMoney(uiLocale, metricNumber(financeTotals, "paid_revenue_cents"))}
-            helper={(formatCount(uiLocale, metricNumber(dashboardFinance, "active_memberships"))) + i18n("activeMemberships6d55ee8")}
+            helper={i18n("activeMembershipCount", { count: metricNumber(dashboardFinance, "active_memberships") })}
             href={adminHref("/admin/metrics/finance", organizationSlug)}
           />
           <KpiCard label={i18n("reviewsb83c4cd")} value={formatCount(uiLocale, metricNumber(feedback, "total"))} insight={copy.body} href={adminHref("/admin/reviews", organizationSlug)} />
           <KpiCard
             label={i18n("activeInjuriesdaecfa6")}
             value={formatCount(uiLocale, metricNumber(wellbeing, "active_count"))}
-            helper={(formatCount(uiLocale, metricNumber(wellbeing, "total"))) + i18n("totalReportsdfd4b9e")}
+            helper={i18n("totalReportCount", { count: metricNumber(wellbeing, "total") })}
             insight={copy.body}
             href={adminHref("/admin/metrics/health", organizationSlug)}
           />
           <KpiCard
             label={i18n("notificationClicks02c5775")}
             value={formatCount(uiLocale, metricNumber(notificationClicks, "total"))}
-            helper={(formatCount(uiLocale, metricNumber(events, "total"))) + i18n("trackedEvents398d5c2")}
+            helper={i18n("trackedEventCount", { count: metricNumber(events, "total") })}
             insight={copy.body}
             href={adminHref("/admin/metrics/engagement", organizationSlug)}
           />

@@ -192,7 +192,7 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
               <>
                 <span style={{ color: "var(--text)" }}>{field(row, "invoice_number")}</span>
                 <span style={{ color: "var(--primary-strong)" }}>
-                  {money(uiLocale, row.balance_due_cents)} · {daysOverdue(row.due_date as string)} {i18n("days5548ae4")}
+                  {money(uiLocale, row.balance_due_cents)} · {i18n("dayCount", { count: daysOverdue(row.due_date as string) })}
                 </span>
               </>
             )}

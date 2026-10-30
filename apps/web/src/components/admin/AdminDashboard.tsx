@@ -38,6 +38,14 @@ import {
 import { clockFormat } from "@/lib/clock";
 
 type AlertCategory = "finance" | "coaching" | "training";
+type AlertMessageKey =
+  | "adminAlertExpiringMemberships"
+  | "adminAlertOverdueInvoices"
+  | "adminAlertPendingPayments"
+  | "adminAlertPendingReferralRewards"
+  | "adminAlertInjuryFlags"
+  | "adminAlertUnreadWorkoutReviews"
+  | "adminAlertPendingBookingApprovals";
 
 const DEFAULT_CATEGORIES: AlertCategory[] = ["finance", "coaching", "training"];
 const STORAGE_KEY = "palee-admin-alert-categories";
@@ -138,9 +146,9 @@ function AdminChallengeCard({ challenge }: { challenge: AdminChallengeRecord }) 
       </div>
 
       <div className="mt-3 flex gap-4 text-xs" style={{ color: "var(--muted)" }}>
-        <span>{challenge.progress_summary.participants} {i18n("participantsa94a46c")}</span>
-        <span>{challenge.progress_summary.completed} {i18n("completed231e564")}</span>
-        <span>{pct}{i18n("completionRateca84af1")}</span>
+        <span>{i18n("challengeParticipantCount", { count: Number(challenge.progress_summary.participants ?? 0) })}</span>
+        <span>{i18n("challengeCompletedCount", { count: Number(challenge.progress_summary.completed ?? 0) })}</span>
+        <span>{i18n("challengeCompletionRate", { rate: pct / 100 })}</span>
       </div>
     </article>
   );
@@ -310,35 +318,27 @@ export function AdminDashboard({
   const visibleOperationalKpis = adminMetrics || landingLoading ? operationalKpis.filter((kpi) => kpi[4]) : [];
 
   // ── Alerts ─────────────────────────────────────────────────────────────────
-  const financeAlerts: Array<{ text: string; href: string }> = [
-    ...(Number(totals.expiring_memberships ?? 0) > 0
-      ? [{ text: (String(totals.expiring_memberships)) + i18n("membershipsExpiringWithin30Daysae431f3"), href: "/admin/finance?tab=queues" }]
-      : []),
-    ...((queues.overdue_invoices ?? []).length > 0
-      ? [{ text: (String((queues.overdue_invoices ?? []).length)) + i18n("overdueInvoicesab09bd9"), href: "/admin/finance?tab=queues" }]
-      : []),
-    ...((queues.pending_payments ?? []).length > 0
-      ? [{ text: (String((queues.pending_payments ?? []).length)) + i18n("pendingPayments200b7ff"), href: "/admin/finance?tab=queues" }]
-      : []),
-    ...((queues.pending_referral_rewards ?? []).length > 0
-      ? [{ text: (String((queues.pending_referral_rewards ?? []).length)) + i18n("pendingReferralRewards94485f1"), href: "/admin/finance?tab=referrals" }]
-      : []),
-  ];
+  // Each alert is one ICU plural message with the count inside it, so every
+  // locale controls spacing, word order and plural forms (never `count + text`).
+  type DashboardAlert = { text: string; href: string };
+  const alertsFor = (rows: Array<[count: number, key: AlertMessageKey, href: string]>): DashboardAlert[] =>
+    rows.filter(([count]) => count > 0).map(([count, key, href]) => ({ text: i18n(key, { count }), href }));
 
-  const coachingAlerts: Array<{ text: string; href: string }> = [
-    ...(Number(coaching.injury_count ?? 0) > 0
-      ? [{ text: (String(coaching.injury_count)) + i18n("injuryFlagsSinceLastVisit507e216"), href: "/admin/wellbeing" }]
-      : []),
-    ...(Number(coaching.review_count ?? 0) > 0
-      ? [{ text: (String(coaching.review_count)) + i18n("unreadWorkoutReviews43cac80"), href: "/admin/reviews" }]
-      : []),
-  ];
+  const financeAlerts = alertsFor([
+    [Number(totals.expiring_memberships ?? 0), "adminAlertExpiringMemberships", "/admin/finance?tab=queues"],
+    [(queues.overdue_invoices ?? []).length, "adminAlertOverdueInvoices", "/admin/finance?tab=queues"],
+    [(queues.pending_payments ?? []).length, "adminAlertPendingPayments", "/admin/finance?tab=queues"],
+    [(queues.pending_referral_rewards ?? []).length, "adminAlertPendingReferralRewards", "/admin/finance?tab=referrals"],
+  ]);
 
-  const trainingAlerts: Array<{ text: string; href: string }> = [
-    ...(pendingBookingsCount > 0
-      ? [{ text: (String(pendingBookingsCount)) + i18n("pendingBookingApprovals7ec01ae"), href: "/admin/class-schedule" }]
-      : []),
-  ];
+  const coachingAlerts = alertsFor([
+    [Number(coaching.injury_count ?? 0), "adminAlertInjuryFlags", "/admin/wellbeing"],
+    [Number(coaching.review_count ?? 0), "adminAlertUnreadWorkoutReviews", "/admin/reviews"],
+  ]);
+
+  const trainingAlerts = alertsFor([
+    [pendingBookingsCount, "adminAlertPendingBookingApprovals", "/admin/class-schedule"],
+  ]);
 
   const allAlerts: Record<AlertCategory, { label: string; items: Array<{ text: string; href: string }> }> = {
     finance: { label: i18n("finance1b48d3f"), items: canFinanceReports ? financeAlerts : [] },
