@@ -206,6 +206,7 @@ test.describe("trials", () => {
     await page.getByLabel("Write a message").fill("Card declined?");
     await page.getByRole("button", { name: "Send", exact: true }).click();
     await expect.poll(() => sent[0]?.topic).toBe("payment");
+    await expect(page.getByLabel("Write a message")).toHaveValue("");
 
     await page.getByLabel("Write a message").fill("Hello?");
     await page.getByRole("button", { name: "Send", exact: true }).click();
