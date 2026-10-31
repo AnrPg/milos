@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import type { PublicPackage } from "@/api/my-payments";
 import {
@@ -158,12 +158,11 @@ export function DeskRequestDialog({
 function HeldDialog({ slug, pkg, places, onClose }: { slug: string; pkg: PublicPackage; places?: DeskPlace[]; onClose: () => void }) {
   const t = useTranslations("DeskPay");
   const request = useRequestPackage(slug);
-  const asked = useRef(false);
   const { mutate } = request;
 
+  // No once-only guard: React's dev double mount drops the first mutation's
+  // result, and asking again is safe because the server returns the open request.
   useEffect(() => {
-    if (asked.current) return;
-    asked.current = true;
     mutate(pkg.id);
   }, [mutate, pkg.id]);
 
