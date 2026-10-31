@@ -92,8 +92,9 @@ export function BoxChat({
 
   const send = useMutation({
     mutationFn: (text: string) => sendBoxMessage(token, slug, text, newOperationId(), topic),
-    onSuccess: (message) => {
-      setBody("");
+    onSuccess: (message, sentText) => {
+      // Keep whatever was typed while the message was on its way.
+      setBody((current) => (current.trim() === sentText ? "" : current));
       queryClient.setQueryData<BoxConversation>(boxConversationKey(slug), (current) =>
         current ? { ...current, messages: [...(current.messages ?? []), message] } : current,
       );

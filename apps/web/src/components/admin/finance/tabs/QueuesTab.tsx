@@ -144,10 +144,12 @@ export function QueuesTab({ locationIds }: { locationIds?: string } = {}) {
         ) : active === "awaiting" ? (
           awaitingQuery.isLoading ? (
             <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>{i18n("loadingQueuea1e2a39")}</p>
-          ) : awaiting.length === 0 ? (
-            <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }} data-testid="desk-requests-empty">{deskT("queueEmpty")}</p>
           ) : (
-            <DeskPackageRequestRows rows={awaiting} />
+            // Stays mounted when the last request is collected, so its receipt shows.
+            <DeskPackageRequestRows
+              rows={awaiting}
+              empty={<p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }} data-testid="desk-requests-empty">{deskT("queueEmpty")}</p>}
+            />
           )
         ) : queuesQuery.isLoading ? (
           <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>{i18n("loadingQueuea1e2a39")}</p>

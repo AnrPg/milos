@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 import type { ReceivedPayment } from "@/api/finance";
 import {
@@ -59,13 +59,14 @@ export function PersonLink({ userId, name, handle }: { userId: string | null | u
   );
 }
 
-export function DeskPackageRequestRows({ rows }: { rows: DeskPackageRequest[] }) {
+export function DeskPackageRequestRows({ rows, empty }: { rows: DeskPackageRequest[]; empty?: ReactNode }) {
   const t = useTranslations("DeskPay");
   const locale = useUiLocale();
   const [collecting, setCollecting] = useState<DeskPackageRequest | null>(null);
 
   return (
     <>
+      {rows.length === 0 ? empty : null}
       {rows.map((row, index) => {
         const amount = new Intl.NumberFormat(locale, { style: "currency", currency: row.currency }).format(row.price_cents / 100);
         const name = row.person?.display_name || row.person?.handle || t("someone");

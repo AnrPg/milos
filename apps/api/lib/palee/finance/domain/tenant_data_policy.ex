@@ -32,6 +32,9 @@ defmodule Palee.Finance.Domain.TenantDataPolicy do
               %{table: "referral_programs"},
               %{table: "promotion_codes"},
               %{table: "promotion_campaigns"},
+              # ADR-291: desk-pay requests reference packages, subscriptions
+              # and payments, so they go before all three.
+              %{table: "finance_package_requests"},
               # ADR-098 corporate billing: payments -> invoices -> clients;
               # subscriptions reference corporate clients, so clients follow them.
               %{table: "finance_corporate_payments"},
