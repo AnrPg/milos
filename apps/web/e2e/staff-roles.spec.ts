@@ -73,11 +73,14 @@ async function signedInOwner(page: Page) {
 // The role filter is a segmented radio group on wide screens, a picker on phones.
 async function pickRole(page: Page, name: RegExp) {
   const picker = page.getByRole("combobox", { name: "Filter by role" });
+  const radio = page.getByRole("radio", { name });
+  // The filters sheet may still be opening: wait for either control before choosing.
+  await expect(picker.or(radio).filter({ visible: true }).first()).toBeVisible();
   if (await picker.isVisible()) {
     await picker.click();
     await page.getByRole("option", { name }).click();
   } else {
-    await page.getByRole("radio", { name }).click();
+    await radio.click();
   }
 }
 
