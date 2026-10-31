@@ -65,6 +65,11 @@ defmodule PaleeWeb.PersonalDataExportControllerTest do
              Enum.sort([ctx.box.id, ctx.other_box.id])
 
     assert [%{"invoice_number" => "INV-ME"}] = files["payments.json"]["finance_invoices"]
+
+    assert [%{"package_name_snapshot" => "PKG-ME"} = request] =
+             files["payments.json"]["finance_package_requests"]
+
+    refute Map.has_key?(request, "requested_by_id")
     assert [%{"provider" => "garmin"}] = files["devices.json"]["device_connections"]
     assert [%{"id" => my_id}] = files["profile.json"]["users"]
     assert my_id == ctx.me.id
@@ -73,6 +78,7 @@ defmodule PaleeWeb.PersonalDataExportControllerTest do
     refute everything =~ "Other note"
     refute everything =~ "From them"
     refute everything =~ "INV-OTHER"
+    refute everything =~ "PKG-OTHER"
     refute everything =~ "SECRET-ACCESS-TOKEN"
     refute everything =~ "password_hash"
     refute everything =~ ctx.other.id
@@ -121,6 +127,10 @@ defmodule PaleeWeb.PersonalDataExportControllerTest do
 
     invoice!(ctx.box, ctx.me, my_membership, "INV-ME")
     invoice!(ctx.box, ctx.other, other_membership, "INV-OTHER")
+
+    package = package!(ctx.box)
+    package_request!(ctx.box, ctx.me, package, "PKG-ME")
+    package_request!(ctx.box, ctx.other, package, "PKG-OTHER")
 
     now = DateTime.utc_now()
 
@@ -202,6 +212,50 @@ defmodule PaleeWeb.PersonalDataExportControllerTest do
           user_id: dump(user.id),
           membership_id: membership_id,
           invoice_number: number,
+          inserted_at: now,
+          updated_at: now
+        }
+      ])
+    end)
+  end
+
+  defp package!(org) do
+    id = Ecto.UUID.generate()
+    now = DateTime.utc_now()
+
+    RepoContext.run(%{organization_id: org.id}, fn ->
+      Repo.insert_all("membership_packages", [
+        %{
+          id: dump(id),
+          organization_id: dump(org.id),
+          name: "Unlimited",
+          family: "unlimited",
+          billing_period: "monthly",
+          inserted_at: now,
+          updated_at: now
+        }
+      ])
+    end)
+
+    dump(id)
+  end
+
+  # ADR-291: a package asked for at the desk; the name snapshot tells them apart.
+  defp package_request!(org, user, package_id, name) do
+    now = DateTime.utc_now()
+
+    RepoContext.run(%{organization_id: org.id, user_id: user.id}, fn ->
+      Repo.insert_all("finance_package_requests", [
+        %{
+          id: dump(Ecto.UUID.generate()),
+          organization_id: dump(org.id),
+          user_id: dump(user.id),
+          membership_package_id: package_id,
+          package_name_snapshot: name,
+          price_cents_snapshot: 7_500,
+          currency: "EUR",
+          requested_by_id: dump(user.id),
+          hold_until: Date.add(Date.utc_today(), 14),
           inserted_at: now,
           updated_at: now
         }

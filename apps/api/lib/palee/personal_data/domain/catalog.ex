@@ -180,6 +180,8 @@ defmodule Palee.PersonalData.Domain.Catalog do
       tenant("payments", "finance_credit_ledger_entries", @me),
       tenant("payments", "finance_payment_reversals", @me),
       tenant("payments", "finance_refund_receipts", @me),
+      # ADR-291: packages the person asked to pay for at the desk.
+      tenant("payments", "finance_package_requests", @me),
       tenant("payments", "payment_intents", @me,
         drop: ~w(redirect_url return_url provider_ref claimed_at)
       ),
