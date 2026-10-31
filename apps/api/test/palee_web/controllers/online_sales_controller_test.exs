@@ -86,6 +86,8 @@ defmodule PaleeWeb.OnlineSalesControllerTest do
 
   test "the public page lists only packages sold online", %{conn: conn} = ctx do
     sell_online(conn, ctx, ctx.package)
+    # ADR-291: a package never chosen is listed for the desk; the owner's «off» is not.
+    keep_at_desk(conn, ctx, ctx.hidden)
 
     {:ok, profile} =
       UpdateBoxPublicProfile.call(ctx.context, %{"about" => "Box", "disciplines" => ["crossfit"]})

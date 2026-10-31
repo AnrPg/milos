@@ -286,7 +286,7 @@ function FormRow({
   );
 }
 
-function ReceivedView({
+export function ReceivedView({
   received,
   nickname,
   money,

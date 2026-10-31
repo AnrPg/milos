@@ -168,6 +168,78 @@ defmodule PaleeWeb.Schemas.Payments do
     }
   end
 
+  @doc "ADR-291: a package waiting to be paid at the front desk («Περιμένει πληρωμή»)."
+  def package_request do
+    %Schema{
+      type: :object,
+      properties: %{
+        id: @uuid,
+        user_id: @uuid,
+        package_id: @uuid,
+        package_name: %Schema{type: :string},
+        price_cents: @int,
+        currency: %Schema{type: :string},
+        status: %Schema{type: :string, enum: ~w(pending activated cancelled lapsed)},
+        source: %Schema{type: :string, enum: ~w(member staff)},
+        requested_at: %Schema{type: :string, format: :"date-time"},
+        hold_until: %Schema{
+          type: :string,
+          format: :date,
+          description: "The box's last day the package is held; it is removed the day after"
+        },
+        hold_days: @int,
+        days_left: @int,
+        person: %Schema{
+          type: :object,
+          nullable: true,
+          description: "Staff queue only: who asked, to open their account",
+          properties: %{
+            user_id: @uuid,
+            display_name: @text,
+            handle: @text,
+            avatar_url: @text
+          }
+        }
+      },
+      required: [
+        :currency,
+        :days_left,
+        :hold_days,
+        :hold_until,
+        :id,
+        :package_id,
+        :package_name,
+        :price_cents,
+        :requested_at,
+        :source,
+        :status,
+        :user_id
+      ]
+    }
+  end
+
+  def package_request_list,
+    do: one(:requests, %Schema{type: :array, items: package_request()})
+
+  def package_request_created do
+    %Schema{
+      type: :object,
+      properties: %{request: package_request(), created: %Schema{type: :boolean}},
+      required: [:created, :request]
+    }
+  end
+
+  def package_request_collect_body do
+    %Schema{
+      type: :object,
+      properties: %{
+        payment_method: %Schema{type: :string, enum: ~w(cash card_manual bank_transfer other)},
+        notes: %{@text | maxLength: 500}
+      },
+      required: [:payment_method]
+    }
+  end
+
   def intent do
     %Schema{
       type: :object,

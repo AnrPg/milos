@@ -1,8 +1,9 @@
 import { expect, test, type Page } from "./support/test";
 
 // Member shop (ADR-190): the fixed card in Box, the grid with one card per
-// product, the product page with every size, the one-screen cart where the
-// online card is visible but blocked, and the order page with QR + timeline.
+// product, the product page with every size, the one-screen cart (no online
+// card while the box has no provider, ADR-291), the placed dialog with QR and
+// pickup code, and the order page with QR, code, «Αποθήκευση» and timeline.
 // The API is stubbed; anything not stubbed answers `{}`.
 // Not run yet: the owner asked to skip Playwright until the shop API branch
 // is merged. Stubs follow PaleeWeb.Schemas.Shop.
@@ -154,7 +155,7 @@ test.describe("shop", () => {
     await expect(page.getByTestId("shop-cart-button")).toContainText("1");
   });
 
-  test("checkout is one screen and the online card is shown but blocked", async ({ page }) => {
+  test("checkout is one screen with no online card while the box has no provider", async ({ page }) => {
     await common(page);
     const placed: unknown[] = [];
     await page.route("**/api/org/kypseli/me/shop/orders", (route) => {
@@ -166,17 +167,30 @@ test.describe("shop", () => {
       window.localStorage.setItem("palee:shop-cart:kypseli", JSON.stringify({ lines: [{ variantId: "v-s", productId: "p-tee", quantity: 1 }], source: null }));
     });
     await page.goto("/box/shop/cart?box=kypseli");
-    await expect(page.getByRole("radio", { name: /Online by card/ })).toBeDisabled();
+    await expect(page.getByRole("radio", { name: /At pickup/ })).toBeVisible();
+    await expect(page.getByRole("radio", { name: /Online by card/ })).toHaveCount(0);
     await expect(page.locator("input:not([type=radio]):not([type=hidden])")).toHaveCount(0);
     await page.getByTestId("shop-place-order").click();
     await expect(page).toHaveURL(/\/box\/shop\/orders\/o-1/);
     expect(placed).toHaveLength(1);
+    // ADR-291 (2B): a centred dialog with the QR and the pickup code to show at the desk.
+    const dialog = page.getByTestId("shop-placed");
+    await expect(dialog.getByTestId("shop-placed-qr")).toBeVisible();
+    await expect(dialog.getByTestId("shop-placed-code")).toHaveText("7Q4K");
+    await dialog.getByTestId("shop-placed-ok").click();
+    await expect(dialog).toBeHidden();
+    await expect(page).not.toHaveURL(/placed=1/);
   });
 
   test("the order page shows the pickup QR and the timeline", async ({ page }) => {
     await common(page);
     await page.goto("/box/shop/orders/o-1?box=kypseli");
     await expect(page.getByTestId("shop-order-qr")).toBeVisible();
+    await expect(page.getByTestId("shop-order-code")).toContainText("7Q4K");
     await expect(page.getByTestId("shop-order-status")).toContainText("Being prepared");
+    // «Αποθήκευση»: the pickup pass is saved as an image to show with the app closed.
+    const download = page.waitForEvent("download");
+    await page.getByTestId("shop-order-save").click();
+    expect((await download).suggestedFilename()).toMatch(/\.png$/);
   });
 });

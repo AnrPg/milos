@@ -48,6 +48,24 @@ defmodule Palee.Payments.Domain.PackageSaleTest do
       assert PackageSale.visibility(package([]), @not_connected) == "no_provider"
     end
 
+    test "ADR-291: without a provider, never-chosen paid packages are listed for the desk" do
+      assert PackageSale.visibility(package(sold_online: false), @not_connected) == "no_provider"
+
+      chosen_off = package(sold_online: false, sold_online_chosen_at: ~U[2026-10-01 10:00:00Z])
+      assert PackageSale.visibility(chosen_off, @not_connected) == "off"
+
+      for type <- ~w(add_on shared corporate) do
+        assert PackageSale.visibility(
+                 package(sold_online: false, package_type: type),
+                 @not_connected
+               ) ==
+                 "off"
+      end
+
+      # Connected, a never-chosen package is still off until connecting opens it.
+      assert PackageSale.visibility(package(sold_online: false), @connected) == "off"
+    end
+
     test "a switched-off purpose matters only once a provider is connected" do
       offer = %{@pt_off | available: false}
       assert PackageSale.visibility(package(package_type: "pt_pack"), offer) == "no_provider"

@@ -41,8 +41,8 @@ function newKey() {
 /**
  * Cart and checkout on one screen with no typed fields (Baymard): the lines,
  * the pickup point (a choice only when there are several), how to pay (at
- * pickup, on the account when the owner allows it, and online card shown
- * greyed out until `online_payment.available`), a code behind «Έχεις
+ * pickup, on the account when the owner allows it, and online card only
+ * when `online_payment.available`, ADR-291), a code behind «Έχεις
  * κωδικό;», the totals in cents, and «Παραγγελία». The invoice then shows in
  * Εγώ › Πληρωμές › Συναλλαγές.
  */
@@ -78,11 +78,11 @@ export function CartPage() {
   const pickup = places.find((item) => item.id === pickupId) ?? places[0] ?? null;
   const serverModes = quote?.payment_modes ?? ["at_pickup"];
   const onlineAvailable = quote?.online_payment.available ?? false;
+  // ADR-291: online card payment is offered only when the box takes it; never shown greyed out.
   const modes: { mode: ShopPaymentMode; available: boolean }[] = [
     { mode: "at_pickup", available: serverModes.includes("at_pickup") },
     ...(serverModes.includes("on_account") ? [{ mode: "on_account" as const, available: true }] : []),
-    // Owner's call: online card payment is visible but blocked until the provider ships.
-    { mode: "online", available: onlineAvailable },
+    ...(onlineAvailable ? [{ mode: "online" as const, available: true }] : []),
   ];
   const [mode, setMode] = useState<ShopPaymentMode>("at_pickup");
   const [openState, setCodeOpen] = useState(false);
@@ -114,7 +114,9 @@ export function CartPage() {
       {
         onSuccess: (order) => {
           update(() => EMPTY_CART);
-          router.replace(shopHref(`/orders/${encodeURIComponent(order.id)}`, slug, explicit));
+          // ADR-291: the order page opens with its QR and code in the middle of the screen.
+          const href = shopHref(`/orders/${encodeURIComponent(order.id)}`, slug, explicit);
+          router.replace(`${href}${href.includes("?") ? "&" : "?"}placed=1`);
         },
       },
     );
@@ -225,7 +227,7 @@ export function CartPage() {
               disabled={!available}
               onSelect={() => setMode(option)}
               title={t(`pay_${option}`)}
-              hint={option === "online" && !available ? t("pay_online_blocked") : t(`pay_${option}_hint`)}
+              hint={t(`pay_${option}_hint`)}
               testId={`shop-pay-${option}`}
             />
           ))}

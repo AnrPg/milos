@@ -32,6 +32,7 @@ config :palee, Oban,
        {"*/15 * * * *", Palee.Workers.RefreshCoachingAggregatesJob},
        {"0 2 * * *", Palee.Workers.MarkOverdueInvoicesJob},
        {"9 * * * *", Palee.Workers.SubscriptionChargesJob},
+       {"21 * * * *", Palee.Workers.LapsePackageRequestsJob},
        {"17 * * * *", Palee.Workers.ReconcileEntitlementReservationsJob},
        {"0 9 * * *", Palee.Workers.PaymentReminderJob},
        {"41 * * * *", Palee.Workers.ExecutionAbandonmentSweepJob},
@@ -426,6 +427,7 @@ config :palee,
        Palee.Infrastructure.Execution.EctoTrainingLogStore
 
 config :palee, :finance_store, Palee.Infrastructure.Finance.EctoFinanceStore
+config :palee, :package_request_store, Palee.Infrastructure.Finance.EctoPackageRequestStore
 
 # ADR-192: the shop's report read model.
 config :palee, :shop_report_store, Palee.Infrastructure.Shop.EctoShopReportStore

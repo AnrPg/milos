@@ -7075,6 +7075,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/finance/package-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Packages waiting to be paid at the front desk
+         * @description Open requests (held `hold_days` days), oldest first, each with the person who asked.
+         */
+        get: operations["PaleeWeb.AdminPackageRequestController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/finance/package-requests/{id}/collect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Take the money for a package waiting at the desk («Είσπραξη»)
+         * @description Records the payment (the box's receipt or invoice, ADR-222) and assigns the package from today in one step. Safe to retry.
+         */
+        post: operations["PaleeWeb.AdminPackageRequestController.collect"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/packages": {
         parameters: {
             query?: never;
@@ -12294,6 +12334,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/package-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The member's packages waiting to be paid at the front desk */
+        get: operations["PaleeWeb.MyPaymentsController.package_requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/package-requests/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Take back a package that waits for payment at the front desk */
+        post: operations["PaleeWeb.MyPaymentsController.cancel_package_request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/packages/{id}/buy": {
         parameters: {
             query?: never;
@@ -12325,6 +12399,26 @@ export interface paths {
         get: operations["PaleeWeb.MyPaymentsController.package_terms"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/packages/{id}/request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask for a package to pay at the front desk («Το θέλω»)
+         * @description ADR-291: the package waits as «Περιμένει πληρωμή» for `hold_days` days; it grants nothing and owes nothing until the desk takes the money. Asking again for the same package returns the open request (`created: false`).
+         */
+        post: operations["PaleeWeb.MyPaymentsController.request_package"];
         delete?: never;
         options?: never;
         head?: never;
@@ -80985,6 +81079,128 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminPackageRequestController.index": {
+        parameters: {
+            query?: {
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Package requests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        requests: {
+                            currency: string;
+                            days_left: number;
+                            hold_days: number;
+                            /**
+                             * Format: date
+                             * @description The box's last day the package is held; it is removed the day after
+                             */
+                            hold_until: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            package_id: string;
+                            package_name: string;
+                            /** @description Staff queue only: who asked, to open their account */
+                            person?: {
+                                avatar_url?: string | null;
+                                display_name?: string | null;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                user_id?: string;
+                            } | null;
+                            price_cents: number;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** @enum {string} */
+                            source: "member" | "staff";
+                            /** @enum {string} */
+                            status: "pending" | "activated" | "cancelled" | "lapsed";
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminPackageRequestController.collect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    notes?: string | null;
+                    /** @enum {string} */
+                    payment_method: "cash" | "card_manual" | "bank_transfer" | "other";
+                };
+            };
+        };
+        responses: {
+            /** @description Collected */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        received: {
+                            [key: string]: unknown;
+                        };
+                        request: {
+                            currency: string;
+                            days_left: number;
+                            hold_days: number;
+                            /**
+                             * Format: date
+                             * @description The box's last day the package is held; it is removed the day after
+                             */
+                            hold_until: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            package_id: string;
+                            package_name: string;
+                            /** @description Staff queue only: who asked, to open their account */
+                            person?: {
+                                avatar_url?: string | null;
+                                display_name?: string | null;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                user_id?: string;
+                            } | null;
+                            price_cents: number;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** @enum {string} */
+                            source: "member" | "staff";
+                            /** @enum {string} */
+                            status: "pending" | "activated" | "cancelled" | "lapsed";
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminFinanceController.packages": {
         parameters: {
             query?: {
@@ -109855,6 +110071,114 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.MyPaymentsController.package_requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Package requests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        requests: {
+                            currency: string;
+                            days_left: number;
+                            hold_days: number;
+                            /**
+                             * Format: date
+                             * @description The box's last day the package is held; it is removed the day after
+                             */
+                            hold_until: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            package_id: string;
+                            package_name: string;
+                            /** @description Staff queue only: who asked, to open their account */
+                            person?: {
+                                avatar_url?: string | null;
+                                display_name?: string | null;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                user_id?: string;
+                            } | null;
+                            price_cents: number;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** @enum {string} */
+                            source: "member" | "staff";
+                            /** @enum {string} */
+                            status: "pending" | "activated" | "cancelled" | "lapsed";
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.cancel_package_request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Package request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        request: {
+                            currency: string;
+                            days_left: number;
+                            hold_days: number;
+                            /**
+                             * Format: date
+                             * @description The box's last day the package is held; it is removed the day after
+                             */
+                            hold_until: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            package_id: string;
+                            package_name: string;
+                            /** @description Staff queue only: who asked, to open their account */
+                            person?: {
+                                avatar_url?: string | null;
+                                display_name?: string | null;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                user_id?: string;
+                            } | null;
+                            price_cents: number;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** @enum {string} */
+                            source: "member" | "staff";
+                            /** @enum {string} */
+                            status: "pending" | "activated" | "cancelled" | "lapsed";
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.MyPaymentsController.buy_package": {
         parameters: {
             query?: never;
@@ -109979,6 +110303,105 @@ export interface operations {
                         provider: string | null;
                         start_now_text: string | null;
                         withdrawal_days: number | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyPaymentsController.request_package": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Package request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        created: boolean;
+                        request: {
+                            currency: string;
+                            days_left: number;
+                            hold_days: number;
+                            /**
+                             * Format: date
+                             * @description The box's last day the package is held; it is removed the day after
+                             */
+                            hold_until: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            package_id: string;
+                            package_name: string;
+                            /** @description Staff queue only: who asked, to open their account */
+                            person?: {
+                                avatar_url?: string | null;
+                                display_name?: string | null;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                user_id?: string;
+                            } | null;
+                            price_cents: number;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** @enum {string} */
+                            source: "member" | "staff";
+                            /** @enum {string} */
+                            status: "pending" | "activated" | "cancelled" | "lapsed";
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Package request */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        created: boolean;
+                        request: {
+                            currency: string;
+                            days_left: number;
+                            hold_days: number;
+                            /**
+                             * Format: date
+                             * @description The box's last day the package is held; it is removed the day after
+                             */
+                            hold_until: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            package_id: string;
+                            package_name: string;
+                            /** @description Staff queue only: who asked, to open their account */
+                            person?: {
+                                avatar_url?: string | null;
+                                display_name?: string | null;
+                                handle?: string | null;
+                                /** Format: uuid */
+                                user_id?: string;
+                            } | null;
+                            price_cents: number;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** @enum {string} */
+                            source: "member" | "staff";
+                            /** @enum {string} */
+                            status: "pending" | "activated" | "cancelled" | "lapsed";
+                            /** Format: uuid */
+                            user_id: string;
+                        };
                     };
                 };
             };

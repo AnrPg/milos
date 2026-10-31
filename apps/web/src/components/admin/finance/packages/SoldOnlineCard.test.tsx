@@ -68,9 +68,9 @@ describe("SoldOnlineCard (ADR-271, mockup p1 A)", () => {
     expect(screen.getByRole("link", { name: /Άνοιξέ το/ })).toHaveAttribute("href", "/admin/settings?tab=payments");
   });
 
-  it("says buying opens after connecting when no provider is connected", () => {
+  it("says members pay at the front desk when no provider is connected (ADR-291)", () => {
     wrap(<SoldOnlineCard token="token" pkg={{ ...PACKAGE, online_visibility: "no_provider" }} />, "en");
-    expect(screen.getByTestId("sold-online-hint")).toHaveTextContent("Buying opens once you connect online payments.");
+    expect(screen.getByTestId("sold-online-hint")).toHaveTextContent("Box members pay at the front desk until you connect online payments.");
     expect(screen.getByRole("link", { name: /Settings › Payments/ })).toBeVisible();
   });
 
@@ -95,7 +95,7 @@ describe("SoldOnlineCard (ADR-271, mockup p1 A)", () => {
 });
 
 describe("SoldOnlineBadge", () => {
-  it("shows «Online», «Online · δεν φαίνεται», or nothing", () => {
+  it("shows «Online», «Στην υποδοχή», or nothing", () => {
     const { rerender } = wrap(<SoldOnlineBadge pkg={PACKAGE} />);
     expect(screen.getByTestId("sold-online-badge")).toHaveTextContent("Online");
     rerender(
@@ -105,7 +105,7 @@ describe("SoldOnlineBadge", () => {
         </NextIntlClientProvider>
       </QueryClientProvider>,
     );
-    expect(screen.getByTestId("sold-online-badge")).toHaveTextContent("Online · δεν φαίνεται");
+    expect(screen.getByTestId("sold-online-badge")).toHaveTextContent("Στην υποδοχή");
     rerender(
       <QueryClientProvider client={new QueryClient()}>
         <NextIntlClientProvider locale="el" messages={el}>

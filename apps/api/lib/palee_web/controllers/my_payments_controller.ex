@@ -8,6 +8,7 @@ defmodule PaleeWeb.MyPaymentsController do
   use OpenApiSpex.ControllerSpecs
 
   alias OpenApiSpex.{Parameter, Schema}
+  alias Palee.Application.Finance.PackageRequests
   alias Palee.Application.Payments.{OnlinePayments, OnlineSales}
   alias PaleeWeb.Schemas.Payments, as: P
 
@@ -183,6 +184,49 @@ defmodule PaleeWeb.MyPaymentsController do
     with {:ok, payment} <-
            OnlineSales.buy_package(conn.assigns.tenant_context, id, with_client(conn)) do
       json(conn, %{payment: payment})
+    end
+  end
+
+  operation(:request_package,
+    summary: "Ask for a package to pay at the front desk («Το θέλω»)",
+    description:
+      "ADR-291: the package waits as «Περιμένει πληρωμή» for `hold_days` days; it grants " <>
+        "nothing and owes nothing until the desk takes the money. Asking again for the " <>
+        "same package returns the open request (`created: false`).",
+    parameters: [@id],
+    responses: [
+      created: {"Package request", "application/json", P.package_request_created()},
+      ok: {"Package request", "application/json", P.package_request_created()}
+    ]
+  )
+
+  def request_package(conn, %{id: id}) do
+    with {:ok, %{created: created} = result} <-
+           PackageRequests.request(conn.assigns.tenant_context, id) do
+      conn
+      |> put_status(if(created, do: :created, else: :ok))
+      |> json(result)
+    end
+  end
+
+  operation(:package_requests,
+    summary: "The member's packages waiting to be paid at the front desk",
+    responses: [ok: {"Package requests", "application/json", P.package_request_list()}]
+  )
+
+  def package_requests(conn, _params) do
+    json(conn, %{requests: PackageRequests.mine(conn.assigns.tenant_context)})
+  end
+
+  operation(:cancel_package_request,
+    summary: "Take back a package that waits for payment at the front desk",
+    parameters: [@id],
+    responses: [ok: {"Package request", "application/json", P.one(:request, P.package_request())}]
+  )
+
+  def cancel_package_request(conn, %{id: id}) do
+    with {:ok, request} <- PackageRequests.cancel(conn.assigns.tenant_context, id) do
+      json(conn, %{request: request})
     end
   end
 

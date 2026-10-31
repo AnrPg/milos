@@ -411,6 +411,13 @@ defmodule PaleeWeb.RouteCapabilities do
     # ADR-222: front desk takes the money and leaves the document the billing
     # setup calls for, a paid invoice included.
     {W.AdminFinanceController, :receive_payment} => [:take_payments],
+    # ADR-291: «Περιμένουν πληρωμή» and its «Είσπραξη».
+    {W.AdminPackageRequestController, :index} => [
+      :take_payments,
+      :manage_billing,
+      :view_finance_reports
+    ],
+    {W.AdminPackageRequestController, :collect} => [:take_payments],
     {W.AdminFinanceController, :redeem_promotion} => [:take_payments],
     {W.AdminFinanceController, :create_invoice} => [:manage_billing],
     {W.AdminFinanceController, :generate_renewal_invoice} => [:manage_billing],

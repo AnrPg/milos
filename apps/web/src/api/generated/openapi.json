@@ -188033,6 +188033,320 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/package-requests": {
+      "get": {
+        "callbacks": {},
+        "description": "Open requests (held `hold_days` days), oldest first, each with the person who asked.",
+        "operationId": "PaleeWeb.AdminPackageRequestController.index",
+        "parameters": [
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "requests": {
+                      "items": {
+                        "properties": {
+                          "currency": {
+                            "type": "string"
+                          },
+                          "days_left": {
+                            "type": "integer"
+                          },
+                          "hold_days": {
+                            "type": "integer"
+                          },
+                          "hold_until": {
+                            "description": "The box's last day the package is held; it is removed the day after",
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "package_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "package_name": {
+                            "type": "string"
+                          },
+                          "person": {
+                            "description": "Staff queue only: who asked, to open their account",
+                            "nullable": true,
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "display_name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "handle": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "price_cents": {
+                            "type": "integer"
+                          },
+                          "requested_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "source": {
+                            "enum": [
+                              "member",
+                              "staff"
+                            ],
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "activated",
+                              "cancelled",
+                              "lapsed"
+                            ],
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "currency",
+                          "days_left",
+                          "hold_days",
+                          "hold_until",
+                          "id",
+                          "package_id",
+                          "package_name",
+                          "price_cents",
+                          "requested_at",
+                          "source",
+                          "status",
+                          "user_id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "requests"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Package requests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Packages waiting to be paid at the front desk",
+        "tags": [
+          "Admin Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/finance/package-requests/{id}/collect": {
+      "post": {
+        "callbacks": {},
+        "description": "Records the payment (the box's receipt or invoice, ADR-222) and assigns the package from today in one step. Safe to retry.",
+        "operationId": "PaleeWeb.AdminPackageRequestController.collect",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "notes": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "payment_method": {
+                    "enum": [
+                      "cash",
+                      "card_manual",
+                      "bank_transfer",
+                      "other"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "payment_method"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "received": {
+                      "additionalProperties": true,
+                      "type": "object"
+                    },
+                    "request": {
+                      "properties": {
+                        "currency": {
+                          "type": "string"
+                        },
+                        "days_left": {
+                          "type": "integer"
+                        },
+                        "hold_days": {
+                          "type": "integer"
+                        },
+                        "hold_until": {
+                          "description": "The box's last day the package is held; it is removed the day after",
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "package_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "package_name": {
+                          "type": "string"
+                        },
+                        "person": {
+                          "description": "Staff queue only: who asked, to open their account",
+                          "nullable": true,
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "display_name": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "price_cents": {
+                          "type": "integer"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "source": {
+                          "enum": [
+                            "member",
+                            "staff"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "activated",
+                            "cancelled",
+                            "lapsed"
+                          ],
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "currency",
+                        "days_left",
+                        "hold_days",
+                        "hold_until",
+                        "id",
+                        "package_id",
+                        "package_name",
+                        "price_cents",
+                        "requested_at",
+                        "source",
+                        "status",
+                        "user_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "received",
+                    "request"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Collected"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Take the money for a package waiting at the desk («Είσπραξη»)",
+        "tags": [
+          "Admin Finance"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/packages": {
       "get": {
         "callbacks": {},
@@ -271755,6 +272069,273 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/me/package-requests": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyPaymentsController.package_requests",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "requests": {
+                      "items": {
+                        "properties": {
+                          "currency": {
+                            "type": "string"
+                          },
+                          "days_left": {
+                            "type": "integer"
+                          },
+                          "hold_days": {
+                            "type": "integer"
+                          },
+                          "hold_until": {
+                            "description": "The box's last day the package is held; it is removed the day after",
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "package_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "package_name": {
+                            "type": "string"
+                          },
+                          "person": {
+                            "description": "Staff queue only: who asked, to open their account",
+                            "nullable": true,
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "display_name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "handle": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "price_cents": {
+                            "type": "integer"
+                          },
+                          "requested_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "source": {
+                            "enum": [
+                              "member",
+                              "staff"
+                            ],
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "activated",
+                              "cancelled",
+                              "lapsed"
+                            ],
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "currency",
+                          "days_left",
+                          "hold_days",
+                          "hold_until",
+                          "id",
+                          "package_id",
+                          "package_name",
+                          "price_cents",
+                          "requested_at",
+                          "source",
+                          "status",
+                          "user_id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "requests"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Package requests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The member's packages waiting to be paid at the front desk",
+        "tags": [
+          "Member Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/package-requests/{id}/cancel": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyPaymentsController.cancel_package_request",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "request": {
+                      "properties": {
+                        "currency": {
+                          "type": "string"
+                        },
+                        "days_left": {
+                          "type": "integer"
+                        },
+                        "hold_days": {
+                          "type": "integer"
+                        },
+                        "hold_until": {
+                          "description": "The box's last day the package is held; it is removed the day after",
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "package_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "package_name": {
+                          "type": "string"
+                        },
+                        "person": {
+                          "description": "Staff queue only: who asked, to open their account",
+                          "nullable": true,
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "display_name": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "price_cents": {
+                          "type": "integer"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "source": {
+                          "enum": [
+                            "member",
+                            "staff"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "activated",
+                            "cancelled",
+                            "lapsed"
+                          ],
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "currency",
+                        "days_left",
+                        "hold_days",
+                        "hold_until",
+                        "id",
+                        "package_id",
+                        "package_name",
+                        "price_cents",
+                        "requested_at",
+                        "source",
+                        "status",
+                        "user_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "request"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Package request"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Take back a package that waits for payment at the front desk",
+        "tags": [
+          "Member Finance"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/me/packages/{id}/buy": {
       "post": {
         "callbacks": {},
@@ -272115,6 +272696,261 @@
           }
         ],
         "summary": "What buying a package online costs, and the texts to agree to",
+        "tags": [
+          "Member Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/packages/{id}/request": {
+      "post": {
+        "callbacks": {},
+        "description": "ADR-291: the package waits as «Περιμένει πληρωμή» for `hold_days` days; it grants nothing and owes nothing until the desk takes the money. Asking again for the same package returns the open request (`created: false`).",
+        "operationId": "PaleeWeb.MyPaymentsController.request_package",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "created": {
+                      "type": "boolean"
+                    },
+                    "request": {
+                      "properties": {
+                        "currency": {
+                          "type": "string"
+                        },
+                        "days_left": {
+                          "type": "integer"
+                        },
+                        "hold_days": {
+                          "type": "integer"
+                        },
+                        "hold_until": {
+                          "description": "The box's last day the package is held; it is removed the day after",
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "package_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "package_name": {
+                          "type": "string"
+                        },
+                        "person": {
+                          "description": "Staff queue only: who asked, to open their account",
+                          "nullable": true,
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "display_name": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "price_cents": {
+                          "type": "integer"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "source": {
+                          "enum": [
+                            "member",
+                            "staff"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "activated",
+                            "cancelled",
+                            "lapsed"
+                          ],
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "currency",
+                        "days_left",
+                        "hold_days",
+                        "hold_until",
+                        "id",
+                        "package_id",
+                        "package_name",
+                        "price_cents",
+                        "requested_at",
+                        "source",
+                        "status",
+                        "user_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "created",
+                    "request"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Package request"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "created": {
+                      "type": "boolean"
+                    },
+                    "request": {
+                      "properties": {
+                        "currency": {
+                          "type": "string"
+                        },
+                        "days_left": {
+                          "type": "integer"
+                        },
+                        "hold_days": {
+                          "type": "integer"
+                        },
+                        "hold_until": {
+                          "description": "The box's last day the package is held; it is removed the day after",
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "package_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "package_name": {
+                          "type": "string"
+                        },
+                        "person": {
+                          "description": "Staff queue only: who asked, to open their account",
+                          "nullable": true,
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "display_name": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "handle": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "user_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "price_cents": {
+                          "type": "integer"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "source": {
+                          "enum": [
+                            "member",
+                            "staff"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "activated",
+                            "cancelled",
+                            "lapsed"
+                          ],
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "currency",
+                        "days_left",
+                        "hold_days",
+                        "hold_until",
+                        "id",
+                        "package_id",
+                        "package_name",
+                        "price_cents",
+                        "requested_at",
+                        "source",
+                        "status",
+                        "user_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "created",
+                    "request"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Package request"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Ask for a package to pay at the front desk («Το θέλω»)",
         "tags": [
           "Member Finance"
         ]
