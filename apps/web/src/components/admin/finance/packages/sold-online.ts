@@ -16,8 +16,13 @@ export function onlineVisibility(pkg: FinanceRecord | null | undefined): OnlineV
   return ONLINE_VISIBILITIES.includes(value as OnlineVisibility) ? (value as OnlineVisibility) : "off";
 }
 
+/**
+ * Whether box members see the package (the switch's state). ADR-291: with no
+ * online payments, a paid package whose owner never chose is listed too, to
+ * ask for («Το θέλω») and pay at the front desk.
+ */
 export function isSoldOnline(pkg: FinanceRecord | null | undefined): boolean {
-  return pkg?.sold_online === true;
+  return pkg?.sold_online === true || onlineVisibility(pkg) === "no_provider";
 }
 
 /** The switch cannot be turned on for a free or retired package. */
@@ -27,12 +32,13 @@ export function canSellOnline(visibility: OnlineVisibility): boolean {
 
 /** Marked «Πωλείται online» but members do not see it yet: shown in the warning colour. */
 export function isHidden(visibility: OnlineVisibility): boolean {
-  return visibility === "purpose_off" || visibility === "no_provider";
+  return visibility === "purpose_off";
 }
 
-/** The list badge: «Online», «Online · δεν φαίνεται», or none. */
-export function badgeKey(visibility: OnlineVisibility): "badge" | "badgeHidden" | null {
+/** The list badge: «Online», «Στην υποδοχή» (ADR-291), «Online · δεν φαίνεται», or none. */
+export function badgeKey(visibility: OnlineVisibility): "badge" | "badgeDesk" | "badgeHidden" | null {
   if (visibility === "visible") return "badge";
+  if (visibility === "no_provider") return "badgeDesk";
   if (isHidden(visibility)) return "badgeHidden";
   return null;
 }

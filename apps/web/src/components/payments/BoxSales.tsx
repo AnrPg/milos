@@ -10,11 +10,15 @@ import { FRESHNESS } from "@/lib/query-policy";
 
 import { BuyPackageSheet } from "./BuyPackageSheet";
 import { buyableHere, renewalPackages } from "./checkout-flow";
+import { deskMode, deskPackages } from "./desk-payment";
+import { DeskRenewDialog } from "./DeskPayment";
 
 /**
  * What a box sells online that may be bought on this device (ADR-248,
  * ADR-256): nothing when the box takes no online payments, and never a
- * digital-only package inside the store apps.
+ * digital-only package inside the store apps. ADR-291: a box without online
+ * payments lists `deskPackages` instead, asked for in the app and paid at the
+ * front desk (no store rule applies: nothing is paid in the app).
  */
 export function useBoxSales(slug: string | null | undefined) {
   const query = useQuery({
@@ -26,13 +30,20 @@ export function useBoxSales(slug: string | null | undefined) {
   });
   const data = query.data;
   const packages = data?.online_payments ? buyableHere(data.packages, nativePlatform()) : [];
-  return { packages, provider: data?.provider ?? null, isLoading: query.isLoading };
+  return {
+    packages,
+    desk: deskMode(data),
+    deskPackages: deskPackages(data),
+    provider: data?.provider ?? null,
+    isLoading: query.isLoading,
+  };
 }
 
 /** Box › «Συνδρομή» › «Ανανέωση» (mockup s4 option B, sheet 1). */
 export function RenewButton({ slug }: { slug: string }) {
   const t = useTranslations("Pay");
-  const { packages } = useBoxSales(slug);
+  const sales = useBoxSales(slug);
+  const packages = sales.desk ? sales.deskPackages : sales.packages;
   const [open, setOpen] = useState(false);
   if (renewalPackages(packages).length === 0) return null;
 
@@ -47,7 +58,9 @@ export function RenewButton({ slug }: { slug: string }) {
       >
         {t("renew")}
       </button>
-      {open ? (
+      {open && sales.desk ? (
+        <DeskRenewDialog slug={slug} packages={packages} onClose={() => setOpen(false)} />
+      ) : open ? (
         <BuyPackageSheet slug={slug} packages={packages} mode={{ kind: "renew" }} origin="box" onClose={() => setOpen(false)} />
       ) : null}
     </>

@@ -14,6 +14,7 @@ import { useMyClubs } from "@/components/community/use-community";
 import { AccessNotice, EntitlementCard } from "@/components/finance/MembershipEntitlement";
 import { BoxToday } from "@/components/member-app/box/BoxToday";
 import { RenewButton } from "@/components/payments/BoxSales";
+import { PendingPackages } from "@/components/payments/DeskPayment";
 import { boxExtensionsFor } from "@/components/member-app/box/box-extensions";
 import { CoachActions, NextCoachSession, SessionPackageSummary } from "@/components/member-app/box/CoachBox";
 import { HubActionTile, HubButton, HubCard, HubIcons, HubPage } from "@/components/member-app/HubParts";
@@ -82,6 +83,8 @@ export function BoxHub() {
           <AccessNotice entitlement={entitlement} />
           {layout === "coach" ? <SessionPackageSummary entitlement={entitlement} /> : null}
           {entitlement?.plan ? <EntitlementCard entitlement={entitlement} /> : null}
+          {/* ADR-291: packages asked for in the app, waiting to be paid at the desk. */}
+          {membership ? <PendingPackages slug={membership.organization.slug} /> : null}
           <Suspense fallback={null}>
             <SeasonsEntry />
           </Suspense>

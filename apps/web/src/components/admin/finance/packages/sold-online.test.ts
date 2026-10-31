@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { badgeKey, canSellOnline, fixLink, isHidden, onlineVisibility, salesPageHref, soldOnlineCount } from "./sold-online";
+import { badgeKey, canSellOnline, fixLink, isHidden, isSoldOnline, onlineVisibility, salesPageHref, soldOnlineCount } from "./sold-online";
 
 describe("sold-online (ADR-271)", () => {
   it("reads the API's online_visibility and never guesses a rule", () => {
@@ -11,7 +11,7 @@ describe("sold-online (ADR-271)", () => {
 
   it("maps each visibility to the list badge", () => {
     expect(badgeKey("visible")).toBe("badge");
-    expect(badgeKey("no_provider")).toBe("badgeHidden");
+    expect(badgeKey("no_provider")).toBe("badgeDesk");
     expect(badgeKey("purpose_off")).toBe("badgeHidden");
     expect(badgeKey("off")).toBeNull();
     expect(badgeKey("free")).toBeNull();
@@ -23,6 +23,13 @@ describe("sold-online (ADR-271)", () => {
     expect(fixLink("visible")).toBeNull();
     expect(fixLink("free")).toBeNull();
     expect(isHidden("visible")).toBe(false);
+    expect(isHidden("no_provider")).toBe(false);
+  });
+
+  it("shows a never-chosen package as on while members ask for it at the desk (ADR-291)", () => {
+    expect(isSoldOnline({ sold_online: false, online_visibility: "no_provider" })).toBe(true);
+    expect(isSoldOnline({ sold_online: false, online_visibility: "off" })).toBe(false);
+    expect(isSoldOnline({ sold_online: true, online_visibility: "visible" })).toBe(true);
   });
 
   it("does not let free or retired packages be switched on", () => {

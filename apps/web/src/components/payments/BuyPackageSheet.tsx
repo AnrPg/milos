@@ -78,7 +78,7 @@ export function BuyPackageSheet({
   );
 }
 
-function PackageChoice({ pkg, checked, onSelect }: { pkg: PublicPackage; checked: boolean; onSelect: () => void }) {
+export function PackageChoice({ pkg, checked, onSelect }: { pkg: PublicPackage; checked: boolean; onSelect: () => void }) {
   const t = useTranslations("Pay");
   const locale = useUiLocale();
   return (

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
@@ -9,6 +10,7 @@ import { QrCode } from "@/components/check-in/QrCode";
 import { Dialog, DialogButton } from "@/components/ui/Dialog";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { orderReference, orderTimeline } from "@/lib/shop/catalog";
+import { downloadPickupPass, spacedCode } from "@/lib/shop/pickup-pass";
 
 import { ErrorNotice, LoadingLine, Money, Panel, ShopHeader } from "./ShopParts";
 import { ProductThumb } from "./shared/ShopBits";
@@ -21,10 +23,13 @@ function time(locale: string, value: string | null) {
 }
 
 /**
- * Η παραγγελία μου: the QR and the reference the desk scans, a timeline
- * (placed → ready at the desk → picked up), the lines, how it is paid, and
- * «Ακύρωση» while staff have not handed it over. «Έτοιμη για παραλαβή»
- * reaches the member as a notification that opens this page.
+ * Η παραγγελία μου: the QR and the pickup code the desk scans or types, a
+ * timeline (placed → ready at the desk → picked up), the lines, how it is
+ * paid, and «Ακύρωση» while staff have not handed it over. «Έτοιμη για
+ * παραλαβή» reaches the member as a notification that opens this page.
+ * ADR-291 (mockup 2B): just after ordering, a centred window shows the QR and
+ * code with what to do at the desk; «Αποθήκευση» keeps both as an image that
+ * opens without the app or a connection.
  */
 export function OrderPage({ orderId }: { orderId: string }) {
   const t = useTranslations("Shop");
@@ -33,6 +38,16 @@ export function OrderPage({ orderId }: { orderId: string }) {
   const order = useShopOrder(slug, orderId);
   const back = shopHref("", slug, explicit);
   const data = order.data;
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const placed = searchParams.get("placed") === "1";
+
+  function closePlaced() {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("placed");
+    const query = params.toString();
+    router.replace(`${window.location.pathname}${query ? `?${query}` : ""}`, { scroll: false });
+  }
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 pb-8 pt-4">
@@ -43,6 +58,7 @@ export function OrderPage({ orderId }: { orderId: string }) {
         subtitle={data ? time(locale, data.placed_at) : null}
       />
       {data ? <OrderBody order={data} slug={slug!} locale={locale} /> : order.isError ? <ErrorNotice message={t("orderMissing")} /> : <LoadingLine />}
+      {data && placed && data.payment_mode !== "online" ? <PlacedDialog order={data} locale={locale} onClose={closePlaced} /> : null}
     </main>
   );
 }
@@ -73,12 +89,19 @@ function OrderBody({ order, slug, locale }: { order: ShopOrder; slug: string; lo
             <QrCode value={order.pickup_code} label={t("orderQr", { number: orderReference(order) })} testId="shop-order-qr" className="aspect-square w-full" />
           </div>
         ) : null}
+        {open ? (
+          <p className="flex flex-col items-center" data-testid="shop-order-code">
+            <span className="text-xs font-bold" style={{ color: "var(--dim)" }}>{t("pickupCode")}</span>
+            <span className="font-mono text-2xl font-extrabold tracking-[0.18em]" style={{ color: "var(--text)" }}>{spacedCode(order.pickup_code)}</span>
+          </p>
+        ) : null}
         <p className="font-mono text-lg font-bold tracking-[0.1em]" style={{ color: "var(--text)" }}>{orderReference(order)}</p>
         {open ? (
           <p className="text-sm" style={{ color: "var(--text-soft)" }}>
             {order.expires_at ? t("showAtDeskUntil", { date: new Date(order.expires_at).toLocaleDateString(locale, { weekday: "short", day: "numeric", month: "numeric" }) }) : t("showAtDesk")}
           </p>
         ) : null}
+        {open ? <SavePassButton order={order} locale={locale} /> : null}
         {order.status === "cancelled" && order.cancel_reason ? <p className="text-sm" style={{ color: "var(--text-soft)" }}>{order.cancel_reason}</p> : null}
       </section>
 
@@ -166,5 +189,83 @@ function OrderBody({ order, slug, locale }: { order: ShopOrder; slug: string; lo
         </Dialog>
       ) : null}
     </>
+  );
+}
+
+/** «Αποθήκευση»: the QR and the code as one image for the photos. */
+function SavePassButton({ order, locale, testId = "shop-order-save" }: { order: ShopOrder; locale: string; testId?: string }) {
+  const t = useTranslations("Shop");
+  const [state, setState] = useState<"idle" | "saving" | "saved" | "failed">("idle");
+
+  async function save() {
+    setState("saving");
+    try {
+      await downloadPickupPass({
+        code: order.pickup_code,
+        reference: orderReference(order),
+        box: null,
+        place: order.pickup_location?.name ?? null,
+        total: new Intl.NumberFormat(locale, { style: "currency", currency: order.currency }).format(order.total_cents / 100),
+        labels: { code: t("pickupCode"), showAtDesk: t("showAtDesk") },
+      });
+      setState("saved");
+    } catch {
+      setState("failed");
+    }
+  }
+
+  return (
+    <span className="flex flex-col items-center gap-1">
+      <button
+        type="button"
+        onClick={save}
+        disabled={state === "saving"}
+        className="min-h-11 rounded-2xl px-4 text-sm font-bold"
+        style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+        data-testid={testId}
+      >
+        {t("savePass")}
+      </button>
+      {state === "saved" ? <span className="text-xs" style={{ color: "var(--success)" }}>{t("savePassDone")}</span> : null}
+      {state === "failed" ? <span className="text-xs" style={{ color: "var(--danger)" }}>{t("savePassFailed")}</span> : null}
+    </span>
+  );
+}
+
+/** Just after ordering: the QR, the code and what to do at the desk, in the middle of the screen. */
+function PlacedDialog({ order, locale, onClose }: { order: ShopOrder; locale: string; onClose: () => void }) {
+  const t = useTranslations("Shop");
+  const total = new Intl.NumberFormat(locale, { style: "currency", currency: order.currency }).format(order.total_cents / 100);
+  const paid = order.payment_status === "paid";
+  return (
+    <Dialog onClose={onClose} title={t("placedTitle")} variant="center" size="sm" testId="shop-placed">
+      <div className="flex min-w-0 flex-col items-center gap-3 text-center">
+        <div className="w-full max-w-[13rem] rounded-3xl p-3" style={{ background: "var(--paper)" }}>
+          <QrCode value={order.pickup_code} label={t("orderQr", { number: orderReference(order) })} testId="shop-placed-qr" className="aspect-square w-full" />
+        </div>
+        <p className="flex flex-col items-center">
+          <span className="text-xs font-bold" style={{ color: "var(--dim)" }}>{t("pickupCode")}</span>
+          <span className="font-mono text-2xl font-extrabold tracking-[0.18em]" style={{ color: "var(--text)" }} data-testid="shop-placed-code">
+            {spacedCode(order.pickup_code)}
+          </span>
+        </p>
+        <ol className="flex w-full list-decimal flex-col gap-1 ps-5 text-start text-sm" style={{ color: "var(--text)" }}>
+          <li>{t("placedStepShow")}</li>
+          {paid ? null : <li>{t("placedStepPay", { total })}</li>}
+          <li>{t("placedStepTake")}</li>
+        </ol>
+        <p className="text-xs" style={{ color: "var(--text-soft)" }}>{t("placedNote")}</p>
+        <SavePassButton order={order} locale={locale} testId="shop-placed-save" />
+        <button
+          type="button"
+          onClick={onClose}
+          className="min-h-11 w-full rounded-2xl px-4 text-sm font-bold"
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+          data-testid="shop-placed-ok"
+        >
+          {t("gotIt")}
+        </button>
+      </div>
+    </Dialog>
   );
 }

@@ -6084,13 +6084,28 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     |> Enum.map(&normalize_referral_reward/1)
   end
 
+  # ADR-291: each row names its person (`user_id`), so the desk opens their account.
   defp list_recent_redemptions(limit, users) do
-    PromotionRedemption
-    |> for_user_memberships(users)
-    |> order_by([redemption], desc: redemption.redeemed_at)
-    |> limit(^limit)
-    |> Repo.all()
-    |> Enum.map(&normalize_promotion_redemption/1)
+    redemptions =
+      PromotionRedemption
+      |> for_user_memberships(users)
+      |> order_by([redemption], desc: redemption.redeemed_at)
+      |> limit(^limit)
+      |> Repo.all()
+
+    people =
+      Membership
+      |> tenant_scope()
+      |> where([membership], membership.id in ^Enum.map(redemptions, & &1.membership_id))
+      |> select([membership], {membership.id, membership.user_id})
+      |> Repo.all()
+      |> Map.new()
+
+    Enum.map(redemptions, fn redemption ->
+      redemption
+      |> normalize_promotion_redemption()
+      |> Map.put(:user_id, Map.get(people, redemption.membership_id))
+    end)
   end
 
   defp maybe_put_applied_at(params, "applied", nil), do: Map.put(params, :applied_at, utc_now())

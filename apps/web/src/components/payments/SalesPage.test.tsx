@@ -132,10 +132,11 @@ describe("Σελίδα αγοράς πακέτων (mockup s5 option C)", () => 
     expect(screen.getByTestId("pay-submit")).toBeDisabled();
   });
 
-  it("without online payments shows no buy buttons", async () => {
+  it("without online payments offers «Το θέλω» and no buy buttons (ADR-291)", async () => {
     vi.mocked(fetchPublicPackages).mockResolvedValue({ packages: PACKAGES, online_payments: false, provider: null, withdrawal_days: 14 } as never);
     renderPage();
-    expect(await screen.findByText(el.Pay.nothingOnline)).toBeInTheDocument();
+    expect(await screen.findByTestId("sales-desk-note")).toHaveTextContent(el.DeskPay.pageNote);
+    expect(screen.getAllByRole("button", { name: el.DeskPay.want }).length).toBeGreaterThan(0);
     expect(screen.queryByRole("button", { name: "Αγορά" })).toBeNull();
   });
 });

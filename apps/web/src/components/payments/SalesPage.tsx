@@ -14,6 +14,7 @@ import { useOrganizationMemberships } from "@/lib/organization-slug";
 import { SPARK_GO_STYLE } from "@/lib/spark";
 
 import { useBoxSales } from "./BoxSales";
+import { DeskRequestDialog, WantButton, type DeskPlace } from "./DeskPayment";
 import { perLabel } from "./BuyPackageSheet";
 import { providerLabel, salesPageSections } from "./checkout-flow";
 import { BeforePaying, money, usePackageCheckout } from "./PackageCheckout";
@@ -23,19 +24,28 @@ import { BeforePaying, money, usePackageCheckout } from "./PackageCheckout";
  * the trial first, then three packages with their prices, the rest one
  * «Όλα» away. Buying leads through sign-in or sign-up into the same
  * «Πριν πληρώσεις» as the app, with the same legal rules (ADR-248). In the
- * store apps digital-only packages are not offered (ADR-256).
+ * store apps digital-only packages are not offered (ADR-256). ADR-291: a box
+ * without online payments shows its packages with «Το θέλω» instead, paid at
+ * the front desk; nothing offers a payment the box cannot take.
  */
 export function SalesPage({ page, line }: { page: PublicBoxPage; line: string }) {
   const t = useTranslations("Pay");
+  const tDesk = useTranslations("DeskPay");
   const locale = useUiLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const slug = page.box.slug;
   const sales = useBoxSales(slug);
-  const { trial, top, more } = salesPageSections(sales.packages);
+  const desk = sales.desk;
+  const shown = desk ? sales.deskPackages : sales.packages;
+  const { trial, top, more } = salesPageSections(shown);
   const [all, setAll] = useState(false);
   const requested = searchParams.get("buy");
-  const buying = sales.packages.find((pkg) => pkg.id === requested) ?? null;
+  const buying = shown.find((pkg) => pkg.id === requested) ?? null;
+  const places: DeskPlace[] = (page.locations ?? []).map((location) => ({
+    name: location.name,
+    address: [location.address, location.city].filter(Boolean).join(", ") || null,
+  }));
 
   function open(pkg: PublicPackage | null) {
     const params = new URLSearchParams(searchParams.toString());
@@ -84,7 +94,7 @@ export function SalesPage({ page, line }: { page: PublicBoxPage; line: string })
             style={SPARK_GO_STYLE}
             data-testid="sales-trial-buy"
           >
-            {t("bookTrial")}
+            {desk ? tDesk("want") : t("bookTrial")}
           </button>
         </section>
       ) : null}
@@ -109,7 +119,11 @@ export function SalesPage({ page, line }: { page: PublicBoxPage; line: string })
                 <span className="text-xs" style={{ color: "var(--dim)" }}>{perLabel(t, pkg.billing_period)}</span>
               </p>
               {pkg.description ? <p className="text-xs" style={{ color: "var(--text-soft)" }}>{pkg.description}</p> : null}
-              <BuyButton primary={index === 0} onClick={() => open(pkg)} />
+              {desk ? (
+                <WantButton primary={index === 0} onClick={() => open(pkg)} testId={`sales-want-${pkg.id}`} />
+              ) : (
+                <BuyButton primary={index === 0} onClick={() => open(pkg)} />
+              )}
             </article>
           ))}
         </div>
@@ -141,7 +155,11 @@ export function SalesPage({ page, line }: { page: PublicBoxPage; line: string })
                       {money(locale, pkg.base_price_cents, pkg.currency)}
                       {perLabel(t, pkg.billing_period)}
                     </span>
-                    <BuyButton small onClick={() => open(pkg)} />
+                    {desk ? (
+                      <WantButton small onClick={() => open(pkg)} testId={`sales-want-${pkg.id}`} />
+                    ) : (
+                      <BuyButton small onClick={() => open(pkg)} />
+                    )}
                   </div>
                 </li>
               ))}
@@ -150,15 +168,30 @@ export function SalesPage({ page, line }: { page: PublicBoxPage; line: string })
         </section>
       ) : null}
 
-      {!sales.isLoading && sales.packages.length === 0 ? (
-        <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("nothingOnline")}</p>
+      {desk && shown.length > 0 ? (
+        <p className="text-center text-xs" style={{ color: "var(--dim)" }} data-testid="sales-desk-note">{tDesk("pageNote")}</p>
+      ) : null}
+
+      {!sales.isLoading && shown.length === 0 ? (
+        <p className="text-sm" style={{ color: "var(--text-soft)" }}>{desk ? tDesk("nothing") : t("nothingOnline")}</p>
       ) : null}
 
       {provider ? (
         <p className="text-center text-xs" style={{ color: "var(--dim)" }}>{t("paymentsVia", { provider })}</p>
       ) : null}
 
-      {buying ? <BuyDialog slug={slug} boxName={page.box.name} pkg={buying} onClose={() => open(null)} /> : null}
+      {buying && desk ? (
+        <DeskRequestDialog
+          slug={slug}
+          boxName={page.box.name}
+          pkg={buying}
+          places={places}
+          next={`/b/${encodeURIComponent(slug)}/packages?buy=${encodeURIComponent(buying.id)}`}
+          onClose={() => open(null)}
+        />
+      ) : buying ? (
+        <BuyDialog slug={slug} boxName={page.box.name} pkg={buying} onClose={() => open(null)} />
+      ) : null}
     </main>
   );
 }
