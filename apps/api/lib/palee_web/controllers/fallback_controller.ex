@@ -384,6 +384,9 @@ defmodule PaleeWeb.FallbackController do
     withdrawal_period_over: {:conflict, "The 14 days to withdraw have passed"},
     withdrawal_not_available: {:conflict, "This payment cannot be withdrawn from"},
     already_withdrawn: {:conflict, "You have already withdrawn from this package"},
+    # ADR-291: packages waiting to be paid at the front desk.
+    package_request_closed: {:conflict, "This request is no longer waiting for payment"},
+    package_request_exists: {:conflict, "You have already asked for this package"},
     # ADR-260: failed charges in the queue.
     payment_not_retryable: {:conflict, "This charge can no longer be tried again"},
     # ADR-261: one-button connection.

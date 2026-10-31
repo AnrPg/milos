@@ -15,11 +15,13 @@ defmodule Palee.Payments.Domain.PackageSale do
     * `off` – the box sells it only at the front desk;
     * `purpose_off` – the provider is connected but «Τι πληρώνεται online»
       leaves its purpose off;
-    * `no_provider` – listed on the package page, bought once the box
-      connects online payments;
+    * `no_provider` – no online payments: listed on the package page to ask
+      for («Το θέλω») and pay at the front desk (ADR-291); a package whose
+      owner never chose is listed too, and opens online on connecting;
     * `visible` – listed and bought online.
   """
 
+  alias Palee.Finance.Domain.PackageRequestPolicy
   alias Palee.Payments.Domain.AccountOptions
 
   @visibilities ~w(visible free off purpose_off no_provider inactive)
@@ -35,11 +37,21 @@ defmodule Palee.Payments.Domain.PackageSale do
     cond do
       package[:active] != true -> "inactive"
       not paid?(package) -> "free"
+      not offer.available and desk_listed?(package) -> "no_provider"
       package[:sold_online] != true -> "off"
-      offer.available and not allowed?(package, offer) -> "purpose_off"
       not offer.available -> "no_provider"
+      not allowed?(package, offer) -> "purpose_off"
       true -> "visible"
     end
+  end
+
+  # ADR-291: without online payments the package page lists every paid
+  # package its owner never kept off, to ask for and pay at the front desk;
+  # connecting later turns those same packages on (ADR-271 `opens?/2`).
+  defp desk_listed?(package) do
+    package[:sold_online] == true or
+      (package[:sold_online_chosen_at] == nil and
+         package[:package_type] not in PackageRequestPolicy.needs_more())
   end
 
   @doc "Whether the public package page lists it (bought or not yet)."

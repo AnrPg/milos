@@ -81,16 +81,22 @@ defmodule PaleeWeb.SoldOnlineControllerTest do
     |> Map.new(&{&1["name"], {&1["sold_online"], &1["online_visibility"]}})
   end
 
-  test "before connecting, packages are front-desk only and say so", %{conn: conn} = ctx do
+  test "before connecting, paid packages are asked for at the front desk and say so",
+       %{conn: conn} = ctx do
+    # ADR-291: never chosen, so members see them and pay at the desk.
     assert packages(conn, ctx) == %{
-             "Unlimited" => {false, "off"},
-             "3 φορές την εβδομάδα" => {false, "off"},
+             "Unlimited" => {false, "no_provider"},
+             "3 φορές την εβδομάδα" => {false, "no_provider"},
              "Δοκιμαστικό" => {false, "free"},
              "Παλιό" => {false, "inactive"}
            }
 
     package = set_sold_online(conn, ctx, ctx.unlimited, true)
     assert package["online_visibility"] == "no_provider"
+
+    # The owner's «off» keeps it away from members.
+    off = set_sold_online(conn, ctx, ctx.three, false)
+    assert off["online_visibility"] == "off"
   end
 
   test "connecting opens the paid packages once and tells the owner", %{conn: conn} = ctx do

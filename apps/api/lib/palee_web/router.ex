@@ -582,6 +582,10 @@ defmodule PaleeWeb.Router do
     # ADR-248: buying packages online, withdrawal, paying shop orders.
     get("/packages/:id/purchase-terms", MyPaymentsController, :package_terms)
     post("/packages/:id/buy", MyPaymentsController, :buy_package)
+    # ADR-291: «Το θέλω», paid at the front desk.
+    post("/packages/:id/request", MyPaymentsController, :request_package)
+    get("/package-requests", MyPaymentsController, :package_requests)
+    post("/package-requests/:id/cancel", MyPaymentsController, :cancel_package_request)
     post("/payments/:id/withdraw", MyPaymentsController, :withdraw)
     post("/shop/orders/:id/pay-online", MyPaymentsController, :pay_shop_order)
     # ADR-252: Box › Documents (sign, certificates, health certificate).
@@ -1580,6 +1584,9 @@ defmodule PaleeWeb.Router do
     delete("/finance/members/:id/leave", AdminFinanceController, :undo_member_left)
     post("/finance/members/:id/payments", AdminFinanceController, :record_payment)
     post("/finance/members/:id/payments/receive", AdminFinanceController, :receive_payment)
+    # ADR-291: packages waiting to be paid at the front desk.
+    get("/finance/package-requests", AdminPackageRequestController, :index)
+    post("/finance/package-requests/:id/collect", AdminPackageRequestController, :collect)
     post("/finance/members/:id/receipts", AdminFinanceController, :create_receipt)
     post("/finance/members/:id/invoices", AdminFinanceController, :create_invoice)
 
